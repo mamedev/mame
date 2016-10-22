@@ -96,7 +96,7 @@ const device_type UV201 = &device_creator<uv201_device>;
 //  uv201_device - constructor
 //-------------------------------------------------
 
-uv201_device::uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+uv201_device::uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, UV201, "UV201", tag, owner, clock, "uv201", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_write_ext_int(*this),
@@ -203,16 +203,16 @@ void uv201_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void uv201_device::initialize_palette()
 {
-	UINT8 offlointensity = 0x00;
-	UINT8 offhiintensity = 0xc0;
+	uint8_t offlointensity = 0x00;
+	uint8_t offhiintensity = 0xc0;
 
-	UINT8 onlointensity = 0xa0;
-	UINT8 onhiintensity = 0xff;
+	uint8_t onlointensity = 0xa0;
+	uint8_t onhiintensity = 0xff;
 
 	for (int i = 0; i < 4; i++)
 	{
 		int offset = i * 8;
-		UINT8 onvalue, offvalue;
+		uint8_t onvalue, offvalue;
 
 		if (offset < 16)
 		{
@@ -298,7 +298,7 @@ void uv201_device::do_partial_update()
 
 READ8_MEMBER( uv201_device::read )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (offset)
 	{
@@ -482,7 +482,7 @@ READ_LINE_MEMBER( uv201_device::kbd_r )
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 uv201_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t uv201_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t(0x00,0x00,0x00), cliprect);
 
@@ -502,23 +502,23 @@ UINT32 uv201_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	for (int i = 0; i < 16; i++)
 	{
-		UINT8 xy_hi = (m_cmd & COMMAND_A_B) ? RAM(RAM_XY_HI_A) : RAM(RAM_XY_HI_B);
-		UINT8 y_lo = (m_cmd & COMMAND_A_B) ? RAM(RAM_Y_LO_A) : RAM(RAM_Y_LO_B);
-		UINT16 y = (BIT(xy_hi, 7) << 8) | y_lo;
+		uint8_t xy_hi = (m_cmd & COMMAND_A_B) ? RAM(RAM_XY_HI_A) : RAM(RAM_XY_HI_B);
+		uint8_t y_lo = (m_cmd & COMMAND_A_B) ? RAM(RAM_Y_LO_A) : RAM(RAM_Y_LO_B);
+		uint16_t y = (BIT(xy_hi, 7) << 8) | y_lo;
 		int xord = xy_hi & 0x0f;
 
-		UINT8 rp_hi_color = RAM_XORD(RAM_RP_HI_COLOR);
-		UINT8 rp_lo = RAM_XORD(RAM_RP_LO);
-		UINT16 rp = ((rp_hi_color << 8) | rp_lo) & 0x1fff;
+		uint8_t rp_hi_color = RAM_XORD(RAM_RP_HI_COLOR);
+		uint8_t rp_lo = RAM_XORD(RAM_RP_LO);
+		uint16_t rp = ((rp_hi_color << 8) | rp_lo) & 0x1fff;
 
 		if (rp < 0x800) rp |= 0x2000;
 
-		UINT8 dx_int_xcopy = RAM_XORD(RAM_DX_INT_XCOPY);
+		uint8_t dx_int_xcopy = RAM_XORD(RAM_DX_INT_XCOPY);
 		int color = ((dx_int_xcopy & 0x60) >> 2) | (BIT(rp_hi_color, 5) << 2) | (BIT(rp_hi_color, 6) << 1) | (BIT(rp_hi_color, 7));
-		UINT8 dx = dx_int_xcopy & 0x1f;
-		UINT8 dy = RAM_XORD(RAM_DY);
+		uint8_t dx = dx_int_xcopy & 0x1f;
+		uint8_t dy = RAM_XORD(RAM_DY);
 		int xcopy = BIT(dx_int_xcopy, 7);
-		UINT8 x = RAM_XORD(RAM_X);
+		uint8_t x = RAM_XORD(RAM_X);
 
 		if (LOG) logerror("Object %u xord %u y %u x %u dy %u dx %u xcopy %u color %u rp %04x\n", i, xord, y, x, dy, dx, xcopy, color, rp);
 
@@ -529,7 +529,7 @@ UINT32 uv201_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		{
 			for (int sx = 0; sx < dx; sx++)
 			{
-				UINT8 data = m_read_db(rp);
+				uint8_t data = m_read_db(rp);
 
 				for (int bit = 0; bit < 8; bit++)
 				{

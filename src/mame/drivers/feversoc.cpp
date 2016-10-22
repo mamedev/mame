@@ -90,15 +90,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT32> m_mainram1;
-	required_shared_ptr<UINT32> m_mainram2;
-	required_shared_ptr<UINT32> m_nvram;
-	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<uint32_t> m_mainram1;
+	required_shared_ptr<uint32_t> m_mainram2;
+	required_shared_ptr<uint32_t> m_nvram;
+	required_shared_ptr<uint32_t> m_spriteram;
 	DECLARE_READ32_MEMBER(in0_r);
 	DECLARE_WRITE32_MEMBER(output_w);
 	DECLARE_DRIVER_INIT(feversoc);
 	virtual void video_start() override;
-	UINT32 screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(feversoc_irq);
 	required_device<sh2_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -115,9 +115,9 @@ void feversoc_state::video_start()
 {
 }
 
-UINT32 feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *spriteram32 = m_spriteram;
+	uint32_t *spriteram32 = m_spriteram;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
 	bitmap.fill(m_palette->pen(0), cliprect); //black pen
@@ -148,8 +148,8 @@ UINT32 feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind1
 
 READ32_MEMBER(feversoc_state::in0_r)
 {
-	UINT32 io0 = (ioport("IN1")->read()&0xffff) << 16;
-	UINT32 io1 = (ioport("IN0")->read()&0xffff) << 0;
+	uint32_t io0 = (ioport("IN1")->read()&0xffff) << 16;
+	uint32_t io1 = (ioport("IN0")->read()&0xffff) << 0;
 	return io0 | io1;
 }
 
@@ -321,7 +321,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(feversoc_state,feversoc)
 {
-	UINT32 *rom = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *rom = (uint32_t *)memregion("maincpu")->base();
 
 	seibuspi_rise11_sprite_decrypt_feversoc(memregion("gfx1")->base(), 0x200000);
 

@@ -83,8 +83,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_sc0_vram;
-	required_shared_ptr<UINT8> m_sc0_attr;
+	required_shared_ptr<uint8_t> m_sc0_vram;
+	required_shared_ptr<uint8_t> m_sc0_attr;
 	tilemap_t *m_sc0_tilemap;
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
@@ -96,7 +96,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(caswin);
-	UINT32 screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -119,7 +119,7 @@ void caswin_state::video_start()
 	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(caswin_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
-UINT32 caswin_state::screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t caswin_state::screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -294,7 +294,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(caswin_state, caswin)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 

@@ -29,14 +29,14 @@
 /* Set NZCV flags for ADDS / SUBS */
 #define HandleALUAddFlags(rd, rn, op2)                                                \
 	if (insn & INSN_S)                                                                  \
-	SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                       \
+	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                       \
 				| (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
 				| (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
 				| HandleALUNZFlags(rd)));                                               \
 	R15 += 4;
 
 #define HandleThumbALUAddFlags(rd, rn, op2)                                                       \
-	SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                   \
+	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                   \
 				| (((!THUMB_SIGN_BITS_DIFFER(rn, op2)) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
 				| (((~(rn)) < (op2)) << C_BIT)                                                      \
 				| HandleALUNZFlags(rd)));                                                           \
@@ -62,14 +62,14 @@
 
 #define HandleALUSubFlags(rd, rn, op2)                                                                         \
 	if (insn & INSN_S)                                                                                           \
-	SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
+	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
 				| ((SIGN_BITS_DIFFER(rn, op2) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT)                             \
 				| (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
 				| HandleALUNZFlags(rd)));                                                                        \
 	R15 += 4;
 
 #define HandleThumbALUSubFlags(rd, rn, op2)                                                                    \
-	SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
+	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
 				| ((THUMB_SIGN_BITS_DIFFER(rn, op2) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT)                 \
 				| (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
 				| HandleALUNZFlags(rd)));                                                                        \
@@ -118,17 +118,17 @@
 
 // Long ALU Functions use bit 63
 #define HandleLongALUNZFlags(rd)                            \
-	((((rd) & ((UINT64)1 << 63)) >> 32) | ((!(rd)) << Z_BIT))
+	((((rd) & ((uint64_t)1 << 63)) >> 32) | ((!(rd)) << Z_BIT))
 
 #define HandleALULogicalFlags(rd, sc)                  \
 	if (insn & INSN_S)                                   \
-	SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | C_MASK)) \
+	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | C_MASK)) \
 				| HandleALUNZFlags(rd)                   \
 				| (((sc) != 0) << C_BIT)));              \
 	R15 += 4;
 
-#define DRC_RD      uml::mem(&GET_REGISTER(rd))
-#define DRC_RS      uml::mem(&GET_REGISTER(rs))
+#define DRC_RD      uml::mem(&GetRegister(rd))
+#define DRC_RS      uml::mem(&GetRegister(rs))
 #define DRC_CPSR    uml::mem(&GET_CPSR)
 #define DRC_PC      uml::mem(&R15)
 #define DRC_REG(i)  uml::mem(&m_r[(i)])
@@ -148,8 +148,8 @@
 
 
 // used to be functions, but no longer a need, so we'll use define for better speed.
-#define GetRegister(rIndex)        m_r[sRegisterTable[GET_MODE][rIndex]]
-#define SetRegister(rIndex, value) m_r[sRegisterTable[GET_MODE][rIndex]] = value
+#define GetRegister(rIndex)        m_r[m_reg_group[rIndex]]
+#define SetRegister(rIndex, value) m_r[m_reg_group[rIndex]] = value
 
 #define GetModeRegister(mode, rIndex)        m_r[sRegisterTable[mode][rIndex]]
 #define SetModeRegister(mode, rIndex, value) m_r[sRegisterTable[mode][rIndex]] = value

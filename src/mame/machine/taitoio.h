@@ -17,7 +17,7 @@
 class tc0220ioc_device : public device_t
 {
 public:
-	tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tc0220ioc_device() {}
 
 	template<class _Object> static devcb_base &set_read_0_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_0_cb.set_callback(object); }
@@ -41,8 +41,8 @@ protected:
 
 private:
 	// internal state
-	UINT8      m_regs[8];
-	UINT8      m_port;
+	uint8_t      m_regs[8];
+	uint8_t      m_port;
 
 	required_device<watchdog_timer_device> m_watchdog;
 
@@ -58,7 +58,7 @@ extern const device_type TC0220IOC;
 class tc0510nio_device : public device_t
 {
 public:
-	tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tc0510nio_device() {}
 
 	template<class _Object> static devcb_base &set_read_0_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_0_cb.set_callback(object); }
@@ -82,7 +82,7 @@ protected:
 
 private:
 	// internal state
-	UINT8   m_regs[8];
+	uint8_t   m_regs[8];
 
 	required_device<watchdog_timer_device> m_watchdog;
 
@@ -98,7 +98,7 @@ extern const device_type TC0510NIO;
 class tc0640fio_device : public device_t
 {
 public:
-	tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tc0640fio_device() {}
 
 	template<class _Object> static devcb_base &set_read_0_callback(device_t &device, _Object object) { return downcast<tc0640fio_device &>(device).m_read_0_cb.set_callback(object); }
@@ -123,7 +123,7 @@ protected:
 
 	private:
 	// internal state
-	UINT8   m_regs[8];
+	uint8_t   m_regs[8];
 
 	required_device<watchdog_timer_device> m_watchdog;
 

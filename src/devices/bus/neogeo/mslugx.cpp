@@ -19,7 +19,7 @@
 const device_type NEOGEO_MSLUGX_CART = &device_creator<neogeo_mslugx_cart>;
 
 
-neogeo_mslugx_cart::neogeo_mslugx_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
+neogeo_mslugx_cart::neogeo_mslugx_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
 	neogeo_rom_device(mconfig, NEOGEO_MSLUGX_CART, "Neo Geo Metal Slug X Cart", tag, owner, clock, "neocart_mslugx", __FILE__),
 	m_prot(*this, "mslugx_prot")
 {}

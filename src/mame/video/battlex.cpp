@@ -63,8 +63,8 @@ void battlex_state::video_start()
 void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	UINT8 *source = m_spriteram;
-	UINT8 *finish = m_spriteram + 0x200;
+	uint8_t *source = m_spriteram;
+	uint8_t *finish = m_spriteram + 0x200;
 
 	while (source < finish)
 	{
@@ -90,7 +90,7 @@ void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 battlex_state::screen_update_battlex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t battlex_state::screen_update_battlex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!flip_screen())
 		m_bg_tilemap->set_scrollx(0, m_scroll_lsb | (m_scroll_msb << 8));

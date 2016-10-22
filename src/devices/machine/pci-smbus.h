@@ -10,7 +10,7 @@
 
 class smbus_device : public pci_device {
 public:
-	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER  (hst_sts_r);
 	DECLARE_WRITE8_MEMBER (hst_sts_w);
@@ -55,11 +55,11 @@ protected:
 private:
 	DECLARE_ADDRESS_MAP(map, 32);
 
-	UINT16 slv_data;
+	uint16_t slv_data;
 
-	UINT8 hst_sts, hst_cnt, hst_cmd, xmit_slva, hst_d0, hst_d1;
-	UINT8 host_block_db, pec, rcv_slva, aux_sts, aux_ctl;
-	UINT8 smlink_pin_ctl, smbus_pin_ctl, slv_sts, slv_cmd, notify_daddr, notify_dlow, notify_dhigh;
+	uint8_t hst_sts, hst_cnt, hst_cmd, xmit_slva, hst_d0, hst_d1;
+	uint8_t host_block_db, pec, rcv_slva, aux_sts, aux_ctl;
+	uint8_t smlink_pin_ctl, smbus_pin_ctl, slv_sts, slv_cmd, notify_daddr, notify_dlow, notify_dhigh;
 };
 
 extern const device_type SMBUS;

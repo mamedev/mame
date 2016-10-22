@@ -21,7 +21,7 @@ Atari Sprint 4 driver
 
 CUSTOM_INPUT_MEMBER(sprint4_state::get_lever)
 {
-	int n = (FPTR) param;
+	int n = (uintptr_t) param;
 
 	return 4 * m_gear[n] > m_da_latch;
 }
@@ -29,7 +29,7 @@ CUSTOM_INPUT_MEMBER(sprint4_state::get_lever)
 
 CUSTOM_INPUT_MEMBER(sprint4_state::get_wheel)
 {
-	int n = (FPTR) param;
+	int n = (uintptr_t) param;
 
 	return 8 * m_steer_FF1[n] + 8 * m_steer_FF2[n] > m_da_latch;
 }
@@ -37,7 +37,7 @@ CUSTOM_INPUT_MEMBER(sprint4_state::get_wheel)
 
 CUSTOM_INPUT_MEMBER(sprint4_state::get_collision)
 {
-	int n = (FPTR) param;
+	int n = (uintptr_t) param;
 
 	return m_collision[n];
 }
@@ -51,7 +51,7 @@ void sprint4_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		nmi_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sprint4_state::device_timer");
+		assert_always(false, "Unknown id in sprint4_state::device_timer");
 	}
 }
 
@@ -62,19 +62,19 @@ TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 
 	/* MAME updates controls only once per frame but the game checks them on every NMI */
 
-	UINT8 wheel[4] =
+	uint8_t wheel[4] =
 	{
-		static_cast<UINT8>(ioport("WHEEL1")->read()),
-		static_cast<UINT8>(ioport("WHEEL2")->read()),
-		static_cast<UINT8>(ioport("WHEEL3")->read()),
-		static_cast<UINT8>(ioport("WHEEL4")->read())
+		static_cast<uint8_t>(ioport("WHEEL1")->read()),
+		static_cast<uint8_t>(ioport("WHEEL2")->read()),
+		static_cast<uint8_t>(ioport("WHEEL3")->read()),
+		static_cast<uint8_t>(ioport("WHEEL4")->read())
 	};
-	UINT8 lever[4] =
+	uint8_t lever[4] =
 	{
-		static_cast<UINT8>(ioport("LEVER1")->read()),
-		static_cast<UINT8>(ioport("LEVER2")->read()),
-		static_cast<UINT8>(ioport("LEVER3")->read()),
-		static_cast<UINT8>(ioport("LEVER4")->read())
+		static_cast<uint8_t>(ioport("LEVER1")->read()),
+		static_cast<uint8_t>(ioport("LEVER2")->read()),
+		static_cast<uint8_t>(ioport("LEVER3")->read()),
+		static_cast<uint8_t>(ioport("LEVER4")->read())
 	};
 
 	int i;
@@ -140,7 +140,7 @@ void sprint4_state::machine_reset()
 
 READ8_MEMBER(sprint4_state::sprint4_wram_r)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	return videoram[0x380 + offset];
 }
 
@@ -167,7 +167,7 @@ READ8_MEMBER(sprint4_state::sprint4_options_r)
 
 WRITE8_MEMBER(sprint4_state::sprint4_wram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[0x380 + offset] = data;
 }
 

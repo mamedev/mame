@@ -67,10 +67,10 @@ typedef NATIVE_DRC drcbe_native;
 struct bevalidate_test
 {
 	opcode_t                opcode;
-	UINT8                   size;
-	UINT8                   iflags;
-	UINT8                   flags;
-	UINT64                  param[4];
+	uint8_t                   size;
+	uint8_t                   iflags;
+	uint8_t                   flags;
+	uint64_t                  param[4];
 };
 
 
@@ -124,7 +124,7 @@ drcbe_interface::~drcbe_interface()
 //  drcuml_state - constructor
 //-------------------------------------------------
 
-drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits)
+drcuml_state::drcuml_state(device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
 	: m_device(device),
 		m_cache(cache),
 		m_drcbe_interface(device.machine().options().drc_use_c() ?
@@ -196,7 +196,7 @@ void drcuml_state::reset()
 //  begin_block - begin a new code block
 //-------------------------------------------------
 
-drcuml_block *drcuml_state::begin_block(UINT32 maxinst)
+drcuml_block *drcuml_state::begin_block(uint32_t maxinst)
 {
 	// find an inactive block that matches our qualifications
 	drcuml_block *bestblock = nullptr;
@@ -230,7 +230,7 @@ code_handle *drcuml_state::handle_alloc(const char *name)
 //  symbol table
 //-------------------------------------------------
 
-void drcuml_state::symbol_add(void *base, UINT32 length, const char *name)
+void drcuml_state::symbol_add(void *base, uint32_t length, const char *name)
 {
 	m_symlist.append(*global_alloc(symbol(base, length, name)));
 }
@@ -242,7 +242,7 @@ void drcuml_state::symbol_add(void *base, UINT32 length, const char *name)
 //  found
 //-------------------------------------------------
 
-const char *drcuml_state::symbol_find(void *base, UINT32 *offset)
+const char *drcuml_state::symbol_find(void *base, uint32_t *offset)
 {
 	drccodeptr search = drccodeptr(base);
 
@@ -295,7 +295,7 @@ void drcuml_state::log_printf(const char *format, ...)
 //  drcuml_block - constructor
 //-------------------------------------------------
 
-drcuml_block::drcuml_block(drcuml_state &drcuml, UINT32 maxinst)
+drcuml_block::drcuml_block(drcuml_state &drcuml, uint32_t maxinst)
 	: m_drcuml(drcuml),
 		m_next(nullptr),
 		m_nextinst(0),
@@ -389,7 +389,7 @@ uml::instruction &drcuml_block::append()
 
 void drcuml_block::optimize()
 {
-	UINT32 mapvar[MAPVAR_COUNT] = { 0 };
+	uint32_t mapvar[MAPVAR_COUNT] = { 0 };
 
 	// iterate over instructions
 	for (int instnum = 0; instnum < m_nextinst; instnum++)
@@ -397,8 +397,8 @@ void drcuml_block::optimize()
 		instruction &inst = m_inst[instnum];
 
 		// first compute what flags we need
-		UINT8 accumflags = 0;
-		UINT8 remainingflags = inst.output_flags();
+		uint8_t accumflags = 0;
+		uint8_t remainingflags = inst.output_flags();
 
 		// scan ahead until we run out of possible remaining flags
 		for (int scannum = instnum + 1; remainingflags != 0 && scannum < m_nextinst; scannum++)
@@ -454,11 +454,11 @@ void drcuml_block::disassemble()
 
 		// print labels, handles, and hashes left justified
 		else if (inst.opcode() == OP_LABEL)
-			m_drcuml.log_printf("$%X:\n", UINT32(inst.param(0).label()));
+			m_drcuml.log_printf("$%X:\n", uint32_t(inst.param(0).label()));
 		else if (inst.opcode() == OP_HANDLE)
 			m_drcuml.log_printf("%s:\n", inst.param(0).handle().string());
 		else if (inst.opcode() == OP_HASH)
-			m_drcuml.log_printf("(%X,%X):\n", UINT32(inst.param(0).immediate()), UINT32(inst.param(1).immediate()));
+			m_drcuml.log_printf("(%X,%X):\n", uint32_t(inst.param(0).immediate()), uint32_t(inst.param(1).immediate()));
 
 		// indent everything else with a tab
 		else
@@ -470,7 +470,7 @@ void drcuml_block::disassemble()
 			{
 				m_drcuml.log_printf("\t%-50.50s; %s\n", dasm.c_str(), get_comment_text(m_inst[firstcomment], comment));
 				firstcomment++;
-				flushcomments = TRUE;
+				flushcomments = true;
 			}
 			else
 				m_drcuml.log_printf("\t%s\n", dasm.c_str());
@@ -506,7 +506,7 @@ const char *drcuml_block::get_comment_text(const instruction &inst, std::string 
 
 	// mapvars comment about their values
 	else if (inst.opcode() == OP_MAPVAR) {
-		comment = string_format("m%d = $%X", (int)inst.param(0).mapvar() - MAPVAR_M0, (UINT32)inst.param(1).immediate());
+		comment = string_format("m%d = $%X", (int)inst.param(0).mapvar() - MAPVAR_M0, (uint32_t)inst.param(1).immediate());
 		return comment.c_str();
 	}
 
@@ -528,7 +528,7 @@ const char *drcuml_block::get_comment_text(const instruction &inst, std::string 
 //  array of parameter values
 //-------------------------------------------------
 
-inline UINT8 effective_test_psize(const opcode_info &opinfo, int pnum, int instsize, const UINT64 *params)
+inline uint8_t effective_test_psize(const opcode_info &opinfo, int pnum, int instsize, const uint64_t *params)
 {
 	switch (opinfo.param[pnum].size)
 	{
@@ -766,7 +766,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, code_handle **h
 			// iterate over possibilities
 			for (pindex = 0; pindex < pcount; pindex++)
 			{
-				int skip = FALSE;
+				bool skip = false;
 				int pscannum;
 
 				// for param 0, print a dot
@@ -779,7 +779,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, code_handle **h
 					// loop over all parameters we've done before; if the parameter is a source and matches us, skip this case
 					for (pscannum = 0; pscannum < pnum; pscannum++)
 						if ((opinfo->param[pscannum].output & PIO_IN) && ptype == paramlist[pscannum].type && pindex == paramlist[pscannum].value)
-							skip = TRUE;
+							skip = true;
 
 				// can't duplicate multiple dest parameters
 				if (opinfo->param[pnum].output & PIO_OUT)
@@ -787,7 +787,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, code_handle **h
 					// loop over all parameters we've done before; if the parameter is a source and matches us, skip this case
 					for (pscannum = 0; pscannum < pnum; pscannum++)
 						if ((opinfo->param[pscannum].output & PIO_OUT) && ptype == paramlist[pscannum].type && pindex == paramlist[pscannum].value)
-							skip = TRUE;
+							skip = true;
 
 				// iterate over the next parameter in line
 				if (!skip)
@@ -809,8 +809,8 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, code_handle **h
 static void bevalidate_iterate_over_flags(drcuml_state *drcuml, code_handle **handles, const bevalidate_test *test, parameter *paramlist)
 {
 	const opcode_info *opinfo = opcode_info_table[test->opcode()];
-	UINT8 flagmask = opinfo->outflags;
-	UINT8 curmask;
+	uint8_t flagmask = opinfo->outflags;
+	uint8_t curmask;
 
 	// iterate over all possible flag combinations
 	for (curmask = 0; curmask <= flagmask; curmask++)
@@ -825,17 +825,17 @@ static void bevalidate_iterate_over_flags(drcuml_state *drcuml, code_handle **ha
     results
 -------------------------------------------------*/
 
-static void bevalidate_execute(drcuml_state *drcuml, code_handle **handles, const bevalidate_test *test, const parameter *paramlist, UINT8 flagmask)
+static void bevalidate_execute(drcuml_state *drcuml, code_handle **handles, const bevalidate_test *test, const parameter *paramlist, uint8_t flagmask)
 {
 	parameter params[ARRAY_LENGTH(test->param)];
 	drcuml_machine_state istate, fstate;
 	instruction testinst;
 	drcuml_block *block;
-	UINT64 *parammem;
+	uint64_t *parammem;
 	int numparams;
 
 	// allocate memory for parameters
-	parammem = (UINT64 *)drcuml->cache->alloc_near(sizeof(UINT64) * (ARRAY_LENGTH(test->param) + 1));
+	parammem = (uint64_t *)drcuml->cache->alloc_near(sizeof(uint64_t) * (ARRAY_LENGTH(test->param) + 1));
 
 	// flush the cache
 	drcuml->reset();
@@ -888,10 +888,10 @@ static void bevalidate_execute(drcuml_state *drcuml, code_handle **handles, cons
 	drcuml->execute(*handles[0]);
 
 	// verify the results
-	bevalidate_verify_state(drcuml, &istate, &fstate, test, *(UINT32 *)&parammem[ARRAY_LENGTH(test->param)], params, &testinst, handles[1]->code, handles[2]->code, flagmask);
+	bevalidate_verify_state(drcuml, &istate, &fstate, test, *(uint32_t *)&parammem[ARRAY_LENGTH(test->param)], params, &testinst, handles[1]->code, handles[2]->code, flagmask);
 
 	// free memory
-	drcuml->cache->dealloc(parammem, sizeof(UINT64) * (ARRAY_LENGTH(test->param) + 1));
+	drcuml->cache->dealloc(parammem, sizeof(uint64_t) * (ARRAY_LENGTH(test->param) + 1));
 }
 
 
@@ -920,8 +920,8 @@ static void bevalidate_initialize_random_state(drcuml_state *drcuml, drcuml_bloc
 	// initialize float registers to random values
 	for (regnum = 0; regnum < ARRAY_LENGTH(state->f); regnum++)
 	{
-		*(UINT32 *)&state->f[regnum].s.h = machine.rand();
-		*(UINT32 *)&state->f[regnum].s.l = machine.rand();
+		*(uint32_t *)&state->f[regnum].s.h = machine.rand();
+		*(uint32_t *)&state->f[regnum].s.l = machine.rand();
 	}
 
 	// initialize map variables to random values
@@ -936,7 +936,7 @@ static void bevalidate_initialize_random_state(drcuml_state *drcuml, drcuml_bloc
     to executing a test
 -------------------------------------------------*/
 
-static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *state, const bevalidate_test *test, const parameter *paramlist, parameter *params, UINT64 *parammem)
+static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *state, const bevalidate_test *test, const parameter *paramlist, parameter *params, uint64_t *parammem)
 {
 	const opcode_info *opinfo = opcode_info_table[test->opcode()];
 	int numparams = ARRAY_LENGTH(test->param);
@@ -976,11 +976,11 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
 
 			// memory parameters: set the memory value in the parameter space and set the parameter value to point to it
 			case parameter::PTYPE_MEMORY:
-				curparam->value = (FPTR)&parammem[pnum];
+				curparam->value = (uintptr_t)&parammem[pnum];
 				if (psize == 4)
-					*(UINT32 *)(FPTR)curparam->value = test->param[pnum];
+					*(uint32_t *)(uintptr_t)curparam->value = test->param[pnum];
 				else
-					*(UINT64 *)(FPTR)curparam->value = test->param[pnum];
+					*(uint64_t *)(uintptr_t)curparam->value = test->param[pnum];
 				break;
 
 			// map variables: issue a MAPVAR instruction to set the value and set the parameter value to the mapvar index
@@ -1007,11 +1007,11 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
     discrepancies
 -------------------------------------------------*/
 
-static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_state *istate, drcuml_machine_state *state, const bevalidate_test *test, UINT32 flags, const parameter *params, const instruction *testinst, drccodeptr codestart, drccodeptr codeend, UINT8 flagmask)
+static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_state *istate, drcuml_machine_state *state, const bevalidate_test *test, uint32_t flags, const parameter *params, const instruction *testinst, drccodeptr codestart, drccodeptr codeend, uint8_t flagmask)
 {
 	const opcode_info *opinfo = opcode_info_table[test->opcode()];
-	UINT8 ireg[REG_I_END - REG_I0] = { 0 };
-	UINT8 freg[REG_F_END - REG_F0] = { 0 };
+	uint8_t ireg[REG_I_END - REG_I0] = { 0 };
+	uint8_t freg[REG_F_END - REG_F0] = { 0 };
 	char errorbuf[1024];
 	char *errend = errorbuf;
 	int pnum, regnum;
@@ -1039,8 +1039,8 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 		if (opinfo->param[pnum].output & PIO_OUT)
 		{
 			int psize = effective_test_psize(opinfo, pnum, test->size, test->param);
-			UINT64 mask = U64(0xffffffffffffffff) >> (64 - 8 * psize);
-			UINT64 result = 0;
+			uint64_t mask = U64(0xffffffffffffffff) >> (64 - 8 * psize);
+			uint64_t result = 0;
 
 			// fetch the result from the parameters
 			switch (params[pnum].type)
@@ -1060,9 +1060,9 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 				// memory registers fetch from the memory address
 				case parameter::PTYPE_MEMORY:
 					if (psize == 4)
-						result = *(UINT32 *)(FPTR)params[pnum].value;
+						result = *(uint32_t *)(uintptr_t)params[pnum].value;
 					else
-						result = *(UINT64 *)(FPTR)params[pnum].value;
+						result = *(uint64_t *)(uintptr_t)params[pnum].value;
 					break;
 
 				default:
@@ -1072,13 +1072,13 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 			// check against the mask
 			if (test->param[pnum] != UNDEFINED_U64 && (result & mask) != (test->param[pnum] & mask))
 			{
-				if ((UINT32)mask == mask)
+				if ((uint32_t)mask == mask)
 					errend += sprintf(errend, "  Parameter %d ... result:%08X  expected:%08X\n", pnum,
-										(UINT32)(result & mask), (UINT32)(test->param[pnum] & mask));
+										(uint32_t)(result & mask), (uint32_t)(test->param[pnum] & mask));
 				else
 					errend += sprintf(errend, "  Parameter %d ... result:%08X%08X  expected:%08X%08X\n", pnum,
-										(UINT32)((result & mask) >> 32), (UINT32)(result & mask),
-										(UINT32)((test->param[pnum] & mask) >> 32), (UINT32)(test->param[pnum] & mask));
+										(uint32_t)((result & mask) >> 32), (uint32_t)(result & mask),
+										(uint32_t)((test->param[pnum] & mask) >> 32), (uint32_t)(test->param[pnum] & mask));
 			}
 		}
 
@@ -1086,15 +1086,15 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 	for (regnum = 0; regnum < ARRAY_LENGTH(state->r); regnum++)
 		if (ireg[regnum] == 0 && istate->r[regnum].d != state->r[regnum].d)
 			errend += sprintf(errend, "  Register i%d ... result:%08X%08X  originally:%08X%08X\n", regnum,
-								(UINT32)(state->r[regnum].d >> 32), (UINT32)state->r[regnum].d,
-								(UINT32)(istate->r[regnum].d >> 32), (UINT32)istate->r[regnum].d);
+								(uint32_t)(state->r[regnum].d >> 32), (uint32_t)state->r[regnum].d,
+								(uint32_t)(istate->r[regnum].d >> 32), (uint32_t)istate->r[regnum].d);
 
 	// check source float parameters for unexpected alterations
 	for (regnum = 0; regnum < ARRAY_LENGTH(state->f); regnum++)
-		if (freg[regnum] == 0 && *(UINT64 *)&istate->f[regnum].d != *(UINT64 *)&state->f[regnum].d)
+		if (freg[regnum] == 0 && *(uint64_t *)&istate->f[regnum].d != *(uint64_t *)&state->f[regnum].d)
 			errend += sprintf(errend, "  Register f%d ... result:%08X%08X  originally:%08X%08X\n", regnum,
-								(UINT32)(*(UINT64 *)&state->f[regnum].d >> 32), (UINT32)*(UINT64 *)&state->f[regnum].d,
-								(UINT32)(*(UINT64 *)&istate->f[regnum].d >> 32), (UINT32)*(UINT64 *)&istate->f[regnum].d);
+								(uint32_t)(*(uint64_t *)&state->f[regnum].d >> 32), (uint32_t)*(uint64_t *)&state->f[regnum].d,
+								(uint32_t)(*(uint64_t *)&istate->f[regnum].d >> 32), (uint32_t)*(uint64_t *)&istate->f[regnum].d);
 
 	// output the error if we have one
 	if (errend != errorbuf)

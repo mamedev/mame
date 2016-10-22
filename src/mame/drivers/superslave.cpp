@@ -34,7 +34,7 @@ Oxx,yy          = Out port
 
 READ8_MEMBER( superslave_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	offs_t boundry = 0xc000 | ((m_memctrl & 0xf0) << 6);
 
@@ -145,7 +145,7 @@ READ8_MEMBER( superslave_state::status_r)
 
 	*/
 
-	UINT8 data = 1;
+	uint8_t data = 1;
 
 	// RS-232
 	data |= m_rs232d->dsr_r() << 4;

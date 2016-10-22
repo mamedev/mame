@@ -34,7 +34,7 @@ ADDRESS_MAP_END
 //  upd7752_device - constructor
 //-------------------------------------------------
 
-upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, UPD7752, "uPD7752", tag, owner, clock, "upd7752", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this), m_stream(nullptr),
@@ -96,7 +96,7 @@ void upd7752_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  INLINE HELPERS
 //**************************************************************************
 
-inline UINT8 upd7752_device::readbyte(offs_t address)
+inline uint8_t upd7752_device::readbyte(offs_t address)
 {
 	return space().read_byte(address);
 }
@@ -105,7 +105,7 @@ inline UINT8 upd7752_device::readbyte(offs_t address)
 //  writebyte - write a byte at the given address
 //-------------------------------------------------
 
-inline void upd7752_device::writebyte(offs_t address, UINT8 data)
+inline void upd7752_device::writebyte(offs_t address, uint8_t data)
 {
 	space().write_byte(address, data);
 }
@@ -114,7 +114,7 @@ inline void upd7752_device::writebyte(offs_t address, UINT8 data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-void upd7752_device::status_change(UINT8 flag,bool type)
+void upd7752_device::status_change(uint8_t flag,bool type)
 {
 	if(type == true)
 		m_status |= flag;

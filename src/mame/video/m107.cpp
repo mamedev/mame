@@ -78,7 +78,7 @@ WRITE16_MEMBER(m107_state::vram_w)
 
 WRITE16_MEMBER(m107_state::control_w)
 {
-	UINT16 old = m_control[offset];
+	uint16_t old = m_control[offset];
 	pf_layer_info *layer;
 
 	COMBINE_DATA(&m_control[offset]);
@@ -142,7 +142,7 @@ void m107_state::video_start()
 			layer->tmap->set_transparent_pen(0);
 	}
 
-	m_buffered_spriteram = make_unique_clear<UINT16[]>(0x1000/2);
+	m_buffered_spriteram = make_unique_clear<uint16_t[]>(0x1000/2);
 
 	save_item(NAME(m_sprite_display));
 	save_item(NAME(m_raster_irq_position));
@@ -159,9 +159,9 @@ void m107_state::video_start()
 
 void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram = m_buffered_spriteram.get();
+	uint16_t *spriteram = m_buffered_spriteram.get();
 	int offs;
-	UINT8 *rom = m_user1_ptr;
+	uint8_t *rom = m_user1_ptr;
 
 	for (offs = 0;offs < 0x800;offs += 4)
 	{
@@ -302,7 +302,7 @@ void m107_state::update_scroll_positions()
 
 		if (m_control[0x08 + laynum] & 0x01) //used by World PK Soccer goal scrolling and Fire Barrel sea wave effect (stage 2) / canyon parallax effect (stage 6)
 		{
-			const UINT16 *scrolldata = m_vram_data + (0xe000 + 0x200 * laynum) / 2;
+			const uint16_t *scrolldata = m_vram_data + (0xe000 + 0x200 * laynum) / 2;
 
 			layer->tmap->set_scroll_rows(512);
 			for (i = 0; i < 512; i++)
@@ -332,7 +332,7 @@ void m107_state::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const
 	{
 		for (line = cliprect.min_y; line <= cliprect.max_y;line++)
 		{
-			const UINT16 *scrolldata = m_vram_data + (0xe800 + 0x200 * laynum) / 2;
+			const uint16_t *scrolldata = m_vram_data + (0xe800 + 0x200 * laynum) / 2;
 			clip.min_y = clip.max_y = line;
 
 			m_pf_layer[laynum].tmap->set_scrollx(0,  m_control[1 + 2 * laynum]);
@@ -390,7 +390,7 @@ WRITE16_MEMBER(m107_state::spritebuffer_w)
 
 /*****************************************************************************/
 
-UINT32 m107_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m107_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_scroll_positions();
 	screenrefresh(screen, bitmap, cliprect);

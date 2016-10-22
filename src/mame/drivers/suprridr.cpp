@@ -232,7 +232,7 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(suprridr_state::control_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	/* screen flip multiplexes controls */
 	if (is_screen_flipped())

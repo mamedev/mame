@@ -37,13 +37,13 @@ struct zeus2_poly_extra_data
 {
 	const void *    palbase;
 	const void *    texbase;
-	UINT16          solidcolor;
-	INT16           zoffset;
-	UINT16          transcolor;
-	UINT16          texwidth;
-	UINT16          color;
-	UINT32          alpha;
-	UINT32          ctrl_word;
+	uint16_t          solidcolor;
+	int16_t           zoffset;
+	uint16_t          transcolor;
+	uint16_t          texwidth;
+	uint16_t          color;
+	uint32_t          alpha;
+	uint32_t          ctrl_word;
 	bool            blend_enable;
 	bool            depth_test_enable;
 	bool            depth_write_enable;
@@ -53,18 +53,18 @@ struct zeus2_poly_extra_data
 *  Macros
 *************************************/
 
-#define WAVERAM_BLOCK0(blocknum)                ((void *)((UINT8 *)waveram + 8 * (blocknum)))
-#define WAVERAM_BLOCK0_EXT(blocknum)                ((void *)((UINT8 *)m_state->waveram + 8 * (blocknum)))
+#define WAVERAM_BLOCK0(blocknum)                ((void *)((uint8_t *)waveram + 8 * (blocknum)))
+#define WAVERAM_BLOCK0_EXT(blocknum)                ((void *)((uint8_t *)m_state->waveram + 8 * (blocknum)))
 
-#define WAVERAM_PTR8(base, bytenum)             ((UINT8 *)(base) + BYTE4_XOR_LE(bytenum))
+#define WAVERAM_PTR8(base, bytenum)             ((uint8_t *)(base) + BYTE4_XOR_LE(bytenum))
 #define WAVERAM_READ8(base, bytenum)            (*WAVERAM_PTR8(base, bytenum))
 #define WAVERAM_WRITE8(base, bytenum, data)     do { *WAVERAM_PTR8(base, bytenum) = (data); } while (0)
 
-#define WAVERAM_PTR16(base, wordnum)            ((UINT16 *)(base) + BYTE_XOR_LE(wordnum))
+#define WAVERAM_PTR16(base, wordnum)            ((uint16_t *)(base) + BYTE_XOR_LE(wordnum))
 #define WAVERAM_READ16(base, wordnum)           (*WAVERAM_PTR16(base, wordnum))
 #define WAVERAM_WRITE16(base, wordnum, data)    do { *WAVERAM_PTR16(base, wordnum) = (data); } while (0)
 
-#define WAVERAM_PTR32(base, dwordnum)           ((UINT32 *)(base) + (dwordnum))
+#define WAVERAM_PTR32(base, dwordnum)           ((uint32_t *)(base) + (dwordnum))
 #define WAVERAM_READ32(base, dwordnum)          (*WAVERAM_PTR32(base, dwordnum))
 #define WAVERAM_WRITE32(base, dwordnum, data)   do { *WAVERAM_PTR32(base, dwordnum) = (data); } while (0)
 
@@ -78,9 +78,9 @@ class zeus2_renderer : public poly_manager<float, zeus2_poly_extra_data, 4, 1000
 public:
 	zeus2_renderer(zeus2_device *state);
 
-	void render_poly_8bit(INT32 scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid);
+	void render_poly_8bit(int32_t scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid);
 
-	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, int logit);
+	void zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdata, int logit);
 
 private:
 	zeus2_device* m_state;
@@ -103,11 +103,11 @@ typedef zeus2_renderer::extent_t z2_poly_extent;
 class zeus2_device : public device_t
 {
 public:
-	zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	screen_device *m_screen;              /* the screen we are acting on */
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ32_MEMBER( zeus2_r );
 	DECLARE_WRITE32_MEMBER( zeus2_w );
 	TIMER_CALLBACK_MEMBER(display_irq_off);
@@ -121,8 +121,8 @@ public:
 	void set_float_mode(int mode) { m_atlantis = mode; }
 	int m_atlantis; // Used to switch to using IEEE754 floating point format for atlantis
 
-	UINT32 m_zeusbase[0x80];
-	UINT32 m_renderRegs[0x50];
+	uint32_t m_zeusbase[0x80];
+	uint32_t m_renderRegs[0x50];
 
 	zeus2_renderer* poly;
 
@@ -131,16 +131,16 @@ public:
 	float zeus_matrix[3][3];
 	float zeus_point[3];
 	float zeus_point2[3];
-	UINT32 zeus_texbase;
+	uint32_t zeus_texbase;
 	int zeus_quad_size;
-	UINT32 m_renderAddr;
+	uint32_t m_renderAddr;
 	bool m_thegrid;
-	UINT32 *m_directCmd;
+	uint32_t *m_directCmd;
 
-	UINT32 *waveram;
-	std::unique_ptr<UINT32[]> m_frameColor;
-	std::unique_ptr<UINT16[]> m_frameDepth;
-	UINT32 m_pal_table[0x100];
+	uint32_t *waveram;
+	std::unique_ptr<uint32_t[]> m_frameColor;
+	std::unique_ptr<uint16_t[]> m_frameDepth;
+	uint32_t m_pal_table[0x100];
 
 	emu_timer *int_timer;
 	emu_timer *vblank_timer;
@@ -156,25 +156,25 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(int_timer_callback);
-	void zeus2_register32_w(offs_t offset, UINT32 data, int logit);
-	void zeus2_register_update(offs_t offset, UINT32 oldval, int logit);
-	int zeus2_fifo_process(const UINT32 *data, int numwords);
-	void zeus2_pointer_write(UINT8 which, UINT32 value, int logit);
-	void load_pal_table(void *wavePtr, UINT32 ctrl, int logit);
-	void zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit);
-	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
-	void print_fifo_command(const UINT32 *data, int numwords, const char *suffix);
-	void log_render_info(UINT32 texdata);
+	void zeus2_register32_w(offs_t offset, uint32_t data, int logit);
+	void zeus2_register_update(offs_t offset, uint32_t oldval, int logit);
+	bool zeus2_fifo_process(const uint32_t *data, int numwords);
+	void zeus2_pointer_write(uint8_t which, uint32_t value, int logit);
+	void load_pal_table(void *wavePtr, uint32_t ctrl, int logit);
+	void zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit);
+	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
+	void print_fifo_command(const uint32_t *data, int numwords, const char *suffix);
+	void log_render_info(uint32_t texdata);
 	/*************************************
 	*  Member variables
 	*************************************/
-	UINT8 log_fifo;
+	uint8_t log_fifo;
 
-	UINT32 zeus_fifo[20];
-	UINT8 zeus_fifo_words;
+	uint32_t zeus_fifo[20];
+	uint8_t zeus_fifo_words;
 
-	UINT32 m_fill_color;
-	UINT32 m_fill_depth;
+	uint32_t m_fill_color;
+	uint32_t m_fill_depth;
 
 	int m_yScale;
 
@@ -183,7 +183,7 @@ private:
 	struct reg_info
 	{
 		struct reg_info *next;
-		UINT32 value;
+		uint32_t value;
 	};
 
 	reg_info *regdata[0x80];
@@ -198,7 +198,7 @@ public:
 	/*************************************
 	*  Inlines for block addressing
 	*************************************/
-	inline float convert_float(UINT32 val)
+	inline float convert_float(uint32_t val)
 	{
 		if (m_atlantis) {
 			return reinterpret_cast<float&>(val);
@@ -207,35 +207,35 @@ public:
 			return tms3203x_device::fp_to_float(val);
 	}
 
-	inline UINT32 frame_addr_from_xy(UINT32 x, UINT32 y, bool render)
+	inline uint32_t frame_addr_from_xy(uint32_t x, uint32_t y, bool render)
 	{
-		UINT32 addr = render ? frame_addr_from_phys_addr(m_renderRegs[0x4] << (15 + m_yScale))
+		uint32_t addr = render ? frame_addr_from_phys_addr(m_renderRegs[0x4] << (15 + m_yScale))
 			: frame_addr_from_phys_addr((m_zeusbase[0x38] >> 1) << (m_yScale << 1));
 		addr += (y << (9 + m_yScale)) + x;
 		return addr;
 	}
 
 	// Convert 0xRRRRCCCC to frame buffer addresss
-	//inline UINT32 frame_addr_from_expanded_addr(UINT32 addr)
+	//inline uint32_t frame_addr_from_expanded_addr(uint32_t addr)
 	//{
 	//  return (((addr & 0x3ff0000) >> (16 - 9 + 1)) | (addr & 0x1ff)) << 1;
 	//}
 
 	// Convert Physical 0xRRRRCCCC to frame buffer addresss
 	// Based on address reg 51 (no scaling)
-	inline UINT32 frame_addr_from_phys_addr(UINT32 physAddr)
+	inline uint32_t frame_addr_from_phys_addr(uint32_t physAddr)
 	{
-		UINT32 addr = (((physAddr & 0x3ff0000) >> (16 - 9)) | (physAddr & 0x1ff)) << 1;
+		uint32_t addr = (((physAddr & 0x3ff0000) >> (16 - 9)) | (physAddr & 0x1ff)) << 1;
 		return addr;
 	}
 
 	// Read from frame buffer
 	inline void frame_read()
 	{
-		UINT32 addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
+		uint32_t addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
 		m_zeusbase[0x58] = m_frameColor[addr];
 		m_zeusbase[0x59] = m_frameColor[addr + 1];
-		m_zeusbase[0x5a] = *(UINT32*)&m_frameDepth[addr];
+		m_zeusbase[0x5a] = *(uint32_t*)&m_frameDepth[addr];
 		if (m_zeusbase[0x5e] & 0x40)
 		{
 			m_zeusbase[0x51]++;
@@ -247,7 +247,7 @@ public:
 	// Write to frame buffer
 	inline void frame_write()
 	{
-		UINT32 addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
+		uint32_t addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
 		if (m_zeusbase[0x57] & 0x1)
 			m_frameColor[addr] = m_zeusbase[0x58];
 		if (m_zeusbase[0x5e] & 0x20) {
@@ -258,7 +258,7 @@ public:
 			if (m_zeusbase[0x57] & 0x4)
 					m_frameColor[addr + 1] = m_zeusbase[0x59];
 			if (m_zeusbase[0x57] & 0x10)
-				*(UINT32*)&m_frameDepth[addr] = m_zeusbase[0x5a];
+				*(uint32_t*)&m_frameDepth[addr] = m_zeusbase[0x5a];
 		}
 
 		if (m_zeusbase[0x5e] & 0x40)
@@ -269,16 +269,16 @@ public:
 		}
 	}
 
-	inline void *waveram0_ptr_from_expanded_addr(UINT32 addr)
+	inline void *waveram0_ptr_from_expanded_addr(uint32_t addr)
 	{
-		UINT32 blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 16) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
+		uint32_t blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 16) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
 		return WAVERAM_BLOCK0(blocknum);
 	}
 
 #ifdef UNUSED_FUNCTION
-	inline void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
+	inline void *waveram0_ptr_from_texture_addr(uint32_t addr, int width)
 	{
-		UINT32 blocknum = ((addr & ~1) * width) / 8;
+		uint32_t blocknum = ((addr & ~1) * width) / 8;
 		return WAVERAM_BLOCK0(blocknum);
 	}
 #endif
@@ -286,13 +286,13 @@ public:
 	/*************************************
 	*  Inlines for rendering
 	*************************************/
-	inline UINT32 conv_rgb555_to_rgb32(UINT16 color)
+	inline uint32_t conv_rgb555_to_rgb32(uint16_t color)
 	{
 		return ((color & 0x7c00) << 9) | ((color & 0x3e0) << 6) | ((color & 0x1f) << 3);
 	}
 
 #ifdef UNUSED_FUNCTION
-	inline void WAVERAM_plot(int y, int x, UINT32 color)
+	inline void WAVERAM_plot(int y, int x, uint32_t color)
 	{
 		if (zeus_cliprect.contains(x, y))
 			WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
@@ -300,7 +300,7 @@ public:
 #endif
 
 #ifdef UNUSED_FUNCTION
-	inline void waveram_plot_depth(int y, int x, UINT32 color, UINT16 depth)
+	inline void waveram_plot_depth(int y, int x, uint32_t color, uint16_t depth)
 	{
 		if (zeus_cliprect.contains(x, y))
 		{
@@ -311,11 +311,11 @@ public:
 #endif
 
 #ifdef UNUSED_FUNCTION
-	inline void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)
+	inline void waveram_plot_check_depth(int y, int x, uint32_t color, uint16_t depth)
 	{
 		if (zeus_cliprect.contains(x, y))
 		{
-			UINT16 *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, y, x);
+			uint16_t *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, y, x);
 			if (depth <= *depthptr)
 			{
 				WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
@@ -326,11 +326,11 @@ public:
 #endif
 
 #ifdef UNUSED_FUNCTION
-	inline void waveram_plot_check_depth_nowrite(int y, int x, UINT32 color, UINT16 depth)
+	inline void waveram_plot_check_depth_nowrite(int y, int x, uint32_t color, uint16_t depth)
 	{
 		if (zeus_cliprect.contains(x, y))
 		{
-			UINT16 *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, y, x);
+			uint16_t *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, y, x);
 			if (depth <= *depthptr)
 				WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 		}
@@ -339,16 +339,16 @@ public:
 	/*************************************
 	*  Inlines for texel accesses
 	*************************************/
-	inline UINT8 get_texel_8bit(const void *base, int y, int x, int width)
+	inline uint8_t get_texel_8bit(const void *base, int y, int x, int width)
 	{
-		UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
+		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
 		return WAVERAM_READ8(base, byteoffs);
 	}
 
 #ifdef UNUSED_FUNCTION
-	inline UINT8 get_texel_4bit(const void *base, int y, int x, int width)
+	inline uint8_t get_texel_4bit(const void *base, int y, int x, int width)
 	{
-		UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
+		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
 		return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 	}
 #endif

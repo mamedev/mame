@@ -203,7 +203,7 @@ private:
 	void    set_keyboard_column(int number, int data);
 
 	// Pointer to EPROM
-	UINT16 *m_rom;
+	uint16_t *m_rom;
 
 	// First joystick. 6 for TI-99/4A
 	int     m_firstjoy;
@@ -211,10 +211,10 @@ private:
 	int     m_keyboard_column;
 	int     m_check_alphalock;
 
-	// True if SGCPU DSR is enabled
+	// true if SGCPU DSR is enabled
 	bool m_internal_dsr;
 
-	// True if SGCPU rom6 is enabled
+	// true if SGCPU rom6 is enabled
 	bool m_internal_rom6;
 
 	// Offset to the ROM6 bank.
@@ -223,10 +223,10 @@ private:
 	// Wait states
 	int m_waitcount;
 
-	// TRUE when mapper is active
+	// true when mapper is active
 	bool m_map_mode;
 
-	// TRUE when mapper registers are accessible
+	// true when mapper registers are accessible
 	bool m_access_mapper;
 
 	// Value on address bus (after being set by setaddress)
@@ -259,12 +259,12 @@ private:
 	// State of the DBIN line
 	int m_dbin;
 
-	UINT8   m_lowbyte;
-	UINT8   m_highbyte;
-	UINT8   m_latch;
+	uint8_t   m_lowbyte;
+	uint8_t   m_highbyte;
+	uint8_t   m_latch;
 
 	// Mapper registers
-	UINT8 m_mapper[16];
+	uint8_t m_mapper[16];
 
 	// Latch for 9901 INT2, INT1 lines
 	int     m_9901_int;
@@ -448,9 +448,9 @@ SETOFFSET_MEMBER( ti99_4p_state::setoffset )
 READ16_MEMBER( ti99_4p_state::memread )
 {
 	int address = 0;
-	UINT8 hbyte = 0;
+	uint8_t hbyte = 0;
 
-	UINT16 value = 0;
+	uint16_t value = 0;
 
 	int addr_off8k = m_addr_buf & 0x1fff;
 
@@ -578,9 +578,9 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 */
 READ16_MEMBER( ti99_4p_state::debugger_read )
 {
-	UINT8 lval = 0;
-	UINT8 hval = 0;
-	UINT16 addrb = offset << 1;
+	uint8_t lval = 0;
+	uint8_t hval = 0;
+	uint16_t addrb = offset << 1;
 	m_peribox->memen_in(ASSERT_LINE);
 	m_peribox->readz(space, addrb+1, &lval);
 	m_peribox->readz(space, addrb, &hval);
@@ -712,7 +712,7 @@ WRITE8_MEMBER( ti99_4p_state::cruwrite )
 
 READ8_MEMBER( ti99_4p_state::cruread )
 {
-	UINT8 value = 0;
+	uint8_t value = 0;
 	m_peribox->crureadz(space, offset<<4, &value);
 	return value;
 }
@@ -752,7 +752,7 @@ READ8_MEMBER( ti99_4p_state::read_by_9901 )
 		break;
 
 	case TMS9901_INT8_INT15:
-		// Read pins INT8*-INT15* of TI99's 9901.
+		// Read pins int8_t*-INT15* of TI99's 9901.
 		// bit 0-2: keyboard status bits 5 to 7
 		// bit 3: tape input mirror
 		// bit 5-7: weird, not emulated
@@ -938,7 +938,7 @@ void ti99_4p_state::machine_start()
 	m_sysready = ASSERT_LINE;
 	m_muxready = true;
 
-	m_rom = (UINT16*)(memregion("maincpu")->base());
+	m_rom = (uint16_t*)(memregion("maincpu")->base());
 
 	save_item(NAME(m_firstjoy));
 	save_item(NAME(m_keyboard_column));

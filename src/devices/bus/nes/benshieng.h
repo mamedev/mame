@@ -12,7 +12,7 @@ class nes_benshieng_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_benshieng_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_benshieng_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -22,9 +22,9 @@ public:
 
 private:
 	void update_banks();
-	UINT8 m_dipsetting;
-	UINT8 m_mmc_prg_bank[4];
-	UINT8 m_mmc_vrom_bank[4];
+	uint8_t m_dipsetting;
+	uint8_t m_mmc_prg_bank[4];
+	uint8_t m_mmc_vrom_bank[4];
 };
 
 

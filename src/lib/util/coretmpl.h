@@ -21,10 +21,6 @@
 #include <utility>
 #include <vector>
 
-
-typedef std::vector<UINT8> dynamic_buffer;
-
-
 // ======================> simple_list
 
 // a simple_list is a singly-linked list whose 'next' pointer is owned

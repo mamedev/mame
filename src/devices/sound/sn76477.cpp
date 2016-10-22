@@ -142,7 +142,7 @@ static const double out_neg_gain[] =
 
 const device_type SN76477 = &device_creator<sn76477_device>;
 
-sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SN76477, "SN76477", tag, owner, clock, "sn76477", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_enable(0),
@@ -417,7 +417,7 @@ double sn76477_device::compute_vco_duty_cycle() /* no measure, just a number */
 }
 
 
-UINT32 sn76477_device::compute_noise_gen_freq() /* in Hz */
+uint32_t sn76477_device::compute_noise_gen_freq() /* in Hz */
 {
 	/* this formula was derived using the data points below
 
@@ -447,7 +447,7 @@ UINT32 sn76477_device::compute_noise_gen_freq() /* in Hz */
 	    3.3M          487.59
 	*/
 
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 
 	if ((m_noise_clock_res >= NOISE_MIN_CLOCK_RES) &&
 		(m_noise_clock_res <= NOISE_MAX_CLOCK_RES))
@@ -907,7 +907,7 @@ void sn76477_device::close_wav_file()
 }
 
 
-void sn76477_device::add_wav_data(INT16 data_l, INT16 data_r)
+void sn76477_device::add_wav_data(int16_t data_l, int16_t data_r)
 {
 	wav_add_data_16lr(m_file, &data_l, &data_r, 1);
 }
@@ -926,9 +926,9 @@ void sn76477_device::intialize_noise()
 }
 
 
-inline UINT32 sn76477_device::generate_next_real_noise_bit()
+inline uint32_t sn76477_device::generate_next_real_noise_bit()
 {
-	UINT32 out = ((m_rng >> 28) & 1) ^ ((m_rng >> 0) & 1);
+	uint32_t out = ((m_rng >> 28) & 1) ^ ((m_rng >> 0) & 1);
 
 		/* if bits 0-4 and 28 are all zero then force the output to 1 */
 	if ((m_rng & 0x1000001f) == 0)
@@ -1700,7 +1700,7 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	double vco_cap_charging_step;
 	double vco_cap_discharging_step;
 	double vco_cap_voltage_max;
-	UINT32 noise_gen_freq;
+	uint32_t noise_gen_freq;
 	double noise_filter_cap_charging_step;
 	double noise_filter_cap_discharging_step;
 	double attack_decay_cap_charging_step;
@@ -1918,7 +1918,7 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* mix the output, if enabled, or not saturated by the VCO */
 		if (!m_enable && (m_vco_cap_voltage <= VCO_CAP_VOLTAGE_MAX))
 		{
-			UINT32 out;
+			uint32_t out;
 
 			/* enabled */
 			switch (m_mixer_mode)
@@ -1989,8 +1989,8 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		if (LOG_WAV && LOG_WAV_ENABLED_ONLY && !m_enable)
 		{
-			INT16 log_data_l;
-			INT16 log_data_r;
+			int16_t log_data_l;
+			int16_t log_data_r;
 
 			switch (LOG_WAV_VALUE_L)
 			{

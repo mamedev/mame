@@ -91,8 +91,8 @@ WRITE16_MEMBER(stlforce_state::stlforce_tx_videoram_w)
 
 void stlforce_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT16 *source = m_spriteram+0x0;
-	const UINT16 *finish = m_spriteram+0x800;
+	const uint16_t *source = m_spriteram+0x0;
+	const uint16_t *finish = m_spriteram+0x800;
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 	int ypos, xpos, attr, num;
 
@@ -120,7 +120,7 @@ void stlforce_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 stlforce_state::screen_update_stlforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t stlforce_state::screen_update_stlforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

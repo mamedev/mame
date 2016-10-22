@@ -35,7 +35,7 @@ class mm1_keyboard_t :  public device_t
 {
 public:
 	// construction/destruction
-	mm1_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mm1_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_kbst_wr_callback(device_t &device, _Object object) { return downcast<mm1_keyboard_t &>(device).m_write_kbst.set_callback(object); }
 
@@ -76,7 +76,7 @@ private:
 
 	int m_sense;
 	int m_drive;
-	UINT8 m_data;
+	uint8_t m_data;
 
 	static bool first_time;                 // for power switch sound
 	emu_timer *m_scan_timer;                // scan timer

@@ -163,8 +163,8 @@ static const char *const opcode_strings[0x0100] =
 CPU_DISASSEMBLE( m6805 )
 {
 	int code, bit;
-	UINT16 ea;
-	UINT32 flags = 0;
+	uint16_t ea;
+	uint32_t flags = 0;
 
 	code = oprom[0];
 
@@ -179,14 +179,14 @@ CPU_DISASSEMBLE( m6805 )
 	{
 	case _btr:  /* bit test and relative branch */
 		bit = (code >> 1) & 7;
-		sprintf (buffer, "%d,$%02X,$%03X", bit, opram[1], pc + 3 + (INT8)opram[2]);
+		sprintf (buffer, "%d,$%02X,$%03X", bit, opram[1], pc + 3 + (int8_t)opram[2]);
 		return 3 | flags | DASMFLAG_SUPPORTED;
 	case _bit:  /* bit test */
 		bit = (code >> 1) & 7;
 		sprintf (buffer, "%d,$%03X", bit, opram[1]);
 		return 2 | flags | DASMFLAG_SUPPORTED;
 	case _rel:  /* relative */
-		sprintf (buffer, "$%03X", pc + 2 + (INT8)opram[1]);
+		sprintf (buffer, "$%03X", pc + 2 + (int8_t)opram[1]);
 		return 2 | flags | DASMFLAG_SUPPORTED;
 	case _imm:  /* immediate */
 		sprintf (buffer, "#$%02X", opram[1]);

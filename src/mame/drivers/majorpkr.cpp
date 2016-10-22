@@ -480,8 +480,8 @@ public:
 	required_device<address_map_bank_device> m_vram_bank;
 
 	required_memory_bank m_rom_bank;
-	required_shared_ptr<UINT8> m_fg_vram;
-	required_shared_ptr<UINT8> m_bg_vram;
+	required_shared_ptr<uint8_t> m_fg_vram;
+	required_shared_ptr<uint8_t> m_bg_vram;
 
 	tilemap_t    *m_bg_tilemap, *m_fg_tilemap;
 
@@ -504,7 +504,7 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -541,7 +541,7 @@ void majorpkr_state::video_start()
 }
 
 
-UINT32 majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0);
@@ -1168,7 +1168,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(majorpkr_state, majorpkr)
 {
-	UINT8 * ROM = (UINT8 *)memregion("maincpu")->base();
+	uint8_t * ROM = (uint8_t *)memregion("maincpu")->base();
 	m_rom_bank->configure_entries(0, 4, &ROM[0xe000], 0x800);
 }
 

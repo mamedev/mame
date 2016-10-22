@@ -41,7 +41,7 @@
 class micropolis_device : public device_t
 {
 public:
-	micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~micropolis_device() {}
 
 	template<class _Object> static devcb_base &set_dden_rd_callback(device_t &device, _Object object) { return downcast<micropolis_device &>(device).m_read_dden.set_callback(object); }
@@ -57,7 +57,7 @@ public:
 		dev.m_floppy_drive_tags[3] = tag4;
 	}
 
-	void set_drive(UINT8 drive); // set current drive (0-3)
+	void set_drive(uint8_t drive); // set current drive (0-3)
 
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_READ8_MEMBER( data_r );
@@ -83,20 +83,20 @@ private:
 	const char *m_floppy_drive_tags[4];
 
 	/* register */
-	UINT8 m_data;
-	UINT8 m_drive_num;
-	UINT8 m_track;
-	UINT8 m_sector;
-	UINT8 m_command;
-	UINT8 m_status;
+	uint8_t m_data;
+	uint8_t m_drive_num;
+	uint8_t m_track;
+	uint8_t m_sector;
+	uint8_t m_command;
+	uint8_t m_status;
 
-	UINT8   m_write_cmd;              /* last write command issued */
+	uint8_t   m_write_cmd;              /* last write command issued */
 
-	UINT8   m_buffer[6144];           /* I/O buffer (holds up to a whole track) */
-	UINT32  m_data_offset;            /* offset into I/O buffer */
-	INT32   m_data_count;             /* transfer count from/into I/O buffer */
+	uint8_t   m_buffer[6144];           /* I/O buffer (holds up to a whole track) */
+	uint32_t  m_data_offset;            /* offset into I/O buffer */
+	int32_t   m_data_count;             /* transfer count from/into I/O buffer */
 
-	UINT32  m_sector_length;          /* sector length (byte) */
+	uint32_t  m_sector_length;          /* sector length (byte) */
 
 	/* this is the drive currently selected */
 	legacy_floppy_image_device *m_drive;

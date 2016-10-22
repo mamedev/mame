@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( sgx_io , AS_IO, 8, pce_state )
 ADDRESS_MAP_END
 
 
-UINT32 pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_huc6260->video_update( bitmap, cliprect );
 	return 0;

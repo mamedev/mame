@@ -28,7 +28,7 @@ class cbm2_hrg_t : public device_t,
 {
 public:
 	// construction/destruction
-	cbm2_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	cbm2_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -39,8 +39,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_cbm2_expansion_card_interface overrides
-	virtual UINT8 cbm2_bd_r(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3) override;
-	virtual void cbm2_bd_w(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3) override;
+	virtual uint8_t cbm2_bd_r(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) override;
+	virtual void cbm2_bd_w(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) override;
 
 private:
 	required_device<ef9365_device> m_gdc;
@@ -54,7 +54,7 @@ class cbm2_hrg_a_t :  public cbm2_hrg_t
 {
 public:
 	// construction/destruction
-	cbm2_hrg_a_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cbm2_hrg_a_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -67,7 +67,7 @@ class cbm2_hrg_b_t :  public cbm2_hrg_t
 {
 public:
 	// construction/destruction
-	cbm2_hrg_b_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cbm2_hrg_b_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

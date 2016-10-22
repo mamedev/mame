@@ -241,7 +241,7 @@ void windows_osd_interface::build_slider_list()
 	}
 }
 
-void windows_osd_interface::add_audio_to_recording(const INT16 *buffer, int samples_this_frame)
+void windows_osd_interface::add_audio_to_recording(const int16_t *buffer, int samples_this_frame)
 {
 	auto window = osd_common_t::s_window_list.front(); // We only record on the first window
 	if (window != nullptr)
@@ -1218,7 +1218,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			break;
 
 		case WM_CHAR:
-			window->machine().ui_input().push_char_event(window->m_target, (unicode_char) wparam);
+			window->machine().ui_input().push_char_event(window->m_target, (char32_t) wparam);
 			break;
 
 		case WM_MOUSEWHEEL:
@@ -1272,7 +1272,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		// syscommands: catch win_start_maximized
 		case WM_SYSCOMMAND:
 		{
-			UINT16 cmd = wparam & 0xfff0;
+			uint16_t cmd = wparam & 0xfff0;
 
 			// prevent screensaver or monitor power events
 			if (cmd == SC_MONITORPOWER || cmd == SC_SCREENSAVE)
@@ -1408,13 +1408,13 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
-	INT32 extrawidth = wnd_extra_width();
-	INT32 extraheight = wnd_extra_height();
-	INT32 propwidth, propheight;
-	INT32 minwidth, minheight;
-	INT32 maxwidth, maxheight;
-	INT32 viswidth, visheight;
-	INT32 adjwidth, adjheight;
+	int32_t extrawidth = wnd_extra_width();
+	int32_t extraheight = wnd_extra_height();
+	int32_t propwidth, propheight;
+	int32_t minwidth, minheight;
+	int32_t maxwidth, maxheight;
+	int32_t viswidth, visheight;
+	int32_t adjwidth, adjheight;
 	float pixel_aspect;
 
 	auto monitor = monitor_from_rect(&rect);
@@ -1531,7 +1531,7 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 
 osd_dim win_window_info::get_min_bounds(int constrain)
 {
-	INT32 minwidth, minheight;
+	int32_t minwidth, minheight;
 
 	//assert(GetCurrentThreadId() == window_threadid);
 

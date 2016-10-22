@@ -100,7 +100,7 @@ void gcpinbal_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in gcpinbal_state::device_timer");
+		assert_always(false, "Unknown id in gcpinbal_state::device_timer");
 	}
 }
 
@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 	}
 	else
 	{
-		UINT8 *ROM = memregion("msm")->base();
+		uint8_t *ROM = memregion("msm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_start] & 0x0f) : (ROM[m_adpcm_start] & 0xf0) >> 4));
 		m_msm->data_w(m_adpcm_data & 0xf);

@@ -140,7 +140,7 @@
 #define GROM_A_EEPROM "u1_grom"
 #define ROM6_EEPROM "u6_rom6"
 
-snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ti_expansion_card_device(mconfig, TI99_HSGPL, "SNUG High-speed GPL card", tag, owner, clock, "ti99_hsgpl", __FILE__),
 	  m_dsr_eeprom(*this, DSR_EEPROM),
 	  m_rom6_eeprom(*this, ROM6_EEPROM),
@@ -295,7 +295,7 @@ WRITE8_MEMBER(snug_high_speed_gpl_device::write)
 /*
     Specific read access: dsrspace
 */
-void snug_high_speed_gpl_device::dsrspace_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask)
+void snug_high_speed_gpl_device::dsrspace_readz(address_space& space, offs_t offset, uint8_t* value, uint8_t mem_mask)
 {
 	if (m_dsr_enabled)
 	{
@@ -307,7 +307,7 @@ void snug_high_speed_gpl_device::dsrspace_readz(address_space& space, offs_t off
 /*
     Specific read access: cartspace
 */
-void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask)
+void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t offset, uint8_t* value, uint8_t mem_mask)
 {
 	if (!m_card_enabled || m_flash_mode)
 	{
@@ -339,7 +339,7 @@ void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t of
     it here - which is indeed closer to reality, since the real HSGPL also
     emulates GROM instead of using proper ones.
 */
-void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask)
+void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset, uint8_t* value, uint8_t mem_mask)
 {
 	if (space.debugger_access()) return;
 
@@ -457,7 +457,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 /*
     Specific write access: cartspace
 */
-void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask)
+void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_card_enabled || m_flash_mode)
 	{
@@ -525,7 +525,7 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 /*
     Specific write access: grom_write
 */
-void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask)
+void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (space.debugger_access()) return;
 

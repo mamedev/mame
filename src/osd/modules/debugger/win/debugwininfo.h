@@ -103,10 +103,10 @@ protected:
 
 	bool is_main_console() const { return m_is_main_console; }
 	HWND window() const { return m_wnd; }
-	UINT32 minwidth() const { return m_minwidth; }
-	UINT32 maxwidth() const { return m_maxwidth; }
-	void set_minwidth(UINT32 value) { m_minwidth = value; }
-	void set_maxwidth(UINT32 value) { m_maxwidth = value; }
+	uint32_t minwidth() const { return m_minwidth; }
+	uint32_t maxwidth() const { return m_maxwidth; }
+	void set_minwidth(uint32_t value) { m_minwidth = value; }
+	void set_maxwidth(uint32_t value) { m_maxwidth = value; }
 
 	virtual void recompute_children();
 	virtual void update_menu() { }
@@ -131,10 +131,10 @@ private:
 	HWND            m_wnd;
 	WNDPROC const   m_handler;
 
-	UINT32          m_minwidth, m_maxwidth;
-	UINT32          m_minheight, m_maxheight;
+	uint32_t          m_minwidth, m_maxwidth;
+	uint32_t          m_minheight, m_maxheight;
 
-	UINT16          m_ignore_char_lparam;
+	uint16_t          m_ignore_char_lparam;
 
 	static bool     s_window_class_registered;
 };

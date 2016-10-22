@@ -422,7 +422,7 @@ inline void abc77_device::key_down(int state)
 //  abc77_device - constructor
 //-------------------------------------------------
 
-abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	abc_keyboard_interface(mconfig, *this),
 	m_maincpu(*this, I8035_TAG),
@@ -437,10 +437,10 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	abc77_device(mconfig, ABC55, "Luxor ABC 55", tag, owner, clock, "abc55", __FILE__) { }
 
-abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	abc77_device(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock, "abc77", __FILE__) { }
 
 
@@ -527,7 +527,7 @@ READ8_MEMBER( abc77_device::p1_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_stb)
 	{

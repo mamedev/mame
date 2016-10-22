@@ -96,13 +96,13 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_pf1_rowscroll;
-	required_shared_ptr<UINT16> m_pf2_rowscroll;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_decrypted_opcodes;
+	required_shared_ptr<uint16_t> m_pf1_rowscroll;
+	required_shared_ptr<uint16_t> m_pf2_rowscroll;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	/* misc */
-	UINT8 m_sound_irq;
+	uint8_t m_sound_irq;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -117,21 +117,21 @@ public:
 	DECLARE_DRIVER_INIT(dblewing);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
-	void dblewing_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
+	void dblewing_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 
 	READ16_MEMBER( wf_protection_region_0_104_r );
 	WRITE16_MEMBER( wf_protection_region_0_104_w );
 };
 
 
-UINT32 dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
@@ -149,8 +149,8 @@ READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -158,7 +158,7 @@ WRITE16_MEMBER( dblewing_state::wf_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -358,7 +358,7 @@ void dblewing_state::machine_reset()
 	m_sound_irq = 0;
 }
 
-void dblewing_state::dblewing_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+void dblewing_state::dblewing_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_sound_irq |= 0x02;
@@ -459,7 +459,7 @@ ROM_END
 DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
-	deco102_decrypt_cpu((UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x399d, 0x25, 0x3d);
+	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x399d, 0x25, 0x3d);
 }
 
 

@@ -188,8 +188,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	UINT32* m_cpuregion;
-	std::unique_ptr<UINT32[]> m_mainram;
+	uint32_t* m_cpuregion;
+	std::unique_ptr<uint32_t[]> m_mainram;
 
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
@@ -245,8 +245,8 @@ INPUT_PORTS_END
 
 void pluto5_state::machine_start()
 {
-	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
-	m_mainram = make_unique_clear<UINT32[]>(0x10000);
+	m_cpuregion = (uint32_t*)memregion( "maincpu" )->base();
+	m_mainram = make_unique_clear<uint32_t[]>(0x10000);
 
 }
 
@@ -831,9 +831,9 @@ ROM_END
 
 
 
-static void astra_addresslines( UINT16* src, size_t srcsize, int small )
+static void astra_addresslines( uint16_t* src, size_t srcsize, int small )
 {
-	std::vector<UINT16> dst(srcsize/2);
+	std::vector<uint16_t> dst(srcsize/2);
 
 	int blocksize;
 
@@ -855,11 +855,11 @@ static void astra_addresslines( UINT16* src, size_t srcsize, int small )
 
 DRIVER_INIT_MEMBER(pluto5_state,hb)
 {
-	astra_addresslines( (UINT16*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
+	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
 
 	#if 0
 	{
-		UINT8* ROM = memregion( "maincpu" )->base();
+		uint8_t* ROM = memregion( "maincpu" )->base();
 		FILE *fp;
 		char filename[256];
 		sprintf(filename,"%s", machine().system().name);

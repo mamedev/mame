@@ -208,7 +208,7 @@ READ8_MEMBER(apple2gs_state::adbmicro_p1_in)
 
 READ8_MEMBER(apple2gs_state::adbmicro_p2_in)
 {
-	UINT8 rv = 0;
+	uint8_t rv = 0;
 
 	rv |= 0x40;     // no reset
 	rv |= (m_adb_line) ? 0x00 : 0x80;

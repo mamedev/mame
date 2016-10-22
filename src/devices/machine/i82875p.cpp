@@ -41,7 +41,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82875p_host_device)
 	AM_INHERIT_FROM(pci_host_device::config_map)
 ADDRESS_MAP_END
 
-i82875p_host_device::i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i82875p_host_device::i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, I82875P_HOST, "I82875P Northbridge", tag, owner, clock, "i82875p_host", __FILE__)
 {
 }
@@ -341,12 +341,12 @@ void i82875p_host_device::device_reset()
 	skpd = 0x0000;
 }
 
-void i82875p_host_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+void i82875p_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
 
-	UINT32 top = toud << 16;
+	uint32_t top = toud << 16;
 	if(esmramc & 1) {
 		switch((esmramc >> 1) & 3) {
 		case 2: top += 512*1024; break;
@@ -426,7 +426,7 @@ void i82875p_host_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 }
 
 
-i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: agp_bridge_device(mconfig, I82875P_AGP, "I82875P AGP Bridge", tag, owner, clock, "i82875p_agp", __FILE__)
 {
 }
@@ -449,7 +449,7 @@ DEVICE_ADDRESS_MAP_START(overflow_map, 32, i82875p_overflow_device)
 ADDRESS_MAP_END
 
 
-i82875p_overflow_device::i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i82875p_overflow_device::i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, I82875P_OVERFLOW, "I82875P Configuration Overflow", tag, owner, clock, "i82875p_overflow", __FILE__)
 {
 }

@@ -41,12 +41,12 @@ public:
 		m_palette(*this, "palette"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_tile_ram;
-	required_shared_ptr<UINT8> m_sprite_ram;
+	required_shared_ptr<uint8_t> m_tile_ram;
+	required_shared_ptr<uint8_t> m_sprite_ram;
 
 	/* misc */
-	UINT8 m_pot_state;
-	UINT8 m_pot_latch;
+	uint8_t m_pot_state;
+	uint8_t m_pot_latch;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -65,7 +65,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(boxer);
-	UINT32 screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pot_interrupt);
 	TIMER_CALLBACK_MEMBER(periodic_callback);
 	void draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -91,7 +91,7 @@ void boxer_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		periodic_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in boxer_state::device_timer");
+		assert_always(false, "Unknown id in boxer_state::device_timer");
 	}
 }
 
@@ -114,7 +114,7 @@ TIMER_CALLBACK_MEMBER(boxer_state::periodic_callback)
 
 	if (scanline == 0)
 	{
-		UINT8 mask[256];
+		uint8_t mask[256];
 
 		int i;
 
@@ -164,7 +164,7 @@ void boxer_state::draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 	for (n = 0; n < 2; n++)
 	{
-		const UINT8* p = memregion(n == 0 ? "user1" : "user2")->base();
+		const uint8_t* p = memregion(n == 0 ? "user1" : "user2")->base();
 
 		int i, j;
 
@@ -178,7 +178,7 @@ void boxer_state::draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		{
 			for (j = 0; j < 4; j++)
 			{
-				UINT8 code;
+				uint8_t code;
 
 				code = p[32 * l + 4 * i + j];
 
@@ -205,7 +205,7 @@ void boxer_state::draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect )
 }
 
 
-UINT32 boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
 
@@ -215,7 +215,7 @@ UINT32 boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &bit
 	{
 		for (j = 0; j < 32; j++)
 		{
-			UINT8 code = m_tile_ram[32 * i + j];
+			uint8_t code = m_tile_ram[32 * i + j];
 
 
 				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
@@ -240,7 +240,7 @@ UINT32 boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &bit
 
 READ8_MEMBER(boxer_state::boxer_input_r)
 {
-	UINT8 val = ioport("IN0")->read();
+	uint8_t val = ioport("IN0")->read();
 
 	if (ioport("IN3")->read() < m_screen->vpos())
 		val |= 0x02;
@@ -251,7 +251,7 @@ READ8_MEMBER(boxer_state::boxer_input_r)
 
 READ8_MEMBER(boxer_state::boxer_misc_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	switch (offset & 3)
 	{

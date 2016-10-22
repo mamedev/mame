@@ -29,7 +29,7 @@ const device_type VRC6 = &device_creator<vrc6snd_device>;
 //  vrc6snd_device - constructor
 //-------------------------------------------------
 
-vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VRC6, "VRC6 sound", tag, owner, clock, "vrc6snd", __FILE__),
 		device_sound_interface(mconfig, *this), m_freqctrl(0), m_sawrate(0), m_sawfrql(0), m_sawfrqh(0), m_sawclock(0), m_sawaccum(0), m_stream(nullptr)
 {
@@ -89,7 +89,7 @@ void vrc6snd_device::device_reset()
 void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *out = outputs[0];
-	INT16 tmp;
+	int16_t tmp;
 	int i;
 
 	// check global halt bit
@@ -201,7 +201,7 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 
 		// sum 2 4-bit pulses, 1 5-bit saw = unsigned 6 bit output
-		tmp = (INT16)(UINT8)(m_output[0] + m_output[1] + m_output[2]);
+		tmp = (int16_t)(uint8_t)(m_output[0] + m_output[1] + m_output[2]);
 		tmp <<= 8;
 
 		out[i] = tmp;

@@ -93,7 +93,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	int m_ROM_paged;
 	int m_irq_state;
 	int m_KeyRow;
@@ -104,7 +104,7 @@ public:
 	DECLARE_DRIVER_INIT(ti99_2_24);
 	DECLARE_DRIVER_INIT(ti99_2_32);
 	virtual void machine_reset() override;
-	UINT32 screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ti99_2_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -163,9 +163,9 @@ INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
 
 
 
-UINT32 ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int i, sx, sy;
 
 

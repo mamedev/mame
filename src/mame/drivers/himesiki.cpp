@@ -398,7 +398,7 @@ GFXDECODE_END
 
 void himesiki_state::machine_start()
 {
-	UINT8 *ROM = memregion("banks")->base();
+	uint8_t *ROM = memregion("banks")->base();
 
 	membank("bank1")->configure_entries(0, 4, ROM, 0x4000);
 

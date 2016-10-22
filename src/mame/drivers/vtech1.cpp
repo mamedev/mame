@@ -85,10 +85,10 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( vtech1 );
 
 private:
-	static const UINT8 VZ_BASIC = 0xf0;
-	static const UINT8 VZ_MCODE = 0xf1;
+	static const uint8_t VZ_BASIC = 0xf0;
+	static const uint8_t VZ_MCODE = 0xf1;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_mc6847;
@@ -106,7 +106,7 @@ private:
 SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 header[24];
+	uint8_t header[24];
 	char pgmname[18];
 
 	// get the header
@@ -118,16 +118,16 @@ SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 	pgmname[16] = '\0';
 
 	// get start and end addresses
-	UINT16 start = pick_integer_le(header, 22, 2);
-	UINT16 end = start + snapshot_size - sizeof(header);
-	UINT16 size = end - start;
+	uint16_t start = pick_integer_le(header, 22, 2);
+	uint16_t end = start + snapshot_size - sizeof(header);
+	uint16_t size = end - start;
 
 	// write it to ram
-	UINT8 *ptr = (UINT8 *)image.ptr() + sizeof(header);
+	uint8_t *ptr = (uint8_t *)image.ptr() + sizeof(header);
 
-	for (UINT16 addr = start; addr <= end; addr++, ptr++)
+	for (uint16_t addr = start; addr <= end; addr++, ptr++)
 	{
-		UINT8 to_write = *ptr;
+		uint8_t to_write = *ptr;
 		space.write_byte(addr, to_write);
 
 		// verify
@@ -184,7 +184,7 @@ READ8_MEMBER( vtech1_state::vtech1_lightpen_r )
 
 READ8_MEMBER( vtech1_state::vtech1_keyboard_r )
 {
-	UINT8 result = 0x3f;
+	uint8_t result = 0x3f;
 
 	// bit 0 to 5, keyboard input
 	if (!BIT(offset, 0)) result &= ioport("keyboard_0")->read();
@@ -412,7 +412,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const INT16 speaker_levels[] = {-32768, 0, 32767, 0};
+static const int16_t speaker_levels[] = {-32768, 0, 32767, 0};
 
 static MACHINE_CONFIG_START( laser110, vtech1_state )
 

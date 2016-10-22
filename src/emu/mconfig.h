@@ -38,8 +38,8 @@ struct internal_layout
 {
 	size_t decompressed_size;
 	size_t compressed_size;
-	UINT8 compression_type;
-	const UINT8* data;
+	uint8_t compression_type;
+	const uint8_t* data;
 };
 
 
@@ -73,8 +73,8 @@ public:
 	const internal_layout *            m_default_layout;           // default layout for this machine
 
 	// helpers during configuration; not for general use
-	device_t *device_add(device_t *owner, const char *tag, device_type type, UINT32 clock);
-	device_t *device_replace(device_t *owner, const char *tag, device_type type, UINT32 clock);
+	device_t *device_add(device_t *owner, const char *tag, device_type type, uint32_t clock);
+	device_t *device_replace(device_t *owner, const char *tag, device_type type, uint32_t clock);
 	device_t *device_remove(device_t *owner, const char *tag);
 	device_t *device_find(device_t *owner, const char *tag);
 

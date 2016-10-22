@@ -135,8 +135,8 @@ class mos6560_device : public device_t,
 						public device_video_interface
 {
 public:
-	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_potx_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_potx.set_callback(object); }
 	template<class _Object> static devcb_base &set_poty_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_poty.set_callback(object); }
@@ -146,11 +146,11 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	UINT8 bus_r();
+	uint8_t bus_r();
 
 	DECLARE_WRITE_LINE_MEMBER( lp_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	enum
@@ -173,11 +173,11 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	inline UINT8 read_videoram(offs_t offset);
-	inline UINT8 read_colorram(offs_t offset);
+	inline uint8_t read_videoram(offs_t offset);
+	inline uint8_t read_colorram(offs_t offset);
 
-	void draw_character( int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color );
-	void draw_character_multi( int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color );
+	void draw_character( int ybegin, int yend, int ch, int yoff, int xoff, uint16_t *color );
+	void draw_character_multi( int ybegin, int yend, int ch, int yoff, int xoff, uint16_t *color );
 	void drawlines( int first, int last );
 	void soundport_w( int offset, int data );
 	void sound_start();
@@ -191,7 +191,7 @@ protected:
 	devcb_read8    m_read_potx;
 	devcb_read8    m_read_poty;
 
-	UINT8 m_reg[16];
+	uint8_t m_reg[16];
 
 	bitmap_rgb32 m_bitmap;
 
@@ -204,16 +204,16 @@ protected:
 	int m_chargenaddr, m_videoaddr;
 
 	/* values in videoformat */
-	UINT16 m_backgroundcolor, m_framecolor, m_helpercolor;
+	uint16_t m_backgroundcolor, m_framecolor, m_helpercolor;
 
 	/* arrays for bit to color conversion without condition checking */
-	UINT16 m_mono[2], m_monoinverted[2], m_multi[4], m_multiinverted[4];
+	uint16_t m_mono[2], m_monoinverted[2], m_multi[4], m_multiinverted[4];
 
 	/* video chip settings */
 	int m_total_xsize, m_total_ysize, m_total_lines, m_total_vretracerate;
 
 	/* DMA */
-	UINT8 m_last_data;
+	uint8_t m_last_data;
 
 	/* sound part */
 	int m_tone1pos, m_tone2pos, m_tone3pos,
@@ -223,8 +223,8 @@ protected:
 	m_noisesamples;   /* count of samples to give out per tone */
 
 	sound_stream *m_channel;
-	std::unique_ptr<INT16[]> m_tone;
-	std::unique_ptr<INT8[]> m_noise;
+	std::unique_ptr<int16_t[]> m_tone;
+	std::unique_ptr<int8_t[]> m_noise;
 
 	emu_timer *m_line_timer;
 };
@@ -236,7 +236,7 @@ class mos6561_device :  public mos6560_device
 {
 public:
 	// construction/destruction
-	mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -246,7 +246,7 @@ class mos656x_attack_ufo_device :  public mos6560_device
 {
 public:
 	// construction/destruction
-	mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

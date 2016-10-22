@@ -47,7 +47,7 @@ class c8050_fdc_t :  public device_t
 {
 public:
 	// construction/destruction
-	c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_sync.set_callback(object); }
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_ready.set_callback(object); }
@@ -106,13 +106,13 @@ protected:
 		int odd_hd;
 
 		attotime edge;
-		UINT16 shift_reg;
+		uint16_t shift_reg;
 		int bit_counter;
-		UINT8 e;
+		uint8_t e;
 		offs_t i;
 
-		UINT8 pi;
-		UINT16 shift_reg_write;
+		uint8_t pi;
+		uint16_t shift_reg_write;
 	};
 
 	devcb_write_line m_write_sync;
@@ -136,7 +136,7 @@ protected:
 	int m_mode_sel;
 	int m_rw_sel;
 	int m_odd_hd;
-	UINT8 m_pi;
+	uint8_t m_pi;
 
 	live_info cur_live, checkpoint_live;
 	fdc_pll_t cur_pll, checkpoint_pll;

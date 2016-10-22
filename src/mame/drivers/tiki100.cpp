@@ -31,10 +31,10 @@ READ8_MEMBER( tiki100_state::mrq_r )
 {
 	bool mdis = 1;
 
-	UINT8 data = m_exp->mrq_r(space, offset, 0xff, mdis);
+	uint8_t data = m_exp->mrq_r(space, offset, 0xff, mdis);
 
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
-	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
+	uint8_t prom = m_prom->base()[prom_addr] ^ 0xff;
 
 	if (prom & ROM0)
 	{
@@ -48,7 +48,7 @@ READ8_MEMBER( tiki100_state::mrq_r )
 
 	if (prom & VIR)
 	{
-		UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
+		uint16_t addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
 		data = m_video_ram[addr];
 	}
@@ -65,11 +65,11 @@ WRITE8_MEMBER( tiki100_state::mrq_w )
 {
 	bool mdis = 1;
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
-	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
+	uint8_t prom = m_prom->base()[prom_addr] ^ 0xff;
 
 	if (prom & VIR)
 	{
-		UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
+		uint16_t addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
 		m_video_ram[addr] = data;
 	}
@@ -84,7 +84,7 @@ WRITE8_MEMBER( tiki100_state::mrq_w )
 
 READ8_MEMBER( tiki100_state::iorq_r )
 {
-	UINT8 data = m_exp->iorq_r(space, offset, 0xff);
+	uint8_t data = m_exp->iorq_r(space, offset, 0xff);
 
 	switch ((offset & 0xff) >> 2)
 	{
@@ -178,7 +178,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 
 READ8_MEMBER( tiki100_state::keyboard_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_keylatch < 12)
 	{
@@ -218,7 +218,7 @@ WRITE8_MEMBER( tiki100_state::video_mode_w )
 	if (BIT(data, 7))
 	{
 		int color = data & 0x0f;
-		UINT8 colordata = ~m_palette_val;
+		uint8_t colordata = ~m_palette_val;
 
 		m_palette->set_pen_color(color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
 	}
@@ -446,17 +446,17 @@ INPUT_PORTS_END
 
 /* Video */
 
-UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT16 addr = (m_scroll << 7);
+	uint16_t addr = (m_scroll << 7);
 	int sx, y, pixel, mode = (m_mode >> 4) & 0x03;
 
 	for (y = 0; y < 256; y++)
 	{
 		for (sx = 0; sx < 128; sx++)
 		{
-			UINT8 data = m_video_ram[addr & TIKI100_VIDEORAM_MASK];
+			uint8_t data = m_video_ram[addr & TIKI100_VIDEORAM_MASK];
 
 			switch (mode)
 			{
@@ -551,7 +551,7 @@ READ8_MEMBER( tiki100_state::pio_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// centronics
 	data |= m_centronics_ack << 4;

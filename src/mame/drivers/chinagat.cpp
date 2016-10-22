@@ -241,7 +241,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_rom_addr_w )
 WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
 {
 	/* i8748 Port 2 write */
-	UINT8 *saiyugoub1_adpcm_rom = memregion("adpcm")->base();
+	uint8_t *saiyugoub1_adpcm_rom = memregion("adpcm")->base();
 
 	if (data & 0x80)    /* Reset m5205 and disable ADPCM ROM outputs */
 	{
@@ -899,8 +899,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chinagat_state,chinagat)
 {
-	UINT8 *MAIN = memregion("maincpu")->base();
-	UINT8 *SUB = memregion("sub")->base();
+	uint8_t *MAIN = memregion("maincpu")->base();
+	uint8_t *SUB = memregion("sub")->base();
 
 	m_technos_video_hw = 1;
 	m_sprite_irq = M6809_IRQ_LINE;

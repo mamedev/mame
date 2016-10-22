@@ -19,11 +19,11 @@ WRITE16_MEMBER(rohga_state::rohga_buffer_spriteram16_w)
 
 /******************************************************************************/
 
-UINT32 rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	/* Update playfields */
 	flip_screen_set(BIT(flip, 7));
@@ -77,7 +77,7 @@ VIDEO_START_MEMBER(rohga_state,wizdfire)
 }
 
 // not amazingly efficient, called multiple times to pull a layer out of the sprite bitmaps, but keeps correct sprite<->sprite priorities
-void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, UINT16 pri, UINT16 primask)
+void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, uint16_t pri, uint16_t primask)
 {
 	int y, x;
 	const pen_t *paldata = m_palette->pens();
@@ -87,8 +87,8 @@ void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &clipre
 	sprite_bitmap = &m_sprgen2->get_sprite_temp_bitmap();
 	penbase = 0x600;
 
-	UINT16* srcline;
-	UINT32* dstline;
+	uint16_t* srcline;
+	uint32_t* dstline;
 
 
 	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
@@ -98,18 +98,18 @@ void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
-			UINT16 pix = srcline[x];
+			uint16_t pix = srcline[x];
 
 			if ((pix & primask) != pri)
 				continue;
 
 			if (pix&0xf)
 			{
-				UINT16 pen = pix&0x1ff;
+				uint16_t pen = pix&0x1ff;
 
 				if (pen&0x100)
 				{
-					UINT32 base = dstline[x];
+					uint32_t base = dstline[x];
 					pen &=0xff;
 					dstline[x] = alpha_blend_r32(base, paldata[pen+penbase], 0x80);
 				}
@@ -122,11 +122,11 @@ void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	/* draw sprite gfx to temp bitmaps */
 	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
@@ -158,10 +158,10 @@ UINT32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-UINT32 rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	/* draw sprite gfx to temp bitmaps */
 	m_sprgen1->set_alt_format(true);

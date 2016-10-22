@@ -50,19 +50,19 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_playfield_ram;
+	required_shared_ptr<uint8_t> m_playfield_ram;
 
 	/* video-related */
 	tilemap_t  *m_tmap;
-	UINT8    m_pitcher_vert;
-	UINT8    m_pitcher_horz;
-	UINT8    m_pitcher_pic;
-	UINT8    m_ball_vert;
-	UINT8    m_ball_horz;
+	uint8_t    m_pitcher_vert;
+	uint8_t    m_pitcher_horz;
+	uint8_t    m_pitcher_pic;
+	uint8_t    m_ball_vert;
+	uint8_t    m_ball_horz;
 
 	/* misc */
-	UINT8    m_potmask;
-	UINT8    m_potsense;
+	uint8_t    m_potmask;
+	uint8_t    m_potsense;
 
 	emu_timer *m_pot_clear_timer;
 	emu_timer *m_quarter_timer;
@@ -86,7 +86,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(flyball);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(joystick_callback);
 	TIMER_CALLBACK_MEMBER(quarter_callback);
@@ -113,7 +113,7 @@ TILEMAP_MAPPER_MEMBER(flyball_state::get_memory_offset)
 
 TILE_GET_INFO_MEMBER(flyball_state::get_tile_info)
 {
-	UINT8 data = m_playfield_ram[tile_index];
+	uint8_t data = m_playfield_ram[tile_index];
 	int flags = ((data & 0x40) ? TILE_FLIPX : 0) | ((data & 0x80) ? TILE_FLIPY : 0);
 	int code = data & 63;
 
@@ -130,7 +130,7 @@ void flyball_state::video_start()
 }
 
 
-UINT32 flyball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t flyball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int pitcherx = m_pitcher_horz;
 	int pitchery = m_pitcher_vert - 31;
@@ -171,7 +171,7 @@ void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 
 	default:
-		assert_always(FALSE, "Unknown id in flyball_state::device_timer");
+		assert_always(false, "Unknown id in flyball_state::device_timer");
 	}
 }
 
@@ -424,9 +424,9 @@ PALETTE_INIT_MEMBER(flyball_state, flyball)
 void flyball_state::machine_start()
 {
 	/* address bits 0 through 8 are inverted */
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
-	dynamic_buffer buf(len);
+	std::vector<uint8_t> buf(len);
 	for (int i = 0; i < len; i++)
 		buf[i ^ 0x1ff] = ROM[i];
 	memcpy(ROM, &buf[0], len);

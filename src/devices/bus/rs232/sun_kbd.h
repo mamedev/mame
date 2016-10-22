@@ -15,7 +15,7 @@ extern device_type const SUN_KBD_ADAPTOR;
 class sun_keyboard_adaptor_device : public device_t, public device_rs232_port_interface
 {
 public:
-	sun_keyboard_adaptor_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
+	sun_keyboard_adaptor_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 	virtual ~sun_keyboard_adaptor_device() override;
 
 	virtual machine_config_constructor device_mconfig_additions() const override;

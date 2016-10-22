@@ -40,7 +40,7 @@ protected:
 	void previous();
 	void next();
 	std::string current_display_name();
-	UINT32 current_display_flags();
+	uint32_t current_display_flags();
 
 private:
 	// device iterator
@@ -139,9 +139,9 @@ std::string menu_device_control<DeviceType>::current_display_name()
 //-------------------------------------------------
 
 template<class DeviceType>
-UINT32 menu_device_control<DeviceType>::current_display_flags()
+uint32_t menu_device_control<DeviceType>::current_display_flags()
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	if (count() > 1)
 	{
 		if (current_index() > 0)

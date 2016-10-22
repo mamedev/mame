@@ -31,16 +31,16 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_region_ptr<UINT8> m_colors;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_region_ptr<uint8_t> m_colors;
 
 	// internal state
-	UINT8 m_flip_screen;
+	uint8_t m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_READ8_MEMBER(v128_r);
-	UINT32 screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -54,19 +54,19 @@ public:
  *
  *************************************/
 
-UINT32 dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		UINT8 fore_color;
+		uint8_t fore_color;
 
-		UINT8 x = offs >> 8 << 3;
-		UINT8 y = offs & 0xff;
+		uint8_t x = offs >> 8 << 3;
+		uint8_t y = offs & 0xff;
 
 		/* the need for +1 is extremely unusual, but definitely correct */
 		offs_t color_address = ((((offs << 2) & 0x03e0) | (offs >> 8)) + 1) & 0x03ff;
 
-		UINT8 data = m_videoram[offs];
+		uint8_t data = m_videoram[offs];
 
 		if (m_flip_screen)
 			fore_color = (m_colors[color_address] >> 3) & 0x07;
@@ -75,7 +75,7 @@ UINT32 dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rgb3
 
 		for (int i = 0; i < 8; i++)
 		{
-			UINT8 color = (data & 0x01) ? fore_color : 0;
+			uint8_t color = (data & 0x01) ? fore_color : 0;
 			bitmap.pix32(y, x) = m_palette->pen_color(color);
 
 			data = data >> 1;
@@ -96,7 +96,7 @@ UINT32 dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rgb3
 
 READ8_MEMBER(dorachan_state::protection_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch (m_maincpu->pcbase())
 	{

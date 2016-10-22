@@ -49,7 +49,7 @@ const device_type CCPU = &device_creator<ccpu_cpu_device>;
 
 #define STANDARD_ACC_OP(resexp,cmpval) \
 do { \
-	UINT16 result = resexp; \
+	uint16_t result = resexp; \
 	SET_A0;                      /* set the A0 bit based on the previous 'A' value */ \
 	SET_CMP_VAL(cmpval);          /* set the compare values to the previous accumulator and the cmpval */ \
 	SET_NC(result);               /* set the NC flag based on the unmasked result */ \
@@ -62,7 +62,7 @@ do { \
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, CCPU, "Cinematronics CPU", tag, owner, clock, "ccpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 15, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 32, -1)
@@ -83,7 +83,7 @@ READ8_MEMBER( ccpu_cpu_device::read_jmi )
 
 void ccpu_cpu_device::wdt_timer_trigger()
 {
-	m_waiting = FALSE;
+	m_waiting = false;
 	m_watchdog++;
 	if (m_watchdog >= 3)
 		m_PC = 0;
@@ -180,7 +180,7 @@ void ccpu_cpu_device::device_reset()
 	m_miflag = m_nextmiflag = m_nextnextmiflag = 0;
 	m_drflag = 0;
 
-	m_waiting = FALSE;
+	m_waiting = false;
 	m_watchdog = 0;
 }
 
@@ -200,8 +200,8 @@ void ccpu_cpu_device::execute_run()
 
 	do
 	{
-		UINT16 tempval;
-		UINT8 opcode;
+		uint16_t tempval;
+		uint8_t opcode;
 
 		/* update the delayed MI flag */
 		m_miflag = m_nextmiflag;
@@ -437,7 +437,7 @@ void ccpu_cpu_device::execute_run()
 				m_I = (m_P << 4) + (opcode & 0x0f);
 				tempval = RDMEM(m_I);
 				{
-					UINT16 result = *m_acc + (tempval ^ 0xfff) + 1;
+					uint16_t result = *m_acc + (tempval ^ 0xfff) + 1;
 					SET_A0;
 					SET_CMP_VAL(tempval);
 					SET_NC(result);
@@ -469,11 +469,11 @@ void ccpu_cpu_device::execute_run()
 			/* DV */
 			case 0xe0:
 				{
-					INT16 stopX = (INT16)(m_A << 4) >> 4;
-					INT16 stopY = (INT16)(m_B << 4) >> 4;
+					int16_t stopX = (int16_t)(m_A << 4) >> 4;
+					int16_t stopY = (int16_t)(m_B << 4) >> 4;
 
-					stopX = ((INT16)(stopX - m_X) >> m_T) + m_X;
-					stopY = ((INT16)(stopY - m_Y) >> m_T) + m_Y;
+					stopX = ((int16_t)(stopX - m_X) >> m_T) + m_X;
+					stopY = ((int16_t)(stopY - m_Y) >> m_T) + m_Y;
 
 					m_vector_callback(m_X, m_Y, stopX, stopY, m_T);
 
@@ -515,10 +515,10 @@ void ccpu_cpu_device::execute_run()
 				{
 					if (m_A & 1)
 					{
-						UINT16 result;
+						uint16_t result;
 						m_cmpacc = m_B;
 						m_A = (m_A >> 1) | ((m_B << 11) & 0x800);
-						m_B = ((INT16)(m_B << 4) >> 5) & 0xfff;
+						m_B = ((int16_t)(m_B << 4) >> 5) & 0xfff;
 						result = m_B + tempval;
 						SET_NC(result);
 						SET_MI(result);
@@ -526,20 +526,20 @@ void ccpu_cpu_device::execute_run()
 					}
 					else
 					{
-						UINT16 result;
+						uint16_t result;
 						m_cmpacc = m_A;
 						result = m_A + tempval;
 						m_A = (m_A >> 1) | ((m_B << 11) & 0x800);
-						m_B = ((INT16)(m_B << 4) >> 5) & 0xfff;
+						m_B = ((int16_t)(m_B << 4) >> 5) & 0xfff;
 						SET_NC(result);
 						SET_MI(result);
 					}
 				}
 				else
 				{
-					UINT16 result;
+					uint16_t result;
 					m_cmpacc = m_B;
-					m_B = ((INT16)(m_B << 4) >> 5) & 0xfff;
+					m_B = ((int16_t)(m_B << 4) >> 5) & 0xfff;
 					result = m_B + tempval;
 					SET_NC(result);
 					SET_MI(result);
@@ -568,7 +568,7 @@ void ccpu_cpu_device::execute_run()
 			/* FRM */
 			case 0xe5:
 			case 0xf5:
-				m_waiting = TRUE;
+				m_waiting = true;
 				NEXT_ACC_A;
 				m_icount = -1;
 
@@ -623,7 +623,7 @@ void ccpu_cpu_device::execute_run()
 			/* SHR */
 			case 0xeb:
 			case 0xfb:
-				tempval = ((m_acc == &m_A) ? (m_A >> 1) : ((INT16)(m_B << 4) >> 5)) & 0xfff;
+				tempval = ((m_acc == &m_A) ? (m_A >> 1) : ((int16_t)(m_B << 4) >> 5)) & 0xfff;
 				tempval |= (*m_acc + (0xb0b | (opcode & 0xf0))) & 0x1000;
 				STANDARD_ACC_OP(tempval, 0xb0b | (opcode & 0xf0));
 				NEXT_ACC_A; CYCLES(1);
@@ -641,7 +641,7 @@ void ccpu_cpu_device::execute_run()
 			/* ASR */
 			case 0xed:
 			case 0xfd:
-				tempval = ((INT16)(*m_acc << 4) >> 5) & 0xfff;
+				tempval = ((int16_t)(*m_acc << 4) >> 5) & 0xfff;
 				STANDARD_ACC_OP(tempval, 0xd0d | (opcode & 0xf0));
 				NEXT_ACC_A; CYCLES(1);
 				break;
@@ -652,10 +652,10 @@ void ccpu_cpu_device::execute_run()
 				if (m_acc == &m_A)
 				{
 					tempval = (m_A >> 1) | ((m_B << 11) & 0x800);
-					m_B = ((INT16)(m_B << 4) >> 5) & 0xfff;
+					m_B = ((int16_t)(m_B << 4) >> 5) & 0xfff;
 				}
 				else
-					tempval = ((INT16)(m_B << 4) >> 5) & 0xfff;
+					tempval = ((int16_t)(m_B << 4) >> 5) & 0xfff;
 				tempval |= (*m_acc + (0xe0e | (opcode & 0xf0))) & 0x1000;
 				STANDARD_ACC_OP(tempval, 0xe0e | (opcode & 0xf0));
 				NEXT_ACC_A; CYCLES(1);
@@ -678,8 +678,8 @@ void ccpu_cpu_device::execute_run()
 
 			/* IV */
 			case 0xf0:
-				m_X = (INT16)(m_A << 4) >> 4;
-				m_Y = (INT16)(m_B << 4) >> 4;
+				m_X = (int16_t)(m_A << 4) >> 4;
+				m_Y = (int16_t)(m_B << 4) >> 4;
 				NEXT_ACC_A; CYCLES(1);
 				break;
 		}
@@ -687,7 +687,7 @@ void ccpu_cpu_device::execute_run()
 }
 
 
-offs_t ccpu_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t ccpu_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( ccpu );
 	return CPU_DISASSEMBLE_NAME(ccpu)(this, buffer, pc, oprom, opram, options);

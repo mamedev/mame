@@ -46,7 +46,7 @@ class k051649_device : public device_t,
 						public device_sound_interface
 {
 public:
-	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k051649_device() { }
 
 protected:
@@ -81,12 +81,12 @@ private:
 	int m_rate;
 
 	/* mixer tables and internal buffers */
-	std::unique_ptr<INT16[]> m_mixer_table;
-	INT16 *m_mixer_lookup;
+	std::unique_ptr<int16_t[]> m_mixer_table;
+	int16_t *m_mixer_lookup;
 	std::unique_ptr<short[]> m_mixer_buffer;
 
 	/* chip registers */
-	UINT8 m_test;
+	uint8_t m_test;
 };
 
 extern const device_type K051649;

@@ -175,19 +175,19 @@ code at z80:0093:
 
 SAMPLES_START_CB_MEMBER(superqix_state::pbillian_sh_start)
 {
-	UINT8 *src = memregion("samples")->base();
+	uint8_t *src = memregion("samples")->base();
 	int i, len = memregion("samples")->bytes();
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
-	m_samplebuf = std::make_unique<INT16[]>(len);
+	m_samplebuf = std::make_unique<int16_t[]>(len);
 	for (i = 0;i < len;i++)
-		m_samplebuf[i] = (INT8)(src[i] ^ 0x80) * 256;
+		m_samplebuf[i] = (int8_t)(src[i] ^ 0x80) * 256;
 }
 
 WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
 {
 	//logerror("sample trigger write of %02x\n", data);
-	UINT8 *src = memregion("samples")->base();
+	uint8_t *src = memregion("samples")->base();
 	int len = memregion("samples")->bytes();
 	int start,end;
 
@@ -217,7 +217,7 @@ void superqix_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		hle_68705_w_cb(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in superqix_state::device_timer");
+		assert_always(false, "Unknown id in superqix_state::device_timer");
 	}
 }
 
@@ -268,7 +268,7 @@ READ8_MEMBER(superqix_state::in4_mcu_r)
 {
 //  logerror("%04x: in4_mcu_r\n",space.device().safe_pc());
 	//logerror("%04x: ay_port_b_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_t &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
-	UINT8 temp = ioport("P2")->read();
+	uint8_t temp = ioport("P2")->read();
 	//logerror("returning %02X\n", temp);
 	return temp;
 }
@@ -805,7 +805,7 @@ READ8_MEMBER(superqix_state::hotsmash_68705_portC_r)
 WRITE8_MEMBER(superqix_state::hotsmash_68705_portC_w)
 {
 	m_portC_internal = data|0xF0;
-	UINT8 changed_m_portC_out = (m_portC_out^(m_portC_internal|(~m_ddrC)));
+	uint8_t changed_m_portC_out = (m_portC_out^(m_portC_internal|(~m_ddrC)));
 	m_portC_out = (m_portC_internal|(~m_ddrC));
 
 	if ((changed_m_portC_out&0x08) && !(m_portC_out&0x08)) // on the falling edge of the latch bit, update m_portA_in and (if applicable) m_portB_out latches
@@ -893,7 +893,7 @@ CUSTOM_INPUT_MEMBER(superqix_state::pbillian_semaphore_input_r)
 READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
 {
 	//logerror("%04x: ay_port_a_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_state_interface &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
-	UINT8 temp = ioport("BUTTONS")->read();
+	uint8_t temp = ioport("BUTTONS")->read();
 	//logerror("returning %02X\n", temp);
 	return temp;
 }
@@ -901,7 +901,7 @@ READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
 READ8_MEMBER(superqix_state::pbillian_ay_port_b_r)
 {
 	//logerror("%04x: ay_port_b_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_t &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
-	UINT8 temp = ioport("SYSTEM")->read();
+	uint8_t temp = ioport("SYSTEM")->read();
 	//logerror("returning %02X\n", temp);
 	return temp;
 }
@@ -932,7 +932,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::hle_68705_w_cb)
 		case 0x00: m_curr_player = 0; break; // this command should fully reset the mcu and quadrature counters by jumping to its reset vector, as in hotsmash. it does not return a response value.
 		case 0x01:
 		{
-			UINT8 p = ioport(m_curr_player ? "PLUNGER2" : "PLUNGER1")->read() & 0xbf;
+			uint8_t p = ioport(m_curr_player ? "PLUNGER2" : "PLUNGER1")->read() & 0xbf;
 			if ((p & 0x3f) == 0) p |= 0x40;
 			m_fromMCU = p;
 			break;
@@ -1730,9 +1730,9 @@ DRIVER_INIT_MEMBER(superqix_state,sqixr0)
 
 DRIVER_INIT_MEMBER(superqix_state,perestro)
 {
-	UINT8 *src;
+	uint8_t *src;
 	int len;
-	UINT8 temp[16];
+	uint8_t temp[16];
 	int i,j;
 
 	/* decrypt program code; the address lines are shuffled around in a non-trivial way */

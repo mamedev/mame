@@ -77,7 +77,7 @@ class z8536_device :  public device_t,
 {
 public:
 	// construction/destruction
-	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pa.set_callback(object); }
@@ -297,10 +297,10 @@ private:
 	void get_interrupt_vector();
 	void check_interrupt();
 
-	UINT8 read_register(offs_t offset);
-	UINT8 read_register(offs_t offset, UINT8 mask);
-	void write_register(offs_t offset, UINT8 data);
-	void write_register(offs_t offset, UINT8 data, UINT8 mask);
+	uint8_t read_register(offs_t offset);
+	uint8_t read_register(offs_t offset, uint8_t mask);
+	void write_register(offs_t offset, uint8_t data);
+	void write_register(offs_t offset, uint8_t data, uint8_t mask);
 
 	bool counter_enabled(device_timer_id id);
 	bool counter_external_output(device_timer_id id);
@@ -330,18 +330,18 @@ private:
 
 	// register state
 	int m_state;
-	UINT8 m_register[48];
-	UINT8 m_pointer;
+	uint8_t m_register[48];
+	uint8_t m_pointer;
 
 	// input/output port state
-	UINT8 m_input[3];
-	UINT8 m_output[3];
-	UINT8 m_buffer[3];
-	UINT8 m_match[3];
+	uint8_t m_input[3];
+	uint8_t m_output[3];
+	uint8_t m_buffer[3];
+	uint8_t m_match[3];
 
 	// timers
 	emu_timer *m_timer;
-	UINT16 m_counter[3];
+	uint16_t m_counter[3];
 };
 
 

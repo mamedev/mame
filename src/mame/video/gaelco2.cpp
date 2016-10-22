@@ -336,7 +336,7 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
 
 void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask, int xoffs)
 {
-	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
+	uint16_t *buffered_spriteram16 = m_spriteram->buffer();
 	int j, x, y, ex, ey, px, py;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
@@ -387,12 +387,12 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 					} else { /* last palette entry is reserved for shadows and highlights */
 
 						/* get a pointer to the current sprite's gfx data */
-						const UINT8 *gfx_src = gfx->get_data(number % gfx->elements());
+						const uint8_t *gfx_src = gfx->get_data(number % gfx->elements());
 
 						for (py = 0; py < gfx->height(); py++){
 							/* get a pointer to the current line in the screen bitmap */
 							int ypos = ((sy + ey*16 + py) & 0x1ff);
-							UINT16 *srcy = &bitmap.pix16(ypos);
+							uint16_t *srcy = &bitmap.pix16(ypos);
 
 							int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
 
@@ -401,7 +401,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 							for (px = 0; px < gfx->width(); px++){
 								/* get current pixel */
 								int xpos = (((sx + ex*16 + px) & 0x3ff) + spr_x_adjust) & 0x3ff;
-								UINT16 *pixel = srcy + xpos;
+								uint16_t *pixel = srcy + xpos;
 								int src_color = *pixel;
 
 								int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
@@ -430,7 +430,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 ***************************************************************************/
 
-UINT32 gaelco2_state::screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gaelco2_state::screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -464,7 +464,7 @@ UINT32 gaelco2_state::screen_update_gaelco2(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
+uint32_t gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
 {
 	int i;
 
@@ -513,5 +513,5 @@ UINT32 gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-UINT32 gaelco2_state::screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 0); }
-UINT32 gaelco2_state::screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 1); }
+uint32_t gaelco2_state::screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 0); }
+uint32_t gaelco2_state::screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 1); }

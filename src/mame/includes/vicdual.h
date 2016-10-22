@@ -45,8 +45,8 @@ public:
 	required_device<screen_device> m_screen;
 	optional_memory_region m_proms;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_characterram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_characterram;
 
 	required_ioport m_in0;
 	required_ioport m_in1;
@@ -55,9 +55,9 @@ public:
 	optional_ioport m_color_bw;
 	optional_ioport_array<2> m_fake_lives;
 
-	UINT8 m_coin_status;
-	UINT8 m_palette_bank;
-	UINT8 m_samurai_protection_data;
+	uint8_t m_coin_status;
+	uint8_t m_palette_bank;
+	uint8_t m_samurai_protection_data;
 	int m_nsub_coin_counter;
 	int m_nsub_play_counter;
 	int m_port1State;
@@ -149,9 +149,9 @@ public:
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int get_vcounter();
 	int is_cabinet_color();
 };

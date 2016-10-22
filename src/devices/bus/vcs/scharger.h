@@ -16,7 +16,7 @@ class a26_rom_ss_device : public a26_rom_f6_device
 {
 public:
 	// construction/destruction
-	a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -30,14 +30,14 @@ public:
 
 private:
 	cpu_device   *m_maincpu;
-	inline UINT8 read_byte(UINT32 offset);
+	inline uint8_t read_byte(uint32_t offset);
 
 	int m_base_banks[2];
-	UINT8 m_reg;
-	UINT8 m_write_delay, m_ram_write_enabled, m_rom_enabled;
-	UINT32 m_byte_started;
-	UINT16 m_last_address;
-	UINT32 m_diff_adjust;
+	uint8_t m_reg;
+	uint8_t m_write_delay, m_ram_write_enabled, m_rom_enabled;
+	uint32_t m_byte_started;
+	uint16_t m_last_address;
+	uint32_t m_diff_adjust;
 };
 
 

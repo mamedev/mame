@@ -86,7 +86,7 @@ void save_manager::allow_registration(bool allowed)
 //  index
 //-------------------------------------------------
 
-const char *save_manager::indexed_item(int index, void *&base, UINT32 &valsize, UINT32 &valcount) const
+const char *save_manager::indexed_item(int index, void *&base, uint32_t &valsize, uint32_t &valcount) const
 {
 	if (index >= m_entry_list.size() || index < 0)
 		return nullptr;
@@ -147,7 +147,7 @@ void save_manager::register_postload(save_prepost_delegate func)
 //  memory
 //-------------------------------------------------
 
-void save_manager::save_memory(device_t *device, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount)
+void save_manager::save_memory(device_t *device, const char *module, const char *tag, uint32_t index, const char *name, void *val, uint32_t valsize, uint32_t valcount)
 {
 	assert(valsize == 1 || valsize == 2 || valsize == 4 || valsize == 8);
 
@@ -195,13 +195,13 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 save_error save_manager::check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
 {
 	// if we want to validate the signature, compute it
-	UINT32 sig;
+	uint32_t sig;
 	sig = machine.save().signature();
 
 	// seek to the beginning and read the header
 	file.compress(FCOMPRESS_NONE);
 	file.seek(0, SEEK_SET);
-	UINT8 header[HEADER_SIZE];
+	uint8_t header[HEADER_SIZE];
 	if (file.read(header, sizeof(header)) != sizeof(header))
 	{
 		if (errormsg != nullptr)
@@ -238,13 +238,13 @@ save_error save_manager::read_file(emu_file &file)
 	// read the header and turn on compression for the rest of the file
 	file.compress(FCOMPRESS_NONE);
 	file.seek(0, SEEK_SET);
-	UINT8 header[HEADER_SIZE];
+	uint8_t header[HEADER_SIZE];
 	if (file.read(header, sizeof(header)) != sizeof(header))
 		return STATERR_READ_ERROR;
 	file.compress(FCOMPRESS_MEDIUM);
 
 	// verify the header and report an error if it doesn't match
-	UINT32 sig = signature();
+	uint32_t sig = signature();
 	if (validate_header(header, machine().system().name, sig, nullptr, "Error: ")  != STATERR_NONE)
 		return STATERR_INVALID_HEADER;
 
@@ -254,7 +254,7 @@ save_error save_manager::read_file(emu_file &file)
 	// read all the data, flipping if necessary
 	for (auto &entry : m_entry_list)
 	{
-		UINT32 totalsize = entry->m_typesize * entry->m_typecount;
+		uint32_t totalsize = entry->m_typesize * entry->m_typecount;
 		if (file.read(entry->m_data, totalsize) != totalsize)
 			return STATERR_READ_ERROR;
 
@@ -292,13 +292,13 @@ save_error save_manager::write_file(emu_file &file)
 		return STATERR_ILLEGAL_REGISTRATIONS;
 
 	// generate the header
-	UINT8 header[HEADER_SIZE];
+	uint8_t header[HEADER_SIZE];
 	memcpy(&header[0], STATE_MAGIC_NUM, 8);
 	header[8] = SAVE_VERSION;
 	header[9] = NATIVE_ENDIAN_VALUE_LE_BE(0, SS_MSB_FIRST);
 	strncpy((char *)&header[0x0a], machine().system().name, 0x1c - 0x0a);
-	UINT32 sig = signature();
-	*(UINT32 *)&header[0x1c] = little_endianize_int32(sig);
+	uint32_t sig = signature();
+	*(uint32_t *)&header[0x1c] = little_endianize_int32(sig);
 
 	// write the header and turn on compression for the rest of the file
 	file.compress(FCOMPRESS_NONE);
@@ -313,7 +313,7 @@ save_error save_manager::write_file(emu_file &file)
 	// then write all the data
 	for (auto &entry : m_entry_list)
 	{
-		UINT32 totalsize = entry->m_typesize * entry->m_typecount;
+		uint32_t totalsize = entry->m_typesize * entry->m_typecount;
 		if (file.write(entry->m_data, totalsize) != totalsize)
 			return STATERR_WRITE_ERROR;
 	}
@@ -326,20 +326,20 @@ save_error save_manager::write_file(emu_file &file)
 //  is a CRC over the structure of the data
 //-------------------------------------------------
 
-UINT32 save_manager::signature() const
+uint32_t save_manager::signature() const
 {
 	// iterate over entries
-	UINT32 crc = 0;
+	uint32_t crc = 0;
 	for (auto &entry : m_entry_list)
 	{
 		// add the entry name to the CRC
-		crc = core_crc32(crc, (UINT8 *)entry->m_name.c_str(), entry->m_name.length());
+		crc = core_crc32(crc, (uint8_t *)entry->m_name.c_str(), entry->m_name.length());
 
 		// add the type and size to the CRC
-		UINT32 temp[2];
+		uint32_t temp[2];
 		temp[0] = little_endianize_int32(entry->m_typecount);
 		temp[1] = little_endianize_int32(entry->m_typesize);
-		crc = core_crc32(crc, (UINT8 *)&temp[0], sizeof(temp));
+		crc = core_crc32(crc, (uint8_t *)&temp[0], sizeof(temp));
 	}
 	return crc;
 }
@@ -362,7 +362,7 @@ void save_manager::dump_registry() const
 //  header
 //-------------------------------------------------
 
-save_error save_manager::validate_header(const UINT8 *header, const char *gamename, UINT32 signature,
+save_error save_manager::validate_header(const uint8_t *header, const char *gamename, uint32_t signature,
 	void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix)
 {
 	// check magic number
@@ -392,7 +392,7 @@ save_error save_manager::validate_header(const UINT8 *header, const char *gamena
 	// check signature, if we were asked to
 	if (signature != 0)
 	{
-		UINT32 rawsig = *(UINT32 *)&header[0x1c];
+		uint32_t rawsig = *(uint32_t *)&header[0x1c];
 		if (signature != little_endianize_int32(rawsig))
 		{
 			if (errormsg != nullptr)
@@ -418,7 +418,7 @@ save_manager::state_callback::state_callback(save_prepost_delegate callback)
 //  state_entry - constructor
 //-------------------------------------------------
 
-state_entry::state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, UINT8 size, UINT32 count)
+state_entry::state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, uint8_t size, uint32_t count)
 	: m_data(data),
 		m_name(name),
 		m_device(device),
@@ -439,27 +439,27 @@ state_entry::state_entry(void *data, const char *name, device_t *device, const c
 
 void state_entry::flip_data()
 {
-	UINT16 *data16;
-	UINT32 *data32;
-	UINT64 *data64;
+	uint16_t *data16;
+	uint32_t *data32;
+	uint64_t *data64;
 	int count;
 
 	switch (m_typesize)
 	{
 		case 2:
-			data16 = (UINT16 *)m_data;
+			data16 = (uint16_t *)m_data;
 			for (count = 0; count < m_typecount; count++)
 				data16[count] = flipendian_int16(data16[count]);
 			break;
 
 		case 4:
-			data32 = (UINT32 *)m_data;
+			data32 = (uint32_t *)m_data;
 			for (count = 0; count < m_typecount; count++)
 				data32[count] = flipendian_int32(data32[count]);
 			break;
 
 		case 8:
-			data64 = (UINT64 *)m_data;
+			data64 = (uint64_t *)m_data;
 			for (count = 0; count < m_typecount; count++)
 				data64[count] = flipendian_int64(data64[count]);
 			break;

@@ -336,15 +336,14 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
-#include "sound/dac.h"
-#include "sound/ym2151.h"
-#include "machine/fd1094.h"
-#include "machine/nvram.h"
-#include "video/segaic24.h"
 #include "includes/segas24.h"
 #include "includes/segaipt.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/fd1094.h"
+#include "machine/nvram.h"
+#include "sound/volt_reg.h"
+#include "sound/ym2151.h"
+#include "video/segaic24.h"
 
 #define MASTER_CLOCK        XTAL_20MHz
 #define VIDEO_CLOCK         XTAL_32MHz
@@ -516,7 +515,7 @@ WRITE16_MEMBER( segas24_state::fdc_ctrl_w )
 
 // I/O Mappers
 
-UINT8 segas24_state::hotrod_io_r(UINT8 port)
+uint8_t segas24_state::hotrod_io_r(uint8_t port)
 {
 	switch(port)
 	{
@@ -540,20 +539,20 @@ UINT8 segas24_state::hotrod_io_r(UINT8 port)
 	return 0x00;
 }
 
-UINT8 segas24_state::dcclub_io_r(UINT8 port)
+uint8_t segas24_state::dcclub_io_r(uint8_t port)
 {
 	switch(port)
 	{
 	case 0:
 	{
-		static const UINT8 pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9, 0, 0, 0 };
+		static const uint8_t pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9, 0, 0, 0 };
 		return (m_p1->read() & 0xf) | ((~pos[m_paddle->read()>>4]<<4) & 0xf0);
 	}
 	case 1:
 		return m_p2->read();
 	case 2:
 	{
-		static const UINT8 pos[16] = { 0, 0, 0, 0, 0, 0,  0, 0, 0, 1, 3, 2 };
+		static const uint8_t pos[16] = { 0, 0, 0, 0, 0, 0,  0, 0, 0, 1, 3, 2 };
 		return(~pos[m_paddle->read()>>4] & 0x03) | 0xfc;
 	}
 	case 3:
@@ -571,7 +570,7 @@ UINT8 segas24_state::dcclub_io_r(UINT8 port)
 }
 
 
-UINT8 segas24_state::mahmajn_io_r(UINT8 port)
+uint8_t segas24_state::mahmajn_io_r(uint8_t port)
 {
 	switch(port)
 	{
@@ -595,7 +594,7 @@ UINT8 segas24_state::mahmajn_io_r(UINT8 port)
 	return 0x00;
 }
 
-void segas24_state::mahmajn_io_w(UINT8 port, UINT8 data)
+void segas24_state::mahmajn_io_w(uint8_t port, uint8_t data)
 {
 	switch(port)
 	{
@@ -604,21 +603,21 @@ void segas24_state::mahmajn_io_w(UINT8 port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		m_dac->write_signed8(data);
+		m_dac->write(data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
 	}
 }
 
-void segas24_state::hotrod_io_w(UINT8 port, UINT8 data)
+void segas24_state::hotrod_io_w(uint8_t port, uint8_t data)
 {
 	switch(port)
 	{
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		m_dac->write_signed8(data);
+		m_dac->write(data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -767,7 +766,7 @@ void segas24_state::reset_reset()
 	prev_resetcontrol = resetcontrol;
 }
 
-void segas24_state::reset_control_w(UINT8 data)
+void segas24_state::reset_control_w(uint8_t data)
 {
 	resetcontrol = data;
 	reset_reset();
@@ -813,7 +812,7 @@ WRITE8_MEMBER( segas24_state::frc_mode_w )
 
 READ8_MEMBER( segas24_state::frc_r )
 {
-	INT32 result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0)).as_double();
+	int32_t result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0)).as_double();
 
 	result %= ((frc_mode) ? 0x67 : 0x100);
 
@@ -830,13 +829,13 @@ WRITE8_MEMBER( segas24_state::frc_w )
 
 // Protection magic latch
 
-const UINT8  segas24_state::mahmajn_mlt[8] = { 5, 1, 6, 2, 3, 7, 4, 0 };
-const UINT8 segas24_state::mahmajn2_mlt[8] = { 6, 0, 5, 3, 1, 4, 2, 7 };
-const UINT8      segas24_state::qgh_mlt[8] = { 3, 7, 4, 0, 2, 6, 5, 1 };
-const UINT8 segas24_state::bnzabros_mlt[8] = { 2, 4, 0, 5, 7, 3, 1, 6 };
-const UINT8   segas24_state::qrouka_mlt[8] = { 1, 6, 4, 7, 0, 5, 3, 2 };
-const UINT8 segas24_state::quizmeku_mlt[8] = { 0, 3, 2, 4, 6, 1, 7, 5 };
-const UINT8   segas24_state::dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
+const uint8_t  segas24_state::mahmajn_mlt[8] = { 5, 1, 6, 2, 3, 7, 4, 0 };
+const uint8_t segas24_state::mahmajn2_mlt[8] = { 6, 0, 5, 3, 1, 4, 2, 7 };
+const uint8_t      segas24_state::qgh_mlt[8] = { 3, 7, 4, 0, 2, 6, 5, 1 };
+const uint8_t segas24_state::bnzabros_mlt[8] = { 2, 4, 0, 5, 7, 3, 1, 6 };
+const uint8_t   segas24_state::qrouka_mlt[8] = { 1, 6, 4, 7, 0, 5, 3, 2 };
+const uint8_t segas24_state::quizmeku_mlt[8] = { 0, 3, 2, 4, 6, 1, 7, 5 };
+const uint8_t   segas24_state::dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
 
 
 READ16_MEMBER( segas24_state::mlatch_r )
@@ -848,7 +847,7 @@ WRITE16_MEMBER( segas24_state::mlatch_w )
 {
 	if(ACCESSING_BITS_0_7) {
 		int i;
-		UINT8 mxor = 0;
+		uint8_t mxor = 0;
 		if(!mlatch_table) {
 			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space.device().tag(), space.device().safe_pc());
 			return;
@@ -997,7 +996,7 @@ WRITE16_MEMBER(segas24_state::irq_w)
 	}
 	case 1:
 		if(ACCESSING_BITS_0_7) {
-			UINT8 old_tmode = irq_tmode;
+			uint8_t old_tmode = irq_tmode;
 			irq_timer_sync();
 			irq_tmode = data & 3;
 			irq_timer_start(old_tmode);
@@ -1330,7 +1329,7 @@ void segas24_state::machine_start()
 
 	if (m_romboard != nullptr)
 	{
-		UINT8 *usr1 = m_romboard->base();
+		uint8_t *usr1 = m_romboard->base();
 		membank("bank1")->configure_entries(0, 16, usr1, 0x40000);
 		membank("bank2")->configure_entries(0, 16, usr1, 0x40000);
 	}
@@ -2043,9 +2042,9 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system24_floppy, system24 )

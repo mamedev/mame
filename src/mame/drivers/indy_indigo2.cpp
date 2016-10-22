@@ -50,87 +50,542 @@
 #include "machine/pit8253.h"
 #include "video/newport.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsihd.h"
 #include "machine/wd33c93.h"
 #include "machine/ds1386.h"
+#include "machine/z80scc.h"
 
-#define MCFG_IOC2_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, SGI_IOC2, 0)
+#define SCC_TAG		"scc"
+#define PI1_TAG		"pi1"
+#define KBDC_TAG	"kbdc"
+#define PIT_TAG		"pit"
+
+#define SCC_CLOCK	XTAL_10MHz
+
+#define MCFG_IOC2_GUINNESS_ADD(_tag)  \
+	MCFG_DEVICE_ADD(_tag, SGI_IOC2_GUINNESS, 0)
+
+#define MCFG_IOC2_FULL_HOUSE_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SGI_IOC2_FULL_HOUSE, 0)
 
 class ioc2_device : public device_t
 {
 public:
-	ioc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ioc2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ioc2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t id);
 
-	DECLARE_WRITE32_MEMBER( int3_write );
-	DECLARE_READ32_MEMBER( int3_read );
+	DECLARE_WRITE32_MEMBER( write );
+	DECLARE_READ32_MEMBER( read );
 
-	void lower_local0_irq(UINT8 source_mask);
-	void raise_local0_irq(UINT8 source_mask);
-	void lower_local1_irq(UINT8 source_mask);
-	void raise_local1_irq(UINT8 source_mask);
+	DECLARE_INPUT_CHANGED_MEMBER( power_button );
+	DECLARE_INPUT_CHANGED_MEMBER( volume_down );
+	DECLARE_INPUT_CHANGED_MEMBER( volume_up );
+
+	void lower_local0_irq(uint8_t source_mask);
+	void raise_local0_irq(uint8_t source_mask);
+	void lower_local1_irq(uint8_t source_mask);
+	void raise_local1_irq(uint8_t source_mask);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	required_device<mips3_device> m_maincpu;
+	required_device<scc85C30_device> m_scc;
+	required_device<pc_lpt_device> m_pi1; 	// we assume standard parallel port (SPP) mode
+											// TODO: SGI parallel port (SGIPP), HP BOISE high speed parallel port (HPBPP), and Ricoh scanner modes
+	required_device<kbdc8042_device> m_kbdc;
+	required_device<pit8254_device> m_pit;
 
-	UINT32	m_regs[0x40];
-	UINT32	m_par_read_cnt;
-	UINT32	m_par_cntl;
+	virtual void handle_reset_reg_write(uint8_t data);
+
+	uint8_t m_gen_ctrl_select_reg;
+	uint8_t m_gen_ctrl_reg;
+	uint8_t m_front_panel_reg;
+
+	uint8_t m_read_reg;
+	uint8_t m_dma_sel;
+	uint8_t m_reset_reg;
+	uint8_t m_write_reg;
+
+	uint8_t m_int3_local0_status_reg;
+	uint8_t m_int3_local0_mask_reg;
+	uint8_t m_int3_local1_status_reg;
+	uint8_t m_int3_local1_mask_reg;
+	uint8_t m_int3_map_status_reg;
+	uint8_t m_int3_map_mask0_reg;
+	uint8_t m_int3_map_mask1_reg;
+	uint8_t m_int3_map_pol_reg;
+	uint8_t m_int3_timer_clear_reg;
+	uint8_t m_int3_err_status_reg;
+
+	uint32_t	m_par_read_cnt;
+	uint32_t	m_par_cntl;
+	uint8_t	m_system_id;
 };
 
-const device_type SGI_IOC2 = &device_creator<ioc2_device>;
+class ioc2_guinness_device : public ioc2_device
+{
+public:
+	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ioc2_guinness_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+		: ioc2_device(mconfig, type, name, tag, owner, clock, shortname, source, 0x01) { }
+};
 
-ioc2_device::ioc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SGI_IOC2, "SGI IOC2 I/O Controller", tag, owner, clock, "ioc2", __FILE__)
-	, m_maincpu(*this, "^maincpu")
+class ioc2_full_house_device : public ioc2_device
+{
+public:
+	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ioc2_full_house_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+		: ioc2_device(mconfig, type, name, tag, owner, clock, shortname, source, 0x20) { }
+};
+
+const device_type SGI_IOC2_GUINNESS = &device_creator<ioc2_guinness_device>;
+const device_type SGI_IOC2_FULL_HOUSE = &device_creator<ioc2_full_house_device>;
+
+ioc2_guinness_device::ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ioc2_guinness_device(mconfig, SGI_IOC2_GUINNESS, "SGI IOC2 (Guinness)", tag, owner, clock, "ioc2g", __FILE__)
 {
 }
 
+ioc2_full_house_device::ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ioc2_full_house_device(mconfig, SGI_IOC2_FULL_HOUSE, "SGI IOC2 (Full House)", tag, owner, clock, "ioc2f", __FILE__)
+{
+}
+
+static INPUT_PORTS_START( front_panel )
+	PORT_START("panel_buttons")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Power")		PORT_CHANGED_MEMBER(DEVICE_SELF, ioc2_device, power_button, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Volume Down")	PORT_CHANGED_MEMBER(DEVICE_SELF, ioc2_device, volume_down, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Volume Up")	PORT_CHANGED_MEMBER(DEVICE_SELF, ioc2_device, volume_up, 0)
+INPUT_PORTS_END
+
+ioport_constructor ioc2_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(front_panel);
+}
+
+MACHINE_CONFIG_FRAGMENT( ioc2_device )
+	MCFG_SCC85C30_ADD(SCC_TAG, SCC_CLOCK, 0, 0, 0, 0)
+
+	MCFG_DEVICE_ADD(PI1_TAG, PC_LPT, 0)
+
+	MCFG_DEVICE_ADD(KBDC_TAG, KBDC8042, 0)
+	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_STANDARD)
+	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("^maincpu", INPUT_LINE_RESET))
+
+	MCFG_DEVICE_ADD(PIT_TAG, PIT8254, 0)
+	MCFG_PIT8253_CLK0(1000000)
+	MCFG_PIT8253_CLK1(1000000)
+	MCFG_PIT8253_CLK2(1000000)
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(KBDC_TAG, kbdc8042_device, write_out2))
+MACHINE_CONFIG_END
+
+machine_config_constructor ioc2_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(ioc2_device);
+}
+
+ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t id)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_maincpu(*this, "^maincpu")
+	, m_scc(*this, SCC_TAG)
+	, m_pi1(*this, PI1_TAG)
+	, m_kbdc(*this, KBDC_TAG)
+	, m_pit(*this, PIT_TAG)
+	, m_gen_ctrl_select_reg(0)
+	, m_gen_ctrl_reg(0)
+	, m_front_panel_reg(0)
+	, m_read_reg(0)
+	, m_dma_sel(0)
+	, m_reset_reg(0)
+	, m_write_reg(0)
+	, m_int3_local0_status_reg(0)
+	, m_int3_local0_mask_reg(0)
+	, m_int3_local1_status_reg(0)
+	, m_int3_local1_mask_reg(0)
+	, m_int3_map_status_reg(0)
+	, m_int3_map_mask0_reg(0)
+	, m_int3_map_mask1_reg(0)
+	, m_int3_map_pol_reg(0)
+	, m_int3_timer_clear_reg(0)
+	, m_int3_err_status_reg(0)
+	, m_par_read_cnt(0)
+	, m_par_cntl(0)
+	, m_system_id(id)
+{
+}
+
+#define FRONT_PANEL_POWER_STATE			(0x01)
+#define FRONT_PANEL_POWER_BUTTON_INT	(0x02)
+#define FRONT_PANEL_VOL_DOWN_INT		(0x10)
+#define FRONT_PANEL_VOL_DOWN_HOLD		(0x20)
+#define FRONT_PANEL_VOL_UP_INT			(0x40)
+#define FRONT_PANEL_VOL_UP_HOLD			(0x80)
+
 void ioc2_device::device_start()
 {
+	m_front_panel_reg = FRONT_PANEL_POWER_STATE;
 }
 
 void ioc2_device::device_reset()
 {
 	m_par_read_cnt = 0;
 	m_par_cntl = 0;
-	memset(m_regs, 0, sizeof(UINT32) * 0x40);
+
+	m_gen_ctrl_select_reg = 0;
+	m_gen_ctrl_reg = 0;
+	m_front_panel_reg = FRONT_PANEL_POWER_STATE;
+
+	m_read_reg = 0;
+	m_dma_sel = 0;
+	m_reset_reg = 0;
+	m_write_reg = 0;
+
+	m_int3_local0_status_reg = 0;
+	m_int3_local0_mask_reg = 0;
+	m_int3_local1_status_reg = 0;
+	m_int3_local1_mask_reg = 0;
+	m_int3_map_status_reg = 0;
+	m_int3_map_mask0_reg = 0;
+	m_int3_map_mask1_reg = 0;
+	m_int3_map_pol_reg = 0;
+	m_int3_timer_clear_reg = 0;
+	m_int3_err_status_reg = 0;
 }
 
-#define KBDC_TAG	"kbdc"
+#define INT3_LOCAL0_FIFO    (0x01)
+#define INT3_LOCAL0_SCSI0   (0x02)
+#define INT3_LOCAL0_SCSI1   (0x04)
+#define INT3_LOCAL0_ETHERNET    (0x08)
+#define INT3_LOCAL0_MC_DMA  (0x10)
+#define INT3_LOCAL0_PARALLEL    (0x20)
+#define INT3_LOCAL0_GRAPHICS    (0x40)
+#define INT3_LOCAL0_MAPPABLE0   (0x80)
+
+#define INT3_LOCAL1_GP0     (0x01)
+#define INT3_LOCAL1_PANEL   (0x02)
+#define INT3_LOCAL1_GP2     (0x04)
+#define INT3_LOCAL1_MAPPABLE1   (0x08)
+#define INT3_LOCAL1_HPC_DMA     (0x10)
+#define INT3_LOCAL1_AC_FAIL     (0x20)
+#define INT3_LOCAL1_VSYNC   (0x40)
+#define INT3_LOCAL1_RETRACE (0x80)
+
+void ioc2_device::raise_local0_irq(uint8_t source_mask)
+{
+	m_int3_local0_status_reg |= source_mask;
+	m_maincpu->set_input_line(MIPS3_IRQ0, (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void ioc2_device::lower_local0_irq(uint8_t source_mask)
+{
+	m_int3_local0_status_reg &= ~source_mask;
+}
+
+void ioc2_device::raise_local1_irq(uint8_t source_mask)
+{
+	m_int3_local1_status_reg |= source_mask;
+	m_maincpu->set_input_line(MIPS3_IRQ1, (m_int3_local1_mask_reg & m_int3_local1_status_reg) != 0 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void ioc2_device::lower_local1_irq(uint8_t source_mask)
+{
+	m_int3_local1_status_reg &= ~source_mask;
+}
+
+READ32_MEMBER( ioc2_device::read )
+{
+	switch (offset)
+	{
+		case 0x00/4: case 0x04/4: case 0x08/4:
+			return m_pi1->read(space, offset, 0xff);
+
+		case 0x0c/4: // Parallel Port DMA Control Register [docs?]
+		case 0x10/4: // Parallel Port Interrupt Status Register [docs?]
+		case 0x14/4: // Parallel Port Interrupt Mask Register [docs?]
+		case 0x18/4: // Parallel Port Timer 1 Register [docs?]
+		case 0x1c/4: // Parallel Port Timer 2 Register [docs?]
+		case 0x20/4: // Parallel Port Timer 3 Register [docs?]
+		case 0x24/4: // Parallel Port Timer 4 Register [docs?]
+			return 0;
+
+		case 0x30/4: // Serial Port1 Command Transfer
+		case 0x34/4: // Serial Port1 Data Transfer
+		case 0x38/4: // Serial Port2 Command Transfer
+		case 0x3c/4: // Serial Port2 Data Transfer
+			return m_scc->ba_cd_r(space, (offset - 0x30/4) ^ 1);
+
+		case 0x40/4: // Keyboard/Mouse Registers
+		case 0x44/4: // Keyboard/Mouse Registers
+			return m_kbdc->data_r(space, (offset - 0x40/4) * 4);
+
+		case 0x50/4: // Front Panel Register
+			return m_front_panel_reg;
+
+		case 0x58/4: // System ID Register
+			return m_system_id;
+
+		case 0x60/4: // Read Register
+			return m_read_reg;
+
+		case 0x68/4: // DMA_SEL Register
+			// Bits 2-0 not quite understood, seem to be copy/paste error in SGI's own documents:
+			//
+			// 2	RW		Parallel Port DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [this makes sense. -ed.]
+			// 1	RW		ISDN Channel B DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [is this a copy/paste error? perhaps "Parallel Port" should be "ISDN Channel B"?]
+			// 0	RW		[same text as above. Another copy/paste error, maybe? Should be channel A, with the bit selecting DMA channel 0/1 for ISDN channel A, the and the same for ISDN channel B in bit 1?]
+			return m_dma_sel;
+
+		case 0x70/4: // Reset Register
+			return m_reset_reg;
+
+		case 0x78/4: // Write Register
+			// Not yet implemented, some bits unnecessary:
+			//
+			// Bit	Oper	Description
+			// 7	RW		Margin High. Set low for normal +5V operation, high to step supply up to +5.5V. Cleared at reset.
+			// 6	RW		Margin Low. Set lowf or normal +5V operation, high to step supply down to +4.5V. Cleared at reset.
+			// 5	RW		UART1 PC Mode. Set low to configure Port1 for RS422 Mac mode, high to select RS232 PC mode. Cleared at reset.
+			// 4	RW		UART2 PC Mode. Set low to configure Port2 for RS422 Mac mode, high to select RS232 PC mode. Cleared at reset.
+			// 3	RW		Ethernet Auto Select (active high). Set low for manual mode, high to have LXT901 automatically select TP or AUI based on link integrity. Cleared at reset.
+			// 2	RW		Ethernet Port Select. Set low for TP, high for AUI. This setting is only used when Auto Select is in manual mode. Cleared at reset.
+			// 1	RW		Ethernet UTP/STP select. Set low to select 150 ohm termination fro shielded TP (default), set high to select 100 ohm termination for unshielded TP. Cleared at reset.
+			// 0	RW		Ethernet Normal Threshold (NTH) select. Set low to select the normal TP squelch threshold (default), high to reduce threshold by 4.5 dB (set low when reset).
+			return m_write_reg;
+
+		case 0x80/4: // INT3 Local0 Status Register
+			return m_int3_local0_status_reg;
+
+		case 0x84/4: // INT3 Local0 Mask Register
+			return m_int3_local0_mask_reg;
+
+		case 0x88/4: // INT3 Local1 Status Register
+			return m_int3_local1_status_reg;
+
+		case 0x8c/4: // INT3 Local1 Mask Register
+			return m_int3_local1_mask_reg;
+
+		case 0x90/4: // INT3 Map Status Register [TODO]
+			return m_int3_map_status_reg;
+
+		case 0x94/4: // INT3 Map Mask0 Register [TODO]
+			return m_int3_map_mask0_reg;
+
+		case 0x98/4: // INT3 Map Mask1 Register [TODO]
+			return m_int3_map_mask1_reg;
+
+		case 0x9c/4: // INT3 Map Pol Register [TODO]
+			return m_int3_map_pol_reg;
+
+		case 0xa0/4: // INT3 Timer Clear Register [TODO]
+			return m_int3_timer_clear_reg;
+
+		case 0xa4/4: // INT3 Error Status Register [TODO]
+			return m_int3_err_status_reg;
+
+		case 0xb0/4: // Timer Counter 0 Register
+		case 0xb4/4: // Timer Counter 1 Register
+		case 0xb8/4: // Timer Counter 2 Register
+		case 0xbc/4: // Timer Control Word Register
+			return m_pit->read(space, offset - 0xb0/4);
+	}
+
+	return 0;
+}
+
+#define DMA_SEL_CLOCK_SEL_MASK		(0x30)
+#define DMA_SEL_CLOCK_SEL_10MHz 	(0x00)
+#define DMA_SEL_CLOCK_SEL_6_67MHz	(0x10)
+#define DMA_SEL_CLOCK_SEL_EXT		(0x20)
+
+WRITE32_MEMBER( ioc2_device::write )
+{
+	switch (offset)
+	{
+		case 0x00/4: case 0x04/4: case 0x08/4:
+			m_pi1->write(space, offset, data & 0xff, 0xff);
+			return;
+
+		case 0x0c/4: // Parallel Port DMA Control Register [docs?]
+		case 0x10/4: // Parallel Port Interrupt Status Register [docs?]
+		case 0x14/4: // Parallel Port Interrupt Mask Register [docs?]
+		case 0x18/4: // Parallel Port Timer 1 Register [docs?]
+		case 0x1c/4: // Parallel Port Timer 2 Register [docs?]
+		case 0x20/4: // Parallel Port Timer 3 Register [docs?]
+		case 0x24/4: // Parallel Port Timer 4 Register [docs?]
+			return;
+
+		case 0x30/4: // Serial Port1 Command Transfer
+		case 0x34/4: // Serial Port1 Data Transfer
+		case 0x38/4: // Serial Port2 Command Transfer
+		case 0x3c/4: // Serial Port2 Data Transfer
+			m_scc->ba_cd_w(space, (offset - 0x30/4) ^ 1, data & 0xff);
+			return;
+
+		case 0x40/4: // Keyboard/Mouse Registers
+		case 0x44/4: // Keyboard/Mouse Registers
+			m_kbdc->data_w(space, (offset - 0x40/4) * 4, data & 0xff);
+			return;
+
+		case 0x50/4: // Front Panel Register
+			m_front_panel_reg &= ~(data & (FRONT_PANEL_VOL_UP_INT | FRONT_PANEL_VOL_DOWN_INT | FRONT_PANEL_POWER_BUTTON_INT));
+			return;
+
+		case 0x68/4: // DMA_SEL Register
+		{
+			// Bits 2-0 not quite understood, seem to be copy/paste error in SGI's own documents:
+			//
+			// 5:4	RW		Serial Port Clock Select: 00 selects a 10MHz internal clock (default), 01 selects a 6.67MHz internal clock, and 02 or 03 selects the external clock input.
+			// 2	RW		Parallel Port DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [this makes sense. -ed.]
+			// 1	RW		ISDN Channel B DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [is this a copy/paste error? perhaps "Parallel Port" should be "ISDN Channel B"?]
+			// 0	RW		[same text as above. Another copy/paste error, maybe? Should be channel A, with the bit selecting DMA channel 0/1 for ISDN channel A, the and the same for ISDN channel B in bit 1?]
+			uint8_t old = m_dma_sel;
+			m_dma_sel = data;
+			uint8_t diff = old ^ m_dma_sel;
+			if (diff & DMA_SEL_CLOCK_SEL_MASK)
+			{
+				if (diff & DMA_SEL_CLOCK_SEL_EXT)
+				{
+					printf("External clock select %sselected\n", (old & DMA_SEL_CLOCK_SEL_EXT) != 0 ? "de" : "");
+				}
+			}
+			// TODO: Currently we always assume a 10MHz clock
+			return;
+		}
+
+		case 0x70/4: // Reset Register
+			handle_reset_reg_write(data);
+			return;
+
+		case 0x78/4: // Write Register
+			m_write_reg = data;
+			return;
+
+		case 0x80/4: // INT3 Local0 Status Register
+		case 0x88/4: // INT3 Local1 Status Register
+		case 0x90/4: // INT3 Map Status Register
+		case 0xa4/4: // INT3 Error Stat Register
+			// Read-only registers
+			return;
+
+		case 0x84/4: // INT3 Local0 Mask Register
+		{
+			uint8_t old = m_int3_local0_mask_reg;
+			m_int3_local0_mask_reg = data;
+			bool old_line = (old & m_int3_local0_status_reg) != 0;
+			bool new_line = (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0;
+			if (old_line != new_line)
+				m_maincpu->set_input_line(MIPS3_IRQ0, (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0 ? ASSERT_LINE : CLEAR_LINE);
+			return;
+		}
+
+		case 0x8c/4: // INT3 Local1 Mask Register
+		{
+			uint8_t old = m_int3_local0_mask_reg;
+			m_int3_local0_mask_reg = data;
+			bool old_line = (old & m_int3_local0_status_reg) != 0;
+			bool new_line = (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0;
+			if (old_line != new_line)
+				m_maincpu->set_input_line(MIPS3_IRQ0, (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0 ? ASSERT_LINE : CLEAR_LINE);
+			return;
+		}
+
+		case 0x94/4: // INT3 Map Mask0 Register
+			// TODO: Implement mappable interrupts
+			m_int3_map_mask0_reg = data;
+			return;
+
+		case 0x98/4: // INT3 Map Mask1 Register
+			// TODO: Implement mappable interrupts
+			m_int3_map_mask1_reg = data;
+			return;
+
+		case 0x9c/4: // INT3 Map Pol Register
+			// TODO: Mappable interrupt polarity select
+			m_int3_map_pol_reg = data;
+			return;
+
+		case 0xb0/4: // Timer Counter 0 Register
+		case 0xb4/4: // Timer Counter 1 Register
+		case 0xb8/4: // Timer Counter 2 Register
+		case 0xbc/4: // Timer Control Word Register
+			m_pit->write(space, offset - 0xb0/4, data & 0xff);
+			return;
+	}
+}
+
+void ioc2_device::handle_reset_reg_write(uint8_t data)
+{
+	// guinness/fullhouse-specific implementations can handle bit 3 being used for ISDN reset on Indy only and bit 2 for EISA reset on Indigo 2 only, but for now we do nothing with it
+	m_reset_reg = data;
+}
+
+INPUT_CHANGED_MEMBER( ioc2_device::power_button )
+{
+	if (!newval)
+	{
+		m_front_panel_reg |= FRONT_PANEL_POWER_BUTTON_INT;
+	}
+}
+
+INPUT_CHANGED_MEMBER( ioc2_device::volume_up )
+{
+	if (!newval)
+	{
+		m_front_panel_reg |= FRONT_PANEL_VOL_UP_INT;
+		m_front_panel_reg |= FRONT_PANEL_VOL_UP_HOLD;
+	}
+	else
+	{
+		m_front_panel_reg &= ~FRONT_PANEL_VOL_UP_HOLD;
+	}
+}
+
+INPUT_CHANGED_MEMBER( ioc2_device::volume_down )
+{
+	if (!newval)
+	{
+		m_front_panel_reg |= FRONT_PANEL_VOL_DOWN_INT;
+		m_front_panel_reg |= FRONT_PANEL_VOL_DOWN_HOLD;
+	}
+	else
+	{
+		m_front_panel_reg &= ~FRONT_PANEL_VOL_DOWN_HOLD;
+	}
+}
+
 #define IOC2_TAG	"ioc2"
 #define RTC_TAG		"ds1386"
 
 struct hpc3_t
 {
-	UINT32 m_enetr_nbdp;
-	UINT32 m_enetr_cbp;
-	UINT32 m_unk0;
-	UINT32 m_unk1;
-	UINT32 m_ic_unk0;
-	UINT32 m_scsi0_desc;
-	UINT32 m_scsi0_dma_ctrl;
+	uint32_t m_enetr_nbdp;
+	uint32_t m_enetr_cbp;
+	uint32_t m_unk0;
+	uint32_t m_unk1;
+	uint32_t m_ic_unk0;
+	uint32_t m_scsi0_desc;
+	uint32_t m_scsi0_dma_ctrl;
 };
 
-struct m_hal2
+struct hal2
 {
-	UINT32 m_iar;
-	UINT32 m_idr[4];
+	uint32_t m_iar;
+	uint32_t m_idr[4];
 };
 
 struct pbus_dma_t
 {
-	UINT8 m_active;
-	UINT32 m_cur_ptr;
-	UINT32 m_desc_ptr;
-	UINT32 m_next_ptr;
-	UINT32 m_words_left;
+	uint8_t m_active;
+	uint32_t m_cur_ptr;
+	uint32_t m_desc_ptr;
+	uint32_t m_next_ptr;
+	uint32_t m_words_left;
 };
 
 class ip22_state : public driver_device
@@ -147,12 +602,9 @@ public:
 		, m_wd33c93(*this, "wd33c93")
 		, m_unkpbus0(*this, "unkpbus0")
 		, m_mainram(*this, "mainram")
-		, m_lpt0(*this, "lpt_0")
-		, m_pit(*this, "pit8254")
 		, m_sgi_mc(*this, "sgi_mc")
 		, m_newport(*this, "newport")
 		, m_dac(*this, "dac")
-		, m_kbdc8042(*this, KBDC_TAG)
 		, m_ioc2(*this, IOC2_TAG)
 		, m_rtc(*this, RTC_TAG)
 	{
@@ -161,8 +613,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ32_MEMBER(hpc3_pbus6_r);
-	DECLARE_WRITE32_MEMBER(hpc3_pbus6_w);
 	DECLARE_READ32_MEMBER(hpc3_hd_enet_r);
 	DECLARE_WRITE32_MEMBER(hpc3_hd_enet_w);
 	DECLARE_READ32_MEMBER(hpc3_hd0_r);
@@ -190,25 +640,22 @@ protected:
 
 	required_device<mips3_device> m_maincpu;
 	required_device<wd33c93_device> m_wd33c93;
-	required_shared_ptr<UINT32> m_unkpbus0;
-	required_shared_ptr<UINT32> m_mainram;
-	required_device<pc_lpt_device> m_lpt0;
-	required_device<pit8254_device> m_pit;
+	required_shared_ptr<uint32_t> m_unkpbus0;
+	required_shared_ptr<uint32_t> m_mainram;
 	required_device<sgi_mc_device> m_sgi_mc;
 	required_device<newport_video_device> m_newport;
-	required_device<dac_device> m_dac;
-	required_device<kbdc8042_device> m_kbdc8042;
+	required_device<dac_word_interface> m_dac;
 	required_device<ioc2_device> m_ioc2;
 	required_device<ds1386_device> m_rtc;
 
-	void dump_chain(address_space &space, UINT32 ch_base);
+	void dump_chain(address_space &space, uint32_t ch_base);
 
 	hpc3_t m_hpc3;
 
-	m_hal2 m_hal2;
+	hal2 m_hal2;
 
 	pbus_dma_t m_pbus_dma;
-	UINT8 m_dma_buffer[4096];
+	uint8_t m_dma_buffer[4096];
 
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
@@ -230,221 +677,6 @@ inline void ATTR_PRINTF(3,4) ip22_state::verboselog(int n_level, const char *s_f
 	}
 }
 
-
-// interrupt sources handled by INT3
-#define INT3_LOCAL0_FIFO    (0x01)
-#define INT3_LOCAL0_SCSI0   (0x02)
-#define INT3_LOCAL0_SCSI1   (0x04)
-#define INT3_LOCAL0_ETHERNET    (0x08)
-#define INT3_LOCAL0_MC_DMA  (0x10)
-#define INT3_LOCAL0_PARALLEL    (0x20)
-#define INT3_LOCAL0_GRAPHICS    (0x40)
-#define INT3_LOCAL0_MAPPABLE0   (0x80)
-
-#define INT3_LOCAL1_GP0     (0x01)
-#define INT3_LOCAL1_PANEL   (0x02)
-#define INT3_LOCAL1_GP2     (0x04)
-#define INT3_LOCAL1_MAPPABLE1   (0x08)
-#define INT3_LOCAL1_HPC_DMA     (0x10)
-#define INT3_LOCAL1_AC_FAIL     (0x20)
-#define INT3_LOCAL1_VSYNC   (0x40)
-#define INT3_LOCAL1_RETRACE (0x80)
-
-void ioc2_device::raise_local0_irq(UINT8 source_mask)
-{
-	// signal the interrupt is pending
-	m_regs[0] |= source_mask;
-
-	// if it's not masked, also assert it now at the CPU
-	if (m_regs[1] & source_mask)
-		m_maincpu->set_input_line(MIPS3_IRQ0, ASSERT_LINE);
-}
-
-void ioc2_device::lower_local0_irq(UINT8 source_mask)
-{
-	m_regs[0] &= ~source_mask;
-}
-
-void ioc2_device::raise_local1_irq(UINT8 source_mask)
-{
-	// signal the interrupt is pending
-	m_regs[2] |= source_mask;
-
-	// if it's not masked, also assert it now at the CPU
-	if (m_regs[3] & source_mask)
-		m_maincpu->set_input_line(MIPS3_IRQ1, ASSERT_LINE);
-}
-
-void ioc2_device::lower_local1_irq(UINT8 source_mask)
-{
-	m_regs[2] &= ~source_mask;
-}
-
-READ32_MEMBER( ioc2_device::int3_read )
-{
-	return m_regs[offset];
-}
-
-WRITE32_MEMBER( ioc2_device::int3_write )
-{
-	m_regs[offset] = data;
-
-	for (int line = 0; line < 2; line++)
-	{
-		m_maincpu->set_input_line(MIPS3_IRQ0 + line, (m_regs[line*2] & m_regs[line*2+1]) != 0 ? ASSERT_LINE : CLEAR_LINE);
-	}
-}
-
-READ32_MEMBER(ip22_state::hpc3_pbus6_r)
-{
-	UINT8 ret8;
-	switch( offset )
-	{
-	case 0x004/4:
-		ret8 = m_lpt0->control_r(space, 0) ^ 0x0d;
-		//verboselog(0, "Parallel Control Read: %02x\n", ret8 );
-		return ret8;
-	case 0x008/4:
-		ret8 = m_lpt0->status_r(space, 0) ^ 0x80;
-		//verboselog(0, "Parallel Status Read: %02x\n", ret8 );
-		return ret8;
-	case 0x030/4:
-		//verboselog(2, "Serial 1 Command Transfer Read, 0x1fbd9830: %02x\n", 0x04 );
-		switch(space.device().safe_pc())
-		{
-			case 0x9fc1d9e4:    // interpreter (ip244415)
-			case 0x9fc1d9e0:    // DRC (ip244415)
-			case 0x9fc1f8e0:    // interpreter (ip224613)
-			case 0x9fc1f8dc:    // DRC (ip224613)
-			case 0x9fc204c8:    // interpreter (ip225015)
-			case 0x9fc204c4:    // DRC (ip225015)
-				return 0x00000005;
-		}
-		return 0x00000004;
-	case 0x038/4:
-		//verboselog(2, "Serial 2 Command Transfer Read, 0x1fbd9838: %02x\n", 0x04 );
-		return 0x00000004;
-	case 0x40/4:
-		return m_kbdc8042->data_r(space, 0);
-	case 0x44/4:
-		return m_kbdc8042->data_r(space, 4);
-	case 0x58/4:
-		return 0x20;    // chip rev 1, board rev 0, "Guinness" (Indy) => 0x01 for "Full House" (Indigo2)
-	case 0x80/4:
-	case 0x84/4:
-	case 0x88/4:
-	case 0x8c/4:
-	case 0x90/4:
-	case 0x94/4:
-	case 0x98/4:
-	case 0x9c/4:
-	case 0xa0/4:
-	case 0xa4/4:
-	case 0xa8/4:
-	case 0xac/4:
-		return m_ioc2->int3_read(space, offset-0x80/4, ~0);
-	case 0xb0/4:
-		ret8 = m_pit->read(space, 0);
-		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
-		return ret8;
-	case 0xb4/4:
-		ret8 = m_pit->read(space, 1);
-		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
-		return ret8;
-	case 0xb8/4:
-		ret8 = m_pit->read(space, 2);
-		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
-		return ret8;
-	case 0xbc/4:
-		ret8 = m_pit->read(space, 3);
-		//verboselog(0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
-		return ret8;
-	default:
-		//verboselog(0, "Unknown HPC PBUS6 Read: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), mem_mask );
-		return 0;
-	}
-}
-
-WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
-{
-	char cChar;
-
-	switch( offset )
-	{
-	case 0x004/4:
-		//verboselog(0, "Parallel Control Write: %08x\n", data );
-		m_lpt0->control_w(space, 0, data ^ 0x0d);
-		//m_ioc_par_cntl = data;
-		break;
-	case 0x030/4:
-		if( ( data & 0x000000ff ) >= 0x20 )
-		{
-			//verboselog(2, "Serial 1 Command Transfer Write: %02x: %c\n", data & 0x000000ff, data & 0x000000ff );
-		}
-		else
-		{
-			//verboselog(2, "Serial 1 Command Transfer Write: %02x\n", data & 0x000000ff );
-		}
-		cChar = data & 0x000000ff;
-		if( cChar >= 0x20 || cChar == 0x0d || cChar == 0x0a )
-		{
-//          osd_printf_info( "%c", cChar );
-		}
-		break;
-	case 0x034/4:
-		if( ( data & 0x000000ff ) >= 0x20 )
-		{
-			//verboselog(2, "Serial 1 Data Transfer Write: %02x: %c\n", data & 0x000000ff, data & 0x000000ff );
-		}
-		else
-		{
-			//verboselog(2, "Serial 1 Data Transfer Write: %02x\n", data & 0x000000ff );
-		}
-		cChar = data & 0x000000ff;
-		if( cChar >= 0x20 || cChar == 0x0d || cChar == 0x0a )
-		{
-//          osd_printf_info( "%c", cChar );
-		}
-		break;
-	case 0x40/4:
-		m_kbdc8042->data_w(space, 0, data);
-		break;
-	case 0x44/4:
-		m_kbdc8042->data_w(space, 4, data);
-		break;
-	case 0x80/4:
-	case 0x84/4:
-	case 0x88/4:
-	case 0x8c/4:
-	case 0x90/4:
-	case 0x94/4:
-	case 0x98/4:
-	case 0x9c/4:
-	case 0xa0/4:
-	case 0xa4/4:
-		m_ioc2->int3_write(space, offset - 0x80/4, data, ~0);
-		break;
-	case 0xb0/4:
-		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		m_pit->write(space, 0, data & 0x000000ff);
-		return;
-	case 0xb4/4:
-		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		m_pit->write(space, 1, data & 0x000000ff);
-		return;
-	case 0xb8/4:
-		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		m_pit->write(space, 2, data & 0x000000ff);
-		return;
-	case 0xbc/4:
-		//verboselog(0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		m_pit->write(space, 3, data & 0x000000ff);
-		return;
-	default:
-		//verboselog(0, "Unknown HPC PBUS6 Write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), data, mem_mask );
-		break;
-	}
-}
 
 READ32_MEMBER(ip22_state::hpc3_hd_enet_r)
 {
@@ -779,7 +1011,7 @@ void ip22_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		ip22_dma(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in ip22_state::device_timer");
+		assert_always(false, "Unknown id in ip22_state::device_timer");
 	}
 }
 
@@ -789,10 +1021,10 @@ TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
 #if 0
 	if( m_pbus_dma.m_active )
 	{
-		UINT16 temp16 = ( m_mainram[(m_pbus_dma.m_cur_ptr - 0x08000000)/4] & 0xffff0000 ) >> 16;
-		INT16 stemp16 = (INT16)((temp16 >> 8) | (temp16 << 8));
+		uint16_t temp16 = ( m_mainram[(m_pbus_dma.m_cur_ptr - 0x08000000)/4] & 0xffff0000 ) >> 16;
+		int16_t stemp16 = (int16_t)((temp16 >> 8) | (temp16 << 8));
 
-		m_dac->write_signed16(stemp16 ^ 0x8000);
+		m_dac->write_signed16(stemp16);
 
 		m_pbus_dma.m_cur_ptr += 4;
 
@@ -819,14 +1051,14 @@ TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
 
 READ32_MEMBER(ip22_state::hpc3_pbusdma_r)
 {
-	//UINT32 channel = offset / (0x2000/4);
+	//uint32_t channel = offset / (0x2000/4);
 	//verboselog((machine(), 0, "PBUS DMA Channel %d Read: 0x%08x (%08x)\n", channel, 0x1fb80000 + offset*4, mem_mask );
 	return 0;
 }
 
 WRITE32_MEMBER(ip22_state::hpc3_pbusdma_w)
 {
-	UINT32 channel = offset / (0x2000/4);
+	uint32_t channel = offset / (0x2000/4);
 
 	switch( offset & 0x07ff )
 	{
@@ -916,7 +1148,7 @@ static ADDRESS_MAP_START( ip225015_map, AS_PROGRAM, 32, ip22_state )
 	AM_RANGE( 0x1fbd8000, 0x1fbd83ff ) AM_READWRITE(hal2_r, hal2_w )
 	AM_RANGE( 0x1fbd8400, 0x1fbd87ff ) AM_RAM /* hack */
 	AM_RANGE( 0x1fbd9000, 0x1fbd93ff ) AM_READWRITE(hpc3_pbus4_r, hpc3_pbus4_w )
-	AM_RANGE( 0x1fbd9800, 0x1fbd9bff ) AM_READWRITE(hpc3_pbus6_r, hpc3_pbus6_w )
+	AM_RANGE( 0x1fbd9800, 0x1fbd9bff ) AM_DEVREADWRITE(IOC2_TAG, ioc2_device, read, write)
 	AM_RANGE( 0x1fbdc000, 0x1fbdc7ff ) AM_RAM
 	AM_RANGE( 0x1fbdd000, 0x1fbdd3ff ) AM_RAM
 	AM_RANGE( 0x1fbe0000, 0x1fbe04ff ) AM_DEVREADWRITE8(RTC_TAG, ds1386_device, data_r, data_w, 0x000000ff)
@@ -938,7 +1170,7 @@ void ip22_state::machine_reset()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
-void ip22_state::dump_chain(address_space &space, UINT32 ch_base)
+void ip22_state::dump_chain(address_space &space, uint32_t ch_base)
 {
 	printf("node: %08x %08x %08x (len = %x)\n", space.read_dword(ch_base), space.read_dword(ch_base+4), space.read_dword(ch_base+8), space.read_dword(ch_base+4) & 0x3fff);
 
@@ -972,7 +1204,7 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 			// HPC3 DMA: host to device
 			if ((m_hpc3.m_scsi0_dma_ctrl & HPC3_DMACTRL_ENABLE) && (m_hpc3.m_scsi0_dma_ctrl & HPC3_DMACTRL_DIR))
 			{
-				UINT32 wptr, tmpword;
+				uint32_t wptr, tmpword;
 				int words, dptr, twords;
 
 				words = m_wd33c93->get_dma_count();
@@ -1060,9 +1292,9 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 				// clear DMA on the controller too
 				m_wd33c93->clear_dma();
 #if 0
-				UINT32 dptr, tmpword;
-				UINT32 bc = space.read_dword(m_hpc3.m_scsi0_desc + 4);
-				UINT32 rptr = space.read_dword(m_hpc3.m_scsi0_desc);
+				uint32_t dptr, tmpword;
+				uint32_t bc = space.read_dword(m_hpc3.m_scsi0_desc + 4);
+				uint32_t rptr = space.read_dword(m_hpc3.m_scsi0_desc);
 				int length = bc & 0x3fff;
 				int xie = (bc & 0x20000000) ? 1 : 0;
 				int eox = (bc & 0x80000000) ? 1 : 0;
@@ -1114,7 +1346,7 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 			// HPC3 DMA: device to host
 			if ((m_hpc3.m_scsi0_dma_ctrl & HPC3_DMACTRL_ENABLE) && !(m_hpc3.m_scsi0_dma_ctrl & HPC3_DMACTRL_DIR))
 			{
-				UINT32 wptr, tmpword;
+				uint32_t wptr, tmpword;
 				int words, sptr, twords;
 
 				words = m_wd33c93->get_dma_count();
@@ -1225,12 +1457,6 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	//MCFG_MIPS3_DCACHE_SIZE(32768)
 	MCFG_CPU_PROGRAM_MAP( ip225015_map)
 
-	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
-	MCFG_PIT8253_CLK0(1000000)
-	MCFG_PIT8253_CLK1(1000000)
-	MCFG_PIT8253_CLK2(1000000)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbdc", kbdc8042_device, write_out2))
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
@@ -1245,12 +1471,11 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 
 	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
 
-	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD( "dac", DAC, 0 )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+	MCFG_SOUND_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_1)
@@ -1261,11 +1486,7 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_WD33C93_IRQ_CB(WRITELINE(ip22_state,scsi_irq))
 
-	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
-	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_STANDARD)
-	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
-
-	MCFG_IOC2_ADD(IOC2_TAG)
+	MCFG_IOC2_GUINNESS_ADD(IOC2_TAG)
 
 	MCFG_DS1386_8K_ADD(RTC_TAG, 32768)
 MACHINE_CONFIG_END

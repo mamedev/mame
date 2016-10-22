@@ -6,7 +6,7 @@
 
 WRITE16_MEMBER(tigeroad_state::tigeroad_videoram_w)
 {
-	UINT16 *videoram = m_videoram;
+	uint16_t *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
@@ -72,7 +72,7 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_scroll_w)
 
 TILE_GET_INFO_MEMBER(tigeroad_state::get_bg_tile_info)
 {
-	UINT8 *tilerom = memregion("bgmap")->base();
+	uint8_t *tilerom = memregion("bgmap")->base();
 
 	int data = tilerom[tile_index];
 	int attr = tilerom[tile_index + 1];
@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(tigeroad_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(tigeroad_state::get_fg_tile_info)
 {
-	UINT16 *videoram = m_videoram;
+	uint16_t *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int attr = data >> 8;
 	int code = (data & 0xff) + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5);
@@ -118,7 +118,7 @@ void tigeroad_state::video_start()
 	m_fg_tilemap->set_transparent_pen(3);
 }
 
-UINT32 tigeroad_state::screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tigeroad_state::screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 2, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 1 );

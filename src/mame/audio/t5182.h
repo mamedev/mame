@@ -7,7 +7,7 @@ class t5182_device : public device_t
 
 {
 public:
-	t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~t5182_device() {}
 
 	enum
@@ -49,7 +49,7 @@ protected:
 private:
 	// internal state
 	required_device<cpu_device> m_ourcpu;
-	required_shared_ptr<UINT8> m_sharedram;
+	required_shared_ptr<uint8_t> m_sharedram;
 	int m_irqstate;
 	int m_semaphore_main;
 	int m_semaphore_snd;

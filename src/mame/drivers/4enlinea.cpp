@@ -224,9 +224,9 @@ public:
 	INTERRUPT_GEN_MEMBER(_4enlinea_irq);
 	INTERRUPT_GEN_MEMBER(_4enlinea_audio_irq);
 
-	UINT8 m_irq_count;
-	UINT8 m_serial_flags;
-	UINT8 m_serial_data[2];
+	uint8_t m_irq_count;
+	uint8_t m_serial_flags;
+	uint8_t m_serial_data[2];
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -244,7 +244,7 @@ class isa8_cga_4enlinea_device : public isa8_cga_device
 {
 public:
 	// construction/destruction
-	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( _4enlinea_io_read );
 	DECLARE_WRITE8_MEMBER( _4enlinea_mode_control_w );
@@ -259,7 +259,7 @@ const tiny_rom_entry *isa8_cga_4enlinea_device::device_rom_region() const
 
 const device_type ISA8_CGA_4ENLINEA = &device_creator<isa8_cga_4enlinea_device>;
 
-isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_4ENLINEA, "ISA8_CGA_4ENLINEA", tag, owner, clock, "4enlinea_cga", __FILE__)
 {
 }
@@ -267,7 +267,7 @@ isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig
 
 READ8_MEMBER( isa8_cga_4enlinea_device::_4enlinea_io_read )
 {
-	UINT8 data;
+	uint8_t data;
 
 	switch (offset)
 	{

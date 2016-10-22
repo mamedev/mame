@@ -97,7 +97,7 @@ const device_type G65816 = &device_creator<g65816_device>;
 const device_type _5A22 = &device_creator<_5a22_device>;
 
 
-g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, G65816, "G65C816", tag, owner, clock, "g65c816", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0)
 	, m_cpu_type(CPU_TYPE_G65816)
@@ -105,7 +105,7 @@ g65816_device::g65816_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal)
+g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal)
 	, m_cpu_type(cpu_type)
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START(_5a22_map, AS_PROGRAM, 8, _5a22_device)
 ADDRESS_MAP_END
 
 
-_5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+_5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: g65816_device(mconfig, _5A22, "5A22", tag, owner, clock, "5a22", __FILE__, CPU_TYPE_5A22, ADDRESS_MAP_NAME(_5a22_map))
 {
 }
@@ -759,7 +759,7 @@ void g65816_device::execute_set_input(int line, int state)
 #include "g65816ds.h"
 
 
-offs_t g65816_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t g65816_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, FLAG_M, FLAG_X);
 }
@@ -1080,7 +1080,7 @@ WRITE8_MEMBER( _5a22_device::wrdivh_w )
 
 WRITE8_MEMBER( _5a22_device::wrdvdd_w )
 {
-	UINT16 quotient, remainder;
+	uint16_t quotient, remainder;
 
 	m_dvdd = data;
 

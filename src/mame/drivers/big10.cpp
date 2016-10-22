@@ -78,7 +78,7 @@ public:
 	{ }
 
 	required_device<v9938_device> m_v9938;
-	UINT8 m_mux_data;
+	uint8_t m_mux_data;
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	required_device<cpu_device> m_maincpu;
@@ -105,7 +105,7 @@ WRITE8_MEMBER(big10_state::mux_w)
 
 READ8_MEMBER(big10_state::mux_r)
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 	for (int b = 0; b < 6; b++)
 		if (BIT(m_mux_data, b))
 			result &= m_in[b]->read();

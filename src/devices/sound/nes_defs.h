@@ -28,20 +28,13 @@
 #ifndef __NES_DEFS_H__
 #define __NES_DEFS_H__
 
-/* BOOLEAN CONSTANTS */
-#ifndef TRUE
-#define TRUE   1
-#define FALSE  0
-#endif
-
 /* REGULAR TYPE DEFINITIONS */
-typedef INT8          int8;
-typedef INT16         int16;
-typedef INT32         int32;
-typedef UINT8         uint8;
-typedef UINT16        uint16;
-typedef UINT32        uint32;
-typedef UINT8         boolean;
+typedef int8_t          int8;
+typedef int16_t         int16;
+typedef int32_t         int32;
+typedef uint8_t         uint8;
+typedef uint16_t        uint16;
+typedef uint32_t        uint32;
 
 
 /* QUEUE TYPES */
@@ -118,7 +111,7 @@ struct square_t
 	float sweep_phase;
 	uint8 adder;
 	uint8 env_vol;
-	boolean enabled;
+	bool enabled;
 };
 
 /* Triangle Wave */
@@ -147,8 +140,8 @@ struct triangle_t
 	float phaseacc;
 	float output_vol;
 	uint8 adder;
-	boolean counter_started;
-	boolean enabled;
+	bool counter_started;
+	bool enabled;
 };
 
 /* Noise Wave */
@@ -176,7 +169,7 @@ struct noise_t
 	float output_vol;
 	float env_phase;
 	uint8 env_vol;
-	boolean enabled;
+	bool enabled;
 };
 
 /* DPCM Wave */
@@ -207,8 +200,8 @@ struct dpcm_t
 	float phaseacc;
 	float output_vol;
 	uint8 cur_byte;
-	boolean enabled;
-	boolean irq_occurred;
+	bool enabled;
+	bool irq_occurred;
 	address_space *memory;
 	signed char vol;
 };

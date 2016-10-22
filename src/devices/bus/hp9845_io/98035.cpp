@@ -76,7 +76,7 @@ enum {
     MSEC_TMR_ID
 };
 
-hp98035_io_card::hp98035_io_card(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hp98035_io_card::hp98035_io_card(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
     : hp9845_io_card_device(mconfig , HP98035_IO_CARD , "HP98035 card" , tag , owner , clock , "hp98035" , __FILE__)
 {
 }
@@ -177,7 +177,7 @@ void hp98035_io_card::device_timer(emu_timer &timer, device_timer_id id, int par
         }
 
         // Every ms: advance active units
-        UINT8 triggered = 0;
+        uint8_t triggered = 0;
         for (timer_unit_t& unit : m_units) {
             if (unit.m_state != UNIT_IDLE) {
                 if (unit.m_input && unit.m_state == UNIT_ACTIVE) {
@@ -218,7 +218,7 @@ void hp98035_io_card::device_timer(emu_timer &timer, device_timer_id id, int par
 
 READ16_MEMBER(hp98035_io_card::reg_r)
 {
-    UINT16 res;
+    uint16_t res;
 
     switch (offset) {
     case 0:
@@ -256,7 +256,7 @@ WRITE16_MEMBER(hp98035_io_card::reg_w)
     switch (offset) {
     case 0:
         // R4: IDR
-        m_idr = (UINT8)data;
+        m_idr = (uint8_t)data;
         m_idr_full = true;
         update_ibuffer();
         break;
@@ -337,7 +337,7 @@ void hp98035_io_card::update_ibuffer(void)
 void hp98035_io_card::process_ibuffer(void)
 {
     m_ibuffer[ m_ibuffer_ptr ] = '\0';
-    const UINT8 *p = &m_ibuffer[ 0 ];
+    const uint8_t *p = &m_ibuffer[ 0 ];
 
     clear_obuffer();
 
@@ -345,7 +345,7 @@ void hp98035_io_card::process_ibuffer(void)
 
     while (*p != '\0' && !get_out) {
         std::ostringstream out;
-        UINT8 datetime[ 5 ];
+        uint8_t datetime[ 5 ];
         unsigned unit_no;
 
         switch (*p++) {
@@ -447,7 +447,7 @@ void hp98035_io_card::process_ibuffer(void)
     m_ibuffer_ptr = 0;
 }
 
-bool hp98035_io_card::assign_unit(timer_unit_t& unit , const UINT8*& p , bool input)
+bool hp98035_io_card::assign_unit(timer_unit_t& unit , const uint8_t*& p , bool input)
 {
     unsigned port_no;
 
@@ -473,13 +473,13 @@ bool hp98035_io_card::assign_unit(timer_unit_t& unit , const UINT8*& p , bool in
     }
 }
 
-bool hp98035_io_card::parse_unit_command(const UINT8*& p, unsigned unit_no)
+bool hp98035_io_card::parse_unit_command(const uint8_t*& p, unsigned unit_no)
 {
     unit_no--;
     timer_unit_t& unit = m_units[ unit_no ];
     bool get_out = false;
     unsigned msec;
-    UINT8 to_match[ 5 ];
+    uint8_t to_match[ 5 ];
     std::ostringstream out;
 
     LOG(("U %c %u %p\n" , *p , unit_no , &unit));
@@ -607,7 +607,7 @@ void hp98035_io_card::clear_obuffer(void)
     m_obuffer_ptr = 0;
 }
 
-void hp98035_io_card::set_obuffer(UINT8 b)
+void hp98035_io_card::set_obuffer(uint8_t b)
 {
     m_obuffer[ 0 ] = b;
     m_obuffer_len = 1;
@@ -632,12 +632,12 @@ void hp98035_io_card::update_obuffer(void)
     }
 }
 
-void hp98035_io_card::set_error(UINT8 mask)
+void hp98035_io_card::set_error(uint8_t mask)
 {
     m_error |= mask;
 }
 
-bool hp98035_io_card::parse_datetime(const UINT8*& p, UINT8 *out) const
+bool hp98035_io_card::parse_datetime(const uint8_t*& p, uint8_t *out) const
 {
     unsigned n_fields = 0;
 
@@ -655,7 +655,7 @@ bool hp98035_io_card::parse_datetime(const UINT8*& p, UINT8 *out) const
         // Shift all fields one position to the left
         memmove(&out[ 0 ] , &out[ 1 ] , 4 * sizeof(out[ 0 ]));
         // Put the new field in the last position
-        out[ 4 ] = (UINT8)(tmp * 10 + *p - '0');
+        out[ 4 ] = (uint8_t)(tmp * 10 + *p - '0');
         n_fields++;
         p++;
     }
@@ -686,7 +686,7 @@ bool hp98035_io_card::parse_datetime(const UINT8*& p, UINT8 *out) const
         return true;
     }
     // Month
-    UINT8 month;
+    uint8_t month;
     if (n_fields == 4) {
         month = m_mon;
     } else {
@@ -703,7 +703,7 @@ bool hp98035_io_card::parse_datetime(const UINT8*& p, UINT8 *out) const
     return true;
 }
 
-bool hp98035_io_card::parse_unit_no(const UINT8*& p, unsigned& unit) const
+bool hp98035_io_card::parse_unit_no(const uint8_t*& p, unsigned& unit) const
 {
     if (*p < '1' || *p > '0' + HP98035_UNIT_COUNT) {
         return false;
@@ -717,7 +717,7 @@ bool hp98035_io_card::parse_unit_no(const UINT8*& p, unsigned& unit) const
     return true;
 }
 
-bool hp98035_io_card::parse_msec(const UINT8*& p, unsigned& msec) const
+bool hp98035_io_card::parse_msec(const uint8_t*& p, unsigned& msec) const
 {
     msec = 0;
 

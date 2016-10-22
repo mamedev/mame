@@ -25,7 +25,7 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 
 
 #define GET_01_01_01_BRANCH_ADDR \
-	INT32 address = (op & 0x00fe0000) >> 17; \
+	int32_t address = (op & 0x00fe0000) >> 17; \
 	address |= ((op & 0x00008000) >> 15) << 7; \
 	if (address & 0x80) address = -0x80 + (address & 0x7f); \
 	op &= ~ 0x00fe800f;
@@ -57,7 +57,7 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 		int s_temp = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0; \
 		int S = s_temp | (S_temp<<6);
 #define COMMON32_GET_CONDITION \
-		UINT8 condition = op & 0x0000001f;  op &= ~0x0000001f;
+		uint8_t condition = op & 0x0000001f;  op &= ~0x0000001f;
 
 
 #define COMMON16_GET_breg \
@@ -110,7 +110,7 @@ int arcompact_handle00_00_dasm(DASM_OPS_32)
 	int size = 4;
 	// Branch Conditionally
 	// 0000 0sss ssss sss0 SSSS SSSS SSNQ QQQQ
-	INT32 address = (op & 0x07fe0000) >> 17;
+	int32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
@@ -125,7 +125,7 @@ int arcompact_handle00_01_dasm(DASM_OPS_32)
 	int size = 4;
 	// Branch Unconditionally Far
 	// 0000 0sss ssss sss1 SSSS SSSS SSNR TTTT
-	INT32 address = (op & 0x07fe0000) >> 17;
+	int32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	address |= ((op & 0x0000000f) >> 0) << 20;
 	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
@@ -144,7 +144,7 @@ int arcompact_handle01_00_00dasm(DASM_OPS_32)
 
 	// Branch and Link Conditionally
 	// 00001 sssssssss 00 SSSSSSSSSS N QQQQQ
-	INT32 address =   (op & 0x07fc0000) >> 17;
+	int32_t address =   (op & 0x07fc0000) >> 17;
 	address |=        ((op & 0x0000ffc0) >> 6) << 10;
 	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
@@ -160,7 +160,7 @@ int arcompact_handle01_00_01dasm(DASM_OPS_32)
 	int size = 4;
 	// Branch and Link Unconditionally Far
 	// 00001 sssssssss 10  SSSSSSSSSS N R TTTT
-	INT32 address =   (op & 0x07fc0000) >> 17;
+	int32_t address =   (op & 0x07fc0000) >> 17;
 	address |=        ((op & 0x0000ffc0) >> 6) << 10;
 	address |=        ((op & 0x0000000f) >> 0) << 20;
 	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
@@ -196,7 +196,7 @@ int arcompact_01_01_00_helper(DASM_OPS_32, const char* optext)
 	}
 	else
 	{
-		UINT32 limm;
+		uint32_t limm;
 		GET_LIMM_32;
 		size = 8;
 
@@ -283,7 +283,7 @@ int arcompact_handle02_dasm(DASM_OPS_32)
 
 	int sdat = s | (S << 8); // todo - signed
 
-	UINT32 limm = 0;
+	uint32_t limm = 0;
 	if (breg == LIMM_REG)
 	{
 		GET_LIMM_32;
@@ -309,7 +309,7 @@ int arcompact_handle02_dasm(DASM_OPS_32)
 int arcompact_handle03_dasm(DASM_OPS_32)
 {
 	int size = 4;
-	UINT32 limm = 0;
+	uint32_t limm = 0;
 	int got_limm = 0;
 	// bitpos
 	// 1111 1111 1111 1111 0000 0000 0000 0000
@@ -374,7 +374,7 @@ int arcompact_handle04_p00_helper_dasm(DASM_OPS_32, const char* optext, int igno
 	//           PP
 	// 0010 0bbb 00ii iiii FBBB CCCC CCAA AAAA
 	int size = 4;
-	UINT32 limm = 0;
+	uint32_t limm = 0;
 	int got_limm = 0;
 
 	COMMON32_GET_breg;
@@ -446,7 +446,7 @@ int arcompact_handle04_p01_helper_dasm(DASM_OPS_32, const char* optext, int igno
 	//           PP
 	// 0010 0bbb 01ii iiii FBBB uuuu uuAA AAAA
 	int size = 4;
-	UINT32 limm = 0;
+	uint32_t limm = 0;
 //  int got_limm = 0;
 
 	COMMON32_GET_breg;
@@ -504,7 +504,7 @@ int arcompact_handle04_p01_helper_dasm(DASM_OPS_32, const char* optext, int igno
 int arcompact_handle04_p10_helper_dasm(DASM_OPS_32, const char* optext, int b_reserved)
 {
 	int size = 4;
-	UINT32 limm;
+	uint32_t limm;
 	//int got_limm = 0;
 
 	COMMON32_GET_breg;
@@ -543,7 +543,7 @@ int arcompact_handle04_p10_helper_dasm(DASM_OPS_32, const char* optext, int b_re
 int arcompact_handle04_p11_m0_helper_dasm(DASM_OPS_32, const char* optext, int b_reserved)
 {
 	int size = 4;
-	UINT32 limm = 0;
+	uint32_t limm = 0;
 	int got_limm = 0;
 
 	COMMON32_GET_breg;
@@ -599,7 +599,7 @@ int arcompact_handle04_p11_m0_helper_dasm(DASM_OPS_32, const char* optext, int b
 int arcompact_handle04_p11_m1_helper_dasm(DASM_OPS_32, const char* optext, int b_reserved)
 {
 	int size = 4;
-	UINT32 limm;
+	uint32_t limm;
 	//int got_limm = 0;
 
 	COMMON32_GET_breg;
@@ -902,7 +902,7 @@ int arcompact_handle04_2a_dasm(DASM_OPS_32)  // Load FROM Auxiliary register TO 
 
 
 	int size = 4;
-	UINT32 limm = 0;
+	uint32_t limm = 0;
 	int got_limm = 0;
 
 	COMMON32_GET_p;
@@ -981,7 +981,7 @@ int arcompact_handle04_2b_dasm(DASM_OPS_32)  // Store TO Auxiliary register FROM
 	// rather than using the lPcc opcode
 
 	int size = 4;
-	UINT32 limm = 0;
+	uint32_t limm = 0;
 	int got_limm = 0;
 
 	COMMON32_GET_p;
@@ -1102,7 +1102,7 @@ int arcompact_handle04_2f_helper_dasm(DASM_OPS_32, const char* optext)
 
 		if (creg == LIMM_REG)
 		{
-			UINT32 limm;
+			uint32_t limm;
 			GET_LIMM_32;
 			size = 8;
 			output  += sprintf( output, "(%08x) ", limm );
@@ -1167,7 +1167,7 @@ int arcompact_handle04_2f_3f_05_dasm(DASM_OPS_32)  { print("BRK (%08x)", op); re
 int arcompact_handle04_3x_helper_dasm(DASM_OPS_32, int dsize, int extend)
 {
 	int size = 4;
-	UINT32 limm=0;
+	uint32_t limm=0;
 	int got_limm = 0;
 
 	output += sprintf(output, "LD");
@@ -1283,7 +1283,7 @@ int arcompact_handle05_2f_0x_helper_dasm(DASM_OPS_32, const char* optext)
 
 		if (creg == LIMM_REG)
 		{
-			UINT32 limm;
+			uint32_t limm;
 			GET_LIMM_32;
 			size = 8;
 			output  += sprintf( output, "(%08x) ", limm );
@@ -1451,7 +1451,7 @@ int arcompact_handle0e_0x_helper_dasm(DASM_OPS_16, const char* optext, int revop
 
 	if (h == LIMM_REG)
 	{
-		UINT32 limm;
+		uint32_t limm;
 		GET_LIMM;
 		size = 6;
 		if (!revop) print("%s %s <- 0x%08x", optext, regnames[breg], limm);

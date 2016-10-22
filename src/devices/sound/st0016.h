@@ -23,7 +23,7 @@ class st0016_device : public device_t,
 						public device_sound_interface
 {
 public:
-	st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~st0016_device() { }
 
 	template<class _Object> static devcb_base &set_soundram_callback(device_t &device, _Object object) { return downcast<st0016_device &>(device).m_ram_read_cb.set_callback(object); }
@@ -45,7 +45,7 @@ private:
 	int m_vpos[8];
 	int m_frac[8];
 	int m_lponce[8];
-	UINT8 m_regs[0x100];
+	uint8_t m_regs[0x100];
 };
 
 extern const device_type ST0016;

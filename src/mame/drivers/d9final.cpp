@@ -40,9 +40,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<UINT8> m_lo_vram;
-	required_shared_ptr<UINT8> m_hi_vram;
-	required_shared_ptr<UINT8> m_cram;
+	required_shared_ptr<uint8_t> m_lo_vram;
+	required_shared_ptr<uint8_t> m_hi_vram;
+	required_shared_ptr<uint8_t> m_cram;
 
 	tilemap_t *m_sc0_tilemap;
 
@@ -57,7 +57,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -78,7 +78,7 @@ void d9final_state::video_start()
 	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(d9final_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
-UINT32 d9final_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t d9final_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;

@@ -15,7 +15,7 @@ overriden if more than one controller is used */
 class ti990_hdc_device : public device_t
 {
 public:
-	ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti990_hdc_device &>(device).m_interrupt_callback.set_callback(object); }
 
@@ -58,14 +58,14 @@ private:
 		device_image_interface *img;                        /* image descriptor */
 		format_t format;
 		hard_disk_file *hd_handle;      /* mame hard disk descriptor - only if format == format_mame */
-		unsigned int wp : 1;                    /* TRUE if disk is write-protected */
-		unsigned int unsafe : 1;                /* TRUE when a disk has just been connected */
+		unsigned int wp : 1;                    /* true if disk is write-protected */
+		unsigned int unsafe : 1;                /* true when a disk has just been connected */
 
 		/* disk geometry */
 		unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;
 	};
 
-	UINT16 m_w[8];
+	uint16_t m_w[8];
 
 	devcb_write_line m_interrupt_callback;
 

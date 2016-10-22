@@ -87,7 +87,7 @@ public:
 	        file - reference to an osd_file::ptr to receive the newly-opened file
 	            handle; this is only valid if the function returns FILERR_NONE
 
-	        filesize - reference to a UINT64 to receive the size of the opened
+	        filesize - reference to a uint64_t to receive the size of the opened
 	            file; this is only valid if the function returns FILERR_NONE
 
 	    Return value:
@@ -147,7 +147,7 @@ public:
 
 	        length - number of bytes to read from the file
 
-	        actual - reference to a UINT32 to receive the number of bytes actually
+	        actual - reference to a uint32_t to receive the number of bytes actually
 	            read during the operation; valid only if the function returns
 	            FILERR_NONE
 
@@ -170,7 +170,7 @@ public:
 
 	        length - number of bytes to write to the file
 
-	        actual - reference to a UINT32 to receive the number of bytes actually
+	        actual - reference to a uint32_t to receive the number of bytes actually
 	            written during the operation; valid only if the function returns
 	            FILERR_NONE
 
@@ -251,25 +251,25 @@ const char *osd_getenv(const char *name);
 
         filename - pointer to a path which might describe a physical drive
 
-        cylinders - pointer to a UINT32 to receive the number of cylinders
+        cylinders - pointer to a uint32_t to receive the number of cylinders
             of the physical drive
 
-        heads - pointer to a UINT32 to receive the number of heads per
+        heads - pointer to a uint32_t to receive the number of heads per
             cylinder of the physical drive
 
-        sectors - pointer to a UINT32 to receive the number of sectors per
+        sectors - pointer to a uint32_t to receive the number of sectors per
             cylinder of the physical drive
 
-        bps - pointer to a UINT32 to receive the number of bytes per sector
+        bps - pointer to a uint32_t to receive the number of bytes per sector
             of the physical drive
 
     Return value:
 
-        TRUE if the filename points to a physical drive and if the values
-        pointed to by cylinders, heads, sectors, and bps are valid; FALSE in
+        true if the filename points to a physical drive and if the values
+        pointed to by cylinders, heads, sectors, and bps are valid; false in
         any other case
 -----------------------------------------------------------------------------*/
-int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UINT32 *heads, UINT32 *sectors, UINT32 *bps);
+bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps);
 
 
 /*-----------------------------------------------------------------------------
@@ -278,7 +278,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 
     Parameters:
 
-        uchar - pointer to a UINT32 to receive the resulting unicode
+        uchar - pointer to a uint32_t to receive the resulting unicode
             character
 
         osdchar - pointer to one or more chars that are in the OS-default
@@ -290,7 +290,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 
         The number of characters required to form a Unicode character.
 -----------------------------------------------------------------------------*/
-int osd_uchar_from_osdchar(unicode_char *uchar, const char *osdchar, size_t count);
+int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count);
 
 
 /*-----------------------------------------------------------------------------
@@ -305,7 +305,7 @@ int osd_uchar_from_osdchar(unicode_char *uchar, const char *osdchar, size_t coun
         Whether this character is legal in a filename
 -----------------------------------------------------------------------------*/
 
-bool osd_is_valid_filename_char(unicode_char uchar);
+bool osd_is_valid_filename_char(char32_t uchar);
 
 
 /*-----------------------------------------------------------------------------
@@ -320,7 +320,7 @@ bool osd_is_valid_filename_char(unicode_char uchar);
         Whether this character is legal in a file path
 -----------------------------------------------------------------------------*/
 
-bool osd_is_valid_filepath_char(unicode_char uchar);
+bool osd_is_valid_filepath_char(char32_t uchar);
 
 
 /***************************************************************************
@@ -408,7 +408,7 @@ bool osd_is_absolute_path(const std::string &path);
 ***************************************************************************/
 
 /* a osd_ticks_t is a 64-bit unsigned integer that is used as a core type in timing interfaces */
-typedef UINT64 osd_ticks_t;
+typedef uint64_t osd_ticks_t;
 
 
 /*-----------------------------------------------------------------------------
@@ -560,10 +560,10 @@ int osd_work_queue_items(osd_work_queue *queue);
 
     Return value:
 
-        TRUE if the queue is empty; FALSE if the wait timed out before the
+        true if the queue is empty; false if the wait timed out before the
         queue was emptied.
 -----------------------------------------------------------------------------*/
-int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout);
+bool osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout);
 
 
 /*-----------------------------------------------------------------------------
@@ -615,11 +615,11 @@ void osd_work_queue_free(osd_work_queue *queue);
         On single-threaded systems, this function may actually execute the
         work item immediately before returning.
 -----------------------------------------------------------------------------*/
-osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_callback callback, INT32 numitems, void *parambase, INT32 paramstep, UINT32 flags);
+osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_callback callback, int32_t numitems, void *parambase, int32_t paramstep, uint32_t flags);
 
 
 /* inline helper to queue a single work item using the same interface */
-static inline osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags)
+static inline osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, uint32_t flags)
 {
 	return osd_work_item_queue_multiple(queue, callback, 1, param, 0, flags);
 }
@@ -637,10 +637,10 @@ static inline osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work
 
     Return value:
 
-        TRUE if the item completed; FALSE if the wait timed out before the
+        true if the item completed; false if the wait timed out before the
         item completed.
 -----------------------------------------------------------------------------*/
-int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout);
+bool osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout);
 
 
 /*-----------------------------------------------------------------------------
@@ -858,8 +858,8 @@ public:
 	virtual bool open_output(const char *devname) = 0;
 	virtual void close() = 0;
 	virtual bool poll() = 0;
-	virtual int read(UINT8 *pOut) = 0;
-	virtual void write(UINT8 data) = 0;
+	virtual int read(uint8_t *pOut) = 0;
+	virtual void write(uint8_t data) = 0;
 };
 
 //FIXME: really needed here?

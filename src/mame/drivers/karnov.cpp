@@ -726,7 +726,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
 {
-	UINT8 port = ioport("FAKE")->read();
+	uint8_t port = ioport("FAKE")->read();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
 	if (port == m_coin_mask)
@@ -1288,7 +1288,7 @@ DRIVER_INIT_MEMBER(karnov_state,wndrplnt)
 
 DRIVER_INIT_MEMBER(karnov_state,chelnov)
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
 	m_microcontroller_id = CHELNOV;
 	m_coin_mask = 0xe0;
@@ -1297,7 +1297,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnov)
 
 DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
 	m_microcontroller_id = CHELNOVU;
 	m_coin_mask = 0xe0;
@@ -1306,7 +1306,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 
 DRIVER_INIT_MEMBER(karnov_state,chelnovj)
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
 	m_microcontroller_id = CHELNOVJ;
 	m_coin_mask = 0xe0;

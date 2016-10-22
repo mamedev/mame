@@ -26,7 +26,7 @@ class p1_hdc_device : public device_t,
 {
 public:
 	// construction/destruction
-	p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -40,7 +40,7 @@ protected:
 private:
 	required_device<wd2010_device> m_hdc;
 
-	//UINT8 m_ram[0x800];
+	//uint8_t m_ram[0x800];
 
 public:
 	DECLARE_READ8_MEMBER(p1_HDC_r);

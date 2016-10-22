@@ -154,10 +154,10 @@ static const struct { const char *mnemonic; Adr adr; } table[]={
 
 CPU_DISASSEMBLE( sc61860 )
 {
-	const UINT8 *base_oprom = oprom;
+	const uint8_t *base_oprom = oprom;
 	int oper=*(oprom++);
 	int t;
-	UINT16 adr;
+	uint16_t adr;
 
 	switch(oper&0xc0) {
 	case 0x80:

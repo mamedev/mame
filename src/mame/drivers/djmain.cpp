@@ -102,7 +102,7 @@ WRITE32_MEMBER(djmain_state::sndram_bank_w)
 
 READ32_MEMBER(djmain_state::sndram_r)
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 
 	if (ACCESSING_BITS_24_31)
 		data |= m_sndram[offset * 4] << 24;
@@ -154,7 +154,7 @@ WRITE32_MEMBER(djmain_state::obj_ctrl_w)
 
 READ32_MEMBER(djmain_state::obj_rom_r)
 {
-	UINT8 *mem8 = memregion("gfx1")->base();
+	uint8_t *mem8 = memregion("gfx1")->base();
 	int bank = m_obj_regs[0x28/4] >> 16;
 
 	offset += bank * 0x200;
@@ -190,7 +190,7 @@ WRITE32_MEMBER(djmain_state::v_ctrl_w)
 
 READ32_MEMBER(djmain_state::v_rom_r)
 {
-	UINT8 *mem8 = memregion("gfx2")->base();
+	uint8_t *mem8 = memregion("gfx2")->base();
 	int bank = m_k056832->word_r(space, 0x34/2, 0xffff);
 
 	offset *= 2;
@@ -223,11 +223,11 @@ READ8_MEMBER(djmain_state::inp2_r)
 
 READ32_MEMBER(djmain_state::turntable_r)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 pos;
+		uint8_t pos;
 		int delta;
 
 		pos = m_turntable[m_turntable_select].read_safe(0);
@@ -1989,7 +1989,7 @@ DRIVER_INIT_MEMBER(djmain_state,beatmania)
 	m_ata_user_password = nullptr;
 }
 
-static const UINT8 beatmania_master_password[2 + 32] =
+static const uint8_t beatmania_master_password[2 + 32] =
 {
 	0x01, 0x00,
 	0x4d, 0x47, 0x43, 0x28, 0x4b, 0x29, 0x4e, 0x4f,
@@ -2000,7 +2000,7 @@ static const UINT8 beatmania_master_password[2 + 32] =
 
 DRIVER_INIT_MEMBER(djmain_state,hmcompmx)
 {
-	static const UINT8 hmcompmx_user_password[2 + 32] =
+	static const uint8_t hmcompmx_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x3a, 0x34, 0x38, 0x2a,
@@ -2017,7 +2017,7 @@ DRIVER_INIT_MEMBER(djmain_state,hmcompmx)
 
 DRIVER_INIT_MEMBER(djmain_state,bm4thmix)
 {
-	static const UINT8 bm4thmix_user_password[2 + 32] =
+	static const uint8_t bm4thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x29, 0x4b, 0x2f, 0x2c, 0x4c, 0x32,
@@ -2033,7 +2033,7 @@ DRIVER_INIT_MEMBER(djmain_state,bm4thmix)
 
 DRIVER_INIT_MEMBER(djmain_state,bm5thmix)
 {
-	static const UINT8 bm5thmix_user_password[2 + 32] =
+	static const uint8_t bm5thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x37, 0x35, 0x4a, 0x23,
@@ -2050,7 +2050,7 @@ DRIVER_INIT_MEMBER(djmain_state,bm5thmix)
 
 DRIVER_INIT_MEMBER(djmain_state,bmclubmx)
 {
-	static const UINT8 bmclubmx_user_password[2 + 32] =
+	static const uint8_t bmclubmx_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x20, 0x30, 0x57, 0x3c, 0x3f, 0x38, 0x32,
@@ -2068,7 +2068,7 @@ DRIVER_INIT_MEMBER(djmain_state,bmclubmx)
 
 DRIVER_INIT_MEMBER(djmain_state,bmcompm2)
 {
-	static const UINT8 bmcompm2_user_password[2 + 32] =
+	static const uint8_t bmcompm2_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x3a, 0x20, 0x31, 0x3e, 0x46, 0x2c, 0x35, 0x46,
@@ -2085,7 +2085,7 @@ DRIVER_INIT_MEMBER(djmain_state,bmcompm2)
 
 DRIVER_INIT_MEMBER(djmain_state,hmcompm2)
 {
-	static const UINT8 hmcompm2_user_password[2 + 32] =
+	static const uint8_t hmcompm2_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x3b, 0x39, 0x24, 0x3e, 0x4e, 0x59, 0x5c, 0x32,
@@ -2102,7 +2102,7 @@ DRIVER_INIT_MEMBER(djmain_state,hmcompm2)
 
 DRIVER_INIT_MEMBER(djmain_state,bmdct)
 {
-	static const UINT8 bmdct_user_password[2 + 32] =
+	static const uint8_t bmdct_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x52, 0x47, 0x30, 0x3f, 0x2f, 0x39, 0x54, 0x5e,
@@ -2119,7 +2119,7 @@ DRIVER_INIT_MEMBER(djmain_state,bmdct)
 
 DRIVER_INIT_MEMBER(djmain_state,bmcorerm)
 {
-	static const UINT8 bmcorerm_user_password[2 + 32] =
+	static const uint8_t bmcorerm_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x3f, 0x4d, 0x4a, 0x27,
@@ -2136,7 +2136,7 @@ DRIVER_INIT_MEMBER(djmain_state,bmcorerm)
 
 DRIVER_INIT_MEMBER(djmain_state,bm6thmix)
 {
-	static const UINT8 bm6thmix_user_password[2 + 32] =
+	static const uint8_t bm6thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x3d, 0x4d, 0x4a, 0x23,
@@ -2153,7 +2153,7 @@ DRIVER_INIT_MEMBER(djmain_state,bm6thmix)
 
 DRIVER_INIT_MEMBER(djmain_state,bm7thmix)
 {
-	static const UINT8 bm7thmix_user_password[2 + 32] =
+	static const uint8_t bm7thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x3f, 0x4e, 0x4a, 0x25,
@@ -2170,7 +2170,7 @@ DRIVER_INIT_MEMBER(djmain_state,bm7thmix)
 
 DRIVER_INIT_MEMBER(djmain_state,bmfinal)
 {
-	static const UINT8 bmfinal_user_password[2 + 32] =
+	static const uint8_t bmfinal_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x3f, 0x4f, 0x4a, 0x23,

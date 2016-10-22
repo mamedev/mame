@@ -72,14 +72,14 @@ public:
 	DECLARE_READ8_MEMBER( pc1640_port278_r );
 
 	struct {
-		UINT8 x,y; //byte clipping needed
+		uint8_t x,y; //byte clipping needed
 	} m_mouse;
 
 	// 64 system status register?
-	UINT8 m_port60;
-	UINT8 m_port61;
-	UINT8 m_port62;
-	UINT8 m_port65;
+	uint8_t m_port60;
+	uint8_t m_port61;
+	uint8_t m_port62;
+	uint8_t m_port65;
 
 	int m_dipstate;
 };
@@ -290,7 +290,7 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 
 READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
 {
-	UINT8 data = m_lpt1->read(space, offset);
+	uint8_t data = m_lpt1->read(space, offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (ioport("DSW0")->read() & 7);
@@ -302,7 +302,7 @@ READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
 
 READ8_MEMBER( amstrad_pc_state::pc200_port278_r )
 {
-	UINT8 data = m_lpt2->read(space, offset);
+	uint8_t data = m_lpt2->read(space, offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (ioport("DSW0")->read() & 7);
@@ -315,7 +315,7 @@ READ8_MEMBER( amstrad_pc_state::pc200_port278_r )
 
 READ8_MEMBER( amstrad_pc_state::pc1640_port378_r )
 {
-	UINT8 data = m_lpt1->read(space, offset);
+	uint8_t data = m_lpt1->read(space, offset);
 
 	if (offset == 1)
 		data=(data & ~7) | (ioport("DSW0")->read() & 7);

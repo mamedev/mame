@@ -12,7 +12,7 @@
 #include "i4004.h"
 
 
-static const UINT8 kbp_table[] = { 0x00,0x01,0x02,0x0f,0x03,0x0f,0x0f,0x0f,0x04,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f };
+static const uint8_t kbp_table[] = { 0x00,0x01,0x02,0x0f,0x03,0x0f,0x0f,0x0f,0x04,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f };
 
 
 /***************************************************************************
@@ -24,7 +24,7 @@ static const UINT8 kbp_table[] = { 0x00,0x01,0x02,0x0f,0x03,0x0f,0x0f,0x0f,0x04,
 const device_type I4004 = &device_creator<i4004_cpu_device>;
 
 
-i4004_cpu_device::i4004_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i4004_cpu_device::i4004_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, I4004, "Intel I4004", tag, owner, clock, "i4004", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
@@ -36,75 +36,75 @@ i4004_cpu_device::i4004_cpu_device(const machine_config &mconfig, const char *ta
 }
 
 
-UINT8 i4004_cpu_device::ROP()
+uint8_t i4004_cpu_device::ROP()
 {
-	UINT8 retVal = m_direct->read_byte(GET_PC.w.l);
+	uint8_t retVal = m_direct->read_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x0fff;
 	m_PC = GET_PC;
 	return retVal;
 }
 
-UINT8 i4004_cpu_device::READ_ROM()
+uint8_t i4004_cpu_device::READ_ROM()
 {
 	return m_direct->read_byte((GET_PC.w.l & 0x0f00) | m_R[0]);
 }
 
 void i4004_cpu_device::WPM()
 {
-	UINT8 t =  (m_program->read_byte(m_RAM.d) << 4) | m_A;
+	uint8_t t =  (m_program->read_byte(m_RAM.d) << 4) | m_A;
 	m_program->write_byte((GET_PC.w.l & 0x0f00) | m_RAM.d, t);
 }
 
 
-UINT8 i4004_cpu_device::ARG()
+uint8_t i4004_cpu_device::ARG()
 {
-	UINT8 retVal = m_direct->read_byte(GET_PC.w.l);
+	uint8_t retVal = m_direct->read_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x0fff;
 	m_PC = GET_PC;
 	return retVal;
 }
 
-UINT8 i4004_cpu_device::RM()
+uint8_t i4004_cpu_device::RM()
 {
 	return m_data->read_byte(m_RAM.d) & 0x0f;
 }
 
-UINT8 i4004_cpu_device::RMS(UINT32 a)
+uint8_t i4004_cpu_device::RMS(uint32_t a)
 {
 	return m_data->read_byte((m_RAM.d & 0xff0) + a) >> 4;
 }
 
-void i4004_cpu_device::WM(UINT8 v)
+void i4004_cpu_device::WM(uint8_t v)
 {
-	UINT8 t =  m_data->read_byte(m_RAM.d);
+	uint8_t t =  m_data->read_byte(m_RAM.d);
 	m_data->write_byte(m_RAM.d, (t & 0xf0) | v);
 }
 
 
-void i4004_cpu_device::WMP(UINT8 v)
+void i4004_cpu_device::WMP(uint8_t v)
 {
 	m_io->write_byte((m_RAM.d >> 6) | 0x10, v & 0x0f);
 }
 
-void i4004_cpu_device::WMS(UINT32 a, UINT8 v)
+void i4004_cpu_device::WMS(uint32_t a, uint8_t v)
 {
-	UINT8 t =  m_data->read_byte((m_RAM.d & 0xff0) + a);
+	uint8_t t =  m_data->read_byte((m_RAM.d & 0xff0) + a);
 	m_data->write_byte((m_RAM.d & 0xff0) + a, (t & 0x0f) | (v<<4));
 }
 
-UINT8 i4004_cpu_device::RIO()
+uint8_t i4004_cpu_device::RIO()
 {
 	return m_io->read_byte(m_RAM.b.l >> 4) & 0x0f;
 }
 
-void i4004_cpu_device::WIO(UINT8 v)
+void i4004_cpu_device::WIO(uint8_t v)
 {
 	m_io->write_byte(m_RAM.b.l >> 4, v & 0x0f);
 }
 
-UINT8 i4004_cpu_device::GET_REG(UINT8 num)
+uint8_t i4004_cpu_device::GET_REG(uint8_t num)
 {
-	UINT8 r = m_R[num>>1];
+	uint8_t r = m_R[num>>1];
 	if (num & 1) {
 		return r & 0x0f;
 	} else {
@@ -112,7 +112,7 @@ UINT8 i4004_cpu_device::GET_REG(UINT8 num)
 	}
 }
 
-void i4004_cpu_device::SET_REG(UINT8 num, UINT8 val)
+void i4004_cpu_device::SET_REG(uint8_t num, uint8_t val)
 {
 	if (num & 1) {
 		m_R[num>>1] = (m_R[num>>1] & 0xf0) + (val & 0x0f);
@@ -132,7 +132,7 @@ void i4004_cpu_device::POP_STACK()
 	m_pc_pos = (m_pc_pos - 1) & m_addr_mask;
 }
 
-void i4004_cpu_device::set_test(UINT8 val)
+void i4004_cpu_device::set_test(uint8_t val)
 {
 	m_TEST = val;
 }
@@ -150,13 +150,13 @@ void i4004_cpu_device::execute_one(int opcode)
 		case 0x18: case 0x19: case 0x1a: case 0x1b:
 		case 0x1c: case 0x1d: case 0x1e: case 0x1f: /* JCN */
 			{
-				UINT8 arg =  ARG();
+				uint8_t arg =  ARG();
 
-				UINT8 C1 = BIT(opcode,3);
-				UINT8 C2 = BIT(opcode,2);
-				UINT8 C3 = BIT(opcode,1);
-				UINT8 C4 = BIT(opcode,0);
-				UINT8 JUMP = (((m_A == 0) ? 1 : 0) & C2) | ((m_C) & C3) | ((m_TEST ^ 1) & C4);
+				uint8_t C1 = BIT(opcode,3);
+				uint8_t C2 = BIT(opcode,2);
+				uint8_t C3 = BIT(opcode,1);
+				uint8_t C4 = BIT(opcode,0);
+				uint8_t JUMP = (((m_A == 0) ? 1 : 0) & C2) | ((m_C) & C3) | ((m_TEST ^ 1) & C4);
 				m_icount -= 8;
 
 				if(((C1 ^ 1) &  JUMP) | (C1 & (JUMP ^ 1))) {
@@ -197,7 +197,7 @@ void i4004_cpu_device::execute_one(int opcode)
 		case 0x58: case 0x59: case 0x5a: case 0x5b:
 		case 0x5c: case 0x5d: case 0x5e: case 0x5f: /* JMS */
 			{
-				UINT16 newPC = ((opcode & 0x0f) << 8) | ARG();
+				uint16_t newPC = ((opcode & 0x0f) << 8) | ARG();
 				m_icount -= 8;
 				PUSH_STACK();
 				GET_PC.w.l = newPC;
@@ -215,8 +215,8 @@ void i4004_cpu_device::execute_one(int opcode)
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f: /* ISZ */
 			{
-				UINT8 val = (GET_REG(opcode & 0x0f) + 1) & 0xf;
-				UINT16 addr = ARG();
+				uint8_t val = (GET_REG(opcode & 0x0f) + 1) & 0xf;
+				uint16_t addr = ARG();
 				m_icount -= 8;
 				SET_REG(opcode & 0x0f, val);
 				if (val!=0) {
@@ -230,7 +230,7 @@ void i4004_cpu_device::execute_one(int opcode)
 		case 0x88: case 0x89: case 0x8a: case 0x8b:
 		case 0x8c: case 0x8d: case 0x8e: case 0x8f: /* ADD */
 			{
-				UINT8 acc = m_A + GET_REG(opcode & 0x0f) + m_C;
+				uint8_t acc = m_A + GET_REG(opcode & 0x0f) + m_C;
 				m_A = acc & 0x0f;
 				m_C = (acc >> 4) & 1;
 			}
@@ -240,7 +240,7 @@ void i4004_cpu_device::execute_one(int opcode)
 		case 0x98: case 0x99: case 0x9a: case 0x9b:
 		case 0x9c: case 0x9d: case 0x9e: case 0x9f: /* SUB */
 			{
-				UINT8 acc = m_A + (GET_REG(opcode & 0x0f) ^ 0x0f) + (m_C ^ 1);
+				uint8_t acc = m_A + (GET_REG(opcode & 0x0f) ^ 0x0f) + (m_C ^ 1);
 				m_A = acc & 0x0f;
 				m_C = (acc >> 4) & 1;
 			}
@@ -256,7 +256,7 @@ void i4004_cpu_device::execute_one(int opcode)
 		case 0xb8: case 0xb9: case 0xba: case 0xbb:
 		case 0xbc: case 0xbd: case 0xbe: case 0xbf: /* XCH */
 			{
-				UINT8 temp = m_A;
+				uint8_t temp = m_A;
 				m_A = GET_REG(opcode & 0x0f);
 				SET_REG(opcode & 0x0f, temp);
 			}
@@ -353,7 +353,7 @@ void i4004_cpu_device::execute_one(int opcode)
 			break;
 		case 0xf6: /* RAR */
 			{
-				UINT8 c = m_A & 1;
+				uint8_t c = m_A & 1;
 				m_A = (m_A >> 1) | (m_C  << 3);
 				m_C = c;
 			}
@@ -522,7 +522,7 @@ void i4004_cpu_device::state_string_export(const device_state_entry &entry, std:
 	}
 }
 
-offs_t i4004_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t i4004_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( i4004 );
 	return CPU_DISASSEMBLE_NAME(i4004)(this, buffer, pc, oprom, opram, options);

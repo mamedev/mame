@@ -30,7 +30,7 @@ const device_type AICARTC = &device_creator<aicartc_device>;
 //  aicartc_device - constructor
 //-------------------------------------------------
 
-aicartc_device::aicartc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+aicartc_device::aicartc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AICARTC, "AICA RTC", tag, owner, clock, "aicartc", __FILE__),
 		device_rtc_interface(mconfig, *this), m_rtc_reg_lo(0), m_rtc_reg_hi(0), m_rtc_tick(0), m_we(0), m_clock_timer(nullptr)
 {
@@ -66,7 +66,7 @@ void aicartc_device::rtc_clock_updated(int year, int month, int day, int day_of_
 	const int month_to_day_conversion[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
 	// put the seconds
-	UINT32 current_time = second;
+	uint32_t current_time = second;
 
 	// put the minutes
 	current_time += minute * 60;
@@ -128,7 +128,7 @@ void aicartc_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 READ16_MEMBER( aicartc_device::read )
 {
-	UINT16 res;
+	uint16_t res;
 
 	res = 0;
 	switch(offset)

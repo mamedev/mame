@@ -264,44 +264,44 @@ public:
 	optional_ioport m_touch_x;
 	optional_ioport m_touch_y;
 
-	required_shared_ptr<UINT8> m_cmos_ram;
-	required_shared_ptr<UINT8> m_program_ram;
-	required_shared_ptr<UINT8> m_s3000_ram;
-	required_shared_ptr<UINT8> m_s5000_ram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_s7000_ram;
-	required_shared_ptr<UINT8> m_sb000_ram;
-	required_shared_ptr<UINT8> m_sd000_ram;
-	required_shared_ptr<UINT8> m_sf000_ram;
-	required_shared_ptr<UINT8> m_io_port;
+	required_shared_ptr<uint8_t> m_cmos_ram;
+	required_shared_ptr<uint8_t> m_program_ram;
+	required_shared_ptr<uint8_t> m_s3000_ram;
+	required_shared_ptr<uint8_t> m_s5000_ram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_s7000_ram;
+	required_shared_ptr<uint8_t> m_sb000_ram;
+	required_shared_ptr<uint8_t> m_sd000_ram;
+	required_shared_ptr<uint8_t> m_sf000_ram;
+	required_shared_ptr<uint8_t> m_io_port;
 
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_wingboard;
-	UINT8 m_doorcycle;
-	UINT16 door_wait;
-	UINT8 m_jumper_e16_e17;
-	UINT16 m_vid_address;
-	std::unique_ptr<UINT8[]> m_palette_ram;
-	std::unique_ptr<UINT8[]> m_palette_ram2;
-	UINT64 m_last_cycles;
-	UINT8 m_coin_state;
-	UINT64 m_last_door;
-	UINT8 m_door_open;
-	UINT64 m_last_coin_out;
-	UINT8 m_coin_out_state;
+	uint8_t m_wingboard;
+	uint8_t m_doorcycle;
+	uint16_t door_wait;
+	uint8_t m_jumper_e16_e17;
+	uint16_t m_vid_address;
+	std::unique_ptr<uint8_t[]> m_palette_ram;
+	std::unique_ptr<uint8_t[]> m_palette_ram2;
+	uint64_t m_last_cycles;
+	uint8_t m_coin_state;
+	uint64_t m_last_door;
+	uint8_t m_door_open;
+	uint64_t m_last_coin_out;
+	uint8_t m_coin_out_state;
 	int m_sda_dir;
-	UINT8 m_bv_state;
-	UINT8 m_bv_busy;
-	UINT8 m_bv_pulse;
-	UINT8 m_bv_denomination;
-	UINT8 m_bv_protocol;
-	UINT64 m_bv_cycles;
-	UINT8 m_bv_last_enable_state;
-	UINT8 m_bv_enable_state;
-	UINT8 m_bv_enable_count;
-	UINT8 m_bv_data_bit;
-	UINT8 m_bv_loop_count;
-	UINT16 id023_data;
+	uint8_t m_bv_state;
+	uint8_t m_bv_busy;
+	uint8_t m_bv_pulse;
+	uint8_t m_bv_denomination;
+	uint8_t m_bv_protocol;
+	uint64_t m_bv_cycles;
+	uint8_t m_bv_last_enable_state;
+	uint8_t m_bv_enable_state;
+	uint8_t m_bv_enable_count;
+	uint8_t m_bv_data_bit;
+	uint8_t m_bv_loop_count;
+	uint16_t id023_data;
 
 	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
 	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
@@ -329,7 +329,7 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void peplus_load_superdata(const char *bank_name);
 	DECLARE_PALETTE_INIT(peplus);
 	void handle_lightpen();
@@ -338,8 +338,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-static const UINT8  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };
-static const UINT16 id_023[8] = { 0x4a6c, 0x4a7b, 0x4a4b, 0x4a5a, 0x4a2b, 0x4a0a, 0x4a19, 0x4a3a };
+static const uint8_t  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };
+static const uint16_t id_023[8] = { 0x4a6c, 0x4a7b, 0x4a4b, 0x4a5a, 0x4a2b, 0x4a0a, 0x4a19, 0x4a3a };
 
 
 /**************
@@ -348,7 +348,7 @@ static const UINT16 id_023[8] = { 0x4a6c, 0x4a7b, 0x4a4b, 0x4a5a, 0x4a2b, 0x4a0a
 
 void peplus_state::peplus_load_superdata(const char *bank_name)
 {
-	UINT8 *super_data = memregion(bank_name)->base();
+	uint8_t *super_data = memregion(bank_name)->base();
 
 	/* Distribute Superboard Data */
 	memcpy(m_s3000_ram, &super_data[0x3000], 0x1000);
@@ -416,7 +416,7 @@ void peplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_crtc->assert_light_pen_input();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in peplus_state::device_timer");
+		assert_always(false, "Unknown id in peplus_state::device_timer");
 	}
 }
 
@@ -595,7 +595,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
         833.3 cycles per millisecond
         10 ms = 8333 cycles
 */
-	UINT64 curr_cycles = m_maincpu->total_cycles();
+	uint64_t curr_cycles = m_maincpu->total_cycles();
 
 	// Allow Bill Insert if DBV Enabled
 	if (m_bv_enable_state == 0x01 && ((m_dbv.read_safe(0xff) & 0x01) == 0x00)) {
@@ -810,12 +810,12 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
         Bit 6 = LOW BATTERY
         Bit 7 = I2C EEPROM SDA
 */
-	UINT8 bank_a = 0x50; // Turn Off Low Battery and Hopper Full Statuses
-	UINT8 coin_optics = 0x00;
-	UINT8 coin_out = 0x00;
-	UINT64 curr_cycles = m_maincpu->total_cycles();
+	uint8_t bank_a = 0x50; // Turn Off Low Battery and Hopper Full Statuses
+	uint8_t coin_optics = 0x00;
+	uint8_t coin_out = 0x00;
+	uint64_t curr_cycles = m_maincpu->total_cycles();
 
-	UINT8 sda = 0;
+	uint8_t sda = 0;
 	if(!m_sda_dir)
 	{
 		sda = m_i2cmem->read_sda();
@@ -907,7 +907,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 
 TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int pr = m_palette_ram[tile_index];
 	int pr2 = m_palette_ram2[tile_index];
 	int vr = videoram[tile_index];
@@ -928,13 +928,13 @@ TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
 void peplus_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(peplus_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
-	m_palette_ram = std::make_unique<UINT8[]>(0x3000);
+	m_palette_ram = std::make_unique<uint8_t[]>(0x3000);
 	memset(m_palette_ram.get(), 0, 0x3000);
-	m_palette_ram2 = std::make_unique<UINT8[]>(0x3000);
+	m_palette_ram2 = std::make_unique<uint8_t[]>(0x3000);
 	memset(m_palette_ram2.get(), 0, 0x3000);
 }
 
-UINT32 peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -943,8 +943,8 @@ UINT32 peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 &b
 
 PALETTE_INIT_MEMBER(peplus_state, peplus)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
-	UINT32 proms_size = memregion("proms")->bytes();
+	const uint8_t *color_prom = memregion("proms")->base();
+	uint32_t proms_size = memregion("proms")->bytes();
 /*  prom bits
     7654 3210
     ---- -xxx   red component.
@@ -1061,8 +1061,8 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(peplus_state::peplus_input_r)
 {
-	UINT8 inp_ret = 0x00;
-	UINT8 inp_read = ioport((const char *)param)->read();
+	uint8_t inp_ret = 0x00;
+	uint8_t inp_read = ioport((const char *)param)->read();
 
 	if (inp_read & 0x01) inp_ret = 0x01;
 	if (inp_read & 0x02) inp_ret = 0x02;
@@ -1367,27 +1367,27 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(peplus_state,nonplus)
 {
 	door_wait = 500;
-	m_doorcycle = FALSE;
-	m_wingboard = FALSE;
-	m_jumper_e16_e17 = FALSE;
+	m_doorcycle = false;
+	m_wingboard = false;
+	m_jumper_e16_e17 = false;
 }
 
 /* Normal board */
 DRIVER_INIT_MEMBER(peplus_state,peplus)
 {
 	door_wait = 500;
-	m_doorcycle = TRUE;
-	m_wingboard = FALSE;
-	m_jumper_e16_e17 = FALSE;
+	m_doorcycle = true;
+	m_wingboard = false;
+	m_jumper_e16_e17 = false;
 }
 
 /* Superboard */
 DRIVER_INIT_MEMBER(peplus_state,peplussb)
 {
 	door_wait = 500;
-	m_doorcycle = TRUE;
-	m_wingboard = FALSE;
-	m_jumper_e16_e17 = FALSE;
+	m_doorcycle = true;
+	m_wingboard = false;
+	m_jumper_e16_e17 = false;
 	peplus_load_superdata("user1");
 }
 
@@ -1395,9 +1395,9 @@ DRIVER_INIT_MEMBER(peplus_state,peplussb)
 DRIVER_INIT_MEMBER(peplus_state,pepluss64)
 {
 	door_wait = 500;
-	m_doorcycle = TRUE;
-	m_wingboard = FALSE;
-	m_jumper_e16_e17 = TRUE;
+	m_doorcycle = true;
+	m_wingboard = false;
+	m_jumper_e16_e17 = true;
 	peplus_load_superdata("user1");
 }
 
@@ -1405,9 +1405,9 @@ DRIVER_INIT_MEMBER(peplus_state,pepluss64)
 DRIVER_INIT_MEMBER(peplus_state,peplussbw)
 {
 	door_wait = 12345;
-	m_doorcycle = TRUE;
-	m_wingboard = TRUE;
-	m_jumper_e16_e17 = TRUE;
+	m_doorcycle = true;
+	m_wingboard = true;
+	m_jumper_e16_e17 = true;
 	peplus_load_superdata("user1");
 }
 

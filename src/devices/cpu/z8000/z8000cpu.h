@@ -150,30 +150,30 @@
 /* get data from the opcode words */
 /* o is the opcode word offset    */
 /* s is a nibble shift factor     */
-#define GET_BIT(o)      UINT16 bit = 1 << (get_operand(o) & 15)
-#define GET_CCC(o,s)    UINT8 cc = (get_operand(o) >> (s)) & 15
+#define GET_BIT(o)      uint16_t bit = 1 << (get_operand(o) & 15)
+#define GET_CCC(o,s)    uint8_t cc = (get_operand(o) >> (s)) & 15
 
-#define GET_DST(o,s)    UINT8 dst = (get_operand(o) >> (s)) & 15
-#define GET_SRC(o,s)    UINT8 src = (get_operand(o) >> (s)) & 15
-#define GET_IDX(o,s)    UINT8 idx = (get_operand(o) >> (s)) & 15
-#define GET_CNT(o,s)    INT8 cnt = (get_operand(o) >> (s)) & 15
-#define GET_IMM4(o,s)   UINT8 imm4 = (get_operand(o) >> (s)) & 15
+#define GET_DST(o,s)    uint8_t dst = (get_operand(o) >> (s)) & 15
+#define GET_SRC(o,s)    uint8_t src = (get_operand(o) >> (s)) & 15
+#define GET_IDX(o,s)    uint8_t idx = (get_operand(o) >> (s)) & 15
+#define GET_CNT(o,s)    int8_t cnt = (get_operand(o) >> (s)) & 15
+#define GET_IMM4(o,s)   uint8_t imm4 = (get_operand(o) >> (s)) & 15
 
-#define GET_I4M1(o,s)   UINT8 i4p1 = ((get_operand(o) >> (s)) & 15) + 1
-#define GET_IMM1(o,s)   UINT8 imm1 = (get_operand(o) >> (s)) & 2
-#define GET_IMM2(o,s)   UINT8 imm2 = (get_operand(o) >> (s)) & 3
-#define GET_IMM3(o,s)   UINT8 imm3 = (get_operand(o) >> (s)) & 7
+#define GET_I4M1(o,s)   uint8_t i4p1 = ((get_operand(o) >> (s)) & 15) + 1
+#define GET_IMM1(o,s)   uint8_t imm1 = (get_operand(o) >> (s)) & 2
+#define GET_IMM2(o,s)   uint8_t imm2 = (get_operand(o) >> (s)) & 3
+#define GET_IMM3(o,s)   uint8_t imm3 = (get_operand(o) >> (s)) & 7
 
-#define GET_IMM8(o)     UINT8 imm8 = (UINT8)get_operand(o)
+#define GET_IMM8(o)     uint8_t imm8 = (uint8_t)get_operand(o)
 
-#define GET_IMM16(o)    UINT16 imm16 = get_operand(o)
-#define GET_IDX16(o)    UINT32 idx16 = get_operand(o)
-#define GET_IMM32       UINT32 imm32 = (get_operand(1) << 16) + get_operand(2)
-#define GET_DSP7        UINT8 dsp7 = get_operand(0) & 127
-#define GET_DSP8        INT8 dsp8 = (INT8)get_operand(0)
-#define GET_DSP16       UINT32 dsp16 = addr_add(m_pc, (INT16)get_operand(1))
-#define GET_ADDR(o)     UINT32 addr = (UINT32)get_addr_operand(o)
-#define GET_ADDR_RAW(o)     UINT32 addr = (UINT32)get_raw_addr_operand(o)
+#define GET_IMM16(o)    uint16_t imm16 = get_operand(o)
+#define GET_IDX16(o)    uint32_t idx16 = get_operand(o)
+#define GET_IMM32       uint32_t imm32 = (get_operand(1) << 16) + get_operand(2)
+#define GET_DSP7        uint8_t dsp7 = get_operand(0) & 127
+#define GET_DSP8        int8_t dsp8 = (int8_t)get_operand(0)
+#define GET_DSP16       uint32_t dsp16 = addr_add(m_pc, (int16_t)get_operand(1))
+#define GET_ADDR(o)     uint32_t addr = (uint32_t)get_addr_operand(o)
+#define GET_ADDR_RAW(o)     uint32_t addr = (uint32_t)get_raw_addr_operand(o)
 
 
 /* structure for the opcode definition table */
@@ -184,7 +184,7 @@ struct Z8000_init {
 	int     size, cycles;
 	opcode_func opcode;
 	const char  *dasm;
-	UINT32 dasmflags;
+	uint32_t dasmflags;
 };
 
 /* structure for the opcode execution table / disassembler */
@@ -193,7 +193,7 @@ struct Z8000_exec {
 	int     cycles;
 	int     size;
 	const char    *dasm;
-	UINT32 dasmflags;
+	uint32_t dasmflags;
 };
 
 /* opcode execution table */

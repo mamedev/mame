@@ -69,15 +69,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
 	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
-	UINT8 port09_value;
-	UINT8 port10_value;
-	UINT8 port11_value;
-	UINT8 port12_value;
-	UINT8 port13_value;
-	UINT8 port14_value;
-	UINT8 port15_value;
-	UINT8 port16_value;
-	UINT8 port17_value;
+	uint8_t port09_value;
+	uint8_t port10_value;
+	uint8_t port11_value;
+	uint8_t port12_value;
+	uint8_t port13_value;
+	uint8_t port14_value;
+	uint8_t port15_value;
+	uint8_t port16_value;
+	uint8_t port17_value;
 
 	DECLARE_WRITE8_MEMBER(ec_port00_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port01_out_w);
@@ -114,8 +114,8 @@ public:
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
 
-	UINT8 m_banksel;
-	UINT8 m_credsel;
+	uint8_t m_banksel;
+	uint8_t m_credsel;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_reel0;
@@ -322,7 +322,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
 {
 	if (m_credsel!=0xff)
 	{
-		UINT8 bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
+		uint8_t bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
 		output().set_digit_value(m_credsel+8, bf7segdata);
 	}
 }
@@ -335,7 +335,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
 {
 	if (m_banksel!=0xff)
 	{
-		UINT8 bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
+		uint8_t bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
 		output().set_digit_value(m_banksel, bf7segdata);
 	}
 }

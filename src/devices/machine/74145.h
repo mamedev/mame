@@ -54,7 +54,7 @@ class ttl74145_device :  public device_t
 {
 public:
 	// construction/destruction
-	ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_output_line_0_callback(device_t &device, _Object object) { return downcast<ttl74145_device &>(device).m_output_line_0_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_output_line_1_callback(device_t &device, _Object object) { return downcast<ttl74145_device &>(device).m_output_line_1_cb.set_callback(object); }
@@ -67,8 +67,8 @@ public:
 	template<class _Object> static devcb_base &set_output_line_8_callback(device_t &device, _Object object) { return downcast<ttl74145_device &>(device).m_output_line_8_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_output_line_9_callback(device_t &device, _Object object) { return downcast<ttl74145_device &>(device).m_output_line_9_cb.set_callback(object); }
 
-	UINT16 read();
-	void write(UINT8 data);
+	uint16_t read();
+	void write(uint8_t data);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -87,7 +87,7 @@ private:
 	devcb_write_line m_output_line_9_cb;
 
 	/* decoded number */
-	UINT16 m_number;
+	uint16_t m_number;
 };
 
 // device type definition

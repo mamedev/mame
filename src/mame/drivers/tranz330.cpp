@@ -109,7 +109,7 @@ WRITE8_MEMBER( tranz330_state::pio_a_w )
 
 READ8_MEMBER( tranz330_state::pio_b_r )
 {
-	UINT8 input_mask = 0xf;
+	uint8_t input_mask = 0xf;
 	for (int i = 0; i < 4; i++)
 	{
 		if (!BIT(m_keypad_col_mask, i))

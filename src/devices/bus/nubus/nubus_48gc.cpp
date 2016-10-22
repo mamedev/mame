@@ -76,7 +76,7 @@ const tiny_rom_entry *nubus_824gc_device::device_rom_region() const
 //  jmfb_device - constructor
 //-------------------------------------------------
 
-jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_screen(nullptr), m_timer(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_stride(0), m_base(0), m_count(0), m_clutoffs(0), m_xres(0), m_yres(0), m_is824(false)
@@ -85,13 +85,13 @@ jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const 
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	jmfb_device(mconfig, NUBUS_48GC, "Apple 4*8 video card", tag, owner, clock, "nb_48gc", __FILE__)
 {
 	m_is824 = false;
 }
 
-nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	jmfb_device(mconfig, NUBUS_824GC, "Apple 8*24 video card", tag, owner, clock, "nb_824gc", __FILE__)
 {
 	m_is824 = true;
@@ -103,7 +103,7 @@ nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char
 
 void jmfb_device::device_start()
 {
-	UINT32 slotspace;
+	uint32_t slotspace;
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
@@ -157,12 +157,12 @@ void jmfb_device::device_timer(emu_timer &timer, device_timer_id tid, int param,
 	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 }
 
-UINT32 jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline, *base;
+	uint32_t *scanline, *base;
 	int x, y;
-	UINT8 *vram8 = &m_vram[0];
-	UINT8 pixels;
+	uint8_t *vram8 = &m_vram[0];
+	uint8_t pixels;
 
 	// first time?  kick off the VBL timer
 	if (!m_screen)
@@ -243,7 +243,7 @@ UINT32 jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			for (y = 0; y < m_yres; y++)
 			{
 				scanline = &bitmap.pix32(y);
-				base = (UINT32 *)&m_vram[y * m_stride];
+				base = (uint32_t *)&m_vram[y * m_stride];
 				for (x = 0; x < m_xres; x++)
 				{
 					*scanline++ = *base++;

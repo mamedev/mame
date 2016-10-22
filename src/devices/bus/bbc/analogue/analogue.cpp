@@ -49,7 +49,7 @@ device_bbc_analogue_interface::~device_bbc_analogue_interface()
 //  bbc_analogue_slot_device - constructor
 //-------------------------------------------------
 
-bbc_analogue_slot_device::bbc_analogue_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bbc_analogue_slot_device::bbc_analogue_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, BBC_ANALOGUE_SLOT, "BBC Micro Analogue port", tag, owner, clock, "bbc_analogue_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {
@@ -65,7 +65,7 @@ void bbc_analogue_slot_device::device_start()
 	m_card = dynamic_cast<device_bbc_analogue_interface *>(get_card_device());
 }
 
-UINT8 bbc_analogue_slot_device::ch_r(int channel)
+uint8_t bbc_analogue_slot_device::ch_r(int channel)
 {
 	if (m_card)
 		return m_card->ch_r(channel);
@@ -73,7 +73,7 @@ UINT8 bbc_analogue_slot_device::ch_r(int channel)
 		return 0x00;
 }
 
-UINT8 bbc_analogue_slot_device::pb_r()
+uint8_t bbc_analogue_slot_device::pb_r()
 {
 	if (m_card)
 		return m_card->pb_r();

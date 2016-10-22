@@ -31,7 +31,7 @@
 #include "includes/prof180x.h"
 #include "softlist.h"
 
-UINT32 prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -39,7 +39,7 @@ UINT32 prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 READ8_MEMBER( prof180x_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset < 0x40000)
 	{

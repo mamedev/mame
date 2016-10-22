@@ -22,7 +22,7 @@ const device_type SVISION_SND = &device_creator<svision_sound_device>;
 //  svision_sound_device - constructor
 //-------------------------------------------------
 
-svision_sound_device::svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+svision_sound_device::svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SVISION_SND, "Super Vision Audio Custom", tag, owner, clock, "svision_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_mixer_channel(nullptr)
@@ -67,7 +67,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			{
 				if (channel->on||channel->count)
 				{
-					int on = FALSE;
+					bool on = false;
 					switch (channel->waveform)
 					{
 						case 0:
@@ -85,7 +85,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 							break;
 					}
 					{
-						INT16 s = on ? channel->volume << 8 : 0;
+						int16_t s = on ? channel->volume << 8 : 0;
 						if (j == 0)
 							*right += s;
 						else
@@ -99,7 +99,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 		}
 		if (m_noise.on && (m_noise.play || m_noise.count))
 		{
-			INT16 s = (m_noise.value ? 1 << 8: 0) * m_noise.volume;
+			int16_t s = (m_noise.value ? 1 << 8: 0) * m_noise.volume;
 			int b1, b2;
 			if (m_noise.left)
 				*left += s;
@@ -128,9 +128,9 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 		}
 		if (m_dma.on)
 		{
-			UINT8 sample;
-			INT16 s;
-			UINT16 addr = m_dma.start + (unsigned) m_dma.pos / 2;
+			uint8_t sample;
+			int16_t s;
+			uint16_t addr = m_dma.start + (unsigned) m_dma.pos / 2;
 			if (addr >= 0x8000 && addr < 0xc000)
 			{
 				sample = machine().root_device().memregion("user1")->base()[(addr & 0x3fff) | m_dma.ca14to16];
@@ -151,8 +151,8 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			m_dma.pos += m_dma.step;
 			if (m_dma.pos >= m_dma.size)
 			{
-				m_dma.finished = TRUE;
-				m_dma.on = FALSE;
+				m_dma.finished = true;
+				m_dma.on = false;
 				m_irq_cb();
 			}
 		}
@@ -236,7 +236,7 @@ void svision_sound_device::sound_decrement()
 void svision_sound_device::soundport_w(int which, int offset, int data)
 {
 	SVISION_CHANNEL *channel = &m_channel[which];
-	UINT16 size;
+	uint16_t size;
 
 	m_mixer_channel->update();
 	channel->reg[offset] = data;

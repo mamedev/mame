@@ -30,7 +30,7 @@
 class namco_53xx_device : public device_t
 {
 public:
-	namco_53xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_53xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_input_0_callback(device_t &device, _Object object) { return downcast<namco_53xx_device &>(device).m_in_0.set_callback(object); }
 	template<class _Object> static devcb_base &set_input_1_callback(device_t &device, _Object object) { return downcast<namco_53xx_device &>(device).m_in_1.set_callback(object); }
@@ -58,7 +58,7 @@ protected:
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
-	UINT8           m_portO;
+	uint8_t           m_portO;
 	devcb_read8    m_k;
 	devcb_read8    m_in_0;
 	devcb_read8    m_in_1;

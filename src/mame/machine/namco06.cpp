@@ -102,7 +102,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 
 READ8_MEMBER( namco_06xx_device::data_r )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	LOG(("%s: 06XX '%s' read offset %d\n",machine().describe_context(),tag(),offset));
 
@@ -176,7 +176,7 @@ WRITE8_MEMBER( namco_06xx_device::ctrl_w )
 
 const device_type NAMCO_06XX = &device_creator<namco_06xx_device>;
 
-namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_06XX, "Namco 06xx", tag, owner, clock, "namco06xx", __FILE__)
 	, m_control(0)
 	, m_nmicpu(*this, finder_base::DUMMY_TAG)

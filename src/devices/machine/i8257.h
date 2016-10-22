@@ -101,7 +101,7 @@ class i8257_device :  public device_t,
 {
 public:
 	// construction/destruction
-	i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -164,10 +164,10 @@ private:
 	int m_state;
 	int m_current_channel;
 	int m_last_channel;
-	UINT8 m_transfer_mode;
-	UINT8 m_status;
-	UINT8 m_request;
-	UINT8 m_temp;
+	uint8_t m_transfer_mode;
+	uint8_t m_status;
+	uint8_t m_request;
+	uint8_t m_temp;
 
 	devcb_write_line   m_out_hrq_cb;
 	devcb_write_line   m_out_tc_cb;
@@ -192,9 +192,9 @@ private:
 
 	struct
 	{
-		UINT16 m_address;
-		UINT16 m_count;
-		UINT8 m_mode;
+		uint16_t m_address;
+		uint16_t m_count;
+		uint8_t m_mode;
 	} m_channel[4];
 };
 

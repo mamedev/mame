@@ -12,7 +12,7 @@
 #include "debugger.h"
 #include "tms57002.h"
 
-static const char *get_memadr(UINT32 opcode, char type)
+static const char *get_memadr(uint32_t opcode, char type)
 {
 	static char buff[2][10];
 	static int index = 0;
@@ -38,8 +38,8 @@ static const char *get_memadr(UINT32 opcode, char type)
 
 CPU_DISASSEMBLE(tms57002)
 {
-	UINT32 opcode = opram[0] | (opram[1] << 8) | (opram[2] << 16);
-	UINT8 fa = opcode >> 18;
+	uint32_t opcode = opram[0] | (opram[1] << 8) | (opram[2] << 16);
+	uint8_t fa = opcode >> 18;
 	char *buf = buffer;
 	if(fa == 0x3f) {
 		switch((opcode >> 11) & 0x7f) { // category 3

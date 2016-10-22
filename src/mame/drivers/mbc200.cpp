@@ -83,11 +83,11 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT8 m_comm_latch;
-	UINT8 m_term_data;
+	uint8_t m_comm_latch;
+	uint8_t m_term_data;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi_m;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
 	required_device<speaker_sound_device> m_speaker;
@@ -160,7 +160,7 @@ ADDRESS_MAP_END
 READ8_MEMBER(mbc200_state::p2_porta_r)
 {
 	machine().scheduler().synchronize(); // force resync
-	UINT8 tmp = m_comm_latch;
+	uint8_t tmp = m_comm_latch;
 	m_comm_latch = 0;
 	m_ppi_m->pc6_w(0); // ppi_ack
 	return tmp;
@@ -181,7 +181,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( mbc200_state::keyboard_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (offset)
 	{
 		if (m_term_data)
@@ -241,8 +241,8 @@ void mbc200_state::machine_start()
 
 void mbc200_state::machine_reset()
 {
-	UINT8* roms = memregion("roms")->base();
-	UINT8* main = memregion("maincpu")->base();
+	uint8_t* roms = memregion("roms")->base();
+	uint8_t* main = memregion("maincpu")->base();
 	memcpy(main, roms, 0x1000);
 }
 
@@ -253,9 +253,9 @@ SLOT_INTERFACE_END
 MC6845_UPDATE_ROW( mbc200_state::update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t gfx;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{

@@ -35,22 +35,22 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_sharedram;
-	optional_shared_ptr<UINT16> m_spr1vram;
-	optional_shared_ptr<UINT16> m_spr2vram;
-	optional_shared_ptr<UINT16> m_spr1cgram;
-	optional_shared_ptr<UINT16> m_spr2cgram;
-	required_shared_ptr<UINT16> m_fgvideoram;
-	required_shared_ptr<UINT16> m_rozvideoram;
-	optional_shared_ptr<UINT16> m_sprcgram;
-	optional_shared_ptr<UINT16> m_spritelist;
-	optional_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_fgregs;
-	optional_shared_ptr<UINT16> m_rozregs;
+	required_shared_ptr<uint16_t> m_sharedram;
+	optional_shared_ptr<uint16_t> m_spr1vram;
+	optional_shared_ptr<uint16_t> m_spr2vram;
+	optional_shared_ptr<uint16_t> m_spr1cgram;
+	optional_shared_ptr<uint16_t> m_spr2cgram;
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<uint16_t> m_rozvideoram;
+	optional_shared_ptr<uint16_t> m_sprcgram;
+	optional_shared_ptr<uint16_t> m_spritelist;
+	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_fgregs;
+	optional_shared_ptr<uint16_t> m_rozregs;
 
 	optional_memory_bank m_z80bank;
 
-	UINT16 *  m_zoomdata;
+	uint16_t *  m_zoomdata;
 
 	/* video-related */
 	tilemap_t   *m_fg_tilemap;
@@ -59,9 +59,9 @@ public:
 	int       m_flipscreen;
 	int       m_gfxctrl;
 	int       m_scroll[2];
-	UINT32 f1gp2_tile_callback( UINT32 code );
-	UINT32 f1gp_old_tile_callback( UINT32 code );
-	UINT32 f1gp_ol2_tile_callback( UINT32 code );
+	uint32_t f1gp2_tile_callback( uint32_t code );
+	uint32_t f1gp_old_tile_callback( uint32_t code );
+	uint32_t f1gp_ol2_tile_callback( uint32_t code );
 
 	/* misc */
 	int       m_pending_command;
@@ -99,8 +99,8 @@ public:
 	DECLARE_MACHINE_START(f1gpb);
 	DECLARE_VIDEO_START(f1gpb);
 	DECLARE_VIDEO_START(f1gp2);
-	UINT32 screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void f1gpb_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect );
 };

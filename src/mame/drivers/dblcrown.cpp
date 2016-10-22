@@ -71,15 +71,15 @@ public:
 	required_device<palette_device> m_palette;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 m_bank;
-	UINT8 m_irq_src;
-	std::unique_ptr<UINT8[]> m_pal_ram;
-	std::unique_ptr<UINT8[]> m_vram;
-	UINT8 m_vram_bank[2];
-	UINT8 m_mux_data;
-	UINT8 m_lamps_data;
+	uint8_t m_bank;
+	uint8_t m_irq_src;
+	std::unique_ptr<uint8_t[]> m_pal_ram;
+	std::unique_ptr<uint8_t[]> m_vram;
+	uint8_t m_vram_bank[2];
+	uint8_t m_mux_data;
+	uint8_t m_lamps_data;
 
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(bank_w);
@@ -113,13 +113,13 @@ protected:
 
 void dblcrown_state::video_start()
 {
-	m_pal_ram = std::make_unique<UINT8[]>(0x200 * 2);
-	m_vram = std::make_unique<UINT8[]>(0x1000 * 0x10);
+	m_pal_ram = std::make_unique<uint8_t[]>(0x200 * 2);
+	m_vram = std::make_unique<uint8_t[]>(0x1000 * 0x10);
 
 	save_pointer(NAME(m_vram.get()), 0x1000 * 0x10);
 }
 
-UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	gfx_element *gfx_2 = m_gfxdecode->gfx(1);
@@ -132,8 +132,8 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	{
 		for (x = 0; x < 32; x++)
 		{
-			UINT16 tile = ((m_vram[count]) | (m_vram[count+1] << 8)) & 0xfff;
-			UINT8 col = (m_vram[count+1] >> 4);
+			uint16_t tile = ((m_vram[count]) | (m_vram[count+1] << 8)) & 0xfff;
+			uint8_t col = (m_vram[count+1] >> 4);
 
 			gfx_2->opaque(bitmap, cliprect, tile, col, 0, 0, x * 16, y * 16);
 
@@ -147,8 +147,8 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	{
 		for (x = 0; x < 64; x++)
 		{
-			UINT16 tile = ((m_vram[count]) | (m_vram[count + 1] << 8)) & 0xfff;
-			UINT8 col = (m_vram[count + 1] >> 4); // ok?
+			uint16_t tile = ((m_vram[count]) | (m_vram[count + 1] << 8)) & 0xfff;
+			uint8_t col = (m_vram[count + 1] >> 4); // ok?
 
 			gfx->transpen(bitmap, cliprect, tile, col, 0, 0, x * 8, y * 8, 0);
 
@@ -210,7 +210,7 @@ WRITE8_MEMBER( dblcrown_state::palette_w)
 
 READ8_MEMBER( dblcrown_state::vram_r)
 {
-	UINT32 hi_offs;
+	uint32_t hi_offs;
 	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
 
 	return m_vram[(offset & 0xfff) | hi_offs];
@@ -218,14 +218,14 @@ READ8_MEMBER( dblcrown_state::vram_r)
 
 WRITE8_MEMBER( dblcrown_state::vram_w)
 {
-	UINT32 hi_offs;
+	uint32_t hi_offs;
 	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
 
 	m_vram[(offset & 0xfff) | hi_offs] = data;
 
 	#ifdef DEBUG_VRAM
 	{
-		UINT8 *VRAM = memregion("vram")->base();
+		uint8_t *VRAM = memregion("vram")->base();
 
 		VRAM[(offset & 0xfff) | hi_offs] = data;
 		m_gfxdecode->gfx(0)->mark_dirty(((offset & 0xfff) | hi_offs) / 32);
@@ -260,7 +260,7 @@ READ8_MEMBER( dblcrown_state::in_mux_r )
 {
 	const char *const muxnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	int i;
-	UINT8 res;
+	uint8_t res;
 
 	res = 0;
 
@@ -277,7 +277,7 @@ READ8_MEMBER( dblcrown_state::in_mux_type_r )
 {
 	const char *const muxnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	int i;
-	UINT8 res;
+	uint8_t res;
 
 	res = 0xff;
 
@@ -555,7 +555,7 @@ GFXDECODE_END
 
 void dblcrown_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("rom_bank")->configure_entries(0, 0x20, &ROM[0], 0x2000);
 }
 

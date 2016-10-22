@@ -136,7 +136,7 @@ ioport_constructor vp590_device::device_input_ports() const
 //  vp590_device - constructor
 //-------------------------------------------------
 
-vp590_device::vp590_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vp590_device::vp590_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VP590, "VP590", tag, owner, clock, "vp590", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_cgc(*this, CDP1862_TAG),
@@ -167,11 +167,11 @@ void vp590_device::device_start()
 //  vip_program_w - program write
 //-------------------------------------------------
 
-void vp590_device::vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh)
+void vp590_device::vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	if (offset >= 0xc000 && offset < 0xe000)
 	{
-		UINT8 mask = 0xff;
+		uint8_t mask = 0xff;
 
 		m_a12 = (offset & 0x1000) ? 1 : 0;
 
@@ -193,7 +193,7 @@ void vp590_device::vip_program_w(address_space &space, offs_t offset, UINT8 data
 //  vip_io_w - I/O write
 //-------------------------------------------------
 
-void vp590_device::vip_io_w(address_space &space, offs_t offset, UINT8 data)
+void vp590_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -213,9 +213,9 @@ void vp590_device::vip_io_w(address_space &space, offs_t offset, UINT8 data)
 //  vip_dma_w - DMA write
 //-------------------------------------------------
 
-void vp590_device::vip_dma_w(address_space &space, offs_t offset, UINT8 data)
+void vp590_device::vip_dma_w(address_space &space, offs_t offset, uint8_t data)
 {
-	UINT8 mask = 0xff;
+	uint8_t mask = 0xff;
 
 	if (!m_a12)
 	{
@@ -233,7 +233,7 @@ void vp590_device::vip_dma_w(address_space &space, offs_t offset, UINT8 data)
 //  vip_screen_update - screen update
 //-------------------------------------------------
 
-UINT32 vp590_device::vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vp590_device::vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_cgc->screen_update(screen, bitmap, cliprect);
 

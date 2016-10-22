@@ -15,11 +15,11 @@
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 
-void apple525_set_lines(device_t *device,UINT8 lines);
+void apple525_set_lines(device_t *device,uint8_t lines);
 void apple525_set_enable_lines(device_t *device,int enable_mask);
 
-UINT8 apple525_read_data(device_t *device);
-void apple525_write_data(device_t *device,UINT8 data);
+uint8_t apple525_read_data(device_t *device);
+void apple525_write_data(device_t *device,uint8_t data);
 int apple525_read_status(device_t *device);
 int apple525_get_count(running_machine &machine);
 
@@ -27,7 +27,7 @@ class apple525_floppy_image_device :    public legacy_floppy_image_device
 {
 public:
 	// construction/destruction
-	apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -43,7 +43,7 @@ public:
 	unsigned int track_dirty : 1;
 	int position;
 	int spin_count;         /* simulate drive spin to fool RWTS test at $BD34 */
-	UINT8 track_data[APPLE2_NIBBLE_SIZE * APPLE2_SECTOR_COUNT];
+	uint8_t track_data[APPLE2_NIBBLE_SIZE * APPLE2_SECTOR_COUNT];
 
 protected:
 	virtual void device_start() override;

@@ -13,17 +13,17 @@
 
 const device_type M740 = &device_creator<m740_device>;
 
-m740_device::m740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m740_device::m740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M740, "M740", tag, owner, clock, "m740", __FILE__), m_irq_multiplex(0), m_irq_vector(0)
 {
 }
 
-m740_device::m740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+m740_device::m740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	m6502_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_multiplex(0), m_irq_vector(0)
 {
 }
 
-offs_t m740_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m740_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
 }
@@ -70,33 +70,33 @@ void m740_device::state_string_export(const device_state_entry &entry, std::stri
 	}
 }
 
-UINT8 m740_device::do_clb(UINT8 in, UINT8 bit)
+uint8_t m740_device::do_clb(uint8_t in, uint8_t bit)
 {
 	return in & ~(1<<bit);
 }
 
-UINT8 m740_device::do_seb(UINT8 in, UINT8 bit)
+uint8_t m740_device::do_seb(uint8_t in, uint8_t bit)
 {
 	return in | (1<<bit);
 }
 
 // swap the two nibbles of the input (Rotate Right Four bits)
 // doesn't affect the flags
-UINT8 m740_device::do_rrf(UINT8 in)
+uint8_t m740_device::do_rrf(uint8_t in)
 {
 		return ((in&0xf)<<4) | ((in&0xf0)>>4);
 }
 
-void m740_device::do_sbc_dt(UINT8 val)
+void m740_device::do_sbc_dt(uint8_t val)
 {
-	UINT8 c = P & F_C ? 0 : 1;
+	uint8_t c = P & F_C ? 0 : 1;
 	P &= ~(F_N|F_V|F_Z|F_C);
-	UINT16 diff = TMP2 - val - c;
-	UINT8 al = (TMP2 & 15) - (val & 15) - c;
-	if(INT8(al) < 0)
+	uint16_t diff = TMP2 - val - c;
+	uint8_t al = (TMP2 & 15) - (val & 15) - c;
+	if(int8_t(al) < 0)
 		al -= 6;
-	UINT8 ah = (TMP2 >> 4) - (val >> 4) - (INT8(al) < 0);
-	if(!UINT8(diff))
+	uint8_t ah = (TMP2 >> 4) - (val >> 4) - (int8_t(al) < 0);
+	if(!uint8_t(diff))
 		P |= F_Z;
 	else if(diff & 0x80)
 		P |= F_N;
@@ -104,18 +104,18 @@ void m740_device::do_sbc_dt(UINT8 val)
 		P |= F_V;
 	if(!(diff & 0xff00))
 		P |= F_C;
-	if(INT8(ah) < 0)
+	if(int8_t(ah) < 0)
 		ah -= 6;
 	TMP2 = (ah << 4) | (al & 15);
 }
 
-void m740_device::do_sbc_ndt(UINT8 val)
+void m740_device::do_sbc_ndt(uint8_t val)
 {
-	UINT16 diff = TMP2 - val - (P & F_C ? 0 : 1);
+	uint16_t diff = TMP2 - val - (P & F_C ? 0 : 1);
 	P &= ~(F_N|F_V|F_Z|F_C);
-	if(!UINT8(diff))
+	if(!uint8_t(diff))
 		P |= F_Z;
-	else if(INT8(diff) < 0)
+	else if(int8_t(diff) < 0)
 		P |= F_N;
 	if((TMP2^val) & (TMP2^diff) & 0x80)
 		P |= F_V;
@@ -124,7 +124,7 @@ void m740_device::do_sbc_ndt(UINT8 val)
 	TMP2 = diff;
 }
 
-void m740_device::do_sbct(UINT8 val)
+void m740_device::do_sbct(uint8_t val)
 {
 	if(P & F_D)
 		do_sbc_dt(val);
@@ -132,15 +132,15 @@ void m740_device::do_sbct(UINT8 val)
 		do_sbc_ndt(val);
 }
 
-void m740_device::do_adc_dt(UINT8 val)
+void m740_device::do_adc_dt(uint8_t val)
 {
-	UINT8 c = P & F_C ? 1 : 0;
+	uint8_t c = P & F_C ? 1 : 0;
 	P &= ~(F_N|F_V|F_Z|F_C);
-	UINT8 al = (TMP2 & 15) + (val & 15) + c;
+	uint8_t al = (TMP2 & 15) + (val & 15) + c;
 	if(al > 9)
 		al += 6;
-	UINT8 ah = (TMP2 >> 4) + (val >> 4) + (al > 15);
-	if(!UINT8(TMP2 + val + c))
+	uint8_t ah = (TMP2 >> 4) + (val >> 4) + (al > 15);
+	if(!uint8_t(TMP2 + val + c))
 		P |= F_Z;
 	else if(ah & 8)
 		P |= F_N;
@@ -153,14 +153,14 @@ void m740_device::do_adc_dt(UINT8 val)
 	TMP2 = (ah << 4) | (al & 15);
 }
 
-void m740_device::do_adc_ndt(UINT8 val)
+void m740_device::do_adc_ndt(uint8_t val)
 {
-	UINT16 sum;
+	uint16_t sum;
 	sum = TMP2 + val + (P & F_C ? 1 : 0);
 	P &= ~(F_N|F_V|F_Z|F_C);
-	if(!UINT8(sum))
+	if(!uint8_t(sum))
 		P |= F_Z;
-	else if(INT8(sum) < 0)
+	else if(int8_t(sum) < 0)
 		P |= F_N;
 	if(~(TMP2^val) & (TMP2^sum) & 0x80)
 		P |= F_V;
@@ -169,7 +169,7 @@ void m740_device::do_adc_ndt(UINT8 val)
 	TMP2 = sum;
 }
 
-void m740_device::do_adct(UINT8 val)
+void m740_device::do_adct(uint8_t val)
 {
 	if(P & F_D)
 		do_adc_dt(val);
@@ -231,7 +231,7 @@ void m740_device::set_irq_line(int line, int state)
 		{
 			if (m_irq_multiplex & (1 << i))
 			{
-				m_irq_vector = 0xfffc - (UINT16)(2 * i);
+				m_irq_vector = 0xfffc - (uint16_t)(2 * i);
 				break;
 			}
 		}

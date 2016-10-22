@@ -488,7 +488,7 @@
  *
  *     DISCRETE_COUNTER(name of node,
  *                      enable node or static value,
- *                      reset node or static value, (reset when TRUE)
+ *                      reset node or static value, (reset when true)
  *                      clock node or static value,
  *                      min count static value,
  *                      max count static value,
@@ -3856,7 +3856,7 @@ struct discrete_lfsr_desc
 
 struct discrete_op_amp_osc_info
 {
-	UINT32  type;
+	uint32_t  type;
 	double  r1;
 	double  r2;
 	double  r3;
@@ -3908,7 +3908,7 @@ struct discrete_dac_r1_ladder
 
 struct discrete_integrate_info
 {
-	UINT32  type;
+	uint32_t  type;
 	double  r1;     // r1a + r1b
 	double  r2;     // r2a + r2b
 	double  r3;     // r3a + r3b
@@ -3939,7 +3939,7 @@ struct discrete_mixer_desc
 
 struct discrete_op_amp_info
 {
-	UINT32  type;
+	uint32_t  type;
 	double  r1;
 	double  r2;
 	double  r3;
@@ -3952,7 +3952,7 @@ struct discrete_op_amp_info
 
 struct discrete_op_amp_1sht_info
 {
-	UINT32  type;
+	uint32_t  type;
 	double  r1;
 	double  r2;
 	double  r3;
@@ -4240,7 +4240,7 @@ class discrete_input_interface
 public:
 	virtual ~discrete_input_interface() { }
 
-	virtual void input_write(int sub_node, UINT8 data ) = 0;
+	virtual void input_write(int sub_node, uint8_t data ) = 0;
 };
 
 class discrete_sound_output_interface
@@ -4282,7 +4282,7 @@ class discrete_device : public device_t
 
 protected:
 	// construction/destruction
-	discrete_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	discrete_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock);
 
 public:
 	// inline configuration helpers
@@ -4360,8 +4360,8 @@ private:
 
 	/* profiling */
 	int                     m_profiling;
-	UINT64                  m_total_samples;
-	UINT64                  m_total_stream_updates;
+	uint64_t                  m_total_samples;
+	uint64_t                  m_total_stream_updates;
 };
 
 // ======================> discrete_sound_device
@@ -4371,7 +4371,7 @@ class discrete_sound_device :   public discrete_device,
 {
 public:
 	// construction/destruction
-	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~discrete_sound_device(void) { };
 
 	/* --------------------------------- */

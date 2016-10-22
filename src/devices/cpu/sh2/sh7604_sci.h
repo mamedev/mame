@@ -42,7 +42,7 @@ class sh7604_sci_device : public device_t,
 {
 public:
 	// construction/destruction
-	sh7604_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh7604_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -69,10 +69,10 @@ protected:
 	virtual void device_reset() override;
 private:
 	const address_space_config      m_space_config;
-	UINT8 m_smr;
-	UINT8 m_scr;
-	UINT8 m_ssr;
-	UINT8 m_brr;
+	uint8_t m_smr;
+	uint8_t m_scr;
+	uint8_t m_ssr;
+	uint8_t m_brr;
 };
 
 

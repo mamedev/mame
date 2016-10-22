@@ -737,7 +737,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port3_w)
 
 READ8_MEMBER(maygay1b_state::mcu_port0_r)
 {
-	UINT8 ret = m_lamp_strobe;
+	uint8_t ret = m_lamp_strobe;
 #ifdef USE_MCU
 	// the MCU code checks to see if the input from this port is stable in
 	// the main loop
@@ -754,7 +754,7 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 	// this is read in BOTH the external interrupts
 	// it seems that both the writes from the main cpu go here
 	// and the MCU knows which is is based on the interrupt level
-	UINT8 ret = m_main_to_mcu;
+	uint8_t ret = m_main_to_mcu;
 #ifdef USE_MCU
 	logerror("%s: mcu_port2_r returning %02x\n", machine().describe_context(), ret);
 #endif
@@ -862,20 +862,20 @@ WRITE8_MEMBER(maygay1b_state::m1ab_no_oki_w)
 DRIVER_INIT_MEMBER(maygay1b_state,m1common)
 {
 	//Initialise paging for non-extended ROM space
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &rom[0x0e000], 0x10000);
 	membank("bank1")->set_entry(0);
 
 	// print out the rom id / header info to give us some hints
 	// note this isn't always correct, alley cat has 'Calpsyo' still in the ident string?
 	{
-		UINT8 *cpu = memregion( "maincpu" )->base();
+		uint8_t *cpu = memregion( "maincpu" )->base();
 		int base = 0xff20;
 		for (int i=0;i<14;i++)
 		{
 			for (int j=0;j<16;j++)
 			{
-				UINT8 rom = cpu[base];
+				uint8_t rom = cpu[base];
 
 				if ((rom>=0x20) && (rom<0x7f))
 				{

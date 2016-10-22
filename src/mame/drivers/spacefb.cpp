@@ -137,7 +137,7 @@ void spacefb_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		interrupt_callback(ptr, param);
 		break;
 	default:
-			assert_always(FALSE, "Unknown id in spacefb_state::device_timer");
+			assert_always(false, "Unknown id in spacefb_state::device_timer");
 	}
 }
 
@@ -147,7 +147,7 @@ TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 
 	/* compute vector and set the interrupt line */
 	int vpos = m_screen->vpos();
-	UINT8 vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
+	uint8_t vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
 
 	/* set up for next interrupt */
@@ -244,7 +244,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spacefb_audio_io_map, AS_IO, 8, spacefb_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(audio_p2_r)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(audio_t0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)

@@ -220,7 +220,7 @@ GFXDECODE_END
 
 void momoko_state::machine_start()
 {
-	UINT8 *BG_MAP = memregion("user1")->base();
+	uint8_t *BG_MAP = memregion("user1")->base();
 
 	membank("bank1")->configure_entries(0, 32, &BG_MAP[0x0000], 0x1000);
 

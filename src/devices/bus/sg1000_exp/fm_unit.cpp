@@ -72,7 +72,7 @@ machine_config_constructor sega_fm_unit_device::device_mconfig_additions() const
 //  sega_fm_unit_device - constructor
 //-------------------------------------------------
 
-sega_fm_unit_device::sega_fm_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sega_fm_unit_device::sega_fm_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA_FM_UNIT, "Sega FM Sound Unit", tag, owner, clock, "sega_fm_unit", __FILE__),
 	device_sg1000_expansion_slot_interface(mconfig, *this),
 	m_ym(*this, "ym2413"),
@@ -147,13 +147,13 @@ WRITE8_MEMBER(sega_fm_unit_device::peripheral_w)
 }
 
 
-bool sega_fm_unit_device::is_readable(UINT8 offset)
+bool sega_fm_unit_device::is_readable(uint8_t offset)
 {
 	return (offset <= 3) ? true : false;
 }
 
 
-bool sega_fm_unit_device::is_writeable(UINT8 offset)
+bool sega_fm_unit_device::is_writeable(uint8_t offset)
 {
 	return (offset <= 3) ? true : false;
 }

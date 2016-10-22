@@ -32,13 +32,13 @@ public:
 		m_fdc(*this, "fdc")  { }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_vram;
+	required_shared_ptr<uint8_t> m_p_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<i8272a_device> m_fdc;
 
 	virtual void machine_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(tc_w);
@@ -60,13 +60,13 @@ WRITE8_MEMBER(ax20_state::ctl_w)
 	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!(data & 1));
 }
 
-UINT32 ax20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ax20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for ( int y = 0; y < 24; y++ )
 	{
 		for ( int x = 0; x < 80; x++ )
 		{
-			UINT16 tile = m_p_vram[24 +  y * 128 + x ] & 0x7f;
+			uint16_t tile = m_p_vram[24 +  y * 128 + x ] & 0x7f;
 
 			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*12);
 		}

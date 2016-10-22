@@ -15,11 +15,11 @@
 class sparc_debug_state
 {
 public:
-	virtual UINT64 get_reg_r(unsigned index) const = 0;
-	virtual UINT64 get_translated_pc() const = 0;
-	virtual UINT8 get_icc() const = 0;
-	virtual UINT8 get_xcc() const = 0;
-	virtual UINT8 get_fcc(unsigned index) const = 0; // ?><=
+	virtual uint64_t get_reg_r(unsigned index) const = 0;
+	virtual uint64_t get_translated_pc() const = 0;
+	virtual uint8_t get_icc() const = 0;
+	virtual uint8_t get_xcc() const = 0;
+	virtual uint8_t get_fcc(unsigned index) const = 0; // ?><=
 
 protected:
 	~sparc_debug_state() { }
@@ -38,7 +38,7 @@ public:
 		const char *name = nullptr;
 		const char *desc = nullptr;
 	};
-	typedef std::map<UINT8, asi_desc> asi_desc_map;
+	typedef std::map<uint8_t, asi_desc> asi_desc_map;
 
 	struct state_reg_desc
 	{
@@ -48,7 +48,7 @@ public:
 		const char  *read_name = nullptr;
 		const char  *write_name = nullptr;
 	};
-	typedef std::map<UINT8, state_reg_desc> state_reg_desc_map;
+	typedef std::map<uint8_t, state_reg_desc> state_reg_desc_map;
 
 	struct prftch_desc
 	{
@@ -56,7 +56,7 @@ public:
 		prftch_desc(const char *name_) : name(name_) { }
 		const char *name = nullptr;
 	};
-	typedef std::map<UINT8, prftch_desc> prftch_desc_map;
+	typedef std::map<uint8_t, prftch_desc> prftch_desc_map;
 
 	sparc_disassembler(const sparc_debug_state *state, unsigned version);
 	sparc_disassembler(const sparc_debug_state *state, unsigned version, vis_level vis);
@@ -106,13 +106,13 @@ public:
 		}
 	}
 
-	offs_t dasm(char *buf, offs_t pc, UINT32 op) const;
+	offs_t dasm(char *buf, offs_t pc, uint32_t op) const;
 
 private:
 	struct branch_desc
 	{
-		INT32           (*get_disp)(UINT32 op);
-		const char *    (*get_comment)(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op);
+		int32_t           (*get_disp)(uint32_t op);
+		const char *    (*get_comment)(const sparc_debug_state *state, bool use_cc, offs_t pc, uint32_t op);
 		int             disp_width;
 		bool            use_pred, use_cc;
 		const char      *reg_cc[4];
@@ -125,7 +125,7 @@ private:
 		const char      *mnemonic;
 		const char      *g0_synth;
 	};
-	typedef std::map<UINT8, int_op_desc> int_op_desc_map;
+	typedef std::map<uint8_t, int_op_desc> int_op_desc_map;
 
 	struct fpop1_desc
 	{
@@ -137,7 +137,7 @@ private:
 		bool        rd_shift = false;
 		const char  *mnemonic = nullptr;
 	};
-	typedef std::map<UINT16, fpop1_desc> fpop1_desc_map;
+	typedef std::map<uint16_t, fpop1_desc> fpop1_desc_map;
 
 	struct fpop2_desc
 	{
@@ -147,7 +147,7 @@ private:
 		bool        shift = false;
 		const char  *mnemonic = nullptr;
 	};
-	typedef std::map<UINT16, fpop2_desc> fpop2_desc_map;
+	typedef std::map<uint16_t, fpop2_desc> fpop2_desc_map;
 
 	struct ldst_desc
 	{
@@ -160,7 +160,7 @@ private:
 		const char  *mnemonic = nullptr;
 		const char  *g0_synth = nullptr;
 	};
-	typedef std::map<UINT8, ldst_desc> ldst_desc_map;
+	typedef std::map<uint8_t, ldst_desc> ldst_desc_map;
 
 	struct vis_op_desc
 	{
@@ -173,29 +173,29 @@ private:
 		bool        collapse = false;
 		const char  *mnemonic = nullptr;
 	};
-	typedef std::map<UINT16, vis_op_desc> vis_op_desc_map;
+	typedef std::map<uint16_t, vis_op_desc> vis_op_desc_map;
 
-	offs_t dasm_invalid(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_branch(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_shift(char *buf, offs_t pc, UINT32 op, const char *mnemonic, const char *mnemonicx, const char *mnemonicx0) const;
-	offs_t dasm_read_state_reg(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_write_state_reg(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_move_cond(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_move_reg_cond(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_fpop1(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_fpop2(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_impdep1(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_jmpl(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_return(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_tcc(char *buf, offs_t pc, UINT32 op) const;
-	offs_t dasm_ldst(char *buf, offs_t pc, UINT32 op) const;
+	offs_t dasm_invalid(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_branch(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_shift(char *buf, offs_t pc, uint32_t op, const char *mnemonic, const char *mnemonicx, const char *mnemonicx0) const;
+	offs_t dasm_read_state_reg(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_write_state_reg(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_move_cond(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_move_reg_cond(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_fpop1(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_fpop2(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_impdep1(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_jmpl(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_return(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_tcc(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_ldst(char *buf, offs_t pc, uint32_t op) const;
 
-	void dasm_address(char *&output, UINT32 op) const;
-	void dasm_asi(char *&output, UINT32 op) const;
-	void dasm_asi_comment(char *&output, UINT32 op) const;
-	void dasm_vis_arg(char *&output, bool &args, vis_op_desc::arg fmt, UINT32 reg) const;
+	void dasm_address(char *&output, uint32_t op) const;
+	void dasm_asi(char *&output, uint32_t op) const;
+	void dasm_asi_comment(char *&output, uint32_t op) const;
+	void dasm_vis_arg(char *&output, bool &args, vis_op_desc::arg fmt, uint32_t reg) const;
 
-	UINT32 freg(UINT32 val, bool shift) const;
+	uint32_t freg(uint32_t val, bool shift) const;
 
 	template <typename T> void add_int_op_desc(const T &desc);
 	template <typename T> void add_fpop1_desc(const T &desc);

@@ -61,7 +61,7 @@ machine_config_constructor cpc_ddi1_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_ddi1_device::cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_ddi1_device::cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_DDI1, "DDI-1", tag, owner, clock, "cpc_ddi1", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_fdc(*this,"upd765"),
@@ -127,7 +127,7 @@ WRITE8_MEMBER(cpc_ddi1_device::fdc_w)
 
 READ8_MEMBER(cpc_ddi1_device::fdc_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch(offset)
 	{
@@ -150,13 +150,13 @@ WRITE8_MEMBER(cpc_ddi1_device::rombank_w)
 	m_slot->rom_select(space,0,data);
 }
 
-void cpc_ddi1_device::set_mapping(UINT8 type)
+void cpc_ddi1_device::set_mapping(uint8_t type)
 {
 	if(type != MAP_UPPER)
 		return;
 	if(m_rom_active)
 	{
-		UINT8* ROM = memregion("disc_rom")->base();
+		uint8_t* ROM = memregion("disc_rom")->base();
 		membank(":bank7")->set_base(ROM);
 		membank(":bank8")->set_base(ROM+0x2000);
 	}

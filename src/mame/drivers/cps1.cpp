@@ -379,7 +379,7 @@ READ16_MEMBER(cps_state::qsound_rom_r)
 {
 	if (memregion("user1") != nullptr)
 	{
-		UINT8 *rom = memregion("user1")->base();
+		uint8_t *rom = memregion("user1")->base();
 		return rom[offset] | 0xff00;
 	}
 	else
@@ -12032,8 +12032,8 @@ DRIVER_INIT_MEMBER( cps_state, sf2ceblp )
 DRIVER_INIT_MEMBER( cps_state, sf2m8 )
 {
 	// unscramble gfx
-	UINT8 *grom = memregion("gfx")->base();
-	UINT8 *urom = memregion("user2")->base();
+	uint8_t *grom = memregion("gfx")->base();
+	uint8_t *urom = memregion("user2")->base();
 	int i = 0x480000, j = 0;
 
 	for (j = 0x20000; j < 0x80000; j+=2)
@@ -12051,10 +12051,10 @@ DRIVER_INIT_MEMBER( cps_state, sf2m8 )
 	DRIVER_INIT_CALL(cps1);
 }
 
-void cps_state::kabuki_setup(void (*decode)(UINT8 *src, UINT8 *dst))
+void cps_state::kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst))
 {
-	m_decrypt_kabuki = std::make_unique<UINT8[]>(0x8000);
-	UINT8 *rom = memregion("audiocpu")->base();
+	m_decrypt_kabuki = std::make_unique<uint8_t[]>(0x8000);
+	uint8_t *rom = memregion("audiocpu")->base();
 	decode(rom, m_decrypt_kabuki.get());
 	membank("decrypted")->set_base(m_decrypt_kabuki.get());
 }
@@ -12094,7 +12094,7 @@ DRIVER_INIT_MEMBER(cps_state,pang3b)
 
 DRIVER_INIT_MEMBER(cps_state,pang3)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	int A, src, dst;
 
 	for (A = 0x80000; A < 0x100000; A += 2)
@@ -12118,7 +12118,7 @@ DRIVER_INIT_MEMBER(cps_state,pang3)
 
 READ16_MEMBER(cps_state::ganbare_ram_r)
 {
-	UINT16 result = 0xffff;
+	uint16_t result = 0xffff;
 
 	if (ACCESSING_BITS_0_7)
 		result = (result & ~0x00ff) | m_m48t35->read(space, offset, 0xff);

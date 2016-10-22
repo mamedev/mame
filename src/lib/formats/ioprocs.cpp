@@ -17,7 +17,7 @@ static void stdio_closeproc(void *file)
 	fclose((FILE*)file);
 }
 
-static int stdio_seekproc(void *file, INT64 offset, int whence)
+static int stdio_seekproc(void *file, int64_t offset, int whence)
 {
 	return fseek((FILE*)file, (long) offset, whence);
 }
@@ -32,7 +32,7 @@ static size_t stdio_writeproc(void *file, const void *buffer, size_t length)
 	return fwrite(buffer, 1, length, (FILE*)file);
 }
 
-static UINT64 stdio_filesizeproc(void *file)
+static uint64_t stdio_filesizeproc(void *file)
 {
 	long l, sz;
 	l = ftell((FILE*)file);
@@ -71,7 +71,7 @@ static void corefile_closeproc(void *file)
 	delete (util::core_file*)file;
 }
 
-static int corefile_seekproc(void *file, INT64 offset, int whence)
+static int corefile_seekproc(void *file, int64_t offset, int whence)
 {
 	return ((util::core_file*)file)->seek(offset, whence);
 }
@@ -86,15 +86,15 @@ static size_t corefile_writeproc(void *file, const void *buffer, size_t length)
 	return ((util::core_file*)file)->write(buffer, length);
 }
 
-static UINT64 corefile_filesizeproc(void *file)
+static uint64_t corefile_filesizeproc(void *file)
 {
 	const auto l = ((util::core_file*)file)->tell();
 	if (((util::core_file*)file)->seek(0, SEEK_END))
 		return (size_t) -1;
 	const auto sz = ((util::core_file*)file)->tell();
 	if (((util::core_file*)file)->seek(l, SEEK_SET))
-		return UINT64(-1);
-	return UINT64(sz);
+		return uint64_t(-1);
+	return uint64_t(sz);
 }
 
 const struct io_procs corefile_ioprocs =
@@ -121,7 +121,7 @@ const struct io_procs corefile_ioprocs_noclose =
     calls for accessing generic IO
 *********************************************************************/
 
-static void io_generic_seek(struct io_generic *genio, UINT64 offset)
+static void io_generic_seek(struct io_generic *genio, uint64_t offset)
 {
 	genio->procs->seekproc(genio->file, offset, SEEK_SET);
 }
@@ -136,9 +136,9 @@ void io_generic_close(struct io_generic *genio)
 
 
 
-void io_generic_read(struct io_generic *genio, void *buffer, UINT64 offset, size_t length)
+void io_generic_read(struct io_generic *genio, void *buffer, uint64_t offset, size_t length)
 {
-	UINT64 size;
+	uint64_t size;
 	size_t bytes_read;
 
 	size = io_generic_size(genio);
@@ -151,17 +151,17 @@ void io_generic_read(struct io_generic *genio, void *buffer, UINT64 offset, size
 		io_generic_seek(genio, offset);
 		bytes_read = genio->procs->readproc(genio->file, buffer, length);
 	}
-	memset(((UINT8 *) buffer) + bytes_read, genio->filler, length - bytes_read);
+	memset(((uint8_t *) buffer) + bytes_read, genio->filler, length - bytes_read);
 }
 
 
 
-void io_generic_write(struct io_generic *genio, const void *buffer, UINT64 offset, size_t length)
+void io_generic_write(struct io_generic *genio, const void *buffer, uint64_t offset, size_t length)
 {
-	UINT64 filler_size = 0;
+	uint64_t filler_size = 0;
 	char filler_buffer[1024];
 	size_t bytes_to_write;
-	UINT64 size;
+	uint64_t size;
 
 	size = io_generic_size(genio);
 
@@ -191,9 +191,9 @@ void io_generic_write(struct io_generic *genio, const void *buffer, UINT64 offse
 
 
 
-void io_generic_write_filler(struct io_generic *genio, UINT8 filler, UINT64 offset, size_t length)
+void io_generic_write_filler(struct io_generic *genio, uint8_t filler, uint64_t offset, size_t length)
 {
-	UINT8 buffer[512];
+	uint8_t buffer[512];
 	size_t this_length;
 
 	memset(buffer, filler, std::min(length, sizeof(buffer)));
@@ -209,7 +209,7 @@ void io_generic_write_filler(struct io_generic *genio, UINT8 filler, UINT64 offs
 
 
 
-UINT64 io_generic_size(struct io_generic *genio)
+uint64_t io_generic_size(struct io_generic *genio)
 {
 	return genio->procs->filesizeproc(genio->file);
 }

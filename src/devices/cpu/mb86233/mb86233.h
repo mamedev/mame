@@ -51,7 +51,7 @@ class mb86233_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_fifo_read_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_cb.set_callback(object); }
@@ -65,9 +65,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 2; }
-	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 2; }
+	virtual uint32_t execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -77,9 +77,9 @@ protected:
 	void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
@@ -87,28 +87,28 @@ private:
 
 	union MB86233_REG
 	{
-		INT32   i;
-		UINT32  u;
+		int32_t   i;
+		uint32_t  u;
 		float   f;
 	};
 
-	UINT16          m_pc;
+	uint16_t          m_pc;
 	MB86233_REG     m_a;
 	MB86233_REG     m_b;
 	MB86233_REG     m_d;
 	MB86233_REG     m_p;
 
-	UINT16          m_reps;
-	UINT16          m_pcs[4];
-	UINT8           m_pcsp;
-	UINT32          m_eb;
-	UINT32          m_shift;
-	UINT32          m_repcnt;
-	UINT16          m_sr;
-	UINT8           m_fpucontrol;
+	uint16_t          m_reps;
+	uint16_t          m_pcs[4];
+	uint8_t           m_pcsp;
+	uint32_t          m_eb;
+	uint32_t          m_shift;
+	uint32_t          m_repcnt;
+	uint16_t          m_sr;
+	uint8_t           m_fpucontrol;
 
-	UINT32          m_gpr[16];
-	UINT32          m_extport[0x30];
+	uint32_t          m_gpr[16];
+	uint32_t          m_extport[0x30];
 
 	address_space *m_program;
 	direct_read_data *m_direct;
@@ -122,20 +122,20 @@ private:
 	const char       *m_tablergn;
 
 	/* internal RAM */
-	UINT32          m_RAM[2 * 0x200];
-	UINT32          *m_ARAM, *m_BRAM;
-	UINT32          *m_Tables;
+	uint32_t          m_RAM[2 * 0x200];
+	uint32_t          *m_ARAM, *m_BRAM;
+	uint32_t          *m_Tables;
 
 	void FLAGSF( float v );
-	void FLAGSI( UINT32 v );
-	int COND( UINT32 cond );
-	void ALU( UINT32 alu);
-	UINT32 ScaleExp(unsigned int v,int scale);
-	UINT32 GETEXTERNAL( UINT32 EB, UINT32 offset );
-	void SETEXTERNAL( UINT32 EB, UINT32 offset, UINT32 value );
-	UINT32 GETREGS( UINT32 reg, int source );
-	void SETREGS( UINT32 reg, UINT32 val );
-	UINT32 INDIRECT( UINT32 reg, int source );
+	void FLAGSI( uint32_t v );
+	int COND( uint32_t cond );
+	void ALU( uint32_t alu);
+	uint32_t ScaleExp(unsigned int v,int scale);
+	uint32_t GETEXTERNAL( uint32_t EB, uint32_t offset );
+	void SETEXTERNAL( uint32_t EB, uint32_t offset, uint32_t value );
+	uint32_t GETREGS( uint32_t reg, int source );
+	void SETREGS( uint32_t reg, uint32_t val );
+	uint32_t INDIRECT( uint32_t reg, int source );
 
 };
 

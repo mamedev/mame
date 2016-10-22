@@ -192,8 +192,8 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
 	/* 8751 - the real thing is much more complicated than that. */
-	UINT8 coin = 0;
-	UINT8 port = ioport("IN2")->read() & 0x70;
+	uint8_t coin = 0;
+	uint8_t port = ioport("IN2")->read() & 0x70;
 
 	if (space.device().safe_pc() == 0x1188)
 		return ~m_coin_command_pending;
@@ -221,7 +221,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_r)
 
 WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 {
-	static const UINT8 i8751_init_data[]={
+	static const uint8_t i8751_init_data[]={
 		0xf5,0xd5,0xdd,0x21,0x05,0xc1,0x87,0x5f,0x87,0x83,0x5f,0x16,0x00,0xdd,0x19,0xd1,
 		0xf1,0xc9,0xf5,0xd5,0xfd,0x21,0x2f,0xc1,0x87,0x5f,0x16,0x00,0xfd,0x19,0xd1,0xf1,
 		0xc9,0xe3,0xd5,0xc5,0xf5,0xdd,0xe5,0xfd,0xe5,0xe9,0xe1,0xfd,0xe1,0xdd,0xe1,0xf1,
@@ -409,7 +409,7 @@ INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
 	/* coin insertion causes an IRQ */
 	if(newval)
 	{
-		m_coin_command_pending = (UINT8)(FPTR)(param);
+		m_coin_command_pending = (uint8_t)(uintptr_t)(param);
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
 		    definitely doesn't expect them as it locks out the coin routine */
@@ -581,8 +581,8 @@ INTERRUPT_GEN_MEMBER(firetrap_state::firetrap_irq)
 
 void firetrap_state::machine_start()
 {
-	UINT8 *MAIN = memregion("maincpu")->base();
-	UINT8 *SOUND = memregion("audiocpu")->base();
+	uint8_t *MAIN = memregion("maincpu")->base();
+	uint8_t *SOUND = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &MAIN[0x10000], 0x4000);
 	membank("bank2")->configure_entries(0, 2, &SOUND[0x10000], 0x4000);

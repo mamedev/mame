@@ -120,7 +120,7 @@ enum {
 	OPWOLF_REGION_OTHER
 };
 
-static const UINT16 level_data_00[] = {
+static const uint16_t level_data_00[] = {
 	0x0480, 0x1008, 0x0300,   0x5701, 0x0001, 0x0010,
 	0x0480, 0x1008, 0x0300,   0x5701, 0x0001, 0x002b,
 	0x0780, 0x0009, 0x0300,   0x4a01, 0x0004, 0x0020,
@@ -158,7 +158,7 @@ static const UINT16 level_data_00[] = {
 	0xffff
 };
 
-static const UINT16 level_data_01[] = {
+static const uint16_t level_data_01[] = {
 	0x0780, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0010,
 	0x0780, 0x0209, 0x0300,   0x4c01, 0x4004, 0x0020,
 	0x0780, 0x0309, 0x0300,   0x4d01, 0xe003, 0x0030,
@@ -196,7 +196,7 @@ static const UINT16 level_data_01[] = {
 	0xffff
 };
 
-static const UINT16 level_data_02[] = {
+static const uint16_t level_data_02[] = {
 	0x0480, 0x000b, 0x0300,   0x4501, 0x0001, 0x0018,
 	0x0480, 0x000b, 0x0300,   0x4501, 0x2001, 0x0030,
 	0x0780, 0x1208, 0x0300,   0x5d01, 0x0004, 0x0010,
@@ -234,7 +234,7 @@ static const UINT16 level_data_02[] = {
 	0xffff
 };
 
-static const UINT16 level_data_03[] = {
+static const uint16_t level_data_03[] = {
 	0x0480, 0x000b, 0x0300,   0x4501, 0x0001, 0x0018,
 	0x0480, 0x000b, 0x0300,   0x4501, 0x2001, 0x002b,
 	0x0780, 0x010c, 0x0300,   0x4601, 0x0004, 0x000d,
@@ -272,7 +272,7 @@ static const UINT16 level_data_03[] = {
 	0xffff
 };
 
-static const UINT16 level_data_04[] = {
+static const uint16_t level_data_04[] = {
 	0x0780, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0010,
 	0x0780, 0x0209, 0x0300,   0x4c01, 0x4004, 0x0020,
 	0x0780, 0x0309, 0x0300,   0x4d01, 0xe003, 0x0030,
@@ -310,7 +310,7 @@ static const UINT16 level_data_04[] = {
 	0xffff
 };
 
-static const UINT16 level_data_05[] = {
+static const uint16_t level_data_05[] = {
 	0x0480, 0x1008, 0x0300,   0x5701, 0x0001, 0x0010,
 	0x0480, 0x1008, 0x0300,   0x5701, 0x0001, 0x002b,
 	0x0780, 0x0009, 0x0300,   0x4a01, 0x0004, 0x0020,
@@ -348,7 +348,7 @@ static const UINT16 level_data_05[] = {
 	0xffff
 };
 
-static const UINT16 level_data_06[] = {
+static const uint16_t level_data_06[] = {
 	0x0000, 0x1008, 0x0300,   0x5701, 0x0001, 0x0010,
 	0x0000, 0x1008, 0x0300,   0x5701, 0x0001, 0x002b,
 	0x0000, 0x0000, 0x0000,   0x0000, 0x0000, 0x0000,
@@ -386,7 +386,7 @@ static const UINT16 level_data_06[] = {
 	0xffff
 };
 
-static const UINT16 level_data_07[] = {
+static const uint16_t level_data_07[] = {
 	0x0480, 0x000b, 0x0300,   0x4501, 0x0001, 0x0001,
 	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
 	0x0780, 0x0109, 0x0300,   0x4a01, 0x0004, 0x0004,
@@ -422,11 +422,11 @@ static const UINT16 level_data_07[] = {
 	0xffff
 };
 
-static const UINT16 level_data_08[] = {
+static const uint16_t level_data_08[] = {
 	0xffff
 };
 
-static const UINT16 level_data_09[] = {
+static const uint16_t level_data_09[] = {
 	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
 	0x0780, 0x0109, 0x0300,   0x4a01, 0x8003, 0x8003,
@@ -462,7 +462,7 @@ static const UINT16 level_data_09[] = {
 	0xffff
 };
 
-static const UINT16 *const level_data_lookup[] =
+static const uint16_t *const level_data_lookup[] =
 {
 	level_data_00,
 	level_data_01,
@@ -488,7 +488,7 @@ void opwolf_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		cchip_timer(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in opwolf_state::device_timer");
+		assert_always(false, "Unknown id in opwolf_state::device_timer");
 	}
 }
 
@@ -499,7 +499,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::opwolf_timer_callback)
 	if (m_current_cmd == 0xf5)
 	{
 		int const level = m_cchip_ram[0x1b] % 10;
-		UINT16 const *const level_data = level_data_lookup[level];
+		uint16_t const *const level_data = level_data_lookup[level];
 
 		// The c-chip data is stored as a series of 3 word sets, delimited by 0xffff
 		memset(m_cchip_ram + 0x200, 0, 0x200);
@@ -660,9 +660,9 @@ WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
 		if (offset == 0x14)
 		{
 #if OPWOLF_READ_COINAGE_FROM_ROM
-			UINT16* rom = (UINT16*)memregion("maincpu")->base();
-			UINT32 coin_table[2] = {0, 0};
-			UINT8 coin_offset[2];
+			uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+			uint32_t coin_table[2] = {0, 0};
+			uint8_t coin_offset[2];
 			int slot;
 
 			if ((m_opwolf_region == OPWOLF_REGION_JAPAN) || (m_opwolf_region == OPWOLF_REGION_US))

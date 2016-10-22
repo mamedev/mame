@@ -148,7 +148,7 @@ void menu_dats_view::populate()
 //  draw - draw dats menu
 //-------------------------------------------------
 
-void menu_dats_view::draw(UINT32 flags)
+void menu_dats_view::draw(uint32_t flags)
 {
 	auto line_height = ui().get_line_height();
 	auto ud_arrow_width = line_height * machine().render().ui_aspect();
@@ -347,7 +347,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 
 		if (bcolor != UI_TEXT_BG_COLOR)
 			ui().draw_textured_box(container(), x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
-				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 
 		ui().draw_text_full(container(), elem.label.c_str(), x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fcolor, bcolor, &width, nullptr);
 		x1 += width + space;
@@ -394,7 +394,7 @@ void menu_dats_view::get_data()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
+		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(uintptr_t)(x + 1));
 	}
 }
 
@@ -412,7 +412,7 @@ void menu_dats_view::get_data_sw()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
+		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(uintptr_t)(x + 1));
 	}
 }
 

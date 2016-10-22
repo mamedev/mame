@@ -74,13 +74,13 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	required_shared_ptr<UINT8> m_scroll_ram;
-	required_shared_ptr<UINT8> m_sprite_ram;
-	required_shared_ptr<UINT8> m_dderby_vidchars;
-	required_shared_ptr<UINT8> m_dderby_vidattribs;
-	UINT8 *m_racetrack_tilemap_rom;
+	required_shared_ptr<uint8_t> m_scroll_ram;
+	required_shared_ptr<uint8_t> m_sprite_ram;
+	required_shared_ptr<uint8_t> m_dderby_vidchars;
+	required_shared_ptr<uint8_t> m_dderby_vidattribs;
+	uint8_t *m_racetrack_tilemap_rom;
 	tilemap_t *m_racetrack_tilemap;
-	UINT8 m_io_port[8];
+	uint8_t m_io_port[8];
 	int m_bg;
 	DECLARE_WRITE8_MEMBER(dderby_sound_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -88,7 +88,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dmndrby);
-	UINT32 screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dderby_irq);
 	INTERRUPT_GEN_MEMBER(dderby_timer_irq);
 	required_device<cpu_device> m_maincpu;
@@ -362,7 +362,7 @@ void dmndrby_state::video_start()
 
 }
 
-UINT32 dmndrby_state::screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dmndrby_state::screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 	int off,scrolly;
@@ -461,7 +461,7 @@ wouldnt like to say its the most effective way though...
 // copied from elsewhere. surely incorrect
 PALETTE_INIT_MEMBER(dmndrby_state, dmndrby)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -505,7 +505,7 @@ PALETTE_INIT_MEMBER(dmndrby_state, dmndrby)
 	/* normal tiles use colors 0-15 */
 	for (i = 0x000; i < 0x300; i++)
 	{
-		UINT8 ctabentry = color_prom[i];
+		uint8_t ctabentry = color_prom[i];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

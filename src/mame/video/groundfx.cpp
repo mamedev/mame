@@ -62,8 +62,8 @@ Heavy use is made of sprite zooming.
 
 void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs)
 {
-	UINT32 *spriteram32 = m_spriteram;
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
+	uint32_t *spriteram32 = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -195,12 +195,12 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
                 SCREEN REFRESH
 **************************************************************/
 
-UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT8 layer[5];
-	UINT8 scclayer[3];
-	UINT16 priority;
+	uint8_t layer[5];
+	uint8_t scclayer[3];
+	uint16_t priority;
 
 	m_tc0100scn->tilemap_update();
 	m_tc0480scp->tilemap_update();

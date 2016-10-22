@@ -15,16 +15,16 @@
 class tp0320_cpu_device : public tms0980_cpu_device
 {
 public:
-	tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// overrides
 	//virtual void device_start() override;
 
-	virtual UINT32 decode_fixed(UINT16 op) override { return 0; } // not yet
-	virtual UINT32 decode_micro(UINT8 sel) override;
+	virtual uint32_t decode_fixed(uint16_t op) override { return 0; } // not yet
+	virtual uint32_t decode_micro(uint8_t sel) override;
 	virtual void device_reset() override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };

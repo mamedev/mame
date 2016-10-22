@@ -12,14 +12,14 @@ const int V = 1;
 const device_type H8_TIMER8_CHANNEL  = &device_creator<h8_timer8_channel_device>;
 const device_type H8H_TIMER8_CHANNEL = &device_creator<h8h_timer8_channel_device>;
 
-h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_TIMER8_CHANNEL, "H8 8-bits timer channel", tag, owner, clock, "h8_8bits_timer_channel", __FILE__),
 	cpu(*this, "^"), chained_timer(nullptr), intc(nullptr), chain_tag(nullptr), intc_tag(nullptr), irq_ca(0), irq_cb(0), irq_v(0), chain_type(0), tcr(0), tcsr(0), tcnt(0), extra_clock_bit(false),
 	has_adte(false), has_ice(false), clock_type(0), clock_divider(0), clear_type(0), counter_cycle(0), last_clock_update(0), event_time(0)
 {
 }
 
-h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	cpu(*this, "^"), chained_timer(nullptr), intc(nullptr), chain_tag(nullptr), intc_tag(nullptr), irq_ca(0), irq_cb(0), irq_v(0), chain_type(0), tcr(0), tcsr(0), tcnt(0), extra_clock_bit(false),
 	has_adte(false), has_ice(false), clock_type(0), clock_divider(0), clear_type(0), counter_cycle(0), last_clock_update(0), event_time(0)
@@ -145,7 +145,7 @@ WRITE8_MEMBER(h8_timer8_channel_device::tcsr_w)
 {
 	update_counter();
 
-	UINT8 mask = has_adte || has_ice ? 0x1f : 0x0f;
+	uint8_t mask = has_adte || has_ice ? 0x1f : 0x0f;
 	tcsr = (tcsr & ~mask) | (data & mask);
 	tcsr &= data | 0x1f;
 
@@ -207,7 +207,7 @@ void h8_timer8_channel_device::device_reset()
 	extra_clock_bit = false;
 }
 
-UINT64 h8_timer8_channel_device::internal_update(UINT64 current_time)
+uint64_t h8_timer8_channel_device::internal_update(uint64_t current_time)
 {
 	if(event_time && current_time >= event_time) {
 		update_counter(current_time);
@@ -217,7 +217,7 @@ UINT64 h8_timer8_channel_device::internal_update(UINT64 current_time)
 	return event_time;
 }
 
-void h8_timer8_channel_device::update_counter(UINT64 cur_time)
+void h8_timer8_channel_device::update_counter(uint64_t cur_time)
 {
 	if(clock_type != DIV)
 		return;
@@ -225,8 +225,8 @@ void h8_timer8_channel_device::update_counter(UINT64 cur_time)
 	if(!cur_time)
 		cur_time = cpu->total_cycles();
 
-	UINT64 base_time = (last_clock_update + clock_divider/2) / clock_divider;
-	UINT64 new_time = (cur_time + clock_divider/2) / clock_divider;
+	uint64_t base_time = (last_clock_update + clock_divider/2) / clock_divider;
+	uint64_t new_time = (cur_time + clock_divider/2) / clock_divider;
 
 	int tt = tcnt + new_time - base_time;
 	tcnt = tt % counter_cycle;
@@ -260,10 +260,10 @@ void h8_timer8_channel_device::update_counter(UINT64 cur_time)
 	last_clock_update = cur_time;
 }
 
-void h8_timer8_channel_device::recalc_event(UINT64 cur_time)
+void h8_timer8_channel_device::recalc_event(uint64_t cur_time)
 {
 	bool update_cpu = cur_time == 0;
-	UINT64 old_event_time = event_time;
+	uint64_t old_event_time = event_time;
 
 	if(clock_type != DIV) {
 		event_time = 0;
@@ -275,7 +275,7 @@ void h8_timer8_channel_device::recalc_event(UINT64 cur_time)
 	if(!cur_time)
 		cur_time = cpu->total_cycles();
 
-	UINT32 event_delay = 0xffffffff;
+	uint32_t event_delay = 0xffffffff;
 	if(clear_type == CLEAR_A || clear_type == CLEAR_B)
 		counter_cycle = tcor[clear_type - CLEAR_A];
 	else {
@@ -286,7 +286,7 @@ void h8_timer8_channel_device::recalc_event(UINT64 cur_time)
 	}
 
 	for(auto & elem : tcor) {
-		UINT32 new_delay = 0xffffffff;
+		uint32_t new_delay = 0xffffffff;
 		if(elem > tcnt) {
 			if(tcnt >= counter_cycle || elem <= counter_cycle)
 				new_delay = elem - tcnt;
@@ -353,7 +353,7 @@ void h8_timer8_channel_device::timer_tick()
 	}
 }
 
-h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer8_channel_device(mconfig, H8H_TIMER8_CHANNEL, "H8H 8-bits timer channel", tag, owner, clock, "h8h_8bits_timer_channel", __FILE__)
 {
 }

@@ -10,7 +10,7 @@ Base class for HLE'd SCSI devices.
 
 #include "scsihle.h"
 
-scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	scsi_port_interface(mconfig, *this),
 	m_scsi_id(*this, "SCSI_ID"),
@@ -131,7 +131,7 @@ static const char *const phasenames[] =
 
 #define LOG(level, ...)     if(LOGLEVEL>=level) logerror(__VA_ARGS__)
 
-void scsihle_device::data_out(UINT8 data)
+void scsihle_device::data_out(uint8_t data)
 {
 //  printf( "%s data out %02x\n", tag(), data );
 	output_data0(BIT(data, 0));
@@ -144,12 +144,12 @@ void scsihle_device::data_out(UINT8 data)
 	output_data7(BIT(data, 7));
 }
 
-void scsihle_device::scsi_out_req_delay(UINT8 state)
+void scsihle_device::scsi_out_req_delay(uint8_t state)
 {
 	req_timer->adjust(attotime::from_nsec(REQ_DELAY_NS),state);
 }
 
-void scsihle_device::dump_bytes(UINT8 *buff, int count)
+void scsihle_device::dump_bytes(uint8_t *buff, int count)
 {
 	int byteno;
 
@@ -317,7 +317,7 @@ void scsihle_device::scsibus_exec_command()
 		scsibus_read_data();
 }
 
-UINT8 scsihle_device::scsibus_driveno(UINT8 drivesel)
+uint8_t scsihle_device::scsibus_driveno(uint8_t drivesel)
 {
 	switch (drivesel)
 	{
@@ -333,7 +333,7 @@ UINT8 scsihle_device::scsibus_driveno(UINT8 drivesel)
 	}
 }
 
-void scsihle_device::scsi_change_phase(UINT8 newphase)
+void scsihle_device::scsi_change_phase(uint8_t newphase)
 {
 	LOG(1,"scsi_change_phase() from=%s, to=%s\n",phasenames[m_phase],phasenames[newphase]);
 

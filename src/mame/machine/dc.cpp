@@ -77,7 +77,7 @@ static const char *const sysctrl_names[] =
 
 #endif
 
-void dc_state::generic_dma(UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32 size, bool to_mainram)
+void dc_state::generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram)
 {
 	sh4_ddt_dma ddt;
 	if(to_mainram)
@@ -194,7 +194,7 @@ TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)
 
 void dc_state::g2_dma_execute(address_space &space, int channel)
 {
-	UINT32 src,dst,size;
+	uint32_t src,dst,size;
 	dst = m_g2_dma[channel].g2_addr;
 	src = m_g2_dma[channel].root_addr;
 	size = 0;
@@ -234,7 +234,7 @@ void dc_state::g2_dma_execute(address_space &space, int channel)
 // register decode helpers
 
 // this accepts only 32-bit accesses
-int dc_state::decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+int dc_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift)
 {
 	int reg = offset * 2;
 
@@ -257,7 +257,7 @@ int dc_state::decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 }
 
 // this accepts only 32 and 16 bit accesses
-int dc_state::decode_reg3216_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+int dc_state::decode_reg3216_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift)
 {
 	int reg = offset * 2;
 
@@ -282,7 +282,7 @@ int dc_state::decode_reg3216_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 
 int dc_state::dc_compute_interrupt_level()
 {
-	UINT32 ln,lx,le;
+	uint32_t ln,lx,le;
 
 	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML6NRM];
 	lx=dc_sysctrl_regs[SB_ISTEXT] & dc_sysctrl_regs[SB_IML6EXT];
@@ -367,7 +367,7 @@ void dc_state::dc_update_interrupt_status()
 READ64_MEMBER(dc_state::dc_sysctrl_r )
 {
 	int reg;
-	UINT64 shift;
+	uint64_t shift;
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
 
@@ -378,19 +378,19 @@ READ64_MEMBER(dc_state::dc_sysctrl_r )
 	}
 	#endif
 
-	return (UINT64)dc_sysctrl_regs[reg] << shift;
+	return (uint64_t)dc_sysctrl_regs[reg] << shift;
 }
 
 WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 {
 	int reg;
-	UINT64 shift;
-	UINT32 old,dat;
-	UINT32 address;
+	uint64_t shift;
+	uint32_t old,dat;
+	uint32_t address;
 	struct sh4_ddt_dma ddtdata;
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
+	dat = (uint32_t)(data >> shift);
 	old = dc_sysctrl_regs[reg];
 	dc_sysctrl_regs[reg] = dat; // 5f6800+off*4=dat
 	switch (reg)
@@ -479,7 +479,7 @@ WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 
 READ64_MEMBER(dc_state::dc_gdrom_r )
 {
-	UINT32 off;
+	uint32_t off;
 
 	if ((int)~mem_mask & 1)
 	{
@@ -500,16 +500,16 @@ READ64_MEMBER(dc_state::dc_gdrom_r )
 
 WRITE64_MEMBER(dc_state::dc_gdrom_w )
 {
-	UINT32 dat,off;
+	uint32_t dat,off;
 
 	if ((int)~mem_mask & 1)
 	{
-		dat=(UINT32)(data >> 32);
+		dat=(uint32_t)(data >> 32);
 		off=(offset << 1) | 1;
 	}
 	else
 	{
-		dat=(UINT32)data;
+		dat=(uint32_t)data;
 		off=offset << 1;
 	}
 
@@ -519,22 +519,22 @@ WRITE64_MEMBER(dc_state::dc_gdrom_w )
 READ64_MEMBER(dc_state::dc_g2_ctrl_r )
 {
 	int reg;
-	UINT64 shift;
+	uint64_t shift;
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
 	osd_printf_verbose("G2CTRL:  Unmapped read %08x\n", 0x5f7800+reg*4);
-	return (UINT64)g2bus_regs[reg] << shift;
+	return (uint64_t)g2bus_regs[reg] << shift;
 }
 
 WRITE64_MEMBER(dc_state::dc_g2_ctrl_w )
 {
 	int reg;
-	UINT64 shift;
-	UINT32 dat;
-	UINT8 old;
+	uint64_t shift;
+	uint32_t dat;
+	uint8_t old;
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
+	dat = (uint32_t)(data >> shift);
 
 	g2bus_regs[reg] = dat; // 5f7800+reg*4=dat
 
@@ -584,7 +584,7 @@ WRITE64_MEMBER(dc_state::dc_g2_ctrl_w )
 	}
 }
 
-int dc_state::decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+int dc_state::decode_reg_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift)
 {
 	int reg = offset * 2;
 
@@ -609,7 +609,7 @@ int dc_state::decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 READ64_MEMBER(dc_state::dc_modem_r )
 {
 	int reg;
-	UINT64 shift;
+	uint64_t shift;
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
 
@@ -627,11 +627,11 @@ READ64_MEMBER(dc_state::dc_modem_r )
 WRITE64_MEMBER(dc_state::dc_modem_w )
 {
 	int reg;
-	UINT64 shift;
-	UINT32 dat;
+	uint64_t shift;
+	uint32_t dat;
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
+	dat = (uint32_t)(data >> shift);
 	osd_printf_verbose("%s",string_format("MODEM: [%08x=%x] write %I64x to %x, mask %I64x\n", 0x600000+reg*4, dat, data, offset, mem_mask).c_str());
 }
 
@@ -674,7 +674,7 @@ void dc_state::machine_reset()
 
 READ32_MEMBER(dc_state::dc_aica_reg_r)
 {
-//  osd_printf_verbose("%s",string_format("AICA REG: [%08x] read %I64x, mask %I64x\n", 0x700000+reg*4, (UINT64)offset, mem_mask).c_str());
+//  osd_printf_verbose("%s",string_format("AICA REG: [%08x] read %I64x, mask %I64x\n", 0x700000+reg*4, (uint64_t)offset, mem_mask).c_str());
 
 	if(offset == 0x2c00/4)
 		return m_armrst;

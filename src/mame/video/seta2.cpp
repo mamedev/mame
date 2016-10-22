@@ -127,7 +127,7 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 	           grdians =  019a
 	*/
 
-	UINT16 olddata = m_vregs[offset];
+	uint16_t olddata = m_vregs[offset];
 
 	COMBINE_DATA(&m_vregs[offset]);
 	if ( m_vregs[offset] != olddata )
@@ -164,12 +164,12 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 ***************************************************************************/
 
 static void seta_drawgfx(   bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
-							UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
+							uint32_t code,uint32_t color,int flipx,int flipy,int x0,int y0,
 							int shadow_depth, bool opaque)
 {
-	const UINT8 *addr, *source;
-	UINT8 pen;
-	UINT16 *dest;
+	const uint8_t *addr, *source;
+	uint8_t pen;
+	uint16_t *dest;
 	int sx, x1, dx;
 	int sy, y1, dy;
 
@@ -219,10 +219,10 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	// Sprites list
 
 	// When debugging, use m_spriteram here, and run mame -update_in_pause, i.e.:
-//  UINT16 *buffered_spriteram16 = m_spriteram;
-	UINT16 *buffered_spriteram16 = m_buffered_spriteram.get();
-	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
-	UINT16 *end = &buffered_spriteram16[m_spriteram.bytes()/2];
+//  uint16_t *buffered_spriteram16 = m_spriteram;
+	uint16_t *buffered_spriteram16 = m_buffered_spriteram.get();
+	uint16_t *s1  = buffered_spriteram16 + 0x3000/2;
+	uint16_t *end = &buffered_spriteram16[m_spriteram.bytes()/2];
 
 //  for ( ; s1 < end; s1+=4 )
 	for ( ; s1 < buffered_spriteram16 + 0x4000/2; s1+=4 )   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
@@ -234,7 +234,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		int sprite  = s1[3];
 
 		// Single-sprite address
-		UINT16 *s2 = &buffered_spriteram16[(sprite & 0x7fff) * 4];
+		uint16_t *s2 = &buffered_spriteram16[(sprite & 0x7fff) * 4];
 
 		// Single-sprite size
 		int global_sizex = xoffs & 0xfc00;
@@ -357,7 +357,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 						int px = ((dx + x * (8 << tilesize) + 0x10) & 0x3ff) - 0x10;
 						int tx, ty;
 						int attr, code, color;
-						UINT16 *s3;
+						uint16_t *s3;
 
 						s3  =   &buffered_spriteram16[2 * ((page * 0x2000/4) + ((y & 0x1f) << 6) + (x & 0x03f))];
 
@@ -451,7 +451,7 @@ void seta2_state::video_start()
 	for (int i = 0; m_gfxdecode->gfx(i); ++i)
 		m_gfxdecode->gfx(i)->set_granularity(16);
 
-	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
+	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
 
 	m_xoffset = 0;
 	m_yoffset = 0;
@@ -471,7 +471,7 @@ VIDEO_START_MEMBER(seta2_state,yoffset)
 	m_yoffset = 0x10;
 }
 
-UINT32 seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Black or pen 0?
 	bitmap.fill(m_palette->pen(0), cliprect);
@@ -503,12 +503,12 @@ void seta2_state::draw_rgbram(bitmap_ind16 &bitmap)
 		for (int x = 0; x < 0x200; ++x)
 		{
 			int offs = x * 2/2 + y * 0x400/2;
-			UINT32 data = ((m_rgbram[offs + 0x40000/2] & 0xff) << 16) | m_rgbram[offs];
+			uint32_t data = ((m_rgbram[offs + 0x40000/2] & 0xff) << 16) | m_rgbram[offs];
 			bitmap.pix16(y, x) = (data & 0x7fff);
 		}
 	}
 }
-UINT32 seta2_state::staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t seta2_state::staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update(screen, bitmap, cliprect);
 //  draw_rgbram(bitmap);

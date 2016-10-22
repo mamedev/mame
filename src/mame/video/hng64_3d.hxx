@@ -11,7 +11,7 @@ hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
 	, m_state(state)
 	, m_colorBuffer3d(state.m_screen->visible_area().width(), state.m_screen->visible_area().height())
 {
-	const INT32 bufferSize = state.m_screen->visible_area().width() * state.m_screen->visible_area().height();
+	const int32_t bufferSize = state.m_screen->visible_area().width() * state.m_screen->visible_area().height();
 	m_depthBuffer3d = std::make_unique<float[]>(bufferSize);
 }
 
@@ -110,7 +110,7 @@ WRITE32_MEMBER(hng64_state::dl_control_w)
 // 3d 'Functions' //
 ////////////////////
 
-void hng64_state::printPacket(const UINT16* packet, int hex)
+void hng64_state::printPacket(const uint16_t* packet, int hex)
 {
 	if (hex)
 	{
@@ -140,7 +140,7 @@ void hng64_state::printPacket(const UINT16* packet, int hex)
 
 // Operation 0001
 // Camera transformation.
-void hng64_state::setCameraTransformation(const UINT16* packet)
+void hng64_state::setCameraTransformation(const uint16_t* packet)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -185,7 +185,7 @@ void hng64_state::setCameraTransformation(const UINT16* packet)
 
 // Operation 0010
 // Lighting information
-void hng64_state::setLighting(const UINT16* packet)
+void hng64_state::setLighting(const uint16_t* packet)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -217,7 +217,7 @@ void hng64_state::setLighting(const UINT16* packet)
 
 // Operation 0011
 // Palette / Model flags?
-void hng64_state::set3dFlags(const UINT16* packet)
+void hng64_state::set3dFlags(const uint16_t* packet)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -243,7 +243,7 @@ void hng64_state::set3dFlags(const UINT16* packet)
 
 // Operation 0012
 // Projection Matrix.
-void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
+void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -298,7 +298,7 @@ void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 
 // Operation 0100
 // Polygon rasterization.
-void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
+void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 {
 	//printPacket(packet, 1);
 
@@ -363,9 +363,9 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 	objectMatrix[14] = uToF(packet[6]);
 	objectMatrix[15] = 1.0f;
 
-	UINT32 size[4];
-	UINT32 address[4];
-	UINT32 megaOffset;
+	uint32_t size[4];
+	uint32_t address[4];
+	uint32_t megaOffset;
 	polygon lastPoly = { 0 };
 
 
@@ -398,9 +398,9 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 	//////////////////////////////////////////////*/
 
 	// 3d ROM Offset
-	UINT16* threeDRoms = m_vertsrom;
-	UINT32  threeDOffset = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
-	UINT16* threeDPointer = &threeDRoms[threeDOffset * 3];
+	uint16_t* threeDRoms = m_vertsrom;
+	uint32_t  threeDOffset = (((uint32_t)packet[2]) << 16) | ((uint32_t)packet[3]);
+	uint16_t* threeDPointer = &threeDRoms[threeDOffset * 3];
 
 	if (threeDOffset >= m_vertsrom_size)
 	{
@@ -455,7 +455,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 	address[3] |= (megaOffset << 16);
 
 	// Debug - ajg
-	//UINT32 tdColor = 0xff000000;
+	//uint32_t tdColor = 0xff000000;
 	//if (threeDPointer[14] & 0x0002) tdColor |= 0x00ff0000;
 	//if (threeDPointer[14] & 0x0001) tdColor |= 0x0000ff00;
 	//if (threeDPointer[14] & 0x0000) tdColor |= 0x000000ff;
@@ -463,7 +463,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 	// For all 4 polygon chunks
 	for (int k = 0; k < 4; k++)
 	{
-		UINT16* chunkOffset = &threeDRoms[address[k] * 3];
+		uint16_t* chunkOffset = &threeDRoms[address[k] * 3];
 		for (int l = 0; l < size[k]; l++)
 		{
 			////////////////////////////////////////////
@@ -481,7 +481,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 			//                                                                                                               1101 1000 0111 0000 )
 
 
-			UINT8 chunkType = chunkOffset[0] & 0x00ff;
+			uint8_t chunkType = chunkOffset[0] & 0x00ff;
 
 			// Debug - ajg
 			if (chunkOffset[0] & 0xff00)
@@ -502,7 +502,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 			//break;
 
 			// TEXTURE
-			// There may be more than just high & low res texture types, so I'm keeping texType as a UINT8. */
+			// There may be more than just high & low res texture types, so I'm keeping texType as a uint8_t. */
 			if (chunkOffset[1] & 0x1000) currentPoly.texType = 0x1;
 			else                         currentPoly.texType = 0x0;
 
@@ -526,9 +526,9 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 					currentPoly.palOffset += 0x800;
 			}
 
-			//UINT16 explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
-			UINT16 explicitPaletteValue1 = ((chunkOffset[1] & 0x0f00) >> 8) * 0x080;
-			UINT16 explicitPaletteValue2 = ((chunkOffset[1] & 0x00f0) >> 4) * 0x008;
+			//uint16_t explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
+			uint16_t explicitPaletteValue1 = ((chunkOffset[1] & 0x0f00) >> 8) * 0x080;
+			uint16_t explicitPaletteValue2 = ((chunkOffset[1] & 0x00f0) >> 4) * 0x008;
 
 			// The presence of 0x00f0 *probably* sets 0x10-sized palette addressing.
 			if (explicitPaletteValue2) currentPoly.palPageSize = 0x10;
@@ -554,7 +554,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 			}
 #endif
 
-			UINT8 chunkLength = 0;
+			uint8_t chunkLength = 0;
 			switch(chunkType)
 			{
 			/*/////////////////////////
@@ -902,7 +902,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, int& numPolys)
 // then we end up with other invalid packets in the 2nd half which should be ignored.
 // This would suggest our processing if flawed in other ways, or there is something else to indicate packet length.
 
-void hng64_state::hng64_command3d(const UINT16* packet)
+void hng64_state::hng64_command3d(const uint16_t* packet)
 {
 	int numPolys = 0;
 
@@ -945,15 +945,15 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		}
 
 		// Split the packet and call recoverPolygonBlock on each half.
-		UINT16 miniPacket[16];
-		memset(miniPacket, 0, sizeof(UINT16)*16);
+		uint16_t miniPacket[16];
+		memset(miniPacket, 0, sizeof(uint16_t)*16);
 		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i];
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
 		recoverPolygonBlock(miniPacket, numPolys);
 
-		memset(miniPacket, 0, sizeof(UINT16)*16);
+		memset(miniPacket, 0, sizeof(uint16_t)*16);
 		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i+8];
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
@@ -1006,7 +1006,7 @@ void hng64_state::clear3d()
 /* 3D/framebuffer video registers
  * ------------------------------
  *
- * UINT32 | Bits                                    | Use
+ * uint32_t | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *      0 | ---- --x- ---- ---- ---- ---- ---- ---- | Reads in Fatal Fury WA, if on then there isn't a 3d refresh (busy flag?).
@@ -1070,17 +1070,17 @@ void hng64_state::setIdentity(float *matrix)
 	matrix[0] = matrix[5] = matrix[10] = matrix[15] = 1.0f;
 }
 
-float hng64_state::uToF(UINT16 input)
+float hng64_state::uToF(uint16_t input)
 {
 	float retVal;
-	retVal = (float)((INT16)input) / 32768.0f;
+	retVal = (float)((int16_t)input) / 32768.0f;
 	return retVal;
 
 #if 0
-	if ((INT16)input < 0)
-		retVal = (float)((INT16)input) / 32768.0f;
+	if ((int16_t)input < 0)
+		retVal = (float)((int16_t)input) / 32768.0f;
 	else
-		retVal = (float)((INT16)input) / 32767.0f;
+		retVal = (float)((int16_t)input) / 32767.0f;
 #endif
 }
 
@@ -1099,7 +1099,7 @@ void hng64_state::normalize(float* x)
 // POLYGON RASTERIZATION CODE //
 ////////////////////////////////
 
-void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
+void hng64_poly_renderer::render_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
@@ -1119,10 +1119,10 @@ void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
-	UINT32* colorBuffer = &m_colorBuffer3d.pix32(scanline, extent.startx);
+	uint32_t* colorBuffer = &m_colorBuffer3d.pix32(scanline, extent.startx);
 	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
 
-	const UINT8 *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
+	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
 
 	// Step over each pixel in the horizontal span
 	for(int x = extent.startx; x < extent.stopx; x++)
@@ -1139,12 +1139,12 @@ void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent
 			if ((renderData.debugColor & 0xff000000) == 0x01000000)
 			{
 				// ST color mode
-				*colorBuffer = rgb_t(255, (UINT8)(sCorrect*255.0f), (UINT8)(tCorrect*255.0f), (UINT8)(0));
+				*colorBuffer = rgb_t(255, (uint8_t)(sCorrect*255.0f), (uint8_t)(tCorrect*255.0f), (uint8_t)(0));
 			}
 			else if ((renderData.debugColor & 0xff000000) == 0x02000000)
 			{
 				// Lighting only
-				*colorBuffer = rgb_t(255, (UINT8)rCorrect, (UINT8)gCorrect, (UINT8)bCorrect);
+				*colorBuffer = rgb_t(255, (uint8_t)rCorrect, (uint8_t)gCorrect, (uint8_t)bCorrect);
 			}
 			else if ((renderData.debugColor & 0xff000000) == 0xff000000)
 			{
@@ -1186,7 +1186,7 @@ void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent
 					textureS += (128.0f * (renderData.texPageVertOffset>>0));
 				}
 
-				UINT8 paletteEntry = textureOffset[((int)textureS)*1024 + (int)textureT];
+				uint8_t paletteEntry = textureOffset[((int)textureS)*1024 + (int)textureT];
 
 				// Naive Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
@@ -1212,7 +1212,7 @@ void hng64_poly_renderer::render_scanline(INT32 scanline, const extent_t& extent
 					if (green >= 255) green = 255;
 					if (blue >= 255) blue = 255;
 
-					color = rgb_t(255, (UINT8)red, (UINT8)green, (UINT8)blue);
+					color = rgb_t(255, (uint8_t)red, (uint8_t)green, (uint8_t)blue);
 
 					*colorBuffer = color;
 					*depthBuffer = z;

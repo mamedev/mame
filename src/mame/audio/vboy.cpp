@@ -34,7 +34,7 @@ const device_type VBOYSND = &device_creator<vboysnd_device>;
 #define S5SWP       0x51c
 #define SST0P       0x580
 
-static const UINT16 outTbl[64][32] = {
+static const uint16_t outTbl[64][32] = {
 	{ 0x0000, 0xffe0, 0xffc0, 0xffa0, 0xff80, 0xff60, 0xff40, 0xff20, 0xff00, 0xfee0, 0xfec0, 0xfea0, 0xfe80, 0xfe60, 0xfe40, 0xfe20,
 		0xfe00, 0xfde0, 0xfdc0, 0xfda0, 0xfd80, 0xfd60, 0xfd40, 0xfd20, 0xfd00, 0xfce0, 0xfcc0, 0xfca0, 0xfc80, 0xfc60, 0xfc40, 0xfc20},
 	{ 0x0000, 0xffe1, 0xffc2, 0xffa3, 0xff84, 0xff65, 0xff46, 0xff27, 0xff08, 0xfee9, 0xfeca, 0xfeab, 0xfe8c, 0xfe6d, 0xfe4e, 0xfe2f,
@@ -165,7 +165,7 @@ static const UINT16 outTbl[64][32] = {
 		0x01f0, 0x020f, 0x022e, 0x024d, 0x026c, 0x028b, 0x02aa, 0x02c9, 0x02e8, 0x0307, 0x0326, 0x0345, 0x0364, 0x0383, 0x03a2, 0x03c1}
 };
 
-static const INT8 outLvlTbl[16][16] = {
+static const int8_t outLvlTbl[16][16] = {
 	{ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
 	{ 0,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,  2},
 	{ 0,  1,  1,  1,  2,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  4},
@@ -184,8 +184,8 @@ static const INT8 outLvlTbl[16][16] = {
 	{ 0,  2,  4,  6,  8, 10, 12, 14, 16, 17, 19, 21, 23, 25, 27, 29}
 };
 
-static inline UINT8 mgetb(register UINT8 *ptr) { return *ptr; }
-static inline void mputb(UINT8 *ptr, INT8 data) { *ptr = data; }
+static inline uint8_t mgetb(register uint8_t *ptr) { return *ptr; }
+static inline void mputb(uint8_t *ptr, int8_t data) { *ptr = data; }
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -195,7 +195,7 @@ static inline void mputb(UINT8 *ptr, INT8 data) { *ptr = data; }
 //  vboysnd_device - constructor
 //-------------------------------------------------
 
-vboysnd_device::vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vboysnd_device::vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VBOYSND, "Virtual Boy audio", tag, owner, clock, "vboysnd", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
@@ -282,8 +282,8 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		size = (float)snd_channel[channel].sample_len / 32.0f;
 		for (j=0; j<32;)
 		{
-			INT8 byte = mgetb(m_aram + waveAddr + (j++ << 2)) & 0x3f;
-//          INT8 nbyte = mgetb(m_aram + waveAddr + (j << 2)) & 0x3f;
+			int8_t byte = mgetb(m_aram + waveAddr + (j++ << 2)) & 0x3f;
+//          int8_t nbyte = mgetb(m_aram + waveAddr + (j << 2)) & 0x3f;
 			int end = (int)(((float)j)*size);
 			float val, add;
 
@@ -293,25 +293,25 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			for (; k<end; k++, val+=add)
 			{
 #ifdef LAME_COMPILER_BUG
-				if ((INT32)&snd_channel[channel].sample[k] == (INT32)&snd_channel[channel].offset)
+				if ((int32_t)&snd_channel[channel].sample[k] == (int32_t)&snd_channel[channel].offset)
 					Debugger();
 #endif
-				snd_channel[channel].sample[k] = ((UINT8)val);
+				snd_channel[channel].sample[k] = ((uint8_t)val);
 			}
 		}
 	}
 
 	for (j=0; j<len; j++)
 	{
-		INT32 note_left = 0;
-		INT32 note_right = 0;
+		int32_t note_left = 0;
+		int32_t note_right = 0;
 
 		// process first 4 sound channels
 		for (i=0; i</*5*/5; i++)
 		{
-			UINT8 outLeft, outRight;
-			const INT16 *outTblPtr;
-//          UINT8 env0, env1;
+			uint8_t outLeft, outRight;
+			const int16_t *outTblPtr;
+//          uint8_t env0, env1;
 			s_snd_channel *channel = &snd_channel[i];
 
 			if (!channel->playing)
@@ -319,12 +319,12 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 			outLeft = outLvlTbl[channel->volLeft][channel->envelope];
 			outRight = outLvlTbl[channel->volRight][channel->envelope];
-//          env1 = ((UINT8)mgetb(m_aram+SxEV1b+i*0x40));
+//          env1 = ((uint8_t)mgetb(m_aram+SxEV1b+i*0x40));
 			if (channel->env1 & 0x01)
 			{
 				channel->env_time++;
 
-//              env0 = ((UINT8)mgetb(m_aram+SxEV0b+i*0x40));
+//              env0 = ((uint8_t)mgetb(m_aram+SxEV0b+i*0x40));
 				if (channel->env_time >= channel->env_steptime /*waveEnv2LenTbl[env0 & 0x7]*/)
 				{
 					// it's time for a step
@@ -352,7 +352,7 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				}
 			}
 
-			outTblPtr = (INT16 *) outTbl[channel->sample[channel->offset]];
+			outTblPtr = (int16_t *) outTbl[channel->sample[channel->offset]];
 			if (outLeft)  note_left  += outTblPtr[outLeft ];
 			if (outRight) note_right += outTblPtr[outRight];
 			channel->offset++;
@@ -377,8 +377,8 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		if (note_right < -32767) note_right = -32767;
 		if (note_right > 32767) note_right = 32767;
 
-		*(outL++) = ((INT16)note_left);
-		*(outR++) = ((INT16)note_right);
+		*(outL++) = ((int16_t)note_left);
+		*(outR++) = ((int16_t)note_right);
 	}
 }
 
@@ -403,7 +403,7 @@ WRITE8_MEMBER( vboysnd_device::write )
 	int volReg, intervalReg;
 	int channel, ouroffs;
 
-	mputb((UINT8 *)m_aram+offset, data);
+	mputb((uint8_t *)m_aram+offset, data);
 	if (offset < 0x400)
 		return;
 
@@ -430,15 +430,15 @@ WRITE8_MEMBER( vboysnd_device::write )
 				volReg = mgetb(m_aram + SxLRVb + i);        // 6-4-4 - L/R output level setting
 				if (snd_channel[channel].playing)
 				{
-					snd_channel[channel].volLeft = ((UINT8)volReg) >> 4;
-					snd_channel[channel].volRight = ((UINT8)volReg) & 0xf;
+					snd_channel[channel].volLeft = ((uint8_t)volReg) >> 4;
+					snd_channel[channel].volRight = ((uint8_t)volReg) & 0xf;
 					break;
 				}
 			}
 		case SxINT:
 			if (channel < 5)
 			{
-				UINT8 env0, env1;
+				uint8_t env0, env1;
 				// find out if the sound is playing
 				intervalReg = mgetb(m_aram + SxINTb + i);   // 6-4-6 - Sound Interval
 				volReg = mgetb(m_aram + SxLRVb + i);        // 6-4-4 - L/R output level setting
@@ -459,14 +459,14 @@ WRITE8_MEMBER( vboysnd_device::write )
 				env0 = mgetb(m_aram+SxEV0b+i); env1 = mgetb(m_aram+SxEV1b+i);
 				snd_channel[channel].env0 = env0;
 				snd_channel[channel].env1 = env1;
-				snd_channel[channel].volLeft = ((UINT8)volReg) >> 4;
-				snd_channel[channel].volRight = ((UINT8)volReg) & 0xf;
+				snd_channel[channel].volLeft = ((uint8_t)volReg) >> 4;
+				snd_channel[channel].volRight = ((uint8_t)volReg) & 0xf;
 				snd_channel[channel].env_steptime = (env1 & 0x1) ? waveEnv2LenTbl[env0 & 0x7] : 0;
 				snd_channel[channel].sample_len = waveFreq2LenTbl[freq];
 
 				snd_channel[channel].offset = 0;
 				snd_channel[channel].time = (intervalReg & 0x20) ? waveTimer2LenTbl[intervalReg & 0x1f] : 0;
-				snd_channel[channel].envelope = ((UINT8)mgetb(m_aram+SxEV0b+i)) >> 4;
+				snd_channel[channel].envelope = ((uint8_t)mgetb(m_aram+SxEV0b+i)) >> 4;
 				snd_channel[channel].env_time = 0;
 			}
 			else
@@ -487,7 +487,7 @@ WRITE8_MEMBER( vboysnd_device::write )
 		case SxEV0:
 			if (channel < 5)
 				if (snd_channel[channel].playing)
-					snd_channel[channel].envelope = ((UINT8)mgetb(m_aram+SxEV0b+i)) >> 4;
+					snd_channel[channel].envelope = ((uint8_t)mgetb(m_aram+SxEV0b+i)) >> 4;
 			break;
 	}
 }

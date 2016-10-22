@@ -70,7 +70,7 @@ protected:
 					cur_generate_sample,
 					dirty_flags;
 
-	UINT16 m_cd_out_ptr;
+	uint16_t m_cd_out_ptr;
 
 	signed short xa_last[4];
 	bool status_enabled,
@@ -221,18 +221,18 @@ protected:
 	static reverb_preset *find_reverb_preset(const unsigned short *param);
 
 public:
-	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<spu_device &>(device).m_irq_handler.set_callback(object); }
 
-	void dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size );
-	void dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size );
+	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
+	void dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
 
 	void reinit_sound();
 	void kill_sound();
 
-	void start_dma(UINT8 *mainram, bool to_spu, UINT32 size);
+	void start_dma(uint8_t *mainram, bool to_spu, uint32_t size);
 	bool play_xa(const unsigned int sector, const unsigned char *sec);
 	bool play_cdda(const unsigned int sector, const unsigned char *sec);
 	void flush_xa(const unsigned int sector=0);

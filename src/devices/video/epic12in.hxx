@@ -4,7 +4,7 @@
 
 void epic12_device::FUNCNAME(BLIT_PARAMS)
 {
-	UINT32* gfx2;
+	uint32_t* gfx2;
 	int y, yf;
 
 #if REALLY_SIMPLE == 0
@@ -35,12 +35,12 @@ void epic12_device::FUNCNAME(BLIT_PARAMS)
 
 #if REALLY_SIMPLE == 1
 #if TRANSPARENT == 1
-	UINT32 pen;
+	uint32_t pen;
 #endif
 #else
-	UINT32 pen;
+	uint32_t pen;
 #endif
-	UINT32 *bmp;
+	uint32_t *bmp;
 
 #if FLIPX == 1
 	src_x += (dimx-1);
@@ -94,15 +94,15 @@ void epic12_device::FUNCNAME(BLIT_PARAMS)
 #if BLENDED == 1
 #if _SMODE == 0
 #if _DMODE == 0
-	const UINT8* salpha_table = epic12_device_colrtable[s_alpha];
-	const UINT8* dalpha_table = epic12_device_colrtable[d_alpha];
+	const uint8_t* salpha_table = epic12_device_colrtable[s_alpha];
+	const uint8_t* dalpha_table = epic12_device_colrtable[d_alpha];
 #endif
 
 #if _DMODE == 5
-	const UINT8* salpha_table = epic12_device_colrtable[s_alpha];
+	const uint8_t* salpha_table = epic12_device_colrtable[s_alpha];
 #endif
 #if _DMODE == 1
-	const UINT8* salpha_table = epic12_device_colrtable[s_alpha];
+	const uint8_t* salpha_table = epic12_device_colrtable[s_alpha];
 #endif
 
 #endif
@@ -110,7 +110,7 @@ void epic12_device::FUNCNAME(BLIT_PARAMS)
 #if _SMODE == 2
 #if _DMODE == 0
 
-	const UINT8* dalpha_table = epic12_device_colrtable[d_alpha];
+	const uint8_t* dalpha_table = epic12_device_colrtable[d_alpha];
 #endif
 #endif
 #endif
@@ -130,12 +130,12 @@ void epic12_device::FUNCNAME(BLIT_PARAMS)
 		#endif
 
 #if 1
-		const UINT32* end = bmp+(dimx-startx);
+		const uint32_t* end = bmp+(dimx-startx);
 #else
 		// maybe we can do some SSE type optimizations on larger blocks? right now this just results in more code and slower compiling tho.
 
 		const int width = dimx-startx;
-		const UINT32* end = bmp+(width);
+		const uint32_t* end = bmp+(width);
 
 		if (width<0) return;
 

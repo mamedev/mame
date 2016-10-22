@@ -232,7 +232,7 @@ void taitob_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_maincpu->set_input_line(3, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in taitob_state::device_timer");
+		assert_always(false, "Unknown id in taitob_state::device_timer");
 	}
 }
 
@@ -2747,7 +2747,7 @@ MACHINE_CONFIG_END
 #if 0
 void taitob_state::ryujin_patch(void)
 {
-	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 	rom[ 0x62/2 ] = 1;
 	//0 (already in rom) - Taito Corporation 1993
 	//1 - Taito America corp with blue FBI logo
@@ -2812,7 +2812,7 @@ MACHINE_CONFIG_END
 #if 0
 void taitob_state::sbm_patch(void)
 {
-	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 	rom[ 0x7ffff/2 ] = 2; //US version
 }
 #endif

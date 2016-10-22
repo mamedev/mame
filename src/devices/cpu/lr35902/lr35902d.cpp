@@ -36,7 +36,7 @@ static const char *const s_mnemonic[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const UINT32 s_flags[] = {
+static const uint32_t s_flags[] = {
 	0    ,0    ,0    ,0    ,_OVER,0    ,0    ,
 	0    ,0    ,0    ,0    ,0    ,0    ,_OVER,
 	0    ,0    ,0    ,0    ,0    ,0    ,0    ,
@@ -48,7 +48,7 @@ static const UINT32 s_flags[] = {
 
 struct lr35902dasm
 {
-	UINT8   mnemonic;
+	uint8_t   mnemonic;
 	const char *arguments;
 };
 
@@ -195,9 +195,9 @@ CPU_DISASSEMBLE( lr35902 )
 	const lr35902dasm *d;
 	const char /* *symbol,*/ *src;
 	char *dst;
-	INT8 offset;
-	UINT8 op, op1;
-	UINT16 ea;
+	int8_t offset;
+	uint8_t op, op1;
+	uint16_t ea;
 	int pos = 0;
 
 	dst = buffer;
@@ -251,7 +251,7 @@ CPU_DISASSEMBLE( lr35902 )
 				dst += sprintf( dst, "$%04X", ea );
 				break;
 			case 'O':   /* Offset relative to PC */
-				offset = (INT8) opram[pos++];
+				offset = (int8_t) opram[pos++];
 				dst += sprintf( dst, "$%04X", pc + offset + 2 );
 				break;
 			case 'V':   /* Restart vector */

@@ -17,8 +17,8 @@
 CPU_DISASSEMBLE( ccpu )
 {
 	unsigned startpc = pc;
-	UINT8 opcode = oprom[pc++ - startpc];
-	UINT8 tempval;
+	uint8_t opcode = oprom[pc++ - startpc];
+	uint8_t tempval;
 
 	switch (opcode)
 	{

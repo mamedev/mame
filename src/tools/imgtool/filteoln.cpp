@@ -20,7 +20,7 @@ static imgtoolerr_t convert_stream_eolns(imgtool::stream &source, imgtool::strea
 {
 	size_t len, i, pos;
 	char buffer[2000];
-	int hit_cr = FALSE;
+	int hit_cr = false;
 
 	while((len = source.read(buffer, sizeof(buffer))) > 0)
 	{
@@ -53,7 +53,7 @@ static imgtoolerr_t convert_stream_eolns(imgtool::stream &source, imgtool::strea
 
 
 
-static imgtoolerr_t ascii_readfile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &destf)
+static imgtoolerr_t ascii_readfile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
 	imgtool::stream *mem_stream;
@@ -65,7 +65,7 @@ static imgtoolerr_t ascii_readfile(imgtool::partition *partition, const char *fi
 		goto done;
 	}
 
-	err = partition->read_file(filename, fork, *mem_stream, nullptr);
+	err = partition.read_file(filename, fork, *mem_stream, nullptr);
 	if (err)
 		goto done;
 
@@ -82,7 +82,7 @@ done:
 
 
 
-static imgtoolerr_t ascii_writefile(imgtool::partition *partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
+static imgtoolerr_t ascii_writefile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	imgtool::stream *mem_stream = nullptr;
@@ -96,14 +96,14 @@ static imgtoolerr_t ascii_writefile(imgtool::partition *partition, const char *f
 		goto done;
 	}
 
-	eoln = partition->get_info_string(IMGTOOLINFO_STR_EOLN);
+	eoln = partition.get_info_string(IMGTOOLINFO_STR_EOLN);
 
 	err = convert_stream_eolns(sourcef, *mem_stream, eoln);
 	if (err)
 		goto done;
 	mem_stream->seek(SEEK_SET, 0);
 
-	err = partition->write_file(filename, fork, *mem_stream, opts, nullptr);
+	err = partition.write_file(filename, fork, *mem_stream, opts, nullptr);
 	if (err)
 		goto done;
 
@@ -115,7 +115,7 @@ done:
 
 
 
-void filter_eoln_getinfo(UINT32 state, union filterinfo *info)
+void filter_eoln_getinfo(uint32_t state, union filterinfo *info)
 {
 	switch(state)
 	{

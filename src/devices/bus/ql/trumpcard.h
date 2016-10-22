@@ -28,8 +28,8 @@ class ql_trump_card_t : public device_t,
 {
 public:
 	// construction/destruction
-	ql_trump_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ql_trump_card_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size);
+	ql_trump_card_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ql_trump_card_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int ram_size);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -43,15 +43,15 @@ protected:
 	virtual void device_reset() override;
 
 	// device_ql_expansion_card_interface overrides
-	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) override;
-	virtual void write(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
 	required_device<wd1772_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_memory_region m_rom;
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 
 	int m_ram_size;
 	bool m_rom_en;
@@ -64,7 +64,7 @@ class ql_trump_card_256k_t :  public ql_trump_card_t
 {
 public:
 	// construction/destruction
-	ql_trump_card_256k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ql_trump_card_256k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -74,7 +74,7 @@ class ql_trump_card_512k_t :  public ql_trump_card_t
 {
 public:
 	// construction/destruction
-	ql_trump_card_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ql_trump_card_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -84,7 +84,7 @@ class ql_trump_card_768k_t :  public ql_trump_card_t
 {
 public:
 	// construction/destruction
-	ql_trump_card_768k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ql_trump_card_768k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

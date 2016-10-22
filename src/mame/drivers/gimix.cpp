@@ -119,20 +119,20 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 private:
-	UINT8 m_term_data;
-	UINT8 m_dma_status;
-	UINT8 m_dma_ctrl;
-	UINT8 m_dma_drive_select;
-	UINT16 m_dma_start_addr;
-	UINT32 m_dma_current_addr;
-	UINT8 m_task;
-	UINT8 m_task_banks[16][16];
-	UINT8 m_selected_drive;
+	uint8_t m_term_data;
+	uint8_t m_dma_status;
+	uint8_t m_dma_ctrl;
+	uint8_t m_dma_drive_select;
+	uint16_t m_dma_start_addr;
+	uint32_t m_dma_current_addr;
+	uint8_t m_task;
+	uint8_t m_task_banks[16][16];
+	uint8_t m_selected_drive;
 	bool m_floppy0_ready;
 	bool m_floppy1_ready;
 
-	UINT8 m_pia1_pa;
-	UINT8 m_pia1_pb;
+	uint8_t m_pia1_pa;
+	uint8_t m_pia1_pb;
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -228,7 +228,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( gimix_state::keyin_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -498,7 +498,7 @@ void gimix_state::machine_reset()
 
 void gimix_state::machine_start()
 {
-	UINT8* ROM = m_rom->base();
+	uint8_t* ROM = m_rom->base();
 	m_rombank1->configure_entries(0,4,ROM,0x800);
 	m_rombank2->configure_entries(0,4,ROM,0x800);
 	m_fixedrombank->configure_entries(0,4,ROM+0x700,0x800);

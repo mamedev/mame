@@ -171,10 +171,10 @@ void atarig1_state::pitfightb_cheap_slapstic_init()
 {
 	/* install a read handler */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),this));
-	m_bslapstic_base = (UINT16 *)(memregion("maincpu")->base() + 0x38000);
+	m_bslapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0x38000);
 
 	/* allocate memory for a copy of bank 0 */
-	m_bslapstic_bank0 = std::make_unique<UINT8[]>(0x2000);
+	m_bslapstic_bank0 = std::make_unique<uint8_t[]>(0x2000);
 	memcpy(m_bslapstic_bank0.get(), m_bslapstic_base, 0x2000);
 
 	/* not primed by default */

@@ -10,12 +10,12 @@
 
 static char *output;
 
-offs_t pdp8_dasm_one(char *buffer, offs_t pc, UINT16 op)
+offs_t pdp8_dasm_one(char *buffer, offs_t pc, uint16_t op)
 {
-	UINT8 opcode = (op >> 011) & 07;
-	UINT16 current_page = pc & 07600;
-	UINT16 zero_addr = op & 0177;
-	UINT16 current_addr = current_page | zero_addr;
+	uint8_t opcode = (op >> 011) & 07;
+	uint16_t current_page = pc & 07600;
+	uint16_t zero_addr = op & 0177;
+	uint16_t current_addr = current_page | zero_addr;
 	bool indirect = (op & 0400) ? true : false;
 	bool zero_page = (op & 0200) ? false : true;
 
@@ -168,7 +168,7 @@ offs_t pdp8_dasm_one(char *buffer, offs_t pc, UINT16 op)
 
 CPU_DISASSEMBLE( pdp8 )
 {
-	UINT16 op = (*(UINT8 *)(opram + 0) << 8) |
-				(*(UINT8 *)(opram + 1) << 0);
+	uint16_t op = (*(uint8_t *)(opram + 0) << 8) |
+				(*(uint8_t *)(opram + 1) << 0);
 	return pdp8_dasm_one(buffer, pc, op);
 }

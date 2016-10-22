@@ -15,9 +15,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_fg_tilemap;
 	int m_charbank[2];
@@ -30,8 +30,8 @@ public:
 	int m_flipx;
 	int m_spritebank;
 
-	UINT8 m_nmi_mask;
-	UINT8 m_sound_nmi_mask;
+	uint8_t m_nmi_mask;
+	uint8_t m_sound_nmi_mask;
 
 	DECLARE_READ8_MEMBER(fake_d800_r);
 	DECLARE_WRITE8_MEMBER(fake_d800_w);
@@ -54,7 +54,7 @@ public:
 	virtual void video_start() override;
 
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);

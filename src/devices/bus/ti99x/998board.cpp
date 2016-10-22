@@ -121,7 +121,7 @@
 #define TRACE_GROM 0
 #define TRACE_PUNMAP 0
 
-mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MAINBOARD8, "TI-99/8 Mainboard", tag, owner, clock, "ti998_mainboard", __FILE__),
 	m_A14_set(false),
 	m_pending_write(false),
@@ -197,8 +197,8 @@ SETOFFSET_MEMBER( mainboard8_device::setoffset )
 	select_groms();
 
 	// Speech select lines will always be asserted/cleared as soon as the address is available
-	m_speech->wsq_w((m_vaquerro->spwt_out() == ASSERT_LINE)? FALSE : TRUE);
-	m_speech->rsq_w((m_vaquerro->sprd_out() == ASSERT_LINE)? FALSE : TRUE);
+	m_speech->wsq_w((m_vaquerro->spwt_out() == ASSERT_LINE)? false : true);
+	m_speech->rsq_w((m_vaquerro->sprd_out() == ASSERT_LINE)? false : true);
 
 	// If it is a logical space address, tell the mapper to stay inactive
 	line_state lasreq = (line_state)m_vaquerro->lascsq_out();
@@ -457,7 +457,7 @@ WRITE_LINE_MEMBER( mainboard8_device::msast_in )
 
 READ8_MEMBER( mainboard8_device::read )
 {
-	UINT8 value = 0;
+	uint8_t value = 0;
 	const char* what;
 
 	// =================================================
@@ -746,8 +746,8 @@ WRITE_LINE_MEMBER( mainboard8_device::sound_ready )
 
 WRITE_LINE_MEMBER( mainboard8_device::speech_ready )
 {
-	// The TMS5200 implementation uses TRUE/FALSE, not ASSERT/CLEAR semantics
-	m_speech_ready = (state==FALSE)? ASSERT_LINE : CLEAR_LINE;
+	// The TMS5200 implementation uses true/false, not ASSERT/CLEAR semantics
+	m_speech_ready = (state==false)? ASSERT_LINE : CLEAR_LINE;
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::pbox_ready )
@@ -917,7 +917,7 @@ const device_type MAINBOARD8 = &device_creator<mainboard8_device>;
 
 ***************************************************************************/
 
-vaquerro_device::vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vaquerro_device::vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, VAQUERRO, "Logical Address Space Decoder", tag, owner, clock, "ti998_vaquerro", __FILE__),
 	m_crus(ASSERT_LINE),
 	m_crugl(ASSERT_LINE),
@@ -1366,7 +1366,7 @@ enum
 	INTERNAL
 };
 
-mofetta_device::mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mofetta_device::mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MOFETTA, "Physical Address Space Decoder", tag, owner, clock, "ti998_mofetta", __FILE__),
 	m_gotfirstword(false)
 {
@@ -1652,7 +1652,7 @@ const device_type MOFETTA = &device_creator<mofetta_device>;
 
 ***************************************************************************/
 
-amigo_device::amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amigo_device::amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, AMIGO, "Address space mapper", tag, owner, clock, "ti998_amigo", __FILE__),
 	m_logical_space(true),
 	m_crus(ASSERT_LINE)
@@ -1798,7 +1798,7 @@ SETOFFSET_MEMBER( amigo_device::set_address )
 READ8_MEMBER( amigo_device::read )
 {
 	// Read the protection status bits and reset them
-	UINT8 value = m_protflag;
+	uint8_t value = m_protflag;
 	m_protflag = 0;
 	return value;
 }
@@ -2002,7 +2002,7 @@ enum
 	SHSK = 0x01
 };
 
-oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, OSO, "Hexbus interface", tag, owner, clock, "oso", __FILE__), m_data(0), m_status(0), m_control(0), m_xmit(0)
 {
 }

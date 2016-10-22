@@ -41,12 +41,12 @@ public:
 	required_device<tc0640fio_device> m_tc0640fio;
 	required_memory_region m_gfx2;
 
-	required_shared_ptr<UINT32> m_vram;
-	required_shared_ptr<UINT32> m_objlist;
-	required_shared_ptr<UINT32> m_snd_shared_ram;
-	required_shared_ptr<UINT32> m_main_ram;
-	required_shared_ptr<UINT16> m_dsp_shared_ram;
-	required_shared_ptr<UINT32> m_palette_ram;
+	required_shared_ptr<uint32_t> m_vram;
+	required_shared_ptr<uint32_t> m_objlist;
+	required_shared_ptr<uint32_t> m_snd_shared_ram;
+	required_shared_ptr<uint32_t> m_main_ram;
+	required_shared_ptr<uint16_t> m_dsp_shared_ram;
+	required_shared_ptr<uint32_t> m_palette_ram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -55,26 +55,26 @@ public:
 
 	required_device<tc0780fpa_device> m_tc0780fpa;
 
-	UINT32 m_dsp_rom_pos;
+	uint32_t m_dsp_rom_pos;
 
 	int m_first_dsp_reset;
-	INT16 m_viewport_data[3];
-	INT16 m_projection_data[3];
-	INT16 m_intersection_data[3];
+	int16_t m_viewport_data[3];
+	int16_t m_projection_data[3];
+	int16_t m_intersection_data[3];
 
 	int m_gfx_index;
 
-	std::unique_ptr<UINT32[]> m_char_ram;
-	std::unique_ptr<UINT32[]> m_tile_ram;
+	std::unique_ptr<uint32_t[]> m_char_ram;
+	std::unique_ptr<uint32_t[]> m_tile_ram;
 	tilemap_t *m_tilemap;
 
-	UINT8 m_mcu_comm_main;
-	UINT8 m_mcu_comm_hc11;
-	UINT8 m_mcu_data_main;
-	UINT8 m_mcu_data_hc11;
-	UINT8 m_mcu_output;
+	uint8_t m_mcu_comm_main;
+	uint8_t m_mcu_comm_hc11;
+	uint8_t m_mcu_data_main;
+	uint8_t m_mcu_data_hc11;
+	uint8_t m_mcu_output;
 
-	UINT8 m_has_dsp_hack;
+	uint8_t m_has_dsp_hack;
 
 	int m_speed_meter;
 	int m_brake_meter;
@@ -131,9 +131,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitojc_vblank);
-	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 w1, UINT32 w2, UINT8 bank_type);
-	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri);
+	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t w1, uint32_t w2, uint8_t bank_type);
+	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri);
 };

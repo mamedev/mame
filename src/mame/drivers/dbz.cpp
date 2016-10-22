@@ -493,9 +493,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dbz_state,dbz)
 {
-	UINT16 *ROM;
+	uint16_t *ROM;
 
-	ROM = (UINT16 *)memregion("maincpu")->base();
+	ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// to avoid crash during loop at 0x00076e after D4 > 0x80 (reading tiles region out of bounds)
 	ROM[0x76c/2] = 0x007f;    /* 0x00ff */
@@ -526,9 +526,9 @@ DRIVER_INIT_MEMBER(dbz_state,dbz)
 
 DRIVER_INIT_MEMBER(dbz_state,dbza)
 {
-	UINT16 *ROM;
+	uint16_t *ROM;
 
-	ROM = (UINT16 *)memregion("maincpu")->base();
+	ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// nop out dbz1's mask rom test
 	// tile ROM test
@@ -549,9 +549,9 @@ DRIVER_INIT_MEMBER(dbz_state,dbza)
 
 DRIVER_INIT_MEMBER(dbz_state,dbz2)
 {
-	UINT16 *ROM;
+	uint16_t *ROM;
 
-	ROM = (UINT16 *)memregion("maincpu")->base();
+	ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// to avoid crash during loop at 0x000a4a after D4 > 0x80 (reading tiles region out of bounds)
 	ROM[0xa48/2] = 0x007f;    /* 0x00ff */

@@ -379,7 +379,7 @@ Boards:
 
 MACHINE_RESET_MEMBER(pacman_state,mschamp)
 {
-	UINT8 *rom = memregion("maincpu")->base() + 0x10000;
+	uint8_t *rom = memregion("maincpu")->base() + 0x10000;
 	int whichbank = ioport("GAME")->read() & 1;
 
 	membank("bank1")->configure_entries(0, 2, &rom[0x0000], 0x8000);
@@ -677,8 +677,8 @@ WRITE8_MEMBER(pacman_state::bigbucks_bank_w)
 
 READ8_MEMBER(pacman_state::bigbucks_question_r)
 {
-	UINT8 *question = memregion("user1")->base();
-	UINT8 ret;
+	uint8_t *question = memregion("user1")->base();
+	uint8_t ret;
 
 	ret = question[(m_bigbucks_bank << 16) | (offset ^ 0xffff)];
 
@@ -781,7 +781,7 @@ WRITE8_MEMBER(pacman_state::rocktrv2_question_bank_w)
 
 READ8_MEMBER(pacman_state::rocktrv2_question_r)
 {
-	UINT8 *question = memregion("user1")->base();
+	uint8_t *question = memregion("user1")->base();
 
 	return question[offset | (m_rocktrv2_question_bank * 0x8000)];
 }
@@ -6799,7 +6799,7 @@ ROM_END
 
 void pacman_state::maketrax_rom_decode()
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -6828,7 +6828,7 @@ DRIVER_INIT_MEMBER(pacman_state,maketrax)
 
 void pacman_state::korosuke_rom_decode()
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -6861,7 +6861,7 @@ DRIVER_INIT_MEMBER(pacman_state,ponpoko)
 	/* Here we revert it to the usual format. */
 
 	int i, j;
-	UINT8 *RAM, temp;
+	uint8_t *RAM, temp;
 	int length = memregion("gfx1")->bytes()/2;
 
 	/* Characters */
@@ -6891,10 +6891,10 @@ DRIVER_INIT_MEMBER(pacman_state,ponpoko)
 	}
 }
 
-void pacman_state::eyes_decode(UINT8 *data)
+void pacman_state::eyes_decode(uint8_t *data)
 {
 	int j;
-	UINT8 swapbuffer[8];
+	uint8_t swapbuffer[8];
 
 	for (j = 0; j < 8; j++)
 	{
@@ -6910,7 +6910,7 @@ void pacman_state::eyes_decode(UINT8 *data)
 DRIVER_INIT_MEMBER(pacman_state,eyes)
 {
 	int i, len;
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 	/* CPU ROMs */
 
@@ -6938,7 +6938,7 @@ DRIVER_INIT_MEMBER(pacman_state,eyes)
 #define BITSWAP11(val,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
 	BITSWAP16(val,15,14,13,12,11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0)
 
-void pacman_state::mspacman_install_patches(UINT8 *ROM)
+void pacman_state::mspacman_install_patches(uint8_t *ROM)
 {
 	int i;
 
@@ -6993,7 +6993,7 @@ void pacman_state::mspacman_install_patches(UINT8 *ROM)
 DRIVER_INIT_MEMBER(pacman_state,mspacman)
 {
 	int i;
-	UINT8 *ROM, *DROM;
+	uint8_t *ROM, *DROM;
 
 	/* CPU ROMs */
 
@@ -7048,7 +7048,7 @@ DRIVER_INIT_MEMBER(pacman_state, mschamp)
 DRIVER_INIT_MEMBER(pacman_state,woodpek)
 {
 	int i, len;
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 	/* Graphics ROMs */
 
@@ -7071,7 +7071,7 @@ DRIVER_INIT_MEMBER(pacman_state,jumpshot)
 
 DRIVER_INIT_MEMBER(pacman_state,drivfrcp)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0 * 0x2000]);
 	membank("bank2")->set_base(&ROM[1 * 0x2000]);
 	membank("bank3")->set_base(&ROM[2 * 0x2000]);
@@ -7080,7 +7080,7 @@ DRIVER_INIT_MEMBER(pacman_state,drivfrcp)
 
 DRIVER_INIT_MEMBER(pacman_state,8bpm)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 
 	/* Data lines D0 and D6 swapped */
@@ -7097,7 +7097,7 @@ DRIVER_INIT_MEMBER(pacman_state,8bpm)
 
 DRIVER_INIT_MEMBER(pacman_state,porky)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 
 	/* Data lines D0 and D4 swapped */
@@ -7120,7 +7120,7 @@ DRIVER_INIT_MEMBER(pacman_state,porky)
 DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
 {
 	/* hack to pass the rom check for the bad rom */
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x7ffe] = 0xa7;
 	ROM[0x7fee] = 0x6d;
@@ -7133,8 +7133,8 @@ The select line is tied to a2; a0 and a1 of the eprom are are left out of
 socket and run through the 74298.  Clock is tied to system clock.  */
 DRIVER_INIT_MEMBER(pacman_state,mspacmbe)
 {
-	UINT8 temp;
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t temp;
+	uint8_t *RAM = memregion("maincpu")->base();
 	int i;
 
 	/* Address lines A1 and A0 swapped if A2=0 */
@@ -7152,7 +7152,7 @@ DRIVER_INIT_MEMBER(pacman_state,mspacmbe)
 READ8_MEMBER(pacman_state::mspacii_protection_r)
 {
 	/* used by extra routine at $3FE, bit 4 of 504d needs to be low, and of 504e to be high */
-	UINT8 data = ioport("IN1")->read();
+	uint8_t data = ioport("IN1")->read();
 	return (data & 0xef) | (offset << 4 & 0x10);
 }
 
@@ -7164,8 +7164,8 @@ DRIVER_INIT_MEMBER(pacman_state,mspacii)
 
 DRIVER_INIT_MEMBER(pacman_state,superabc)
 {
-	UINT8 *src = memregion("user1")->base();
-	UINT8 *dest = memregion("gfx1")->base();
+	uint8_t *src = memregion("user1")->base();
+	uint8_t *dest = memregion("gfx1")->base();
 
 	// descramble gfx
 	for (int i = 0; i < 0x10000; i++)

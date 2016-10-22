@@ -60,7 +60,7 @@ private:
 
 READ8_MEMBER( et3400_state::keypad_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (~offset & 4)
 		data &= ioport("X2")->read();
@@ -76,10 +76,10 @@ WRITE8_MEMBER( et3400_state::display_w )
 {
 /* This computer sets each segment, one at a time. */
 
-	static const UINT8 segments[8]={0x40,0x20,0x10,0x08,0x04,0x02,0x01,0x80};
-	UINT8 digit = (offset >> 4) & 7;
-	UINT8 segment = segments[offset & 7];
-	UINT8 segdata = output().get_digit_value(digit);
+	static const uint8_t segments[8]={0x40,0x20,0x10,0x08,0x04,0x02,0x01,0x80};
+	uint8_t digit = (offset >> 4) & 7;
+	uint8_t segment = segments[offset & 7];
+	uint8_t segdata = output().get_digit_value(digit);
 
 	if (data & 1)
 		segdata |= segment;

@@ -10,15 +10,15 @@ extern const device_type TI990_TAPE_CTRL;
 struct tape_unit_t
 {
 	device_image_interface *img;        // image descriptor
-	bool bot;   // TRUE if we are at the beginning of tape
-	bool eot;   // TRUE if we are at the end of tape
-	bool wp;    // TRUE if tape is write-protected
+	bool bot;   // true if we are at the beginning of tape
+	bool eot;   // true if we are at the end of tape
+	bool wp;    // true if tape is write-protected
 };
 
 class tap_990_device : public device_t
 {
 public:
-	tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object)
 	{
 		return downcast<tap_990_device &>(device).m_int_line.set_callback(object);
@@ -54,7 +54,7 @@ private:
 
 	devcb_write_line m_int_line;
 
-	UINT16 m_w[8];
+	uint16_t m_w[8];
 
 	tape_unit_t m_tape[MAX_TAPE_UNIT];
 };

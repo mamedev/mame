@@ -64,15 +64,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	UINT8 m_nmi_enable;
-	UINT8 m_start_lamp;
-	UINT8 m_ldp_read_latch;
-	UINT8 m_ldp_write_latch;
-	UINT8 m_brake_gas;
+	uint8_t m_nmi_enable;
+	uint8_t m_start_lamp;
+	uint8_t m_ldp_read_latch;
+	uint8_t m_ldp_write_latch;
+	uint8_t m_brake_gas;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
-	required_shared_ptr<UINT8> m_sprite_ram;
-	required_shared_ptr<UINT8> m_palette_ram;
-	required_shared_ptr<UINT8> m_tile_ram;
+	required_shared_ptr<uint8_t> m_sprite_ram;
+	required_shared_ptr<uint8_t> m_palette_ram;
+	required_shared_ptr<uint8_t> m_tile_ram;
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_READ8_MEMBER(pedal_in);
 	DECLARE_WRITE8_MEMBER(ldp_write);
@@ -81,7 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_write);
 	DECLARE_DRIVER_INIT(gpworld);
 	virtual void machine_start() override;
-	UINT32 screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_gpworld);
 	void gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	inline void draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
@@ -105,7 +105,7 @@ protected:
 /* VIDEO GOODS */
 void gpworld_state::gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
-	UINT8 characterX, characterY;
+	uint8_t characterX, characterY;
 
 	/* Temporarily set to 64 wide to accommodate two screens */
 	for (characterX = 0; characterX < 64; characterX++)
@@ -146,12 +146,12 @@ void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &
 
 	int i;
 
-	UINT8 *GFX = memregion("gfx2")->base();
+	uint8_t *GFX = memregion("gfx2")->base();
 
 	/* Heisted from Daphne which heisted it from MAME */
 	for (i = 0; i < 0x800; i += 8)
 	{
-		UINT8 *spr_reg = m_sprite_ram + i;
+		uint8_t *spr_reg = m_sprite_ram + i;
 
 		if (spr_reg[SPR_Y_BOTTOM] && spr_reg[SPR_X_LO] != 0xff)
 		{
@@ -189,7 +189,7 @@ void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &
 				while (1)
 				{
 					int data_lo, data_high;
-					UINT8 pixel1, pixel2, pixel3, pixel4;
+					uint8_t pixel1, pixel2, pixel3, pixel4;
 
 					data_lo   = GFX[(src2 & 0x7fff) | (sprite_bank << 16)];
 					data_high = GFX[(src2 & 0x7fff) | 0x8000 | (sprite_bank << 16)];
@@ -202,7 +202,7 @@ void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &
 					/* we'll see if this is still applicable */
 					if (src & 0x8000)
 					{
-						UINT8 temp_pixel;
+						uint8_t temp_pixel;
 						temp_pixel = pixel1;
 						pixel1 = pixel4;
 						pixel4 = temp_pixel;
@@ -242,7 +242,7 @@ void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &
 }
 
 
-UINT32 gpworld_state::screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gpworld_state::screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -450,7 +450,7 @@ void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in gpworld_state::device_timer");
+		assert_always(false, "Unknown id in gpworld_state::device_timer");
 	}
 }
 

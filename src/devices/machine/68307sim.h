@@ -36,39 +36,39 @@ class m68307_sim
 {
 	public:
 
-	UINT16 m_pacnt; // 8-bit
-	UINT16 m_paddr; // 8-bit
-	UINT16 m_padat; // 8-bit
+	uint16_t m_pacnt; // 8-bit
+	uint16_t m_paddr; // 8-bit
+	uint16_t m_padat; // 8-bit
 
-	UINT16 m_pbcnt;
-	UINT16 m_pbddr;
-	UINT16 m_pbdat;
+	uint16_t m_pbcnt;
+	uint16_t m_pbddr;
+	uint16_t m_pbdat;
 
-	UINT16 m_pivr; // 8-bit
+	uint16_t m_pivr; // 8-bit
 
-	UINT16 m_br[4];
-	UINT16 m_or[4];
-	UINT16 m_picr;
-	UINT16 m_licr1;
-	UINT16 m_licr2;
-
-
-	void write_pacnt(UINT16 data, UINT16 mem_mask);
-	void write_paddr(UINT16 data, UINT16 mem_mask);
-	UINT16 read_padat(m68307cpu_device* m68k, address_space &space, UINT16 mem_mask);
-	void write_padat(m68307cpu_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask);
-
-	void write_pbcnt(UINT16 data, UINT16 mem_mask);
-	void write_pbddr(UINT16 data, UINT16 mem_mask);
-	UINT16 read_pbdat(m68307cpu_device* m68k, address_space &space, UINT16 mem_mask);
-	void write_pbdat(m68307cpu_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask);
+	uint16_t m_br[4];
+	uint16_t m_or[4];
+	uint16_t m_picr;
+	uint16_t m_licr1;
+	uint16_t m_licr2;
 
 
+	void write_pacnt(uint16_t data, uint16_t mem_mask);
+	void write_paddr(uint16_t data, uint16_t mem_mask);
+	uint16_t read_padat(m68307cpu_device* m68k, address_space &space, uint16_t mem_mask);
+	void write_padat(m68307cpu_device* m68k, address_space &space, uint16_t data, uint16_t mem_mask);
 
-	void write_licr1(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask);
-	void write_licr2(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask);
-	void write_picr(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask);
-	void write_pivr(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask);
+	void write_pbcnt(uint16_t data, uint16_t mem_mask);
+	void write_pbddr(uint16_t data, uint16_t mem_mask);
+	uint16_t read_pbdat(m68307cpu_device* m68k, address_space &space, uint16_t mem_mask);
+	void write_pbdat(m68307cpu_device* m68k, address_space &space, uint16_t data, uint16_t mem_mask);
+
+
+
+	void write_licr1(m68307cpu_device* m68k, uint16_t data, uint16_t mem_mask);
+	void write_licr2(m68307cpu_device* m68k, uint16_t data, uint16_t mem_mask);
+	void write_picr(m68307cpu_device* m68k, uint16_t data, uint16_t mem_mask);
+	void write_pivr(m68307cpu_device* m68k, uint16_t data, uint16_t mem_mask);
 
 	void reset(void);
 };

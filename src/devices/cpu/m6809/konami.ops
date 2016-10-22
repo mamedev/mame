@@ -372,7 +372,7 @@ INDEXED:
 			// postbyte offset
 			m_ea.w = ireg();	// need to do this now because ireg() might be PC
 			@m_temp.b.l = read_opcode_arg();
-			m_temp.w = m_ea.w + (INT8) m_temp.b.l;
+			m_temp.w = m_ea.w + (int8_t) m_temp.b.l;
 			eat(1);
 			break;
 
@@ -381,7 +381,7 @@ INDEXED:
 			m_ea.w = ireg();	// need to do this now because ireg() might be PC
 			@m_temp.b.h = read_opcode_arg();
 			@m_temp.b.l = read_opcode_arg();
-			m_temp.w = m_ea.w + (INT16) m_temp.w;
+			m_temp.w = m_ea.w + (int16_t) m_temp.w;
 			eat(2);
 			break;
 
@@ -397,19 +397,19 @@ INDEXED:
 
 		case 0xA0: case 0xB0: case 0xD0: case 0xE0: case 0xF0:
 			// relative to register A
-			m_temp.w = ireg() + (INT8) m_q.r.a;
+			m_temp.w = ireg() + (int8_t) m_q.r.a;
 			@eat(1);
 			break;
 
 		case 0xA1: case 0xB1: case 0xD1: case 0xE1: case 0xF1:
 			// relative to register B
-			m_temp.w = ireg() + (INT8) m_q.r.b;
+			m_temp.w = ireg() + (int8_t) m_q.r.b;
 			@eat(1);
 			break;
 
 		case 0xA7: case 0xB7: case 0xD7: case 0xE7: case 0xF7:
 			// relative to register D
-			m_temp.w = ireg() + (INT16) m_q.r.d;
+			m_temp.w = ireg() + (int16_t) m_q.r.d;
 			@eat(4);
 			break;
 
@@ -434,7 +434,7 @@ INDEXED:
 EXG:
 	{
 		// konami's EXG instruction differs enough from 6809 to fork the code
-		UINT8 param = read_opcode_arg();
+		uint8_t param = read_opcode_arg();
 		exgtfr_register reg1 = read_exgtfr_register(param >> 0);
 		exgtfr_register reg2 = read_exgtfr_register(param >> 4);
 		write_exgtfr_register(param >> 0, reg2);
@@ -446,7 +446,7 @@ EXG:
 TFR:
 	{
 		// konami's TFR instruction differs enough from 6809 to fork the code
-		UINT8 param = read_opcode_arg();
+		uint8_t param = read_opcode_arg();
 		exgtfr_register reg = read_exgtfr_register(param >> 0);
 		write_exgtfr_register(param >> 4, reg);
 	}
@@ -499,14 +499,14 @@ BSET2:
 
 DECXJNZ:
 	// not sure if this affects V?
-	m_x.w = set_flags<UINT16>(CC_NZV, m_x.w, 1, m_x.w - 1);
+	m_x.w = set_flags<uint16_t>(CC_NZV, m_x.w, 1, m_x.w - 1);
 	@eat(1);
 	set_cond(cond_ne());
 	goto BRANCH;
 
 DECBJNZ:
 	// not sure if this affects V?
-	m_q.r.b = set_flags<UINT8>(CC_NZV, m_q.r.b, 1, m_q.r.b - 1);
+	m_q.r.b = set_flags<uint8_t>(CC_NZV, m_q.r.b, 1, m_q.r.b - 1);
 	@eat(1);
 	set_cond(cond_ne());
 	goto BRANCH;
@@ -521,7 +521,7 @@ LSRD:
 		else
 			m_cc &= ~CC_C;
 
-		m_q.r.d = set_flags<UINT16>(CC_NZ, safe_shift_right_unsigned<UINT16>(m_q.r.d, m_temp.b.l));
+		m_q.r.d = set_flags<uint16_t>(CC_NZ, safe_shift_right_unsigned<uint16_t>(m_q.r.d, m_temp.b.l));
 	}
 	eat(1);
 	return;
@@ -536,7 +536,7 @@ ASLD:
 		else
 			m_cc &= ~CC_C;
 
-		m_q.r.d = set_flags<UINT16>(CC_NZV, safe_shift_left<INT16>(m_q.r.d, m_temp.b.l));
+		m_q.r.d = set_flags<uint16_t>(CC_NZV, safe_shift_left<int16_t>(m_q.r.d, m_temp.b.l));
 	}
 	eat(1);
 	return;
@@ -551,7 +551,7 @@ ASRD:
 		else
 			m_cc &= ~CC_C;
 
-		m_q.r.d = set_flags<UINT16>(CC_NZ, safe_shift_right<INT16>(m_q.r.d, m_temp.b.l));
+		m_q.r.d = set_flags<uint16_t>(CC_NZ, safe_shift_right<int16_t>(m_q.r.d, m_temp.b.l));
 	}
 	eat(1);
 	return;
@@ -561,7 +561,7 @@ ROLD:
 
 	// doing this as a loop is lame
 	while(m_temp.b.l--)
-		m_temp.w = set_flags<UINT16>(CC_NZ, rotate_left(m_temp.w));
+		m_temp.w = set_flags<uint16_t>(CC_NZ, rotate_left(m_temp.w));
 
 	eat(1);
 	return;
@@ -571,14 +571,14 @@ RORD:
 
 	// doing this as a loop is lame
 	while(m_temp.b.l--)
-		m_temp.w = set_flags<UINT16>(CC_NZ, rotate_right(m_temp.w));
+		m_temp.w = set_flags<uint16_t>(CC_NZ, rotate_right(m_temp.w));
 
 	eat(1);
 	return;
 
 ABS8:
 	@m_temp.b.l = read_operand();
-	m_temp.b.l = set_flags<UINT8>(CC_NZVC, 0, m_temp.b.l, ((INT8) m_temp.b.l) >= 0 ? m_temp.b.l : -m_temp.b.l);
+	m_temp.b.l = set_flags<uint8_t>(CC_NZVC, 0, m_temp.b.l, ((int8_t) m_temp.b.l) >= 0 ? m_temp.b.l : -m_temp.b.l);
 	@eat(1);
 	write_operand(m_temp.b.l);
 	return;
@@ -586,7 +586,7 @@ ABS8:
 ABS16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
-	m_temp.w = set_flags<UINT16>(CC_NZVC, 0, m_temp.w, ((INT16) m_temp.w) >= 0 ? m_temp.w : -m_temp.w);
+	m_temp.w = set_flags<uint16_t>(CC_NZVC, 0, m_temp.w, ((int16_t) m_temp.w) >= 0 ? m_temp.w : -m_temp.w);
 	@eat(1);
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);

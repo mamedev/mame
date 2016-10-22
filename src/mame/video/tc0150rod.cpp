@@ -14,7 +14,7 @@ Road generator. Two roads allow for forking. Gfx data fetched from ROM. Refer to
 
 const device_type TC0150ROD = &device_creator<tc0150rod_device>;
 
-tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0150ROD, "Taito TC0150ROD", tag, owner, clock, "tc0150rod", __FILE__),
 	m_roadgfx(*this, DEVICE_SELF, 0x40000)
 {
@@ -209,23 +209,23 @@ lookup table from rom for the TaitoZ sprites.
 
 ******************************************************************************/
 
-void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs, int palette_offs, int type, int road_trans, bitmap_ind8 &priority_bitmap, UINT32 low_priority, UINT32 high_priority )
+void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs, int palette_offs, int type, int road_trans, bitmap_ind8 &priority_bitmap, uint32_t low_priority, uint32_t high_priority )
 {
 	#ifdef MAME_DEBUG
 	static int dislayer[6]; /* Road Layer toggles to help get road correct */
 	#endif
 
 	int x_offs = 0xa7;  /* Increasing this shifts road to right */
-	UINT16 scanline[512];
-	UINT16 roada_line[512], roadb_line[512];
-	UINT16 *dst16;
-	UINT16 *roada, *roadb;
+	uint16_t scanline[512];
+	uint16_t roada_line[512], roadb_line[512];
+	uint16_t *dst16;
+	uint16_t *roada, *roadb;
 
-	UINT16 pixel, color, gfx_word;
-	UINT16 roada_clipl, roada_clipr, roada_bodyctrl;
-	UINT16 roadb_clipl, roadb_clipr, roadb_bodyctrl;
-	UINT16 pri, pixpri;
-	UINT8 priorities[6];
+	uint16_t pixel, color, gfx_word;
+	uint16_t roada_clipl, roada_clipr, roada_bodyctrl;
+	uint16_t roadb_clipl, roadb_clipr, roadb_bodyctrl;
+	uint16_t pri, pixpri;
+	uint8_t priorities[6];
 	int x_index, roadram_index, roadram2_index, i;
 	int xoffset, paloffs, palloffs, palroffs;
 	int road_gfx_tilenum, colbank, road_center;

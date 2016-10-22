@@ -63,8 +63,8 @@ To Do:
 
 WRITE16_MEMBER(fuuki16_state::vregs_w)
 {
-	UINT16 old_data = m_vregs[offset];
-	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
+	uint16_t old_data = m_vregs[offset];
+	uint16_t new_data = COMBINE_DATA(&m_vregs[offset]);
 	if ((offset == 0x1c/2) && old_data != new_data)
 	{
 		const rectangle &visarea = m_screen->visible_area();
@@ -412,14 +412,14 @@ void fuuki16_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_raster_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in fuuki16_state::device_timer");
+		assert_always(false, "Unknown id in fuuki16_state::device_timer");
 	}
 }
 
 
 void fuuki16_state::machine_start()
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x8000);
 

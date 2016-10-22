@@ -68,7 +68,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_kbpio;
@@ -82,7 +82,7 @@ public:
 	required_device<xerox_820_keyboard_t> m_kb;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
@@ -99,8 +99,8 @@ public:
 	void update_nmi();
 
 	/* video state */
-	UINT8 m_scroll;                     /* vertical scroll */
-	UINT8 m_framecnt;
+	uint8_t m_scroll;                     /* vertical scroll */
+	uint8_t m_framecnt;
 	int m_ncset2;                       /* national character set */
 	int m_vatt;                         /* X120 video attribute */
 	int m_lowlite;                      /* low light attribute */

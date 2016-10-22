@@ -6,7 +6,7 @@
 class st0020_device : public device_t, public device_gfx_interface
 {
 public:
-	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void set_is_st0032(device_t &device, int is_st0032);
@@ -35,13 +35,13 @@ protected:
 private:
 
 	int m_st0020_gfxram_bank;
-	std::unique_ptr<UINT16[]> m_st0020_gfxram;
-	std::unique_ptr<UINT16[]> m_st0020_spriteram;
-	std::unique_ptr<UINT16[]> m_st0020_blitram;
+	std::unique_ptr<uint16_t[]> m_st0020_gfxram;
+	std::unique_ptr<uint16_t[]> m_st0020_spriteram;
+	std::unique_ptr<uint16_t[]> m_st0020_blitram;
 	void st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	DECLARE_READ16_MEMBER(st0020_blit_r);
 	DECLARE_WRITE16_MEMBER(st0020_blit_w);
-	UINT8* m_rom_ptr;
+	uint8_t* m_rom_ptr;
 	size_t m_rom_size;
 };
 

@@ -162,13 +162,13 @@ public:
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram_a;
-	required_shared_ptr<UINT8> m_colorram_a;
-	required_shared_ptr<UINT8> m_videoram_b;
-	required_shared_ptr<UINT8> m_colorram_b;
-	required_region_ptr<UINT8> m_gfx1;
-	required_region_ptr<UINT8> m_gfx2;
-	required_region_ptr<UINT8> m_proms;
+	required_shared_ptr<uint8_t> m_videoram_a;
+	required_shared_ptr<uint8_t> m_colorram_a;
+	required_shared_ptr<uint8_t> m_videoram_b;
+	required_shared_ptr<uint8_t> m_colorram_b;
+	required_region_ptr<uint8_t> m_gfx1;
+	required_region_ptr<uint8_t> m_gfx2;
+	required_region_ptr<uint8_t> m_proms;
 	required_ioport m_input2;
 	required_ioport m_dsw2;
 	required_device<cpu_device> m_maincpu;
@@ -182,12 +182,12 @@ public:
 
 	void machine_reset() override;
 
-	int get_color_offset(UINT8 tile, UINT8 attr, int ra, int px);
+	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(miniboy7);
 
 private:
-	UINT8 m_ay_pb;
+	uint8_t m_ay_pb;
 	int m_gpri;
 };
 
@@ -196,7 +196,7 @@ private:
 *          Video Hardware          *
 ***********************************/
 
-int miniboy7_state::get_color_offset(UINT8 tile, UINT8 attr, int ra, int px)
+int miniboy7_state::get_color_offset(uint8_t tile, uint8_t attr, int ra, int px)
 {
 /*  - bits -
     7654 3210
@@ -209,16 +209,16 @@ int miniboy7_state::get_color_offset(UINT8 tile, UINT8 attr, int ra, int px)
 	if (attr & 0x04)
 	{
 		int bank = (attr & 0x03) << 8;
-		UINT8 bitplane0 = m_gfx2[0x0000 + ((tile + bank) << 3) + ra];
-		UINT8 bitplane1 = m_gfx2[0x2000 + ((tile + bank) << 3) + ra];
-		UINT8 bitplane2 = m_gfx2[0x4000 + ((tile + bank) << 3) + ra];
+		uint8_t bitplane0 = m_gfx2[0x0000 + ((tile + bank) << 3) + ra];
+		uint8_t bitplane1 = m_gfx2[0x2000 + ((tile + bank) << 3) + ra];
+		uint8_t bitplane2 = m_gfx2[0x4000 + ((tile + bank) << 3) + ra];
 
 		return (color << 3) + ((BIT(bitplane0 << px, 7) << 0) | (BIT(bitplane1 << px, 7) << 1) | (BIT(bitplane2 << px, 7) << 2));
 	}
 	else
 	{
 		int bank = (attr & 0x01) << 8;
-		UINT8 bitplane0 = m_gfx1[((tile + bank) << 3) + ra];
+		uint8_t bitplane0 = m_gfx1[((tile + bank) << 3) + ra];
 		return (color << 3) + BIT(bitplane0 << px, 7);
 	}
 }
@@ -227,14 +227,14 @@ MC6845_UPDATE_ROW( miniboy7_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-	for (UINT8 cx = 0; cx < x_count; cx+=1)
+	for (uint8_t cx = 0; cx < x_count; cx+=1)
 	{
 		for (int px = 0; px < 8; px++)
 		{
 			int offset_a = (m_gpri ? 0x80 : 0) + get_color_offset(m_videoram_a[ma + cx], m_colorram_a[ma + cx], ra, px);
 			int offset_b = (m_gpri ? 0 : 0x80) + get_color_offset(m_videoram_b[ma + cx], m_colorram_b[ma + cx], ra, px);
-			UINT8 color_a = m_proms[offset_a] & 0x0f;
-			UINT8 color_b = m_proms[offset_b] & 0x0f;
+			uint8_t color_a = m_proms[offset_a] & 0x0f;
+			uint8_t color_b = m_proms[offset_b] & 0x0f;
 
 			if (color_a && (m_gpri || !color_b))          // videoram A has priority
 				bitmap.pix32(y, (cx << 3) + px) = palette[offset_a];

@@ -35,7 +35,7 @@ static const char *const condition[16] =
     CODE CODE
 ***************************************************************************/
 
-static inline char *src2(UINT32 op, int scale)
+static inline char *src2(uint32_t op, int scale)
 {
 	static char temp[20];
 	if ((op & 0xffe0) == 0xffe0)
@@ -47,25 +47,25 @@ static inline char *src2(UINT32 op, int scale)
 
 CPU_DISASSEMBLE( asap )
 {
-	UINT32 op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
+	uint32_t op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 	int opcode = op >> 27;
 	int cond = (op >> 21) & 1;
 	int rdst = (op >> 22) & 31;
 	int rsrc1 = (op >> 16) & 31;
 	int rsrc2 = op & 0xffff;
 	int rsrc2_iszero = (!rsrc2 || rsrc2 == 0xffe0);
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 
 	switch (opcode)
 	{
 		case 0x00:  sprintf(buffer, "trap   $00"); flags = DASMFLAG_STEP_OVER;                              break;
-		case 0x01:  sprintf(buffer, "b%s    $%08x", condition[rdst & 15], pc + ((INT32)(op << 10) >> 8));   break;
+		case 0x01:  sprintf(buffer, "b%s    $%08x", condition[rdst & 15], pc + ((int32_t)(op << 10) >> 8));   break;
 		case 0x02:  if ((op & 0x003fffff) == 3)
 					{
-						UINT32 nextop = oprom[4] | (oprom[5] << 8) | (oprom[6] << 16) | (oprom[7] << 24);
+						uint32_t nextop = oprom[4] | (oprom[5] << 8) | (oprom[6] << 16) | (oprom[7] << 24);
 						if ((nextop >> 27) == 0x10 && ((nextop >> 22) & 31) == rdst && (nextop & 0xffff) == 0)
 						{
-							UINT32 nextnextop = oprom[8] | (oprom[9] << 8) | (oprom[10] << 16) | (oprom[11] << 24);
+							uint32_t nextnextop = oprom[8] | (oprom[9] << 8) | (oprom[10] << 16) | (oprom[11] << 24);
 							sprintf(buffer, "llit%s $%08x,%s", setcond[cond], nextnextop, reg[rdst]);
 							return 12 | DASMFLAG_STEP_OVER | DASMFLAG_SUPPORTED;
 						}
@@ -73,10 +73,10 @@ CPU_DISASSEMBLE( asap )
 					if (rdst)
 					{
 						flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
-						sprintf(buffer, "bsr    %s,$%08x", reg[rdst], pc + ((INT32)(op << 10) >> 8));
+						sprintf(buffer, "bsr    %s,$%08x", reg[rdst], pc + ((int32_t)(op << 10) >> 8));
 					}
 					else
-						sprintf(buffer, "bra    $%08x", pc + ((INT32)(op << 10) >> 8));
+						sprintf(buffer, "bra    $%08x", pc + ((int32_t)(op << 10) >> 8));
 					break;
 		case 0x03:  sprintf(buffer, "lea%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,2), reg[rdst]);  break;
 		case 0x04:  sprintf(buffer, "leah%s %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);  break;

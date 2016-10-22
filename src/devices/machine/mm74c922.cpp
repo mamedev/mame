@@ -36,7 +36,7 @@ const device_type MM74C923 = &device_creator<mm74c922_device>;
 //  mm74c922_device - constructor
 //-------------------------------------------------
 
-mm74c922_device::mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mm74c922_device::mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MM74C922, "MM74C922", tag, owner, clock, "mm74c922", __FILE__),
 	m_write_da(*this),
 	m_read_x1(*this),
@@ -101,7 +101,7 @@ void mm74c922_device::device_timer(emu_timer &timer, device_timer_id id, int par
 //  read -
 //-------------------------------------------------
 
-UINT8 mm74c922_device::read()
+uint8_t mm74c922_device::read()
 {
 	if (LOG) logerror("MM74C922 '%s' Data Read: %02x\n", tag(), m_data);
 
@@ -146,7 +146,7 @@ void mm74c922_device::clock_scan_counters()
 
 void mm74c922_device::detect_keypress()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_x)
 	{

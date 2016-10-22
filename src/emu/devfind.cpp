@@ -22,23 +22,23 @@ template class object_finder_base<memory_bank, true>;
 template class object_finder_base<ioport_port, false>;
 template class object_finder_base<ioport_port, true>;
 
-template class object_finder_base<UINT8, false>;
-template class object_finder_base<UINT8, true>;
-template class object_finder_base<UINT16, false>;
-template class object_finder_base<UINT16, true>;
-template class object_finder_base<UINT32, false>;
-template class object_finder_base<UINT32, true>;
-template class object_finder_base<UINT64, false>;
-template class object_finder_base<UINT64, true>;
+template class object_finder_base<uint8_t, false>;
+template class object_finder_base<uint8_t, true>;
+template class object_finder_base<uint16_t, false>;
+template class object_finder_base<uint16_t, true>;
+template class object_finder_base<uint32_t, false>;
+template class object_finder_base<uint32_t, true>;
+template class object_finder_base<uint64_t, false>;
+template class object_finder_base<uint64_t, true>;
 
-template class object_finder_base<INT8, false>;
-template class object_finder_base<INT8, true>;
-template class object_finder_base<INT16, false>;
-template class object_finder_base<INT16, true>;
-template class object_finder_base<INT32, false>;
-template class object_finder_base<INT32, true>;
-template class object_finder_base<INT64, false>;
-template class object_finder_base<INT64, true>;
+template class object_finder_base<int8_t, false>;
+template class object_finder_base<int8_t, true>;
+template class object_finder_base<int16_t, false>;
+template class object_finder_base<int16_t, true>;
+template class object_finder_base<int32_t, false>;
+template class object_finder_base<int32_t, true>;
+template class object_finder_base<int64_t, false>;
+template class object_finder_base<int64_t, true>;
 
 template class memory_region_finder<false>;
 template class memory_region_finder<true>;
@@ -49,41 +49,41 @@ template class memory_bank_finder<true>;
 template class ioport_finder<false>;
 template class ioport_finder<true>;
 
-template class region_ptr_finder<UINT8, false>;
-template class region_ptr_finder<UINT8, true>;
-template class region_ptr_finder<UINT16, false>;
-template class region_ptr_finder<UINT16, true>;
-template class region_ptr_finder<UINT32, false>;
-template class region_ptr_finder<UINT32, true>;
-template class region_ptr_finder<UINT64, false>;
-template class region_ptr_finder<UINT64, true>;
+template class region_ptr_finder<uint8_t, false>;
+template class region_ptr_finder<uint8_t, true>;
+template class region_ptr_finder<uint16_t, false>;
+template class region_ptr_finder<uint16_t, true>;
+template class region_ptr_finder<uint32_t, false>;
+template class region_ptr_finder<uint32_t, true>;
+template class region_ptr_finder<uint64_t, false>;
+template class region_ptr_finder<uint64_t, true>;
 
-template class region_ptr_finder<INT8, false>;
-template class region_ptr_finder<INT8, true>;
-template class region_ptr_finder<INT16, false>;
-template class region_ptr_finder<INT16, true>;
-template class region_ptr_finder<INT32, false>;
-template class region_ptr_finder<INT32, true>;
-template class region_ptr_finder<INT64, false>;
-template class region_ptr_finder<INT64, true>;
+template class region_ptr_finder<int8_t, false>;
+template class region_ptr_finder<int8_t, true>;
+template class region_ptr_finder<int16_t, false>;
+template class region_ptr_finder<int16_t, true>;
+template class region_ptr_finder<int32_t, false>;
+template class region_ptr_finder<int32_t, true>;
+template class region_ptr_finder<int64_t, false>;
+template class region_ptr_finder<int64_t, true>;
 
-template class shared_ptr_finder<UINT8, false>;
-template class shared_ptr_finder<UINT8, true>;
-template class shared_ptr_finder<UINT16, false>;
-template class shared_ptr_finder<UINT16, true>;
-template class shared_ptr_finder<UINT32, false>;
-template class shared_ptr_finder<UINT32, true>;
-template class shared_ptr_finder<UINT64, false>;
-template class shared_ptr_finder<UINT64, true>;
+template class shared_ptr_finder<uint8_t, false>;
+template class shared_ptr_finder<uint8_t, true>;
+template class shared_ptr_finder<uint16_t, false>;
+template class shared_ptr_finder<uint16_t, true>;
+template class shared_ptr_finder<uint32_t, false>;
+template class shared_ptr_finder<uint32_t, true>;
+template class shared_ptr_finder<uint64_t, false>;
+template class shared_ptr_finder<uint64_t, true>;
 
-template class shared_ptr_finder<INT8, false>;
-template class shared_ptr_finder<INT8, true>;
-template class shared_ptr_finder<INT16, false>;
-template class shared_ptr_finder<INT16, true>;
-template class shared_ptr_finder<INT32, false>;
-template class shared_ptr_finder<INT32, true>;
-template class shared_ptr_finder<INT64, false>;
-template class shared_ptr_finder<INT64, true>;
+template class shared_ptr_finder<int8_t, false>;
+template class shared_ptr_finder<int8_t, true>;
+template class shared_ptr_finder<int16_t, false>;
+template class shared_ptr_finder<int16_t, true>;
+template class shared_ptr_finder<int32_t, false>;
+template class shared_ptr_finder<int32_t, true>;
+template class shared_ptr_finder<int64_t, false>;
+template class shared_ptr_finder<int64_t, true>;
 
 
 
@@ -119,7 +119,7 @@ finder_base::~finder_base()
 //  find_memregion - find memory region
 //-------------------------------------------------
 
-void *finder_base::find_memregion(UINT8 width, size_t &length, bool required) const
+void *finder_base::find_memregion(uint8_t width, size_t &length, bool required) const
 {
 	// look up the region and return nullptr if not found
 	memory_region *const region = m_base.memregion(m_tag);
@@ -194,7 +194,7 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 //  find_memshare - find memory share
 //-------------------------------------------------
 
-void *finder_base::find_memshare(UINT8 width, size_t &bytes, bool required) const
+void *finder_base::find_memshare(uint8_t width, size_t &bytes, bool required) const
 {
 	// look up the share and return nullptr if not found
 	memory_share *share = m_base.memshare(m_tag);

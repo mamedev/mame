@@ -12,7 +12,7 @@ class nes_somari_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -30,20 +30,20 @@ private:
 	void update_mirror();
 	void bank_update_switchmode();
 
-	UINT8 m_board_mode;
+	uint8_t m_board_mode;
 
 	// MMC3 - inherited from txrom
-	UINT8 m_mmc3_mirror_reg;
+	uint8_t m_mmc3_mirror_reg;
 
 	// MMC1
-	UINT8 m_count;
-	UINT8 m_mmc1_latch;
-	UINT8 m_mmc1_reg[4];
+	uint8_t m_count;
+	uint8_t m_mmc1_latch;
+	uint8_t m_mmc1_reg[4];
 
 	// VRC2
-	UINT8 m_vrc_prg_bank[2];
-	UINT8 m_vrc_vrom_bank[8];
-	UINT8 m_vrc_mirror_reg;
+	uint8_t m_vrc_prg_bank[2];
+	uint8_t m_vrc_vrom_bank[8];
+	uint8_t m_vrc_mirror_reg;
 };
 
 

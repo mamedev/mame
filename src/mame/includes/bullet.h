@@ -106,7 +106,7 @@ public:
 	int m_brom;
 
 	// DMA state
-	UINT8 m_exdma;
+	uint8_t m_exdma;
 	int m_buf;
 	bool m_fdrdy;
 	int m_dartardy;
@@ -170,8 +170,8 @@ public:
 	void update_dma_rdy();
 
 	int m_rome;
-	UINT8 m_xdma0;
-	UINT8 m_mbank;
+	uint8_t m_xdma0;
+	uint8_t m_mbank;
 	int m_wack;
 	int m_wrdy;
 };

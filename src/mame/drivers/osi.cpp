@@ -269,7 +269,7 @@ READ8_MEMBER( sb2m600_state::keyboard_r )
 	if (m_io_reset->read())
 		m_maincpu->reset();
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(m_keylatch, 0))
 		data &= m_io_row0->read();
@@ -889,7 +889,7 @@ void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_beeper->set_clock(300);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sb2m600_state::device_timer");
+		assert_always(false, "Unknown id in sb2m600_state::device_timer");
 	}
 }
 

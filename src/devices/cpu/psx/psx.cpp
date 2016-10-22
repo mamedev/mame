@@ -172,7 +172,7 @@ const device_type CXD8661R = &device_creator<cxd8661r_device>;
 const device_type CXD8606BQ = &device_creator<cxd8606bq_device>;
 const device_type CXD8606CQ = &device_creator<cxd8606cq_device>;
 
-static const UINT32 mtc0_writemask[]=
+static const uint32_t mtc0_writemask[]=
 {
 	0x00000000, /* !INDEX */
 	0x00000000, /* !RANDOM */
@@ -217,7 +217,7 @@ WRITE32_MEMBER( psxcpu_device::exp_base_w )
 	m_exp_base = 0x1f000000 | ( m_exp_base & 0xffffff );
 }
 
-UINT32 psxcpu_device::exp_base()
+uint32_t psxcpu_device::exp_base()
 {
 	return m_exp_base;
 }
@@ -241,7 +241,7 @@ READ32_MEMBER( psxcpu_device::ram_config_r )
 
 WRITE32_MEMBER( psxcpu_device::ram_config_w )
 {
-	UINT32 old = m_ram_config;
+	uint32_t old = m_ram_config;
 
 	COMBINE_DATA( &m_ram_config ); // TODO: check byte writes
 
@@ -258,7 +258,7 @@ READ32_MEMBER( psxcpu_device::rom_config_r )
 
 WRITE32_MEMBER( psxcpu_device::rom_config_w )
 {
-	UINT32 old = m_rom_config;
+	uint32_t old = m_rom_config;
 
 	COMBINE_DATA( &m_rom_config ); // TODO: check byte writes
 
@@ -287,7 +287,7 @@ READ32_MEMBER( psxcpu_device::biu_r )
 
 WRITE32_MEMBER( psxcpu_device::biu_w )
 {
-	UINT32 old = m_biu;
+	uint32_t old = m_biu;
 
 	COMBINE_DATA( &m_biu ); // TODO: check byte writes
 
@@ -303,15 +303,15 @@ void psxcpu_device::stop()
 	debugger_instruction_hook( this,  m_pc );
 }
 
-UINT32 psxcpu_device::cache_readword( UINT32 offset )
+uint32_t psxcpu_device::cache_readword( uint32_t offset )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 
 	if( ( m_biu & BIU_TAG ) != 0 )
 	{
 		if( ( m_biu & BIU_IS1 ) != 0 )
 		{
-			UINT32 tag = m_icacheTag[ ( offset / 16 ) % ( ICACHE_ENTRIES / 4 ) ];
+			uint32_t tag = m_icacheTag[ ( offset / 16 ) % ( ICACHE_ENTRIES / 4 ) ];
 			data |= tag & TAG_VALID;
 
 			if( ( ( tag ^ offset ) & TAG_MATCH_MASK ) == 0 )
@@ -339,7 +339,7 @@ UINT32 psxcpu_device::cache_readword( UINT32 offset )
 	return data;
 }
 
-void psxcpu_device::cache_writeword( UINT32 offset, UINT32 data )
+void psxcpu_device::cache_writeword( uint32_t offset, uint32_t data )
 {
 	if( ( m_biu & BIU_TAG ) != 0 )
 	{
@@ -369,7 +369,7 @@ void psxcpu_device::cache_writeword( UINT32 offset, UINT32 data )
 	}
 }
 
-UINT8 psxcpu_device::readbyte( UINT32 address )
+uint8_t psxcpu_device::readbyte( uint32_t address )
 {
 	if( m_bus_attached )
 	{
@@ -379,7 +379,7 @@ UINT8 psxcpu_device::readbyte( UINT32 address )
 	return cache_readword( address ) >> ( ( address & 3 ) * 8 );
 }
 
-UINT16 psxcpu_device::readhalf( UINT32 address )
+uint16_t psxcpu_device::readhalf( uint32_t address )
 {
 	if( m_bus_attached )
 	{
@@ -389,7 +389,7 @@ UINT16 psxcpu_device::readhalf( UINT32 address )
 	return cache_readword( address ) >> ( ( address & 2 ) * 8 );
 }
 
-UINT32 psxcpu_device::readword( UINT32 address )
+uint32_t psxcpu_device::readword( uint32_t address )
 {
 	if( m_bus_attached )
 	{
@@ -399,7 +399,7 @@ UINT32 psxcpu_device::readword( UINT32 address )
 	return cache_readword( address );
 }
 
-UINT32 psxcpu_device::readword_masked( UINT32 address, UINT32 mask )
+uint32_t psxcpu_device::readword_masked( uint32_t address, uint32_t mask )
 {
 	if( m_bus_attached )
 	{
@@ -409,7 +409,7 @@ UINT32 psxcpu_device::readword_masked( UINT32 address, UINT32 mask )
 	return cache_readword( address );
 }
 
-void psxcpu_device::writeword( UINT32 address, UINT32 data )
+void psxcpu_device::writeword( uint32_t address, uint32_t data )
 {
 	if( m_bus_attached )
 	{
@@ -421,7 +421,7 @@ void psxcpu_device::writeword( UINT32 address, UINT32 data )
 	}
 }
 
-void psxcpu_device::writeword_masked( UINT32 address, UINT32 data, UINT32 mask )
+void psxcpu_device::writeword_masked( uint32_t address, uint32_t data, uint32_t mask )
 {
 	if( m_bus_attached )
 	{
@@ -750,7 +750,7 @@ static const struct
 	{ 0x00, 0x00, nullptr }
 };
 
-UINT32 psxcpu_device::log_bioscall_parameter( int parm )
+uint32_t psxcpu_device::log_bioscall_parameter( int parm )
 {
 	if( parm < 4 )
 	{
@@ -763,7 +763,7 @@ UINT32 psxcpu_device::log_bioscall_parameter( int parm )
 const char *psxcpu_device::log_bioscall_string( int parm )
 {
 	int pos;
-	UINT32 address;
+	uint32_t address;
 	static char string[ 1024 ];
 
 	address = log_bioscall_parameter( parm );
@@ -777,7 +777,7 @@ const char *psxcpu_device::log_bioscall_string( int parm )
 
 	for( ;; )
 	{
-		UINT8 c = readbyte( address );
+		uint8_t c = readbyte( address );
 		if( c == 0 )
 		{
 			break;
@@ -872,7 +872,7 @@ void psxcpu_device::log_bioscall()
 			{
 				while( nbytes > 0 )
 				{
-					UINT8 c = readbyte( buffer );
+					uint8_t c = readbyte( buffer );
 					putchar( c );
 					nbytes--;
 					buffer++;
@@ -959,13 +959,13 @@ void psxcpu_device::log_bioscall()
 					{
 						if( parm > 0 )
 						{
-							UINT32 format = log_bioscall_parameter( parm - 1 );
+							uint32_t format = log_bioscall_parameter( parm - 1 );
 							const char *parmstr = nullptr;
 							int percent = 0;
 
 							for( ;; )
 							{
-								UINT8 c = readbyte( format );
+								uint8_t c = readbyte( format );
 								if( c == 0 )
 								{
 									break;
@@ -1172,7 +1172,7 @@ void psxcpu_device::multiplier_update()
 	{
 	case MULTIPLIER_OPERATION_MULT:
 		{
-			INT64 result = mul_32x32( (INT32)m_multiplier_operand1, (INT32)m_multiplier_operand2 );
+			int64_t result = mul_32x32( (int32_t)m_multiplier_operand1, (int32_t)m_multiplier_operand2 );
 			m_lo = extract_64lo( result );
 			m_hi = extract_64hi( result );
 		}
@@ -1180,7 +1180,7 @@ void psxcpu_device::multiplier_update()
 
 	case MULTIPLIER_OPERATION_MULTU:
 		{
-			UINT64 result = mulu_32x32( m_multiplier_operand1, m_multiplier_operand2 );
+			uint64_t result = mulu_32x32( m_multiplier_operand1, m_multiplier_operand2 );
 			m_lo = extract_64lo( result );
 			m_hi = extract_64hi( result );
 		}
@@ -1194,7 +1194,7 @@ void psxcpu_device::multiplier_update()
 		}
 		else if( m_multiplier_operand2 == 0 )
 		{
-			if( (INT32)m_multiplier_operand1 < 0 )
+			if( (int32_t)m_multiplier_operand1 < 0 )
 			{
 				m_lo = 1;
 			}
@@ -1207,8 +1207,8 @@ void psxcpu_device::multiplier_update()
 		}
 		else
 		{
-			m_lo = (INT32)m_multiplier_operand1 / (INT32)m_multiplier_operand2;
-			m_hi = (INT32)m_multiplier_operand1 % (INT32)m_multiplier_operand2;
+			m_lo = (int32_t)m_multiplier_operand1 / (int32_t)m_multiplier_operand2;
+			m_hi = (int32_t)m_multiplier_operand1 % (int32_t)m_multiplier_operand2;
 		}
 		break;
 
@@ -1229,7 +1229,7 @@ void psxcpu_device::multiplier_update()
 	m_multiplier_operation = MULTIPLIER_OPERATION_IDLE;
 }
 
-UINT32 psxcpu_device::get_hi()
+uint32_t psxcpu_device::get_hi()
 {
 	if( m_multiplier_operation != MULTIPLIER_OPERATION_IDLE )
 	{
@@ -1239,7 +1239,7 @@ UINT32 psxcpu_device::get_hi()
 	return m_hi;
 }
 
-UINT32 psxcpu_device::get_lo()
+uint32_t psxcpu_device::get_lo()
 {
 	if( m_multiplier_operation != MULTIPLIER_OPERATION_IDLE )
 	{
@@ -1363,8 +1363,8 @@ void psxcpu_device::update_ram_config()
 		break;
 	}
 
-	UINT32 ram_size = m_ram->size();
-	UINT8 *pointer = m_ram->pointer();
+	uint32_t ram_size = m_ram->size();
+	uint8_t *pointer = m_ram->pointer();
 
 	if( ram_size > window_size )
 	{
@@ -1398,8 +1398,8 @@ void psxcpu_device::update_rom_config()
 		window_size = max_window_size;
 	}
 
-	UINT32 rom_size = m_rom->bytes();
-	UINT8 *pointer = m_rom->base();
+	uint32_t rom_size = m_rom->bytes();
+	uint8_t *pointer = m_rom->base();
 
 	if( rom_size > window_size )
 	{
@@ -1470,7 +1470,7 @@ void psxcpu_device::fetch_next_op()
 {
 	if( m_delayr == PSXCPU_DELAYR_PC )
 	{
-		UINT32 safepc = m_delayv & ~m_bad_word_address_mask;
+		uint32_t safepc = m_delayv & ~m_bad_word_address_mask;
 
 		m_op = m_direct->read_dword( safepc );
 	}
@@ -1509,7 +1509,7 @@ int psxcpu_device::advance_pc()
 	return 1;
 }
 
-void psxcpu_device::load( UINT32 reg, UINT32 value )
+void psxcpu_device::load( uint32_t reg, uint32_t value )
 {
 	advance_pc();
 
@@ -1519,7 +1519,7 @@ void psxcpu_device::load( UINT32 reg, UINT32 value )
 	}
 }
 
-void psxcpu_device::delayed_load( UINT32 reg, UINT32 value )
+void psxcpu_device::delayed_load( uint32_t reg, uint32_t value )
 {
 	if( m_delayr == reg )
 	{
@@ -1533,7 +1533,7 @@ void psxcpu_device::delayed_load( UINT32 reg, UINT32 value )
 	m_delayv = value;
 }
 
-void psxcpu_device::branch( UINT32 address )
+void psxcpu_device::branch( uint32_t address )
 {
 	advance_pc();
 
@@ -1565,7 +1565,7 @@ void psxcpu_device::unconditional_branch()
 	m_delayv = ( m_pc & 0xf0000000 ) + ( INS_TARGET( m_op ) << 2 );
 }
 
-void psxcpu_device::common_exception( int exception, UINT32 romOffset, UINT32 ramOffset )
+void psxcpu_device::common_exception( int exception, uint32_t romOffset, uint32_t ramOffset )
 {
 	int cause = ( exception << 2 ) | ( ( ( m_op >> 26 ) & 3 ) << 28 );
 
@@ -1658,19 +1658,19 @@ void psxcpu_device::store_bus_error_exception()
 	common_exception( EXC_DBE, 0xbfc00180, 0x80000080 );
 }
 
-void psxcpu_device::load_bad_address( UINT32 address )
+void psxcpu_device::load_bad_address( uint32_t address )
 {
 	m_cp0r[ CP0_BADA ] = address;
 	exception( EXC_ADEL );
 }
 
-void psxcpu_device::store_bad_address( UINT32 address )
+void psxcpu_device::store_bad_address( uint32_t address )
 {
 	m_cp0r[ CP0_BADA ] = address;
 	exception( EXC_ADES );
 }
 
-int psxcpu_device::data_address_breakpoint( int dcic_rw, int dcic_status, UINT32 address )
+int psxcpu_device::data_address_breakpoint( int dcic_rw, int dcic_status, uint32_t address )
 {
 	if( address < 0x1f000000 || address > 0x1fffffff )
 	{
@@ -1694,12 +1694,12 @@ int psxcpu_device::data_address_breakpoint( int dcic_rw, int dcic_status, UINT32
 	return 0;
 }
 
-int psxcpu_device::load_data_address_breakpoint( UINT32 address )
+int psxcpu_device::load_data_address_breakpoint( uint32_t address )
 {
 	return data_address_breakpoint( DCIC_DR | DCIC_DAE, DCIC_DB | DCIC_DA | DCIC_R, address );
 }
 
-int psxcpu_device::store_data_address_breakpoint( UINT32 address )
+int psxcpu_device::store_data_address_breakpoint( uint32_t address )
 {
 	return data_address_breakpoint( DCIC_DW | DCIC_DAE, DCIC_DB | DCIC_DA | DCIC_W, address );
 }
@@ -1747,7 +1747,7 @@ ADDRESS_MAP_END
 //  psxcpu_device - constructor
 //-------------------------------------------------
 
-psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source ) :
+psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source ) :
 	cpu_device( mconfig, type, name, tag, owner, clock, shortname, source ),
 	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME( psxcpu_internal_map ) ),
 	m_gpu_read_handler( *this ),
@@ -1761,32 +1761,32 @@ psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, c
 	m_disable_rom_berr = false;
 }
 
-cxd8530aq_device::cxd8530aq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8530aq_device::cxd8530aq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: psxcpu_device( mconfig, CXD8661R, "CXD8530AQ", tag, owner, clock, "cxd8530aq", __FILE__ )
 {
 }
 
-cxd8530bq_device::cxd8530bq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8530bq_device::cxd8530bq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: psxcpu_device( mconfig, CXD8661R, "CXD8530BQ", tag, owner, clock, "cxd8530bq", __FILE__ )
 {
 }
 
-cxd8530cq_device::cxd8530cq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8530cq_device::cxd8530cq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: psxcpu_device( mconfig, CXD8661R, "CXD8530CQ", tag, owner, clock, "cxd8530cq", __FILE__ )
 {
 }
 
-cxd8661r_device::cxd8661r_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8661r_device::cxd8661r_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: psxcpu_device( mconfig, CXD8661R, "CXD8661R", tag, owner, clock, "cxd8661r", __FILE__ )
 {
 }
 
-cxd8606bq_device::cxd8606bq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8606bq_device::cxd8606bq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: psxcpu_device( mconfig, CXD8606BQ, "CXD8606BQ", tag, owner, clock, "cxd8606bq", __FILE__ )
 {
 }
 
-cxd8606cq_device::cxd8606cq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8606cq_device::cxd8606cq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: psxcpu_device( mconfig, CXD8606CQ, "CXD8606CQ", tag, owner, clock, "cxd8606cq", __FILE__ )
 {
 }
@@ -1968,7 +1968,7 @@ void psxcpu_device::device_reset()
 
 	/// TODO: get dma to access ram through the memory map?
 	psxdma_device *psxdma = subdevice<psxdma_device>( "dma" );
-	psxdma->m_ram = (UINT32 *)m_ram->pointer();
+	psxdma->m_ram = (uint32_t *)m_ram->pointer();
 	psxdma->m_ramsize = m_ram->size();
 
 	m_delayr = 0;
@@ -2052,13 +2052,13 @@ void psxcpu_device::state_string_export( const device_state_entry &entry, std::s
 //  helper function
 //-------------------------------------------------
 
-offs_t psxcpu_device::disasm_disassemble( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options )
+offs_t psxcpu_device::disasm_disassemble( char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options )
 {
 	return DasmPSXCPU( this, buffer, pc, opram );
 }
 
 
-UINT32 psxcpu_device::get_register_from_pipeline( int reg )
+uint32_t psxcpu_device::get_register_from_pipeline( int reg )
 {
 	if( m_delayr == reg )
 	{
@@ -2082,7 +2082,7 @@ int psxcpu_device::cop0_usable()
 
 void psxcpu_device::lwc( int cop, int sr_cu )
 {
-	UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+	uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 	int breakpoint = load_data_address_breakpoint( address );
 
 	if( ( m_cp0r[ CP0_SR ] & sr_cu ) == 0 )
@@ -2099,7 +2099,7 @@ void psxcpu_device::lwc( int cop, int sr_cu )
 	}
 	else
 	{
-		UINT32 data = readword( address );
+		uint32_t data = readword( address );
 
 		if( m_berr )
 		{
@@ -2135,7 +2135,7 @@ void psxcpu_device::lwc( int cop, int sr_cu )
 
 void psxcpu_device::swc( int cop, int sr_cu )
 {
-	UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+	uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 	int breakpoint = store_data_address_breakpoint( address );
 
 	if( ( m_cp0r[ CP0_SR ] & sr_cu ) == 0 )
@@ -2148,7 +2148,7 @@ void psxcpu_device::swc( int cop, int sr_cu )
 	}
 	else
 	{
-		UINT32 data = 0;
+		uint32_t data = 0;
 
 		switch( cop )
 		{
@@ -2239,7 +2239,7 @@ void psxcpu_device::bc( int cop, int sr_cu, int condition )
 
 void psxcpu_device::execute_set_input( int inputnum, int state )
 {
-	UINT32 ip;
+	uint32_t ip;
 
 	switch( inputnum )
 	{
@@ -2315,7 +2315,7 @@ void psxcpu_device::execute_run()
 					break;
 
 				case FUNCT_SRA:
-					load( INS_RD( m_op ), (INT32)m_r[ INS_RT( m_op ) ] >> INS_SHAMT( m_op ) );
+					load( INS_RD( m_op ), (int32_t)m_r[ INS_RT( m_op ) ] >> INS_SHAMT( m_op ) );
 					break;
 
 				case FUNCT_SLLV:
@@ -2327,7 +2327,7 @@ void psxcpu_device::execute_run()
 					break;
 
 				case FUNCT_SRAV:
-					load( INS_RD( m_op ), (INT32)m_r[ INS_RT( m_op ) ] >> ( m_r[ INS_RS( m_op ) ] & 31 ) );
+					load( INS_RD( m_op ), (int32_t)m_r[ INS_RT( m_op ) ] >> ( m_r[ INS_RS( m_op ) ] & 31 ) );
 					break;
 
 				case FUNCT_JR:
@@ -2391,8 +2391,8 @@ void psxcpu_device::execute_run()
 
 				case FUNCT_ADD:
 					{
-						UINT32 result = m_r[ INS_RS( m_op ) ] + m_r[ INS_RT( m_op ) ];
-						if( (INT32)( ~( m_r[ INS_RS( m_op ) ] ^ m_r[ INS_RT( m_op ) ] ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
+						uint32_t result = m_r[ INS_RS( m_op ) ] + m_r[ INS_RT( m_op ) ];
+						if( (int32_t)( ~( m_r[ INS_RS( m_op ) ] ^ m_r[ INS_RT( m_op ) ] ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
 						{
 							exception( EXC_OVF );
 						}
@@ -2409,8 +2409,8 @@ void psxcpu_device::execute_run()
 
 				case FUNCT_SUB:
 					{
-						UINT32 result = m_r[ INS_RS( m_op ) ] - m_r[ INS_RT( m_op ) ];
-						if( (INT32)( ( m_r[ INS_RS( m_op ) ] ^ m_r[ INS_RT( m_op ) ] ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
+						uint32_t result = m_r[ INS_RS( m_op ) ] - m_r[ INS_RT( m_op ) ];
+						if( (int32_t)( ( m_r[ INS_RS( m_op ) ] ^ m_r[ INS_RT( m_op ) ] ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
 						{
 							exception( EXC_OVF );
 						}
@@ -2442,7 +2442,7 @@ void psxcpu_device::execute_run()
 					break;
 
 				case FUNCT_SLT:
-					load( INS_RD( m_op ), (INT32)m_r[ INS_RS( m_op ) ] < (INT32)m_r[ INS_RT( m_op ) ] );
+					load( INS_RD( m_op ), (int32_t)m_r[ INS_RS( m_op ) ] < (int32_t)m_r[ INS_RT( m_op ) ] );
 					break;
 
 				case FUNCT_SLTU:
@@ -2459,7 +2459,7 @@ void psxcpu_device::execute_run()
 				switch( INS_RT_REGIMM( m_op ) )
 				{
 				case RT_BLTZ:
-					conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] < 0 );
+					conditional_branch( (int32_t)m_r[ INS_RS( m_op ) ] < 0 );
 
 					if( INS_RT( m_op ) == RT_BLTZAL )
 					{
@@ -2468,7 +2468,7 @@ void psxcpu_device::execute_run()
 					break;
 
 				case RT_BGEZ:
-					conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] >= 0 );
+					conditional_branch( (int32_t)m_r[ INS_RS( m_op ) ] >= 0 );
 
 					if( INS_RT( m_op ) == RT_BGEZAL )
 					{
@@ -2496,18 +2496,18 @@ void psxcpu_device::execute_run()
 				break;
 
 			case OP_BLEZ:
-				conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] < 0 || m_r[ INS_RS( m_op ) ] == m_r[ INS_RT( m_op ) ] );
+				conditional_branch( (int32_t)m_r[ INS_RS( m_op ) ] < 0 || m_r[ INS_RS( m_op ) ] == m_r[ INS_RT( m_op ) ] );
 				break;
 
 			case OP_BGTZ:
-				conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] >= 0 && m_r[ INS_RS( m_op ) ] != m_r[ INS_RT( m_op ) ] );
+				conditional_branch( (int32_t)m_r[ INS_RS( m_op ) ] >= 0 && m_r[ INS_RS( m_op ) ] != m_r[ INS_RT( m_op ) ] );
 				break;
 
 			case OP_ADDI:
 				{
-					UINT32 immediate = PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-					UINT32 result = m_r[ INS_RS( m_op ) ] + immediate;
-					if( (INT32)( ~( m_r[ INS_RS( m_op ) ] ^ immediate ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
+					uint32_t immediate = PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t result = m_r[ INS_RS( m_op ) ] + immediate;
+					if( (int32_t)( ~( m_r[ INS_RS( m_op ) ] ^ immediate ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
 					{
 						exception( EXC_OVF );
 					}
@@ -2523,11 +2523,11 @@ void psxcpu_device::execute_run()
 				break;
 
 			case OP_SLTI:
-				load( INS_RT( m_op ), (INT32)m_r[ INS_RS( m_op ) ] < PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) ) );
+				load( INS_RT( m_op ), (int32_t)m_r[ INS_RS( m_op ) ] < PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) ) );
 				break;
 
 			case OP_SLTIU:
-				load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] < (UINT32)PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) ) );
+				load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] < (uint32_t)PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) ) );
 				break;
 
 			case OP_ANDI:
@@ -2595,7 +2595,7 @@ void psxcpu_device::execute_run()
 						{
 							if( cop0_usable() )
 							{
-								UINT32 data = ( m_cp0r[ reg ] & ~mtc0_writemask[ reg ] ) |
+								uint32_t data = ( m_cp0r[ reg ] & ~mtc0_writemask[ reg ] ) |
 									( m_r[ INS_RT( m_op ) ] & mtc0_writemask[ reg ] );
 								advance_pc();
 
@@ -2824,7 +2824,7 @@ void psxcpu_device::execute_run()
 
 			case OP_LB:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int breakpoint = load_data_address_breakpoint( address );
 
 					if( ( address & m_bad_byte_address_mask ) != 0 )
@@ -2837,7 +2837,7 @@ void psxcpu_device::execute_run()
 					}
 					else
 					{
-						UINT32 data = PSXCPU_BYTE_EXTEND( readbyte( address ) );
+						uint32_t data = PSXCPU_BYTE_EXTEND( readbyte( address ) );
 
 						if( m_berr )
 						{
@@ -2853,7 +2853,7 @@ void psxcpu_device::execute_run()
 
 			case OP_LH:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int breakpoint = load_data_address_breakpoint( address );
 
 					if( ( address & m_bad_half_address_mask ) != 0 )
@@ -2866,7 +2866,7 @@ void psxcpu_device::execute_run()
 					}
 					else
 					{
-						UINT32 data = PSXCPU_WORD_EXTEND( readhalf( address ) );
+						uint32_t data = PSXCPU_WORD_EXTEND( readhalf( address ) );
 
 						if( m_berr )
 						{
@@ -2882,7 +2882,7 @@ void psxcpu_device::execute_run()
 
 			case OP_LWL:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int load_type = address & 3;
 					int breakpoint;
 
@@ -2899,7 +2899,7 @@ void psxcpu_device::execute_run()
 					}
 					else
 					{
-						UINT32 data = get_register_from_pipeline( INS_RT( m_op ) );
+						uint32_t data = get_register_from_pipeline( INS_RT( m_op ) );
 
 						switch( load_type )
 						{
@@ -2934,7 +2934,7 @@ void psxcpu_device::execute_run()
 
 			case OP_LW:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int breakpoint = load_data_address_breakpoint( address );
 
 					if( ( address & m_bad_word_address_mask ) != 0 )
@@ -2947,7 +2947,7 @@ void psxcpu_device::execute_run()
 					}
 					else
 					{
-						UINT32 data = readword( address );
+						uint32_t data = readword( address );
 
 						if( m_berr )
 						{
@@ -2963,7 +2963,7 @@ void psxcpu_device::execute_run()
 
 			case OP_LBU:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int breakpoint = load_data_address_breakpoint( address );
 
 					if( ( address & m_bad_byte_address_mask ) != 0 )
@@ -2976,7 +2976,7 @@ void psxcpu_device::execute_run()
 					}
 					else
 					{
-						UINT32 data = readbyte( address );
+						uint32_t data = readbyte( address );
 
 						if( m_berr )
 						{
@@ -2992,7 +2992,7 @@ void psxcpu_device::execute_run()
 
 			case OP_LHU:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int breakpoint = load_data_address_breakpoint( address );
 
 					if( ( address & m_bad_half_address_mask ) != 0 )
@@ -3005,7 +3005,7 @@ void psxcpu_device::execute_run()
 					}
 					else
 					{
-						UINT32 data = readhalf( address );
+						uint32_t data = readhalf( address );
 
 						if( m_berr )
 						{
@@ -3021,7 +3021,7 @@ void psxcpu_device::execute_run()
 
 			case OP_LWR:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int breakpoint = load_data_address_breakpoint( address );
 
 					if( ( address & m_bad_byte_address_mask ) != 0 )
@@ -3034,7 +3034,7 @@ void psxcpu_device::execute_run()
 					}
 					else
 					{
-						UINT32 data = get_register_from_pipeline( INS_RT( m_op ) );
+						uint32_t data = get_register_from_pipeline( INS_RT( m_op ) );
 
 						switch( address & 3 )
 						{
@@ -3069,7 +3069,7 @@ void psxcpu_device::execute_run()
 
 			case OP_SB:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int breakpoint = store_data_address_breakpoint( address );
 
 					if( ( address & m_bad_byte_address_mask ) != 0 )
@@ -3099,7 +3099,7 @@ void psxcpu_device::execute_run()
 
 			case OP_SH:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int breakpoint = store_data_address_breakpoint( address );
 
 					if( ( address & m_bad_half_address_mask ) != 0 )
@@ -3129,7 +3129,7 @@ void psxcpu_device::execute_run()
 
 			case OP_SWL:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int save_type = address & 3;
 					int breakpoint;
 
@@ -3179,7 +3179,7 @@ void psxcpu_device::execute_run()
 
 			case OP_SW:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int breakpoint = store_data_address_breakpoint( address );
 
 					if( ( address & m_bad_word_address_mask ) != 0 )
@@ -3208,7 +3208,7 @@ void psxcpu_device::execute_run()
 
 			case OP_SWR:
 				{
-					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					uint32_t address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
 					int breakpoint = store_data_address_breakpoint( address );
 
 					if( ( address & m_bad_byte_address_mask ) != 0 )
@@ -3296,30 +3296,30 @@ void psxcpu_device::execute_run()
 	} while( m_icount > 0 );
 }
 
-UINT32 psxcpu_device::getcp1dr( int reg )
+uint32_t psxcpu_device::getcp1dr( int reg )
 {
 	/* if a mtc/ctc precedes then this will get the value moved (which cop1 register is irrelevant). */
 	/* if a mfc/cfc follows then it will get the same value as this one. */
 	return m_program->read_dword( m_pc + 4 );
 }
 
-void psxcpu_device::setcp1dr( int reg, UINT32 value )
+void psxcpu_device::setcp1dr( int reg, uint32_t value )
 {
 }
 
-UINT32 psxcpu_device::getcp1cr( int reg )
+uint32_t psxcpu_device::getcp1cr( int reg )
 {
 	/* if a mtc/ctc precedes then this will get the value moved (which cop1 register is irrelevant). */
 	/* if a mfc/cfc follows then it will get the same value as this one. */
 	return m_program->read_dword( m_pc + 4 );
 }
 
-void psxcpu_device::setcp1cr( int reg, UINT32 value )
+void psxcpu_device::setcp1cr( int reg, uint32_t value )
 {
 }
 
 
-UINT32 psxcpu_device::getcp3dr( int reg )
+uint32_t psxcpu_device::getcp3dr( int reg )
 {
 	/* if you have mtc/ctc with an mfc/cfc directly afterwards then you get the value that was moved. */
 	/* if you have an lwc with an mfc/cfc somewhere after it then you get the value that is loaded */
@@ -3327,11 +3327,11 @@ UINT32 psxcpu_device::getcp3dr( int reg )
 	return m_program->read_dword( m_pc + 4 );
 }
 
-void psxcpu_device::setcp3dr( int reg, UINT32 value )
+void psxcpu_device::setcp3dr( int reg, uint32_t value )
 {
 }
 
-UINT32 psxcpu_device::getcp3cr( int reg )
+uint32_t psxcpu_device::getcp3cr( int reg )
 {
 	/* if you have mtc/ctc with an mfc/cfc directly afterwards then you get the value that was moved. */
 	/* if you have an lwc with an mfc/cfc somewhere after it then you get the value that is loaded */
@@ -3339,7 +3339,7 @@ UINT32 psxcpu_device::getcp3cr( int reg )
 	return m_program->read_dword( m_pc + 4 );
 }
 
-void psxcpu_device::setcp3cr( int reg, UINT32 value )
+void psxcpu_device::setcp3cr( int reg, uint32_t value )
 {
 }
 

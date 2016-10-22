@@ -12,7 +12,7 @@ class nes_tengen008_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_tengen008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_tengen008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -28,8 +28,8 @@ class nes_tengen032_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_tengen032_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_tengen032_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -46,13 +46,13 @@ protected:
 	void set_chr();
 	void irq_clock(int blanked);
 
-	UINT16 m_irq_count, m_irq_count_latch;
-	UINT8 m_irq_mode, m_irq_reset;
+	uint16_t m_irq_count, m_irq_count_latch;
+	uint8_t m_irq_mode, m_irq_reset;
 	int m_irq_enable;
 
-	UINT8 m_latch;
-	UINT8 m_mmc_prg_bank[3];
-	UINT8 m_mmc_vrom_bank[8];
+	uint8_t m_latch;
+	uint8_t m_mmc_prg_bank[3];
+	uint8_t m_mmc_vrom_bank[8];
 
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
@@ -66,7 +66,7 @@ class nes_tengen037_device : public nes_tengen032_device
 {
 public:
 	// construction/destruction
-	nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;

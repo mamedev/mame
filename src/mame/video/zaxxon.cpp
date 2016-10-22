@@ -19,7 +19,7 @@
 
 PALETTE_INIT_MEMBER(zaxxon_state, zaxxon)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -70,7 +70,7 @@ PALETTE_INIT_MEMBER(zaxxon_state, zaxxon)
 
 TILE_GET_INFO_MEMBER(zaxxon_state::get_bg_tile_info)
 {
-	const UINT8 *source = memregion("tilemap_dat")->base();
+	const uint8_t *source = memregion("tilemap_dat")->base();
 	int size = memregion("tilemap_dat")->bytes() / 2;
 	int eff_index = tile_index & (size - 1);
 	int code = source[eff_index] + 256 * (source[eff_index + size] & 3);
@@ -261,14 +261,14 @@ WRITE8_MEMBER(zaxxon_state::congo_colorram_w)
 
 WRITE8_MEMBER(zaxxon_state::congo_sprite_custom_w)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 
 	m_congo_custom[offset] = data;
 
 	/* seems to trigger on a write of 1 to the 4th byte */
 	if (offset == 3 && data == 0x01)
 	{
-		UINT16 saddr = m_congo_custom[0] | (m_congo_custom[1] << 8);
+		uint16_t saddr = m_congo_custom[0] | (m_congo_custom[1] << 8);
 		int count = m_congo_custom[2];
 
 		/* count cycles (just a guess) */
@@ -277,7 +277,7 @@ WRITE8_MEMBER(zaxxon_state::congo_sprite_custom_w)
 		/* this is just a guess; the chip is hardwired to the spriteram */
 		while (count-- >= 0)
 		{
-			UINT8 daddr = space.read_byte(saddr + 0) * 4;
+			uint8_t daddr = space.read_byte(saddr + 0) * 4;
 			spriteram[(daddr + 0) & 0xff] = space.read_byte(saddr + 1);
 			spriteram[(daddr + 1) & 0xff] = space.read_byte(saddr + 2);
 			spriteram[(daddr + 2) & 0xff] = space.read_byte(saddr + 3);
@@ -318,9 +318,9 @@ void zaxxon_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 		/* loop over visible rows */
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT16 *dst = &bitmap.pix16(y);
+			uint16_t *dst = &bitmap.pix16(y);
 			int srcx, srcy, vf;
-			UINT16 *src;
+			uint16_t *src;
 
 			/* VF = flipped V signals */
 			vf = y ^ flipmask;
@@ -366,7 +366,7 @@ void zaxxon_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
  *
  *************************************/
 
-inline int zaxxon_state::find_minimum_y(UINT8 value, int flip)
+inline int zaxxon_state::find_minimum_y(uint8_t value, int flip)
 {
 	int flipmask = flip ? 0xff : 0x00;
 	int flipconst = flip ? 0xef : 0xf1;
@@ -397,7 +397,7 @@ inline int zaxxon_state::find_minimum_y(UINT8 value, int flip)
 }
 
 
-inline int zaxxon_state::find_minimum_x(UINT8 value, int flip)
+inline int zaxxon_state::find_minimum_x(uint8_t value, int flip)
 {
 	int flipmask = flip ? 0xff : 0x00;
 	int x;
@@ -411,9 +411,9 @@ inline int zaxxon_state::find_minimum_x(UINT8 value, int flip)
 }
 
 
-void zaxxon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask)
+void zaxxon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t flipxmask, uint16_t flipymask)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 	int flip = flip_screen();
 	int flipmask = flip ? 0xff : 0x00;
@@ -445,36 +445,36 @@ void zaxxon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
  *
  *************************************/
 
-UINT32 zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(bitmap, cliprect, TRUE);
+	draw_background(bitmap, cliprect, true);
 	draw_sprites(bitmap, cliprect, 0x140, 0x180);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-UINT32 zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(bitmap, cliprect, TRUE);
+	draw_background(bitmap, cliprect, true);
 	draw_sprites(bitmap, cliprect, 0x180, 0x180);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-UINT32 zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(bitmap, cliprect, FALSE);
+	draw_background(bitmap, cliprect, false);
 	draw_sprites(bitmap, cliprect, 0x140, 0x180);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-UINT32 zaxxon_state::screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t zaxxon_state::screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(bitmap, cliprect, TRUE);
+	draw_background(bitmap, cliprect, true);
 	draw_sprites(bitmap, cliprect, 0x280, 0x180);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

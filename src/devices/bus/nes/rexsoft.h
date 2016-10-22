@@ -12,7 +12,7 @@ class nes_rex_dbz5_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -24,7 +24,7 @@ public:
 	virtual void pcb_reset() override;
 
 private:
-	UINT8 m_extra;
+	uint8_t m_extra;
 };
 
 
@@ -34,7 +34,7 @@ class nes_rex_sl1632_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -44,10 +44,10 @@ public:
 
 protected:
 	virtual void set_prg(int prg_base, int prg_mask) override;
-	virtual void set_chr(UINT8 chr, int chr_base, int chr_mask) override;
+	virtual void set_chr(uint8_t chr, int chr_base, int chr_mask) override;
 
-	UINT8 m_mode, m_mirror;
-	UINT8 m_extra_bank[12];
+	uint8_t m_mode, m_mirror;
+	uint8_t m_extra_bank[12];
 };
 
 

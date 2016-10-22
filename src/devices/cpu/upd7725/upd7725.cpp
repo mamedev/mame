@@ -24,7 +24,7 @@
 const device_type UPD7725 = &device_creator<upd7725_device>;
 const device_type UPD96050 = &device_creator<upd96050_device>;
 
-necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, const char *shortname, const char *source)
+necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits, const char *name, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
 		m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
@@ -47,12 +47,12 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 }
 
 
-upd7725_device::upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7725_device::upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: necdsp_device(mconfig, UPD7725, tag, owner, clock, 11, 11, "uPD7725", "upd7725", __FILE__)
 {
 }
 
-upd96050_device::upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd96050_device::upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: necdsp_device(mconfig, UPD96050, tag, owner, clock, 14, 12, "uPD96050", "upd96050", __FILE__)
 {
 }
@@ -238,7 +238,7 @@ void necdsp_device::state_string_export(const device_state_entry &entry, std::st
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 necdsp_device::execute_min_cycles() const
+uint32_t necdsp_device::execute_min_cycles() const
 {
 	return 4;
 }
@@ -249,7 +249,7 @@ UINT32 necdsp_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 necdsp_device::execute_max_cycles() const
+uint32_t necdsp_device::execute_max_cycles() const
 {
 	return 4;
 }
@@ -260,7 +260,7 @@ UINT32 necdsp_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 necdsp_device::execute_input_lines() const
+uint32_t necdsp_device::execute_input_lines() const
 {
 	return 3; // TODO: there should be 11: INT, SCK, /SIEN, /SOEN, SI, and /DACK, plus SO, /SORQ and DRQ; for now, just INT, P0, and P1 are enough.
 }
@@ -287,7 +287,7 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 necdsp_device::disasm_min_opcode_bytes() const
+uint32_t necdsp_device::disasm_min_opcode_bytes() const
 {
 	return 4;
 }
@@ -298,7 +298,7 @@ UINT32 necdsp_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 necdsp_device::disasm_max_opcode_bytes() const
+uint32_t necdsp_device::disasm_max_opcode_bytes() const
 {
 	return 4;
 }
@@ -308,7 +308,7 @@ UINT32 necdsp_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t necdsp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t necdsp_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd7725 );
 	return CPU_DISASSEMBLE_NAME(upd7725)(this, buffer, pc, oprom, opram, options);
@@ -316,7 +316,7 @@ offs_t necdsp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 
 void necdsp_device::execute_run()
 {
-	UINT32 opcode;
+	uint32_t opcode;
 
 	do
 	{
@@ -336,7 +336,7 @@ void necdsp_device::execute_run()
 			case 3: exec_ld(opcode); break;
 		}
 
-		INT32 result = (INT32)regs.k * regs.l;  //sign + 30-bit result
+		int32_t result = (int32_t)regs.k * regs.l;  //sign + 30-bit result
 		regs.m = result >> 15;  //store sign + top 15-bits
 		regs.n = result <<  1;  //store low 15-bits + zero
 
@@ -345,15 +345,15 @@ void necdsp_device::execute_run()
 	} while (m_icount > 0);
 }
 
-void necdsp_device::exec_op(UINT32 opcode) {
-	UINT8 pselect = (opcode >> 20)&0x3;  //P select
-	UINT8 alu     = (opcode >> 16)&0xf;  //ALU operation mode
-	UINT8 asl     = (opcode >> 15)&0x1;  //accumulator select
-	UINT8 dpl     = (opcode >> 13)&0x3;  //DP low modify
-	UINT8 dphm    = (opcode >>  9)&0xf;  //DP high XOR modify
-	UINT8 rpdcr   = (opcode >>  8)&0x1;  //RP decrement
-	UINT8 src     = (opcode >>  4)&0xf;  //move source
-	UINT8 dst     = (opcode >>  0)&0xf;  //move destination
+void necdsp_device::exec_op(uint32_t opcode) {
+	uint8_t pselect = (opcode >> 20)&0x3;  //P select
+	uint8_t alu     = (opcode >> 16)&0xf;  //ALU operation mode
+	uint8_t asl     = (opcode >> 15)&0x1;  //accumulator select
+	uint8_t dpl     = (opcode >> 13)&0x3;  //DP low modify
+	uint8_t dphm    = (opcode >>  9)&0xf;  //DP high XOR modify
+	uint8_t rpdcr   = (opcode >>  8)&0x1;  //RP decrement
+	uint8_t src     = (opcode >>  4)&0xf;  //move source
+	uint8_t dst     = (opcode >>  0)&0xf;  //move destination
 
 	switch(src) {
 	case  0: regs.idb = regs.trb; break;
@@ -375,7 +375,7 @@ void necdsp_device::exec_op(UINT32 opcode) {
 	}
 
 	if(alu) {
-	UINT16 p=0, q=0, r=0;
+	uint16_t p=0, q=0, r=0;
 	Flag flag;
 	bool c=0;
 
@@ -474,19 +474,19 @@ void necdsp_device::exec_op(UINT32 opcode) {
 	if(rpdcr) regs.rp--;
 }
 
-void necdsp_device::exec_rt(UINT32 opcode) {
+void necdsp_device::exec_rt(uint32_t opcode) {
 	exec_op(opcode);
 	regs.pc = regs.stack[--regs.sp];
 	regs.sp &= 0xf;
 }
 
-void necdsp_device::exec_jp(UINT32 opcode) {
-	UINT16 brch = (opcode >> 13) & 0x1ff;  //branch
-	UINT16 na  =  (opcode >>  2) & 0x7ff;  //next address
-	UINT16 bank = (opcode >>  0) & 0x3;  //bank address
+void necdsp_device::exec_jp(uint32_t opcode) {
+	uint16_t brch = (opcode >> 13) & 0x1ff;  //branch
+	uint16_t na  =  (opcode >>  2) & 0x7ff;  //next address
+	uint16_t bank = (opcode >>  0) & 0x3;  //bank address
 
-	UINT16 jps = (regs.pc & 0x2000) | (bank << 11) | (na << 0);
-	UINT16 jpl = (bank << 11) | (na << 0);
+	uint16_t jps = (regs.pc & 0x2000) | (bank << 11) | (na << 0);
+	uint16_t jpl = (bank << 11) | (na << 0);
 
 	switch(brch) {
 		case 0x000: regs.pc = regs.so; return;  //JMPSO
@@ -537,9 +537,9 @@ void necdsp_device::exec_jp(UINT32 opcode) {
 	}
 }
 
-void necdsp_device::exec_ld(UINT32 opcode) {
-	UINT16 id = opcode >> 6;  //immediate data
-	UINT8 dst = (opcode >> 0) & 0xf;  //destination
+void necdsp_device::exec_ld(uint32_t opcode) {
+	uint16_t id = opcode >> 6;  //immediate data
+	uint8_t dst = (opcode >> 0) & 0xf;  //destination
 
 	regs.idb = id;
 
@@ -566,7 +566,7 @@ void necdsp_device::exec_ld(UINT32 opcode) {
 	}
 }
 
-UINT8 necdsp_device::snesdsp_read(bool mode) {
+uint8_t necdsp_device::snesdsp_read(bool mode) {
 	if (!mode)
 	{
 		return regs.sr >> 8;
@@ -595,7 +595,7 @@ UINT8 necdsp_device::snesdsp_read(bool mode) {
 	}
 }
 
-void necdsp_device::snesdsp_write(bool mode, UINT8 data) {
+void necdsp_device::snesdsp_write(bool mode, uint8_t data) {
 	if (!mode) return;
 
 	if (regs.sr.drc == 0)

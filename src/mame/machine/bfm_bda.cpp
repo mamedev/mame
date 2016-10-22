@@ -15,7 +15,7 @@ const device_type BFM_BDA = &device_creator<bfm_bda_t>;
 
 //I currently use the BDA character set, until a suitable image can be programmed
 
-static const UINT16 BDAcharset[]=
+static const uint16_t BDAcharset[]=
 {           // FEDC BA98 7654 3210
 	0xA626, // 1010 0110 0010 0110 @.
 	0xE027, // 1110 0000 0010 0111 A.
@@ -83,7 +83,7 @@ static const UINT16 BDAcharset[]=
 	0x4406, // 0100 0100 0000 0110 ?
 };
 
-bfm_bda_t::bfm_bda_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bfm_bda_t::bfm_bda_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BFM_BDA, "BFM BDA VFD controller", tag, owner, clock, "bfm_bda", __FILE__),
 	m_port_val(0)
 {
@@ -144,7 +144,7 @@ void bfm_bda_t::device_reset()
 	memset(m_attrs, 0, sizeof(m_attrs));
 }
 
-UINT16 bfm_bda_t::set_display(UINT16 segin)
+uint16_t bfm_bda_t::set_display(uint16_t segin)
 {
 	return BITSWAP16(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
 }

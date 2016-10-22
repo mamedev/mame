@@ -51,7 +51,7 @@ const device_type ZX8302 = &device_creator<zx8302_device>;
 //  trigger_interrupt -
 //-------------------------------------------------
 
-inline void zx8302_device::trigger_interrupt(UINT8 line)
+inline void zx8302_device::trigger_interrupt(uint8_t line)
 {
 	m_irq |= line;
 
@@ -127,7 +127,7 @@ inline void zx8302_device::transmit_ipc_data()
 //  zx8302_device - constructor
 //-------------------------------------------------
 
-zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ZX8302, "Sinclair ZX8302", tag, owner, clock, "zx8302", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_rtc_clock(0),
@@ -312,7 +312,7 @@ void zx8302_device::rcv_complete()
 
 READ8_MEMBER( zx8302_device::rtc_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -372,7 +372,7 @@ READ8_MEMBER( zx8302_device::mdv_track_r )
 {
 	if (LOG) logerror("ZX8302 '%s' Microdrive Track %u: %02x\n", tag(), m_track, m_mdv_data[m_track]);
 
-	UINT8 data = m_mdv_data[m_track];
+	uint8_t data = m_mdv_data[m_track];
 
 	m_track = !m_track;
 
@@ -401,7 +401,7 @@ READ8_MEMBER( zx8302_device::status_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// TODO network port
 

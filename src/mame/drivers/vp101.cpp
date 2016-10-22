@@ -31,7 +31,7 @@ public:
 	DECLARE_READ32_MEMBER(tty_ready_r);
 	DECLARE_WRITE32_MEMBER(tty_w);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 
@@ -47,7 +47,7 @@ void vp10x_state::video_start()
 {
 }
 
-UINT32 vp10x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vp10x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

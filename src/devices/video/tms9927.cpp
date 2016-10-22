@@ -10,8 +10,8 @@
 #include "video/tms9927.h"
 
 
-static const UINT8 chars_per_row_value[8] = { 20, 32, 40, 64, 72, 80, 96, 132 };
-static const UINT8 skew_bits_value[4] = { 0, 1, 2, 2 };
+static const uint8_t chars_per_row_value[8] = { 20, 32, 40, 64, 72, 80, 96, 132 };
+static const uint8_t skew_bits_value[4] = { 0, 1, 2, 2 };
 
 
 #define HCOUNT               (m_reg[0] + 1)
@@ -34,13 +34,13 @@ const device_type CRT5027 = &device_creator<crt5027_device>;
 const device_type CRT5037 = &device_creator<crt5037_device>;
 const device_type CRT5057 = &device_creator<crt5057_device>;
 
-tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9927_device(mconfig, TMS9927, "TMS9927 VTC", tag, owner, clock, "tms9927", __FILE__)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
-tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_video_interface(mconfig, *this)
 	, m_write_vsyn(*this)
@@ -51,17 +51,17 @@ tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, 
 	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
-crt5027_device::crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+crt5027_device::crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9927_device(mconfig, CRT5027, "CRT5027", tag, owner, clock, "crt5027", __FILE__)
 {
 }
 
-crt5037_device::crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+crt5037_device::crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9927_device(mconfig, CRT5037, "CRT5037", tag, owner, clock, "crt5037", __FILE__)
 {
 }
 
-crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9927_device(mconfig, CRT5057, "CRT5057", tag, owner, clock, "crt5057", __FILE__)
 {
 }
@@ -145,7 +145,7 @@ void tms9927_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void tms9927_device::state_postload()
 {
-	recompute_parameters(TRUE);
+	recompute_parameters(true);
 }
 
 
@@ -174,7 +174,7 @@ void tms9927_device::generic_access(address_space &space, offs_t offset)
 			if (!m_reset)
 			{
 				m_screen->update_now();
-				m_reset = TRUE;
+				m_reset = true;
 			}
 			break;
 
@@ -188,8 +188,8 @@ osd_printf_debug("Up scroll\n");
 			if (m_reset)
 			{
 				m_screen->update_now();
-				m_reset = FALSE;
-				recompute_parameters(FALSE);
+				m_reset = false;
+				recompute_parameters(false);
 			}
 			break;
 	}
@@ -208,14 +208,14 @@ WRITE8_MEMBER( tms9927_device::write )
 		case 0x05:  /* VERTICAL DATA START */
 		case 0x06:  /* LAST DISPLAYED DATA ROW */
 			m_reg[offset] = data;
-			recompute_parameters(FALSE);
+			recompute_parameters(false);
 			break;
 
 		case 0x0c:  /* LOAD CURSOR CHARACTER ADDRESS */
 		case 0x0d:  /* LOAD CURSOR ROW ADDRESS */
 osd_printf_debug("Cursor address changed\n");
 			m_reg[offset - 0x0c + 7] = data;
-			recompute_parameters(FALSE);
+			recompute_parameters(false);
 			break;
 
 		default:
@@ -267,9 +267,9 @@ int tms9927_device::cursor_bounds(rectangle &bounds)
 }
 
 
-void tms9927_device::recompute_parameters(int postload)
+void tms9927_device::recompute_parameters(bool postload)
 {
-	UINT16 offset_hpix, offset_vpix;
+	uint16_t offset_hpix, offset_vpix;
 	attoseconds_t refresh;
 	rectangle visarea;
 
@@ -292,16 +292,16 @@ void tms9927_device::recompute_parameters(int postload)
 	osd_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Offset=%dx%d, Skew=%d, Upscroll=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, offset_hpix, offset_vpix, SKEW_BITS, m_start_datarow);
 
 	/* see if it all makes sense */
-	m_valid_config = TRUE;
+	m_valid_config = true;
 	if ( (m_visible_hpix > m_total_hpix || m_visible_vpix > m_total_vpix) || (((m_visible_hpix-1)<=0) || ((m_visible_vpix-1)<=0)) || ((m_total_hpix * m_total_vpix) == 0) )
 	{
-		m_valid_config = FALSE;
+		m_valid_config = false;
 		logerror("tms9927: invalid visible size (%dx%d) versus total size (%dx%d)\n", m_visible_hpix, m_visible_vpix, m_total_hpix, m_total_vpix);
 	}
 
 	if (m_clock == 0)
 	{
-		m_valid_config = FALSE;
+		m_valid_config = false;
 		// TODO: make the screen refresh never, and disable the vblank and odd/even interrupts here!
 		logerror("tms9927: invalid clock rate of zero defined!\n");
 	}

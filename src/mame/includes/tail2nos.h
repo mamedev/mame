@@ -25,9 +25,9 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_txvideoram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_zoomram;
+	required_shared_ptr<uint16_t> m_txvideoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_zoomram;
 
 	/* video-related */
 	tilemap_t   *m_tx_tilemap;
@@ -52,7 +52,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tail2nos_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	K051316_CB_MEMBER(zoom_callback);

@@ -27,14 +27,14 @@
 void epos_state::get_pens( pen_t *pens )
 {
 	offs_t i;
-	const UINT8 *prom = memregion("proms")->base();
+	const uint8_t *prom = memregion("proms")->base();
 	int len = memregion("proms")->bytes();
 
 	for (i = 0; i < len; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
-		UINT8 data = prom[i];
+		uint8_t data = prom[i];
 
 		bit0 = (data >> 7) & 0x01;
 		bit1 = (data >> 6) & 0x01;
@@ -77,7 +77,7 @@ WRITE8_MEMBER(epos_state::port_1_w)
 }
 
 
-UINT32 epos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t epos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[0x20];
 	offs_t offs;
@@ -86,7 +86,7 @@ UINT32 epos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		UINT8 data = m_videoram[offs];
+		uint8_t data = m_videoram[offs];
 
 		int x = (offs % 136) * 2;
 		int y = (offs / 136);

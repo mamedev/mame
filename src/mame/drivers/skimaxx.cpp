@@ -58,19 +58,19 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<tms34010_device> m_tms;
 
-	required_shared_ptr<UINT32> m_blitter_regs;
-	required_shared_ptr<UINT32> m_fpga_ctrl;
-	required_shared_ptr<UINT16> m_fg_buffer;
+	required_shared_ptr<uint32_t> m_blitter_regs;
+	required_shared_ptr<uint32_t> m_fpga_ctrl;
+	required_shared_ptr<uint16_t> m_fg_buffer;
 
-	std::unique_ptr<UINT32[]> m_bg_buffer;
-	UINT32 *m_bg_buffer_front;
-	UINT32 *m_bg_buffer_back;
-	UINT16 *m_blitter_gfx;
-	UINT32 m_blitter_gfx_len;
-	UINT32 m_blitter_src_x;
-	UINT32 m_blitter_src_dx;
-	UINT32 m_blitter_src_y;
-	UINT32 m_blitter_src_dy;
+	std::unique_ptr<uint32_t[]> m_bg_buffer;
+	uint32_t *m_bg_buffer_front;
+	uint32_t *m_bg_buffer_back;
+	uint16_t *m_blitter_gfx;
+	uint32_t m_blitter_gfx_len;
+	uint32_t m_blitter_src_x;
+	uint32_t m_blitter_src_dx;
+	uint32_t m_blitter_src_y;
+	uint32_t m_blitter_src_dy;
 
 	DECLARE_WRITE32_MEMBER(skimaxx_blitter_w);
 	DECLARE_READ32_MEMBER(skimaxx_blitter_r);
@@ -100,7 +100,7 @@ public:
 // Set up blit parameters
 WRITE32_MEMBER(skimaxx_state::skimaxx_blitter_w)
 {
-	UINT32 newdata = COMBINE_DATA( &m_blitter_regs[offset] );
+	uint32_t newdata = COMBINE_DATA( &m_blitter_regs[offset] );
 
 	switch (offset)
 	{
@@ -131,11 +131,11 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_blitter_w)
 // A read by the 68030 from this area blits one pixel to the back buffer (at the same offset)
 READ32_MEMBER(skimaxx_state::skimaxx_blitter_r)
 {
-	UINT32 penaddr = ((m_blitter_src_x >> 8) & 0x1ff) + ((m_blitter_src_y >> 8) << 9);
-	UINT16 *src = m_blitter_gfx + (penaddr % m_blitter_gfx_len);
-	UINT32 *dst = m_bg_buffer_back + offset;
+	uint32_t penaddr = ((m_blitter_src_x >> 8) & 0x1ff) + ((m_blitter_src_y >> 8) << 9);
+	uint16_t *src = m_blitter_gfx + (penaddr % m_blitter_gfx_len);
+	uint32_t *dst = m_bg_buffer_back + offset;
 
-	UINT16 pen = (*src) & 0x7fff;
+	uint16_t pen = (*src) & 0x7fff;
 
 	if (pen)
 	{
@@ -154,12 +154,12 @@ READ32_MEMBER(skimaxx_state::skimaxx_blitter_r)
 
 void skimaxx_state::video_start()
 {
-	m_blitter_gfx = (UINT16 *) memregion( "blitter" )->base();
+	m_blitter_gfx = (uint16_t *) memregion( "blitter" )->base();
 	m_blitter_gfx_len = memregion( "blitter" )->bytes() / 2;
 
-	m_bg_buffer = std::make_unique<UINT32[]>(0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2); // 2 buffers
-	m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;
-	m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 1;
+	m_bg_buffer = std::make_unique<uint32_t[]>(0x400 * 0x100 * sizeof(uint16_t) / sizeof(uint32_t) * 2); // 2 buffers
+	m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(uint16_t) / sizeof(uint32_t) * 0;
+	m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(uint16_t) / sizeof(uint32_t) * 1;
 	membank("bank1")->configure_entry(0, m_bg_buffer_back);
 	membank("bank1")->configure_entry(1, m_bg_buffer_front);
 }
@@ -173,12 +173,12 @@ void skimaxx_state::video_start()
 // TODO: Might not be used
 TMS340X0_TO_SHIFTREG_CB_MEMBER(skimaxx_state::to_shiftreg)
 {
-	memcpy(shiftreg, &m_fg_buffer[TOWORD(address)], 512 * sizeof(UINT16));
+	memcpy(shiftreg, &m_fg_buffer[TOWORD(address)], 512 * sizeof(uint16_t));
 }
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(skimaxx_state::from_shiftreg)
 {
-	memcpy(&m_fg_buffer[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
+	memcpy(&m_fg_buffer[TOWORD(address)], shiftreg, 512 * sizeof(uint16_t));
 }
 
 
@@ -194,10 +194,10 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
 
 	if (params->rowaddr >= 0x220)
 	{
-		UINT32 rowaddr = (params->rowaddr - 0x220);
-		UINT16 *fg = &m_fg_buffer[rowaddr << 8];
-		UINT32 *bg = &m_bg_buffer_front[rowaddr/2 * 1024/2];
-		UINT16 *dest = &bitmap.pix16(scanline);
+		uint32_t rowaddr = (params->rowaddr - 0x220);
+		uint16_t *fg = &m_fg_buffer[rowaddr << 8];
+		uint32_t *bg = &m_bg_buffer_front[rowaddr/2 * 1024/2];
+		uint16_t *dest = &bitmap.pix16(scanline);
 		//int coladdr = params->coladdr;
 		int x;
 		//coladdr = 0;
@@ -205,7 +205,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
 		dest += params->heblnk;
 		for (x = params->heblnk; x < params->hsblnk; x+=2)
 		{
-			UINT16 tmspix;
+			uint16_t tmspix;
 			tmspix = *fg & 0x7fff;
 			if (tmspix)
 			{
@@ -214,7 +214,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
 			}
 			else
 			{
-				UINT32 data = *bg & 0x7fff7fff;
+				uint32_t data = *bg & 0x7fff7fff;
 				*dest++ = data >> 16;
 				*dest++ = data;
 			}
@@ -243,15 +243,15 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
 
 WRITE32_MEMBER(skimaxx_state::skimaxx_fpga_ctrl_w)
 {
-	UINT32 newdata = COMBINE_DATA( m_fpga_ctrl );
+	uint32_t newdata = COMBINE_DATA( m_fpga_ctrl );
 
 	if (ACCESSING_BITS_0_7)
 	{
 		// double buffering
-		UINT8 bank_bg_buffer = (newdata & 0x40) ? 1 : 0;
+		uint8_t bank_bg_buffer = (newdata & 0x40) ? 1 : 0;
 
-		m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * bank_bg_buffer;
-		m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * (1 - bank_bg_buffer);
+		m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(uint16_t) / sizeof(uint32_t) * bank_bg_buffer;
+		m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(uint16_t) / sizeof(uint32_t) * (1 - bank_bg_buffer);
 
 		membank("bank1")->set_entry(bank_bg_buffer);
 	}
@@ -381,12 +381,12 @@ ADDRESS_MAP_END
 
 #if 0
 
-static const UINT32 texlayout_xoffset[512] =
+static const uint32_t texlayout_xoffset[512] =
 {
 	STEP512(0,16)
 };
 
-static const UINT32 texlayout_yoffset[128] =
+static const uint32_t texlayout_yoffset[128] =
 {
 	STEP128(0,512*16)
 };
@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	/* video hardware */
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(50000000/8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(skimaxx_state, scanline_update)     /* scanline updater (indexed16) */

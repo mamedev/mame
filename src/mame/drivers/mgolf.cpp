@@ -32,14 +32,14 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
 	tilemap_t* m_bg_tilemap;
 
 	/* misc */
-	UINT8 m_prev;
-	UINT8 m_mask;
+	uint8_t m_prev;
+	uint8_t m_mask;
 	attotime m_time_pushed;
 	attotime m_time_released;
 	emu_timer *m_interrupt_timer;
@@ -57,7 +57,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mgolf);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
@@ -71,7 +71,7 @@ protected:
 
 TILE_GET_INFO_MEMBER(mgolf_state::get_tile_info)
 {
-	UINT8 code = m_video_ram[tile_index];
+	uint8_t code = m_video_ram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code, code >> 7, 0);
 }
@@ -90,7 +90,7 @@ void mgolf_state::video_start()
 }
 
 
-UINT32 mgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -120,7 +120,7 @@ UINT32 mgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void mgolf_state::update_plunger(  )
 {
-	UINT8 val = ioport("BUTTON")->read();
+	uint8_t val = ioport("BUTTON")->read();
 
 	if (m_prev != val)
 	{
@@ -147,7 +147,7 @@ void mgolf_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in mgolf_state::device_timer");
+		assert_always(false, "Unknown id in mgolf_state::device_timer");
 	}
 }
 
@@ -183,7 +183,7 @@ READ8_MEMBER(mgolf_state::wram_r)
 
 READ8_MEMBER(mgolf_state::dial_r)
 {
-	UINT8 val = ioport("41")->read();
+	uint8_t val = ioport("41")->read();
 
 	if ((ioport("DIAL")->read() + 0x00) & 0x20)
 	{
@@ -202,7 +202,7 @@ READ8_MEMBER(mgolf_state::misc_r)
 {
 	double plunger = calc_plunger_pos(); /* see Video Pinball */
 
-	UINT8 val = ioport("61")->read();
+	uint8_t val = ioport("61")->read();
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{

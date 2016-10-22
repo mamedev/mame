@@ -24,7 +24,7 @@
 
 const device_type JALECO_BLEND = &device_creator<jaleco_blend_device>;
 
-jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, JALECO_BLEND, "Jaleco Blending Device", tag, owner, clock, "jaleco_blend", __FILE__),
 	m_table(nullptr)
 {
@@ -36,7 +36,7 @@ jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, const ch
 
 void jaleco_blend_device::device_start()
 {
-	m_table = make_unique_clear<UINT8[]>(0xc00);
+	m_table = make_unique_clear<uint8_t[]>(0xc00);
 
 	save_pointer(NAME(m_table.get()), 0xc00);
 }
@@ -50,7 +50,7 @@ void jaleco_blend_device::device_reset()
 	memset(m_table.get(), 0, 0xc00);
 }
 
-void jaleco_blend_device::set(int color, UINT8 val)
+void jaleco_blend_device::set(int color, uint8_t val)
 {
 	m_table[color] = val;
 }
@@ -68,7 +68,7 @@ void jaleco_blend_device::set(int color, UINT8 val)
  */
 
 /* basically an add/subtract function with clamping */
-rgb_t jaleco_blend_device::func(rgb_t dest, rgb_t addMe, UINT8 alpha)
+rgb_t jaleco_blend_device::func(rgb_t dest, rgb_t addMe, uint8_t alpha)
 {
 	int r, g, b;
 	int ir, ig, ib;
@@ -99,13 +99,13 @@ rgb_t jaleco_blend_device::func(rgb_t dest, rgb_t addMe, UINT8 alpha)
 
 template<class _BitmapClass>
 void jaleco_blend_device::drawgfx_common(palette_device &palette,_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
+							uint32_t code,uint32_t color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
 	/* Start drawing */
 	const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-	const UINT8 *alpha = &m_table[gfx->granularity() * (color % gfx->colors())];
-	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
+	const uint8_t *alpha = &m_table[gfx->granularity() * (color % gfx->colors())];
+	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;
 
@@ -152,7 +152,7 @@ void jaleco_blend_device::drawgfx_common(palette_device &palette,_BitmapClass &d
 		// taken from case 7: TRANSPARENCY_ALPHARANGE
 		for (y = sy; y < ey; y++)
 		{
-			const UINT8 *source = source_base + y_index*gfx->rowbytes();
+			const uint8_t *source = source_base + y_index*gfx->rowbytes();
 			typename _BitmapClass::pixel_t *dest = &dest_bmp.pix(y);
 			int x_index = x_index_base;
 			for (x = sx; x < ex; x++)
@@ -179,10 +179,10 @@ void jaleco_blend_device::drawgfx_common(palette_device &palette,_BitmapClass &d
 }
 
 void jaleco_blend_device::drawgfx(palette_device &palette,bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
+							uint32_t code,uint32_t color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 { jaleco_blend_device::drawgfx_common(palette,dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }
 void jaleco_blend_device::drawgfx(palette_device &palette,bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
+							uint32_t code,uint32_t color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 { jaleco_blend_device::drawgfx_common(palette,dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }

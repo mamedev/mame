@@ -101,7 +101,7 @@ void menu_directory::handle()
 void menu_directory::populate()
 {
 	for (auto & elem : s_folders)
-		item_append(_(elem.name), "", 0, (void *)(FPTR)elem.action);
+		item_append(_(elem.name), "", 0, (void *)(uintptr_t)elem.action);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -165,7 +165,7 @@ void menu_display_actual::handle()
 	// process the menu
 	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		switch ((FPTR)menu_event->itemref)
+		switch ((uintptr_t)menu_event->itemref)
 		{
 		case REMOVE:
 			menu::stack_push<menu_remove_folder>(ui(), container(), m_ref);
@@ -312,7 +312,7 @@ void menu_add_change_folder::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			int index = (FPTR)menu_event->itemref - 1;
+			int index = (uintptr_t)menu_event->itemref - 1;
 			const menu_item &pitem = item[index];
 
 			// go up to the parent path
@@ -455,13 +455,13 @@ void menu_add_change_folder::populate()
 
 	// add the drives
 	for (int i = 0; (volume_name = osd_get_volume_name(i)) != nullptr; ++i)
-		item_append(volume_name, "[DRIVE]", 0, (void *)(FPTR)++folders_count);
+		item_append(volume_name, "[DRIVE]", 0, (void *)(uintptr_t)++folders_count);
 
 	// add the directories
 	while ((dirent = path.next()) != nullptr)
 	{
 		if (dirent->type == osd::directory::entry::entry_type::DIR && strcmp(dirent->name, ".") != 0)
-			item_append(dirent->name, "[DIR]", 0, (void *)(FPTR)++folders_count);
+			item_append(dirent->name, "[DIR]", 0, (void *)(uintptr_t)++folders_count);
 	}
 
 	item_append(menu_item_type::SEPARATOR);
@@ -611,7 +611,7 @@ void menu_remove_folder::populate()
 {
 	int folders_count = 0;
 	for (auto & elem : m_folders)
-		item_append(elem, "", 0, (void *)(FPTR)++folders_count);
+		item_append(elem, "", 0, (void *)(uintptr_t)++folders_count);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;

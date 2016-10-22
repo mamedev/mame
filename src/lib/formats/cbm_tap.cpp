@@ -130,7 +130,7 @@ below could be not working.  FP ]
 
 #define CBM_HEADER_SIZE 20
 
-static INT16    wave_data = 0;
+static int16_t    wave_data = 0;
 static int      len;
 
 
@@ -155,7 +155,7 @@ static void toggle_wave_data(void )
 	wave_data = (wave_data == WAVE_HIGH) ? WAVE_LOW : WAVE_HIGH;
 }
 
-static void cbm_output_wave( INT16 **buffer, int length )
+static void cbm_output_wave( int16_t **buffer, int length )
 {
 	if (buffer == nullptr)
 		return;
@@ -168,7 +168,7 @@ static void cbm_output_wave( INT16 **buffer, int length )
 }
 
 
-static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
+static int cbm_tap_do_work( int16_t **buffer, int length, const uint8_t *data )
 {
 	int i, j = 0;
 	int size = 0;
@@ -179,7 +179,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 	int tap_frequency = 0;
 
 	int byte_samples = 0;
-	UINT8 over_pulse_bytes[3] = {0 , 0, 0 };
+	uint8_t over_pulse_bytes[3] = {0 , 0, 0 };
 	int over_pulse_length = 0;
 	/* These waveamp_* values are currently stored but not used.
 	  Further investigations are needed to find real pulse amplitude
@@ -228,7 +228,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 
 	for (i = CBM_HEADER_SIZE; i < length; i++)
 	{
-		UINT8 byte = data[i];
+		uint8_t byte = data[i];
 
 		/* .TAP v0 */
 		/* Here is simple:
@@ -319,7 +319,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 }
 
 
-static int cbm_tap_to_wav_size( const UINT8 *tapdata, int taplen )
+static int cbm_tap_to_wav_size( const uint8_t *tapdata, int taplen )
 {
 	int size = cbm_tap_do_work(nullptr, taplen, tapdata);
 	len = taplen;
@@ -327,11 +327,11 @@ static int cbm_tap_to_wav_size( const UINT8 *tapdata, int taplen )
 	return size;
 }
 
-static int cbm_tap_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
+static int cbm_tap_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 {
-	INT16 *p = buffer;
+	int16_t *p = buffer;
 
-	return cbm_tap_do_work(&p, len, (const UINT8 *)bytes);
+	return cbm_tap_do_work(&p, len, (const uint8_t *)bytes);
 }
 
 

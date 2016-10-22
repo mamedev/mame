@@ -16,7 +16,7 @@
 #include "igs025.h"
 
 
-igs025_device::igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+igs025_device::igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IGS025, "IGS025", tag, owner, clock, "igs_025_022", __FILE__)
 {
 	m_execute_external =  igs025_execute_external(FUNC(igs025_device::no_callback_setup), this);
@@ -339,7 +339,7 @@ void igs025_device::killbld_protection_calculate_hold(int y, int z)
 
 void igs025_device::killbld_protection_calculate_hilo()
 {
-	UINT8 source;
+	uint8_t source;
 
 	m_kb_prot_hilo_select++;
 

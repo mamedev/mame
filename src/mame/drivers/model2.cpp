@@ -134,9 +134,9 @@ enum {
 
 
 #define COPRO_FIFOIN_SIZE   32000
-bool model2_state::copro_fifoin_pop(device_t *device, UINT32 *result,UINT32 offset, UINT32 mem_mask)
+bool model2_state::copro_fifoin_pop(device_t *device, uint32_t *result,uint32_t offset, uint32_t mem_mask)
 {
-	UINT32 r;
+	uint32_t r;
 
 	if (m_copro_fifoin_num == 0)
 	{
@@ -184,7 +184,7 @@ READ_LINE_MEMBER(model2_state::copro_tgp_fifoin_pop_ok)
 
 READ32_MEMBER(model2_state::copro_tgp_fifoin_pop)
 {
-	UINT32 r = m_copro_fifoin_data[m_copro_fifoin_rpos++];
+	uint32_t r = m_copro_fifoin_data[m_copro_fifoin_rpos++];
 
 
 	if (m_copro_fifoin_rpos == COPRO_FIFOIN_SIZE)
@@ -198,7 +198,7 @@ READ32_MEMBER(model2_state::copro_tgp_fifoin_pop)
 }
 
 
-void model2_state::copro_fifoin_push(device_t *device, UINT32 data, UINT32 offset, UINT32 mem_mask)
+void model2_state::copro_fifoin_push(device_t *device, uint32_t data, uint32_t offset, uint32_t mem_mask)
 {
 	if (m_copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
@@ -224,9 +224,9 @@ void model2_state::copro_fifoin_push(device_t *device, UINT32 data, UINT32 offse
 
 
 #define COPRO_FIFOOUT_SIZE  32000
-UINT32 model2_state::copro_fifoout_pop(address_space &space,UINT32 offset, UINT32 mem_mask)
+uint32_t model2_state::copro_fifoout_pop(address_space &space,uint32_t offset, uint32_t mem_mask)
 {
-	UINT32 r;
+	uint32_t r;
 
 	if (m_copro_fifoout_num == 0)
 	{
@@ -266,7 +266,7 @@ UINT32 model2_state::copro_fifoout_pop(address_space &space,UINT32 offset, UINT3
 	return r;
 }
 
-void model2_state::copro_fifoout_push(device_t *device, UINT32 data,UINT32 offset,UINT32 mem_mask)
+void model2_state::copro_fifoout_push(device_t *device, uint32_t data,uint32_t offset,uint32_t mem_mask)
 {
 	if (m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 	{
@@ -328,7 +328,7 @@ READ32_MEMBER(model2_state::timers_r)
 	if (m_timerrun[offset])
 	{
 		// get elapsed time, convert to units of 25 MHz
-		UINT32 cur = (m_timers[offset]->time_elapsed() * 25000000).as_double();
+		uint32_t cur = (m_timers[offset]->time_elapsed() * 25000000).as_double();
 
 		// subtract units from starting value
 		m_timervals[offset] = m_timerorig[offset] - cur;
@@ -352,7 +352,7 @@ WRITE32_MEMBER(model2_state::timers_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 {
-	int tnum = (int)(FPTR)ptr;
+	int tnum = (int)(uintptr_t)ptr;
 	int bit = tnum + 2;
 
 	if(m_timerrun[tnum] == 0)
@@ -372,8 +372,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 
 MACHINE_START_MEMBER(model2_state,model2)
 {
-	m_copro_fifoin_data = make_unique_clear<UINT32[]>(COPRO_FIFOIN_SIZE);
-	m_copro_fifoout_data = make_unique_clear<UINT32[]>(COPRO_FIFOOUT_SIZE);
+	m_copro_fifoin_data = make_unique_clear<uint32_t[]>(COPRO_FIFOIN_SIZE);
+	m_copro_fifoout_data = make_unique_clear<uint32_t[]>(COPRO_FIFOOUT_SIZE);
 }
 
 MACHINE_RESET_MEMBER(model2_state,model2_common)
@@ -462,7 +462,7 @@ MACHINE_RESET_MEMBER(model2_state,model2c)
 	m_dsp_type = DSP_TYPE_TGPX4;
 }
 
-static void chcolor(palette_device &palette, pen_t color, UINT16 data)
+static void chcolor(palette_device &palette, pen_t color, uint16_t data)
 {
 	palette.set_pen_color(color, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
@@ -497,7 +497,7 @@ WRITE32_MEMBER(model2_state::analog_2b_w)
 
 READ32_MEMBER(model2_state::fifoctl_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	if (m_copro_fifoout_num == 0)
 	{
@@ -520,7 +520,7 @@ WRITE32_MEMBER(model2_state::videoctl_w)
 
 CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
 {
-	UINT32 ret = m_in0->read();
+	uint32_t ret = m_in0->read();
 
 	if(m_ctrlmode == 0)
 	{
@@ -535,7 +535,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
 
 CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 {
-	UINT32 iptval = 0x00ff;
+	uint32_t iptval = 0x00ff;
 	if(m_analog_channel < 4)
 	{
 		iptval = m_analog_ports[m_analog_channel].read_safe(0);
@@ -556,9 +556,9 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 /* Used specifically by Sega Rally, others might be different */
 CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
 {
-	UINT8 res = m_gears.read_safe(0);
+	uint8_t res = m_gears.read_safe(0);
 	int i;
-	const UINT8 gearvalue[5] = { 0, 2, 1, 6, 5 };
+	const uint8_t gearvalue[5] = { 0, 2, 1, 6, 5 };
 
 	for(i=0;i<5;i++)
 	{
@@ -692,7 +692,7 @@ WRITE32_MEMBER(model2_state::copro_prg_w)
 		if (m_coprocnt & 1)
 		{
 			m_tgpx4_program[m_coprocnt / 2] &= U64(0xffffffff);
-			m_tgpx4_program[m_coprocnt / 2] |= (UINT64)(data) << 32;
+			m_tgpx4_program[m_coprocnt / 2] |= (uint64_t)(data) << 32;
 		}
 		else
 		{
@@ -745,8 +745,8 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 
 WRITE32_MEMBER(model2_state::copro_function_port_w)
 {
-	UINT32 d = data & 0x800fffff;
-	UINT32 a = (offset >> 2) & 0xff;
+	uint32_t d = data & 0x800fffff;
+	uint32_t a = (offset >> 2) & 0xff;
 	d |= a << 23;
 
 	//logerror("copro_function_port_w: %08X, %08X, %08X\n", data, offset, mem_mask);
@@ -926,7 +926,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_iop_w)
 #endif
 
 
-void model2_state::push_geo_data(UINT32 data)
+void model2_state::push_geo_data(uint32_t data)
 {
 	//osd_printf_debug("push_geo_data: %08X: %08X\n", 0x900000+m_geo_write_start_address, data);
 	m_bufferram[m_geo_write_start_address/4] = data;
@@ -980,7 +980,7 @@ WRITE32_MEMBER(model2_state::geo_w)
 		/*if (data & 0x80000000)
 		{
 		    int i;
-		    UINT32 a;
+		    uint32_t a;
 		    osd_printf_debug("GEO: jump to %08X\n", (data & 0xfffff));
 		    a = (data & 0xfffff) / 4;
 		    for (i=0; i < 4; i++)
@@ -1007,7 +1007,7 @@ WRITE32_MEMBER(model2_state::geo_w)
 
 		if (data & 0x80000000)
 		{
-			UINT32 r = 0;
+			uint32_t r = 0;
 			r |= data & 0x800fffff;
 			r |= ((address >> 4) & 0x3f) << 23;
 			push_geo_data(r);
@@ -1016,12 +1016,12 @@ WRITE32_MEMBER(model2_state::geo_w)
 		{
 			if ((address & 0xf) == 0)
 			{
-				UINT32 r = 0;
+				uint32_t r = 0;
 				r |= data & 0x000fffff;
 				r |= ((address >> 4) & 0x3f) << 23;
 				if((address >> 4) & 0xc0)
 				{
-					UINT8 function = (address >> 4) & 0x3f;
+					uint8_t function = (address >> 4) & 0x3f;
 					if(function == 1)
 					{
 						r |= ((address>>10)&3)<<29; // Eye Mode, used by Sega Rally on car select
@@ -1053,13 +1053,13 @@ WRITE32_MEMBER(model2_state::geo_w)
 
 READ32_MEMBER(model2_state::hotd_lightgun_r)
 {
-	UINT16 res = 0xffff;
+	uint16_t res = 0xffff;
 
 	if(m_lightgun_mux < 8)
 		res = (m_lightgun_ports[m_lightgun_mux >> 1].read_safe(0) >> ((m_lightgun_mux & 1)*8)) & 0xff;
 	else
 	{
-		UINT16 p1x,p1y,p2x,p2y;
+		uint16_t p1x,p1y,p2x,p2y;
 
 		res = 0xfffc;
 
@@ -1101,7 +1101,7 @@ READ32_MEMBER(model2_state::daytona_unk_r)
 #if 0
 READ32_MEMBER(model2_state::desert_unk_r)
 {
-	static UINT8 test;
+	static uint8_t test;
 
 	test ^= 8;
 	// vcop needs bit 3 clear (infinite loop otherwise)
@@ -1140,7 +1140,7 @@ void model2_state::model2_check_irq_state()
 	}
 }
 
-void model2_state::model2_check_irqack_state(UINT32 data)
+void model2_state::model2_check_irqack_state(uint32_t data)
 {
 	const int irq_type[12]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
 
@@ -1234,7 +1234,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 
 READ32_MEMBER(model2_state::model2_5881prot_r)
 {
-	UINT32 retval = 0;
+	uint32_t retval = 0;
 
 	if (offset == 0x0000/4)
 	{
@@ -1252,7 +1252,7 @@ READ32_MEMBER(model2_state::model2_5881prot_r)
 		}
 		else
 		{
-			UINT8* base;
+			uint8_t* base;
 			retval = m_cryptdevice->do_decrypt(base);
 			retval = ((retval & 0xff00) >> 8) | ((retval & 0x00ff) << 8);
 			retval <<= 16;
@@ -1300,7 +1300,7 @@ WRITE32_MEMBER(model2_state::model2_5881prot_w)
 
 READ32_MEMBER(model2_state::maxx_r)
 {
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
 	if (offset <= 0x1f/4)
 	{
@@ -1477,7 +1477,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(model2_state::virtuacop_lightgun_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = (m_lightgun_ports[offset >> 1].read_safe(0) >> ((offset & 1)*8)) & 0xff;
 
@@ -1487,8 +1487,8 @@ READ8_MEMBER(model2_state::virtuacop_lightgun_r)
 /* handles offscreen gun trigger detection here */
 READ8_MEMBER(model2_state::virtuacop_lightgun_offscreen_r)
 {
-	UINT16 special_res = 0xfffc;
-	UINT16 p1x,p1y,p2x,p2y;
+	uint16_t special_res = 0xfffc;
+	uint16_t p1x,p1y,p2x,p2y;
 
 	p1x = m_lightgun_ports[1].read_safe(0);
 	p1y = m_lightgun_ports[0].read_safe(0);
@@ -2234,7 +2234,7 @@ WRITE16_MEMBER(model2_state::model2snd_ctrl)
 	// handle sample banking
 	if (memregion("scsp")->bytes() > 0x800000)
 	{
-		UINT8 *snd = memregion("scsp")->base();
+		uint8_t *snd = memregion("scsp")->base();
 		if (data & 0x20)
 		{
 			membank("bank4")->set_base(snd + 0x200000);
@@ -2270,7 +2270,7 @@ WRITE8_MEMBER(model2_state::scsp_irq)
 
 READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	bool type;
 	//osd_printf_debug("SHARC FIFOIN pop at %08X\n", space.device().safe_pc());
 
@@ -2354,13 +2354,13 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_NVRAM_ADD_1FILL("backup2")
 
 	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)0)
+	MCFG_TIMER_PTR((uintptr_t)0)
 	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)1)
+	MCFG_TIMER_PTR((uintptr_t)1)
 	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)2)
+	MCFG_TIMER_PTR((uintptr_t)2)
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)3)
+	MCFG_TIMER_PTR((uintptr_t)3)
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
@@ -2402,13 +2402,13 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)0)
+	MCFG_TIMER_PTR((uintptr_t)0)
 	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)1)
+	MCFG_TIMER_PTR((uintptr_t)1)
 	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)2)
+	MCFG_TIMER_PTR((uintptr_t)2)
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)3)
+	MCFG_TIMER_PTR((uintptr_t)3)
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
@@ -2436,9 +2436,9 @@ static MACHINE_CONFIG_DERIVED( manxttdx, model2a ) /* Includes a Model 1 Sound b
 	MCFG_SEGAM1AUDIO_ADD("m1audio")
 MACHINE_CONFIG_END
 
-UINT16 model2_state::crypt_read_callback(UINT32 addr)
+uint16_t model2_state::crypt_read_callback(uint32_t addr)
 {
-	UINT16 dat= m_maincpu->space().read_word((0x1d80000+2*addr));
+	uint16_t dat= m_maincpu->space().read_word((0x1d80000+2*addr));
 	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
 }
 
@@ -2519,13 +2519,13 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)0)
+	MCFG_TIMER_PTR((uintptr_t)0)
 	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)1)
+	MCFG_TIMER_PTR((uintptr_t)1)
 	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)2)
+	MCFG_TIMER_PTR((uintptr_t)2)
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)3)
+	MCFG_TIMER_PTR((uintptr_t)3)
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
@@ -2584,13 +2584,13 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)0)
+	MCFG_TIMER_PTR((uintptr_t)0)
 	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)1)
+	MCFG_TIMER_PTR((uintptr_t)1)
 	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)2)
+	MCFG_TIMER_PTR((uintptr_t)2)
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((FPTR)3)
+	MCFG_TIMER_PTR((uintptr_t)3)
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
@@ -5861,7 +5861,7 @@ DRIVER_INIT_MEMBER(model2_state,pltkids)
 	DRIVER_INIT_CALL(genprot);
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x730/4] = 0x08000004;
 }
 
@@ -5870,7 +5870,7 @@ DRIVER_INIT_MEMBER(model2_state,zerogun)
 	DRIVER_INIT_CALL(genprot);
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x700/4] = 0x08000004;
 }
 
@@ -5883,7 +5883,7 @@ DRIVER_INIT_MEMBER(model2_state,sgt24h)
 {
 //  DRIVER_INIT_CALL(genprot);
 
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
@@ -5892,7 +5892,7 @@ DRIVER_INIT_MEMBER(model2_state,doa)
 {
 	m_0229crypt->install_doa_protection();
 
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x630/4] = 0x08000004;
 	ROM[0x808/4] = 0x08000004;
 }

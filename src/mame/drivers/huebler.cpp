@@ -26,7 +26,7 @@
 
 void amu880_state::scan_keyboard()
 {
-	UINT8 data = m_key_row[m_key_a8 ? m_key_d6 : m_key_d7]->read();
+	uint8_t data = m_key_row[m_key_a8 ? m_key_d6 : m_key_d7]->read();
 
 	int a8 = (data & 0x0f) == 0x0f;
 
@@ -68,13 +68,13 @@ READ8_MEMBER( amu880_state::keyboard_r )
 
 	*/
 
-	UINT8 special = m_special->read();
+	uint8_t special = m_special->read();
 
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);
 	int ab0 = BIT(offset, 0);
 
-	UINT16 address = (ab0 << 9) | (m_key_a8 << 8) | (ctrl << 7) | (shift << 6) | (m_key_a5 << 5) | (m_key_a4 << 4) | m_key_d7;
+	uint16_t address = (ab0 << 9) | (m_key_a8 << 8) | (ctrl << 7) | (shift << 6) | (m_key_a5 << 5) | (m_key_a4 << 4) | m_key_d7;
 
 	return m_kb_rom->base()[address];
 }
@@ -209,7 +209,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-UINT32 amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y, sx, x, line;
 	const pen_t *pen = m_palette->pens();
@@ -220,11 +220,11 @@ UINT32 amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 		for (sx = 0; sx < 64; sx++)
 		{
-			UINT16 videoram_addr = ((y / 10) * 64) + sx;
-			UINT8 videoram_data = m_video_ram[videoram_addr & 0x7ff];
+			uint16_t videoram_addr = ((y / 10) * 64) + sx;
+			uint8_t videoram_data = m_video_ram[videoram_addr & 0x7ff];
 
-			UINT16 charrom_addr = ((videoram_data & 0x7f) << 3) | line;
-			UINT8 data = m_char_rom->base()[charrom_addr & 0x3ff];
+			uint16_t charrom_addr = ((videoram_data & 0x7f) << 3) | line;
+			uint8_t data = m_char_rom->base()[charrom_addr & 0x3ff];
 
 			for (x = 0; x < 6; x++)
 			{

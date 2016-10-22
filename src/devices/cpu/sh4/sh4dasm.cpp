@@ -4,8 +4,8 @@
 #include "debugger.h"
 #include "sh4.h"
 
-#define SIGNX8(x)   (((INT32)(x) << 24) >> 24)
-#define SIGNX12(x)  (((INT32)(x) << 20) >> 20)
+#define SIGNX8(x)   (((int32_t)(x) << 24) >> 24)
+#define SIGNX12(x)  (((int32_t)(x) << 20) >> 20)
 
 #define Rn ((opcode >> 8) & 15)
 #define Rm ((opcode >> 4) & 15)
@@ -15,9 +15,9 @@ static const char *const regname[16] = {
 	"R8", "R9", "R10","R11","R12","R13","R14","R15"
 };
 
-static UINT32 op0000(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op0000(char *buffer, uint32_t pc, uint16_t opcode)
 {
-	UINT32  flags = 0;
+	uint32_t  flags = 0;
 	switch (opcode & 0xF)
 	{
 	case 0x0:
@@ -143,13 +143,13 @@ static UINT32 op0000(char *buffer, UINT32 pc, UINT16 opcode)
 	return flags;
 }
 
-static UINT32 op0001(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op0001(char *buffer, uint32_t pc, uint16_t opcode)
 {
 	sprintf(buffer, "MOV.L   %s,@($%02X,%s)", regname[Rm], (opcode & 15) * 4, regname[Rn]);
 	return 0;
 }
 
-static UINT32 op0010(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op0010(char *buffer, uint32_t pc, uint16_t opcode)
 {
 	switch (opcode & 15)
 	{
@@ -205,7 +205,7 @@ static UINT32 op0010(char *buffer, UINT32 pc, UINT16 opcode)
 	return 0;
 }
 
-static UINT32 op0011(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op0011(char *buffer, uint32_t pc, uint16_t opcode)
 {
 	switch (opcode & 15)
 	{
@@ -261,9 +261,9 @@ static UINT32 op0011(char *buffer, UINT32 pc, UINT16 opcode)
 	return 0;
 }
 
-static UINT32 op0100(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op0100(char *buffer, uint32_t pc, uint16_t opcode)
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	switch (opcode & 0xF)
 	{
 	case 0x0:
@@ -463,13 +463,13 @@ static UINT32 op0100(char *buffer, UINT32 pc, UINT16 opcode)
 	return flags;
 }
 
-static UINT32 op0101(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op0101(char *buffer, uint32_t pc, uint16_t opcode)
 {
 	sprintf(buffer, "MOV.L   @($%02X,%s),%s", (opcode & 15) * 4, regname[Rm], regname[Rn]);
 	return 0;
 }
 
-static UINT32 op0110(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op0110(char *buffer, uint32_t pc, uint16_t opcode)
 
 {
 	switch(opcode & 0xF)
@@ -526,13 +526,13 @@ static UINT32 op0110(char *buffer, UINT32 pc, UINT16 opcode)
 	return 0;
 }
 
-static UINT32 op0111(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op0111(char *buffer, uint32_t pc, uint16_t opcode)
 {
 	sprintf(buffer, "ADD     #$%02X,%s", opcode & 0xff, regname[Rn]);
 	return 0;
 }
 
-static UINT32 op1000(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op1000(char *buffer, uint32_t pc, uint16_t opcode)
 {
 	switch((opcode >> 8) & 15)
 	{
@@ -569,29 +569,29 @@ static UINT32 op1000(char *buffer, UINT32 pc, UINT16 opcode)
 	return 0;
 }
 
-static UINT32 op1001(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op1001(char *buffer, uint32_t pc, uint16_t opcode)
 {
-UINT32 ea=(pc+((opcode & 0xff) * 2)+2);
+uint32_t ea=(pc+((opcode & 0xff) * 2)+2);
 
 	sprintf(buffer, "MOV.W   @($%04X,PC),%s [%08X]", (opcode & 0xff) * 2, regname[Rn], ea);
 	return 0;
 }
 
-static UINT32 op1010(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op1010(char *buffer, uint32_t pc, uint16_t opcode)
 {
 	sprintf(buffer, "BRA     $%08X", SIGNX12(opcode & 0xfff) * 2 + pc + 2);
 	return 0;
 }
 
-static UINT32 op1011(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op1011(char *buffer, uint32_t pc, uint16_t opcode)
 {
 	sprintf(buffer, "BSR     $%08X", SIGNX12(opcode & 0xfff) * 2 + pc + 2);
 	return DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 }
 
-static UINT32 op1100(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op1100(char *buffer, uint32_t pc, uint16_t opcode)
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	switch((opcode >> 8) & 15)
 	{
 	case  0:
@@ -647,21 +647,21 @@ static UINT32 op1100(char *buffer, UINT32 pc, UINT16 opcode)
 	return flags;
 }
 
-static UINT32 op1101(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op1101(char *buffer, uint32_t pc, uint16_t opcode)
 {
-UINT32 ea=((pc + 2) & ~3) + (opcode & 0xff) * 4;
+uint32_t ea=((pc + 2) & ~3) + (opcode & 0xff) * 4;
 
 	sprintf(buffer, "MOV.L   @($%04X,PC),%s [%08X]", (opcode & 0xff) * 4, regname[Rn], ea);
 	return 0;
 }
 
-static UINT32 op1110(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op1110(char *buffer, uint32_t pc, uint16_t opcode)
 {
 	sprintf(buffer, "MOV     #$%02X,%s", (opcode & 0xff), regname[Rn]);
 	return 0;
 }
 
-static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
+static uint32_t op1111(char *buffer, uint32_t pc, uint16_t opcode)
 {
 	switch (opcode & 0xf)
 	{
@@ -785,9 +785,9 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 	return 0;
 }
 
-unsigned DasmSH4(char *buffer, unsigned pc, UINT16 opcode)
+unsigned DasmSH4(char *buffer, unsigned pc, uint16_t opcode)
 {
-	UINT32 flags;
+	uint32_t flags;
 
 	pc += 2;
 

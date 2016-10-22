@@ -35,10 +35,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_steer(*this, "STEER") { }
 
-	required_shared_ptr<UINT16> m_spritemap;
-	required_shared_ptr<UINT16> m_raster_ctrl;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_sharedram;
+	required_shared_ptr<uint16_t> m_spritemap;
+	required_shared_ptr<uint16_t> m_raster_ctrl;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_sharedram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -56,19 +56,19 @@ public:
 	required_ioport m_steer;
 
 	// Misc
-	UINT16  m_cpua_ctrl;
-	INT32   m_ioc220_port;
+	uint16_t  m_cpua_ctrl;
+	int32_t   m_ioc220_port;
 
 	// ADPCM
-	UINT8   *m_msm_rom[2];
-	UINT16  m_msm_pos[2];
-	UINT8   m_msm_reset[2];
-	UINT8   m_msm_nibble[2];
-	UINT8   m_msm2_vck;
-	UINT8   m_msm2_vck2;
+	uint8_t   *m_msm_rom[2];
+	uint16_t  m_msm_pos[2];
+	uint8_t   m_msm_reset[2];
+	uint8_t   m_msm_nibble[2];
+	uint8_t   m_msm2_vck;
+	uint8_t   m_msm2_vck2;
 
 #ifdef MAME_DEBUG
-	UINT8   m_dislayer[5];
+	uint8_t   m_dislayer[5];
 #endif
 
 	// drivers/topspeed.c
@@ -91,5 +91,5 @@ public:
 
 	// video/topspeed.c
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_topspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_topspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

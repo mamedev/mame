@@ -23,7 +23,7 @@ DEVICE_ADDRESS_MAP_START(cpu_map, 32, gt64xxx_device)
 	AM_RANGE(0x00000000, 0x00000cff) AM_READWRITE(    cpu_if_r,          cpu_if_w)
 ADDRESS_MAP_END
 
-gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, GT64XXX, "Galileo GT-64XXX System Controller", tag, owner, clock, "gt64xxx", __FILE__),
 		m_be(0), m_autoconfig(0), m_irq_num(-1),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
@@ -68,10 +68,10 @@ void gt64xxx_device::device_start()
 	m_dma_timer->adjust(attotime::never, 0, DMA_TIMER_PERIOD);
 
 	// ROM
-	UINT32 romSize = m_romRegion->bytes();
+	uint32_t romSize = m_romRegion->bytes();
 	m_cpu_space->install_rom   (0x1fc00000, 0x1fc00000 + romSize - 1, m_romRegion->base());
 	// ROM MIPS DRC
-	m_cpu->add_fastram(0x1fc00000, 0x1fc00000 + romSize - 1, TRUE, m_romRegion->base());
+	m_cpu->add_fastram(0x1fc00000, 0x1fc00000 + romSize - 1, true, m_romRegion->base());
 	if (LOG_GALILEO)
 		logerror("%s: gt64xxx_device::device_start ROM Mapped size: 0x%08X start: 0x1fc00000 end: %08X\n", tag(), romSize, 0x1fc00000 + romSize - 1);
 
@@ -152,7 +152,7 @@ void gt64xxx_device::device_reset()
 
 void gt64xxx_device::map_cpu_space()
 {
-	UINT32 winStart, winEnd;
+	uint32_t winStart, winEnd;
 
 	// ROM region starts at 0x1fc00000
 	m_cpu_space->unmap_readwrite(0x00000000, 0x1fbfffff);
@@ -175,8 +175,8 @@ void gt64xxx_device::map_cpu_space()
 		winEnd = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
 		m_ram[ramIndex].resize((winEnd + 1 - winStart) / 4);
 		m_cpu_space->install_ram(winStart, winEnd, m_ram[ramIndex].data());
-		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(m_ram[ramIndex][0]), FALSE, &m_ram[ramIndex][0]);
-		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(UINT32), FALSE, m_ram[ramIndex].data());
+		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(m_ram[ramIndex][0]), false, &m_ram[ramIndex][0]);
+		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(uint32_t), false, m_ram[ramIndex].data());
 		if (LOG_GALILEO)
 			logerror("%s: map_cpu_space ras[%i] start: %08X end: %08X\n", tag(), ramIndex, winStart, winEnd);
 	}
@@ -254,11 +254,11 @@ void gt64xxx_device::map_cpu_space()
 	}
 }
 
-void gt64xxx_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+void gt64xxx_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	int ramIndex;
-	UINT32 winStart, winEnd, winSize;
+	uint32_t winStart, winEnd, winSize;
 
 	// Not sure if GREG_RAS_1_0_LO should be added on PCI address map side.
 	// RAS0
@@ -332,7 +332,7 @@ WRITE_LINE_MEMBER(gt64xxx_device::pci_stall)
 // PCI bus control
 READ32_MEMBER (gt64xxx_device::pci_config_r)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (LOG_GALILEO)
 		logerror("%06X:galileo pci_config_r from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
 	return result;
@@ -345,7 +345,7 @@ WRITE32_MEMBER (gt64xxx_device::pci_config_w)
 // PCI Master Window 0
 READ32_MEMBER (gt64xxx_device::master_mem0_r)
 {
-	UINT32 result = this->space(AS_DATA).read_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), mem_mask);
+	uint32_t result = this->space(AS_DATA).read_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), mem_mask);
 	if (LOG_PCI)
 		logerror("%06X:galileo pci mem0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), result, mem_mask);
 	return result;
@@ -372,7 +372,7 @@ WRITE32_MEMBER (gt64xxx_device::master_mem0_w)
 // PCI Master Window 1
 READ32_MEMBER (gt64xxx_device::master_mem1_r)
 {
-	UINT32 result = this->space(AS_DATA).read_dword((m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), mem_mask);
+	uint32_t result = this->space(AS_DATA).read_dword((m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), mem_mask);
 	if (LOG_PCI)
 		logerror("%06X:galileo pci mem1 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), result, mem_mask);
 	return result;
@@ -387,7 +387,7 @@ WRITE32_MEMBER (gt64xxx_device::master_mem1_w)
 // PCI Master IO
 READ32_MEMBER (gt64xxx_device::master_io_r)
 {
-	UINT32 result = this->space(AS_IO).read_dword((m_reg[GREG_PCI_IO_LO]<<21) | (offset*4), mem_mask);
+	uint32_t result = this->space(AS_IO).read_dword((m_reg[GREG_PCI_IO_LO]<<21) | (offset*4), mem_mask);
 	if (LOG_PCI && m_prev_addr != offset) {
 		m_prev_addr = offset;
 		logerror("%06X:galileo pci io read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), result, mem_mask);
@@ -405,7 +405,7 @@ WRITE32_MEMBER (gt64xxx_device::master_io_w)
 
 READ32_MEMBER(gt64xxx_device::ras_0_r)
 {
-	UINT32 result = m_ram[0][offset];
+	uint32_t result = m_ram[0][offset];
 	if (LOG_PCI)
 		logerror("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
 	return result;
@@ -420,7 +420,7 @@ WRITE32_MEMBER(gt64xxx_device::ras_0_w)
 
 READ32_MEMBER(gt64xxx_device::ras_1_r)
 {
-	UINT32 result = m_ram[1][offset];
+	uint32_t result = m_ram[1][offset];
 	if (LOG_PCI)
 		logerror("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
 	return result;
@@ -435,7 +435,7 @@ WRITE32_MEMBER(gt64xxx_device::ras_1_w)
 
 READ32_MEMBER(gt64xxx_device::ras_2_r)
 {
-	UINT32 result = m_ram[2][offset];
+	uint32_t result = m_ram[2][offset];
 	if (LOG_PCI)
 		logerror("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
 	return result;
@@ -450,7 +450,7 @@ WRITE32_MEMBER(gt64xxx_device::ras_2_w)
 
 READ32_MEMBER(gt64xxx_device::ras_3_r)
 {
-	UINT32 result = m_ram[3][offset];
+	uint32_t result = m_ram[3][offset];
 	if (LOG_PCI)
 		logerror("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
 	return result;
@@ -467,7 +467,7 @@ WRITE32_MEMBER(gt64xxx_device::ras_3_w)
 // CPU I/F
 READ32_MEMBER (gt64xxx_device::cpu_if_r)
 {
-	UINT32 result = m_reg[offset];
+	uint32_t result = m_reg[offset];
 
 	/* switch off the offset for special cases */
 	switch (offset)
@@ -483,7 +483,7 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 			result = timer->count;
 			if (timer->active)
 			{
-				UINT32 elapsed = (timer->timer->elapsed() * m_clock).as_double();
+				uint32_t elapsed = (timer->timer->elapsed() * m_clock).as_double();
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
@@ -538,7 +538,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 		mem_mask = flipendian_int32(mem_mask);
 	}
 
-	UINT32 oldata = m_reg[offset];
+	uint32_t oldata = m_reg[offset];
 	COMBINE_DATA(&m_reg[offset]);
 
 	/* switch off the offset for special cases */
@@ -639,7 +639,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 				}
 				else if (timer->active && !(data & mask))
 				{
-					UINT32 elapsed = (timer->timer->elapsed() * m_clock).as_double();
+					uint32_t elapsed = (timer->timer->elapsed() * m_clock).as_double();
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
 					timer->timer->adjust(attotime::never, which);
@@ -666,7 +666,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 		case GREG_CONFIG_ADDRESS:
 			// Type 0 config transactions signalled by Bus Num = 0 and Device Num != 0
 			// Bits 15:11 get mapped into device number for configuration
-			UINT32 modData;
+			uint32_t modData;
 			if (0 && (data & 0xff0000) == 0x0 && (data & 0xf800)) {
 				// Type 0 transaction
 				modData = 0;
@@ -756,7 +756,7 @@ TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
  *  Galileo DMA handler
  *
  *************************************/
-address_space* gt64xxx_device::dma_decode_address(UINT32 &addr)
+address_space* gt64xxx_device::dma_decode_address(uint32_t &addr)
 {
 	for (size_t index = 0; index < proc_addr_bank::ADDR_NUM; ++index)
 	{
@@ -769,7 +769,7 @@ address_space* gt64xxx_device::dma_decode_address(UINT32 &addr)
 int gt64xxx_device::dma_fetch_next(address_space &space, int which)
 {
 	offs_t address = 0;
-	UINT32 data;
+	uint32_t data;
 
 	/* no-op for unchained mode */
 	if (!(m_reg[GREG_DMA0_CONTROL + which] & 0x200))
@@ -827,7 +827,7 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 	{
 		offs_t srcaddr = m_reg[GREG_DMA0_SOURCE + which];
 		offs_t dstaddr = m_reg[GREG_DMA0_DEST + which];
-		UINT32 bytesleft = m_reg[GREG_DMA0_COUNT + which] & 0xffff;
+		uint32_t bytesleft = m_reg[GREG_DMA0_COUNT + which] & 0xffff;
 		address_space* srcSpace = dma_decode_address(srcaddr);
 		address_space* dstSpace = dma_decode_address(dstaddr);
 
@@ -867,7 +867,7 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 				m_reg[GREG_DMA0_COUNT + which] = (m_reg[GREG_DMA0_COUNT + which] & ~0xffff) | bytesleft;
 
 				m_retry_count++;
-				UINT32 configRetryCount = (m_reg[GREG_PCI_TIMEOUT] >> 16) & 0xff;
+				uint32_t configRetryCount = (m_reg[GREG_PCI_TIMEOUT] >> 16) & 0xff;
 				if (m_retry_count >= configRetryCount && configRetryCount > 0) {
 					logerror("gt64xxx_device::perform_dma Error! Too many PCI retries. DMA%d: src=%08X dst=%08X bytes=%04X sinc=%d dinc=%d\n", which, srcaddr, dstaddr, bytesleft, srcinc, dstinc);
 					// Signal error and abort DMA

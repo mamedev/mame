@@ -269,7 +269,7 @@ ROMs:
 
 const device_type SEGA_XBD_PCB = &device_creator<segaxbd_state>;
 
-segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, SEGA_XBD_PCB, "Sega X-Board PCB", tag, owner, clock, "segaxbd_pcb", __FILE__),
 			m_maincpu(*this, "maincpu"),
 			m_subcpu(*this, "subcpu"),
@@ -309,7 +309,7 @@ void segaxbd_state::device_start()
 		throw device_missing_dependencies();
 
 	// point globals to allocated memory regions
-	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
+	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
 
 	video_start();
 
@@ -412,17 +412,17 @@ public:
 
 	DECLARE_DRIVER_INIT(gprider_double);
 
-	UINT16 shareram[0x800];
-	UINT16 rampage1;
-	UINT16 rampage2;
+	uint16_t shareram[0x800];
+	uint16_t rampage1;
+	uint16_t rampage2;
 };
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-const UINT32 MASTER_CLOCK = XTAL_50MHz;
-const UINT32 SOUND_CLOCK = XTAL_16MHz;
+const uint32_t MASTER_CLOCK = XTAL_50MHz;
+const uint32_t SOUND_CLOCK = XTAL_16MHz;
 
 
 
@@ -447,7 +447,7 @@ void segaxbd_state::timer_ack_callback()
 //  sound_data_w - write data to the sound CPU
 //-------------------------------------------------
 
-void segaxbd_state::sound_data_w(UINT8 data)
+void segaxbd_state::sound_data_w(uint8_t data)
 {
 	synchronize(TID_SOUND_WRITE, data);
 }
@@ -490,9 +490,9 @@ WRITE16_MEMBER( segaxbd_state::adc_w )
 //  iochip_r - helper to handle I/O chip reads
 //-------------------------------------------------
 
-inline UINT16 segaxbd_state::iochip_r(int which, int port, int inputval)
+inline uint16_t segaxbd_state::iochip_r(int which, int port, int inputval)
 {
-	UINT16 result = m_iochip_regs[which][port];
+	uint16_t result = m_iochip_regs[which][port];
 
 	// if there's custom I/O, do that to get the input value
 	if (!m_iochip_custom_io_r[which][port].isnull())
@@ -576,7 +576,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 	data &= 0xff;
 
 	// swap in the new value and remember the previous value
-	UINT8 oldval = m_iochip_regs[0][offset];
+	uint8_t oldval = m_iochip_regs[0][offset];
 	m_iochip_regs[0][offset] = data;
 
 	// certain offsets have common effects
@@ -845,7 +845,7 @@ void segaxbd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 //  coin counters and lamps
 //-------------------------------------------------
 
-void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
+void segaxbd_state::generic_iochip0_lamps_w(uint8_t data)
 {
 	// d0: ?
 	// d3: always 0?
@@ -874,7 +874,7 @@ void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
 //  for Afterburner II
 //-------------------------------------------------
 
-UINT8 segaxbd_state::aburner2_iochip0_motor_r(UINT8 data)
+uint8_t segaxbd_state::aburner2_iochip0_motor_r(uint8_t data)
 {
 	data &= 0xc0;
 
@@ -888,7 +888,7 @@ UINT8 segaxbd_state::aburner2_iochip0_motor_r(UINT8 data)
 //  for Afterburner II
 //-------------------------------------------------
 
-void segaxbd_state::aburner2_iochip0_motor_w(UINT8 data)
+void segaxbd_state::aburner2_iochip0_motor_w(uint8_t data)
 {
 	// TODO
 }
@@ -899,7 +899,7 @@ void segaxbd_state::aburner2_iochip0_motor_w(UINT8 data)
 //  for Super Monaco GP
 //-------------------------------------------------
 
-UINT8 segaxbd_state::smgp_iochip0_motor_r(UINT8 data)
+uint8_t segaxbd_state::smgp_iochip0_motor_r(uint8_t data)
 {
 	data &= 0xc0;
 
@@ -913,7 +913,7 @@ UINT8 segaxbd_state::smgp_iochip0_motor_r(UINT8 data)
 //  for Super Monaco GP
 //-------------------------------------------------
 
-void segaxbd_state::smgp_iochip0_motor_w(UINT8 data)
+void segaxbd_state::smgp_iochip0_motor_w(uint8_t data)
 {
 	// TODO
 }
@@ -924,7 +924,7 @@ void segaxbd_state::smgp_iochip0_motor_w(UINT8 data)
 //  for Last Survivor
 //-------------------------------------------------
 
-UINT8 segaxbd_state::lastsurv_iochip1_port_r(UINT8 data)
+uint8_t segaxbd_state::lastsurv_iochip1_port_r(uint8_t data)
 {
 	return m_mux_ports[m_lastsurv_mux].read_safe(0xff);
 }
@@ -935,7 +935,7 @@ UINT8 segaxbd_state::lastsurv_iochip1_port_r(UINT8 data)
 //  for Last Survivor
 //-------------------------------------------------
 
-void segaxbd_state::lastsurv_iochip0_muxer_w(UINT8 data)
+void segaxbd_state::lastsurv_iochip0_muxer_w(uint8_t data)
 {
 	m_lastsurv_mux = (data >> 5) & 3;
 	generic_iochip0_lamps_w(data & 0x9f);
@@ -954,7 +954,7 @@ void segaxbd_state::lastsurv_iochip0_muxer_w(UINT8 data)
 
 void segaxbd_state::update_main_irqs()
 {
-	UINT8 irq = 0;
+	uint8_t irq = 0;
 
 	if (m_timer_irq_state)
 		irq |= 2;
@@ -1058,7 +1058,7 @@ WRITE16_MEMBER( segaxbd_state::paletteram_w )
 		m_palette_entries = memshare("paletteram")->bytes() / 2;
 
 	// get the new value
-	UINT16 newval = m_paletteram[offset];
+	uint16_t newval = m_paletteram[offset];
 	COMBINE_DATA(&newval);
 	m_paletteram[offset] = newval;
 
@@ -1868,7 +1868,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_REGULAR_DEVICE = &device_creator<segaxbd_regular_state>;
 
-segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -1894,7 +1894,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_FD1094_DEVICE = &device_creator<segaxbd_fd1094_state>;
 
-segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -1936,7 +1936,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_LASTSURV_FD1094_DEVICE = &device_creator<segaxbd_lastsurv_fd1094_state>;
 
-segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -1966,7 +1966,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_LASTSURV_DEVICE = &device_creator<segaxbd_lastsurv_state>;
 
-segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -2009,7 +2009,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_SMGP_FD1094_DEVICE = &device_creator<segaxbd_smgp_fd1094_state>;
 
-segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -2052,7 +2052,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_SMGP_DEVICE = &device_creator<segaxbd_smgp_state>;
 
-segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -2078,7 +2078,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_RASCOT_DEVICE = &device_creator<segaxbd_rascot_state>;
 
-segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -4788,7 +4788,7 @@ DRIVER_INIT_MEMBER(segaxbd_new_state,smgp)
 DRIVER_INIT_MEMBER(segaxbd_new_state,rascot)
 {
 	// patch out bootup link test
-	UINT16 *rom = reinterpret_cast<UINT16 *>(memregion("mainpcb:subcpu")->base());
+	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("mainpcb:subcpu")->base());
 	rom[0xb78/2] = 0x601e; // subrom checksum test
 	rom[0x57e/2] = 0x4e71;
 	rom[0x5d0/2] = 0x6008;

@@ -36,9 +36,9 @@ class m68000_base_device;
 /* ======================================================================== */
 
 /* Check for > 32bit sizes */
-#define MAKE_INT_8(A) (INT8)(A)
-#define MAKE_INT_16(A) (INT16)(A)
-#define MAKE_INT_32(A) (INT32)(A)
+#define MAKE_INT_8(A) (int8_t)(A)
+#define MAKE_INT_16(A) (int16_t)(A)
+#define MAKE_INT_32(A) (int32_t)(A)
 
 
 /* ======================================================================== */
@@ -475,7 +475,7 @@ class m68000_base_device;
 
 union fp_reg
 {
-	UINT64 i;
+	uint64_t i;
 	double f;
 };
 
@@ -489,117 +489,117 @@ public:
 
 
 
-extern const UINT8    m68ki_shift_8_table[];
-extern const UINT16   m68ki_shift_16_table[];
-extern const UINT32   m68ki_shift_32_table[];
-extern const UINT8    m68ki_exception_cycle_table[][256];
-extern const UINT8    m68ki_ea_idx_cycle_table[];
+extern const uint8_t    m68ki_shift_8_table[];
+extern const uint16_t   m68ki_shift_16_table[];
+extern const uint32_t   m68ki_shift_32_table[];
+extern const uint8_t    m68ki_exception_cycle_table[][256];
+extern const uint8_t    m68ki_ea_idx_cycle_table[];
 
 /* Read data immediately after the program counter */
-static inline UINT32 m68ki_read_imm_16(m68000_base_device *m68k);
-static inline UINT32 m68ki_read_imm_32(m68000_base_device *m68k);
+static inline uint32_t m68ki_read_imm_16(m68000_base_device *m68k);
+static inline uint32_t m68ki_read_imm_32(m68000_base_device *m68k);
 
 /* Read data with specific function code */
-static inline UINT32 m68ki_read_8_fc  (m68000_base_device *m68k, UINT32 address, UINT32 fc);
-static inline UINT32 m68ki_read_16_fc (m68000_base_device *m68k, UINT32 address, UINT32 fc);
-static inline UINT32 m68ki_read_32_fc (m68000_base_device *m68k, UINT32 address, UINT32 fc);
+static inline uint32_t m68ki_read_8_fc  (m68000_base_device *m68k, uint32_t address, uint32_t fc);
+static inline uint32_t m68ki_read_16_fc (m68000_base_device *m68k, uint32_t address, uint32_t fc);
+static inline uint32_t m68ki_read_32_fc (m68000_base_device *m68k, uint32_t address, uint32_t fc);
 
 /* Write data with specific function code */
-static inline void m68ki_write_8_fc (m68000_base_device *m68k, UINT32 address, UINT32 fc, UINT32 value);
-static inline void m68ki_write_16_fc(m68000_base_device *m68k, UINT32 address, UINT32 fc, UINT32 value);
-static inline void m68ki_write_32_fc(m68000_base_device *m68k, UINT32 address, UINT32 fc, UINT32 value);
-static inline void m68ki_write_32_pd_fc(m68000_base_device *m68k, UINT32 address, UINT32 fc, UINT32 value);
+static inline void m68ki_write_8_fc (m68000_base_device *m68k, uint32_t address, uint32_t fc, uint32_t value);
+static inline void m68ki_write_16_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc, uint32_t value);
+static inline void m68ki_write_32_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc, uint32_t value);
+static inline void m68ki_write_32_pd_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc, uint32_t value);
 
 /* Indexed and PC-relative ea fetching */
-static inline UINT32 m68ki_get_ea_pcdi(m68000_base_device *m68k);
-static inline UINT32 m68ki_get_ea_pcix(m68000_base_device *m68k);
-static inline UINT32 m68ki_get_ea_ix(m68000_base_device *m68k, UINT32 An);
+static inline uint32_t m68ki_get_ea_pcdi(m68000_base_device *m68k);
+static inline uint32_t m68ki_get_ea_pcix(m68000_base_device *m68k);
+static inline uint32_t m68ki_get_ea_ix(m68000_base_device *m68k, uint32_t An);
 
 /* Operand fetching */
-static inline UINT32 OPER_AY_AI_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_AI_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_AI_32(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_PI_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_PI_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_PI_32(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_PD_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_PD_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_PD_32(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_DI_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_DI_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_DI_32(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_IX_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_IX_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AY_IX_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_AI_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_AI_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_AI_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_PI_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_PI_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_PI_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_PD_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_PD_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_PD_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_DI_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_DI_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_DI_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_IX_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_IX_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AY_IX_32(m68000_base_device *m68k);
 
-static inline UINT32 OPER_AX_AI_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_AI_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_AI_32(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_PI_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_PI_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_PI_32(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_PD_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_PD_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_PD_32(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_DI_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_DI_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_DI_32(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_IX_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_IX_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AX_IX_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_AI_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_AI_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_AI_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_PI_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_PI_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_PI_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_PD_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_PD_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_PD_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_DI_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_DI_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_DI_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_IX_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_IX_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AX_IX_32(m68000_base_device *m68k);
 
-static inline UINT32 OPER_A7_PI_8(m68000_base_device *m68k);
-static inline UINT32 OPER_A7_PD_8(m68000_base_device *m68k);
+static inline uint32_t OPER_A7_PI_8(m68000_base_device *m68k);
+static inline uint32_t OPER_A7_PD_8(m68000_base_device *m68k);
 
-static inline UINT32 OPER_AW_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AW_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AW_32(m68000_base_device *m68k);
-static inline UINT32 OPER_AL_8(m68000_base_device *m68k);
-static inline UINT32 OPER_AL_16(m68000_base_device *m68k);
-static inline UINT32 OPER_AL_32(m68000_base_device *m68k);
-static inline UINT32 OPER_PCDI_8(m68000_base_device *m68k);
-static inline UINT32 OPER_PCDI_16(m68000_base_device *m68k);
-static inline UINT32 OPER_PCDI_32(m68000_base_device *m68k);
-static inline UINT32 OPER_PCIX_8(m68000_base_device *m68k);
-static inline UINT32 OPER_PCIX_16(m68000_base_device *m68k);
-static inline UINT32 OPER_PCIX_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AW_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AW_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AW_32(m68000_base_device *m68k);
+static inline uint32_t OPER_AL_8(m68000_base_device *m68k);
+static inline uint32_t OPER_AL_16(m68000_base_device *m68k);
+static inline uint32_t OPER_AL_32(m68000_base_device *m68k);
+static inline uint32_t OPER_PCDI_8(m68000_base_device *m68k);
+static inline uint32_t OPER_PCDI_16(m68000_base_device *m68k);
+static inline uint32_t OPER_PCDI_32(m68000_base_device *m68k);
+static inline uint32_t OPER_PCIX_8(m68000_base_device *m68k);
+static inline uint32_t OPER_PCIX_16(m68000_base_device *m68k);
+static inline uint32_t OPER_PCIX_32(m68000_base_device *m68k);
 
 /* Stack operations */
-static inline void m68ki_push_16(m68000_base_device *m68k, UINT32 value);
-static inline void m68ki_push_32(m68000_base_device *m68k, UINT32 value);
-static inline UINT32 m68ki_pull_16(m68000_base_device *m68k);
-static inline UINT32 m68ki_pull_32(m68000_base_device *m68k);
+static inline void m68ki_push_16(m68000_base_device *m68k, uint32_t value);
+static inline void m68ki_push_32(m68000_base_device *m68k, uint32_t value);
+static inline uint32_t m68ki_pull_16(m68000_base_device *m68k);
+static inline uint32_t m68ki_pull_32(m68000_base_device *m68k);
 
 /* Program flow operations */
-static inline void m68ki_jump(m68000_base_device *m68k, UINT32 new_pc);
-static inline void m68ki_jump_vector(m68000_base_device *m68k, UINT32 vector);
-static inline void m68ki_branch_8(m68000_base_device *m68k, UINT32 offset);
-static inline void m68ki_branch_16(m68000_base_device *m68k, UINT32 offset);
-static inline void m68ki_branch_32(m68000_base_device *m68k, UINT32 offset);
+static inline void m68ki_jump(m68000_base_device *m68k, uint32_t new_pc);
+static inline void m68ki_jump_vector(m68000_base_device *m68k, uint32_t vector);
+static inline void m68ki_branch_8(m68000_base_device *m68k, uint32_t offset);
+static inline void m68ki_branch_16(m68000_base_device *m68k, uint32_t offset);
+static inline void m68ki_branch_32(m68000_base_device *m68k, uint32_t offset);
 
 /* Status register operations. */
-static inline void m68ki_set_s_flag(m68000_base_device *m68k, UINT32 value);            /* Only bit 2 of value should be set (i.e. 4 or 0) */
-static inline void m68ki_set_sm_flag(m68000_base_device *m68k, UINT32 value);           /* only bits 1 and 2 of value should be set */
-static inline void m68ki_set_ccr(m68000_base_device *m68k, UINT32 value);               /* set the condition code register */
-static inline void m68ki_set_sr(m68000_base_device *m68k, UINT32 value);                /* set the status register */
-static inline void m68ki_set_sr_noint(m68000_base_device *m68k, UINT32 value);          /* set the status register */
+static inline void m68ki_set_s_flag(m68000_base_device *m68k, uint32_t value);            /* Only bit 2 of value should be set (i.e. 4 or 0) */
+static inline void m68ki_set_sm_flag(m68000_base_device *m68k, uint32_t value);           /* only bits 1 and 2 of value should be set */
+static inline void m68ki_set_ccr(m68000_base_device *m68k, uint32_t value);               /* set the condition code register */
+static inline void m68ki_set_sr(m68000_base_device *m68k, uint32_t value);                /* set the status register */
+static inline void m68ki_set_sr_noint(m68000_base_device *m68k, uint32_t value);          /* set the status register */
 
 /* Exception processing */
-static inline UINT32 m68ki_init_exception(m68000_base_device *m68k);              /* Initial exception processing */
+static inline uint32_t m68ki_init_exception(m68000_base_device *m68k);              /* Initial exception processing */
 
-static inline void m68ki_stack_frame_3word(m68000_base_device *m68k, UINT32 pc, UINT32 sr); /* Stack various frame types */
-static inline void m68ki_stack_frame_buserr(m68000_base_device *m68k, UINT32 sr);
+static inline void m68ki_stack_frame_3word(m68000_base_device *m68k, uint32_t pc, uint32_t sr); /* Stack various frame types */
+static inline void m68ki_stack_frame_buserr(m68000_base_device *m68k, uint32_t sr);
 
-static inline void m68ki_stack_frame_0000(m68000_base_device *m68k, UINT32 pc, UINT32 sr, UINT32 vector);
-static inline void m68ki_stack_frame_0001(m68000_base_device *m68k, UINT32 pc, UINT32 sr, UINT32 vector);
-static inline void m68ki_stack_frame_0010(m68000_base_device *m68k, UINT32 sr, UINT32 vector);
-static inline void m68ki_stack_frame_1000(m68000_base_device *m68k, UINT32 pc, UINT32 sr, UINT32 vector);
-static inline void m68ki_stack_frame_1010(m68000_base_device *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address);
-static inline void m68ki_stack_frame_1011(m68000_base_device *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address);
-static inline void m68ki_stack_frame_0111(m68000_base_device *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address, bool in_mmu);
+static inline void m68ki_stack_frame_0000(m68000_base_device *m68k, uint32_t pc, uint32_t sr, uint32_t vector);
+static inline void m68ki_stack_frame_0001(m68000_base_device *m68k, uint32_t pc, uint32_t sr, uint32_t vector);
+static inline void m68ki_stack_frame_0010(m68000_base_device *m68k, uint32_t sr, uint32_t vector);
+static inline void m68ki_stack_frame_1000(m68000_base_device *m68k, uint32_t pc, uint32_t sr, uint32_t vector);
+static inline void m68ki_stack_frame_1010(m68000_base_device *m68k, uint32_t sr, uint32_t vector, uint32_t pc, uint32_t fault_address);
+static inline void m68ki_stack_frame_1011(m68000_base_device *m68k, uint32_t sr, uint32_t vector, uint32_t pc, uint32_t fault_address);
+static inline void m68ki_stack_frame_0111(m68000_base_device *m68k, uint32_t sr, uint32_t vector, uint32_t pc, uint32_t fault_address, bool in_mmu);
 
-static inline void m68ki_exception_trap(m68000_base_device *m68k, UINT32 vector);
-static inline void m68ki_exception_trapN(m68000_base_device *m68k, UINT32 vector);
+static inline void m68ki_exception_trap(m68000_base_device *m68k, uint32_t vector);
+static inline void m68ki_exception_trapN(m68000_base_device *m68k, uint32_t vector);
 static inline void m68ki_exception_trace(m68000_base_device *m68k);
 static inline void m68ki_exception_privilege_violation(m68000_base_device *m68k);
 static inline void m68ki_exception_1010(m68000_base_device *m68k);
@@ -676,20 +676,20 @@ static inline void m68ki_ic_clear(m68000_base_device *m68k)
 
 // read immediate word using the instruction cache
 
-static inline UINT32 m68ki_ic_readimm16(m68000_base_device *m68k, UINT32 address)
+static inline uint32_t m68ki_ic_readimm16(m68000_base_device *m68k, uint32_t address)
 {
 	if (m68k->cacr & M68K_CACR_EI)
 	{
 		// 68020 series I-cache (MC68020 User's Manual, Section 4 - On-Chip Cache Memory)
 		if (m68k->cpu_type & (CPU_TYPE_EC020 | CPU_TYPE_020))
 		{
-			UINT32 tag = (address >> 8) | (m68k->s_flag ? 0x1000000 : 0);
+			uint32_t tag = (address >> 8) | (m68k->s_flag ? 0x1000000 : 0);
 			int idx = (address >> 2) & 0x3f;    // 1-of-64 select
 
 			// do a cache fill if the line is invalid or the tags don't match
 			if ((!m68k->ic_valid[idx]) || (m68k->ic_address[idx] != tag))
 			{
-				UINT32 data = m68k->read32(address & ~3);
+				uint32_t data = m68k->read32(address & ~3);
 
 //              printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
 
@@ -725,9 +725,9 @@ static inline UINT32 m68ki_ic_readimm16(m68000_base_device *m68k, UINT32 address
 /* Handles all immediate reads, does address error check, function code setting,
  * and prefetching if they are enabled in m68kconf.h
  */
-static inline UINT32 m68ki_read_imm_16(m68000_base_device *m68k)
+static inline uint32_t m68ki_read_imm_16(m68000_base_device *m68k)
 {
-	UINT32 result;
+	uint32_t result;
 
 	m68k->mmu_tmp_fc = m68k->s_flag | FUNCTION_CODE_USER_PROGRAM;
 	m68k->mmu_tmp_rw = 1;
@@ -752,9 +752,9 @@ static inline UINT32 m68ki_read_imm_16(m68000_base_device *m68k)
 	return result;
 }
 
-static inline UINT32 m68ki_read_imm_32(m68000_base_device *m68k)
+static inline uint32_t m68ki_read_imm_32(m68000_base_device *m68k)
 {
-	UINT32 temp_val;
+	uint32_t temp_val;
 
 	m68k->mmu_tmp_fc = m68k->s_flag | FUNCTION_CODE_USER_PROGRAM;
 	m68k->mmu_tmp_rw = 1;
@@ -789,13 +789,13 @@ static inline UINT32 m68ki_read_imm_32(m68000_base_device *m68k)
  * These functions will also check for address error and set the function
  * code if they are enabled in m68kconf.h.
  */
-static inline UINT32 m68ki_read_8_fc(m68000_base_device *m68k, UINT32 address, UINT32 fc)
+static inline uint32_t m68ki_read_8_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc)
 {
 	m68k->mmu_tmp_fc = fc;
 	m68k->mmu_tmp_rw = 1;
 	return m68k->/*memory.*/read8(address);
 }
-static inline UINT32 m68ki_read_16_fc(m68000_base_device *m68k, UINT32 address, UINT32 fc)
+static inline uint32_t m68ki_read_16_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc)
 {
 	if (CPU_TYPE_IS_010_LESS(m68k->cpu_type))
 	{
@@ -805,7 +805,7 @@ static inline UINT32 m68ki_read_16_fc(m68000_base_device *m68k, UINT32 address, 
 	m68k->mmu_tmp_rw = 1;
 	return m68k->/*memory.*/read16(address);
 }
-static inline UINT32 m68ki_read_32_fc(m68000_base_device *m68k, UINT32 address, UINT32 fc)
+static inline uint32_t m68ki_read_32_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc)
 {
 	if (CPU_TYPE_IS_010_LESS(m68k->cpu_type))
 	{
@@ -816,13 +816,13 @@ static inline UINT32 m68ki_read_32_fc(m68000_base_device *m68k, UINT32 address, 
 	return m68k->/*memory.*/read32(address);
 }
 
-static inline void m68ki_write_8_fc(m68000_base_device *m68k, UINT32 address, UINT32 fc, UINT32 value)
+static inline void m68ki_write_8_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc, uint32_t value)
 {
 	m68k->mmu_tmp_fc = fc;
 	m68k->mmu_tmp_rw = 0;
 	m68k->/*memory.*/write8(address, value);
 }
-static inline void m68ki_write_16_fc(m68000_base_device *m68k, UINT32 address, UINT32 fc, UINT32 value)
+static inline void m68ki_write_16_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc, uint32_t value)
 {
 	if (CPU_TYPE_IS_010_LESS(m68k->cpu_type))
 	{
@@ -832,7 +832,7 @@ static inline void m68ki_write_16_fc(m68000_base_device *m68k, UINT32 address, U
 	m68k->mmu_tmp_rw = 0;
 	m68k->/*memory.*/write16(address, value);
 }
-static inline void m68ki_write_32_fc(m68000_base_device *m68k, UINT32 address, UINT32 fc, UINT32 value)
+static inline void m68ki_write_32_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc, uint32_t value)
 {
 	if (CPU_TYPE_IS_010_LESS(m68k->cpu_type))
 	{
@@ -848,7 +848,7 @@ static inline void m68ki_write_32_fc(m68000_base_device *m68k, UINT32 address, U
  * A real 68k first writes the high word to [address+2], and then writes the
  * low word to [address].
  */
-static inline void m68ki_write_32_pd_fc(m68000_base_device *m68k, UINT32 address, UINT32 fc, UINT32 value)
+static inline void m68ki_write_32_pd_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc, uint32_t value)
 {
 	if (CPU_TYPE_IS_010_LESS(m68k->cpu_type))
 	{
@@ -866,14 +866,14 @@ static inline void m68ki_write_32_pd_fc(m68000_base_device *m68k, UINT32 address
 /* The program counter relative addressing modes cause operands to be
  * retrieved from program space, not data space.
  */
-static inline UINT32 m68ki_get_ea_pcdi(m68000_base_device *m68k)
+static inline uint32_t m68ki_get_ea_pcdi(m68000_base_device *m68k)
 {
-	UINT32 old_pc = REG_PC(m68k);
+	uint32_t old_pc = REG_PC(m68k);
 	return old_pc + MAKE_INT_16(m68ki_read_imm_16(m68k));
 }
 
 
-static inline UINT32 m68ki_get_ea_pcix(m68000_base_device *m68k)
+static inline uint32_t m68ki_get_ea_pcix(m68000_base_device *m68k)
 {
 	return m68ki_get_ea_ix(m68k, REG_PC(m68k));
 }
@@ -920,13 +920,13 @@ static inline UINT32 m68ki_get_ea_pcix(m68000_base_device *m68k)
  * 1  011  mem indir with long outer
  * 1  100-111  reserved
  */
-static inline UINT32 m68ki_get_ea_ix(m68000_base_device *m68k, UINT32 An)
+static inline uint32_t m68ki_get_ea_ix(m68000_base_device *m68k, uint32_t An)
 {
 	/* An = base register */
-	UINT32 extension = m68ki_read_imm_16(m68k);
-	UINT32 Xn = 0;                        /* Index register */
-	UINT32 bd = 0;                        /* Base Displacement */
-	UINT32 od = 0;                        /* Outer Displacement */
+	uint32_t extension = m68ki_read_imm_16(m68k);
+	uint32_t Xn = 0;                        /* Index register */
+	uint32_t bd = 0;                        /* Base Displacement */
+	uint32_t od = 0;                        /* Outer Displacement */
 
 	if(CPU_TYPE_IS_010_LESS(m68k->cpu_type))
 	{
@@ -993,78 +993,78 @@ static inline UINT32 m68ki_get_ea_ix(m68000_base_device *m68k, UINT32 An)
 
 
 /* Fetch operands */
-static inline UINT32 OPER_AY_AI_8(m68000_base_device *m68k)  {UINT32 ea = EA_AY_AI_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AY_AI_16(m68000_base_device *m68k) {UINT32 ea = EA_AY_AI_16(m68k); return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AY_AI_32(m68000_base_device *m68k) {UINT32 ea = EA_AY_AI_32(m68k); return m68ki_read_32(m68k, ea);}
-static inline UINT32 OPER_AY_PI_8(m68000_base_device *m68k)  {UINT32 ea = EA_AY_PI_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AY_PI_16(m68000_base_device *m68k) {UINT32 ea = EA_AY_PI_16(m68k); return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AY_PI_32(m68000_base_device *m68k) {UINT32 ea = EA_AY_PI_32(m68k); return m68ki_read_32(m68k, ea);}
-static inline UINT32 OPER_AY_PD_8(m68000_base_device *m68k)  {UINT32 ea = EA_AY_PD_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AY_PD_16(m68000_base_device *m68k) {UINT32 ea = EA_AY_PD_16(m68k); return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AY_PD_32(m68000_base_device *m68k) {UINT32 ea = EA_AY_PD_32(m68k); return m68ki_read_32(m68k, ea);}
-static inline UINT32 OPER_AY_DI_8(m68000_base_device *m68k)  {UINT32 ea = EA_AY_DI_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AY_DI_16(m68000_base_device *m68k) {UINT32 ea = EA_AY_DI_16(m68k); return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AY_DI_32(m68000_base_device *m68k) {UINT32 ea = EA_AY_DI_32(m68k); return m68ki_read_32(m68k, ea);}
-static inline UINT32 OPER_AY_IX_8(m68000_base_device *m68k)  {UINT32 ea = EA_AY_IX_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AY_IX_16(m68000_base_device *m68k) {UINT32 ea = EA_AY_IX_16(m68k); return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AY_IX_32(m68000_base_device *m68k) {UINT32 ea = EA_AY_IX_32(m68k); return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AY_AI_8(m68000_base_device *m68k)  {uint32_t ea = EA_AY_AI_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AY_AI_16(m68000_base_device *m68k) {uint32_t ea = EA_AY_AI_16(m68k); return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AY_AI_32(m68000_base_device *m68k) {uint32_t ea = EA_AY_AI_32(m68k); return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AY_PI_8(m68000_base_device *m68k)  {uint32_t ea = EA_AY_PI_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AY_PI_16(m68000_base_device *m68k) {uint32_t ea = EA_AY_PI_16(m68k); return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AY_PI_32(m68000_base_device *m68k) {uint32_t ea = EA_AY_PI_32(m68k); return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AY_PD_8(m68000_base_device *m68k)  {uint32_t ea = EA_AY_PD_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AY_PD_16(m68000_base_device *m68k) {uint32_t ea = EA_AY_PD_16(m68k); return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AY_PD_32(m68000_base_device *m68k) {uint32_t ea = EA_AY_PD_32(m68k); return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AY_DI_8(m68000_base_device *m68k)  {uint32_t ea = EA_AY_DI_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AY_DI_16(m68000_base_device *m68k) {uint32_t ea = EA_AY_DI_16(m68k); return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AY_DI_32(m68000_base_device *m68k) {uint32_t ea = EA_AY_DI_32(m68k); return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AY_IX_8(m68000_base_device *m68k)  {uint32_t ea = EA_AY_IX_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AY_IX_16(m68000_base_device *m68k) {uint32_t ea = EA_AY_IX_16(m68k); return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AY_IX_32(m68000_base_device *m68k) {uint32_t ea = EA_AY_IX_32(m68k); return m68ki_read_32(m68k, ea);}
 
-static inline UINT32 OPER_AX_AI_8(m68000_base_device *m68k)  {UINT32 ea = EA_AX_AI_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AX_AI_16(m68000_base_device *m68k) {UINT32 ea = EA_AX_AI_16(m68k); return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AX_AI_32(m68000_base_device *m68k) {UINT32 ea = EA_AX_AI_32(m68k); return m68ki_read_32(m68k, ea);}
-static inline UINT32 OPER_AX_PI_8(m68000_base_device *m68k)  {UINT32 ea = EA_AX_PI_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AX_PI_16(m68000_base_device *m68k) {UINT32 ea = EA_AX_PI_16(m68k); return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AX_PI_32(m68000_base_device *m68k) {UINT32 ea = EA_AX_PI_32(m68k); return m68ki_read_32(m68k, ea);}
-static inline UINT32 OPER_AX_PD_8(m68000_base_device *m68k)  {UINT32 ea = EA_AX_PD_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AX_PD_16(m68000_base_device *m68k) {UINT32 ea = EA_AX_PD_16(m68k); return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AX_PD_32(m68000_base_device *m68k) {UINT32 ea = EA_AX_PD_32(m68k); return m68ki_read_32(m68k, ea);}
-static inline UINT32 OPER_AX_DI_8(m68000_base_device *m68k)  {UINT32 ea = EA_AX_DI_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AX_DI_16(m68000_base_device *m68k) {UINT32 ea = EA_AX_DI_16(m68k); return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AX_DI_32(m68000_base_device *m68k) {UINT32 ea = EA_AX_DI_32(m68k); return m68ki_read_32(m68k, ea);}
-static inline UINT32 OPER_AX_IX_8(m68000_base_device *m68k)  {UINT32 ea = EA_AX_IX_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AX_IX_16(m68000_base_device *m68k) {UINT32 ea = EA_AX_IX_16(m68k); return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AX_IX_32(m68000_base_device *m68k) {UINT32 ea = EA_AX_IX_32(m68k); return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AX_AI_8(m68000_base_device *m68k)  {uint32_t ea = EA_AX_AI_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AX_AI_16(m68000_base_device *m68k) {uint32_t ea = EA_AX_AI_16(m68k); return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AX_AI_32(m68000_base_device *m68k) {uint32_t ea = EA_AX_AI_32(m68k); return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AX_PI_8(m68000_base_device *m68k)  {uint32_t ea = EA_AX_PI_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AX_PI_16(m68000_base_device *m68k) {uint32_t ea = EA_AX_PI_16(m68k); return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AX_PI_32(m68000_base_device *m68k) {uint32_t ea = EA_AX_PI_32(m68k); return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AX_PD_8(m68000_base_device *m68k)  {uint32_t ea = EA_AX_PD_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AX_PD_16(m68000_base_device *m68k) {uint32_t ea = EA_AX_PD_16(m68k); return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AX_PD_32(m68000_base_device *m68k) {uint32_t ea = EA_AX_PD_32(m68k); return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AX_DI_8(m68000_base_device *m68k)  {uint32_t ea = EA_AX_DI_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AX_DI_16(m68000_base_device *m68k) {uint32_t ea = EA_AX_DI_16(m68k); return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AX_DI_32(m68000_base_device *m68k) {uint32_t ea = EA_AX_DI_32(m68k); return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AX_IX_8(m68000_base_device *m68k)  {uint32_t ea = EA_AX_IX_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AX_IX_16(m68000_base_device *m68k) {uint32_t ea = EA_AX_IX_16(m68k); return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AX_IX_32(m68000_base_device *m68k) {uint32_t ea = EA_AX_IX_32(m68k); return m68ki_read_32(m68k, ea);}
 
-static inline UINT32 OPER_A7_PI_8(m68000_base_device *m68k)  {UINT32 ea = EA_A7_PI_8(m68k);  return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_A7_PD_8(m68000_base_device *m68k)  {UINT32 ea = EA_A7_PD_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_A7_PI_8(m68000_base_device *m68k)  {uint32_t ea = EA_A7_PI_8(m68k);  return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_A7_PD_8(m68000_base_device *m68k)  {uint32_t ea = EA_A7_PD_8(m68k);  return m68ki_read_8(m68k, ea); }
 
-static inline UINT32 OPER_AW_8(m68000_base_device *m68k)     {UINT32 ea = EA_AW_8(m68k);     return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AW_16(m68000_base_device *m68k)    {UINT32 ea = EA_AW_16(m68k);    return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AW_32(m68000_base_device *m68k)    {UINT32 ea = EA_AW_32(m68k);    return m68ki_read_32(m68k, ea);}
-static inline UINT32 OPER_AL_8(m68000_base_device *m68k)     {UINT32 ea = EA_AL_8(m68k);     return m68ki_read_8(m68k, ea); }
-static inline UINT32 OPER_AL_16(m68000_base_device *m68k)    {UINT32 ea = EA_AL_16(m68k);    return m68ki_read_16(m68k, ea);}
-static inline UINT32 OPER_AL_32(m68000_base_device *m68k)    {UINT32 ea = EA_AL_32(m68k);    return m68ki_read_32(m68k, ea);}
-static inline UINT32 OPER_PCDI_8(m68000_base_device *m68k)   {UINT32 ea = EA_PCDI_8(m68k);   return m68ki_read_pcrel_8(m68k, ea); }
-static inline UINT32 OPER_PCDI_16(m68000_base_device *m68k)  {UINT32 ea = EA_PCDI_16(m68k);  return m68ki_read_pcrel_16(m68k, ea);}
-static inline UINT32 OPER_PCDI_32(m68000_base_device *m68k)  {UINT32 ea = EA_PCDI_32(m68k);  return m68ki_read_pcrel_32(m68k, ea);}
-static inline UINT32 OPER_PCIX_8(m68000_base_device *m68k)   {UINT32 ea = EA_PCIX_8(m68k);   return m68ki_read_pcrel_8(m68k, ea); }
-static inline UINT32 OPER_PCIX_16(m68000_base_device *m68k)  {UINT32 ea = EA_PCIX_16(m68k);  return m68ki_read_pcrel_16(m68k, ea);}
-static inline UINT32 OPER_PCIX_32(m68000_base_device *m68k)  {UINT32 ea = EA_PCIX_32(m68k);  return m68ki_read_pcrel_32(m68k, ea);}
+static inline uint32_t OPER_AW_8(m68000_base_device *m68k)     {uint32_t ea = EA_AW_8(m68k);     return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AW_16(m68000_base_device *m68k)    {uint32_t ea = EA_AW_16(m68k);    return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AW_32(m68000_base_device *m68k)    {uint32_t ea = EA_AW_32(m68k);    return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_AL_8(m68000_base_device *m68k)     {uint32_t ea = EA_AL_8(m68k);     return m68ki_read_8(m68k, ea); }
+static inline uint32_t OPER_AL_16(m68000_base_device *m68k)    {uint32_t ea = EA_AL_16(m68k);    return m68ki_read_16(m68k, ea);}
+static inline uint32_t OPER_AL_32(m68000_base_device *m68k)    {uint32_t ea = EA_AL_32(m68k);    return m68ki_read_32(m68k, ea);}
+static inline uint32_t OPER_PCDI_8(m68000_base_device *m68k)   {uint32_t ea = EA_PCDI_8(m68k);   return m68ki_read_pcrel_8(m68k, ea); }
+static inline uint32_t OPER_PCDI_16(m68000_base_device *m68k)  {uint32_t ea = EA_PCDI_16(m68k);  return m68ki_read_pcrel_16(m68k, ea);}
+static inline uint32_t OPER_PCDI_32(m68000_base_device *m68k)  {uint32_t ea = EA_PCDI_32(m68k);  return m68ki_read_pcrel_32(m68k, ea);}
+static inline uint32_t OPER_PCIX_8(m68000_base_device *m68k)   {uint32_t ea = EA_PCIX_8(m68k);   return m68ki_read_pcrel_8(m68k, ea); }
+static inline uint32_t OPER_PCIX_16(m68000_base_device *m68k)  {uint32_t ea = EA_PCIX_16(m68k);  return m68ki_read_pcrel_16(m68k, ea);}
+static inline uint32_t OPER_PCIX_32(m68000_base_device *m68k)  {uint32_t ea = EA_PCIX_32(m68k);  return m68ki_read_pcrel_32(m68k, ea);}
 
 
 
 /* ---------------------------- Stack Functions --------------------------- */
 
 /* Push/pull data from the stack */
-static inline void m68ki_push_16(m68000_base_device *m68k, UINT32 value)
+static inline void m68ki_push_16(m68000_base_device *m68k, uint32_t value)
 {
 	REG_SP(m68k) = MASK_OUT_ABOVE_32(REG_SP(m68k) - 2);
 	m68ki_write_16(m68k, REG_SP(m68k), value);
 }
 
-static inline void m68ki_push_32(m68000_base_device *m68k, UINT32 value)
+static inline void m68ki_push_32(m68000_base_device *m68k, uint32_t value)
 {
 	REG_SP(m68k) = MASK_OUT_ABOVE_32(REG_SP(m68k) - 4);
 	m68ki_write_32(m68k, REG_SP(m68k), value);
 }
 
-static inline UINT32 m68ki_pull_16(m68000_base_device *m68k)
+static inline uint32_t m68ki_pull_16(m68000_base_device *m68k)
 {
 	REG_SP(m68k) = MASK_OUT_ABOVE_32(REG_SP(m68k) + 2);
 	return m68ki_read_16(m68k, REG_SP(m68k)-2);
 }
 
-static inline UINT32 m68ki_pull_32(m68000_base_device *m68k)
+static inline uint32_t m68ki_pull_32(m68000_base_device *m68k)
 {
 	REG_SP(m68k) = MASK_OUT_ABOVE_32(REG_SP(m68k) + 4);
 	return m68ki_read_32(m68k, REG_SP(m68k)-4);
@@ -1101,12 +1101,12 @@ static inline void m68ki_fake_pull_32(m68000_base_device *m68k)
  * These functions will also call the pc_changed callback if it was enabled
  * in m68kconf.h.
  */
-static inline void m68ki_jump(m68000_base_device *m68k, UINT32 new_pc)
+static inline void m68ki_jump(m68000_base_device *m68k, uint32_t new_pc)
 {
 	REG_PC(m68k) = new_pc;
 }
 
-static inline void m68ki_jump_vector(m68000_base_device *m68k, UINT32 vector)
+static inline void m68ki_jump_vector(m68000_base_device *m68k, uint32_t vector)
 {
 	REG_PC(m68k) = (vector<<2) + m68k->vbr;
 	REG_PC(m68k) = m68ki_read_data_32(m68k, REG_PC(m68k));
@@ -1118,17 +1118,17 @@ static inline void m68ki_jump_vector(m68000_base_device *m68k, UINT32 vector)
  * So far I've found no problems with not calling pc_changed for 8 or 16
  * bit branches.
  */
-static inline void m68ki_branch_8(m68000_base_device *m68k, UINT32 offset)
+static inline void m68ki_branch_8(m68000_base_device *m68k, uint32_t offset)
 {
 	REG_PC(m68k) += MAKE_INT_8(offset);
 }
 
-static inline void m68ki_branch_16(m68000_base_device *m68k, UINT32 offset)
+static inline void m68ki_branch_16(m68000_base_device *m68k, uint32_t offset)
 {
 	REG_PC(m68k) += MAKE_INT_16(offset);
 }
 
-static inline void m68ki_branch_32(m68000_base_device *m68k, UINT32 offset)
+static inline void m68ki_branch_32(m68000_base_device *m68k, uint32_t offset)
 {
 	REG_PC(m68k) += offset;
 }
@@ -1140,7 +1140,7 @@ static inline void m68ki_branch_32(m68000_base_device *m68k, UINT32 offset)
 /* Set the S flag and change the active stack pointer.
  * Note that value MUST be 4 or 0.
  */
-static inline void m68ki_set_s_flag(m68000_base_device *m68k, UINT32 value)
+static inline void m68ki_set_s_flag(m68000_base_device *m68k, uint32_t value)
 {
 	/* Backup the old stack pointer */
 	REG_SP_BASE(m68k)[m68k->s_flag | ((m68k->s_flag>>1) & m68k->m_flag)] = REG_SP(m68k);
@@ -1153,7 +1153,7 @@ static inline void m68ki_set_s_flag(m68000_base_device *m68k, UINT32 value)
 /* Set the S and M flags and change the active stack pointer.
  * Note that value MUST be 0, 2, 4, or 6 (bit2 = S, bit1 = M).
  */
-static inline void m68ki_set_sm_flag(m68000_base_device *m68k, UINT32 value)
+static inline void m68ki_set_sm_flag(m68000_base_device *m68k, uint32_t value)
 {
 	/* Backup the old stack pointer */
 	REG_SP_BASE(m68k)[m68k->s_flag | ((m68k->s_flag>>1) & m68k->m_flag)] = REG_SP(m68k);
@@ -1165,7 +1165,7 @@ static inline void m68ki_set_sm_flag(m68000_base_device *m68k, UINT32 value)
 }
 
 /* Set the S and M flags.  Don't touch the stack pointer. */
-static inline void m68ki_set_sm_flag_nosp(m68000_base_device *m68k, UINT32 value)
+static inline void m68ki_set_sm_flag_nosp(m68000_base_device *m68k, uint32_t value)
 {
 	/* Set the S and M flags */
 	m68k->s_flag = value & SFLAG_SET;
@@ -1174,7 +1174,7 @@ static inline void m68ki_set_sm_flag_nosp(m68000_base_device *m68k, UINT32 value
 
 
 /* Set the condition code register */
-static inline void m68ki_set_ccr(m68000_base_device *m68k, UINT32 value)
+static inline void m68ki_set_ccr(m68000_base_device *m68k, uint32_t value)
 {
 	m68k->x_flag = BIT_4(value)  << 4;
 	m68k->n_flag = BIT_3(value)  << 4;
@@ -1184,7 +1184,7 @@ static inline void m68ki_set_ccr(m68000_base_device *m68k, UINT32 value)
 }
 
 /* Set the status register but don't check for interrupts */
-static inline void m68ki_set_sr_noint(m68000_base_device *m68k, UINT32 value)
+static inline void m68ki_set_sr_noint(m68000_base_device *m68k, uint32_t value)
 {
 	/* Mask out the "unimplemented" bits */
 	value &= m68k->sr_mask;
@@ -1200,7 +1200,7 @@ static inline void m68ki_set_sr_noint(m68000_base_device *m68k, UINT32 value)
 /* Set the status register but don't check for interrupts nor
  * change the stack pointer
  */
-static inline void m68ki_set_sr_noint_nosp(m68000_base_device *m68k, UINT32 value)
+static inline void m68ki_set_sr_noint_nosp(m68000_base_device *m68k, uint32_t value)
 {
 	/* Mask out the "unimplemented" bits */
 	value &= m68k->sr_mask;
@@ -1214,7 +1214,7 @@ static inline void m68ki_set_sr_noint_nosp(m68000_base_device *m68k, UINT32 valu
 }
 
 /* Set the status register and check for interrupts */
-static inline void m68ki_set_sr(m68000_base_device *m68k, UINT32 value)
+static inline void m68ki_set_sr(m68000_base_device *m68k, uint32_t value)
 {
 	m68ki_set_sr_noint(m68k, value);
 	m68ki_check_interrupts(m68k);
@@ -1224,10 +1224,10 @@ static inline void m68ki_set_sr(m68000_base_device *m68k, UINT32 value)
 /* ------------------------- Exception Processing ------------------------- */
 
 /* Initiate exception processing */
-static inline UINT32 m68ki_init_exception(m68000_base_device *m68k)
+static inline uint32_t m68ki_init_exception(m68000_base_device *m68k)
 {
 	/* Save the old status register */
-	UINT32 sr = m68ki_get_sr(m68k);
+	uint32_t sr = m68ki_get_sr(m68k);
 
 	/* Turn off trace flag, clear pending traces */
 	m68k->t1_flag = m68k->t0_flag = 0;
@@ -1239,7 +1239,7 @@ static inline UINT32 m68ki_init_exception(m68000_base_device *m68k)
 }
 
 /* 3 word stack frame (68000 only) */
-static inline void m68ki_stack_frame_3word(m68000_base_device *m68k, UINT32 pc, UINT32 sr)
+static inline void m68ki_stack_frame_3word(m68000_base_device *m68k, uint32_t pc, uint32_t sr)
 {
 	m68ki_push_32(m68k, pc);
 	m68ki_push_16(m68k, sr);
@@ -1248,7 +1248,7 @@ static inline void m68ki_stack_frame_3word(m68000_base_device *m68k, UINT32 pc, 
 /* Format 0 stack frame.
  * This is the standard stack frame for 68010+.
  */
-static inline void m68ki_stack_frame_0000(m68000_base_device *m68k, UINT32 pc, UINT32 sr, UINT32 vector)
+static inline void m68ki_stack_frame_0000(m68000_base_device *m68k, uint32_t pc, uint32_t sr, uint32_t vector)
 {
 	/* Stack a 3-word frame if we are 68000 */
 	if(m68k->cpu_type == CPU_TYPE_000 || m68k->cpu_type == CPU_TYPE_008)
@@ -1264,7 +1264,7 @@ static inline void m68ki_stack_frame_0000(m68000_base_device *m68k, UINT32 pc, U
 /* Format 1 stack frame (68020).
  * For 68020, this is the 4 word throwaway frame.
  */
-static inline void m68ki_stack_frame_0001(m68000_base_device *m68k, UINT32 pc, UINT32 sr, UINT32 vector)
+static inline void m68ki_stack_frame_0001(m68000_base_device *m68k, uint32_t pc, uint32_t sr, uint32_t vector)
 {
 	m68ki_push_16(m68k, 0x1000 | (vector<<2));
 	m68ki_push_32(m68k, pc);
@@ -1274,7 +1274,7 @@ static inline void m68ki_stack_frame_0001(m68000_base_device *m68k, UINT32 pc, U
 /* Format 2 stack frame.
  * This is used only by 68020 for trap exceptions.
  */
-static inline void m68ki_stack_frame_0010(m68000_base_device *m68k, UINT32 sr, UINT32 vector)
+static inline void m68ki_stack_frame_0010(m68000_base_device *m68k, uint32_t sr, uint32_t vector)
 {
 	m68ki_push_32(m68k, REG_PPC(m68k));
 	m68ki_push_16(m68k, 0x2000 | (vector<<2));
@@ -1285,7 +1285,7 @@ static inline void m68ki_stack_frame_0010(m68000_base_device *m68k, UINT32 sr, U
 
 /* Bus error stack frame (68000 only).
  */
-static inline void m68ki_stack_frame_buserr(m68000_base_device *m68k, UINT32 sr)
+static inline void m68ki_stack_frame_buserr(m68000_base_device *m68k, uint32_t sr)
 {
 	m68ki_push_32(m68k, REG_PC(m68k));
 	m68ki_push_16(m68k, sr);
@@ -1302,7 +1302,7 @@ static inline void m68ki_stack_frame_buserr(m68000_base_device *m68k, UINT32 sr)
 /* Format 8 stack frame (68010).
  * 68010 only.  This is the 29 word bus/address error frame.
  */
-static inline void m68ki_stack_frame_1000(m68000_base_device *m68k, UINT32 pc, UINT32 sr, UINT32 vector)
+static inline void m68ki_stack_frame_1000(m68000_base_device *m68k, uint32_t pc, uint32_t sr, uint32_t vector)
 {
 	/* VERSION
 	 * NUMBER
@@ -1356,7 +1356,7 @@ static inline void m68ki_stack_frame_1000(m68000_base_device *m68k, UINT32 pc, U
  * if the error happens at an instruction boundary.
  * PC stacked is address of next instruction.
  */
-static inline void m68ki_stack_frame_1010(m68000_base_device *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
+static inline void m68ki_stack_frame_1010(m68000_base_device *m68k, uint32_t sr, uint32_t vector, uint32_t pc, uint32_t fault_address)
 {
 	int orig_rw = m68k->mmu_tmp_buserror_rw;    // this gets splatted by the following pushes, so save it now
 	int orig_fc = m68k->mmu_tmp_buserror_fc;
@@ -1408,7 +1408,7 @@ static inline void m68ki_stack_frame_1010(m68000_base_device *m68k, UINT32 sr, U
  * if the error happens during instruction execution.
  * PC stacked is address of instruction in progress.
  */
-static inline void m68ki_stack_frame_1011(m68000_base_device *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
+static inline void m68ki_stack_frame_1011(m68000_base_device *m68k, uint32_t sr, uint32_t vector, uint32_t pc, uint32_t fault_address)
 {
 	int orig_rw = m68k->mmu_tmp_buserror_rw;    // this gets splatted by the following pushes, so save it now
 	int orig_fc = m68k->mmu_tmp_buserror_fc;
@@ -1482,7 +1482,7 @@ static inline void m68ki_stack_frame_1011(m68000_base_device *m68k, UINT32 sr, U
  * This is used by the 68040 for bus fault and mmu trap
  * 30 words
  */
-static inline void m68ki_stack_frame_0111(m68000_base_device *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address, bool in_mmu)
+static inline void m68ki_stack_frame_0111(m68000_base_device *m68k, uint32_t sr, uint32_t vector, uint32_t pc, uint32_t fault_address, bool in_mmu)
 {
 	int orig_rw = m68k->mmu_tmp_buserror_rw;    // this gets splatted by the following pushes, so save it now
 	int orig_fc = m68k->mmu_tmp_buserror_fc;
@@ -1525,9 +1525,9 @@ static inline void m68ki_stack_frame_0111(m68000_base_device *m68k, UINT32 sr, U
 /* Used for Group 2 exceptions.
  * These stack a type 2 frame on the 020.
  */
-static inline void m68ki_exception_trap(m68000_base_device *m68k, UINT32 vector)
+static inline void m68ki_exception_trap(m68000_base_device *m68k, uint32_t vector)
 {
-	UINT32 sr = m68ki_init_exception(m68k);
+	uint32_t sr = m68ki_init_exception(m68k);
 
 	if(CPU_TYPE_IS_010_LESS(m68k->cpu_type))
 		m68ki_stack_frame_0000(m68k, REG_PC(m68k), sr, vector);
@@ -1541,9 +1541,9 @@ static inline void m68ki_exception_trap(m68000_base_device *m68k, UINT32 vector)
 }
 
 /* Trap#n stacks a 0 frame but behaves like group2 otherwise */
-static inline void m68ki_exception_trapN(m68000_base_device *m68k, UINT32 vector)
+static inline void m68ki_exception_trapN(m68000_base_device *m68k, uint32_t vector)
 {
-	UINT32 sr = m68ki_init_exception(m68k);
+	uint32_t sr = m68ki_init_exception(m68k);
 	m68ki_stack_frame_0000(m68k, REG_PC(m68k), sr, vector);
 	m68ki_jump_vector(m68k, vector);
 
@@ -1554,7 +1554,7 @@ static inline void m68ki_exception_trapN(m68000_base_device *m68k, UINT32 vector
 /* Exception for trace mode */
 static inline void m68ki_exception_trace(m68000_base_device *m68k)
 {
-	UINT32 sr = m68ki_init_exception(m68k);
+	uint32_t sr = m68ki_init_exception(m68k);
 
 	if(CPU_TYPE_IS_010_LESS(m68k->cpu_type))
 	{
@@ -1579,7 +1579,7 @@ static inline void m68ki_exception_trace(m68000_base_device *m68k)
 /* Exception for privilege violation */
 static inline void m68ki_exception_privilege_violation(m68000_base_device *m68k)
 {
-	UINT32 sr = m68ki_init_exception(m68k);
+	uint32_t sr = m68ki_init_exception(m68k);
 
 	if(CPU_TYPE_IS_000(m68k->cpu_type))
 	{
@@ -1596,7 +1596,7 @@ static inline void m68ki_exception_privilege_violation(m68000_base_device *m68k)
 /* Exception for A-Line instructions */
 static inline void m68ki_exception_1010(m68000_base_device *m68k)
 {
-	UINT32 sr;
+	uint32_t sr;
 
 	sr = m68ki_init_exception(m68k);
 	m68ki_stack_frame_0000(m68k, REG_PPC(m68k), sr, EXCEPTION_1010);
@@ -1609,7 +1609,7 @@ static inline void m68ki_exception_1010(m68000_base_device *m68k)
 /* Exception for F-Line instructions */
 static inline void m68ki_exception_1111(m68000_base_device *m68k)
 {
-	UINT32 sr;
+	uint32_t sr;
 
 	sr = m68ki_init_exception(m68k);
 	m68ki_stack_frame_0000(m68k, REG_PPC(m68k), sr, EXCEPTION_1111);
@@ -1622,7 +1622,7 @@ static inline void m68ki_exception_1111(m68000_base_device *m68k)
 /* Exception for illegal instructions */
 static inline void m68ki_exception_illegal(m68000_base_device *m68k)
 {
-	UINT32 sr;
+	uint32_t sr;
 
 	sr = m68ki_init_exception(m68k);
 
@@ -1641,7 +1641,7 @@ static inline void m68ki_exception_illegal(m68000_base_device *m68k)
 /* Exception for format errror in RTE */
 static inline void m68ki_exception_format_error(m68000_base_device *m68k)
 {
-	UINT32 sr = m68ki_init_exception(m68k);
+	uint32_t sr = m68ki_init_exception(m68k);
 	m68ki_stack_frame_0000(m68k, REG_PC(m68k), sr, EXCEPTION_FORMAT_ERROR);
 	m68ki_jump_vector(m68k, EXCEPTION_FORMAT_ERROR);
 
@@ -1652,7 +1652,7 @@ static inline void m68ki_exception_format_error(m68000_base_device *m68k)
 /* Exception for address error */
 static inline void m68ki_exception_address_error(m68000_base_device *m68k)
 {
-	UINT32 sr = m68ki_init_exception(m68k);
+	uint32_t sr = m68ki_init_exception(m68k);
 
 	/* If we were processing a bus error, address error, or reset,
 	 * this is a catastrophic failure.
@@ -1682,7 +1682,7 @@ static inline void m68ki_check_interrupts(m68000_base_device *m68k)
 {
 	if(m68k->nmi_pending)
 	{
-		m68k->nmi_pending = FALSE;
+		m68k->nmi_pending = false;
 		m68k->m68ki_exception_interrupt(m68k, 7);
 	}
 	else if(m68k->int_level > m68k->int_mask)

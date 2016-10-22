@@ -63,15 +63,15 @@ public:
 
 	// inline configuration helpers
 	static void static_set_size(device_t &device, int cells, int cellbits);
-	static void static_set_default_data(device_t &device, const UINT8 *data, UINT32 size);
-	static void static_set_default_data(device_t &device, const UINT16 *data, UINT32 size);
-	static void static_set_default_value(device_t &device, UINT32 value);
+	static void static_set_default_data(device_t &device, const uint8_t *data, uint32_t size);
+	static void static_set_default_data(device_t &device, const uint16_t *data, uint32_t size);
+	static void static_set_default_value(device_t &device, uint32_t value);
 	static void static_set_timing(device_t &device, timing_type type, const attotime &duration);
 
 	// read/write/erase data
-	UINT32 read(offs_t address);
-	void write(offs_t address, UINT32 data);
-	void write_all(UINT32 data);
+	uint32_t read(offs_t address);
+	void write(offs_t address, uint32_t data);
+	void write_all(uint32_t data);
 	void erase(offs_t address);
 	void erase_all();
 
@@ -79,8 +79,8 @@ public:
 	bool ready() const { return machine().time() >= m_completion_time; }
 
 	// internal read/write without side-effects
-	UINT32 internal_read(offs_t address);
-	void internal_write(offs_t address, UINT32 data);
+	uint32_t internal_read(offs_t address);
+	void internal_write(offs_t address, uint32_t data);
 
 protected:
 	// device-level overrides
@@ -95,15 +95,15 @@ protected:
 
 	optional_memory_region  m_region;
 
-	std::unique_ptr<UINT8 []> m_data;
+	std::unique_ptr<uint8_t []> m_data;
 
 	// configuration state
-	UINT32                  m_cells;
-	UINT8                   m_address_bits;
-	UINT8                   m_data_bits;
+	uint32_t                  m_cells;
+	uint8_t                   m_address_bits;
+	uint8_t                   m_data_bits;
 	generic_ptr             m_default_data;
-	UINT32                  m_default_data_size;
-	UINT32                  m_default_value;
+	uint32_t                  m_default_data_size;
+	uint32_t                  m_default_value;
 	bool                    m_default_value_set;
 	attotime                m_operation_time[TIMING_COUNT];
 

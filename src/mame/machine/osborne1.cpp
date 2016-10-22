@@ -32,7 +32,7 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	// Since each peripheral only checks two bits, many addresses will
 	// result in multiple peripherals attempting to drive the bus.  This is
 	// simulated by ANDing all the values together.
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 	if ((offset & 0x900) == 0x100) // Floppy
 		data &= m_fdc->read(space, offset & 0x03);
 	if ((offset & 0x900) == 0x900) // IEEE488 PIA
@@ -97,7 +97,7 @@ WRITE8_MEMBER( osborne1_state::videoram_w )
 		data |= 0x7F;
 	else
 		m_tilemap->mark_tile_dirty(offset);
-	reinterpret_cast<UINT8 *>(m_bank_fxxx->base())[offset] = data;
+	reinterpret_cast<uint8_t *>(m_bank_fxxx->base())[offset] = data;
 }
 
 READ8_MEMBER( osborne1_state::opcode_r )
@@ -105,7 +105,7 @@ READ8_MEMBER( osborne1_state::opcode_r )
 	if (!space.debugger_access())
 	{
 		// Update the flipflops that control bank selection and NMI
-		UINT8 const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
+		uint8_t const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
 		if (!m_rom_mode)
 		{
 			set_rom_mode(m_ub4a_q ? 0 : 1);
@@ -119,7 +119,7 @@ READ8_MEMBER( osborne1_state::opcode_r )
 	address_space &program_space(m_maincpu->space(AS_PROGRAM));
 	bool const prev_debugger_access(program_space.debugger_access());
 	program_space.set_debugger_access(space.debugger_access());
-	UINT8 const data(program_space.read_byte(offset));
+	uint8_t const data(program_space.read_byte(offset));
 	program_space.set_debugger_access(prev_debugger_access);
 	return data;
 }
@@ -171,7 +171,7 @@ READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
 	    6       NDAC
 	    7       NRFD
 	*/
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_ieee->eoi_r() << 3;
 	data |= m_ieee->dav_r() << 5;
@@ -345,7 +345,7 @@ void osborne1_state::video_start()
 	m_video_timer->adjust(machine().first_screen()->time_until_pos(1, 0));
 }
 
-UINT32 osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -364,15 +364,15 @@ void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		update_acia_rxc_txc();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in osborne1_state::device_timer");
+		assert_always(false, "Unknown id in osborne1_state::device_timer");
 	}
 }
 
 TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
 	int const y = machine().first_screen()->vpos();
-	UINT8 const ra = y % 10;
-	UINT8 const port_b = m_pia1->b_output();
+	uint8_t const ra = y % 10;
+	uint8_t const port_b = m_pia1->b_output();
 
 	// Check for start/end of visible area and clear/set CA1 on video PIA
 	if (y == 0)
@@ -388,9 +388,9 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 	if (y < 240)
 	{
 		// Draw a line of the display
-		UINT16 *p = &m_bitmap.pix16(y);
+		uint16_t *p = &m_bitmap.pix16(y);
 		bool const hires = m_screen_pac & m_resolution;
-		UINT16 const row = ((m_scroll_y + (y / 10)) << 7) & 0xF80;
+		uint16_t const row = ((m_scroll_y + (y / 10)) << 7) & 0xF80;
 
 		// The derivation of the initial column is not obvious.  The 7-bit
 		// column counter is preloaded near the beginning of the horizontal
@@ -409,15 +409,15 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 		// signal (set by bit 1 of the value written to 0x2400).  Of course
 		// it depends on the value wrapping around to zero when it counts
 		// past 0x7F
-		UINT16 const col = hires ? ((m_scroll_x & 0x60) + (m_hc_left ? 0x09 : 0x01) + 0x17) : (m_scroll_x + 0x0B);
+		uint16_t const col = hires ? ((m_scroll_x & 0x60) + (m_hc_left ? 0x09 : 0x01) + 0x17) : (m_scroll_x + 0x0B);
 
-		for (UINT16 x = 0; x < (hires ? 104 : 52); x++)
+		for (uint16_t x = 0; x < (hires ? 104 : 52); x++)
 		{
-			UINT16 const offs = row | ((col + x) & 0x7F);
-			UINT8 const chr = m_ram->pointer()[0xF000 + offs];
-			UINT8 const clr = (m_ram->pointer()[0x10000 + offs] & 0x80) ? 2 : 1;
+			uint16_t const offs = row | ((col + x) & 0x7F);
+			uint8_t const chr = m_ram->pointer()[0xF000 + offs];
+			uint8_t const clr = (m_ram->pointer()[0x10000 + offs] & 0x80) ? 2 : 1;
 
-			UINT8 const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_chargen[(ra << 7) | (chr & 0x7F)];
+			uint8_t const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_chargen[(ra << 7) | (chr & 0x7F)];
 
 			// Display a scanline of a character
 			*p++ = BIT(gfx, 7) ? clr : 0;
@@ -458,7 +458,7 @@ TILE_GET_INFO_MEMBER(osborne1_state::get_tile_info)
 }
 
 
-bool osborne1_state::set_rom_mode(UINT8 value)
+bool osborne1_state::set_rom_mode(uint8_t value)
 {
 	if (value != m_rom_mode)
 	{
@@ -473,7 +473,7 @@ bool osborne1_state::set_rom_mode(UINT8 value)
 	}
 }
 
-bool osborne1_state::set_bit_9(UINT8 value)
+bool osborne1_state::set_bit_9(uint8_t value)
 {
 	if (value != m_bit_9)
 	{

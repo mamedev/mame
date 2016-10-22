@@ -54,13 +54,13 @@ public:
 	DECLARE_READ8_MEMBER(systec_c4_r);
 	DECLARE_READ8_MEMBER(systec_c6_r);
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
 READ8_MEMBER( systec_state::systec_c4_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -92,8 +92,8 @@ INPUT_PORTS_END
 
 void systec_state::machine_reset()
 {
-	UINT8 *m_p_maincpu = memregion("maincpu")->base();
-	UINT8 *m_p_roms = memregion("roms")->base();
+	uint8_t *m_p_maincpu = memregion("maincpu")->base();
+	uint8_t *m_p_roms = memregion("roms")->base();
 	memcpy(m_p_maincpu, m_p_roms, 0x2000);
 }
 

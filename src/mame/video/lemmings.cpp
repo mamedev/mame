@@ -22,7 +22,7 @@
 
 TILE_GET_INFO_MEMBER(lemmings_state::get_tile_info)
 {
-	UINT16 tile = m_vram_data[tile_index];
+	uint16_t tile = m_vram_data[tile_index];
 
 	SET_TILE_INFO_MEMBER(2,
 			tile&0x7ff,
@@ -115,11 +115,11 @@ void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& sr
 
 	for (y=cliprect.min_y; y<cliprect.max_y;y++)
 	{
-		UINT32* dst = &bitmap.pix32(y,0);
+		uint32_t* dst = &bitmap.pix32(y,0);
 
 		for (x=cliprect.min_x; x<cliprect.max_x;x++)
 		{
-			UINT16 src = srcbitmap.pix16((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
+			uint16_t src = srcbitmap.pix16((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
 
 			if (src!=0x100)
 				dst[x] = paldata[src];
@@ -127,7 +127,7 @@ void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& sr
 	}
 }
 
-UINT32 lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x1 = -m_control_data[0];
 	int x0 = -m_control_data[2];

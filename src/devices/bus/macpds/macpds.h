@@ -51,8 +51,8 @@ class macpds_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	macpds_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	macpds_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -75,16 +75,16 @@ class macpds_device : public device_t
 {
 public:
 	// construction/destruction
-	macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	macpds_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	macpds_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~macpds_device() { m_device_list.detach_all(); }
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
 	void add_macpds_card(device_macpds_card_interface *card);
-	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, UINT32 mask=0xffffffff);
-	void install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, UINT32 mask=0xffffffff);
-	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
+	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask=0xffffffff);
+	void install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask=0xffffffff);
+	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 	void set_irq_line(int line, int state);
 
 protected:
@@ -119,8 +119,8 @@ public:
 	void set_macpds_device();
 
 	// helper functions for card devices
-	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
-	void install_rom(device_t *dev, const char *romregion, UINT32 addr);
+	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
+	void install_rom(device_t *dev, const char *romregion, uint32_t addr);
 
 	// inline configuration
 	static void static_set_macpds_tag(device_t &device, const char *tag, const char *slottag);

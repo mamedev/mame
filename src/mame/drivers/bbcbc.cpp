@@ -52,7 +52,7 @@ public:
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<3> m_buttons;
 
-	UINT8 m_input_select;
+	uint8_t m_input_select;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

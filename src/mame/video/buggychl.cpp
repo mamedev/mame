@@ -155,7 +155,7 @@ void buggychl_state::draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
-	const UINT8 *gfx;
+	const uint8_t *gfx;
 
 	g_profiler.start(PROFILER_USER1);
 
@@ -163,8 +163,8 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int sx, sy, flipy, zoom, ch, x, px, y;
-		const UINT8 *lookup;
-		const UINT8 *zoomx_rom, *zoomy_rom;
+		const uint8_t *lookup;
+		const uint8_t *zoomx_rom, *zoomy_rom;
 
 		sx = m_spriteram[offs + 3] - ((m_spriteram[offs + 2] & 0x80) << 1);
 		sy = 256 - 64 - m_spriteram[offs] + ((m_spriteram[offs + 1] & 0x80) << 1);
@@ -192,7 +192,7 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				for (ch = 0; ch < 4; ch++)
 				{
 					int pos, code, realflipy;
-					const UINT8 *pendata;
+					const uint8_t *pendata;
 
 					pos = base_pos + 2 * ch;
 					code = 8 * (lookup[pos] | ((lookup[pos + 1] & 0x07) << 8));
@@ -223,7 +223,7 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-UINT32 buggychl_state::screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t buggychl_state::screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_sky_on)
 		draw_sky(bitmap, cliprect);

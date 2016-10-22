@@ -26,7 +26,7 @@ class isa8_fdc_device :
 {
 public:
 	// construction/destruction
-	isa8_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	required_device<pc_fdc_interface> fdc;
 
@@ -39,38 +39,38 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 dack_r(int line) override;
-	virtual void dack_w(int line, UINT8 data) override;
+	virtual uint8_t dack_r(int line) override;
+	virtual void dack_w(int line, uint8_t data) override;
 	virtual void eop_w(int state) override;
 };
 
 class isa8_fdc_xt_device : public isa8_fdc_device {
 public:
-	isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class isa8_fdc_at_device : public isa8_fdc_device {
 public:
-	isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class isa8_fdc_smc_device : public isa8_fdc_device {
 public:
-	isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class isa8_fdc_ps2_device : public isa8_fdc_device {
 public:
-	isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class isa8_fdc_superio_device : public isa8_fdc_device {
 public:
-	isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 

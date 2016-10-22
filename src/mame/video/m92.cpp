@@ -56,7 +56,7 @@ void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 			m92_sprite_interrupt();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in m92_state::device_timer");
+		assert_always(false, "Unknown id in m92_state::device_timer");
 	}
 }
 
@@ -202,7 +202,7 @@ WRITE16_MEMBER(m92_state::m92_pf3_control_w)
 
 WRITE16_MEMBER(m92_state::m92_master_control_w)
 {
-	UINT16 old = m_pf_master_control[offset];
+	uint16_t old = m_pf_master_control[offset];
 	M92_pf_layer_info *layer;
 
 	COMBINE_DATA(&m_pf_master_control[offset]);
@@ -220,13 +220,13 @@ WRITE16_MEMBER(m92_state::m92_master_control_w)
 			/* update size (bit 2) */
 			if (m_pf_master_control[offset] & 0x04)
 			{
-				layer->tmap->enable(FALSE);
+				layer->tmap->enable(false);
 				layer->wide_tmap->enable((~m_pf_master_control[offset] >> 4) & 1);
 			}
 			else
 			{
 				layer->tmap->enable((~m_pf_master_control[offset] >> 4) & 1);
-				layer->wide_tmap->enable(FALSE);
+				layer->wide_tmap->enable(false);
 			}
 
 			/* mark everything dirty of the VRAM base or size changes */
@@ -321,7 +321,7 @@ VIDEO_START_MEMBER(m92_state,ppan)
 
 void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *source = m_spriteram->buffer();
+	uint16_t *source = m_spriteram->buffer();
 	int offs, layer;
 
 	for (layer = 0; layer < 8; layer++)
@@ -394,7 +394,7 @@ void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 // This needs a lot of work...
 void m92_state::ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *source = m_spriteram->live(); // sprite buffer control is never triggered
+	uint16_t *source = m_spriteram->live(); // sprite buffer control is never triggered
 	int offs, layer;
 
 	for (layer = 0; layer < 8; layer++)
@@ -489,7 +489,7 @@ void m92_state::m92_update_scroll_positions()
 
 		if (m_pf_master_control[laynum] & 0x40)
 		{
-			const UINT16 *scrolldata = m_vram_data + (0xf400 + 0x400 * laynum) / 2;
+			const uint16_t *scrolldata = m_vram_data + (0xf400 + 0x400 * laynum) / 2;
 
 			layer->tmap->set_scroll_rows(512);
 			layer->wide_tmap->set_scroll_rows(512);
@@ -536,7 +536,7 @@ void m92_state::m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const
 }
 
 
-UINT32 m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
@@ -553,7 +553,7 @@ UINT32 m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-UINT32 m92_state::screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m92_state::screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);

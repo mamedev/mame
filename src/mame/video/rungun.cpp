@@ -18,8 +18,8 @@
 /* TTL text plane stuff */
 TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 {
-	UINT32 base_addr = (FPTR)tilemap.user_data();
-	UINT8 *lvram = (UINT8 *)m_ttl_vram.get() + base_addr;
+	uint32_t base_addr = (uintptr_t)tilemap.user_data();
+	uint8_t *lvram = (uint8_t *)m_ttl_vram.get() + base_addr;
 	int attr, code;
 
 	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
@@ -58,7 +58,7 @@ WRITE16_MEMBER(rungun_state::rng_psac2_videoram_w)
 
 TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
 {
-	UINT32 base_addr = (FPTR)tilemap.user_data();
+	uint32_t base_addr = (uintptr_t)tilemap.user_data();
 	int tileno, colour, flipx;
 
 	tileno = m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0x3fff;
@@ -84,8 +84,8 @@ void rungun_state::video_start()
 
 	int gfx_index;
 
-	m_ttl_vram = std::make_unique<UINT16[]>(0x1000*2);
-	m_psac2_vram = std::make_unique<UINT16[]>(0x80000*2);
+	m_ttl_vram = std::make_unique<uint16_t[]>(0x1000*2);
+	m_psac2_vram = std::make_unique<uint16_t[]>(0x80000*2);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -99,14 +99,14 @@ void rungun_state::video_start()
 	m_ttl_gfx_index = gfx_index;
 
 	// create the tilemaps
-	for(UINT32 screen_num = 0;screen_num < 2;screen_num++)
+	for(uint32_t screen_num = 0;screen_num < 2;screen_num++)
 	{
 		m_ttl_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-		m_ttl_tilemap[screen_num]->set_user_data((void *)(FPTR)(screen_num * 0x2000));
+		m_ttl_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x2000));
 		m_ttl_tilemap[screen_num]->set_transparent_pen(0);
 
 		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::get_rng_936_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
-		m_936_tilemap[screen_num]->set_user_data((void *)(FPTR)(screen_num * 0x80000));
+		m_936_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x80000));
 		m_936_tilemap[screen_num]->set_transparent_pen(0);
 
 	}
@@ -116,7 +116,7 @@ void rungun_state::video_start()
 	m_screen->register_screen_bitmap(m_rng_dual_demultiplex_right_temp);
 }
 
-UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -142,7 +142,7 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 
 
 // the 60hz signal gets split between 2 screens
-UINT32 rungun_state::screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rungun_state::screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int m_current_display_bank = machine().first_screen()->frame_number() & 1;
 
@@ -156,7 +156,7 @@ UINT32 rungun_state::screen_update_rng_dual_left(screen_device &screen, bitmap_i
 }
 
 // this depends upon the fisrt screen being updated, and the bitmap being copied to the temp bitmap
-UINT32 rungun_state::screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rungun_state::screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap( bitmap, m_rng_dual_demultiplex_right_temp, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -165,7 +165,7 @@ UINT32 rungun_state::screen_update_rng_dual_right(screen_device &screen, bitmap_
 void rungun_state::sprite_dma_trigger(void)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT32 src_address;
+	uint32_t src_address;
 
 	if(m_single_screen_mode == true)
 		src_address = 1*0x2000;

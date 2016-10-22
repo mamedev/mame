@@ -34,16 +34,16 @@ extern const device_type PSX_RCNT;
 struct psx_root
 {
 	emu_timer *timer;
-	UINT16 n_count;
-	UINT16 n_mode;
-	UINT16 n_target;
-	UINT64 n_start;
+	uint16_t n_count;
+	uint16_t n_mode;
+	uint16_t n_target;
+	uint64_t n_start;
 };
 
 class psxrcnt_device : public device_t
 {
 public:
-	psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq0_handler(device_t &device, _Object object) { return downcast<psxrcnt_device &>(device).m_irq0_handler.set_callback(object); }
@@ -62,9 +62,9 @@ protected:
 private:
 	psx_root root_counter[ 3 ];
 
-	UINT64 gettotalcycles( void );
+	uint64_t gettotalcycles( void );
 	int root_divider( int n_counter );
-	UINT16 root_current( int n_counter );
+	uint16_t root_current( int n_counter );
 	int root_target( int n_counter );
 	void root_timer_adjust( int n_counter );
 

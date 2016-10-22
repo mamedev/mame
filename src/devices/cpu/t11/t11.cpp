@@ -39,12 +39,12 @@ const device_type T11 = &device_creator<t11_device>;
 const device_type K1801VM2 = &device_creator<k1801vm2_device>;
 
 
-k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, K1801VM2, "K1801VM2", tag, owner, clock, "k1801vm2", __FILE__)
 {
 }
 
-t11_device::t11_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+t11_device::t11_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)
@@ -55,7 +55,7 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 	memset(&m_psw, 0x00, sizeof(m_psw));
 }
 
-t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, T11, "T11", tag, owner, clock, "t11", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)
@@ -169,8 +169,8 @@ int t11_device::POP()
 
 struct irq_table_entry
 {
-	UINT8   priority;
-	UINT8   vector;
+	uint8_t   priority;
+	uint8_t   vector;
 };
 
 static const struct irq_table_entry irq_table[] =
@@ -251,7 +251,7 @@ void t11_device::t11_check_irqs()
 
 void t11_device::device_start()
 {
-	static const UINT16 initial_pc[] =
+	static const uint16_t initial_pc[] =
 	{
 		0xc000, 0x8000, 0x4000, 0x2000,
 		0x1000, 0x0000, 0xf600, 0xf400
@@ -409,7 +409,7 @@ void t11_device::execute_run()
 
 	do
 	{
-		UINT16 op;
+		uint16_t op;
 
 		m_ppc = m_reg[7];   /* copy PC to previous PC */
 
@@ -422,7 +422,7 @@ void t11_device::execute_run()
 }
 
 
-offs_t t11_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t t11_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( t11 );
 	return CPU_DISASSEMBLE_NAME(t11)(this, buffer, pc, oprom, opram, options);

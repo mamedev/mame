@@ -929,8 +929,8 @@ ROM_END
 DRIVER_INIT_MEMBER(redclash_state,redclash)
 {
 	int i,j;
-	const UINT8 *src = memregion("gfx2")->base();
-	UINT8 *dst = memregion("gfx3")->base();
+	const uint8_t *src = memregion("gfx2")->base();
+	uint8_t *dst = memregion("gfx3")->base();
 	int len = memregion("gfx3")->bytes();
 
 	/* rearrange the sprite graphics */

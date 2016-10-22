@@ -44,9 +44,9 @@
  *
  *************************************/
 
-void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index)
+void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index)
 {
-	UINT32 romsize = m_maincpu_region->bytes();
+	uint32_t romsize = m_maincpu_region->bytes();
 	switch (index)
 	{
 		case 7:
@@ -123,12 +123,12 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
  *
  *************************************/
 
-UINT8 segas18_state::mapper_sound_r()
+uint8_t segas18_state::mapper_sound_r()
 {
 	return m_mcu_data;
 }
 
-void segas18_state::mapper_sound_w(UINT8 data)
+void segas18_state::mapper_sound_w(uint8_t data)
 {
 	m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -144,7 +144,7 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 
 	// configure VDP
 	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 	m_vdp->stop_timers(); // 315-5124 timers
@@ -380,7 +380,7 @@ READ16_MEMBER( segas18_state::ddcrew_custom_io_r )
 
 READ16_MEMBER( segas18_state::lghost_custom_io_r )
 {
-	UINT16 result;
+	uint16_t result;
 	switch (offset)
 	{
 		case 0x3010/2:
@@ -396,7 +396,7 @@ READ16_MEMBER( segas18_state::lghost_custom_io_r )
 
 WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 {
-	UINT8 pos_value_x, pos_value_y;
+	uint8_t pos_value_x, pos_value_y;
 
 	switch (offset)
 	{

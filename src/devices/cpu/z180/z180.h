@@ -125,7 +125,7 @@ class z180_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
 	// construction/destruction
-	z180_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	z180_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 protected:
 	// device-level overrides
@@ -133,12 +133,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 16; }
-	virtual UINT32 execute_input_lines() const override { return 3; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 16; }
+	virtual uint32_t execute_input_lines() const override { return 3; }
+	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
 	virtual void execute_run() override;
-	virtual void execute_burn(INT32 cycles) override;
+	virtual void execute_burn(int32_t cycles) override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
@@ -151,9 +151,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
@@ -162,34 +162,34 @@ private:
 
 	PAIR    m_PREPC,m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_IX,m_IY;
 	PAIR    m_AF2,m_BC2,m_DE2,m_HL2;
-	UINT8   m_R,m_R2,m_IFF1,m_IFF2,m_HALT,m_IM,m_I;
-	UINT8   m_tmdr_latch;                     /* flag latched TMDR0H, TMDR1H values */
-	UINT8   m_read_tcr_tmdr[2];               /* flag to indicate that TCR or TMDR was read */
-	UINT32  m_iol;                            /* I/O line status bits */
-	UINT8   m_io[64];                         /* 64 internal 8 bit registers */
+	uint8_t   m_R,m_R2,m_IFF1,m_IFF2,m_HALT,m_IM,m_I;
+	uint8_t   m_tmdr_latch;                     /* flag latched TMDR0H, TMDR1H values */
+	uint8_t   m_read_tcr_tmdr[2];               /* flag to indicate that TCR or TMDR was read */
+	uint32_t  m_iol;                            /* I/O line status bits */
+	uint8_t   m_io[64];                         /* 64 internal 8 bit registers */
 	offs_t  m_mmu[16];                        /* MMU address translation */
-	UINT8   m_tmdrh[2];                       /* latched TMDR0H and TMDR1H values */
-	UINT16  m_tmdr_value[2];                  /* TMDR values used byt PRT0 and PRT1 as down counter */
-	UINT8   m_tif[2];                         /* TIF0 and TIF1 values */
-	UINT8   m_nmi_state;                      /* nmi line state */
-	UINT8   m_nmi_pending;                    /* nmi pending */
-	UINT8   m_irq_state[3];                   /* irq line states (INT0,INT1,INT2) */
-	UINT8   m_int_pending[11 + 1];  /* interrupt pending */
-	UINT8   m_after_EI;                       /* are we in the EI shadow? */
-	UINT32  m_ea;
-	UINT8   m_timer_cnt;                      /* timer counter / divide by 20 */
-	UINT8   m_dma0_cnt;                       /* dma0 counter / divide by 20 */
-	UINT8   m_dma1_cnt;                       /* dma1 counter / divide by 20 */
+	uint8_t   m_tmdrh[2];                       /* latched TMDR0H and TMDR1H values */
+	uint16_t  m_tmdr_value[2];                  /* TMDR values used byt PRT0 and PRT1 as down counter */
+	uint8_t   m_tif[2];                         /* TIF0 and TIF1 values */
+	uint8_t   m_nmi_state;                      /* nmi line state */
+	uint8_t   m_nmi_pending;                    /* nmi pending */
+	uint8_t   m_irq_state[3];                   /* irq line states (INT0,INT1,INT2) */
+	uint8_t   m_int_pending[11 + 1];  /* interrupt pending */
+	uint8_t   m_after_EI;                       /* are we in the EI shadow? */
+	uint32_t  m_ea;
+	uint8_t   m_timer_cnt;                      /* timer counter / divide by 20 */
+	uint8_t   m_dma0_cnt;                       /* dma0 counter / divide by 20 */
+	uint8_t   m_dma1_cnt;                       /* dma1 counter / divide by 20 */
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_oprogram;
 	direct_read_data *m_odirect;
 	address_space *m_iospace;
-	UINT8   m_rtemp;
-	UINT32  m_ioltemp;
+	uint8_t   m_rtemp;
+	uint32_t  m_ioltemp;
 	int m_icount;
 	int m_extra_cycles;           /* extra cpu cycles */
-	UINT8 *m_cc[6];
+	uint8_t *m_cc[6];
 
 	typedef void (z180_device::*opcode_func)();
 	static const opcode_func s_z180ops[6][0x100];
@@ -197,33 +197,33 @@ private:
 	inline void z180_mmu();
 	inline void RM16( offs_t addr, PAIR *r );
 	inline void WM16( offs_t addr, PAIR *r );
-	inline UINT8 ROP();
-	inline UINT8 ARG();
-	inline UINT32 ARG16();
-	inline UINT8 INC(UINT8 value);
-	inline UINT8 DEC(UINT8 value);
-	inline UINT8 RLC(UINT8 value);
-	inline UINT8 RRC(UINT8 value);
-	inline UINT8 RL(UINT8 value);
-	inline UINT8 RR(UINT8 value);
-	inline UINT8 SLA(UINT8 value);
-	inline UINT8 SRA(UINT8 value);
-	inline UINT8 SLL(UINT8 value);
-	inline UINT8 SRL(UINT8 value);
-	inline UINT8 RES(UINT8 bit, UINT8 value);
-	inline UINT8 SET(UINT8 bit, UINT8 value);
-	inline int exec_op(const UINT8 opcode);
-	inline int exec_cb(const UINT8 opcode);
-	inline int exec_dd(const UINT8 opcode);
-	inline int exec_ed(const UINT8 opcode);
-	inline int exec_fd(const UINT8 opcode);
-	inline int exec_xycb(const UINT8 opcode);
+	inline uint8_t ROP();
+	inline uint8_t ARG();
+	inline uint32_t ARG16();
+	inline uint8_t INC(uint8_t value);
+	inline uint8_t DEC(uint8_t value);
+	inline uint8_t RLC(uint8_t value);
+	inline uint8_t RRC(uint8_t value);
+	inline uint8_t RL(uint8_t value);
+	inline uint8_t RR(uint8_t value);
+	inline uint8_t SLA(uint8_t value);
+	inline uint8_t SRA(uint8_t value);
+	inline uint8_t SLL(uint8_t value);
+	inline uint8_t SRL(uint8_t value);
+	inline uint8_t RES(uint8_t bit, uint8_t value);
+	inline uint8_t SET(uint8_t bit, uint8_t value);
+	inline int exec_op(const uint8_t opcode);
+	inline int exec_cb(const uint8_t opcode);
+	inline int exec_dd(const uint8_t opcode);
+	inline int exec_ed(const uint8_t opcode);
+	inline int exec_fd(const uint8_t opcode);
+	inline int exec_xycb(const uint8_t opcode);
 	int take_interrupt(int irq);
-	UINT8 z180_readcontrol(offs_t port);
-	void z180_writecontrol(offs_t port, UINT8 data);
+	uint8_t z180_readcontrol(offs_t port);
+	void z180_writecontrol(offs_t port, uint8_t data);
 	int z180_dma0(int max_cycles);
 	int z180_dma1();
-	void z180_write_iolines(UINT32 data);
+	void z180_write_iolines(uint32_t data);
 	void clock_timers();
 	int check_interrupts();
 	void handle_io_timers(int cycles);

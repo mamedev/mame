@@ -40,7 +40,7 @@ const tiny_rom_entry *abc_slutprov_device::device_rom_region() const
 //  abc_slutprov_device - constructor
 //-------------------------------------------------
 
-abc_slutprov_device::abc_slutprov_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc_slutprov_device::abc_slutprov_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ABC_SLUTPROV, "Slutprov", tag, owner, clock, "slutprov", __FILE__),
 		device_abcbus_card_interface(mconfig, *this)
 {
@@ -74,6 +74,6 @@ void abc_slutprov_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void abc_slutprov_device::abcbus_cs(UINT8 data)
+void abc_slutprov_device::abcbus_cs(uint8_t data)
 {
 }

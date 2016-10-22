@@ -16,7 +16,7 @@
 
 struct pc_disk_sizes
 {
-	UINT32 image_size;
+	uint32_t image_size;
 	int sectors;
 	int heads;
 };
@@ -43,7 +43,7 @@ static const struct pc_disk_sizes disk_sizes[] =
 static floperr_t pc_dsk_compute_geometry(floppy_image_legacy *floppy, struct basicdsk_geometry *geometry)
 {
 	int i;
-	UINT64 size;
+	uint64_t size;
 
 	memset(geometry, 0, sizeof(*geometry));
 	size = floppy_image_size(floppy);
@@ -67,12 +67,12 @@ static floperr_t pc_dsk_compute_geometry(floppy_image_legacy *floppy, struct bas
 		 * get info from boot sector.
 		 * not correct on all disks
 		 */
-		UINT8 scl, spt, heads;
+		uint8_t scl, spt, heads;
 		floppy_image_read(floppy, &scl, 0x0c, 1);
 		floppy_image_read(floppy, &spt, 0x18, 1);
 		floppy_image_read(floppy, &heads, 0x1A, 1);
 
-		if (size == ((UINT64) scl) * spt * heads * 0x200)
+		if (size == ((uint64_t) scl) * spt * heads * 0x200)
 		{
 			geometry->sectors = spt;
 			geometry->heads = heads;

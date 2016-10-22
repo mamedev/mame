@@ -55,14 +55,14 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
 private:
-	UINT8 m_t_c;
-	UINT8 m_out_offs;
-	UINT8 m_input_line;
+	uint8_t m_t_c;
+	uint8_t m_out_offs;
+	uint8_t m_input_line;
 };
 
 
@@ -196,7 +196,7 @@ void zac_1_state::machine_reset()
 	else
 	{
 		m_p_ram[0xc0] = 3; // 3 balls
-		for (UINT8 i=0xc1; i < 0xd6; i++)
+		for (uint8_t i=0xc1; i < 0xd6; i++)
 			m_p_ram[i] = 1; // enable match & coin slots
 		m_p_ram[0xf7] = 5;
 		m_p_ram[0xf8] = 0x0a;
@@ -207,7 +207,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_inttimer)
 {
 	if (m_t_c > 0x40)
 	{
-		UINT8 vector = (ioport("TEST")->read() ) ? 0x10 : 0x18;
+		uint8_t vector = (ioport("TEST")->read() ) ? 0x10 : 0x18;
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector);
 	}
 	else
@@ -219,13 +219,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_inttimer)
    182E-183F is a storage area for inputs. */
 TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	m_out_offs++;
 
 	if (m_out_offs < 0x40)
 	{
-		UINT8 display = (m_out_offs >> 3) & 7;
-		UINT8 digit = m_out_offs & 7;
+		uint8_t display = (m_out_offs >> 3) & 7;
+		uint8_t digit = m_out_offs & 7;
 		output().set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
 	}
 	else

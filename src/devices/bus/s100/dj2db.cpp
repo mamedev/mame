@@ -250,7 +250,7 @@ ioport_constructor s100_dj2db_device::device_input_ports() const
 //  s100_dj2db_device - constructor
 //-------------------------------------------------
 
-s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_DJ2DB, "DJ2DB", tag, owner, clock, "dj2db", __FILE__),
 	device_s100_card_interface(mconfig, *this),
 	m_fdc(*this, MB8866_TAG),
@@ -309,9 +309,9 @@ void s100_dj2db_device::device_reset()
 //  s100_smemr_r - memory read
 //-------------------------------------------------
 
-UINT8 s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
+uint8_t s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 //  if (!(m_board_enbl & m_phantom)) return 0;
 
@@ -388,7 +388,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 //  s100_mwrt_w - memory write
 //-------------------------------------------------
 
-void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 data)
+void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, uint8_t data)
 {
 //  if (!(m_board_enbl & m_phantom)) return;
 
@@ -481,7 +481,7 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 d
 //  s100_sinp_r - I/O read
 //-------------------------------------------------
 
-UINT8 s100_dj2db_device::s100_sinp_r(address_space &space, offs_t offset)
+uint8_t s100_dj2db_device::s100_sinp_r(address_space &space, offs_t offset)
 {
 	return 0;
 }
@@ -491,7 +491,7 @@ UINT8 s100_dj2db_device::s100_sinp_r(address_space &space, offs_t offset)
 //  s100_sout_w - I/O write
 //-------------------------------------------------
 
-void s100_dj2db_device::s100_sout_w(address_space &space, offs_t offset, UINT8 data)
+void s100_dj2db_device::s100_sout_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset == 0x41)
 	{

@@ -14,16 +14,16 @@
 
 
 struct layer_struct {
-	UINT8  enabled;
-	UINT8  *bg_tiles;
-	UINT8  *bg_map;
-	UINT8  xindex;
-	UINT8  xshift;
-	UINT8  xstart;
-	UINT8  xend;
+	uint8_t  enabled;
+	uint8_t  *bg_tiles;
+	uint8_t  *bg_map;
+	uint8_t  xindex;
+	uint8_t  xshift;
+	uint8_t  xstart;
+	uint8_t  xend;
 	/* GBC specific */
-	UINT8  *gbc_map;
-	INT16  bgline;
+	uint8_t  *gbc_map;
+	int16_t  bgline;
 };
 
 
@@ -31,12 +31,12 @@ class dmg_ppu_device :  public device_t,
 						public device_video_interface
 {
 public:
-	dmg_ppu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT32 vram_size);
-	dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmg_ppu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint32_t vram_size);
+	dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_lr35902_tag(device_t &device, const char *tag) { downcast<dmg_ppu_device &>(device).m_lr35902.set_tag(tag); }
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -66,12 +66,12 @@ protected:
 		LY_LYC_FLAG = 0x04
 	};
 
-	inline void plot_pixel(int x, int y, UINT16 color);
+	inline void plot_pixel(int x, int y, uint16_t color);
 
 	void select_sprites();
 	void calculate_window_cycles();
 	virtual void update_sprites();
-	virtual void update_scanline(UINT32 cycles_to_go);
+	virtual void update_scanline(uint32_t cycles_to_go);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -88,14 +88,14 @@ protected:
 	// state variables
 	bitmap_ind16 m_bitmap;
 
-	UINT8 m_sgb_atf_data[4050];       /* (SGB) Attributes files */
-	UINT32 m_sgb_atf;
-	UINT16 m_sgb_pal_data[4096];
-	UINT8 m_sgb_pal_map[20][18];
-	UINT16 m_sgb_pal[128];
-	std::unique_ptr<UINT8[]> m_sgb_tile_data;
-	UINT8 m_sgb_tile_map[2048];
-	UINT8 m_sgb_window_mask;
+	uint8_t m_sgb_atf_data[4050];       /* (SGB) Attributes files */
+	uint32_t m_sgb_atf;
+	uint16_t m_sgb_pal_data[4096];
+	uint8_t m_sgb_pal_map[20][18];
+	uint16_t m_sgb_pal[128];
+	std::unique_ptr<uint8_t[]> m_sgb_tile_data;
+	uint8_t m_sgb_tile_map[2048];
+	uint8_t m_sgb_window_mask;
 
 	// this is temporarily needed for a bunch of games which draw the border differently...
 	int m_sgb_border_hack;
@@ -104,57 +104,57 @@ protected:
 
 	static constexpr unsigned NR_GB_VID_REGS = 0x40;
 
-	UINT8   m_vid_regs[NR_GB_VID_REGS];
-	UINT8   m_bg_zbuf[160];
+	uint8_t   m_vid_regs[NR_GB_VID_REGS];
+	uint8_t   m_bg_zbuf[160];
 
-	UINT16  m_cgb_bpal[32];   /* CGB current background palette table */
-	UINT16  m_cgb_spal[32];   /* CGB current sprite palette table */
+	uint16_t  m_cgb_bpal[32];   /* CGB current background palette table */
+	uint16_t  m_cgb_spal[32];   /* CGB current sprite palette table */
 
-	UINT16  m_gb_bpal[4];     /* Background palette */
-	UINT16  m_gb_spal0[4];    /* Sprite 0 palette */
-	UINT16  m_gb_spal1[4];    /* Sprite 1 palette */
+	uint16_t  m_gb_bpal[4];     /* Background palette */
+	uint16_t  m_gb_spal0[4];    /* Sprite 0 palette */
+	uint16_t  m_gb_spal1[4];    /* Sprite 1 palette */
 
 	/* WIP Things used to render current line */
 	struct {
 		// Background/window data
-		UINT8 tile_cycle;
-		UINT8 tile_count;
-		UINT8 y;
-		UINT16 pattern_address;
-		UINT8 pattern;
-		UINT16 tile_address;
-		UINT8 plane0;
-		UINT8 plane1;
-		UINT16 shift_register;
+		uint8_t tile_cycle;
+		uint8_t tile_count;
+		uint8_t y;
+		uint16_t pattern_address;
+		uint8_t pattern;
+		uint16_t tile_address;
+		uint8_t plane0;
+		uint8_t plane1;
+		uint16_t shift_register;
 
 		// Sprite data
 		struct {
 			bool enabled;
-			UINT8 x;
-			UINT8 y;
-			UINT8 pattern;
-			UINT8 flags;
-			UINT8 tile_plane_0;
-			UINT8 tile_plane_1;
+			uint8_t x;
+			uint8_t y;
+			uint8_t pattern;
+			uint8_t flags;
+			uint8_t tile_plane_0;
+			uint8_t tile_plane_1;
 		} sprite[10];
-		UINT8 sprite_delay_cycles;
+		uint8_t sprite_delay_cycles;
 		// other internal data
 		bool starting;       // Inital fetches when (re)starting the rendering engine.
-		UINT8 sequence_counter;
+		uint8_t sequence_counter;
 		bool drawing;
 		bool start_drawing;
-		UINT8 scrollx_delay;
-		UINT8 scrollx_to_apply;
-		UINT8 pixels_drawn;
-		UINT16 window_compare_position;
+		uint8_t scrollx_delay;
+		uint8_t scrollx_to_apply;
+		uint8_t pixels_drawn;
+		uint16_t window_compare_position;
 		bool window_active;
-		UINT8 scrollx;
+		uint8_t scrollx;
 		// To keep track of when changes to WNDPOSY/WNDPOSX should kick in
-		UINT8 window_start_y[16];
-		UINT8 window_start_x[16];
+		uint8_t window_start_y[16];
+		uint8_t window_start_x[16];
 		int window_start_y_index;
 		// To keep track of when changes to LCDCONT should kick in for window
-		UINT8 window_enable[16];
+		uint8_t window_enable[16];
 		int window_enable_index;
 		bool window_should_trigger;
 	} m_line;
@@ -179,16 +179,16 @@ protected:
 	int m_hdma_enabled;
 	int m_hdma_possible;
 	int m_hdma_cycles_to_start;
-	UINT16 m_hdma_length;
+	uint16_t m_hdma_length;
 	struct layer_struct m_layer[2];
 	emu_timer *m_lcd_timer;
 	int m_oam_dma_start_cycles;
 	int m_oam_dma_cycles_left;
-	UINT16 m_oam_dma_source_address;
+	uint16_t m_oam_dma_source_address;
 	int m_gbc_mode;
-	UINT8 m_window_x;
-	UINT8 m_window_y;
-	UINT8 m_old_curline;
+	uint8_t m_window_x;
+	uint8_t m_window_y;
+	uint8_t m_old_curline;
 	// Interrupt related
 	bool m_stat_mode0_int;
 	bool m_stat_mode1_int;
@@ -198,44 +198,44 @@ protected:
 	bool m_stat_write_int;
 	bool m_stat_int;
 
-	std::unique_ptr<UINT8[]>   m_vram;     // Pointer to VRAM
-	std::unique_ptr<UINT8[]>   m_oam;      // Pointer to OAM memory
+	std::unique_ptr<uint8_t[]>   m_vram;     // Pointer to VRAM
+	std::unique_ptr<uint8_t[]>   m_oam;      // Pointer to OAM memory
 	bool    m_oam_dma_processing;
-	UINT8   m_gb_tile_no_mod;
-	UINT32  m_gb_chrgen_offs;     // GB Character generator
-	UINT32  m_gb_bgdtab_offs;     // GB Background character table
-	UINT32  m_gb_wndtab_offs;     // GB Window character table
-	UINT32  m_gbc_chrgen_offs;    // CGB Character generator
-	UINT32  m_gbc_bgdtab_offs;    // CGB Background character table
-	UINT32  m_gbc_wndtab_offs;    // CGB Window character table
+	uint8_t   m_gb_tile_no_mod;
+	uint32_t  m_gb_chrgen_offs;     // GB Character generator
+	uint32_t  m_gb_bgdtab_offs;     // GB Background character table
+	uint32_t  m_gb_wndtab_offs;     // GB Window character table
+	uint32_t  m_gbc_chrgen_offs;    // CGB Character generator
+	uint32_t  m_gbc_bgdtab_offs;    // CGB Background character table
+	uint32_t  m_gbc_wndtab_offs;    // CGB Window character table
 	int     m_vram_bank;
 
 	attotime m_last_updated;
-	UINT64 m_cycles_left;
+	uint64_t m_cycles_left;
 	int m_next_state;
 	bool m_updating_state;
 	bool m_enable_experimental_engine;
 
 	virtual void videoptr_restore();
-	virtual bool stat_write(UINT8 new_data);
+	virtual bool stat_write(uint8_t new_data);
 	void increment_scanline();
-	void lcd_switch_on(UINT8 new_data);
-	void update_oam_dma_state(UINT64 cycles);
+	void lcd_switch_on(uint8_t new_data);
+	void update_oam_dma_state(uint64_t cycles);
 	void check_stat_irq();
 	void clear_line_state();
-	void update_line_state(UINT64 cycles);
+	void update_line_state(uint64_t cycles);
 	void check_start_of_window();
 
 private:
-	UINT32 m_oam_size;
-	UINT32 m_vram_size;
+	uint32_t m_oam_size;
+	uint32_t m_vram_size;
 };
 
 
 class mgb_ppu_device : public dmg_ppu_device
 {
 public:
-	mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 
@@ -247,9 +247,9 @@ protected:
 class sgb_ppu_device : public dmg_ppu_device
 {
 public:
-	sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void sgb_io_write_pal(int offs, UINT8 *data);
+	void sgb_io_write_pal(int offs, uint8_t *data);
 
 protected:
 
@@ -258,7 +258,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void update_sprites() override;
-	virtual void update_scanline(UINT32 cycles_to_go) override;
+	virtual void update_scanline(uint32_t cycles_to_go) override;
 	void refresh_border();
 };
 
@@ -266,7 +266,7 @@ protected:
 class cgb_ppu_device : public dmg_ppu_device
 {
 public:
-	cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER(video_r) override;
 	virtual DECLARE_WRITE8_MEMBER(video_w) override;
@@ -278,13 +278,13 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void update_sprites() override;
-	virtual void update_scanline(UINT32 cycles_to_go) override;
+	virtual void update_scanline(uint32_t cycles_to_go) override;
 
 	virtual void update_state() override;
 	virtual void videoptr_restore() override;
-	virtual bool stat_write(UINT8 new_data) override;
-	void update_hdma_state(UINT64 cycles);
-	void hdma_trans(UINT16 length);
+	virtual bool stat_write(uint8_t new_data) override;
+	void update_hdma_state(uint64_t cycles);
+	void hdma_trans(uint16_t length);
 	void hdma_trans_execute();
 };
 

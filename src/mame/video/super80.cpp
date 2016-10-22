@@ -63,10 +63,10 @@ void super80_state::screen_eof_super80m(screen_device &screen, bool state)
 	}
 }
 
-UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr=32,gfx,screen_on=0,fg=0,options=m_io_config->read();
-	UINT16 sy=0,ma=m_vidpg,x;
+	uint8_t y,ra,chr=32,gfx,screen_on=0,fg=0,options=m_io_config->read();
+	uint16_t sy=0,ma=m_vidpg,x;
 
 	output().set_value("cass_led",BIT(m_portf0, 5));
 
@@ -85,7 +85,7 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 32; x++)    // done this way to avoid x overflowing on page FF
 			{
@@ -117,10 +117,10 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr=32,gfx,screen_on=0,fg=0,options=m_io_config->read();
-	UINT16 sy=0,ma=m_vidpg,x;
+	uint8_t y,ra,chr=32,gfx,screen_on=0,fg=0,options=m_io_config->read();
+	uint16_t sy=0,ma=m_vidpg,x;
 
 	output().set_value("cass_led",BIT(m_portf0, 5));
 
@@ -139,7 +139,7 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 32; x++)
 			{
@@ -165,10 +165,10 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr=32,gfx,screen_on=0,fg=0,options=m_io_config->read();
-	UINT16 sy=0,ma=m_vidpg,x;
+	uint8_t y,ra,chr=32,gfx,screen_on=0,fg=0,options=m_io_config->read();
+	uint16_t sy=0,ma=m_vidpg,x;
 
 	output().set_value("cass_led",BIT(m_portf0, 5));
 
@@ -187,7 +187,7 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 32; x++)
 			{
@@ -213,13 +213,13 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr=32,gfx,screen_on=0,col,bg=0,fg=0,options=m_io_config->read();
-	UINT16 sy=0,ma=m_vidpg,x;
+	uint8_t y,ra,chr=32,gfx,screen_on=0,col,bg=0,fg=0,options=m_io_config->read();
+	uint16_t sy=0,ma=m_vidpg,x;
 
 	/* get selected character generator */
-	UINT8 cgen = m_current_charset ^ ((options & 0x10)>>4); /* bit 0 of port F1 and cgen config switch */
+	uint8_t cgen = m_current_charset ^ ((options & 0x10)>>4); /* bit 0 of port F1 and cgen config switch */
 
 	output().set_value("cass_led",BIT(m_portf0, 5));
 
@@ -238,7 +238,7 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 32; x++)
 			{
@@ -295,7 +295,7 @@ WRITE8_MEMBER( super80_state::super80_f1_w )
 
 ---------------------------------------------------------------*/
 
-static const UINT8 mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
+static const uint8_t mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
 READ8_MEMBER( super80_state::super80v_low_r )
 {
@@ -340,7 +340,7 @@ WRITE8_MEMBER( super80_state::super80v_high_w )
 /* The 6845 can produce a variety of cursor shapes - all are emulated here - remove when mame fixed */
 void super80_state::mc6845_cursor_configure()
 {
-	UINT8 i,curs_type=0,r9,r10,r11;
+	uint8_t i,curs_type=0,r9,r10,r11;
 
 	/* curs_type holds the general cursor shape to be created
 	    0 = no cursor
@@ -379,7 +379,7 @@ VIDEO_START_MEMBER(super80_state,super80v)
 	m_p_colorram = memregion("colorram")->base();
 }
 
-UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_s_options=m_io_config->read();
 	output().set_value("cass_led",BIT(m_portf0, 5));
@@ -390,13 +390,13 @@ UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32
 MC6845_UPDATE_ROW( super80_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,col,gfx,fg,bg=0;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,col,gfx,fg,bg=0;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)               // for each character
 	{
-		UINT8 inv=0;
+		uint8_t inv=0;
 		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
 		mem = (ma + x) & 0xfff;
 		chr = m_p_videoram[mem];

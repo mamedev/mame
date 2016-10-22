@@ -198,14 +198,14 @@
     core_i64_hex_format - i64 format printf helper
 -------------------------------------------------*/
 
-static char *core_i64_hex_format(UINT64 value, UINT8 mindigits)
+static char *core_i64_hex_format(uint64_t value, uint8_t mindigits)
 {
 	static char buffer[16][64];
 	// TODO: this can overflow - e.g. when a lot of unmapped writes are logged
 	static int index;
 	char *bufbase = &buffer[index++ % 16][0];
 	char *bufptr = bufbase;
-	INT8 curdigit;
+	int8_t curdigit;
 
 	for (curdigit = 15; curdigit >= 0; curdigit--)
 	{
@@ -263,7 +263,7 @@ class handler_entry
 
 protected:
 	// construction/destruction
-	handler_entry(UINT8 width, endianness_t endianness, UINT8 **rambaseptr);
+	handler_entry(uint8_t width, endianness_t endianness, uint8_t **rambaseptr);
 	virtual ~handler_entry();
 
 public:
@@ -282,7 +282,7 @@ public:
 	offs_t byteoffset(offs_t byteaddress) const { return (byteaddress - m_bytestart) & m_bytemask; }
 
 	// return a pointer to the backing RAM at the given offset
-	UINT8 *ramptr(offs_t offset = 0) const { return *m_rambaseptr + offset; }
+	uint8_t *ramptr(offs_t offset = 0) const { return *m_rambaseptr + offset; }
 
 	// see if we are an exact match to the given parameters
 	bool matches_exactly(offs_t bytestart, offs_t byteend, offs_t bytemask) const
@@ -328,36 +328,36 @@ public:
 	// apply a global mask
 	void apply_mask(offs_t bytemask) { m_bytemask &= bytemask; }
 
-	void clear_conflicting_subunits(UINT64 handlermask);
-	bool overriden_by_mask(UINT64 handlermask);
+	void clear_conflicting_subunits(uint64_t handlermask);
+	bool overriden_by_mask(uint64_t handlermask);
 
 protected:
 	// Subunit description information
 	struct subunit_info
 	{
 		offs_t              m_bytemask;             // bytemask for this subunit
-		UINT32              m_mask;                 // mask (ff, ffff or ffffffff)
-		INT32               m_offset;               // offset to add to the address
-		UINT32              m_multiplier;           // multiplier to the pre-split address
-		UINT8               m_size;                 // size (8, 16 or 32)
-		UINT8               m_shift;                // shift of the subunit
+		uint32_t              m_mask;                 // mask (ff, ffff or ffffffff)
+		int32_t               m_offset;               // offset to add to the address
+		uint32_t              m_multiplier;           // multiplier to the pre-split address
+		uint8_t               m_size;                 // size (8, 16 or 32)
+		uint8_t               m_shift;                // shift of the subunit
 	};
 
 	// internal helpers
-	void configure_subunits(UINT64 handlermask, int handlerbits, int &start_slot, int &end_slot);
+	void configure_subunits(uint64_t handlermask, int handlerbits, int &start_slot, int &end_slot);
 	virtual void remove_subunit(int entry) = 0;
 
 	// internal state
 	bool                    m_populated;            // populated?
-	UINT8                   m_datawidth;
+	uint8_t                   m_datawidth;
 	endianness_t            m_endianness;
 	offs_t                  m_bytestart;            // byte-adjusted start address for handler
 	offs_t                  m_byteend;              // byte-adjusted end address for handler
 	offs_t                  m_bytemask;             // byte-adjusted mask against the final address
-	UINT8 **                m_rambaseptr;           // pointer to the bank base
-	UINT8                   m_subunits;             // for width stubs, the number of subunits
+	uint8_t **                m_rambaseptr;           // pointer to the bank base
+	uint8_t                   m_subunits;             // for width stubs, the number of subunits
 	subunit_info            m_subunit_infos[8];     // for width stubs, the associated subunit info
-	UINT64                  m_invsubmask;           // inverted mask of the populated subunits
+	uint64_t                  m_invsubmask;           // inverted mask of the populated subunits
 };
 
 
@@ -377,7 +377,7 @@ public:
 	};
 
 	// construction/destruction
-	handler_entry_read(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
+	handler_entry_read(uint8_t width, endianness_t endianness, uint8_t **rambaseptr)
 		: handler_entry(width, endianness, rambaseptr),
 			m_ioport(nullptr)
 	{
@@ -390,25 +390,25 @@ public:
 	virtual const char *subunit_name(int entry) const override;
 
 	// configure delegate callbacks
-	void set_delegate(read8_delegate delegate, UINT64 mask = 0);
-	void set_delegate(read16_delegate delegate, UINT64 mask = 0);
-	void set_delegate(read32_delegate delegate, UINT64 mask = 0);
-	void set_delegate(read64_delegate delegate, UINT64 mask = 0);
+	void set_delegate(read8_delegate delegate, uint64_t mask = 0);
+	void set_delegate(read16_delegate delegate, uint64_t mask = 0);
+	void set_delegate(read32_delegate delegate, uint64_t mask = 0);
+	void set_delegate(read64_delegate delegate, uint64_t mask = 0);
 
 	// configure I/O port access
 	void set_ioport(ioport_port &ioport);
 
 	// read via the underlying delegates
-	UINT8 read8(address_space &space, offs_t offset, UINT8 mask) const { return m_read.r8(space, offset, mask); }
-	UINT16 read16(address_space &space, offs_t offset, UINT16 mask) const { return m_read.r16(space, offset, mask); }
-	UINT32 read32(address_space &space, offs_t offset, UINT32 mask) const { return m_read.r32(space, offset, mask); }
-	UINT64 read64(address_space &space, offs_t offset, UINT64 mask) const { return m_read.r64(space, offset, mask); }
+	uint8_t read8(address_space &space, offs_t offset, uint8_t mask) const { return m_read.r8(space, offset, mask); }
+	uint16_t read16(address_space &space, offs_t offset, uint16_t mask) const { return m_read.r16(space, offset, mask); }
+	uint32_t read32(address_space &space, offs_t offset, uint32_t mask) const { return m_read.r32(space, offset, mask); }
+	uint64_t read64(address_space &space, offs_t offset, uint64_t mask) const { return m_read.r64(space, offset, mask); }
 
 private:
 	// stubs for converting between address sizes
-	UINT16 read_stub_16(address_space &space, offs_t offset, UINT16 mask);
-	UINT32 read_stub_32(address_space &space, offs_t offset, UINT32 mask);
-	UINT64 read_stub_64(address_space &space, offs_t offset, UINT64 mask);
+	uint16_t read_stub_16(address_space &space, offs_t offset, uint16_t mask);
+	uint32_t read_stub_32(address_space &space, offs_t offset, uint32_t mask);
+	uint64_t read_stub_64(address_space &space, offs_t offset, uint64_t mask);
 
 	// stubs for reading I/O ports
 	template<typename _UintType>
@@ -440,7 +440,7 @@ public:
 	};
 
 	// construction/destruction
-	handler_entry_write(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
+	handler_entry_write(uint8_t width, endianness_t endianness, uint8_t **rambaseptr)
 		: handler_entry(width, endianness, rambaseptr),
 			m_ioport(nullptr)
 	{
@@ -453,25 +453,25 @@ public:
 	virtual const char *subunit_name(int entry) const override;
 
 	// configure delegate callbacks
-	void set_delegate(write8_delegate delegate, UINT64 mask = 0);
-	void set_delegate(write16_delegate delegate, UINT64 mask = 0);
-	void set_delegate(write32_delegate delegate, UINT64 mask = 0);
-	void set_delegate(write64_delegate delegate, UINT64 mask = 0);
+	void set_delegate(write8_delegate delegate, uint64_t mask = 0);
+	void set_delegate(write16_delegate delegate, uint64_t mask = 0);
+	void set_delegate(write32_delegate delegate, uint64_t mask = 0);
+	void set_delegate(write64_delegate delegate, uint64_t mask = 0);
 
 	// configure I/O port access
 	void set_ioport(ioport_port &ioport);
 
 	// write via the underlying delegates
-	void write8(address_space &space, offs_t offset, UINT8 data, UINT8 mask) const { m_write.w8(space, offset, data, mask); }
-	void write16(address_space &space, offs_t offset, UINT16 data, UINT16 mask) const { m_write.w16(space, offset, data, mask); }
-	void write32(address_space &space, offs_t offset, UINT32 data, UINT32 mask) const { m_write.w32(space, offset, data, mask); }
-	void write64(address_space &space, offs_t offset, UINT64 data, UINT64 mask) const { m_write.w64(space, offset, data, mask); }
+	void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mask) const { m_write.w8(space, offset, data, mask); }
+	void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mask) const { m_write.w16(space, offset, data, mask); }
+	void write32(address_space &space, offs_t offset, uint32_t data, uint32_t mask) const { m_write.w32(space, offset, data, mask); }
+	void write64(address_space &space, offs_t offset, uint64_t data, uint64_t mask) const { m_write.w64(space, offset, data, mask); }
 
 private:
 	// stubs for converting between address sizes
-	void write_stub_16(address_space &space, offs_t offset, UINT16 data, UINT16 mask);
-	void write_stub_32(address_space &space, offs_t offset, UINT32 data, UINT32 mask);
-	void write_stub_64(address_space &space, offs_t offset, UINT64 data, UINT64 mask);
+	void write_stub_16(address_space &space, offs_t offset, uint16_t data, uint16_t mask);
+	void write_stub_32(address_space &space, offs_t offset, uint32_t data, uint32_t mask);
+	void write_stub_64(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
 
 	// stubs for writing I/O ports
 	template<typename _UintType>
@@ -505,7 +505,7 @@ public:
 	void setoffset(address_space &space, offs_t offset) const { if (m_setoffset.has_object()) m_setoffset(space, offset); }
 
 	// configure delegate callbacks
-	void set_delegate(setoffset_delegate delegate, UINT64 mask = 0) { m_setoffset = delegate; }
+	void set_delegate(setoffset_delegate delegate, uint64_t mask = 0) { m_setoffset = delegate; }
 
 private:
 	setoffset_delegate         m_setoffset;
@@ -522,7 +522,7 @@ template<typename _HandlerEntry>
 class handler_entry_proxy
 {
 public:
-	handler_entry_proxy(std::list<_HandlerEntry *> _handlers, UINT64 _mask) : handlers(std::move(_handlers)), mask(_mask) {}
+	handler_entry_proxy(std::list<_HandlerEntry *> _handlers, uint64_t _mask) : handlers(std::move(_handlers)), mask(_mask) {}
 	handler_entry_proxy(const handler_entry_proxy<_HandlerEntry> &hep) : handlers(hep.handlers), mask(hep.mask) {}
 
 	// forward delegate callbacks configuration
@@ -539,7 +539,7 @@ public:
 
 private:
 	std::list<_HandlerEntry *> handlers;
-	UINT64 mask;
+	uint64_t mask;
 };
 
 
@@ -564,35 +564,35 @@ public:
 	virtual ~address_table();
 
 	// getters
-	virtual handler_entry &handler(UINT32 index) const = 0;
+	virtual handler_entry &handler(uint32_t index) const = 0;
 	bool watchpoints_enabled() const { return (m_live_lookup == s_watchpoint_table); }
 
 	// address lookups
-	UINT32 lookup_live(offs_t byteaddress) const { return m_large ? lookup_live_large(byteaddress) : lookup_live_small(byteaddress); }
-	UINT32 lookup_live_small(offs_t byteaddress) const { return m_live_lookup[byteaddress]; }
+	uint32_t lookup_live(offs_t byteaddress) const { return m_large ? lookup_live_large(byteaddress) : lookup_live_small(byteaddress); }
+	uint32_t lookup_live_small(offs_t byteaddress) const { return m_live_lookup[byteaddress]; }
 
-	UINT32 lookup_live_large(offs_t byteaddress) const
+	uint32_t lookup_live_large(offs_t byteaddress) const
 	{
-		UINT32 entry = m_live_lookup[level1_index_large(byteaddress)];
+		uint32_t entry = m_live_lookup[level1_index_large(byteaddress)];
 		if (entry >= SUBTABLE_BASE)
 			entry = m_live_lookup[level2_index_large(entry, byteaddress)];
 		return entry;
 	}
 
-	UINT32 lookup_live_nowp(offs_t byteaddress) const { return m_large ? lookup_live_large_nowp(byteaddress) : lookup_live_small_nowp(byteaddress); }
-	UINT32 lookup_live_small_nowp(offs_t byteaddress) const { return m_table[byteaddress]; }
+	uint32_t lookup_live_nowp(offs_t byteaddress) const { return m_large ? lookup_live_large_nowp(byteaddress) : lookup_live_small_nowp(byteaddress); }
+	uint32_t lookup_live_small_nowp(offs_t byteaddress) const { return m_table[byteaddress]; }
 
-	UINT32 lookup_live_large_nowp(offs_t byteaddress) const
+	uint32_t lookup_live_large_nowp(offs_t byteaddress) const
 	{
-		UINT32 entry = m_table[level1_index_large(byteaddress)];
+		uint32_t entry = m_table[level1_index_large(byteaddress)];
 		if (entry >= SUBTABLE_BASE)
 			entry = m_table[level2_index_large(entry, byteaddress)];
 		return entry;
 	}
 
-	UINT32 lookup(offs_t byteaddress) const
+	uint32_t lookup(offs_t byteaddress) const
 	{
-		UINT32 entry = m_live_lookup[level1_index(byteaddress)];
+		uint32_t entry = m_live_lookup[level1_index(byteaddress)];
 		if (entry >= SUBTABLE_BASE)
 			entry = m_live_lookup[level2_index(entry, byteaddress)];
 		return entry;
@@ -602,37 +602,37 @@ public:
 	void enable_watchpoints(bool enable = true) { m_live_lookup = enable ? s_watchpoint_table : &m_table[0]; }
 
 	// table mapping helpers
-	void map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT16 staticentry);
-	void setup_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask, std::list<UINT32> &entries);
-	UINT16 derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const;
+	void map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, uint16_t staticentry);
+	void setup_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, uint64_t mask, std::list<uint32_t> &entries);
+	uint16_t derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const;
 
 	// misc helpers
 	void mask_all_handlers(offs_t mask);
-	const char *handler_name(UINT16 entry) const;
+	const char *handler_name(uint16_t entry) const;
 
 protected:
 	// determine table indexes based on the address
-	UINT32 level1_index_large(offs_t address) const { return address >> LEVEL2_BITS; }
-	UINT32 level2_index_large(UINT16 l1entry, offs_t address) const { return (1 << LEVEL1_BITS) + ((l1entry - SUBTABLE_BASE) << LEVEL2_BITS) + (address & ((1 << LEVEL2_BITS) - 1)); }
-	UINT32 level1_index(offs_t address) const { return m_large ? level1_index_large(address) : address; }
-	UINT32 level2_index(UINT16 l1entry, offs_t address) const { return m_large ? level2_index_large(l1entry, address) : 0; }
+	uint32_t level1_index_large(offs_t address) const { return address >> LEVEL2_BITS; }
+	uint32_t level2_index_large(uint16_t l1entry, offs_t address) const { return (1 << LEVEL1_BITS) + ((l1entry - SUBTABLE_BASE) << LEVEL2_BITS) + (address & ((1 << LEVEL2_BITS) - 1)); }
+	uint32_t level1_index(offs_t address) const { return m_large ? level1_index_large(address) : address; }
+	uint32_t level2_index(uint16_t l1entry, offs_t address) const { return m_large ? level2_index_large(l1entry, address) : 0; }
 
 	// table population/depopulation
-	void populate_range_mirrored(offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT16 handler);
-	void populate_range(offs_t bytestart, offs_t byteend, UINT16 handler);
+	void populate_range_mirrored(offs_t bytestart, offs_t byteend, offs_t bytemirror, uint16_t handler);
+	void populate_range(offs_t bytestart, offs_t byteend, uint16_t handler);
 
 	// subtable management
-	UINT16 subtable_alloc();
-	void subtable_realloc(UINT16 subentry);
+	uint16_t subtable_alloc();
+	void subtable_realloc(uint16_t subentry);
 	int subtable_merge();
-	void subtable_release(UINT16 subentry);
-	UINT16 *subtable_open(offs_t l1index);
+	void subtable_release(uint16_t subentry);
+	uint16_t *subtable_open(offs_t l1index);
 	void subtable_close(offs_t l1index);
-	UINT16 *subtable_ptr(UINT16 entry) { return &m_table[level2_index(entry, 0)]; }
+	uint16_t *subtable_ptr(uint16_t entry) { return &m_table[level2_index(entry, 0)]; }
 
 	// internal state
-	std::vector<UINT16>   m_table;                    // pointer to base of table
-	UINT16 *                m_live_lookup;              // current lookup
+	std::vector<uint16_t>   m_table;                    // pointer to base of table
+	uint16_t *                m_live_lookup;              // current lookup
 	address_space &         m_space;                    // pointer back to the space
 	bool                    m_large;                    // large memory model?
 
@@ -646,32 +646,32 @@ protected:
 				m_usecount(0) { }
 
 		bool                m_checksum_valid;           // is the checksum valid
-		UINT32              m_checksum;                 // checksum over all the bytes
-		UINT32              m_usecount;                 // number of times this has been used
+		uint32_t              m_checksum;                 // checksum over all the bytes
+		uint32_t              m_usecount;                 // number of times this has been used
 	};
 	std::vector<subtable_data>   m_subtable;            // info about each subtable
-	UINT16                  m_subtable_alloc;           // number of subtables allocated
+	uint16_t                  m_subtable_alloc;           // number of subtables allocated
 
 	// static global read-only watchpoint table
-	static UINT16           s_watchpoint_table[1 << LEVEL1_BITS];
+	static uint16_t           s_watchpoint_table[1 << LEVEL1_BITS];
 
 private:
 	int handler_refcount[SUBTABLE_BASE-STATIC_COUNT];
-	UINT16 handler_next_free[SUBTABLE_BASE-STATIC_COUNT];
-	UINT16 handler_free;
-	UINT16 get_free_handler();
+	uint16_t handler_next_free[SUBTABLE_BASE-STATIC_COUNT];
+	uint16_t handler_free;
+	uint16_t get_free_handler();
 	void verify_reference_counts();
-	void setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<UINT32> &entries);
-	void setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries);
+	void setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<uint32_t> &entries);
+	void setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, uint64_t mask, std::list<uint32_t> &entries);
 
-	void handler_ref(UINT16 entry, int count)
+	void handler_ref(uint16_t entry, int count)
 	{
 		assert(entry < SUBTABLE_BASE);
 		if (entry >= STATIC_COUNT)
 			handler_refcount[entry - STATIC_COUNT] += count;
 	}
 
-	void handler_unref(UINT16 entry)
+	void handler_unref(uint16_t entry)
 	{
 		assert(entry < SUBTABLE_BASE);
 		if (entry >= STATIC_COUNT)
@@ -696,15 +696,15 @@ public:
 	virtual ~address_table_read();
 
 	// getters
-	virtual handler_entry &handler(UINT32 index) const override;
-	handler_entry_read &handler_read(UINT32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
+	virtual handler_entry &handler(uint32_t index) const override;
+	handler_entry_read &handler_read(uint32_t index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
 
 	// range getter
-	handler_entry_proxy<handler_entry_read> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask = 0) {
-		std::list<UINT32> entries;
+	handler_entry_proxy<handler_entry_read> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, uint64_t mask = 0) {
+		std::list<uint32_t> entries;
 		setup_range(bytestart, byteend, bytemask, bytemirror, mask, entries);
 		std::list<handler_entry_read *> handlers;
-		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
+		for (std::list<uint32_t>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_read(*i));
 		return handler_entry_proxy<handler_entry_read>(handlers, mask);
 	}
@@ -740,7 +740,7 @@ private:
 	{
 		m_space.device().debug()->memory_read_hook(m_space, offset * sizeof(_UintType), mask);
 
-		UINT16 *oldtable = m_live_lookup;
+		uint16_t *oldtable = m_live_lookup;
 		m_live_lookup = &m_table[0];
 		_UintType result;
 		if (sizeof(_UintType) == 1) result = m_space.read_byte(offset);
@@ -767,15 +767,15 @@ public:
 	virtual ~address_table_write();
 
 	// getters
-	virtual handler_entry &handler(UINT32 index) const override;
-	handler_entry_write &handler_write(UINT32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
+	virtual handler_entry &handler(uint32_t index) const override;
+	handler_entry_write &handler_write(uint32_t index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
 
 	// range getter
-	handler_entry_proxy<handler_entry_write> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask = 0) {
-		std::list<UINT32> entries;
+	handler_entry_proxy<handler_entry_write> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, uint64_t mask = 0) {
+		std::list<uint32_t> entries;
 		setup_range(bytestart, byteend, bytemask, bytemirror, mask, entries);
 		std::list<handler_entry_write *> handlers;
-		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
+		for (std::list<uint32_t>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_write(*i));
 		return handler_entry_proxy<handler_entry_write>(handlers, mask);
 	}
@@ -808,7 +808,7 @@ private:
 	{
 		m_space.device().debug()->memory_write_hook(m_space, offset * sizeof(_UintType), data, mask);
 
-		UINT16 *oldtable = m_live_lookup;
+		uint16_t *oldtable = m_live_lookup;
 		m_live_lookup = &m_table[0];
 		if (sizeof(_UintType) == 1) m_space.write_byte(offset, data);
 		if (sizeof(_UintType) == 2) m_space.write_word(offset << 1, data, mask);
@@ -843,15 +843,15 @@ public:
 	{
 	}
 
-	handler_entry &handler(UINT32 index) const override {    assert(index < ARRAY_LENGTH(m_handlers));   return *m_handlers[index]; }
-	handler_entry_setoffset &handler_setoffset(UINT32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
+	handler_entry &handler(uint32_t index) const override {    assert(index < ARRAY_LENGTH(m_handlers));   return *m_handlers[index]; }
+	handler_entry_setoffset &handler_setoffset(uint32_t index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
 
 	// range getter
-	handler_entry_proxy<handler_entry_setoffset> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask = 0) {
-		std::list<UINT32> entries;
+	handler_entry_proxy<handler_entry_setoffset> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, uint64_t mask = 0) {
+		std::list<uint32_t> entries;
 		setup_range(bytestart, byteend, bytemask, bytemirror, mask, entries);
 		std::list<handler_entry_setoffset *> handlers;
-		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
+		for (std::list<uint32_t>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_setoffset(*i));
 		return handler_entry_proxy<handler_entry_setoffset>(handlers, mask);
 	}
@@ -881,14 +881,14 @@ class address_space_specific : public address_space
 	typedef address_space_specific<_NativeType, _Endian, _Large> this_type;
 
 	// constants describing the native size
-	static const UINT32 NATIVE_BYTES = sizeof(_NativeType);
-	static const UINT32 NATIVE_MASK = NATIVE_BYTES - 1;
-	static const UINT32 NATIVE_BITS = 8 * NATIVE_BYTES;
+	static const uint32_t NATIVE_BYTES = sizeof(_NativeType);
+	static const uint32_t NATIVE_MASK = NATIVE_BYTES - 1;
+	static const uint32_t NATIVE_BITS = 8 * NATIVE_BYTES;
 
 	// helpers to simplify core code
-	UINT32 read_lookup(offs_t byteaddress) const { return _Large ? m_read.lookup_live_large(byteaddress) : m_read.lookup_live_small(byteaddress); }
-	UINT32 write_lookup(offs_t byteaddress) const { return _Large ? m_write.lookup_live_large(byteaddress) : m_write.lookup_live_small(byteaddress); }
-	UINT32 setoffset_lookup(offs_t byteaddress) const { return _Large ? m_setoffset.lookup_live_large(byteaddress) : m_setoffset.lookup_live_small(byteaddress); }
+	uint32_t read_lookup(offs_t byteaddress) const { return _Large ? m_read.lookup_live_large(byteaddress) : m_read.lookup_live_small(byteaddress); }
+	uint32_t write_lookup(offs_t byteaddress) const { return _Large ? m_write.lookup_live_large(byteaddress) : m_write.lookup_live_small(byteaddress); }
+	uint32_t setoffset_lookup(offs_t byteaddress) const { return _Large ? m_setoffset.lookup_live_large(byteaddress) : m_setoffset.lookup_live_small(byteaddress); }
 
 public:
 	// construction/destruction
@@ -903,7 +903,7 @@ public:
 		// and returning the correct results
 
 		// install some dummy RAM for the first 16 bytes with well-known values
-		UINT8 buffer[16];
+		uint8_t buffer[16];
 		for (int index = 0; index < 16; index++)
 			buffer[index ^ ((_Endian == ENDIANNESS_NATIVE) ? 0 : (data_width()/8 - 1))] = index * 0x11;
 		install_ram_generic(0x00, 0x0f, 0x0f, 0, ROW_READWRITE, buffer);
@@ -913,22 +913,22 @@ public:
 		for (int address = 0; address < 8; address++)
 		{
 			// determine expected values
-			UINT64 expected64 = ((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 7 : 0)) * 0x11) << 56) |
-								((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 6 : 1)) * 0x11) << 48) |
-								((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 5 : 2)) * 0x11) << 40) |
-								((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 4 : 3)) * 0x11) << 32) |
-								((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 3 : 4)) * 0x11) << 24) |
-								((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 2 : 5)) * 0x11) << 16) |
-								((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 1 : 6)) * 0x11) <<  8) |
-								((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 0 : 7)) * 0x11) <<  0);
-			UINT32 expected32 = (_Endian == ENDIANNESS_LITTLE) ? expected64 : (expected64 >> 32);
-			UINT16 expected16 = (_Endian == ENDIANNESS_LITTLE) ? expected32 : (expected32 >> 16);
-			UINT8 expected8 = (_Endian == ENDIANNESS_LITTLE) ? expected16 : (expected16 >> 8);
+			uint64_t expected64 = ((uint64_t)((address + ((_Endian == ENDIANNESS_LITTLE) ? 7 : 0)) * 0x11) << 56) |
+								((uint64_t)((address + ((_Endian == ENDIANNESS_LITTLE) ? 6 : 1)) * 0x11) << 48) |
+								((uint64_t)((address + ((_Endian == ENDIANNESS_LITTLE) ? 5 : 2)) * 0x11) << 40) |
+								((uint64_t)((address + ((_Endian == ENDIANNESS_LITTLE) ? 4 : 3)) * 0x11) << 32) |
+								((uint64_t)((address + ((_Endian == ENDIANNESS_LITTLE) ? 3 : 4)) * 0x11) << 24) |
+								((uint64_t)((address + ((_Endian == ENDIANNESS_LITTLE) ? 2 : 5)) * 0x11) << 16) |
+								((uint64_t)((address + ((_Endian == ENDIANNESS_LITTLE) ? 1 : 6)) * 0x11) <<  8) |
+								((uint64_t)((address + ((_Endian == ENDIANNESS_LITTLE) ? 0 : 7)) * 0x11) <<  0);
+			uint32_t expected32 = (_Endian == ENDIANNESS_LITTLE) ? expected64 : (expected64 >> 32);
+			uint16_t expected16 = (_Endian == ENDIANNESS_LITTLE) ? expected32 : (expected32 >> 16);
+			uint8_t expected8 = (_Endian == ENDIANNESS_LITTLE) ? expected16 : (expected16 >> 8);
 
-			UINT64 result64;
-			UINT32 result32;
-			UINT16 result16;
-			UINT8 result8;
+			uint64_t result64;
+			uint32_t result32;
+			uint16_t result16;
+			uint8_t result8;
 
 			// validate byte accesses
 			printf("\nAddress %d\n", address);
@@ -1047,20 +1047,20 @@ public:
 	// generate accessor table
 	virtual void accessors(data_accessors &accessors) const override
 	{
-		accessors.read_byte = reinterpret_cast<UINT8 (*)(address_space &, offs_t)>(&read_byte_static);
-		accessors.read_word = reinterpret_cast<UINT16 (*)(address_space &, offs_t)>(&read_word_static);
-		accessors.read_word_masked = reinterpret_cast<UINT16 (*)(address_space &, offs_t, UINT16)>(&read_word_masked_static);
-		accessors.read_dword = reinterpret_cast<UINT32 (*)(address_space &, offs_t)>(&read_dword_static);
-		accessors.read_dword_masked = reinterpret_cast<UINT32 (*)(address_space &, offs_t, UINT32)>(&read_dword_masked_static);
-		accessors.read_qword = reinterpret_cast<UINT64 (*)(address_space &, offs_t)>(&read_qword_static);
-		accessors.read_qword_masked = reinterpret_cast<UINT64 (*)(address_space &, offs_t, UINT64)>(&read_qword_masked_static);
-		accessors.write_byte = reinterpret_cast<void (*)(address_space &, offs_t, UINT8)>(&write_byte_static);
-		accessors.write_word = reinterpret_cast<void (*)(address_space &, offs_t, UINT16)>(&write_word_static);
-		accessors.write_word_masked = reinterpret_cast<void (*)(address_space &, offs_t, UINT16, UINT16)>(&write_word_masked_static);
-		accessors.write_dword = reinterpret_cast<void (*)(address_space &, offs_t, UINT32)>(&write_dword_static);
-		accessors.write_dword_masked = reinterpret_cast<void (*)(address_space &, offs_t, UINT32, UINT32)>(&write_dword_masked_static);
-		accessors.write_qword = reinterpret_cast<void (*)(address_space &, offs_t, UINT64)>(&write_qword_static);
-		accessors.write_qword_masked = reinterpret_cast<void (*)(address_space &, offs_t, UINT64, UINT64)>(&write_qword_masked_static);
+		accessors.read_byte = reinterpret_cast<uint8_t (*)(address_space &, offs_t)>(&read_byte_static);
+		accessors.read_word = reinterpret_cast<uint16_t (*)(address_space &, offs_t)>(&read_word_static);
+		accessors.read_word_masked = reinterpret_cast<uint16_t (*)(address_space &, offs_t, uint16_t)>(&read_word_masked_static);
+		accessors.read_dword = reinterpret_cast<uint32_t (*)(address_space &, offs_t)>(&read_dword_static);
+		accessors.read_dword_masked = reinterpret_cast<uint32_t (*)(address_space &, offs_t, uint32_t)>(&read_dword_masked_static);
+		accessors.read_qword = reinterpret_cast<uint64_t (*)(address_space &, offs_t)>(&read_qword_static);
+		accessors.read_qword_masked = reinterpret_cast<uint64_t (*)(address_space &, offs_t, uint64_t)>(&read_qword_masked_static);
+		accessors.write_byte = reinterpret_cast<void (*)(address_space &, offs_t, uint8_t)>(&write_byte_static);
+		accessors.write_word = reinterpret_cast<void (*)(address_space &, offs_t, uint16_t)>(&write_word_static);
+		accessors.write_word_masked = reinterpret_cast<void (*)(address_space &, offs_t, uint16_t, uint16_t)>(&write_word_masked_static);
+		accessors.write_dword = reinterpret_cast<void (*)(address_space &, offs_t, uint32_t)>(&write_dword_static);
+		accessors.write_dword_masked = reinterpret_cast<void (*)(address_space &, offs_t, uint32_t, uint32_t)>(&write_dword_masked_static);
+		accessors.write_qword = reinterpret_cast<void (*)(address_space &, offs_t, uint64_t)>(&write_qword_static);
+		accessors.write_qword_masked = reinterpret_cast<void (*)(address_space &, offs_t, uint64_t, uint64_t)>(&write_qword_masked_static);
 	}
 
 	// return a pointer to the read bank, or nullptr if none
@@ -1068,7 +1068,7 @@ public:
 	{
 		// perform the lookup
 		byteaddress &= m_bytemask;
-		UINT32 entry = read_lookup(byteaddress);
+		uint32_t entry = read_lookup(byteaddress);
 		const handler_entry_read &handler = m_read.handler_read(entry);
 
 		// 8-bit case: RAM/ROM
@@ -1082,7 +1082,7 @@ public:
 	{
 		// perform the lookup
 		byteaddress &= m_bytemask;
-		UINT32 entry = write_lookup(byteaddress);
+		uint32_t entry = write_lookup(byteaddress);
 		const handler_entry_write &handler = m_write.handler_write(entry);
 
 		// 8-bit case: RAM/ROM
@@ -1100,7 +1100,7 @@ public:
 
 		// look up the handler
 		offs_t byteaddress = offset & m_bytemask;
-		UINT32 entry = read_lookup(byteaddress);
+		uint32_t entry = read_lookup(byteaddress);
 		const handler_entry_read &handler = m_read.handler_read(entry);
 
 		// either read directly from RAM, or call the delegate
@@ -1125,7 +1125,7 @@ public:
 
 		// look up the handler
 		offs_t byteaddress = offset & m_bytemask;
-		UINT32 entry = read_lookup(byteaddress);
+		uint32_t entry = read_lookup(byteaddress);
 		const handler_entry_read &handler = m_read.handler_read(entry);
 
 		// either read directly from RAM, or call the delegate
@@ -1148,7 +1148,7 @@ public:
 
 		// look up the handler
 		offs_t byteaddress = offset & m_bytemask;
-		UINT32 entry = write_lookup(byteaddress);
+		uint32_t entry = write_lookup(byteaddress);
 		const handler_entry_write &handler = m_write.handler_write(entry);
 
 		// either write directly to RAM, or call the delegate
@@ -1173,7 +1173,7 @@ public:
 
 		// look up the handler
 		offs_t byteaddress = offset & m_bytemask;
-		UINT32 entry = write_lookup(byteaddress);
+		uint32_t entry = write_lookup(byteaddress);
 		const handler_entry_write &handler = m_write.handler_write(entry);
 
 		// either write directly to RAM, or call the delegate
@@ -1191,8 +1191,8 @@ public:
 	template<typename _TargetType, bool _Aligned>
 	_TargetType read_direct(offs_t address, _TargetType mask)
 	{
-		const UINT32 TARGET_BYTES = sizeof(_TargetType);
-		const UINT32 TARGET_BITS = 8 * TARGET_BYTES;
+		const uint32_t TARGET_BYTES = sizeof(_TargetType);
+		const uint32_t TARGET_BITS = 8 * TARGET_BYTES;
 
 		// equal to native size and aligned; simple pass-through to the native reader
 		if (NATIVE_BYTES == TARGET_BYTES && (_Aligned || (address & NATIVE_MASK) == 0))
@@ -1201,7 +1201,7 @@ public:
 		// if native size is larger, see if we can do a single masked read (guaranteed if we're aligned)
 		if (NATIVE_BYTES > TARGET_BYTES)
 		{
-			UINT32 offsbits = 8 * (address & (NATIVE_BYTES - (_Aligned ? TARGET_BYTES : 1)));
+			uint32_t offsbits = 8 * (address & (NATIVE_BYTES - (_Aligned ? TARGET_BYTES : 1)));
 			if (_Aligned || (offsbits + TARGET_BITS <= NATIVE_BITS))
 			{
 				if (_Endian != ENDIANNESS_LITTLE) offsbits = NATIVE_BITS - TARGET_BITS - offsbits;
@@ -1210,7 +1210,7 @@ public:
 		}
 
 		// determine our alignment against the native boundaries, and mask the address
-		UINT32 offsbits = 8 * (address & (NATIVE_BYTES - 1));
+		uint32_t offsbits = 8 * (address & (NATIVE_BYTES - 1));
 		address &= ~NATIVE_MASK;
 
 		// if we're here, and native size is larger or equal to the target, we need exactly 2 reads
@@ -1235,7 +1235,7 @@ public:
 			else
 			{
 				// left-justify the mask to the target type
-				const UINT32 LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT = ((NATIVE_BITS >= TARGET_BITS) ? (NATIVE_BITS - TARGET_BITS) : 0);
+				const uint32_t LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT = ((NATIVE_BITS >= TARGET_BITS) ? (NATIVE_BITS - TARGET_BITS) : 0);
 				_NativeType result = 0;
 				_NativeType ljmask = (_NativeType)mask << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
 				_NativeType curmask = ljmask >> offsbits;
@@ -1258,7 +1258,7 @@ public:
 		{
 			// compute the maximum number of loops; we do it this way so that there are
 			// a fixed number of loops for the compiler to unroll if it desires
-			const UINT32 MAX_SPLITS_MINUS_ONE = TARGET_BYTES / NATIVE_BYTES - 1;
+			const uint32_t MAX_SPLITS_MINUS_ONE = TARGET_BYTES / NATIVE_BYTES - 1;
 			_TargetType result = 0;
 
 			// little-endian case
@@ -1270,7 +1270,7 @@ public:
 
 				// read middle bits from subsequent addresses
 				offsbits = NATIVE_BITS - offsbits;
-				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
+				for (uint32_t index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
 				{
 					address += NATIVE_BYTES;
 					curmask = mask >> offsbits;
@@ -1295,7 +1295,7 @@ public:
 				if (curmask != 0) result = (_TargetType)read_native(address, curmask) << offsbits;
 
 				// read middle bits from subsequent addresses
-				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
+				for (uint32_t index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
 				{
 					offsbits -= NATIVE_BITS;
 					address += NATIVE_BYTES;
@@ -1319,8 +1319,8 @@ public:
 	template<typename _TargetType, bool _Aligned>
 	void write_direct(offs_t address, _TargetType data, _TargetType mask)
 	{
-		const UINT32 TARGET_BYTES = sizeof(_TargetType);
-		const UINT32 TARGET_BITS = 8 * TARGET_BYTES;
+		const uint32_t TARGET_BYTES = sizeof(_TargetType);
+		const uint32_t TARGET_BITS = 8 * TARGET_BYTES;
 
 		// equal to native size and aligned; simple pass-through to the native writer
 		if (NATIVE_BYTES == TARGET_BYTES && (_Aligned || (address & NATIVE_MASK) == 0))
@@ -1329,7 +1329,7 @@ public:
 		// if native size is larger, see if we can do a single masked write (guaranteed if we're aligned)
 		if (NATIVE_BYTES > TARGET_BYTES)
 		{
-			UINT32 offsbits = 8 * (address & (NATIVE_BYTES - (_Aligned ? TARGET_BYTES : 1)));
+			uint32_t offsbits = 8 * (address & (NATIVE_BYTES - (_Aligned ? TARGET_BYTES : 1)));
 			if (_Aligned || (offsbits + TARGET_BITS <= NATIVE_BITS))
 			{
 				if (_Endian != ENDIANNESS_LITTLE) offsbits = NATIVE_BITS - TARGET_BITS - offsbits;
@@ -1338,7 +1338,7 @@ public:
 		}
 
 		// determine our alignment against the native boundaries, and mask the address
-		UINT32 offsbits = 8 * (address & (NATIVE_BYTES - 1));
+		uint32_t offsbits = 8 * (address & (NATIVE_BYTES - 1));
 		address &= ~NATIVE_MASK;
 
 		// if we're here, and native size is larger or equal to the target, we need exactly 2 writes
@@ -1361,7 +1361,7 @@ public:
 			else
 			{
 				// left-justify the mask and data to the target type
-				const UINT32 LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT = ((NATIVE_BITS >= TARGET_BITS) ? (NATIVE_BITS - TARGET_BITS) : 0);
+				const uint32_t LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT = ((NATIVE_BITS >= TARGET_BITS) ? (NATIVE_BITS - TARGET_BITS) : 0);
 				_NativeType ljdata = (_NativeType)data << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
 				_NativeType ljmask = (_NativeType)mask << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
 
@@ -1381,7 +1381,7 @@ public:
 		{
 			// compute the maximum number of loops; we do it this way so that there are
 			// a fixed number of loops for the compiler to unroll if it desires
-			const UINT32 MAX_SPLITS_MINUS_ONE = TARGET_BYTES / NATIVE_BYTES - 1;
+			const uint32_t MAX_SPLITS_MINUS_ONE = TARGET_BYTES / NATIVE_BYTES - 1;
 
 			// little-endian case
 			if (_Endian == ENDIANNESS_LITTLE)
@@ -1392,7 +1392,7 @@ public:
 
 				// write middle bits to subsequent addresses
 				offsbits = NATIVE_BITS - offsbits;
-				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
+				for (uint32_t index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
 				{
 					address += NATIVE_BYTES;
 					curmask = mask >> offsbits;
@@ -1417,7 +1417,7 @@ public:
 				if (curmask != 0) write_native(address, data >> offsbits, curmask);
 
 				// write middle bits to subsequent addresses
-				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
+				for (uint32_t index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
 				{
 					offsbits -= NATIVE_BITS;
 					address += NATIVE_BYTES;
@@ -1442,7 +1442,7 @@ public:
 	void set_address(offs_t address) override
 	{
 		offs_t byteaddress = address & m_bytemask;
-		UINT32 entry = setoffset_lookup(byteaddress);
+		uint32_t entry = setoffset_lookup(byteaddress);
 		const handler_entry_setoffset &handler = m_setoffset.handler_setoffset(entry);
 
 		offs_t offset = handler.byteoffset(byteaddress);
@@ -1450,72 +1450,72 @@ public:
 	}
 
 	// virtual access to these functions
-	UINT8 read_byte(offs_t address) override { return (NATIVE_BITS == 8) ? read_native(address & ~NATIVE_MASK) : read_direct<UINT8, true>(address, 0xff); }
-	UINT16 read_word(offs_t address) override { return (NATIVE_BITS == 16) ? read_native(address & ~NATIVE_MASK) : read_direct<UINT16, true>(address, 0xffff); }
-	UINT16 read_word(offs_t address, UINT16 mask) override { return read_direct<UINT16, true>(address, mask); }
-	UINT16 read_word_unaligned(offs_t address) override { return read_direct<UINT16, false>(address, 0xffff); }
-	UINT16 read_word_unaligned(offs_t address, UINT16 mask) override { return read_direct<UINT16, false>(address, mask); }
-	UINT32 read_dword(offs_t address) override { return (NATIVE_BITS == 32) ? read_native(address & ~NATIVE_MASK) : read_direct<UINT32, true>(address, 0xffffffff); }
-	UINT32 read_dword(offs_t address, UINT32 mask) override { return read_direct<UINT32, true>(address, mask); }
-	UINT32 read_dword_unaligned(offs_t address) override { return read_direct<UINT32, false>(address, 0xffffffff); }
-	UINT32 read_dword_unaligned(offs_t address, UINT32 mask) override { return read_direct<UINT32, false>(address, mask); }
-	UINT64 read_qword(offs_t address) override { return (NATIVE_BITS == 64) ? read_native(address & ~NATIVE_MASK) : read_direct<UINT64, true>(address, U64(0xffffffffffffffff)); }
-	UINT64 read_qword(offs_t address, UINT64 mask) override { return read_direct<UINT64, true>(address, mask); }
-	UINT64 read_qword_unaligned(offs_t address) override { return read_direct<UINT64, false>(address, U64(0xffffffffffffffff)); }
-	UINT64 read_qword_unaligned(offs_t address, UINT64 mask) override { return read_direct<UINT64, false>(address, mask); }
+	uint8_t read_byte(offs_t address) override { return (NATIVE_BITS == 8) ? read_native(address & ~NATIVE_MASK) : read_direct<uint8_t, true>(address, 0xff); }
+	uint16_t read_word(offs_t address) override { return (NATIVE_BITS == 16) ? read_native(address & ~NATIVE_MASK) : read_direct<uint16_t, true>(address, 0xffff); }
+	uint16_t read_word(offs_t address, uint16_t mask) override { return read_direct<uint16_t, true>(address, mask); }
+	uint16_t read_word_unaligned(offs_t address) override { return read_direct<uint16_t, false>(address, 0xffff); }
+	uint16_t read_word_unaligned(offs_t address, uint16_t mask) override { return read_direct<uint16_t, false>(address, mask); }
+	uint32_t read_dword(offs_t address) override { return (NATIVE_BITS == 32) ? read_native(address & ~NATIVE_MASK) : read_direct<uint32_t, true>(address, 0xffffffff); }
+	uint32_t read_dword(offs_t address, uint32_t mask) override { return read_direct<uint32_t, true>(address, mask); }
+	uint32_t read_dword_unaligned(offs_t address) override { return read_direct<uint32_t, false>(address, 0xffffffff); }
+	uint32_t read_dword_unaligned(offs_t address, uint32_t mask) override { return read_direct<uint32_t, false>(address, mask); }
+	uint64_t read_qword(offs_t address) override { return (NATIVE_BITS == 64) ? read_native(address & ~NATIVE_MASK) : read_direct<uint64_t, true>(address, U64(0xffffffffffffffff)); }
+	uint64_t read_qword(offs_t address, uint64_t mask) override { return read_direct<uint64_t, true>(address, mask); }
+	uint64_t read_qword_unaligned(offs_t address) override { return read_direct<uint64_t, false>(address, U64(0xffffffffffffffff)); }
+	uint64_t read_qword_unaligned(offs_t address, uint64_t mask) override { return read_direct<uint64_t, false>(address, mask); }
 
-	void write_byte(offs_t address, UINT8 data) override { if (NATIVE_BITS == 8) write_native(address & ~NATIVE_MASK, data); else write_direct<UINT8, true>(address, data, 0xff); }
-	void write_word(offs_t address, UINT16 data) override { if (NATIVE_BITS == 16) write_native(address & ~NATIVE_MASK, data); else write_direct<UINT16, true>(address, data, 0xffff); }
-	void write_word(offs_t address, UINT16 data, UINT16 mask) override { write_direct<UINT16, true>(address, data, mask); }
-	void write_word_unaligned(offs_t address, UINT16 data) override { write_direct<UINT16, false>(address, data, 0xffff); }
-	void write_word_unaligned(offs_t address, UINT16 data, UINT16 mask) override { write_direct<UINT16, false>(address, data, mask); }
-	void write_dword(offs_t address, UINT32 data) override { if (NATIVE_BITS == 32) write_native(address & ~NATIVE_MASK, data); else write_direct<UINT32, true>(address, data, 0xffffffff); }
-	void write_dword(offs_t address, UINT32 data, UINT32 mask) override { write_direct<UINT32, true>(address, data, mask); }
-	void write_dword_unaligned(offs_t address, UINT32 data) override { write_direct<UINT32, false>(address, data, 0xffffffff); }
-	void write_dword_unaligned(offs_t address, UINT32 data, UINT32 mask) override { write_direct<UINT32, false>(address, data, mask); }
-	void write_qword(offs_t address, UINT64 data) override { if (NATIVE_BITS == 64) write_native(address & ~NATIVE_MASK, data); else write_direct<UINT64, true>(address, data, U64(0xffffffffffffffff)); }
-	void write_qword(offs_t address, UINT64 data, UINT64 mask) override { write_direct<UINT64, true>(address, data, mask); }
-	void write_qword_unaligned(offs_t address, UINT64 data) override { write_direct<UINT64, false>(address, data, U64(0xffffffffffffffff)); }
-	void write_qword_unaligned(offs_t address, UINT64 data, UINT64 mask) override { write_direct<UINT64, false>(address, data, mask); }
+	void write_byte(offs_t address, uint8_t data) override { if (NATIVE_BITS == 8) write_native(address & ~NATIVE_MASK, data); else write_direct<uint8_t, true>(address, data, 0xff); }
+	void write_word(offs_t address, uint16_t data) override { if (NATIVE_BITS == 16) write_native(address & ~NATIVE_MASK, data); else write_direct<uint16_t, true>(address, data, 0xffff); }
+	void write_word(offs_t address, uint16_t data, uint16_t mask) override { write_direct<uint16_t, true>(address, data, mask); }
+	void write_word_unaligned(offs_t address, uint16_t data) override { write_direct<uint16_t, false>(address, data, 0xffff); }
+	void write_word_unaligned(offs_t address, uint16_t data, uint16_t mask) override { write_direct<uint16_t, false>(address, data, mask); }
+	void write_dword(offs_t address, uint32_t data) override { if (NATIVE_BITS == 32) write_native(address & ~NATIVE_MASK, data); else write_direct<uint32_t, true>(address, data, 0xffffffff); }
+	void write_dword(offs_t address, uint32_t data, uint32_t mask) override { write_direct<uint32_t, true>(address, data, mask); }
+	void write_dword_unaligned(offs_t address, uint32_t data) override { write_direct<uint32_t, false>(address, data, 0xffffffff); }
+	void write_dword_unaligned(offs_t address, uint32_t data, uint32_t mask) override { write_direct<uint32_t, false>(address, data, mask); }
+	void write_qword(offs_t address, uint64_t data) override { if (NATIVE_BITS == 64) write_native(address & ~NATIVE_MASK, data); else write_direct<uint64_t, true>(address, data, U64(0xffffffffffffffff)); }
+	void write_qword(offs_t address, uint64_t data, uint64_t mask) override { write_direct<uint64_t, true>(address, data, mask); }
+	void write_qword_unaligned(offs_t address, uint64_t data) override { write_direct<uint64_t, false>(address, data, U64(0xffffffffffffffff)); }
+	void write_qword_unaligned(offs_t address, uint64_t data, uint64_t mask) override { write_direct<uint64_t, false>(address, data, mask); }
 
 	// static access to these functions
-	static UINT8 read_byte_static(this_type &space, offs_t address) { return (NATIVE_BITS == 8) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<UINT8, true>(address, 0xff); }
-	static UINT16 read_word_static(this_type &space, offs_t address) { return (NATIVE_BITS == 16) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<UINT16, true>(address, 0xffff); }
-	static UINT16 read_word_masked_static(this_type &space, offs_t address, UINT16 mask) { return space.read_direct<UINT16, true>(address, mask); }
-	static UINT32 read_dword_static(this_type &space, offs_t address) { return (NATIVE_BITS == 32) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<UINT32, true>(address, 0xffffffff); }
-	static UINT32 read_dword_masked_static(this_type &space, offs_t address, UINT32 mask) { return space.read_direct<UINT32, true>(address, mask); }
-	static UINT64 read_qword_static(this_type &space, offs_t address) { return (NATIVE_BITS == 64) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<UINT64, true>(address, U64(0xffffffffffffffff)); }
-	static UINT64 read_qword_masked_static(this_type &space, offs_t address, UINT64 mask) { return space.read_direct<UINT64, true>(address, mask); }
-	static void write_byte_static(this_type &space, offs_t address, UINT8 data) { if (NATIVE_BITS == 8) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<UINT8, true>(address, data, 0xff); }
-	static void write_word_static(this_type &space, offs_t address, UINT16 data) { if (NATIVE_BITS == 16) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<UINT16, true>(address, data, 0xffff); }
-	static void write_word_masked_static(this_type &space, offs_t address, UINT16 data, UINT16 mask) { space.write_direct<UINT16, true>(address, data, mask); }
-	static void write_dword_static(this_type &space, offs_t address, UINT32 data) { if (NATIVE_BITS == 32) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<UINT32, true>(address, data, 0xffffffff); }
-	static void write_dword_masked_static(this_type &space, offs_t address, UINT32 data, UINT32 mask) { space.write_direct<UINT32, true>(address, data, mask); }
-	static void write_qword_static(this_type &space, offs_t address, UINT64 data) { if (NATIVE_BITS == 64) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<UINT64, true>(address, data, U64(0xffffffffffffffff)); }
-	static void write_qword_masked_static(this_type &space, offs_t address, UINT64 data, UINT64 mask) { space.write_direct<UINT64, true>(address, data, mask); }
+	static uint8_t read_byte_static(this_type &space, offs_t address) { return (NATIVE_BITS == 8) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<uint8_t, true>(address, 0xff); }
+	static uint16_t read_word_static(this_type &space, offs_t address) { return (NATIVE_BITS == 16) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<uint16_t, true>(address, 0xffff); }
+	static uint16_t read_word_masked_static(this_type &space, offs_t address, uint16_t mask) { return space.read_direct<uint16_t, true>(address, mask); }
+	static uint32_t read_dword_static(this_type &space, offs_t address) { return (NATIVE_BITS == 32) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<uint32_t, true>(address, 0xffffffff); }
+	static uint32_t read_dword_masked_static(this_type &space, offs_t address, uint32_t mask) { return space.read_direct<uint32_t, true>(address, mask); }
+	static uint64_t read_qword_static(this_type &space, offs_t address) { return (NATIVE_BITS == 64) ? space.read_native(address & ~NATIVE_MASK) : space.read_direct<uint64_t, true>(address, U64(0xffffffffffffffff)); }
+	static uint64_t read_qword_masked_static(this_type &space, offs_t address, uint64_t mask) { return space.read_direct<uint64_t, true>(address, mask); }
+	static void write_byte_static(this_type &space, offs_t address, uint8_t data) { if (NATIVE_BITS == 8) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<uint8_t, true>(address, data, 0xff); }
+	static void write_word_static(this_type &space, offs_t address, uint16_t data) { if (NATIVE_BITS == 16) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<uint16_t, true>(address, data, 0xffff); }
+	static void write_word_masked_static(this_type &space, offs_t address, uint16_t data, uint16_t mask) { space.write_direct<uint16_t, true>(address, data, mask); }
+	static void write_dword_static(this_type &space, offs_t address, uint32_t data) { if (NATIVE_BITS == 32) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<uint32_t, true>(address, data, 0xffffffff); }
+	static void write_dword_masked_static(this_type &space, offs_t address, uint32_t data, uint32_t mask) { space.write_direct<uint32_t, true>(address, data, mask); }
+	static void write_qword_static(this_type &space, offs_t address, uint64_t data) { if (NATIVE_BITS == 64) space.write_native(address & ~NATIVE_MASK, data); else space.write_direct<uint64_t, true>(address, data, U64(0xffffffffffffffff)); }
+	static void write_qword_masked_static(this_type &space, offs_t address, uint64_t data, uint64_t mask) { space.write_direct<uint64_t, true>(address, data, mask); }
 
 	address_table_read      m_read;             // memory read lookup table
 	address_table_write     m_write;            // memory write lookup table
 	address_table_setoffset m_setoffset;        // memory setoffset lookup table
 };
 
-typedef address_space_specific<UINT8,  ENDIANNESS_LITTLE, false> address_space_8le_small;
-typedef address_space_specific<UINT8,  ENDIANNESS_BIG,    false> address_space_8be_small;
-typedef address_space_specific<UINT16, ENDIANNESS_LITTLE, false> address_space_16le_small;
-typedef address_space_specific<UINT16, ENDIANNESS_BIG,    false> address_space_16be_small;
-typedef address_space_specific<UINT32, ENDIANNESS_LITTLE, false> address_space_32le_small;
-typedef address_space_specific<UINT32, ENDIANNESS_BIG,    false> address_space_32be_small;
-typedef address_space_specific<UINT64, ENDIANNESS_LITTLE, false> address_space_64le_small;
-typedef address_space_specific<UINT64, ENDIANNESS_BIG,    false> address_space_64be_small;
+typedef address_space_specific<uint8_t,  ENDIANNESS_LITTLE, false> address_space_8le_small;
+typedef address_space_specific<uint8_t,  ENDIANNESS_BIG,    false> address_space_8be_small;
+typedef address_space_specific<uint16_t, ENDIANNESS_LITTLE, false> address_space_16le_small;
+typedef address_space_specific<uint16_t, ENDIANNESS_BIG,    false> address_space_16be_small;
+typedef address_space_specific<uint32_t, ENDIANNESS_LITTLE, false> address_space_32le_small;
+typedef address_space_specific<uint32_t, ENDIANNESS_BIG,    false> address_space_32be_small;
+typedef address_space_specific<uint64_t, ENDIANNESS_LITTLE, false> address_space_64le_small;
+typedef address_space_specific<uint64_t, ENDIANNESS_BIG,    false> address_space_64be_small;
 
-typedef address_space_specific<UINT8,  ENDIANNESS_LITTLE, true> address_space_8le_large;
-typedef address_space_specific<UINT8,  ENDIANNESS_BIG,    true> address_space_8be_large;
-typedef address_space_specific<UINT16, ENDIANNESS_LITTLE, true> address_space_16le_large;
-typedef address_space_specific<UINT16, ENDIANNESS_BIG,    true> address_space_16be_large;
-typedef address_space_specific<UINT32, ENDIANNESS_LITTLE, true> address_space_32le_large;
-typedef address_space_specific<UINT32, ENDIANNESS_BIG,    true> address_space_32be_large;
-typedef address_space_specific<UINT64, ENDIANNESS_LITTLE, true> address_space_64le_large;
-typedef address_space_specific<UINT64, ENDIANNESS_BIG,    true> address_space_64be_large;
+typedef address_space_specific<uint8_t,  ENDIANNESS_LITTLE, true> address_space_8le_large;
+typedef address_space_specific<uint8_t,  ENDIANNESS_BIG,    true> address_space_8be_large;
+typedef address_space_specific<uint16_t, ENDIANNESS_LITTLE, true> address_space_16le_large;
+typedef address_space_specific<uint16_t, ENDIANNESS_BIG,    true> address_space_16be_large;
+typedef address_space_specific<uint32_t, ENDIANNESS_LITTLE, true> address_space_32le_large;
+typedef address_space_specific<uint32_t, ENDIANNESS_BIG,    true> address_space_32be_large;
+typedef address_space_specific<uint64_t, ENDIANNESS_LITTLE, true> address_space_64le_large;
+typedef address_space_specific<uint64_t, ENDIANNESS_BIG,    true> address_space_64be_large;
 
 
 
@@ -1524,7 +1524,7 @@ typedef address_space_specific<UINT64, ENDIANNESS_BIG,    true> address_space_64
 //**************************************************************************
 
 // global watchpoint table
-UINT16 address_table::s_watchpoint_table[1 << LEVEL1_BITS];
+uint16_t address_table::s_watchpoint_table[1 << LEVEL1_BITS];
 
 
 
@@ -1638,7 +1638,7 @@ void memory_manager::dump(FILE *file)
 //  region_alloc - allocates memory for a region
 //-------------------------------------------------
 
-memory_region *memory_manager::region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian)
+memory_region *memory_manager::region_alloc(const char *name, uint32_t length, uint8_t width, endianness_t endian)
 {
 	osd_printf_verbose("Region '%s' created\n", name);
 	// make sure we don't have a region of the same name; also find the end of the list
@@ -1668,7 +1668,7 @@ void memory_manager::region_free(const char *name)
 
 memory_region *memory_manager::region_containing(const void *memory, offs_t bytes) const
 {
-	const UINT8 *data = reinterpret_cast<const UINT8 *>(memory);
+	const uint8_t *data = reinterpret_cast<const uint8_t *>(memory);
 
 	// look through the region list and return the first match
 	for (auto &region : m_regionlist)
@@ -1995,7 +1995,7 @@ void address_space::check_address(const char *function, offs_t addrstart, offs_t
 void address_space::prepare_map()
 {
 	memory_region *devregion = (m_spacenum == AS_0) ? machine().root_device().memregion(m_device.tag()) : nullptr;
-	UINT32 devregionsize = (devregion != nullptr) ? devregion->bytes() : 0;
+	uint32_t devregionsize = (devregion != nullptr) ? devregion->bytes() : 0;
 
 	// allocate the address map
 	m_map = std::make_unique<address_map>(m_device, m_spacenum);
@@ -2294,7 +2294,7 @@ void address_space::locate_memory()
 //  intersecting blocks and assign their pointers
 //-------------------------------------------------
 
-address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, offs_t byteend, UINT8 *base)
+address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, offs_t byteend, uint8_t *base)
 {
 	address_map_entry *unassigned = nullptr;
 
@@ -2378,7 +2378,7 @@ void address_space::dump_map(FILE *file, read_or_write readorwrite)
 	offs_t bytestart, byteend;
 	for (offs_t byteaddress = 0; byteaddress <= m_bytemask; byteaddress = byteend)
 	{
-		UINT16 entry = table.derive_range(byteaddress, bytestart, byteend);
+		uint16_t entry = table.derive_range(byteaddress, bytestart, byteend);
 		fprintf(file, "%08X-%08X    = %02X: %s [offset=%08X]\n",
 						bytestart, byteend, entry, table.handler_name(entry), table.handler(entry).bytestart());
 		if (++byteend == 0)
@@ -2421,7 +2421,7 @@ void address_space::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrm
 //  of a live device into this address space
 //-------------------------------------------------
 
-void address_space::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &delegate, int bits, UINT64 unitmask)
+void address_space::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &delegate, int bits, uint64_t unitmask)
 {
 	check_address("install_device_delegate", addrstart, addrend);
 	address_map map(*this, addrstart, addrend, bits, unitmask, device, delegate);
@@ -2620,7 +2620,7 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate handler, UINT64 unitmask)
+void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate handler, uint64_t unitmask)
 {
 	VPRINTF(("address_space::install_read_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2634,7 +2634,7 @@ void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_
 	generate_memdump(machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate handler, UINT64 unitmask)
+void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate handler, uint64_t unitmask)
 {
 	VPRINTF(("address_space::install_write_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2648,7 +2648,7 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 	generate_memdump(machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, UINT64 unitmask)
+void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, uint64_t unitmask)
 {
 	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
 	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
@@ -2660,7 +2660,7 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate handler, UINT64 unitmask)
+void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate handler, uint64_t unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -2668,7 +2668,7 @@ void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_
 	generate_memdump(machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate handler, UINT64 unitmask)
+void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate handler, uint64_t unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -2676,7 +2676,7 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 	generate_memdump(machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, UINT64 unitmask)
+void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, uint64_t unitmask)
 {
 	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
 	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
@@ -2688,7 +2688,7 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate handler, UINT64 unitmask)
+void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate handler, uint64_t unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -2696,7 +2696,7 @@ void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_
 	generate_memdump(machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate handler, UINT64 unitmask)
+void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate handler, uint64_t unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -2704,7 +2704,7 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 	generate_memdump(machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, UINT64 unitmask)
+void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, uint64_t unitmask)
 {
 	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
 	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
@@ -2716,7 +2716,7 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate handler, UINT64 unitmask)
+void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate handler, uint64_t unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -2724,7 +2724,7 @@ void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_
 	generate_memdump(machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate handler, UINT64 unitmask)
+void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate handler, uint64_t unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -2732,7 +2732,7 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 	generate_memdump(machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, UINT64 unitmask)
+void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, uint64_t unitmask)
 {
 	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
 	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
@@ -2743,7 +2743,7 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  install_setoffset_handler - install set_offset delegate handlers for the space
 //-----------------------------------------------------------------------
 
-void address_space::install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate handler, UINT64 unitmask)
+void address_space::install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate handler, uint64_t unitmask)
 {
 	VPRINTF(("address_space::install_setoffset_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2782,8 +2782,8 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 		offs_t maskend = byteend & entry.m_bytemask;
 		if (entry.m_memory != nullptr && maskstart >= entry.m_bytestart && maskend <= entry.m_byteend)
 		{
-			VPRINTF(("found in entry %08X-%08X [%p]\n", entry.m_addrstart, entry.m_addrend, (UINT8 *)entry.m_memory + (maskstart - entry.m_bytestart)));
-			return (UINT8 *)entry.m_memory + (maskstart - entry.m_bytestart);
+			VPRINTF(("found in entry %08X-%08X [%p]\n", entry.m_addrstart, entry.m_addrend, (uint8_t *)entry.m_memory + (maskstart - entry.m_bytestart)));
+			return (uint8_t *)entry.m_memory + (maskstart - entry.m_bytestart);
 		}
 	}
 
@@ -2960,7 +2960,7 @@ address_table::~address_table()
 //  map
 //-------------------------------------------------
 
-void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT16 entry)
+void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, uint16_t entry)
 {
 	// convert addresses to bytes
 	offs_t bytestart = addrstart;
@@ -2988,12 +2988,12 @@ void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask,
 	//  verify_reference_counts();
 }
 
-UINT16 address_table::get_free_handler()
+uint16_t address_table::get_free_handler()
 {
 	if (handler_free == STATIC_INVALID)
 		throw emu_fatalerror("Out of handler entries in address table");
 
-	UINT16 handler = handler_free;
+	uint16_t handler = handler_free;
 	handler_free = handler_next_free[handler - STATIC_COUNT];
 	return handler;
 }
@@ -3005,10 +3005,10 @@ UINT16 address_table::get_free_handler()
 //  it
 //-------------------------------------------------
 
-void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries)
+void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, uint64_t mask, std::list<uint32_t> &entries)
 {
 	// Careful, you can't shift by 64 or more
-	UINT64 testmask = (1ULL << (m_space.data_width()-1) << 1) - 1;
+	uint64_t testmask = (1ULL << (m_space.data_width()-1) << 1) - 1;
 
 	if((mask & testmask) == 0 || (mask & testmask) == testmask)
 		setup_range_solid(addrstart, addrend, addrmask, addrmirror, entries);
@@ -3022,10 +3022,10 @@ void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmas
 //  it.  Replace what's there.
 //-------------------------------------------------
 
-void address_table::setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<UINT32> &entries)
+void address_table::setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<uint32_t> &entries)
 {
 	// Grab a free entry
-	UINT16 entry = get_free_handler();
+	uint16_t entry = get_free_handler();
 
 	// Add it in the "to be setup" list
 	entries.push_back(entry);
@@ -3047,7 +3047,7 @@ namespace {
 	};
 }
 
-void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries)
+void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, uint64_t mask, std::list<uint32_t> &entries)
 {
 	// convert addresses to bytes
 	offs_t bytestart = addrstart;
@@ -3063,7 +3063,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 
 	// Scan the memory to see what has to be done
 	std::list<subrange> range_override;
-	std::map<UINT16, std::list<subrange> > range_partial;
+	std::map<uint16_t, std::list<subrange> > range_partial;
 
 	offs_t base_mirror = 0;
 	do
@@ -3074,8 +3074,8 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 		do
 		{
 			offs_t range_start, range_end;
-			UINT16 entry = derive_range(base_address, range_start, range_end);
-			UINT32 stop_address = range_end > end_address ? end_address : range_end;
+			uint16_t entry = derive_range(base_address, range_start, range_end);
+			uint32_t stop_address = range_end > end_address ? end_address : range_end;
 
 			if (entry < STATIC_COUNT || handler(entry).overriden_by_mask(mask))
 				range_override.push_back(subrange(base_address, stop_address));
@@ -3095,7 +3095,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 	if (!range_override.empty())
 	{
 		// Grab a free entry
-		UINT16 entry = get_free_handler();
+		uint16_t entry = get_free_handler();
 
 		// configure the entry to our parameters
 		handler_entry &curentry = handler(entry);
@@ -3115,7 +3115,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 	// Ranges in range_partial must be duplicated then partially changed
 	if (!range_partial.empty())
 	{
-		for (std::map<UINT16, std::list<subrange> >::const_iterator i = range_partial.begin(); i != range_partial.end(); ++i)
+		for (std::map<uint16_t, std::list<subrange> >::const_iterator i = range_partial.begin(); i != range_partial.end(); ++i)
 		{
 			// Theorically, if the handler to change matches the
 			// characteristics of ours, we can directly change it.  In
@@ -3131,7 +3131,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 			offs_t previous_bytemask = base_entry->bytemask();
 
 			// Grab a new handler and copy it there
-			UINT16 entry = get_free_handler();
+			uint16_t entry = get_free_handler();
 			handler_entry &curentry = handler(entry);
 			curentry.copy(base_entry);
 
@@ -3174,7 +3174,7 @@ void address_table::verify_reference_counts()
 
 	for (int level1 = 0; level1 != 1 << LEVEL1_BITS; level1++)
 	{
-		UINT16 l1_entry = m_table[level1];
+		uint16_t l1_entry = m_table[level1];
 		if (l1_entry >= SUBTABLE_BASE)
 		{
 			assert(m_large);
@@ -3182,10 +3182,10 @@ void address_table::verify_reference_counts()
 				continue;
 
 			subtable_seen[l1_entry - SUBTABLE_BASE] = true;
-			const UINT16 *subtable = subtable_ptr(l1_entry);
+			const uint16_t *subtable = subtable_ptr(l1_entry);
 			for (int level2 = 0; level2 != 1 << LEVEL2_BITS; level2++)
 			{
-				UINT16 l2_entry = subtable[level2];
+				uint16_t l2_entry = subtable[level2];
 				assert(l2_entry < SUBTABLE_BASE);
 				if (l2_entry >= STATIC_COUNT)
 					actual_refcounts[l2_entry - STATIC_COUNT]++;
@@ -3210,7 +3210,7 @@ void address_table::verify_reference_counts()
 //  range of addresses
 //-------------------------------------------------
 
-void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT16 handlerindex)
+void address_table::populate_range(offs_t bytestart, offs_t byteend, uint16_t handlerindex)
 {
 	offs_t l2mask = (1 << level2_bits()) - 1;
 	offs_t l1start = bytestart >> level2_bits();
@@ -3225,7 +3225,7 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT16 hand
 	// handle the starting edge if it's not on a block boundary
 	if (l2start != 0)
 	{
-		UINT16 *subtable = subtable_open(l1start);
+		uint16_t *subtable = subtable_open(l1start);
 
 		// if the start and stop end within the same block, handle that
 		if (l1start == l1stop)
@@ -3255,7 +3255,7 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT16 hand
 	// handle the trailing edge if it's not on a block boundary
 	if (l2stop != l2mask)
 	{
-		UINT16 *subtable = subtable_open(l1stop);
+		uint16_t *subtable = subtable_open(l1stop);
 
 		// fill from the beginning
 		handler_ref(handlerindex, l2stop+1);
@@ -3277,7 +3277,7 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT16 hand
 	handler_ref(handlerindex, l1stop - l1start + 1);
 	for (offs_t l1index = l1start; l1index <= l1stop; l1index++)
 	{
-		UINT16 subindex = m_table[l1index];
+		uint16_t subindex = m_table[l1index];
 
 		// if we have a subtable here, release it
 		if (subindex >= SUBTABLE_BASE)
@@ -3295,7 +3295,7 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT16 hand
 //  mirrors
 //-------------------------------------------------
 
-void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT16 handlerindex)
+void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, offs_t bytemirror, uint16_t handlerindex)
 {
 	// determine the mirror bits
 	offs_t lmirrorbits = 0;
@@ -3311,7 +3311,7 @@ void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, of
 			hmirrorbit[hmirrorbits++] = 1 << bit;
 
 	// loop over mirrors in the level 2 table
-	UINT16 prev_entry = STATIC_INVALID;
+	uint16_t prev_entry = STATIC_INVALID;
 	int prev_index = 0;
 	for (offs_t hmirrorcount = 0; hmirrorcount < (1 << hmirrorbits); hmirrorcount++)
 	{
@@ -3384,11 +3384,11 @@ void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, of
 //  range based on the lookup tables
 //-------------------------------------------------
 
-UINT16 address_table::derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const
+uint16_t address_table::derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const
 {
 	// look up the initial address to get the entry we care about
-	UINT16 l1entry;
-	UINT16 entry = l1entry = m_table[level1_index(byteaddress)];
+	uint16_t l1entry;
+	uint16_t entry = l1entry = m_table[level1_index(byteaddress)];
 	if (l1entry >= SUBTABLE_BASE)
 		entry = m_table[level2_index(l1entry, byteaddress)];
 
@@ -3397,16 +3397,16 @@ UINT16 address_table::derive_range(offs_t byteaddress, offs_t &bytestart, offs_t
 	handler(entry).mirrored_start_end(byteaddress, minscan, maxscan);
 
 	// first scan backwards to find the start address
-	UINT16 curl1entry = l1entry;
-	UINT16 curentry = entry;
+	uint16_t curl1entry = l1entry;
+	uint16_t curentry = entry;
 	bytestart = byteaddress;
 	while (1)
 	{
 		// if we need to scan the subtable, do it
 		if (curentry != curl1entry)
 		{
-			UINT32 minindex = level2_index(curl1entry, 0);
-			UINT32 index;
+			uint32_t minindex = level2_index(curl1entry, 0);
+			uint32_t index;
 
 			// scan backwards from the current address, until the previous entry doesn't match
 			for (index = level2_index(curl1entry, bytestart); index > minindex; index--, bytestart -= 1)
@@ -3443,8 +3443,8 @@ UINT16 address_table::derive_range(offs_t byteaddress, offs_t &bytestart, offs_t
 		// if we need to scan the subtable, do it
 		if (curentry != curl1entry)
 		{
-			UINT32 maxindex = level2_index(curl1entry, ~0);
-			UINT32 index;
+			uint32_t maxindex = level2_index(curl1entry, ~0);
+			uint32_t index;
 
 			// scan forwards from the current address, until the next entry doesn't match
 			for (index = level2_index(curl1entry, byteend); index < maxindex; index++, byteend += 1)
@@ -3499,20 +3499,20 @@ void address_table::mask_all_handlers(offs_t mask)
 //  and set its usecount to 1
 //-------------------------------------------------
 
-UINT16 address_table::subtable_alloc()
+uint16_t address_table::subtable_alloc()
 {
 	// loop
 	while (1)
 	{
 		// find a subtable with a usecount of 0
-		for (UINT16 subindex = 0; subindex < SUBTABLE_COUNT; subindex++)
+		for (uint16_t subindex = 0; subindex < SUBTABLE_COUNT; subindex++)
 			if (m_subtable[subindex].m_usecount == 0)
 			{
 				// if this is past our allocation budget, allocate some more
 				if (subindex >= m_subtable_alloc)
 				{
 					m_subtable_alloc += SUBTABLE_ALLOC;
-					UINT32 newsize = (1 << LEVEL1_BITS) + (m_subtable_alloc << level2_bits());
+					uint32_t newsize = (1 << LEVEL1_BITS) + (m_subtable_alloc << level2_bits());
 
 					bool was_live = (m_live_lookup == &m_table[0]);
 					int oldsize = m_table.size();
@@ -3538,9 +3538,9 @@ UINT16 address_table::subtable_alloc()
 //  a subtable
 //-------------------------------------------------
 
-void address_table::subtable_realloc(UINT16 subentry)
+void address_table::subtable_realloc(uint16_t subentry)
 {
-	UINT16 subindex = subentry - SUBTABLE_BASE;
+	uint16_t subindex = subentry - SUBTABLE_BASE;
 
 	// sanity check
 	if (m_subtable[subindex].m_usecount <= 0)
@@ -3559,7 +3559,7 @@ void address_table::subtable_realloc(UINT16 subentry)
 int address_table::subtable_merge()
 {
 	int merged = 0;
-	UINT16 subindex;
+	uint16_t subindex;
 
 	VPRINTF(("Merging subtables....\n"));
 
@@ -3567,8 +3567,8 @@ int address_table::subtable_merge()
 	for (subindex = 0; subindex < SUBTABLE_COUNT; subindex++)
 		if (!m_subtable[subindex].m_checksum_valid && m_subtable[subindex].m_usecount != 0)
 		{
-			UINT32 *subtable = reinterpret_cast<UINT32 *>(subtable_ptr(subindex + SUBTABLE_BASE));
-			UINT32 checksum = 0;
+			uint32_t *subtable = reinterpret_cast<uint32_t *>(subtable_ptr(subindex + SUBTABLE_BASE));
+			uint32_t checksum = 0;
 
 			// update the checksum
 			for (int l2index = 0; l2index < (1 << level2_bits())/4; l2index++)
@@ -3581,9 +3581,9 @@ int address_table::subtable_merge()
 	for (subindex = 0; subindex < SUBTABLE_COUNT; subindex++)
 		if (m_subtable[subindex].m_usecount != 0)
 		{
-			UINT16 *subtable = subtable_ptr(subindex + SUBTABLE_BASE);
-			UINT32 checksum = m_subtable[subindex].m_checksum;
-			UINT16 sumindex;
+			uint16_t *subtable = subtable_ptr(subindex + SUBTABLE_BASE);
+			uint32_t checksum = m_subtable[subindex].m_checksum;
+			uint16_t sumindex;
 
 			for (sumindex = subindex + 1; sumindex < SUBTABLE_COUNT; sumindex++)
 				if (m_subtable[sumindex].m_usecount != 0 &&
@@ -3615,9 +3615,9 @@ int address_table::subtable_merge()
 //  a subtable and free it if we're done
 //-------------------------------------------------
 
-void address_table::subtable_release(UINT16 subentry)
+void address_table::subtable_release(uint16_t subentry)
 {
-	UINT16 subindex = subentry - SUBTABLE_BASE;
+	uint16_t subindex = subentry - SUBTABLE_BASE;
 	// sanity check
 	if (m_subtable[subindex].m_usecount <= 0)
 		fatalerror("Called subtable_release on a table with a usecount of 0\n");
@@ -3628,7 +3628,7 @@ void address_table::subtable_release(UINT16 subentry)
 	if (m_subtable[subindex].m_usecount == 0)
 	{
 		m_subtable[subindex].m_checksum = 0;
-		UINT16 *subtable = subtable_ptr(subentry);
+		uint16_t *subtable = subtable_ptr(subentry);
 		for (int i = 0; i < (1 << LEVEL2_BITS); i++)
 			handler_unref(subtable[i]);
 	}
@@ -3640,21 +3640,21 @@ void address_table::subtable_release(UINT16 subentry)
 //  modification
 //-------------------------------------------------
 
-UINT16 *address_table::subtable_open(offs_t l1index)
+uint16_t *address_table::subtable_open(offs_t l1index)
 {
-	UINT16 subentry = m_table[l1index];
+	uint16_t subentry = m_table[l1index];
 
 	// if we don't have a subtable yet, allocate a new one
 	if (subentry < SUBTABLE_BASE)
 	{
 		int size = 1 << level2_bits();
-		UINT16 newentry = subtable_alloc();
+		uint16_t newentry = subtable_alloc();
 		handler_ref(subentry, size-1);
-		UINT16 *subptr = subtable_ptr(newentry);
+		uint16_t *subptr = subtable_ptr(newentry);
 		for (int i=0; i<size; i++)
 			subptr[i] = subentry;
 		m_table[l1index] = newentry;
-		UINT32 subkey = subentry + (subentry << 8) + (subentry << 16) + (subentry << 24);
+		uint32_t subkey = subentry + (subentry << 8) + (subentry << 16) + (subentry << 24);
 		m_subtable[newentry - SUBTABLE_BASE].m_checksum = subkey * (((1 << level2_bits())/4));
 		subentry = newentry;
 	}
@@ -3662,7 +3662,7 @@ UINT16 *address_table::subtable_open(offs_t l1index)
 	// if we're sharing this subtable, we also need to allocate a fresh copy
 	else if (m_subtable[subentry - SUBTABLE_BASE].m_usecount > 1)
 	{
-		UINT16 newentry = subtable_alloc();
+		uint16_t newentry = subtable_alloc();
 
 		// allocate may cause some additional merging -- look up the subentry again
 		// when we're done; it should still require a split
@@ -3671,7 +3671,7 @@ UINT16 *address_table::subtable_open(offs_t l1index)
 		assert(m_subtable[subentry - SUBTABLE_BASE].m_usecount > 1);
 
 		int size = 1 << level2_bits();
-		UINT16 *src = subtable_ptr(subentry);
+		uint16_t *src = subtable_ptr(subentry);
 		for(int i=0; i != size; i++)
 			handler_ref(src[i], 1);
 
@@ -3705,7 +3705,7 @@ void address_table::subtable_close(offs_t l1index)
 //  description of a handler
 //-------------------------------------------------
 
-const char *address_table::handler_name(UINT16 entry) const
+const char *address_table::handler_name(uint16_t entry) const
 {
 	// banks have names
 	if (entry >= STATIC_BANK1 && entry <= STATIC_BANKMAX)
@@ -3737,7 +3737,7 @@ address_table_read::address_table_read(address_space &space, bool large)
 	// allocate handlers for each entry, prepopulating the bankptrs for banks
 	for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
 	{
-		UINT8 **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? space.manager().bank_pointer_addr(entrynum) : nullptr;
+		uint8_t **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? space.manager().bank_pointer_addr(entrynum) : nullptr;
 		m_handlers[entrynum] = std::make_unique<handler_entry_read>(space.data_width(), space.endianness(), bankptr);
 	}
 
@@ -3746,30 +3746,30 @@ address_table_read::address_table_read(address_space &space, bool large)
 	{
 		// 8-bit case
 		case 8:
-			m_handlers[STATIC_UNMAP]->set_delegate(read8_delegate(FUNC(address_table_read::unmap_r<UINT8>), this));
-			m_handlers[STATIC_NOP]->set_delegate(read8_delegate(FUNC(address_table_read::nop_r<UINT8>), this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(read8_delegate(FUNC(address_table_read::watchpoint_r<UINT8>), this));
+			m_handlers[STATIC_UNMAP]->set_delegate(read8_delegate(FUNC(address_table_read::unmap_r<uint8_t>), this));
+			m_handlers[STATIC_NOP]->set_delegate(read8_delegate(FUNC(address_table_read::nop_r<uint8_t>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read8_delegate(FUNC(address_table_read::watchpoint_r<uint8_t>), this));
 			break;
 
 		// 16-bit case
 		case 16:
-			m_handlers[STATIC_UNMAP]->set_delegate(read16_delegate(FUNC(address_table_read::unmap_r<UINT16>), this));
-			m_handlers[STATIC_NOP]->set_delegate(read16_delegate(FUNC(address_table_read::nop_r<UINT16>), this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(read16_delegate(FUNC(address_table_read::watchpoint_r<UINT16>), this));
+			m_handlers[STATIC_UNMAP]->set_delegate(read16_delegate(FUNC(address_table_read::unmap_r<uint16_t>), this));
+			m_handlers[STATIC_NOP]->set_delegate(read16_delegate(FUNC(address_table_read::nop_r<uint16_t>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read16_delegate(FUNC(address_table_read::watchpoint_r<uint16_t>), this));
 			break;
 
 		// 32-bit case
 		case 32:
-			m_handlers[STATIC_UNMAP]->set_delegate(read32_delegate(FUNC(address_table_read::unmap_r<UINT32>), this));
-			m_handlers[STATIC_NOP]->set_delegate(read32_delegate(FUNC(address_table_read::nop_r<UINT32>), this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(read32_delegate(FUNC(address_table_read::watchpoint_r<UINT32>), this));
+			m_handlers[STATIC_UNMAP]->set_delegate(read32_delegate(FUNC(address_table_read::unmap_r<uint32_t>), this));
+			m_handlers[STATIC_NOP]->set_delegate(read32_delegate(FUNC(address_table_read::nop_r<uint32_t>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read32_delegate(FUNC(address_table_read::watchpoint_r<uint32_t>), this));
 			break;
 
 		// 64-bit case
 		case 64:
-			m_handlers[STATIC_UNMAP]->set_delegate(read64_delegate(FUNC(address_table_read::unmap_r<UINT64>), this));
-			m_handlers[STATIC_NOP]->set_delegate(read64_delegate(FUNC(address_table_read::nop_r<UINT64>), this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(read64_delegate(FUNC(address_table_read::watchpoint_r<UINT64>), this));
+			m_handlers[STATIC_UNMAP]->set_delegate(read64_delegate(FUNC(address_table_read::unmap_r<uint64_t>), this));
+			m_handlers[STATIC_NOP]->set_delegate(read64_delegate(FUNC(address_table_read::nop_r<uint64_t>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read64_delegate(FUNC(address_table_read::watchpoint_r<uint64_t>), this));
 			break;
 	}
 
@@ -3794,7 +3794,7 @@ address_table_read::~address_table_read()
 //  this index
 //-------------------------------------------------
 
-handler_entry &address_table_read::handler(UINT32 index) const
+handler_entry &address_table_read::handler(uint32_t index) const
 {
 	assert(index < ARRAY_LENGTH(m_handlers));
 	return *m_handlers[index];
@@ -3811,7 +3811,7 @@ address_table_write::address_table_write(address_space &space, bool large)
 	// allocate handlers for each entry, prepopulating the bankptrs for banks
 	for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
 	{
-		UINT8 **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? space.manager().bank_pointer_addr(entrynum) : nullptr;
+		uint8_t **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? space.manager().bank_pointer_addr(entrynum) : nullptr;
 		m_handlers[entrynum] = std::make_unique<handler_entry_write>(space.data_width(), space.endianness(), bankptr);
 	}
 
@@ -3820,30 +3820,30 @@ address_table_write::address_table_write(address_space &space, bool large)
 	{
 		// 8-bit case
 		case 8:
-			m_handlers[STATIC_UNMAP]->set_delegate(write8_delegate(FUNC(address_table_write::unmap_w<UINT8>), this));
-			m_handlers[STATIC_NOP]->set_delegate(write8_delegate(FUNC(address_table_write::nop_w<UINT8>), this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(write8_delegate(FUNC(address_table_write::watchpoint_w<UINT8>), this));
+			m_handlers[STATIC_UNMAP]->set_delegate(write8_delegate(FUNC(address_table_write::unmap_w<uint8_t>), this));
+			m_handlers[STATIC_NOP]->set_delegate(write8_delegate(FUNC(address_table_write::nop_w<uint8_t>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write8_delegate(FUNC(address_table_write::watchpoint_w<uint8_t>), this));
 			break;
 
 		// 16-bit case
 		case 16:
-			m_handlers[STATIC_UNMAP]->set_delegate(write16_delegate(FUNC(address_table_write::unmap_w<UINT16>), this));
-			m_handlers[STATIC_NOP]->set_delegate(write16_delegate(FUNC(address_table_write::nop_w<UINT16>), this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(write16_delegate(FUNC(address_table_write::watchpoint_w<UINT16>), this));
+			m_handlers[STATIC_UNMAP]->set_delegate(write16_delegate(FUNC(address_table_write::unmap_w<uint16_t>), this));
+			m_handlers[STATIC_NOP]->set_delegate(write16_delegate(FUNC(address_table_write::nop_w<uint16_t>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write16_delegate(FUNC(address_table_write::watchpoint_w<uint16_t>), this));
 			break;
 
 		// 32-bit case
 		case 32:
-			m_handlers[STATIC_UNMAP]->set_delegate(write32_delegate(FUNC(address_table_write::unmap_w<UINT32>), this));
-			m_handlers[STATIC_NOP]->set_delegate(write32_delegate(FUNC(address_table_write::nop_w<UINT32>), this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(write32_delegate(FUNC(address_table_write::watchpoint_w<UINT32>), this));
+			m_handlers[STATIC_UNMAP]->set_delegate(write32_delegate(FUNC(address_table_write::unmap_w<uint32_t>), this));
+			m_handlers[STATIC_NOP]->set_delegate(write32_delegate(FUNC(address_table_write::nop_w<uint32_t>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write32_delegate(FUNC(address_table_write::watchpoint_w<uint32_t>), this));
 			break;
 
 		// 64-bit case
 		case 64:
-			m_handlers[STATIC_UNMAP]->set_delegate(write64_delegate(FUNC(address_table_write::unmap_w<UINT64>), this));
-			m_handlers[STATIC_NOP]->set_delegate(write64_delegate(FUNC(address_table_write::nop_w<UINT64>), this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(write64_delegate(FUNC(address_table_write::watchpoint_w<UINT64>), this));
+			m_handlers[STATIC_UNMAP]->set_delegate(write64_delegate(FUNC(address_table_write::unmap_w<uint64_t>), this));
+			m_handlers[STATIC_NOP]->set_delegate(write64_delegate(FUNC(address_table_write::nop_w<uint64_t>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write64_delegate(FUNC(address_table_write::watchpoint_w<uint64_t>), this));
 			break;
 	}
 
@@ -3868,7 +3868,7 @@ address_table_write::~address_table_write()
 //  this index
 //-------------------------------------------------
 
-handler_entry &address_table_write::handler(UINT32 index) const
+handler_entry &address_table_write::handler(uint32_t index) const
 {
 	assert(index < ARRAY_LENGTH(m_handlers));
 	return *m_handlers[index];
@@ -3925,7 +3925,7 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 	// find or allocate a matching range
 	direct_range *range = find_range(overrideaddress, m_entry);
 
-	// if we don't map to a bank, return FALSE
+	// if we don't map to a bank, return false
 	if (m_entry < STATIC_BANK1 || m_entry > STATIC_BANKMAX)
 	{
 		// ensure future updates to land here as well until we get back into a bank
@@ -3934,7 +3934,7 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 		return false;
 	}
 
-	UINT8 *base = *m_space.manager().bank_pointer_addr(m_entry);
+	uint8_t *base = *m_space.manager().bank_pointer_addr(m_entry);
 
 	// compute the adjusted base
 	offs_t maskedbits = overrideaddress & ~m_space.bytemask();
@@ -3951,7 +3951,7 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 //  find_range - find a byte address in a range
 //-------------------------------------------------
 
-direct_read_data::direct_range *direct_read_data::find_range(offs_t byteaddress, UINT16 &entry)
+direct_read_data::direct_range *direct_read_data::find_range(offs_t byteaddress, uint16_t &entry)
 {
 	// determine which entry
 	byteaddress &= m_space.m_bytemask;
@@ -4018,7 +4018,7 @@ void direct_read_data::explicit_configure(offs_t bytestart, offs_t byteend, offs
 	m_bytestart = bytestart;
 	m_byteend = byteend;
 	m_bytemask = bytemask;
-	m_ptr = reinterpret_cast<UINT8 *>(ptr) - (bytestart & bytemask);
+	m_ptr = reinterpret_cast<uint8_t *>(ptr) - (bytestart & bytemask);
 }
 
 
@@ -4036,7 +4036,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 		m_space(space),
 		m_bytestart(bytestart),
 		m_byteend(byteend),
-		m_data(reinterpret_cast<UINT8 *>(memory))
+		m_data(reinterpret_cast<uint8_t *>(memory))
 {
 	offs_t const length = byteend + 1 - bytestart;
 	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space.device().tag(), space.name(), bytestart, byteend, memory));
@@ -4054,7 +4054,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 		{
 			m_allocated.resize(length + 0xfff);
 			memset(&m_allocated[0], 0, length + 0xfff);
-			m_data = reinterpret_cast<UINT8 *>((reinterpret_cast<FPTR>(&m_allocated[0]) + 0xfff) & ~0xfff);
+			m_data = reinterpret_cast<uint8_t *>((reinterpret_cast<uintptr_t>(&m_allocated[0]) + 0xfff) & ~0xfff);
 		}
 	}
 
@@ -4065,7 +4065,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 	{
 		int bytes_per_element = space.data_width() / 8;
 		std::string name = string_format("%08x-%08x", bytestart, byteend);
-		space.machine().save().save_memory(nullptr, "memory", space.device().tag(), space.spacenum(), name.c_str(), m_data, bytes_per_element, (UINT32)length / bytes_per_element);
+		space.machine().save().save_memory(nullptr, "memory", space.device().tag(), space.spacenum(), name.c_str(), m_data, bytes_per_element, (uint32_t)length / bytes_per_element);
 	}
 }
 
@@ -4176,7 +4176,7 @@ void memory_bank::set_base(void *base)
 		throw emu_fatalerror("memory_bank::set_base called nullptr base");
 
 	// set the base and invalidate any referencing spaces
-	*m_baseptr = reinterpret_cast<UINT8 *>(base);
+	*m_baseptr = reinterpret_cast<uint8_t *>(base);
 	invalidate_references();
 }
 
@@ -4233,7 +4233,7 @@ void memory_bank::configure_entry(int entrynum, void *base)
 		expand_entries(entrynum);
 
 	// set the entry
-	m_entry[entrynum].m_ptr = reinterpret_cast<UINT8 *>(base);
+	m_entry[entrynum].m_ptr = reinterpret_cast<uint8_t *>(base);
 
 	// if the bank base is not configured, and we're the first entry, set us up
 	if (*m_baseptr == nullptr && entrynum == 0)
@@ -4249,7 +4249,7 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 {
 	// fill in the requested bank entries (backwards to improve allocation)
 	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
-		configure_entry(entrynum, reinterpret_cast<UINT8 *>(base) + (entrynum - startentry) * stride);
+		configure_entry(entrynum, reinterpret_cast<uint8_t *>(base) + (entrynum - startentry) * stride);
 }
 
 
@@ -4261,7 +4261,7 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 //  memory_region - constructor
 //-------------------------------------------------
 
-memory_region::memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian)
+memory_region::memory_region(running_machine &machine, const char *name, uint32_t length, uint8_t width, endianness_t endian)
 	: m_machine(machine),
 		m_name(name),
 		m_buffer(length),
@@ -4282,7 +4282,7 @@ memory_region::memory_region(running_machine &machine, const char *name, UINT32 
 //  handler_entry - constructor
 //-------------------------------------------------
 
-handler_entry::handler_entry(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
+handler_entry::handler_entry(uint8_t width, endianness_t endianness, uint8_t **rambaseptr)
 	: m_populated(false),
 		m_datawidth(width),
 		m_endianness(endianness),
@@ -4337,7 +4337,7 @@ void handler_entry::copy(handler_entry *entry)
 //-------------------------------------------------
 void handler_entry::reconfigure_subunits(offs_t bytestart)
 {
-	INT32 delta = bytestart - m_bytestart;
+	int32_t delta = bytestart - m_bytestart;
 	for (int i=0; i != m_subunits; i++)
 		m_subunit_infos[i].m_offset += delta / (m_subunit_infos[i].m_size / 8);
 }
@@ -4349,9 +4349,9 @@ void handler_entry::reconfigure_subunits(offs_t bytestart)
 //  mask
 //-------------------------------------------------
 
-void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int &start_slot, int &end_slot)
+void handler_entry::configure_subunits(uint64_t handlermask, int handlerbits, int &start_slot, int &end_slot)
 {
-	UINT64 unitmask = ((UINT64)1 << handlerbits) - 1;
+	uint64_t unitmask = ((uint64_t)1 << handlerbits) - 1;
 	assert(handlermask != 0);
 
 	// compute the maximum possible subunits
@@ -4365,8 +4365,8 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 	int count = 0;
 	for (int unitnum = 0; unitnum < maxunits; unitnum++)
 	{
-		UINT32 shift = unitnum * handlerbits;
-		UINT32 scanmask = handlermask >> shift;
+		uint32_t shift = unitnum * handlerbits;
+		uint32_t scanmask = handlermask >> shift;
 		assert((scanmask & unitmask) == 0 || (scanmask & unitmask) == unitmask);
 		if ((scanmask & unitmask) != 0)
 			count++;
@@ -4377,7 +4377,7 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 	start_slot = m_subunits;
 	for (int unitnum = 0; unitnum < maxunits; unitnum++)
 	{
-		UINT32 shift = (unitnum^shift_xor_mask) * handlerbits;
+		uint32_t shift = (unitnum^shift_xor_mask) * handlerbits;
 		if (((handlermask >> shift) & unitmask) != 0)
 		{
 			m_subunit_infos[m_subunits].m_bytemask = m_bytemask;
@@ -4395,7 +4395,7 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 	// compute the inverse mask
 	m_invsubmask = 0;
 	for (int i = 0; i < m_subunits; i++)
-		m_invsubmask |= UINT64(m_subunit_infos[i].m_mask) << m_subunit_infos[i].m_shift;
+		m_invsubmask |= uint64_t(m_subunit_infos[i].m_mask) << m_subunit_infos[i].m_shift;
 	m_invsubmask = ~m_invsubmask;
 }
 
@@ -4405,7 +4405,7 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 //  conflicting with the provided mask
 //-------------------------------------------------
 
-void handler_entry::clear_conflicting_subunits(UINT64 handlermask)
+void handler_entry::clear_conflicting_subunits(uint64_t handlermask)
 {
 	// A mask of 0 is in fact an alternative way of saying ~0
 	if (!handlermask)
@@ -4426,7 +4426,7 @@ void handler_entry::clear_conflicting_subunits(UINT64 handlermask)
 	// compute the inverse mask
 	m_invsubmask = 0;
 	for (int i = 0; i < m_subunits; i++)
-		m_invsubmask |= UINT64(m_subunit_infos[i].m_mask) << m_subunit_infos[i].m_shift;
+		m_invsubmask |= uint64_t(m_subunit_infos[i].m_mask) << m_subunit_infos[i].m_shift;
 	m_invsubmask = ~m_invsubmask;
 }
 
@@ -4437,7 +4437,7 @@ void handler_entry::clear_conflicting_subunits(UINT64 handlermask)
 //  that's currently present
 //-------------------------------------------------
 
-bool handler_entry::overriden_by_mask(UINT64 handlermask)
+bool handler_entry::overriden_by_mask(uint64_t handlermask)
 {
 	// A mask of 0 is in fact an alternative way of saying ~0
 	if (!handlermask)
@@ -4570,7 +4570,7 @@ void handler_entry_read::remove_subunit(int entry)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask)
+void handler_entry_read::set_delegate(read8_delegate delegate, uint64_t mask)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4607,7 +4607,7 @@ void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read16_delegate delegate, UINT64 mask)
+void handler_entry_read::set_delegate(read16_delegate delegate, uint64_t mask)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4642,7 +4642,7 @@ void handler_entry_read::set_delegate(read16_delegate delegate, UINT64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask)
+void handler_entry_read::set_delegate(read32_delegate delegate, uint64_t mask)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4674,7 +4674,7 @@ void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask)
 //  set_delegate - set a 64-bit delegate
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read64_delegate delegate, UINT64 mask)
+void handler_entry_read::set_delegate(read64_delegate delegate, uint64_t mask)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4695,13 +4695,13 @@ void handler_entry_read::set_ioport(ioport_port &ioport)
 {
 	m_ioport = &ioport;
 	if (m_datawidth == 8)
-		set_delegate(read8_delegate(&handler_entry_read::read_stub_ioport<UINT8>, ioport.tag(), this));
+		set_delegate(read8_delegate(&handler_entry_read::read_stub_ioport<uint8_t>, ioport.tag(), this));
 	else if (m_datawidth == 16)
-		set_delegate(read16_delegate(&handler_entry_read::read_stub_ioport<UINT16>, ioport.tag(), this));
+		set_delegate(read16_delegate(&handler_entry_read::read_stub_ioport<uint16_t>, ioport.tag(), this));
 	else if (m_datawidth == 32)
-		set_delegate(read32_delegate(&handler_entry_read::read_stub_ioport<UINT32>, ioport.tag(), this));
+		set_delegate(read32_delegate(&handler_entry_read::read_stub_ioport<uint32_t>, ioport.tag(), this));
 	else if (m_datawidth == 64)
-		set_delegate(read64_delegate(&handler_entry_read::read_stub_ioport<UINT64>, ioport.tag(), this));
+		set_delegate(read64_delegate(&handler_entry_read::read_stub_ioport<uint64_t>, ioport.tag(), this));
 }
 
 
@@ -4710,17 +4710,17 @@ void handler_entry_read::set_ioport(ioport_port &ioport)
 //  8-bit sources
 //-------------------------------------------------
 
-UINT16 handler_entry_read::read_stub_16(address_space &space, offs_t offset, UINT16 mask)
+uint16_t handler_entry_read::read_stub_16(address_space &space, offs_t offset, uint16_t mask)
 {
-	UINT16 result = space.unmap() & m_invsubmask;
+	uint16_t result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		uint32_t submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
-			UINT8 val;
+			uint8_t val;
 			val = m_subread[index].r8(space, aoffset & si.m_bytemask, submask);
 			result |= val << si.m_shift;
 		}
@@ -4734,17 +4734,17 @@ UINT16 handler_entry_read::read_stub_16(address_space &space, offs_t offset, UIN
 //  8-bit and 16-bit sources
 //-------------------------------------------------
 
-UINT32 handler_entry_read::read_stub_32(address_space &space, offs_t offset, UINT32 mask)
+uint32_t handler_entry_read::read_stub_32(address_space &space, offs_t offset, uint32_t mask)
 {
-	UINT32 result = space.unmap() & m_invsubmask;
+	uint32_t result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		uint32_t submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
-			UINT16 val = 0;
+			uint16_t val = 0;
 			switch (si.m_size)
 			{
 			case 8:
@@ -4766,17 +4766,17 @@ UINT32 handler_entry_read::read_stub_32(address_space &space, offs_t offset, UIN
 //  8-bit, 16-bit and 32-bit sources
 //-------------------------------------------------
 
-UINT64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, UINT64 mask)
+uint64_t handler_entry_read::read_stub_64(address_space &space, offs_t offset, uint64_t mask)
 {
-	UINT64 result = space.unmap() & m_invsubmask;
+	uint64_t result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		uint32_t submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
-			UINT32 val = 0;
+			uint32_t val = 0;
 			switch (si.m_size)
 			{
 			case 8:
@@ -4789,7 +4789,7 @@ UINT64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, UIN
 				val = m_subread[index].r32(space, aoffset & si.m_bytemask, submask);
 				break;
 			}
-			result |=  UINT64(val) << si.m_shift;
+			result |=  uint64_t(val) << si.m_shift;
 		}
 	}
 	return result;
@@ -4884,7 +4884,7 @@ void handler_entry_write::remove_subunit(int entry)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask)
+void handler_entry_write::set_delegate(write8_delegate delegate, uint64_t mask)
 {
 	assert(m_datawidth >= 8);
 
@@ -4916,7 +4916,7 @@ void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask)
+void handler_entry_write::set_delegate(write16_delegate delegate, uint64_t mask)
 {
 	assert(m_datawidth >= 16);
 
@@ -4946,7 +4946,7 @@ void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask)
+void handler_entry_write::set_delegate(write32_delegate delegate, uint64_t mask)
 {
 	assert(m_datawidth >= 32);
 
@@ -4973,7 +4973,7 @@ void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask)
 //  set_delegate - set a 64-bit delegate
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write64_delegate delegate, UINT64 mask)
+void handler_entry_write::set_delegate(write64_delegate delegate, uint64_t mask)
 {
 	assert(m_datawidth >= 64);
 	m_write.w64 = delegate;
@@ -4989,13 +4989,13 @@ void handler_entry_write::set_ioport(ioport_port &ioport)
 {
 	m_ioport = &ioport;
 	if (m_datawidth == 8)
-		set_delegate(write8_delegate(&handler_entry_write::write_stub_ioport<UINT8>, ioport.tag(), this));
+		set_delegate(write8_delegate(&handler_entry_write::write_stub_ioport<uint8_t>, ioport.tag(), this));
 	else if (m_datawidth == 16)
-		set_delegate(write16_delegate(&handler_entry_write::write_stub_ioport<UINT16>, ioport.tag(), this));
+		set_delegate(write16_delegate(&handler_entry_write::write_stub_ioport<uint16_t>, ioport.tag(), this));
 	else if (m_datawidth == 32)
-		set_delegate(write32_delegate(&handler_entry_write::write_stub_ioport<UINT32>, ioport.tag(), this));
+		set_delegate(write32_delegate(&handler_entry_write::write_stub_ioport<uint32_t>, ioport.tag(), this));
 	else if (m_datawidth == 64)
-		set_delegate(write64_delegate(&handler_entry_write::write_stub_ioport<UINT64>, ioport.tag(), this));
+		set_delegate(write64_delegate(&handler_entry_write::write_stub_ioport<uint64_t>, ioport.tag(), this));
 }
 
 
@@ -5004,16 +5004,16 @@ void handler_entry_write::set_ioport(ioport_port &ioport)
 //  8-bit sources
 //-------------------------------------------------
 
-void handler_entry_write::write_stub_16(address_space &space, offs_t offset, UINT16 data, UINT16 mask)
+void handler_entry_write::write_stub_16(address_space &space, offs_t offset, uint16_t data, uint16_t mask)
 {
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		uint32_t submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
-			UINT8 adata = data >> si.m_shift;
+			uint8_t adata = data >> si.m_shift;
 			m_subwrite[index].w8(space, aoffset & si.m_bytemask, adata, submask);
 		}
 	}
@@ -5025,16 +5025,16 @@ void handler_entry_write::write_stub_16(address_space &space, offs_t offset, UIN
 //  8-bit and 16-bit sources
 //-------------------------------------------------
 
-void handler_entry_write::write_stub_32(address_space &space, offs_t offset, UINT32 data, UINT32 mask)
+void handler_entry_write::write_stub_32(address_space &space, offs_t offset, uint32_t data, uint32_t mask)
 {
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		uint32_t submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
-			UINT16 adata = data >> si.m_shift;
+			uint16_t adata = data >> si.m_shift;
 			switch (si.m_size)
 			{
 			case 8:
@@ -5054,16 +5054,16 @@ void handler_entry_write::write_stub_32(address_space &space, offs_t offset, UIN
 //  8-bit, 16-bit and 32-bit sources
 //-------------------------------------------------
 
-void handler_entry_write::write_stub_64(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
+void handler_entry_write::write_stub_64(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
 {
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		uint32_t submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
-			UINT32 adata = data >> si.m_shift;
+			uint32_t adata = data >> si.m_shift;
 			switch (si.m_size)
 			{
 			case 8:

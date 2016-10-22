@@ -86,7 +86,7 @@ ROM_END
 //  phillips_22vp931_device - constructor
 //-------------------------------------------------
 
-phillips_22vp931_device::phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+phillips_22vp931_device::phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: laserdisc_device(mconfig, PHILLIPS_22VP931, "Phillips 22VP931", tag, owner, clock, "22vp931", __FILE__),
 		m_i8049_cpu(*this, "vp931"),
 		m_tracktimer(nullptr),
@@ -112,7 +112,7 @@ phillips_22vp931_device::phillips_22vp931_device(const machine_config &mconfig, 
 //  reset_w - write to the reset line
 //-------------------------------------------------
 
-void phillips_22vp931_device::reset_w(UINT8 data)
+void phillips_22vp931_device::reset_w(uint8_t data)
 {
 	// control the CPU state
 	m_i8049_cpu->set_input_line(INPUT_LINE_RESET, data);
@@ -128,7 +128,7 @@ void phillips_22vp931_device::reset_w(UINT8 data)
 //  22VP931
 //-------------------------------------------------
 
-UINT8 phillips_22vp931_device::data_r()
+uint8_t phillips_22vp931_device::data_r()
 {
 	// if data is pending, clear the pending flag and notify any callbacks
 	if (m_tocontroller_pending)
@@ -200,9 +200,9 @@ void phillips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id,
 	{
 		case TID_VBI_DATA_FETCH:
 		{
-			UINT32 line = param >> 2;
+			uint32_t line = param >> 2;
 			int which = param & 3;
-			UINT32 code = 0;
+			uint32_t code = 0;
 
 			// fetch the code and compute the DATIC latched value
 			if (line >= LASERDISC_CODE_LINE16 && line <= LASERDISC_CODE_LINE18)
@@ -323,7 +323,7 @@ void phillips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum
 //  the first visible line of the frame
 //-------------------------------------------------
 
-INT32 phillips_22vp931_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
+int32_t phillips_22vp931_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	// set the first VBI timer to go at the start of line 16
 	timer_set(screen().time_until_pos(16*2), TID_VBI_DATA_FETCH, LASERDISC_CODE_LINE16 << 2);
@@ -389,7 +389,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
 	    $01 = OSM
 	*/
 
-	INT32 speed;
+	int32_t speed;
 
 	if (LOG_PORTS && (m_i8049_out1 ^ data) & 0x08)
 	{
@@ -494,7 +494,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_from_controller_r )
 WRITE8_MEMBER( phillips_22vp931_device::i8049_to_controller_w )
 {
 	// set the pending flag and stash the data
-	m_tocontroller_pending = TRUE;
+	m_tocontroller_pending = true;
 	m_tocontroller = data;
 
 	// signal to the callback if provided
@@ -518,7 +518,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_port1_r )
 	    $20 = P15 = (in) D105
 	*/
 
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 	if (!m_daticerp)
 		result |= 0x40;
 	return result;
@@ -608,7 +608,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_port2_r )
 	    $10 = P24 = (in) D124 -> 0 when data from controller is present, reset to 1 on a read
 	*/
 
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 	if (!m_tocontroller_pending)
 		result |= 0x20;
 	if (!m_fromcontroller_pending)

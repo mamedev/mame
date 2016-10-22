@@ -270,7 +270,7 @@ void menu_select_format::populate()
 
 		if (i && i == m_ext_match)
 			item_append(menu_item_type::SEPARATOR);
-		item_append(fmt->description(), fmt->name(), 0, (void *)(FPTR)i);
+		item_append(fmt->description(), fmt->name(), 0, (void *)(uintptr_t)i);
 	}
 }
 
@@ -285,7 +285,7 @@ void menu_select_format::handle()
 	const event *event = process(0);
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
-		*m_result = int(FPTR(event->itemref));
+		*m_result = int(uintptr_t(event->itemref));
 		stack_pop();
 	}
 }

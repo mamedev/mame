@@ -40,8 +40,8 @@ public:
 	memory_region *m_cart1_rom;
 	memory_region *m_cart2_rom;
 
-	UINT16 m_video_memory_base;
-	UINT8 m_port_FD;
+	uint16_t m_video_memory_base;
+	uint8_t m_port_FD;
 	int m_nmi;
 	DECLARE_READ8_MEMBER(primo_be_1_r);
 	DECLARE_READ8_MEMBER(primo_be_2_r);
@@ -54,14 +54,14 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(primob);
-	UINT32 screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(primo_vblank_interrupt);
 	void primo_draw_scanline(bitmap_ind16 &bitmap, int primo_scanline);
 	void primo_update_memory();
 	void primo_common_driver_init (primo_state *state);
 	void primo_common_machine_init ();
-	void primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size);
-	void primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size);
+	void primo_setup_pss (uint8_t* snapshot_data, uint32_t snapshot_size);
+	void primo_setup_pp (uint8_t* quickload_data, uint32_t quickload_size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( primo );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( primo );
 };

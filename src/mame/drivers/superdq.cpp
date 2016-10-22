@@ -40,10 +40,10 @@ public:
 		m_palette(*this, "palette")  { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
-	UINT8 m_ld_in_latch;
-	UINT8 m_ld_out_latch;
+	uint8_t m_ld_in_latch;
+	uint8_t m_ld_out_latch;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_tilemap;
 	int m_color_bank;
 	DECLARE_WRITE8_MEMBER(superdq_videoram_w);
@@ -55,7 +55,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(superdq);
-	UINT32 screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superdq_vblank);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -74,7 +74,7 @@ void superdq_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superdq_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 superdq_state::screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t superdq_state::screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -91,7 +91,7 @@ UINT32 superdq_state::screen_update_superdq(screen_device &screen, bitmap_rgb32 
 
 PALETTE_INIT_MEMBER(superdq_state, superdq)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	static const int resistances[3] = { 820, 390, 200 };
 	double rweights[3], gweights[3], bweights[2];
@@ -159,7 +159,7 @@ WRITE8_MEMBER(superdq_state::superdq_videoram_w)
 WRITE8_MEMBER(superdq_state::superdq_io_w)
 {
 	int             i;
-	static const UINT8 black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+	static const uint8_t black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
 	if ( data & 0x40 ) /* bit 6 = irqack */
 		m_maincpu->set_input_line(0, CLEAR_LINE);

@@ -65,7 +65,7 @@ void mexico86_state::mcu_simulate(  )
 	{
 		int i;
 		bool coin_curr;
-		UINT8 coin_in_read = ioport("IN0")->read() & 3;
+		uint8_t coin_in_read = ioport("IN0")->read() & 3;
 
 		// TODO: still needs Coinage B into account
 		for(int coin_idx = 0; coin_idx < 2; coin_idx++)
@@ -73,7 +73,7 @@ void mexico86_state::mcu_simulate(  )
 			coin_curr = (coin_in_read & (1 << coin_idx)) == 0;
 			if (coin_curr && m_coin_last[coin_idx] == false)
 			{
-				UINT8 coinage_setting = (ioport("DSW0")->read() >> (coin_idx*2 + 4)) & 3;
+				uint8_t coinage_setting = (ioport("DSW0")->read() >> (coin_idx*2 + 4)) & 3;
 
 				// increase credits counter
 				switch(coinage_setting)
@@ -132,7 +132,7 @@ void mexico86_state::mcu_simulate(  )
 
 		if (m_protection_ram[0xe0] > 0 && m_protection_ram[0xe0] < 4)
 		{
-			static const UINT8 answers[3][16] =
+			static const uint8_t answers[3][16] =
 			{
 				{ 0x00,0x40,0x48,0x50,0x58,0x60,0x68,0x70,0x78,0x80,0x88,0x00,0x00,0x00,0x00,0x00 },
 				{ 0x00,0x04,0x08,0x0C,0x10,0x14,0x18,0x1C,0x20,0x31,0x2B,0x35,0x00,0x00,0x00,0x00 },
@@ -155,20 +155,20 @@ void mexico86_state::mcu_simulate(  )
 		// The following is missing from Knight Boy
 		// this should be equivalent to the obfuscated kiki_clogic() below
 		{
-			static const UINT8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
-			UINT16 sy = m_protection_ram[0xa0] + ((0x18) >> 1);
-			UINT16 sx = m_protection_ram[0xa1] + ((0x18) >> 1);
+			static const uint8_t db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
+			uint16_t sy = m_protection_ram[0xa0] + ((0x18) >> 1);
+			uint16_t sx = m_protection_ram[0xa1] + ((0x18) >> 1);
 
 			for (i = 0; i < 0x38; i += 8)
 			{
-				UINT8 hw = db[m_protection_ram[0x20 + i] & 0xf];
+				uint8_t hw = db[m_protection_ram[0x20 + i] & 0xf];
 
 				if (hw)
 				{
-					UINT16 xdiff = sx - ((UINT16)m_protection_ram[0x20 + i + 6] << 8 | m_protection_ram[0x20 + i + 7]);
+					uint16_t xdiff = sx - ((uint16_t)m_protection_ram[0x20 + i + 6] << 8 | m_protection_ram[0x20 + i + 7]);
 					if (xdiff < hw)
 					{
-						UINT16 ydiff = sy - ((UINT16)m_protection_ram[0x20 + i + 4] << 8 | m_protection_ram[0x20 + i + 5]);
+						uint16_t ydiff = sy - ((uint16_t)m_protection_ram[0x20 + i + 4] << 8 | m_protection_ram[0x20 + i + 5]);
 						if (ydiff < hw)
 							m_protection_ram[0xa2] = 1; // we have a collision
 					}
@@ -203,7 +203,7 @@ INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
 
 void mexico86_state::kiki_clogic(int address, int latch)
 {
-	static const UINT8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
+	static const uint8_t db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
 	int sy, sx, hw, i, qptr, diff1, diff2;
 
 	if (address != KIKI_CL_TRIGGER) // m_queue latched data

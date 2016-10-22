@@ -36,7 +36,7 @@ ADDRESS_MAP_END
 
 
 // device definitions
-tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms0980_cpu_device(mconfig, TP0320, "TP0320", tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4), "tp0320", __FILE__)
 { }
 
@@ -58,7 +58,7 @@ machine_config_constructor tp0320_cpu_device::device_mconfig_additions() const
 
 
 // disasm
-offs_t tp0320_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tp0320_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(tp0320);
 	return CPU_DISASSEMBLE_NAME(tp0320)(this, buffer, pc, oprom, opram, options);
@@ -66,16 +66,16 @@ offs_t tp0320_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 
 
 // device_reset
-UINT32 tp0320_cpu_device::decode_micro(UINT8 sel)
+uint32_t tp0320_cpu_device::decode_micro(uint8_t sel)
 {
-	UINT32 decode = 0;
+	uint32_t decode = 0;
 
 	sel = BITSWAP8(sel,7,6,0,1,2,3,4,5); // lines are reversed
-	UINT32 mask = m_mpla->read(sel);
+	uint32_t mask = m_mpla->read(sel);
 	mask ^= 0x0bff0; // invert active-negative
 
 	//                                                    _____  _______  ______  _____  _____  ______  _____  _____  ______  _____         _____
-	const UINT32 md[22] = { M_AUTA, M_AUTY, M_SSS, M_STO, M_YTP, M_NDMTP, M_DMTP, M_MTP, M_CKP, M_15TN, M_CKN, M_MTN, M_NATN, M_ATN, M_CME, M_CIN, M_SSE, M_CKM, M_NE, M_C8, M_SETR, M_RSTR };
+	const uint32_t md[22] = { M_AUTA, M_AUTY, M_SSS, M_STO, M_YTP, M_NDMTP, M_DMTP, M_MTP, M_CKP, M_15TN, M_CKN, M_MTN, M_NATN, M_ATN, M_CME, M_CIN, M_SSE, M_CKM, M_NE, M_C8, M_SETR, M_RSTR };
 
 	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)
 		if (mask & (1 << bit))

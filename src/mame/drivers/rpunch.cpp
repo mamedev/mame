@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(rpunch_state::ym2151_irq_gen)
 
 void rpunch_state::machine_reset()
 {
-	UINT8 *snd = memregion("upd")->base();
+	uint8_t *snd = memregion("upd")->base();
 	memcpy(snd, snd + 0x20000, 0x20000);
 }
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER(rpunch_state::upd_control_w)
 {
 	if ((data & 1) != m_upd_rom_bank)
 	{
-		UINT8 *snd = memregion("upd")->base();
+		uint8_t *snd = memregion("upd")->base();
 		m_upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (m_upd_rom_bank + 1), 0x20000);
 	}

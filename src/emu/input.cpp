@@ -27,7 +27,7 @@
 //**************************************************************************
 
 // invalid memory value for axis polling
-const INT32 INVALID_AXIS_VALUE      = 0x7fffffff;
+const int32_t INVALID_AXIS_VALUE      = 0x7fffffff;
 
 // additional expanded input codes for sequences
 const input_code input_seq::end_code(DEVICE_CLASS_INTERNAL, 0, ITEM_CLASS_INVALID, ITEM_MODIFIER_NONE, ITEM_ID_SEQ_END);
@@ -54,9 +54,9 @@ public:
 	input_device_switch_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
 
 	// readers
-	virtual INT32 read_as_switch(input_item_modifier modifier) override;
-	virtual INT32 read_as_relative(input_item_modifier modifier) override;
-	virtual INT32 read_as_absolute(input_item_modifier modifier) override;
+	virtual int32_t read_as_switch(input_item_modifier modifier) override;
+	virtual int32_t read_as_relative(input_item_modifier modifier) override;
+	virtual int32_t read_as_absolute(input_item_modifier modifier) override;
 
 	// steadykey helper
 	bool steadykey_changed();
@@ -64,8 +64,8 @@ public:
 
 private:
 	// internal state
-	INT32                   m_steadykey;            // the live steadykey state
-	INT32                   m_oldkey;               // old live state
+	int32_t                   m_steadykey;            // the live steadykey state
+	int32_t                   m_oldkey;               // old live state
 };
 
 
@@ -79,9 +79,9 @@ public:
 	input_device_relative_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
 
 	// readers
-	virtual INT32 read_as_switch(input_item_modifier modifier) override;
-	virtual INT32 read_as_relative(input_item_modifier modifier) override;
-	virtual INT32 read_as_absolute(input_item_modifier modifier) override;
+	virtual int32_t read_as_switch(input_item_modifier modifier) override;
+	virtual int32_t read_as_relative(input_item_modifier modifier) override;
+	virtual int32_t read_as_absolute(input_item_modifier modifier) override;
 };
 
 
@@ -95,9 +95,9 @@ public:
 	input_device_absolute_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
 
 	// readers
-	virtual INT32 read_as_switch(input_item_modifier modifier) override;
-	virtual INT32 read_as_relative(input_item_modifier modifier) override;
-	virtual INT32 read_as_absolute(input_item_modifier modifier) override;
+	virtual int32_t read_as_switch(input_item_modifier modifier) override;
+	virtual int32_t read_as_relative(input_item_modifier modifier) override;
+	virtual int32_t read_as_absolute(input_item_modifier modifier) override;
 };
 
 
@@ -106,7 +106,7 @@ public:
 // simple class to match codes to strings
 struct code_string_table
 {
-	UINT32 operator[](const char *string) const
+	uint32_t operator[](const char *string) const
 	{
 		for (const code_string_table *current = this; current->m_code != ~0; current++)
 			if (strcmp(current->m_string, string) == 0)
@@ -114,7 +114,7 @@ struct code_string_table
 		return ~0;
 	}
 
-	const char *operator[](UINT32 code) const
+	const char *operator[](uint32_t code) const
 	{
 		for (const code_string_table *current = this; current->m_code != ~0; current++)
 			if (current->m_code == code)
@@ -122,7 +122,7 @@ struct code_string_table
 		return nullptr;
 	}
 
-	UINT32                  m_code;
+	uint32_t                  m_code;
 	const char *            m_string;
 };
 
@@ -467,7 +467,7 @@ bool joystick_map::parse(const char *mapstring)
 		if (*mapstring == 0 || *mapstring == '.')
 		{
 			bool symmetric = (rownum >= 5 && *mapstring == 0);
-			const UINT8 *srcrow = &m_map[symmetric ? (8 - rownum) : (rownum - 1)][0];
+			const uint8_t *srcrow = &m_map[symmetric ? (8 - rownum) : (rownum - 1)][0];
 
 			// if this is row 0, we don't have a source row -- invalid
 			if (rownum == 0)
@@ -476,7 +476,7 @@ bool joystick_map::parse(const char *mapstring)
 			// copy from the srcrow, applying up/down symmetry if in the bottom half
 			for (int colnum = 0; colnum < 9; colnum++)
 			{
-				UINT8 val = srcrow[colnum];
+				uint8_t val = srcrow[colnum];
 				if (symmetric)
 					val = (val & (JOYSTICK_MAP_LEFT | JOYSTICK_MAP_RIGHT)) | ((val & JOYSTICK_MAP_UP) << 1) | ((val & JOYSTICK_MAP_DOWN) >> 1);
 				m_map[rownum][colnum] = val;
@@ -492,7 +492,7 @@ bool joystick_map::parse(const char *mapstring)
 				if (colnum > 0 && (*mapstring == 0 || *mapstring == '.'))
 				{
 					bool symmetric = (colnum >= 5);
-					UINT8 val = m_map[rownum][symmetric ? (8 - colnum) : (colnum - 1)];
+					uint8_t val = m_map[rownum][symmetric ? (8 - colnum) : (colnum - 1)];
 					if (symmetric)
 						val = (val & (JOYSTICK_MAP_UP | JOYSTICK_MAP_DOWN)) | ((val & JOYSTICK_MAP_LEFT) << 1) | ((val & JOYSTICK_MAP_RIGHT) >> 1);
 					m_map[rownum][colnum] = val;
@@ -501,7 +501,7 @@ bool joystick_map::parse(const char *mapstring)
 				// otherwise, convert the character to its value
 				else
 				{
-					static const UINT8 charmap[] =
+					static const uint8_t charmap[] =
 					{
 						JOYSTICK_MAP_UP | JOYSTICK_MAP_LEFT,
 						JOYSTICK_MAP_UP,
@@ -572,12 +572,12 @@ std::string joystick_map::to_string() const
 //  map based on the given X/Y axis values
 //-------------------------------------------------
 
-UINT8 joystick_map::update(INT32 xaxisval, INT32 yaxisval)
+uint8_t joystick_map::update(int32_t xaxisval, int32_t yaxisval)
 {
 	// now map the X and Y axes to a 9x9 grid using the raw values
 	xaxisval = ((xaxisval - INPUT_ABSOLUTE_MIN) * 9) / (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN + 1);
 	yaxisval = ((yaxisval - INPUT_ABSOLUTE_MIN) * 9) / (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN + 1);
-	UINT8 mapval = m_map[yaxisval][xaxisval];
+	uint8_t mapval = m_map[yaxisval][xaxisval];
 
 	// handle stickiness
 	if (mapval == JOYSTICK_MAP_STICKY)
@@ -621,7 +621,7 @@ input_code::input_code(input_device &device, input_item_id itemid)
 
 input_seq &input_seq::operator+=(input_code code)
 {
-	// if not enough room, return FALSE
+	// if not enough room, return false
 	int curlength = length();
 	if (curlength < ARRAY_LENGTH(m_code) - 1)
 	{
@@ -805,8 +805,8 @@ input_device::input_device(input_class &_class, int devindex, const char *name, 
 		m_devindex(devindex),
 		m_maxitem(input_item_id(0)),
 		m_internal(internal),
-		m_joystick_deadzone((INT32)(_class.manager().machine().options().joystick_deadzone() * INPUT_ABSOLUTE_MAX)),
-		m_joystick_saturation((INT32)(_class.manager().machine().options().joystick_saturation() * INPUT_ABSOLUTE_MAX)),
+		m_joystick_deadzone((int32_t)(_class.manager().machine().options().joystick_deadzone() * INPUT_ABSOLUTE_MAX)),
+		m_joystick_saturation((int32_t)(_class.manager().machine().options().joystick_saturation() * INPUT_ABSOLUTE_MAX)),
 		m_steadykey_enabled(_class.manager().machine().options().steadykey()),
 		m_lightgun_reload_button(_class.manager().machine().options().offscreen_reload())
 {
@@ -884,7 +884,7 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 //  absolute value
 //-------------------------------------------------
 
-INT32 input_device::apply_deadzone_and_saturation(INT32 result) const
+int32_t input_device::apply_deadzone_and_saturation(int32_t result) const
 {
 	// ignore for non-joysticks
 	if (devclass() != DEVICE_CLASS_JOYSTICK)
@@ -908,7 +908,7 @@ INT32 input_device::apply_deadzone_and_saturation(INT32 result) const
 
 	// otherwise, scale
 	else
-		result = (INT64)(result - m_joystick_deadzone) * (INT64)INPUT_ABSOLUTE_MAX / (INT64)(m_joystick_saturation - m_joystick_deadzone);
+		result = (int64_t)(result - m_joystick_deadzone) * (int64_t)INPUT_ABSOLUTE_MAX / (int64_t)(m_joystick_saturation - m_joystick_deadzone);
 
 	// re-apply sign and return
 	return negative ? -result : result;
@@ -1119,10 +1119,10 @@ input_manager::input_manager(running_machine &machine)
 //  input code
 //-------------------------------------------------
 
-INT32 input_manager::code_value(input_code code)
+int32_t input_manager::code_value(input_code code)
 {
 	g_profiler.start(PROFILER_INPUT);
-	INT32 result = 0;
+	int32_t result = 0;
 
 	// dummy loop to allow clean early exits
 	do
@@ -1383,14 +1383,14 @@ bool input_manager::code_check_axis(input_device_item &item, input_code code)
 
 	// ignore min/max for lightguns
 	// so the selection will not be affected by a gun going out of range
-	INT32 curval = code_value(code);
+	int32_t curval = code_value(code);
 	if (code.device_class() == DEVICE_CLASS_LIGHTGUN &&
 		(code.item_id() == ITEM_ID_XAXIS || code.item_id() == ITEM_ID_YAXIS) &&
 		(curval == INPUT_ABSOLUTE_MAX || curval == INPUT_ABSOLUTE_MIN))
 		return false;
 
 	// compute the diff against memory
-	INT32 diff = curval - item.memory();
+	int32_t diff = curval - item.memory();
 	if (diff < 0)
 		diff = -diff;
 
@@ -1694,7 +1694,7 @@ input_code input_manager::code_from_token(const char *_token)
 	// if we have another token, it is the item class
 	if (curtok < numtokens)
 	{
-		UINT32 temp = (*itemclass_token_table)[token[curtok].c_str()];
+		uint32_t temp = (*itemclass_token_table)[token[curtok].c_str()];
 		if (temp != ~0)
 		{
 			curtok++;
@@ -1768,14 +1768,14 @@ bool input_manager::seq_pressed(const input_seq &seq)
 //  defined in an input sequence
 //-------------------------------------------------
 
-INT32 input_manager::seq_axis_value(const input_seq &seq, input_item_class &itemclass)
+int32_t input_manager::seq_axis_value(const input_seq &seq, input_item_class &itemclass)
 {
 	// start with no valid classes
 	input_item_class itemclasszero = ITEM_CLASS_INVALID;
 	itemclass = ITEM_CLASS_INVALID;
 
 	// iterate over all of the codes
-	INT32 result = 0;
+	int32_t result = 0;
 	bool invert = false;
 	bool enable = true;
 	for (int codenum = 0; ; codenum++)
@@ -1812,7 +1812,7 @@ INT32 input_manager::seq_axis_value(const input_seq &seq, input_item_class &item
 			// non-switch codes are analog values
 			else
 			{
-				INT32 value = code_value(code);
+				int32_t value = code_value(code);
 
 				// if we got a 0 value, don't do anything except remember the first type
 				if (value == 0)
@@ -2074,7 +2074,7 @@ void input_manager::seq_from_tokens(input_seq &seq, const char *string)
 	while (1)
 	{
 		// trim any leading spaces
-		while (*str != 0 && isspace((UINT8)*str))
+		while (*str != 0 && isspace((uint8_t)*str))
 			str++;
 
 		// bail if we're done
@@ -2083,8 +2083,8 @@ void input_manager::seq_from_tokens(input_seq &seq, const char *string)
 
 		// find the end of the token and make it upper-case along the way
 		char *strtemp;
-		for (strtemp = str; *strtemp != 0 && !isspace((UINT8)*strtemp); strtemp++)
-			*strtemp = toupper((UINT8)*strtemp);
+		for (strtemp = str; *strtemp != 0 && !isspace((uint8_t)*strtemp); strtemp++)
+			*strtemp = toupper((uint8_t)*strtemp);
 		char origspace = *strtemp;
 		*strtemp = 0;
 
@@ -2265,7 +2265,7 @@ input_device_switch_item::input_device_switch_item(input_device &device, const c
 //  modified as necessary
 //-------------------------------------------------
 
-INT32 input_device_switch_item::read_as_switch(input_item_modifier modifier)
+int32_t input_device_switch_item::read_as_switch(input_item_modifier modifier)
 {
 	// if we're doing a lightgun reload hack, button 1 and 2 operate differently
 	input_device_class devclass = m_device.devclass();
@@ -2298,7 +2298,7 @@ INT32 input_device_switch_item::read_as_switch(input_item_modifier modifier)
 //  a relative axis value
 //-------------------------------------------------
 
-INT32 input_device_switch_item::read_as_relative(input_item_modifier modifier)
+int32_t input_device_switch_item::read_as_relative(input_item_modifier modifier)
 {
 	// no translation to relative
 	return 0;
@@ -2310,7 +2310,7 @@ INT32 input_device_switch_item::read_as_relative(input_item_modifier modifier)
 //  an absolute axis value
 //-------------------------------------------------
 
-INT32 input_device_switch_item::read_as_absolute(input_item_modifier modifier)
+int32_t input_device_switch_item::read_as_absolute(input_item_modifier modifier)
 {
 	// no translation to absolute
 	return 0;
@@ -2325,7 +2325,7 @@ INT32 input_device_switch_item::read_as_absolute(input_item_modifier modifier)
 
 bool input_device_switch_item::steadykey_changed()
 {
-	INT32 old = m_oldkey;
+	int32_t old = m_oldkey;
 	m_oldkey = update_value();
 	if (((m_current ^ old) & 1) == 0)
 		return false;
@@ -2357,7 +2357,7 @@ input_device_relative_item::input_device_relative_item(input_device &device, con
 //  a switch result based on the modifier
 //-------------------------------------------------
 
-INT32 input_device_relative_item::read_as_switch(input_item_modifier modifier)
+int32_t input_device_relative_item::read_as_switch(input_item_modifier modifier)
 {
 	// process according to modifiers
 	if (modifier == ITEM_MODIFIER_POS || modifier == ITEM_MODIFIER_RIGHT || modifier == ITEM_MODIFIER_DOWN)
@@ -2375,7 +2375,7 @@ INT32 input_device_relative_item::read_as_switch(input_item_modifier modifier)
 //  as a relative axis value
 //-------------------------------------------------
 
-INT32 input_device_relative_item::read_as_relative(input_item_modifier modifier)
+int32_t input_device_relative_item::read_as_relative(input_item_modifier modifier)
 {
 	// just return directly
 	return update_value();
@@ -2387,7 +2387,7 @@ INT32 input_device_relative_item::read_as_relative(input_item_modifier modifier)
 //  as an absolute axis value
 //-------------------------------------------------
 
-INT32 input_device_relative_item::read_as_absolute(input_item_modifier modifier)
+int32_t input_device_relative_item::read_as_absolute(input_item_modifier modifier)
 {
 	// no translation to absolute
 	return 0;
@@ -2414,10 +2414,10 @@ input_device_absolute_item::input_device_absolute_item(input_device &device, con
 //  a switch result based on the modifier
 //-------------------------------------------------
 
-INT32 input_device_absolute_item::read_as_switch(input_item_modifier modifier)
+int32_t input_device_absolute_item::read_as_switch(input_item_modifier modifier)
 {
 	// start with the current value
-	INT32 result = m_device.apply_deadzone_and_saturation(update_value());
+	int32_t result = m_device.apply_deadzone_and_saturation(update_value());
 	assert(result >= INPUT_ABSOLUTE_MIN && result <= INPUT_ABSOLUTE_MAX);
 
 	// left/right/up/down: if this is a joystick, fetch the paired X/Y axis values and convert
@@ -2439,7 +2439,7 @@ INT32 input_device_absolute_item::read_as_switch(input_item_modifier modifier)
 		}
 	}
 
-	// positive/negative: TRUE if past the deadzone in either direction
+	// positive/negative: true if past the deadzone in either direction
 	if (modifier == ITEM_MODIFIER_POS || modifier == ITEM_MODIFIER_RIGHT || modifier == ITEM_MODIFIER_DOWN)
 		return (result > 0);
 	else if (modifier == ITEM_MODIFIER_NEG || modifier == ITEM_MODIFIER_LEFT || modifier == ITEM_MODIFIER_UP)
@@ -2455,7 +2455,7 @@ INT32 input_device_absolute_item::read_as_switch(input_item_modifier modifier)
 //  as a relative axis value
 //-------------------------------------------------
 
-INT32 input_device_absolute_item::read_as_relative(input_item_modifier modifier)
+int32_t input_device_absolute_item::read_as_relative(input_item_modifier modifier)
 {
 	// no translation to relative
 	return 0;
@@ -2468,10 +2468,10 @@ INT32 input_device_absolute_item::read_as_relative(input_item_modifier modifier)
 //  tweaks
 //-------------------------------------------------
 
-INT32 input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
+int32_t input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
 {
 	// start with the current value
-	INT32 result = m_device.apply_deadzone_and_saturation(update_value());
+	int32_t result = m_device.apply_deadzone_and_saturation(update_value());
 	assert(result >= INPUT_ABSOLUTE_MIN && result <= INPUT_ABSOLUTE_MAX);
 
 	// if we're doing a lightgun reload hack, override the value

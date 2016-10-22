@@ -44,24 +44,24 @@ public:
 		, m_bank8(*this, "bank8")
 	{ }
 
-	UINT8 m_orion128_video_mode;
-	UINT8 m_orion128_video_page;
-	UINT8 m_orion128_video_width;
-	UINT8 m_video_mode_mask;
-	UINT8 m_orionpro_pseudo_color;
-	UINT8 m_romdisk_lsb;
-	UINT8 m_romdisk_msb;
-	UINT8 m_orion128_memory_page;
-	UINT8 m_orionz80_memory_page;
-	UINT8 m_orionz80_dispatcher;
-	UINT8 m_speaker_data;
-	UINT8 m_orionpro_ram0_segment;
-	UINT8 m_orionpro_ram1_segment;
-	UINT8 m_orionpro_ram2_segment;
-	UINT8 m_orionpro_page;
-	UINT8 m_orionpro_128_page;
-	UINT8 m_orionpro_rom2_segment;
-	UINT8 m_orionpro_dispatcher;
+	uint8_t m_orion128_video_mode;
+	uint8_t m_orion128_video_page;
+	uint8_t m_orion128_video_width;
+	uint8_t m_video_mode_mask;
+	uint8_t m_orionpro_pseudo_color;
+	uint8_t m_romdisk_lsb;
+	uint8_t m_romdisk_msb;
+	uint8_t m_orion128_memory_page;
+	uint8_t m_orionz80_memory_page;
+	uint8_t m_orionz80_dispatcher;
+	uint8_t m_speaker_data;
+	uint8_t m_orionpro_ram0_segment;
+	uint8_t m_orionpro_ram1_segment;
+	uint8_t m_orionpro_ram2_segment;
+	uint8_t m_orionpro_page;
+	uint8_t m_orionpro_128_page;
+	uint8_t m_orionpro_rom2_segment;
+	uint8_t m_orionpro_dispatcher;
 
 	required_device<fd1793_t> m_fdc;
 
@@ -93,7 +93,7 @@ public:
 	DECLARE_MACHINE_START(orionz80);
 	DECLARE_MACHINE_RESET(orionz80);
 	DECLARE_MACHINE_RESET(orionpro);
-	UINT32 screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orionz80_interrupt);
 	DECLARE_READ8_MEMBER(orion_romdisk_porta_r);
 	DECLARE_WRITE8_MEMBER(orion_romdisk_portb_w);

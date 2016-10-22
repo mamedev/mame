@@ -120,7 +120,7 @@ void ppu2c0x_device::device_config_complete()
 	m_vidaccess_callback_proc = ppu2c0x_vidaccess_delegate();
 }
 
-ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -159,44 +159,44 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 
 
 // NTSC NES
-ppu2c02_device::ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C02, "2C02 PPU", tag, owner, clock, "ppu2c02", __FILE__)
+ppu2c02_device::ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C02, "2C02 PPU", tag, owner, clock, "ppu2c02", __FILE__)
 {
 }
 
 // Playchoice 10
-ppu2c03b_device::ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C03B, "2C03B PPU", tag, owner, clock, "ppu2c03b", __FILE__)
+ppu2c03b_device::ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C03B, "2C03B PPU", tag, owner, clock, "ppu2c03b", __FILE__)
 {
 }
 
 // Vs. Unisystem
-ppu2c04_device::ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C04, "2C04 PPU", tag, owner, clock, "ppu2c04", __FILE__)
+ppu2c04_device::ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C04, "2C04 PPU", tag, owner, clock, "ppu2c04", __FILE__)
 {
 }
 
 // PAL NES
-ppu2c07_device::ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C07, "2C07 PPU", tag, owner, clock, "ppu2c07", __FILE__)
+ppu2c07_device::ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C07, "2C07 PPU", tag, owner, clock, "ppu2c07", __FILE__)
 {
 	m_scanlines_per_frame = PPU_PAL_SCANLINES_PER_FRAME;
 }
 
 // The PPU_2C05 variants have different protection value, set at device start, but otherwise are all the same...
 // Vs. Unisystem (Ninja Jajamaru Kun)
-ppu2c05_01_device::ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C05_01, "2C05_01 PPU", tag, owner, clock, "ppu2c05_01", __FILE__)
+ppu2c05_01_device::ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_01, "2C05_01 PPU", tag, owner, clock, "ppu2c05_01", __FILE__)
 {
 	m_security_value = 0x1b;    // game (jajamaru) doesn't seem to ever actually check it
 }
 // Vs. Unisystem (Mighty Bomb Jack)
-ppu2c05_02_device::ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C05_02, "2C05_02 PPU", tag, owner, clock, "ppu2c05_02", __FILE__)
+ppu2c05_02_device::ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_02, "2C05_02 PPU", tag, owner, clock, "ppu2c05_02", __FILE__)
 {
 	m_security_value = 0x3d;
 }
 // Vs. Unisystem (Gumshoe)
-ppu2c05_03_device::ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C05_03, "2C05_03 PPU", tag, owner, clock, "ppu2c05_03", __FILE__)
+ppu2c05_03_device::ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_03, "2C05_03 PPU", tag, owner, clock, "ppu2c05_03", __FILE__)
 {
 	m_security_value = 0x1c;
 }
 // Vs. Unisystem (Top Gun)
-ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C05_04, "2C05_04 PPU", tag, owner, clock, "ppu2c05_04", __FILE__)
+ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_04, "2C05_04 PPU", tag, owner, clock, "ppu2c05_04", __FILE__)
 {
 	m_security_value = 0x1b;
 }
@@ -223,7 +223,7 @@ void ppu2c0x_device::device_start()
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
 	m_bitmap = std::make_unique<bitmap_ind16>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
-	m_spriteram = make_unique_clear<UINT8[]>(SPRITERAM_SIZE);
+	m_spriteram = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
 	m_colortable = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable));
 	m_colortable_mono = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable_mono));
 
@@ -270,7 +270,7 @@ void ppu2c0x_device::device_start()
 //  readbyte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT8 ppu2c0x_device::readbyte(offs_t address)
+inline uint8_t ppu2c0x_device::readbyte(offs_t address)
 {
 	return space().read_byte(address);
 }
@@ -280,7 +280,7 @@ inline UINT8 ppu2c0x_device::readbyte(offs_t address)
 //  writebyte - write a byte at the given address
 //-------------------------------------------------
 
-inline void ppu2c0x_device::writebyte(offs_t address, UINT8 data)
+inline void ppu2c0x_device::writebyte(offs_t address, uint8_t data)
 {
 	space().write_byte(address, data);
 }
@@ -416,7 +416,7 @@ void ppu2c0x_device::init_palette_rgb( palette_device &palette, int first_entry 
 
 	int R, G, B;
 
-	UINT8 *palette_data = machine().root_device().memregion("palette")->base();
+	uint8_t *palette_data = machine().root_device().memregion("palette")->base();
 
 	/* Loop through the emphasis modes (8 total) */
 	for (color_emphasis = 0; color_emphasis < 8; color_emphasis++)
@@ -552,14 +552,14 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-void ppu2c0x_device::draw_background( UINT8 *line_priority )
+void ppu2c0x_device::draw_background( uint8_t *line_priority )
 {
 	bitmap_ind16 &bitmap = *m_bitmap;
 	int start_x = (m_x_fine ^ 0x07) - 7;
-	UINT16 back_pen;
-	UINT16 *dest;
+	uint16_t back_pen;
+	uint16_t *dest;
 
-	UINT8 scroll_x_coarse, scroll_y_coarse, scroll_y_fine, color_mask;
+	uint8_t scroll_x_coarse, scroll_y_coarse, scroll_y_fine, color_mask;
 	int x, tile_index, i;
 
 	const pen_t *color_table;
@@ -604,7 +604,7 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 		int pos;
 		int index1;
 		int page, page2, address;
-		UINT16 pen;
+		uint16_t pen;
 
 		index1 = tile_index + x;
 
@@ -628,7 +628,7 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 
 		if (start_x < VISIBLE_SCREEN_WIDTH)
 		{
-			UINT8 plane1, plane2;
+			uint8_t plane1, plane2;
 			paldata = &color_table[4 * (((color_byte >> color_bits) & 0x03))];
 
 			// need to read 0x0000 or 0x1000 + 16*nametable data
@@ -642,7 +642,7 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 			/* render the pixel */
 			for (i = 0; i < 8; i++)
 			{
-				UINT8 pix;
+				uint8_t pix;
 				pix = ((plane1 >> 7) & 1) | (((plane2 >> 7) & 1) << 1);
 				plane1 = plane1 << 1;
 				plane2 = plane2 << 1;
@@ -687,7 +687,7 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 	}
 }
 
-void ppu2c0x_device::draw_sprites( UINT8 *line_priority )
+void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 {
 	bitmap_ind16 &bitmap = *m_bitmap;
 
@@ -712,8 +712,8 @@ void ppu2c0x_device::draw_sprites( UINT8 *line_priority )
 
 	for (sprite_index = 0; sprite_index < SPRITERAM_SIZE; sprite_index += 4)
 	{
-		UINT8 plane1;
-		UINT8 plane2;
+		uint8_t plane1;
+		uint8_t plane2;
 
 		sprite_ypos = m_spriteram[sprite_index] + 1;
 		sprite_xpos = m_spriteram[sprite_index + 3];
@@ -798,7 +798,7 @@ void ppu2c0x_device::draw_sprites( UINT8 *line_priority )
 			/* draw the low-priority sprites */
 			for (pixel = 0; pixel < 8; pixel++)
 			{
-				UINT8 pixel_data;
+				uint8_t pixel_data;
 				if (flipx)
 				{
 					pixel_data = (plane1 & 1) + ((plane2 & 1) << 1);
@@ -841,7 +841,7 @@ void ppu2c0x_device::draw_sprites( UINT8 *line_priority )
 			/* draw the high-priority sprites */
 			for (pixel = 0; pixel < 8; pixel++)
 			{
-				UINT8 pixel_data;
+				uint8_t pixel_data;
 				if (flipx)
 				{
 					pixel_data = (plane1 & 1) + ((plane2 & 1) << 1);
@@ -889,7 +889,7 @@ void ppu2c0x_device::draw_sprites( UINT8 *line_priority )
 
 void ppu2c0x_device::render_scanline( void )
 {
-	UINT8 line_priority[VISIBLE_SCREEN_WIDTH];
+	uint8_t line_priority[VISIBLE_SCREEN_WIDTH];
 
 	/* lets see how long it takes */
 	g_profiler.start(PROFILER_USER1);
@@ -905,8 +905,8 @@ void ppu2c0x_device::render_scanline( void )
 	else
 	{
 		bitmap_ind16 &bitmap = *m_bitmap;
-		UINT8 color_mask;
-		UINT16 back_pen;
+		uint8_t color_mask;
+		uint16_t back_pen;
 		int i;
 
 		/* setup the color mask and colortable to use */
@@ -952,8 +952,8 @@ void ppu2c0x_device::update_scanline( void )
 		else
 		{
 			bitmap_ind16 &bitmap = *m_bitmap;
-			UINT8 color_mask;
-			UINT16 back_pen;
+			uint8_t color_mask;
+			uint16_t back_pen;
 			int i;
 
 			/* setup the color mask and colortable to use */
@@ -992,7 +992,7 @@ void ppu2c0x_device::update_scanline( void )
 		/* if it's rolled, increment the coarse y-scroll */
 		if (m_refresh_data & 0x8000)
 		{
-			UINT16 tmp;
+			uint16_t tmp;
 			tmp = (m_refresh_data & 0x03e0) + 0x20;
 			m_refresh_data &= 0x7c1f;
 
@@ -1171,7 +1171,7 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 				int i;
 				for (i = 0; i <= 0x1f; i++)
 				{
-					UINT8 oldColor = m_palette_ram[i];
+					uint8_t oldColor = m_palette_ram[i];
 
 					m_colortable[i] = color_base + oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
 				}
@@ -1279,14 +1279,14 @@ WRITE8_MEMBER( ppu2c0x_device::write )
  *
  *************************************/
 
-void ppu2c0x_device::spriteram_dma( address_space &space, const UINT8 page )
+void ppu2c0x_device::spriteram_dma( address_space &space, const uint8_t page )
 {
 	int i;
 	int address = page << 8;
 
 	for (i = 0; i < SPRITERAM_SIZE; i++)
 	{
-		UINT8 spriteData = space.read_byte(address + i);
+		uint8_t spriteData = space.read_byte(address + i);
 		space.write_byte(0x2004, spriteData);
 	}
 

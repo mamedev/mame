@@ -44,8 +44,8 @@ enum
 struct hd61700_dasm
 {
 	const char *str;
-	UINT8       arg1;
-	UINT8       arg2;
+	uint8_t       arg1;
+	uint8_t       arg2;
 	bool        optjr;
 };
 
@@ -213,12 +213,12 @@ static const hd61700_dasm hd61700_ops[256] =
 };
 
 
-inline int dasm_im8(char *buffer, UINT16 pc, int arg, const UINT8 *oprom, int &pos, int type)
+inline int dasm_im8(char *buffer, uint16_t pc, int arg, const uint8_t *oprom, int &pos, int type)
 {
 	if (((arg>>5) & 0x03) == 0x03)
 	{
 		INC_POS;
-		UINT8 ret = sprintf( buffer, "0x%02x", oprom[POS] & 0x1f );
+		uint8_t ret = sprintf( buffer, "0x%02x", oprom[POS] & 0x1f );
 		return ret;
 	}
 	else
@@ -228,7 +228,7 @@ inline int dasm_im8(char *buffer, UINT16 pc, int arg, const UINT8 *oprom, int &p
 }
 
 
-inline int dasm_im8(char *buffer, UINT16 pc, int arg, int arg1, const UINT8 *oprom, int &pos)
+inline int dasm_im8(char *buffer, uint16_t pc, int arg, int arg1, const uint8_t *oprom, int &pos)
 {
 	if (((arg>>5) & 0x03) == 0x03)
 	{
@@ -241,7 +241,7 @@ inline int dasm_im8(char *buffer, UINT16 pc, int arg, int arg1, const UINT8 *opr
 }
 
 
-int dasm_arg(char *buffer, UINT8 op, UINT16 pc, int arg, const UINT8 *oprom, int &pos)
+int dasm_arg(char *buffer, uint8_t op, uint16_t pc, int arg, const uint8_t *oprom, int &pos)
 {
 	char* buffer_start = buffer;
 	int type = EXT_ROM;
@@ -302,7 +302,7 @@ int dasm_arg(char *buffer, UINT8 op, UINT16 pc, int arg, const UINT8 *oprom, int
 
 		case OP_RMSIM3:
 			{
-				UINT8 tmp = oprom[POS];
+				uint8_t tmp = oprom[POS];
 				INC_POS;
 				buffer += dasm_im8(buffer, pc, tmp, oprom[POS], oprom, pos);
 				buffer += sprintf( buffer, ", 0x%02x", ((tmp>>5)&7)+1);
@@ -312,7 +312,7 @@ int dasm_arg(char *buffer, UINT8 op, UINT16 pc, int arg, const UINT8 *oprom, int
 
 		case OP_IR_IM3:
 			{
-				UINT8 tmp = oprom[POS];
+				uint8_t tmp = oprom[POS];
 				INC_POS;
 				buffer += sprintf( buffer, "(%s%s", (op&1) ? "iz": "ix", (tmp&0x80) ? "-": "+");
 				buffer += dasm_im8(buffer, pc, tmp, oprom[POS], oprom, pos);
@@ -357,10 +357,10 @@ int dasm_arg(char *buffer, UINT8 op, UINT16 pc, int arg, const UINT8 *oprom, int
 		case OP_IM16:
 		case OP_IM16A:
 			{
-				UINT8 tmp1 = oprom[POS];
+				uint8_t tmp1 = oprom[POS];
 				INC_POS;
 				if (!EXT_ROM && arg == OP_IM16A)    INC_POS;
-				UINT8 tmp2 = oprom[POS];
+				uint8_t tmp2 = oprom[POS];
 				buffer += sprintf( buffer, "0x%04x", ((tmp2<<8) | tmp1));
 				INC_POS;
 			}
@@ -373,7 +373,7 @@ int dasm_arg(char *buffer, UINT8 op, UINT16 pc, int arg, const UINT8 *oprom, int
 	return buffer - buffer_start;
 }
 
-UINT32 get_dasmflags(UINT8 op)
+uint32_t get_dasmflags(uint8_t op)
 {
 	switch (op)
 	{
@@ -399,8 +399,8 @@ UINT32 get_dasmflags(UINT8 op)
 CPU_DISASSEMBLE( hd61700 )
 {
 	const hd61700_dasm *inst;
-	UINT32 dasmflags;
-	UINT8 op, op1;
+	uint32_t dasmflags;
+	uint8_t op, op1;
 	int pos = 0, type = EXT_ROM;
 
 	op = oprom[POS];

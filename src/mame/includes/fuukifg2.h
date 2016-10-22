@@ -42,10 +42,10 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr_array<UINT16,4> m_vram;
-	required_shared_ptr<UINT16> m_vregs;
-	required_shared_ptr<UINT16> m_unknown;
-	required_shared_ptr<UINT16> m_priority;
+	required_shared_ptr_array<uint16_t,4> m_vram;
+	required_shared_ptr<uint16_t> m_vregs;
+	required_shared_ptr<uint16_t> m_unknown;
+	required_shared_ptr<uint16_t> m_priority;
 
 	/* video-related */
 	tilemap_t     *m_tilemap[4];
@@ -73,9 +73,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
-	inline void vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_);
+	inline void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_);
 	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 
 protected:

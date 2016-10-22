@@ -93,7 +93,7 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_exp->game_r(get_offset(m_ca), 1, 1, 1, 0) << 5;
 	data |= m_vslsi->eos_r() << 6;
@@ -140,7 +140,7 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_exp->exrom_r(get_offset(m_ca), 1, 1, 1, 0) << 7;
 
@@ -260,7 +260,7 @@ machine_config_constructor c64_magic_voice_cartridge_device::device_mconfig_addi
 //  c64_magic_voice_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_magic_voice_cartridge_device::c64_magic_voice_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_magic_voice_cartridge_device::c64_magic_voice_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_MAGIC_VOICE, "C64 Magic Voice cartridge", tag, owner, clock, "c64_magic_voice", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_vslsi(*this, T6721A_TAG),
@@ -307,7 +307,7 @@ void c64_magic_voice_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2 && sphi2)
 	{
@@ -333,7 +333,7 @@ UINT8 c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t of
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_magic_voice_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_magic_voice_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2 && sphi2)
 	{

@@ -121,7 +121,7 @@ class mcs48_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size, UINT8 feature_mask = 0);
+	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int rom_size, int ram_size, uint8_t feature_mask = 0);
 
 protected:
 	// device-level overrides
@@ -129,12 +129,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 15 - 1) / 15; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 15); }
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 3; }
-	virtual UINT32 execute_input_lines() const override { return 2; }
-	virtual UINT32 execute_default_irq_vector() const override { return MCS48_INPUT_IRQ; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 15 - 1) / 15; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 15); }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 3; }
+	virtual uint32_t execute_input_lines() const override { return 2; }
+	virtual uint32_t execute_default_irq_vector() const override { return MCS48_INPUT_IRQ; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -150,42 +150,42 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 protected:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
-	UINT16      m_prevpc;             /* 16-bit previous program counter */
-	UINT16      m_pc;                 /* 16-bit program counter */
+	uint16_t      m_prevpc;             /* 16-bit previous program counter */
+	uint16_t      m_pc;                 /* 16-bit program counter */
 
-	UINT8       m_a;                  /* 8-bit accumulator */
-	UINT8 *     m_regptr;             /* pointer to r0-r7 */
-	UINT8       m_psw;                /* 8-bit psw */
-	UINT8       m_p1;                 /* 8-bit latched port 1 */
-	UINT8       m_p2;                 /* 8-bit latched port 2 */
-	UINT8       m_ea;                 /* 1-bit latched ea input */
-	UINT8       m_timer;              /* 8-bit timer */
-	UINT8       m_prescaler;          /* 5-bit timer prescaler */
-	UINT8       m_t1_history;         /* 8-bit history of the T1 input */
-	UINT8       m_sts;                /* 8-bit status register (UPI-41 only, except for F1) */
-	UINT8       m_dbbi;               /* 8-bit input data buffer (UPI-41 only) */
-	UINT8       m_dbbo;               /* 8-bit output data buffer (UPI-41 only) */
+	uint8_t       m_a;                  /* 8-bit accumulator */
+	uint8_t *     m_regptr;             /* pointer to r0-r7 */
+	uint8_t       m_psw;                /* 8-bit psw */
+	uint8_t       m_p1;                 /* 8-bit latched port 1 */
+	uint8_t       m_p2;                 /* 8-bit latched port 2 */
+	uint8_t       m_ea;                 /* 1-bit latched ea input */
+	uint8_t       m_timer;              /* 8-bit timer */
+	uint8_t       m_prescaler;          /* 5-bit timer prescaler */
+	uint8_t       m_t1_history;         /* 8-bit history of the T1 input */
+	uint8_t       m_sts;                /* 8-bit status register (UPI-41 only, except for F1) */
+	uint8_t       m_dbbi;               /* 8-bit input data buffer (UPI-41 only) */
+	uint8_t       m_dbbo;               /* 8-bit output data buffer (UPI-41 only) */
 
-	UINT8       m_irq_state;          /* TRUE if an IRQ is pending */
-	UINT8       m_irq_in_progress;    /* TRUE if an IRQ is in progress */
-	UINT8       m_timer_overflow;     /* TRUE on a timer overflow; cleared by taking interrupt */
-	UINT8       m_timer_flag;         /* TRUE on a timer overflow; cleared on JTF */
-	UINT8       m_tirq_enabled;       /* TRUE if the timer IRQ is enabled */
-	UINT8       m_xirq_enabled;       /* TRUE if the external IRQ is enabled */
-	UINT8       m_timecount_enabled;  /* bitmask of timer/counter enabled */
-	UINT8       m_flags_enabled;      /* TRUE if I/O flags have been enabled (UPI-41 only) */
-	UINT8       m_dma_enabled;        /* TRUE if DMA has been enabled (UPI-41 only) */
+	bool          m_irq_state;          /* true if an IRQ is pending */
+	bool          m_irq_in_progress;    /* true if an IRQ is in progress */
+	bool          m_timer_overflow;     /* true on a timer overflow; cleared by taking interrupt */
+	bool          m_timer_flag;         /* true on a timer overflow; cleared on JTF */
+	bool          m_tirq_enabled;       /* true if the timer IRQ is enabled */
+	bool          m_xirq_enabled;       /* true if the external IRQ is enabled */
+	uint8_t       m_timecount_enabled;  /* bitmask of timer/counter enabled */
+	bool          m_flags_enabled;      /* true if I/O flags have been enabled (UPI-41 only) */
+	bool          m_dma_enabled;        /* true if DMA has been enabled (UPI-41 only) */
 
-	UINT16      m_a11;                /* A11 value, either 0x000 or 0x800 */
+	uint16_t      m_a11;                /* A11 value, either 0x000 or 0x800 */
 
 	int         m_icount;
 
@@ -195,27 +195,27 @@ protected:
 	address_space *m_data;
 	address_space *m_io;
 
-	UINT8       m_feature_mask;       /* processor feature flags */
-	UINT16      m_int_rom_size;       /* internal rom size */
+	uint8_t       m_feature_mask;       /* processor feature flags */
+	uint16_t      m_int_rom_size;       /* internal rom size */
 
-	UINT8       m_rtemp;              /* temporary for import/export */
+	uint8_t       m_rtemp;              /* temporary for import/export */
 
 	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
 	static const mcs48_ophandler s_opcode_table[256];
 
-	UINT8 opcode_fetch();
-	UINT8 argument_fetch();
+	uint8_t opcode_fetch();
+	uint8_t argument_fetch();
 	void update_regptr();
 	void push_pc_psw();
 	void pull_pc_psw();
 	void pull_pc();
-	void execute_add(UINT8 dat);
-	void execute_addc(UINT8 dat);
-	void execute_jmp(UINT16 address);
-	void execute_call(UINT16 address);
-	void execute_jcc(UINT8 result);
-	UINT8 p2_mask();
-	void expander_operation(UINT8 operation, UINT8 port);
+	void execute_add(uint8_t dat);
+	void execute_addc(uint8_t dat);
+	void execute_jmp(uint16_t address);
+	void execute_call(uint16_t address);
+	void execute_jcc(uint8_t result);
+	uint8_t p2_mask();
+	void expander_operation(uint8_t operation, uint8_t port);
 	int check_irqs();
 	void burn_cycles(int count);
 
@@ -478,108 +478,108 @@ class i8021_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 30 - 1) / 30; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 30); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 30 - 1) / 30; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 30); }
 };
 
 class i8022_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 30 - 1) / 30; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 30); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 30 - 1) / 30; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 30); }
 };
 
 class i8035_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8048_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8648_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8748_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8039_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8049_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8749_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8040_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8050_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class mb8884_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class n7751_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class m58715_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -587,14 +587,14 @@ class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size);
+	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int rom_size, int ram_size);
 
 	/* functions for talking to the input/output buffers on the UPI41-class chips */
 	DECLARE_READ8_MEMBER(upi41_master_r);
 	DECLARE_WRITE8_MEMBER(upi41_master_w);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	TIMER_CALLBACK_MEMBER( master_callback );
 };
@@ -603,35 +603,35 @@ class i8041_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8741_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8042_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8242_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8742_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

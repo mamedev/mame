@@ -174,7 +174,7 @@ enum
 	E132XS_L60, E132XS_L61, E132XS_L62, E132XS_L63
 };
 
-extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned h_flag, int private_fp);
+extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsigned h_flag, int private_fp);
 
 /* Memory access */
 /* read byte */
@@ -212,8 +212,8 @@ class hyperstone_device : public cpu_device
 {
 public:
 	// construction/destruction
-	hyperstone_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-						const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map, const char *shortname, const char *source);
+	hyperstone_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, uint32_t clock,
+						const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map, const char *shortname, const char *source);
 
 	// public interfaces
 
@@ -226,9 +226,9 @@ protected:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -236,9 +236,9 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -253,38 +253,38 @@ protected:
 	/* Delay information */
 	struct delay_info
 	{
-		INT32   delay_cmd;
-		UINT32  delay_pc;
+		int32_t   delay_cmd;
+		uint32_t  delay_pc;
 	};
 
 	// CPU registers
-	UINT32  m_global_regs[32];
-	UINT32  m_local_regs[64];
+	uint32_t  m_global_regs[32];
+	uint32_t  m_local_regs[64];
 
 	/* internal stuff */
-	UINT32  m_ppc;          // previous pc
-	UINT16  m_op;           // opcode
-	UINT32  m_trap_entry;   // entry point to get trap address
+	uint32_t  m_ppc;          // previous pc
+	uint16_t  m_op;           // opcode
+	uint32_t  m_trap_entry;   // entry point to get trap address
 
-	UINT8   m_clock_scale_mask;
-	UINT8   m_clck_scale;
-	UINT8   m_clock_cycles_1;
-	UINT8   m_clock_cycles_2;
-	UINT8   m_clock_cycles_4;
-	UINT8   m_clock_cycles_6;
+	uint8_t   m_clock_scale_mask;
+	uint8_t   m_clck_scale;
+	uint8_t   m_clock_cycles_1;
+	uint8_t   m_clock_cycles_2;
+	uint8_t   m_clock_cycles_4;
+	uint8_t   m_clock_cycles_6;
 
-	UINT64  m_tr_base_cycles;
-	UINT32  m_tr_base_value;
-	UINT32  m_tr_clocks_per_tick;
-	UINT8   m_timer_int_pending;
+	uint64_t  m_tr_base_cycles;
+	uint32_t  m_tr_base_value;
+	uint32_t  m_tr_clocks_per_tick;
+	uint8_t   m_timer_int_pending;
 	emu_timer *m_timer;
 
 	delay_info m_delay;
 
-	UINT32 m_opcodexor;
+	uint32_t m_opcodexor;
 
-	INT32 m_instruction_length;
-	INT32 m_intblock;
+	int32_t m_instruction_length;
+	int32_t m_intblock;
 
 	// other internal state
 	int     m_icount;
@@ -298,36 +298,36 @@ protected:
 private:
 	struct regs_decode
 	{
-		UINT8   src, dst;       // destination and source register code
-		UINT32  src_value;      // current source register value
-		UINT32  next_src_value; // current next source register value
-		UINT32  dst_value;      // current destination register value
-		UINT32  next_dst_value; // current next destination register value
-		UINT8   sub_type;       // sub type opcode (for DD and X_CODE bits)
+		uint8_t   src, dst;       // destination and source register code
+		uint32_t  src_value;      // current source register value
+		uint32_t  next_src_value; // current next source register value
+		uint32_t  dst_value;      // current destination register value
+		uint32_t  next_dst_value; // current next destination register value
+		uint8_t   sub_type;       // sub type opcode (for DD and X_CODE bits)
 		union
 		{
-			UINT32 u;
-			INT32  s;
+			uint32_t u;
+			int32_t  s;
 		} extra;                // extra value such as immediate value, const, pcrel, ...
-		UINT8   src_is_local;
-		UINT8   dst_is_local;
-		UINT8   same_src_dst;
-		UINT8   same_src_dstf;
-		UINT8   same_srcf_dst;
+		uint8_t   src_is_local;
+		uint8_t   dst_is_local;
+		uint8_t   same_src_dst;
+		uint8_t   same_src_dstf;
+		uint8_t   same_srcf_dst;
 	};
 
 	// internal functions
 	void check_interrupts();
 
-	void set_global_register(UINT8 code, UINT32 val);
-	void set_local_register(UINT8 code, UINT32 val);
+	void set_global_register(uint8_t code, uint32_t val);
+	void set_local_register(uint8_t code, uint32_t val);
 
-	UINT32 get_global_register(UINT8 code);
+	uint32_t get_global_register(uint8_t code);
 
-	UINT32 get_trap_addr(UINT8 trapno);
-	UINT32 get_emu_code_addr(UINT8 num);
+	uint32_t get_trap_addr(uint8_t trapno);
+	uint32_t get_emu_code_addr(uint8_t num);
 	void hyperstone_set_trap_entry(int which);
-	UINT32 compute_tr();
+	uint32_t compute_tr();
 	void update_timer_prescale();
 	void adjust_timer_interrupt();
 
@@ -335,9 +335,9 @@ private:
 
 	void execute_br(struct regs_decode *decode);
 	void execute_dbr(struct regs_decode *decode);
-	void execute_trap(UINT32 addr);
-	void execute_int(UINT32 addr);
-	void execute_exception(UINT32 addr);
+	void execute_trap(uint32_t addr);
+	void execute_int(uint32_t addr);
+	void execute_exception(uint32_t addr);
 	void execute_software(struct regs_decode *decode);
 
 	void hyperstone_chk(struct regs_decode *decode);
@@ -517,7 +517,7 @@ class e116t_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -530,7 +530,7 @@ class e116xt_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -543,7 +543,7 @@ class e116xs_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -556,7 +556,7 @@ class e116xsr_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -569,7 +569,7 @@ class e132n_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -582,7 +582,7 @@ class e132t_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -595,7 +595,7 @@ class e132xn_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -608,7 +608,7 @@ class e132xt_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -621,7 +621,7 @@ class e132xs_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -634,7 +634,7 @@ class e132xsr_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -647,7 +647,7 @@ class gms30c2116_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -660,7 +660,7 @@ class gms30c2132_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -673,7 +673,7 @@ class gms30c2216_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -686,7 +686,7 @@ class gms30c2232_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;

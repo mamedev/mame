@@ -30,7 +30,7 @@
 
 class h8_sci_device : public device_t {
 public:
-	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
 	void set_external_clock_period(const attotime &_period);
@@ -55,7 +55,7 @@ public:
 	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<h8_sci_device &>(device).tx_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_clk_cb(device_t &device, _Object object) { return downcast<h8_sci_device &>(device).clk_cb.set_callback(object); }
 
-	UINT64 internal_update(UINT64 current_time);
+	uint64_t internal_update(uint64_t current_time);
 
 protected:
 	enum {
@@ -121,8 +121,8 @@ protected:
 	int tx_state, rx_state, tx_bit, rx_bit, clock_state, clock_mode, tx_parity, rx_parity, ext_clock_counter;
 	bool clock_value, ext_clock_value, rx_value;
 
-	UINT8 rdr, tdr, smr, scr, ssr, brr, rsr, tsr;
-	UINT64 clock_base, divider;
+	uint8_t rdr, tdr, smr, scr, ssr, brr, rsr, tsr;
+	uint64_t clock_base, divider;
 
 	std::string last_clock_message;
 

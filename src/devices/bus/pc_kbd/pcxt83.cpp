@@ -247,7 +247,7 @@ ioport_constructor ibm_pc_xt_83_keyboard_device::device_input_ports() const
 //  ibm_pc_xt_83_keyboard_device - constructor
 //-------------------------------------------------
 
-ibm_pc_xt_83_keyboard_device::ibm_pc_xt_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ibm_pc_xt_83_keyboard_device::ibm_pc_xt_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC_KBD_IBM_PC_XT_83, "IBM PC/XT Keyboard", tag, owner, clock, "kb_pcxt83", __FILE__),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
@@ -343,7 +343,7 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
 
 	if (!BIT(m_bus, 7) && BIT(data, 7))
 	{
-		UINT8 data = 0xff;
+		uint8_t data = 0xff;
 
 		if (BIT(m_p1, 0)) data &= m_md[0]->read();
 		if (BIT(m_p1, 1)) data &= m_md[1]->read();

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-inline rsp_vec_t vec_veq_vge_vlt_vne(UINT32 iw, rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *le, rsp_vec_t eq, rsp_vec_t sign)
+inline rsp_vec_t vec_veq_vge_vlt_vne(uint32_t iw, rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *le, rsp_vec_t eq, rsp_vec_t sign)
 {
 	rsp_vec_t equal = _mm_cmpeq_epi16(vs, vt);
 

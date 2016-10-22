@@ -91,13 +91,13 @@ private:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<ram_device> m_ram;
-	UINT8 m_stat, m_led;
+	uint8_t m_stat, m_led;
 	int m_msg, m_bsy, m_io, m_cd, m_req, m_rst;
 	emu_timer *m_req_hack;
-	UINT16 m_dskctl;
+	uint16_t m_dskctl;
 	struct {
-		UINT16 ctl;
-		UINT16 regs[1024];
+		uint16_t ctl;
+		uint16_t regs[1024];
 		int type;
 		bool sc;
 	} m_mmu;
@@ -245,7 +245,7 @@ WRITE8_MEMBER( pcd_state::led_w )
 
 READ16_MEMBER( pcd_state::mmu_r )
 {
-	UINT16 data = m_mmu.regs[((m_mmu.ctl & 0x1f) << 5) | ((offset >> 2) & 0x1f)];
+	uint16_t data = m_mmu.regs[((m_mmu.ctl & 0x1f) << 5) | ((offset >> 2) & 0x1f)];
 	//logerror("%s: mmu read %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
 	if(!offset)
 		return m_mmu.ctl;
@@ -275,7 +275,7 @@ WRITE16_MEMBER( pcd_state::mmu_w )
 
 READ8_MEMBER(pcd_state::scsi_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch(offset)
 	{
@@ -381,10 +381,10 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 
 WRITE16_MEMBER(pcd_state::mem_w)
 {
-	UINT16 *ram = (UINT16 *)m_ram->pointer();
+	uint16_t *ram = (uint16_t *)m_ram->pointer();
 	if((m_mmu.ctl & 0x20) && m_mmu.type)
 	{
-		UINT16 reg;
+		uint16_t reg;
 		if(m_mmu.type == 2)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
@@ -403,10 +403,10 @@ WRITE16_MEMBER(pcd_state::mem_w)
 
 READ16_MEMBER(pcd_state::mem_r)
 {
-	UINT16 *ram = (UINT16 *)m_ram->pointer();
+	uint16_t *ram = (uint16_t *)m_ram->pointer();
 	if((m_mmu.ctl & 0x20) && m_mmu.type)
 	{
-		UINT16 reg;
+		uint16_t reg;
 		if(m_mmu.type == 2)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else

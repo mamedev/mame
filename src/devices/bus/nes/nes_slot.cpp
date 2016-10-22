@@ -119,11 +119,11 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 						m_vrc_ls_prg_b(0),
 						m_vrc_ls_chr(0),
 						m_mirroring(PPU_MIRROR_NONE),
-						m_pcb_ctrl_mirror(FALSE),
-						m_four_screen_vram(FALSE),
-						m_has_trainer(FALSE),
-						m_x1_005_alt_mirroring(FALSE),
-						m_bus_conflict(TRUE),
+						m_pcb_ctrl_mirror(false),
+						m_four_screen_vram(false),
+						m_has_trainer(false),
+						m_x1_005_alt_mirroring(false),
+						m_bus_conflict(true),
 						m_open_bus(0),
 						m_prg_chunks(0),
 						m_prg_mask(0xffff),
@@ -158,7 +158,7 @@ void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 			// A few pirate carts have PRG made of 32K + 2K or some weird similar config
 			// in this case we treat the banking as if this 'extra' PRG is not present and
 			// the pcb code has to handle it by accessing directly m_prg!
-			printf("Warning! The loaded PRG has size not a multiple of 8KB (0x%X)\n", (UINT32)size);
+			printf("Warning! The loaded PRG has size not a multiple of 8KB (0x%X)\n", (uint32_t)size);
 			m_prg_chunks--;
 		}
 
@@ -259,7 +259,7 @@ inline int device_nes_cart_interface::prg_8k_bank_num(int bank_8k)
 		return bank_8k;
 
 	// case 2: otherwise return a mirror using the bank_map!
-//  UINT8 temp = bank_8k;
+//  uint8_t temp = bank_8k;
 	bank_8k &= m_prg_mask;
 	bank_8k -= (m_prg_mask/2 + 1);
 //  printf("bank: accessed %x (top: %x), returned %x\n", temp, (m_prg_chunks << 1) - 1, m_prg_bank_map[bank_8k]);
@@ -479,7 +479,7 @@ void device_nes_cart_interface::chr1_x(int start, int bank, int source)
 
 void device_nes_cart_interface::set_nt_page(int page, int source, int bank, int writable)
 {
-	UINT8* base_ptr;
+	uint8_t* base_ptr;
 
 	switch (source)
 	{
@@ -570,7 +570,7 @@ void device_nes_cart_interface::set_nt_mirroring(int mirroring)
 // Helper function for the few mappers reading from 0x8000-0xffff for protection
 // so that they can access the ROM after the protection handling (which overwrites
 // the memory banks)
-UINT8 device_nes_cart_interface::hi_access_rom(UINT32 offset)
+uint8_t device_nes_cart_interface::hi_access_rom(uint32_t offset)
 {
 	int bank = (offset & 0x6000) >> 13;
 	return m_prg[m_prg_bank[bank] * 0x2000 + (offset & 0x1fff)];
@@ -580,10 +580,10 @@ UINT8 device_nes_cart_interface::hi_access_rom(UINT32 offset)
 // Tests by blargg showed that in many of the boards suffering of CPU/ROM
 // conflicts the behaviour can be accurately emulated by writing not the
 // original data, but data & rom[offset]
-UINT8 device_nes_cart_interface::account_bus_conflict(UINT32 offset, UINT8 data)
+uint8_t device_nes_cart_interface::account_bus_conflict(uint32_t offset, uint8_t data)
 {
 	// pirate variants of boards subject to bus conflict are often not subject to it
-	// so we allow to set m_bus_conflict to FALSE at loading time when necessary
+	// so we allow to set m_bus_conflict to false at loading time when necessary
 	if (m_bus_conflict)
 		return data & hi_access_rom(offset);
 	else
@@ -668,7 +668,7 @@ WRITE8_MEMBER(device_nes_cart_interface::write_h)
 }
 
 
-void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted)
+void device_nes_cart_interface::pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted)
 {
 	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
 	// main NES CPU here, even if it does not belong to this device.
@@ -742,7 +742,7 @@ void device_nes_cart_interface::nes_banks_restore()
 //-------------------------------------------------
 //  nes_cart_slot_device - constructor
 //-------------------------------------------------
-nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, NES_CART_SLOT, "NES Cartridge Slot", tag, owner, clock, "nes_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -782,7 +782,7 @@ void nes_cart_slot_device::device_config_complete()
 }
 
 
-void nes_cart_slot_device::pcb_start(UINT8 *ciram_ptr)
+void nes_cart_slot_device::pcb_start(uint8_t *ciram_ptr)
 {
 	if (m_cart)
 		m_cart->pcb_start(machine(), ciram_ptr, exists());
@@ -885,8 +885,8 @@ void nes_cart_slot_device::call_unload()
 	{
 		if (m_cart->get_battery_size() || m_cart->get_mapper_sram_size())
 		{
-			UINT32 tot_size = m_cart->get_battery_size() + m_cart->get_mapper_sram_size();
-			dynamic_buffer temp_nvram(tot_size);
+			uint32_t tot_size = m_cart->get_battery_size() + m_cart->get_mapper_sram_size();
+			std::vector<uint8_t> temp_nvram(tot_size);
 			if (m_cart->get_battery_size())
 				memcpy(&temp_nvram[0], m_cart->get_battery_base(), m_cart->get_battery_size());
 			if (m_cart->get_mapper_sram_size())
@@ -907,8 +907,8 @@ std::string nes_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "nrom";
-		UINT32 len = m_file->size();
-		dynamic_buffer rom(len);
+		uint32_t len = m_file->size();
+		std::vector<uint8_t> rom(len);
 
 		m_file->read(&rom[0], len);
 
@@ -935,7 +935,7 @@ READ8_MEMBER(nes_cart_slot_device::read_l)
 {
 	if (m_cart)
 	{
-		UINT8 val = m_cart->read_l(space, offset);
+		uint8_t val = m_cart->read_l(space, offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4100) & 0xff00) >> 8);
 		return val;
@@ -948,7 +948,7 @@ READ8_MEMBER(nes_cart_slot_device::read_m)
 {
 	if (m_cart)
 	{
-		UINT8 val = m_cart->read_m(space, offset);
+		uint8_t val = m_cart->read_m(space, offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x6000) & 0xff00) >> 8);
 		return val;
@@ -961,7 +961,7 @@ READ8_MEMBER(nes_cart_slot_device::read_h)
 {
 	if (m_cart)
 	{
-		UINT8 val = m_cart->read_h(space, offset);
+		uint8_t val = m_cart->read_h(space, offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x8000) & 0xff00) >> 8);
 		return val;
@@ -974,7 +974,7 @@ READ8_MEMBER(nes_cart_slot_device::read_ex)
 {
 	if (m_cart)
 	{
-		UINT8 val = m_cart->read_ex(space, offset);
+		uint8_t val = m_cart->read_ex(space, offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4020) & 0xff00) >> 8);
 		return val;

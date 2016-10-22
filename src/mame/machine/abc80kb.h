@@ -43,7 +43,7 @@ class abc80_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_keydown_wr_callback(device_t &device, _Object object) { return downcast<abc80_keyboard_device &>(device).m_write_keydown.set_callback(object); }
 
@@ -52,7 +52,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	UINT8 data_r();
+	uint8_t data_r();
 
 protected:
 	// device-level overrides

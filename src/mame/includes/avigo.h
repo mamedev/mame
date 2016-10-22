@@ -53,7 +53,7 @@ public:
 	required_device<address_map_bank_device> m_bankdev1;
 	required_device<address_map_bank_device> m_bankdev2;
 	required_device<intelfsh8_device> m_flash1;
-	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<uint8_t> m_nvram;
 
 	// defined in drivers/avigo.c
 	virtual void machine_start() override;
@@ -86,23 +86,23 @@ public:
 
 	// defined in video/avigo.c
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(vid_memory_r);
 	DECLARE_WRITE8_MEMBER(vid_memory_w);
 
 	// driver state
-	UINT8               m_key_line;
-	UINT8               m_irq;
-	UINT8               m_port2;
-	UINT8               m_bank2_l;
-	UINT8               m_bank2_h;
-	UINT8               m_bank1_l;
-	UINT8               m_bank1_h;
-	UINT8               m_ad_control_status;
-	UINT16              m_ad_value;
-	UINT8 *             m_video_memory;
-	UINT8               m_screen_column;
-	UINT8               m_warm_start;
+	uint8_t               m_key_line;
+	uint8_t               m_irq;
+	uint8_t               m_port2;
+	uint8_t               m_bank2_l;
+	uint8_t               m_bank2_h;
+	uint8_t               m_bank1_l;
+	uint8_t               m_bank1_h;
+	uint8_t               m_ad_control_status;
+	uint16_t              m_ad_value;
+	uint8_t *             m_video_memory;
+	uint8_t               m_screen_column;
+	uint8_t               m_warm_start;
 	DECLARE_PALETTE_INIT(avigo);
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_scan_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);

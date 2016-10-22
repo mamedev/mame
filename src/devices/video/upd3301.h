@@ -42,7 +42,7 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define UPD3301_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
+#define UPD3301_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
 
 
 #define MCFG_UPD3301_CHARACTER_WIDTH(_value) \
@@ -69,7 +69,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)> upd3301_draw_character_delegate;
+typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)> upd3301_draw_character_delegate;
 
 
 // ======================> upd3301_device
@@ -79,7 +79,7 @@ class upd3301_device :  public device_t,
 {
 public:
 	// construction/destruction
-	upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_character_width(device_t &device, int value) { downcast<upd3301_device &>(device).m_width = value; }
 	static void static_set_display_callback(device_t &device, upd3301_draw_character_delegate callback) { downcast<upd3301_device &>(device).m_display_cb = callback; }
@@ -96,7 +96,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( hrtc_r );
 	DECLARE_READ_LINE_MEMBER( vrtc_r );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -139,12 +139,12 @@ private:
 
 	// live state
 	int m_mode;                     // command mode
-	UINT8 m_status;                 // status register
+	uint8_t m_status;                 // status register
 	int m_param_count;              // parameter count
 
 	// FIFOs
-	UINT8 m_data_fifo[80][2];       // row data FIFO
-	UINT8 m_attr_fifo[40][2];       // attribute FIFO
+	uint8_t m_data_fifo[80][2];       // row data FIFO
+	uint8_t m_attr_fifo[40][2];       // attribute FIFO
 	int m_data_fifo_pos;            // row data FIFO position
 	int m_attr_fifo_pos;            // attribute FIFO position
 	int m_input_fifo;               // which FIFO is in input mode

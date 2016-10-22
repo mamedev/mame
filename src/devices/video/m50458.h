@@ -40,7 +40,7 @@ class m50458_device :   public device_t,
 {
 public:
 	// construction/destruction
-	m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE_LINE_MEMBER( write_bit );
@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vreg_126_w);
 	DECLARE_WRITE16_MEMBER(vreg_127_w);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
@@ -68,24 +68,24 @@ protected:
 	int m_latch;
 	int m_reset_line;
 	int m_clock_line;
-	UINT16 m_current_cmd;
+	uint16_t m_current_cmd;
 	int m_cmd_stream_pos;
-	UINT16 m_osd_addr;
-	std::unique_ptr<UINT8[]> m_shadow_gfx;
+	uint16_t m_osd_addr;
+	std::unique_ptr<uint8_t[]> m_shadow_gfx;
 
-	UINT8 m_bg_pen;
-	UINT8 m_phase;
-	UINT8 m_scrf,m_scrr;
-	UINT8 m_space;
-	UINT8 m_hsz1,m_hsz2,m_hsz3;
-	UINT8 m_vsz1,m_vsz2,m_vsz3;
-	UINT8 m_blink;
+	uint8_t m_bg_pen;
+	uint8_t m_phase;
+	uint8_t m_scrf,m_scrr;
+	uint8_t m_space;
+	uint8_t m_hsz1,m_hsz2,m_hsz3;
+	uint8_t m_vsz1,m_vsz2,m_vsz3;
+	uint8_t m_blink;
 
 	m50458_state_t m_osd_state;
 
 private:
-	inline UINT16 read_word(offs_t address);
-	inline void write_word(offs_t address, UINT16 data);
+	inline uint16_t read_word(offs_t address);
+	inline void write_word(offs_t address, uint16_t data);
 
 	const address_space_config      m_space_config;
 };

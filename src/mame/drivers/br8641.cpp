@@ -48,8 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port09_w);
 
 private:
-	UINT8 m_port08;
-	UINT8 m_port09;
+	uint8_t m_port08;
+	uint8_t m_port09;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio1;
 	required_device<z80pio_device> m_pio2;
@@ -121,7 +121,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( brandt8641_state::port08_r )
 {
-	UINT8 i, data = 7;
+	uint8_t i, data = 7;
 
 	for (i = 0; i < 8; i++)
 		if (BIT(m_port09, i))

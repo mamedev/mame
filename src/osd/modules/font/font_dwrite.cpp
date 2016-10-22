@@ -147,13 +147,13 @@ HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 	HRESULT result;
 
 	// Convert the bitmap into a form we understand and save it
-	std::unique_ptr<UINT32> pBitmap(new UINT32[bitmap.width() * bitmap.height()]);
+	std::unique_ptr<uint32_t> pBitmap(new uint32_t[bitmap.width() * bitmap.height()]);
 	for (int y = 0; y < bitmap.height(); y++)
 	{
-		UINT32* pRow = pBitmap.get() + (y * bitmap.width());
+		uint32_t* pRow = pBitmap.get() + (y * bitmap.width());
 		for (int x = 0; x < bitmap.width(); x++)
 		{
-			UINT32 pixel = bitmap.pix32(y, x);
+			uint32_t pixel = bitmap.pix32(y, x);
 			pRow[x] = (pixel == 0xFFFFFFFF) ? rgb_t(0xFF, 0x00, 0x00, 0x00) : rgb_t(0xFF, 0xFF, 0xFF, 0xFF);
 		}
 	}
@@ -172,8 +172,8 @@ HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 		bitmap.width(),
 		bitmap.height(),
 		GUID_WICPixelFormat32bppRGBA,
-		bitmap.width() * sizeof(UINT32),
-		bitmap.width() * bitmap.height() * sizeof(UINT32),
+		bitmap.width() * sizeof(uint32_t),
+		bitmap.width() * bitmap.height() * sizeof(uint32_t),
 		(BYTE*)pBitmap.get(),
 		&bmp2);
 
@@ -192,19 +192,19 @@ HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 class FontDimension
 {
 private:
-	UINT16  m_designUnitsPerEm;
+	uint16_t  m_designUnitsPerEm;
 	float   m_emSizeInDip;
 	float   m_designUnits;
 
 public:
-	FontDimension(UINT16 designUnitsPerEm, float emSizeInDip, float designUnits)
+	FontDimension(uint16_t designUnitsPerEm, float emSizeInDip, float designUnits)
 	{
 		m_designUnitsPerEm = designUnitsPerEm;
 		m_emSizeInDip = emSizeInDip;
 		m_designUnits = designUnits;
 	}
 
-	UINT16 DesignUnitsPerEm() const
+	uint16_t DesignUnitsPerEm() const
 	{
 		return m_designUnitsPerEm;
 	}
@@ -286,7 +286,7 @@ public:
 class FontDimensionFactory
 {
 private:
-	UINT16 m_designUnitsPerEm;
+	uint16_t m_designUnitsPerEm;
 	float m_emSizeInDip;
 
 public:
@@ -295,7 +295,7 @@ public:
 		return m_emSizeInDip;
 	}
 
-	FontDimensionFactory(UINT16 designUnitsPerEm, float emSizeInDip)
+	FontDimensionFactory(uint16_t designUnitsPerEm, float emSizeInDip)
 	{
 		m_designUnitsPerEm = designUnitsPerEm;
 		m_emSizeInDip = emSizeInDip;
@@ -400,7 +400,7 @@ public:
 	//  pixel of a black & white font
 	//-------------------------------------------------
 
-	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override
+	virtual bool get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override
 	{
 		const int MEM_ALIGN_CONST = 31;
 		const int BITMAP_PAD = 50;
@@ -427,8 +427,8 @@ public:
 
 		FontDimensionFactory fdf(gdi_metrics.designUnitsPerEm, m_fontEmHeightInDips);
 
-		UINT32 tempChar = chnum;
-		UINT16 glyphIndex;
+		uint32_t tempChar = chnum;
+		uint16_t glyphIndex;
 		HR_RET0(face->GetGlyphIndicesW(&tempChar, 1, &glyphIndex));
 
 		// get the width of this character
@@ -537,7 +537,7 @@ public:
 		for (actbounds.min_x = 0; actbounds.min_x < bmwidth; actbounds.min_x++)
 		{
 			BYTE *offs = pixels + actbounds.min_x;
-			UINT8 summary = 0;
+			uint8_t summary = 0;
 			for (int y = 0; y < bmheight; y++)
 				summary |= offs[y * bmwidth];
 			if (summary != 0)
@@ -551,7 +551,7 @@ public:
 		for (actbounds.max_x = bmwidth - 1; actbounds.max_x >= 0; actbounds.max_x--)
 		{
 			BYTE *offs = pixels + actbounds.max_x;
-			UINT8 summary = 0;
+			uint8_t summary = 0;
 
 			// Go through the entire column and build a summary
 			for (int y = 0; y < bmheight; y++)
@@ -570,8 +570,8 @@ public:
 			// copy the bits into it
 			for (int y = 0; y < bitmap.height(); y++)
 			{
-				UINT32 *dstrow = &bitmap.pix32(y);
-				UINT8 *srcrow = &pixels[(y + actbounds.min_y) * bmwidth];
+				uint32_t *dstrow = &bitmap.pix32(y);
+				uint8_t *srcrow = &pixels[(y + actbounds.min_y) * bmwidth];
 				for (int x = 0; x < bitmap.width(); x++)
 				{
 					int effx = x + actbounds.min_x;
@@ -773,7 +773,7 @@ private:
 	HRESULT get_family_for_locale(ComPtr<IDWriteLocalizedStrings> family_names, const std::wstring &locale, std::unique_ptr<WCHAR[]> &family_name) const
 	{
 		HRESULT result;
-		UINT32 index;
+		uint32_t index;
 		BOOL exists = false;
 
 		result = family_names->FindLocaleName(locale.c_str(), &index, &exists);
@@ -787,7 +787,7 @@ private:
 			index = 0;
 
 		// Get the length and allocate our buffer
-		UINT32 name_length = 0;
+		uint32_t name_length = 0;
 		HR_RETHR(family_names->GetStringLength(index, &name_length));
 		auto name_buffer = std::make_unique<WCHAR[]>(name_length + 1);
 

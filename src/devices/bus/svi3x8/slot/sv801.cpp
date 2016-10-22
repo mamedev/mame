@@ -55,7 +55,7 @@ machine_config_constructor sv801_device::device_mconfig_additions() const
 //  sv801_device - constructor
 //-------------------------------------------------
 
-sv801_device::sv801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sv801_device::sv801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SV801, "SV-801 Disk Controller", tag, owner, clock, "sv801", __FILE__),
 	device_svi_slot_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),

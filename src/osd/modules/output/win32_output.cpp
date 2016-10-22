@@ -77,7 +77,7 @@ public:
 
 	// output_module
 
-	virtual void notify(const char *outname, INT32 value) override;
+	virtual void notify(const char *outname, int32_t value) override;
 
 	int create_window_class(void);
 	LRESULT register_client(HWND hwnd, LPARAM id);
@@ -175,7 +175,7 @@ void output_win32::exit()
 
 int output_win32::create_window_class(void)
 {
-	static UINT8 classes_created = FALSE;
+	static bool classes_created = false;
 
 	/* only do this once */
 	if (!classes_created)
@@ -192,7 +192,7 @@ int output_win32::create_window_class(void)
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
 			return 1;
-		classes_created = TRUE;
+		classes_created = true;
 	}
 
 	return 0;
@@ -263,7 +263,7 @@ LRESULT output_win32::register_client(HWND hwnd, LPARAM id)
 LRESULT output_win32::unregister_client(HWND hwnd, LPARAM id)
 {
 	registered_client **client;
-	int found = FALSE;
+	bool found = false;
 
 	// find any matching IDs in the list and remove them
 	for (client = &m_clientlist; *client != nullptr; client = &(*client)->next)
@@ -272,7 +272,7 @@ LRESULT output_win32::unregister_client(HWND hwnd, LPARAM id)
 			registered_client *temp = *client;
 			*client = (*client)->next;
 			global_free(temp);
-			found = TRUE;
+			found = true;
 			break;
 		}
 
@@ -303,7 +303,7 @@ LRESULT output_win32::send_id_string(HWND hwnd, LPARAM id)
 
 	// allocate memory for the message
 	datalen = sizeof(copydata_id_string) + strlen(name) + 1;
-	dynamic_buffer buffer(datalen);
+	std::vector<uint8_t> buffer(datalen);
 	copydata_id_string *temp = (copydata_id_string *)&buffer[0];
 	temp->id = id;
 	strcpy(temp->string, name);
@@ -322,7 +322,7 @@ LRESULT output_win32::send_id_string(HWND hwnd, LPARAM id)
 //  notifier_callback
 //============================================================
 
-void output_win32::notify(const char *outname, INT32 value)
+void output_win32::notify(const char *outname, int32_t value)
 {
 	registered_client *client;
 	// loop over clients and notify them

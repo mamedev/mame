@@ -25,13 +25,13 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_vram_0;
-	required_shared_ptr<UINT32> m_vram_1;
-	required_shared_ptr<UINT32> m_vregs;
-	optional_shared_ptr<UINT32> m_bootleg_spritebuffer;
-	std::unique_ptr<UINT32[]>       m_spritebuf1;
-	std::unique_ptr<UINT32[]>       m_spritebuf2;
+	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<uint32_t> m_vram_0;
+	required_shared_ptr<uint32_t> m_vram_1;
+	required_shared_ptr<uint32_t> m_vregs;
+	optional_shared_ptr<uint32_t> m_bootleg_spritebuffer;
+	std::unique_ptr<uint32_t[]>       m_spritebuf1;
+	std::unique_ptr<uint32_t[]>       m_spritebuf2;
 
 	/* video-related */
 	tilemap_t        *m_tilemap_0_size0;
@@ -47,7 +47,7 @@ public:
 	int            m_ka302c_banking;
 
 	/* misc */
-	UINT8          m_soundlatch;
+	uint8_t          m_soundlatch;
 	int            m_z80_nmi;
 	int            m_mcu_status;
 
@@ -56,16 +56,16 @@ public:
 
 	/* game-specific */
 	// 1945 MCU
-	UINT8          m_s1945_mcu_direction;
-	UINT8          m_s1945_mcu_latch1;
-	UINT8          m_s1945_mcu_latch2;
-	UINT8          m_s1945_mcu_inlatch;
-	UINT8          m_s1945_mcu_index;
-	UINT8          m_s1945_mcu_latching;
-	UINT8          m_s1945_mcu_mode;
-	UINT8          m_s1945_mcu_control;
-	UINT8          m_s1945_mcu_bctrl;
-	const UINT8    *m_s1945_mcu_table;
+	uint8_t          m_s1945_mcu_direction;
+	uint8_t          m_s1945_mcu_latch1;
+	uint8_t          m_s1945_mcu_latch2;
+	uint8_t          m_s1945_mcu_inlatch;
+	uint8_t          m_s1945_mcu_index;
+	uint8_t          m_s1945_mcu_latching;
+	uint8_t          m_s1945_mcu_mode;
+	uint8_t          m_s1945_mcu_control;
+	uint8_t          m_s1945_mcu_bctrl;
+	const uint8_t    *m_s1945_mcu_table;
 	DECLARE_READ32_MEMBER(sngkace_input_r);
 	DECLARE_READ32_MEMBER(gunbird_input_r);
 	DECLARE_WRITE32_MEMBER(psikyo_soundlatch_w);
@@ -97,8 +97,8 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(sngkace);
 	DECLARE_VIDEO_START(psikyo);
-	UINT32 screen_update_psikyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_psikyo_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_psikyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_psikyo_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_psikyo(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(psikyo_soundlatch_callback);
 	void psikyo_switch_banks( int tmap, int bank );

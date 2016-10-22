@@ -59,8 +59,8 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_md_videoram_w)
 void drgnmst_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT16 *source = m_spriteram;
-	UINT16 *finish = source + 0x800 / 2;
+	uint16_t *source = m_spriteram;
+	uint16_t *finish = source + 0x800 / 2;
 
 	while (source < finish)
 	{
@@ -133,7 +133,7 @@ void drgnmst_state::video_start()
 	m_md_tilemap->set_scroll_rows(1024);
 }
 
-UINT32 drgnmst_state::screen_update_drgnmst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t drgnmst_state::screen_update_drgnmst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, rowscroll_bank;
 

@@ -62,11 +62,11 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* video-related */
-	UINT8    m_ram_bank;
-	UINT8    m_gfxbank;
-	UINT8    m_port_00;
+	uint8_t    m_ram_bank;
+	uint8_t    m_gfxbank;
+	uint8_t    m_port_00;
 	int      m_adpcm;
-	UINT8    m_toggle;
+	uint8_t    m_toggle;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -77,11 +77,11 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory */
-	UINT8    m_ram_1[0x800];
-	UINT8    m_ram_2[0x800];
-	UINT8    m_ram_3[0x1000];
-	UINT8    m_ram_4[0x1000];
-	UINT8    m_ram_att[0x800];
+	uint8_t    m_ram_1[0x800];
+	uint8_t    m_ram_2[0x800];
+	uint8_t    m_ram_3[0x1000];
+	uint8_t    m_ram_4[0x1000];
+	uint8_t    m_ram_att[0x800];
 	DECLARE_WRITE8_MEMBER(rambank_select_w);
 	DECLARE_WRITE8_MEMBER(discoboy_port_00_w);
 	DECLARE_WRITE8_MEMBER(discoboy_port_01_w);
@@ -100,7 +100,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
 };
@@ -158,15 +158,15 @@ void discoboy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 x, y;
+	uint16_t x, y;
 	int i;
 	int count = 0;
 
 	for (i = 0; i < 0x800; i += 2)
 	{
-		UINT16 pal;
+		uint16_t pal;
 		int r, g, b;
 		pal = m_ram_1[i] | (m_ram_1[i + 1] << 8);
 
@@ -179,7 +179,7 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 
 	for (i = 0; i < 0x800; i += 2)
 	{
-		UINT16 pal;
+		uint16_t pal;
 		int r,g,b;
 		pal = m_ram_2[i] | (m_ram_2[i + 1] << 8);
 
@@ -196,7 +196,7 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 	{
 		for (x = 0; x < 64; x++)
 		{
-			UINT16 tileno = m_ram_3[count] | (m_ram_3[count + 1] << 8);
+			uint16_t tileno = m_ram_3[count] | (m_ram_3[count + 1] << 8);
 
 			if (tileno > 0x2000)
 			{
@@ -217,9 +217,9 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 }
 
 #ifdef UNUSED_FUNCTION
-void discoboy_state::discoboy_setrombank( UINT8 data )
+void discoboy_state::discoboy_setrombank( uint8_t data )
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	data &= 0x2f;
 	space.membank("bank1")->set_base(&ROM[0x6000 + (data * 0x1000)] );
 }
@@ -586,8 +586,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(discoboy_state,discoboy)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *AUDIO = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *AUDIO = memregion("audiocpu")->base();
 
 	memset(m_ram_1, 0, sizeof(m_ram_1));
 	memset(m_ram_2, 0, sizeof(m_ram_2));

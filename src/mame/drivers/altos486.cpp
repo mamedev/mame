@@ -25,7 +25,7 @@ public:
 	{ }
 
 	required_device<i80186_cpu_device> m_maincpu;
-	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<uint16_t> m_ram;
 	required_memory_region m_rom;
 
 	DECLARE_READ8_MEMBER(read_rmx_ack);
@@ -37,8 +37,8 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	bool m_sys_mode;
-	UINT8 m_prot[256];
-	UINT16 m_viol[16];
+	uint8_t m_prot[256];
+	uint16_t m_viol[16];
 };
 
 READ8_MEMBER(altos486_state::read_rmx_ack)
@@ -71,7 +71,7 @@ READ16_MEMBER(altos486_state::mmu_io_r)
 
 WRITE16_MEMBER(altos486_state::mmu_ram_w)
 {
-	//UINT16 entry = m_prot[offset >> 11];
+	//uint16_t entry = m_prot[offset >> 11];
 	//if(!m_sys_mode)
 }
 

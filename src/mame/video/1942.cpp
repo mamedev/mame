@@ -28,7 +28,7 @@
 
 void _1942_state::create_palette()
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -62,7 +62,7 @@ PALETTE_INIT_MEMBER(_1942_state,1942)
 {
 	create_palette();
 
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, colorbase;
 	color_prom += 3 * 256;
 	/* color_prom now points to the beginning of the lookup table */
@@ -99,7 +99,7 @@ PALETTE_INIT_MEMBER(_1942_state,1942p)
 		palette.set_pen_indirect(i, i);
 	}
 
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	for (int i = 0; i < 0x100; i++)
 	{
 		palette.set_pen_indirect(i+0x400, color_prom[i]| 0x240);
@@ -259,7 +259,7 @@ void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 }
 
-UINT32 _1942_state::screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t _1942_state::screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -318,7 +318,7 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 }
 
-UINT32 _1942_state::screen_update_1942p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t _1942_state::screen_update_1942p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites_p(bitmap, cliprect);

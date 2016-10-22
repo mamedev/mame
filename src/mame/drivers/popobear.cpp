@@ -104,11 +104,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_spr;
-	required_shared_ptr<UINT16> m_vram;
-	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<uint16_t> m_spr;
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_vregs;
 
-	std::vector<UINT16> m_vram_rearranged;
+	std::vector<uint16_t> m_vram_rearranged;
 	int m_tilemap_base[4];
 	tilemap_t    *m_bg_tilemap[4];
 
@@ -122,7 +122,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_w);
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
@@ -215,7 +215,7 @@ void popobear_state::video_start()
 {
 	m_vram_rearranged.resize(0x100000 / 2);
 
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(&m_vram_rearranged[0]));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(&m_vram_rearranged[0]));
 
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
@@ -236,7 +236,7 @@ void popobear_state::video_start()
 
 void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8* vram = reinterpret_cast<UINT8 *>(m_spr.target());
+	uint8_t* vram = reinterpret_cast<uint8_t *>(m_spr.target());
 	int i;
 
 	/*
@@ -256,7 +256,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		/* 0x*29 = 32 x 32 */
 		for(i = 0x800-8;i >= 0; i-=8)
 		{
-			UINT16 *sprdata = &m_spr[(0x7f800 + i) / 2];
+			uint16_t *sprdata = &m_spr[(0x7f800 + i) / 2];
 
 			int param = sprdata[0];
 			int pri = (param & 0x0f00)>>8;
@@ -321,7 +321,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 				for(int xi=0;xi<width;xi++)
 				{
-					UINT8 pix = vram[BYTE_XOR_BE(spr_num)];
+					uint8_t pix = vram[BYTE_XOR_BE(spr_num)];
 					int x_draw = (x_dir) ? x+((width-1) - xi) : x+xi;
 
 					if(cliprect.contains(x_draw, y_draw))
@@ -345,7 +345,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-UINT32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	int line;
@@ -357,7 +357,7 @@ UINT32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	clip = visarea;
 
 	//popmessage("%04x",m_vregs[0/2]);
-	UINT16* vreg = m_vregs;
+	uint16_t* vreg = m_vregs;
 
 //  popmessage("%04x %04x %04x %04x %04x %04x %04x - %04x - %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x0b],vreg[0x0e],vreg[0x0f]);
 
@@ -403,8 +403,8 @@ UINT32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 		for (line = 0; line < 240;line++)
 		{
-			UINT16 val = m_vram[scrollbase/2 + line];
-			UINT16 upper = (m_vram[scrollbase2/2 + line]&0xff00)>>8;
+			uint16_t val = m_vram[scrollbase/2 + line];
+			uint16_t upper = (m_vram[scrollbase2/2 + line]&0xff00)>>8;
 
 			clip.min_y = clip.max_y = line;
 
@@ -428,8 +428,8 @@ UINT32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 		for (line = 0; line < 240;line++)
 		{
-			UINT16 val = m_vram[scrollbase/2 + line];
-			UINT16 upper = (m_vram[scrollbase2/2 + line]&0x00ff)>>0;
+			uint16_t val = m_vram[scrollbase/2 + line];
+			uint16_t upper = (m_vram[scrollbase2/2 + line]&0x00ff)>>0;
 
 			clip.min_y = clip.max_y = line;
 

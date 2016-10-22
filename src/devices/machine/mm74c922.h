@@ -79,7 +79,7 @@ class mm74c922_device :  public device_t
 {
 public:
 	// construction/destruction
-	mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_cap_osc(device_t &device, double value) { downcast<mm74c922_device &>(device).m_cap_osc = value; }
 	static void static_set_cap_debounce(device_t &device, double value) { downcast<mm74c922_device &>(device).m_cap_debounce = value; }
@@ -91,7 +91,7 @@ public:
 	template<class _Object> static devcb_base &set_x4_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x4.set_callback(object); }
 	template<class _Object> static devcb_base &set_x5_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x5.set_callback(object); }
 
-	UINT8 read();
+	uint8_t read();
 
 protected:
 	// device-level overrides
@@ -119,7 +119,7 @@ private:
 	int m_x;                    // currently scanned column
 	int m_y;                    // latched row
 
-	UINT8 m_data;               // data latch
+	uint8_t m_data;               // data latch
 
 	int m_da;                   // data available flag
 	int m_next_da;              // next value of data available flag

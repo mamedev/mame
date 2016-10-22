@@ -93,14 +93,14 @@ public:
 
 	/* Batman Forever specifics */
 	optional_device<adsp2181_device>    m_adsp;
-	optional_shared_ptr<UINT32> m_adsp_pram;
+	optional_shared_ptr<uint32_t> m_adsp_pram;
 
 	struct
 	{
-		UINT16 bdma_internal_addr;
-		UINT16 bdma_external_addr;
-		UINT16 bdma_control;
-		UINT16 bdma_word_count;
+		uint16_t bdma_internal_addr;
+		uint16_t bdma_external_addr;
+		uint16_t bdma_control;
+		uint16_t bdma_word_count;
 	} m_adsp_regs;
 
 	DECLARE_MACHINE_RESET(batmanfr);
@@ -109,10 +109,10 @@ public:
 	DECLARE_WRITE32_MEMBER(batmanfr_sound_comms_w);
 
 	// protection specific variables and functions (see machine/stvprot.c)
-	UINT32 m_abus_protenable;
-	UINT32 m_abus_protkey;
+	uint32_t m_abus_protenable;
+	uint32_t m_abus_protkey;
 
-	UINT32 m_a_bus[4];
+	uint32_t m_a_bus[4];
 
 	DECLARE_READ32_MEMBER( common_prot_r );
 	DECLARE_WRITE32_MEMBER( common_prot_w );
@@ -125,9 +125,9 @@ public:
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
 	optional_device<generic_latch_16_device> m_soundlatch; // batmanfr
-	UINT16 crypt_read_callback(UINT32 addr);
-	UINT16 crypt_read_callback_ch1(UINT32 addr);
-	UINT16 crypt_read_callback_ch2(UINT32 addr);
+	uint16_t crypt_read_callback(uint32_t addr);
+	uint16_t crypt_read_callback_ch1(uint32_t addr);
+	uint16_t crypt_read_callback_ch2(uint32_t addr);
 };
 
 

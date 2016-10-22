@@ -71,7 +71,7 @@ void sms_sports_pad_device::device_timer(emu_timer &timer, device_timer_id id, i
 
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sms_sports_pad_device::device_timer");
+		assert_always(false, "Unknown id in sms_sports_pad_device::device_timer");
 	}
 }
 
@@ -92,7 +92,7 @@ WRITE_LINE_MEMBER( sms_sports_pad_device::th_pin_w )
 
 CUSTOM_INPUT_MEMBER( sms_sports_pad_device::rldu_pins_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (m_read_state)
 	{
@@ -157,7 +157,7 @@ ioport_constructor sms_sports_pad_device::device_input_ports() const
 //  sms_sports_pad_device - constructor
 //-------------------------------------------------
 
-sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_SPORTS_PAD, "Sega SMS Sports Pad US", tag, owner, clock, "sms_sports_pad", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_sports_in(*this, "SPORTS_IN"),
@@ -192,7 +192,7 @@ void sms_sports_pad_device::device_start()
 //  sms_peripheral_r - sports pad read
 //-------------------------------------------------
 
-UINT8 sms_sports_pad_device::peripheral_r()
+uint8_t sms_sports_pad_device::peripheral_r()
 {
 	return m_sports_in->read();
 }
@@ -202,7 +202,7 @@ UINT8 sms_sports_pad_device::peripheral_r()
 //  sms_peripheral_w - sports pad write
 //-------------------------------------------------
 
-void sms_sports_pad_device::peripheral_w(UINT8 data)
+void sms_sports_pad_device::peripheral_w(uint8_t data)
 {
 	m_sports_out->write(data);
 }

@@ -24,7 +24,7 @@
 
 class h83002_device : public h8h_device {
 public:
-	h83002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h83002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
@@ -49,13 +49,13 @@ protected:
 	required_device<h8_sci_device> sci1;
 	required_device<h8_watchdog_device> watchdog;
 
-	UINT8 syscr;
+	uint8_t syscr;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
-	virtual void internal_update(UINT64 current_time) override;
+	virtual void internal_update(uint64_t current_time) override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	DECLARE_ADDRESS_MAP(map, 16);
 

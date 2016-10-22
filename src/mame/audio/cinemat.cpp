@@ -53,7 +53,7 @@
 
 WRITE8_MEMBER(cinemat_state::cinemat_sound_control_w)
 {
-	UINT8 oldval = m_sound_control;
+	uint8_t oldval = m_sound_control;
 
 	/* form an 8-bit value with the new bit */
 	m_sound_control = (m_sound_control & ~(1 << offset)) | ((data & 1) << offset);
@@ -129,7 +129,7 @@ static const char *const spacewar_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::spacewar_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::spacewar_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* Explosion - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -201,7 +201,7 @@ static const char *const barrier_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::barrier_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::barrier_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* Player die - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -247,7 +247,7 @@ static const char *const speedfrk_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::speedfrk_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::speedfrk_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* on the falling edge of bit 0x08, clock the inverse of bit 0x04 into the top of the shiftreg */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
@@ -305,7 +305,7 @@ static const char *const starhawk_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::starhawk_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::starhawk_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -374,7 +374,7 @@ static const char *const sundance_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::sundance_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::sundance_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* bong - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -437,7 +437,7 @@ static const char *const tailg_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::tailg_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::tailg_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* the falling edge of bit 0x10 clocks bit 0x08 into the mux selected by bits 0x07 */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
@@ -518,7 +518,7 @@ static const char *const warrior_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::warrior_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::warrior_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* normal level - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -582,7 +582,7 @@ static const char *const armora_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::armora_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::armora_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -676,7 +676,7 @@ static const char *const ripoff_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::ripoff_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::ripoff_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* on the rising edge of bit 0x02, clock bit 0x01 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x02))
@@ -756,9 +756,9 @@ static const char *const starcas_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::starcas_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::starcas_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
-	UINT32 target_pitch;
+	uint32_t target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -863,7 +863,7 @@ static const char *const solarq_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::solarq_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -995,7 +995,7 @@ static const char *const boxingb_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::boxingb_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::boxingb_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -1119,9 +1119,9 @@ static const char *const wotw_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::wotw_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::wotw_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
-	UINT32 target_pitch;
+	uint32_t target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -1219,7 +1219,7 @@ TIMER_CALLBACK_MEMBER( cinemat_state::synced_sound_w )
 }
 
 
-void cinemat_state::demon_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::demon_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* all inputs are inverted */
 	sound_val = ~sound_val;
@@ -1349,7 +1349,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(cinemat_state::qb3_sound_w)
 {
-	UINT16 rega = m_maincpu->state_int(CCPU_A);
+	uint16_t rega = m_maincpu->state_int(CCPU_A);
 	demon_sound_w(0x00 | (~rega & 0x0f), 0x10);
 }
 

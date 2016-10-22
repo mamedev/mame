@@ -56,7 +56,7 @@ void thunderx_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in thunderx_state::device_timer");
+		assert_always(false, "Unknown id in thunderx_state::device_timer");
 	}
 }
 
@@ -180,8 +180,8 @@ this is the data written to internal ram on startup:
 
 void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int hm )
 {
-	UINT8* p0;
-	UINT8* p1;
+	uint8_t* p0;
+	uint8_t* p1;
 	int ii, jj;
 
 	p0 = &m_pmcram[16 + 5 * s0];
@@ -614,7 +614,7 @@ void thunderx_state::machine_start()
 
 	// verified from both scontra and thunderx/gbusters schematics
 	// banks 4-7 must mirror banks 0-3 for gbusters rom test to pass
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	m_rombank->configure_entries(0, 4, &ROM[0], 0x2000);
 	m_rombank->configure_entries(4, 4, &ROM[0], 0x2000);
 	m_rombank->configure_entries(8, 8, &ROM[0x10000], 0x2000);

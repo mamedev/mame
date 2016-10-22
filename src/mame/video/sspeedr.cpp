@@ -84,7 +84,7 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_track_ice_w)
 
 void sspeedr_state::draw_track(bitmap_ind16 &bitmap)
 {
-	const UINT8* p = memregion("gfx3")->base();
+	const uint8_t* p = memregion("gfx3")->base();
 
 	int x;
 	int y;
@@ -172,7 +172,7 @@ void sspeedr_state::draw_track(bitmap_ind16 &bitmap)
 
 void sspeedr_state::draw_drones(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const UINT8 code[6] =
+	static const uint8_t code[6] =
 	{
 		0xf, 0x4, 0x3, 0x9, 0x7, 0xc
 	};
@@ -244,7 +244,7 @@ void sspeedr_state::video_start()
 }
 
 
-UINT32 sspeedr_state::screen_update_sspeedr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sspeedr_state::screen_update_sspeedr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_track(bitmap);
 	draw_drones(bitmap, cliprect);

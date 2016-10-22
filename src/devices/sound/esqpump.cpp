@@ -12,7 +12,7 @@
 
 const device_type ESQ_5505_5510_PUMP = &device_creator<esq_5505_5510_pump>;
 
-esq_5505_5510_pump::esq_5505_5510_pump(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+esq_5505_5510_pump::esq_5505_5510_pump(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ESQ_5505_5510_PUMP, "ESQ_5505_5510_PUMP", tag, owner, clock, "esq_5505_5510_pump", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr), m_timer(nullptr), m_otis(nullptr), m_esp(nullptr),
 		m_esp_halted(true), ticks_spent_processing(0), samples_processed(0)
@@ -54,7 +54,7 @@ void esq_5505_5510_pump::device_stop()
 
 void esq_5505_5510_pump::device_reset()
 {
-	INT64 nsec_per_sample = 100 * 16 * 21;
+	int64_t nsec_per_sample = 100 * 16 * 21;
 	attotime sample_time(0, 1000000000 * nsec_per_sample);
 	attotime initial_delay(0, 0);
 
@@ -73,8 +73,8 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 	{
 #define SAMPLE_SHIFT 4
 		// anything for the 'aux' output?
-		INT16 l = inputs[0][i] >> SAMPLE_SHIFT;
-		INT16 r = inputs[1][i] >> SAMPLE_SHIFT;
+		int16_t l = inputs[0][i] >> SAMPLE_SHIFT;
+		int16_t r = inputs[1][i] >> SAMPLE_SHIFT;
 
 		// push the samples into the ESP
 		m_esp->ser_w(0, inputs[2][i] >> SAMPLE_SHIFT);
@@ -99,16 +99,16 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 #endif
 
 		// read the processed result from the ESP and add to the saved AUX data
-		INT16 ll = m_esp->ser_r(6);
-		INT16 rr = m_esp->ser_r(7);
+		int16_t ll = m_esp->ser_r(6);
+		int16_t rr = m_esp->ser_r(7);
 		l += ll;
 		r += rr;
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
 		// if we're processing the fake program through the ESP, the result should just be that of adding the inputs
-		INT32 el = (inputs[2][i]) + (inputs[4][i]) + (inputs[6][i]);
-		INT32 er = (inputs[3][i]) + (inputs[5][i]) + (inputs[7][i]);
-		INT32 e_next = el + er;
+		int32_t el = (inputs[2][i]) + (inputs[4][i]) + (inputs[6][i]);
+		int32_t er = (inputs[3][i]) + (inputs[5][i]) + (inputs[7][i]);
+		int32_t e_next = el + er;
 		e[(ei + 0x1d0f) % 0x4000] = e_next;
 
 		if (l != e[ei]) {

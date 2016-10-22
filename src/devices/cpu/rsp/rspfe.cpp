@@ -20,7 +20,7 @@
 //  rsp_frontend - constructor
 //-------------------------------------------------
 
-rsp_frontend::rsp_frontend(rsp_device &rsp, UINT32 window_start, UINT32 window_end, UINT32 max_sequence)
+rsp_frontend::rsp_frontend(rsp_device &rsp, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
 	: drc_frontend(rsp, window_start, window_end, max_sequence),
 		m_rsp(rsp)
 {
@@ -34,7 +34,7 @@ rsp_frontend::rsp_frontend(rsp_device &rsp, UINT32 window_start, UINT32 window_e
 
 bool rsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
-	UINT32 op, opswitch;
+	uint32_t op, opswitch;
 
 	// fetch the opcode
 	op = desc.opptr.l[0] = m_rsp.m_direct->read_dword(desc.physpc | 0x1000);
@@ -157,7 +157,7 @@ bool rsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 //  single instruction in the 'special' group
 //-------------------------------------------------
 
-bool rsp_frontend::describe_special(UINT32 op, opcode_desc &desc)
+bool rsp_frontend::describe_special(uint32_t op, opcode_desc &desc)
 {
 	switch (op & 63)
 	{
@@ -219,7 +219,7 @@ bool rsp_frontend::describe_special(UINT32 op, opcode_desc &desc)
 //  single instruction in the 'regimm' group
 //-------------------------------------------------
 
-bool rsp_frontend::describe_regimm(UINT32 op, opcode_desc &desc)
+bool rsp_frontend::describe_regimm(uint32_t op, opcode_desc &desc)
 {
 	switch (RTREG)
 	{
@@ -262,7 +262,7 @@ bool rsp_frontend::describe_regimm(UINT32 op, opcode_desc &desc)
 //  single instruction in the COP0 group
 //-------------------------------------------------
 
-bool rsp_frontend::describe_cop0(UINT32 op, opcode_desc &desc)
+bool rsp_frontend::describe_cop0(uint32_t op, opcode_desc &desc)
 {
 	switch (RSREG)
 	{
@@ -287,7 +287,7 @@ bool rsp_frontend::describe_cop0(UINT32 op, opcode_desc &desc)
 //  single instruction in the COP2 group
 //-------------------------------------------------
 
-bool rsp_frontend::describe_cop2(UINT32 op, opcode_desc &desc)
+bool rsp_frontend::describe_cop2(uint32_t op, opcode_desc &desc)
 {
 	switch (RSREG)
 	{

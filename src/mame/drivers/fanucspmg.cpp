@@ -592,7 +592,7 @@ public:
 	required_device<i8257_device> m_dmac;
 	required_device<mc6845_device> m_crtc;
 	required_device<upd765a_device> m_fdc;
-	required_shared_ptr<UINT8> m_shared;
+	required_shared_ptr<uint8_t> m_shared;
 	required_memory_region m_chargen;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
@@ -627,16 +627,16 @@ public:
 
 	DECLARE_DRIVER_INIT(fanucspmg);
 
-	UINT8 m_vram[24576];
-	UINT8 m_video_ctrl;
+	uint8_t m_vram[24576];
+	uint8_t m_video_ctrl;
 
 private:
 	virtual void machine_reset() override;
-	INT32 m_vram_bank;
-	UINT8 m_vbl_ctrl;
-	UINT8 m_keyboard_row;
-	UINT8 m_vbl_stat;
-	UINT8 m_dma_page;
+	int32_t m_vram_bank;
+	uint8_t m_vbl_ctrl;
+	uint8_t m_keyboard_row;
+	uint8_t m_vbl_stat;
+	uint8_t m_dma_page;
 };
 
 DRIVER_INIT_MEMBER(fanucspmg_state, fanucspmg)
@@ -851,23 +851,23 @@ WRITE8_MEMBER(fanucspmg_state::memory_write_byte)
 
 MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 {
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
-	UINT8 *chargen = m_chargen->base();
+	uint8_t *chargen = m_chargen->base();
 
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ( ma + i );
+		uint16_t offset = ( ma + i );
 
 		if (m_video_ctrl & 0x02)
 		{
 			if (offset <= 0x5ff)
 			{
-				UINT8 chr = m_vram[offset + 0x600];
-				UINT8 attr = m_vram[offset];
-				UINT8 data = chargen[ chr + (ra * 256) ];
-				UINT32 fg = 0;
-				UINT32 bg = 0;
+				uint8_t chr = m_vram[offset + 0x600];
+				uint8_t attr = m_vram[offset];
+				uint8_t data = chargen[ chr + (ra * 256) ];
+				uint32_t fg = 0;
+				uint32_t bg = 0;
 
 				if (attr & 0x20) fg |= 0xff0000;
 				if (attr & 0x40) fg |= 0x00ff00;
@@ -899,23 +899,23 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 
 MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
 {
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
-	UINT8 *chargen = m_chargen->base();
+	uint8_t *chargen = m_chargen->base();
 
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ( ma + i );
+		uint16_t offset = ( ma + i );
 
 		if (m_video_ctrl & 0x02)
 		{
 			if (offset <= 0x5ff)
 			{
-				UINT8 chr = m_vram[offset + 0x600];
-//              UINT8 attr = m_vram[offset];
-				UINT8 data = chargen[ chr + (ra * 256) ];
-				UINT32 fg = 0xff00;
-				UINT32 bg = 0;
+				uint8_t chr = m_vram[offset + 0x600];
+//              uint8_t attr = m_vram[offset];
+				uint8_t data = chargen[ chr + (ra * 256) ];
+				uint32_t fg = 0xff00;
+				uint32_t bg = 0;
 
 				*p++ = ( data & 0x01 ) ? fg : bg;
 				*p++ = ( data & 0x02 ) ? fg : bg;

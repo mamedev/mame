@@ -77,7 +77,7 @@ ioport_constructor nes_powerpad_device::device_input_ports() const
 //  nes_powerpad_device - constructor
 //-------------------------------------------------
 
-nes_powerpad_device::nes_powerpad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_powerpad_device::nes_powerpad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, NES_POWERPAD, "Bandai Power Pad", tag, owner, clock, "nes_powerpad", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_ipt1(*this, "POWERPAD1"),
@@ -111,9 +111,9 @@ void nes_powerpad_device::device_reset()
 //  read
 //-------------------------------------------------
 
-UINT8 nes_powerpad_device::read_bit34()
+uint8_t nes_powerpad_device::read_bit34()
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	ret |= (m_latch[0] & 0x01) << 3;
 	ret |= (m_latch[1] & 0x01) << 4;
 	m_latch[0] >>= 1;
@@ -125,7 +125,7 @@ UINT8 nes_powerpad_device::read_bit34()
 //  write
 //-------------------------------------------------
 
-void nes_powerpad_device::write(UINT8 data)
+void nes_powerpad_device::write(uint8_t data)
 {
 	if (data & 0x01)
 		return;

@@ -125,7 +125,7 @@ GFXDECODE_MEMBER( k051960_device::gfxinfo_gradius3 )
 GFXDECODE_END
 
 
-k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K051960, "K051960 Sprite Generator", tag, owner, clock, "k051960", __FILE__)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, m_ram(nullptr)
@@ -195,7 +195,7 @@ void k051960_device::device_start()
 	if (VERBOSE && !(palette().shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
-	m_ram = make_unique_clear<UINT8[]>(0x400);
+	m_ram = make_unique_clear<uint8_t[]>(0x400);
 
 	// bind callbacks
 	m_k051960_cb.bind_relative_to(*owner());
@@ -238,7 +238,7 @@ void k051960_device::device_reset()
 TIMER_CALLBACK_MEMBER( k051960_device::scanline_callback )
 {
 	// range 0..255
-	UINT8 y = m_screen->vpos();
+	uint8_t y = m_screen->vpos();
 
 	// 32v
 	if ((y % 32 == 0) && m_nmi_enabled)
@@ -380,7 +380,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 #define NUM_SPRITES 128
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
-	UINT8 drawmode_table[256];
+	uint8_t drawmode_table[256];
 
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;

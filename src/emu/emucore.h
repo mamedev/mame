@@ -59,10 +59,10 @@
 typedef void genf(void);
 
 // pen_t is used to represent pixel values in bitmaps
-typedef UINT32 pen_t;
+typedef uint32_t pen_t;
 
 // stream_sample_t is used to represent a single sample in a sound stream
-typedef INT32 stream_sample_t;
+typedef int32_t stream_sample_t;
 
 // running_machine is core to pretty much everything
 class running_machine;
@@ -78,14 +78,14 @@ union generic_ptr
 {
 	generic_ptr(void *value) { v = value; }
 	void *      v;
-	INT8 *      i8;
-	UINT8 *     u8;
-	INT16 *     i16;
-	UINT16 *    u16;
-	INT32 *     i32;
-	UINT32 *    u32;
-	INT64 *     i64;
-	UINT64 *    u64;
+	int8_t *      i8;
+	uint8_t *     u8;
+	int16_t *     i16;
+	uint16_t *    u16;
+	int32_t *     i32;
+	uint32_t *    u32;
+	int64_t *     i64;
+	uint64_t *    u64;
 };
 
 
@@ -93,18 +93,18 @@ union generic_ptr
 union PAIR
 {
 #ifdef LSB_FIRST
-	struct { UINT8 l,h,h2,h3; } b;
-	struct { UINT16 l,h; } w;
-	struct { INT8 l,h,h2,h3; } sb;
-	struct { INT16 l,h; } sw;
+	struct { uint8_t l,h,h2,h3; } b;
+	struct { uint16_t l,h; } w;
+	struct { int8_t l,h,h2,h3; } sb;
+	struct { int16_t l,h; } sw;
 #else
-	struct { UINT8 h3,h2,h,l; } b;
-	struct { INT8 h3,h2,h,l; } sb;
-	struct { UINT16 h,l; } w;
-	struct { INT16 h,l; } sw;
+	struct { uint8_t h3,h2,h,l; } b;
+	struct { int8_t h3,h2,h,l; } sb;
+	struct { uint16_t h,l; } w;
+	struct { int16_t h,l; } sw;
 #endif
-	UINT32 d;
-	INT32 sd;
+	uint32_t d;
+	int32_t sd;
 };
 
 
@@ -112,14 +112,14 @@ union PAIR
 union PAIR16
 {
 #ifdef LSB_FIRST
-	struct { UINT8 l,h; } b;
-	struct { INT8 l,h; } sb;
+	struct { uint8_t l,h; } b;
+	struct { int8_t l,h; } sb;
 #else
-	struct { UINT8 h,l; } b;
-	struct { INT8 h,l; } sb;
+	struct { uint8_t h,l; } b;
+	struct { int8_t h,l; } sb;
 #endif
-	UINT16 w;
-	INT16 sw;
+	uint16_t w;
+	int16_t sw;
 };
 
 
@@ -127,22 +127,22 @@ union PAIR16
 union PAIR64
 {
 #ifdef LSB_FIRST
-	struct { UINT8 l,h,h2,h3,h4,h5,h6,h7; } b;
-	struct { UINT16 l,h,h2,h3; } w;
-	struct { UINT32 l,h; } d;
-	struct { INT8 l,h,h2,h3,h4,h5,h6,h7; } sb;
-	struct { INT16 l,h,h2,h3; } sw;
-	struct { INT32 l,h; } sd;
+	struct { uint8_t l,h,h2,h3,h4,h5,h6,h7; } b;
+	struct { uint16_t l,h,h2,h3; } w;
+	struct { uint32_t l,h; } d;
+	struct { int8_t l,h,h2,h3,h4,h5,h6,h7; } sb;
+	struct { int16_t l,h,h2,h3; } sw;
+	struct { int32_t l,h; } sd;
 #else
-	struct { UINT8 h7,h6,h5,h4,h3,h2,h,l; } b;
-	struct { UINT16 h3,h2,h,l; } w;
-	struct { UINT32 h,l; } d;
-	struct { INT8 h7,h6,h5,h4,h3,h2,h,l; } sb;
-	struct { INT16 h3,h2,h,l; } sw;
-	struct { INT32 h,l; } sd;
+	struct { uint8_t h7,h6,h5,h4,h3,h2,h,l; } b;
+	struct { uint16_t h3,h2,h,l; } w;
+	struct { uint32_t h,l; } d;
+	struct { int8_t h7,h6,h5,h4,h3,h2,h,l; } sb;
+	struct { int16_t h3,h2,h,l; } sw;
+	struct { int32_t h,l; } sd;
 #endif
-	UINT64 q;
-	INT64 sq;
+	uint64_t q;
+	int64_t sq;
 };
 
 
@@ -371,8 +371,8 @@ enum_value(T value) noexcept
 //  FUNCTION PROTOTYPES
 //**************************************************************************
 
-ATTR_NORETURN void fatalerror(const char *format, ...) ATTR_PRINTF(1,2);
-ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4);
+[[noreturn]] void fatalerror(const char *format, ...) ATTR_PRINTF(1,2);
+[[noreturn]] void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4);
 
 //**************************************************************************
 //  INLINE FUNCTIONS
@@ -380,7 +380,7 @@ ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, c
 
 // population count
 #if !defined(__NetBSD__)
-inline int popcount(UINT32 val)
+inline int popcount(uint32_t val)
 {
 	int count;
 
@@ -392,11 +392,11 @@ inline int popcount(UINT32 val)
 
 
 // convert a series of 32 bits into a float
-inline float u2f(UINT32 v)
+inline float u2f(uint32_t v)
 {
 	union {
 		float ff;
-		UINT32 vv;
+		uint32_t vv;
 	} u;
 	u.vv = v;
 	return u.ff;
@@ -404,11 +404,11 @@ inline float u2f(UINT32 v)
 
 
 // convert a float into a series of 32 bits
-inline UINT32 f2u(float f)
+inline uint32_t f2u(float f)
 {
 	union {
 		float ff;
-		UINT32 vv;
+		uint32_t vv;
 	} u;
 	u.ff = f;
 	return u.vv;
@@ -416,11 +416,11 @@ inline UINT32 f2u(float f)
 
 
 // convert a series of 64 bits into a double
-inline double u2d(UINT64 v)
+inline double u2d(uint64_t v)
 {
 	union {
 		double dd;
-		UINT64 vv;
+		uint64_t vv;
 	} u;
 	u.vv = v;
 	return u.dd;
@@ -428,11 +428,11 @@ inline double u2d(UINT64 v)
 
 
 // convert a double into a series of 64 bits
-inline UINT64 d2u(double d)
+inline uint64_t d2u(double d)
 {
 	union {
 		double dd;
-		UINT64 vv;
+		uint64_t vv;
 	} u;
 	u.dd = d;
 	return u.vv;

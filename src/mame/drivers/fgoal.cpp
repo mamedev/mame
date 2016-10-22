@@ -48,14 +48,14 @@ int fgoal_state::intensity(int bits)
 
 PALETTE_INIT_MEMBER(fgoal_state, fgoal)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* for B/W screens PCB can be jumpered to use lower half of PROM */
 
 	for (i = 0; i < 128; i++)
 	{
-		UINT8 color = color_prom[0x80 | i] & 63;
+		uint8_t color = color_prom[0x80 | i] & 63;
 		palette.set_pen_color(i, intensity(color >> 4), intensity(color >> 2), intensity(color >> 0));
 	}
 
@@ -78,7 +78,7 @@ void fgoal_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in fgoal_state::device_timer");
+		assert_always(false, "Unknown id in fgoal_state::device_timer");
 	}
 }
 
@@ -118,7 +118,7 @@ READ8_MEMBER(fgoal_state::analog_r)
 
 CUSTOM_INPUT_MEMBER(fgoal_state::_80_r)
 {
-	UINT8 ret = (m_screen->vpos() & 0x80) ? 1 : 0;
+	uint8_t ret = (m_screen->vpos() & 0x80) ? 1 : 0;
 
 	return ret;
 }
@@ -169,14 +169,14 @@ READ8_MEMBER(fgoal_state::address_lo_r)
 
 READ8_MEMBER(fgoal_state::shifter_r)
 {
-	UINT8 v = m_mb14241->shift_result_r(space, 0);
+	uint8_t v = m_mb14241->shift_result_r(space, 0);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 READ8_MEMBER(fgoal_state::shifter_reverse_r)
 {
-	UINT8 v = m_mb14241->shift_result_r(space, 0);
+	uint8_t v = m_mb14241->shift_result_r(space, 0);
 
 	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
@@ -293,7 +293,7 @@ static INPUT_PORTS_START( fgoal )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(1, 254) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static const UINT32 gfxlayout_xoffset[64] =
+static const uint32_t gfxlayout_xoffset[64] =
 {
 	0x000, 0x008, 0x010, 0x018, 0x020, 0x028, 0x030, 0x038,
 	0x040, 0x048, 0x050, 0x058, 0x060, 0x068, 0x070, 0x078,
@@ -305,7 +305,7 @@ static const UINT32 gfxlayout_xoffset[64] =
 	0x1c0, 0x1c8, 0x1d0, 0x1d8, 0x1e0, 0x1e8, 0x1f0, 0x1f8
 };
 
-static const UINT32 gfxlayout_yoffset[64] =
+static const uint32_t gfxlayout_yoffset[64] =
 {
 	0x0000, 0x0200, 0x0400, 0x0600, 0x0800, 0x0a00, 0x0c00, 0x0e00,
 	0x1000, 0x1200, 0x1400, 0x1600, 0x1800, 0x1a00, 0x1c00, 0x1e00,

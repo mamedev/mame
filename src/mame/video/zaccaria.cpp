@@ -37,7 +37,7 @@ Here's the hookup from the proms (82s131) to the r-g-b-outputs
 ***************************************************************************/
 PALETTE_INIT_MEMBER(zaccaria_state, zaccaria)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j, k;
 	static const int resistances_rg[] = { 1200, 1000, 820 };
 	static const int resistances_b[]  = { 1000, 820 };
@@ -114,7 +114,7 @@ PALETTE_INIT_MEMBER(zaccaria_state, zaccaria)
 
 TILE_GET_INFO_MEMBER(zaccaria_state::get_tile_info)
 {
-	UINT8 attr = m_videoram[tile_index + 0x400];
+	uint8_t attr = m_videoram[tile_index + 0x400];
 	SET_TILE_INFO_MEMBER(0,
 			m_videoram[tile_index] + ((attr & 0x03) << 8),
 			((attr & 0x0c) >> 2) + ((m_attributesram[2 * (tile_index % 32) + 1] & 0x07) << 2),
@@ -201,7 +201,7 @@ WRITE8_MEMBER(zaccaria_state::flip_screen_y_w)
 offsets 1 and 2 are swapped if accessed from spriteram2
 
 */
-void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section)
+void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,uint8_t *spriteram,int color,int section)
 {
 	int offs,o1 = 1,o2 = 2;
 
@@ -238,7 +238,7 @@ void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-UINT32 zaccaria_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t zaccaria_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 

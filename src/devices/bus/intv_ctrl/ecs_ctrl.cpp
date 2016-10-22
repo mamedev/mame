@@ -64,7 +64,7 @@ device_intvecs_control_port_interface::~device_intvecs_control_port_interface()
 //  intvecs_control_port_device - constructor
 //-------------------------------------------------
 
-intvecs_control_port_device::intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+intvecs_control_port_device::intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, INTVECS_CONTROL_PORT, "Mattel Intellivision ECS control port (HACK)", tag, owner, clock, "intvecs_control_port", __FILE__),
 						device_slot_interface(mconfig, *this), m_device(nullptr)
 {
@@ -90,23 +90,23 @@ void intvecs_control_port_device::device_start()
 }
 
 
-UINT8 intvecs_control_port_device::read_portA()
+uint8_t intvecs_control_port_device::read_portA()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data |= m_device->read_portA();
 	return data;
 }
 
-UINT8 intvecs_control_port_device::read_portB()
+uint8_t intvecs_control_port_device::read_portB()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data |= m_device->read_portB();
 	return data;
 }
 
-void intvecs_control_port_device::write_portA(UINT8 data)
+void intvecs_control_port_device::write_portA(uint8_t data)
 {
 	if (m_device)
 		m_device->write_portA(data);
@@ -153,7 +153,7 @@ machine_config_constructor intvecs_ctrls_device::device_mconfig_additions() cons
 	return MACHINE_CONFIG_NAME( intvecs_ctrls );
 }
 
-intvecs_ctrls_device::intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+intvecs_ctrls_device::intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ECS_CTRLS, "Mattel Intellivision ECS Hand Controller x2 (HACK)", tag, owner, clock, "intvecs_ctrls", __FILE__),
 	device_intvecs_control_port_interface(mconfig, *this),
 	m_hand1(*this, "port1"),
@@ -169,12 +169,12 @@ void intvecs_ctrls_device::device_reset()
 {
 }
 
-UINT8 intvecs_ctrls_device::read_portA()
+uint8_t intvecs_ctrls_device::read_portA()
 {
 	return m_hand1->read_ctrl();
 }
 
-UINT8 intvecs_ctrls_device::read_portB()
+uint8_t intvecs_ctrls_device::read_portB()
 {
 	return m_hand2->read_ctrl();
 }
@@ -279,7 +279,7 @@ ioport_constructor intvecs_keybd_device::device_input_ports() const
 	return INPUT_PORTS_NAME( intvecs_keybd );
 }
 
-intvecs_keybd_device::intvecs_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+intvecs_keybd_device::intvecs_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ECS_KEYBD, "Mattel Intellivision ECS Keyboard", tag, owner, clock, "intvecs_keybd", __FILE__)
 	, device_intvecs_control_port_interface(mconfig, *this)
 	, m_keybd(*this, "ROW.%u", 0)
@@ -296,9 +296,9 @@ void intvecs_keybd_device::device_reset()
 	m_psg_portA = 0;
 }
 
-UINT8 intvecs_keybd_device::read_portB()
+uint8_t intvecs_keybd_device::read_portB()
 {
-	UINT8 val = 0xff;
+	uint8_t val = 0xff;
 	// return correct result if more than one bit of 0xFE is set
 	for (int i = 0; i < 7; i++)
 	{
@@ -308,7 +308,7 @@ UINT8 intvecs_keybd_device::read_portB()
 	return val;
 }
 
-void intvecs_keybd_device::write_portA(UINT8 data)
+void intvecs_keybd_device::write_portA(uint8_t data)
 {
 	m_psg_portA = (~data) & 0xff;
 }
@@ -412,7 +412,7 @@ ioport_constructor intvecs_synth_device::device_input_ports() const
 }
 
 
-intvecs_synth_device::intvecs_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+intvecs_synth_device::intvecs_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ECS_SYNTH, "Mattel Intellivision ECS Synthetizer", tag, owner, clock, "intvecs_synth", __FILE__),
 	device_intvecs_control_port_interface(mconfig, *this),
 	m_synth(*this, "SYNTH.%u", 0)
@@ -429,9 +429,9 @@ void intvecs_synth_device::device_reset()
 	m_psg_portA = 0;
 }
 
-UINT8 intvecs_synth_device::read_portB()
+uint8_t intvecs_synth_device::read_portB()
 {
-	UINT8 val = 0xff;
+	uint8_t val = 0xff;
 	// return correct result if more than one bit of 0xFE is set
 	for (int i = 0; i < 7; i++)
 	{
@@ -441,7 +441,7 @@ UINT8 intvecs_synth_device::read_portB()
 	return val;
 }
 
-void intvecs_synth_device::write_portA(UINT8 data)
+void intvecs_synth_device::write_portA(uint8_t data)
 {
 	m_psg_portA = (~data) & 0xff;
 }

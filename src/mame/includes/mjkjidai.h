@@ -23,8 +23,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_region_ptr<UINT8> m_adpcmrom;
-	required_shared_ptr<UINT8> m_videoram;
+	required_region_ptr<uint8_t> m_adpcmrom;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	required_ioport_array<12> m_row;
 
@@ -45,7 +45,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

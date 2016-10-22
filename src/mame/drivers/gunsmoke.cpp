@@ -96,7 +96,7 @@ READ8_MEMBER(gunsmoke_state::gunsmoke_protection_r)
 	    arcade game.  It's hard to tell without pulling the code apart.
 	*/
 
-	static const UINT8 gunsmoke_fixed_data[] = { 0xff, 0x00, 0x00 };
+	static const uint8_t gunsmoke_fixed_data[] = { 0xff, 0x00, 0x00 };
 	return gunsmoke_fixed_data[offset];
 }
 
@@ -278,7 +278,7 @@ GFXDECODE_END
 
 void gunsmoke_state::machine_start()
 {
-	UINT8 *rombase = memregion("maincpu")->base();
+	uint8_t *rombase = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x4000);
 

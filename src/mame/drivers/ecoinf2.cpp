@@ -47,9 +47,9 @@ public:
 	required_ioport m_key;
 	required_ioport m_panel;
 
-	UINT16 m_lamps[16];
-	UINT16 m_leds[16];
-	//UINT16 m_chars[14];
+	uint16_t m_lamps[16];
+	uint16_t m_leds[16];
+	//uint16_t m_chars[14];
 //  void update_display();
 	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }

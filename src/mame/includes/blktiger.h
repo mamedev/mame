@@ -23,24 +23,24 @@ public:
 
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
-	required_shared_ptr<UINT8> m_txvideoram;
+	required_shared_ptr<uint8_t> m_txvideoram;
 
 	/* video-related */
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap8x4;
 	tilemap_t *m_bg_tilemap4x8;
-	UINT32  m_scroll_bank;
-	UINT8   m_scroll_x[2];
-	UINT8   m_scroll_y[2];
-	std::unique_ptr<UINT8[]>   m_scroll_ram;
-	UINT8   m_screen_layout;
-	UINT8   m_chon;
-	UINT8   m_objon;
-	UINT8   m_bgon;
+	uint32_t  m_scroll_bank;
+	uint8_t   m_scroll_x[2];
+	uint8_t   m_scroll_y[2];
+	std::unique_ptr<uint8_t[]>   m_scroll_ram;
+	uint8_t   m_screen_layout;
+	uint8_t   m_chon;
+	uint8_t   m_objon;
+	uint8_t   m_bgon;
 
 	/* mcu-related */
-	UINT8   m_z80_latch;
-	UINT8   m_i8751_latch;
+	uint8_t   m_z80_latch;
+	uint8_t   m_i8751_latch;
 
 	/* devices */
 	optional_device<cpu_device> m_mcu;
@@ -67,7 +67,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_blktiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_blktiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

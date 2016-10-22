@@ -45,7 +45,7 @@
 
 #define NOVRAM_SIZE 256
 
-snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : ti_expansion_card_device(mconfig, TI99_EVPC, "SNUG Enhanced Video Processor Card", tag, owner, clock, "ti99_evpc", __FILE__),
 	device_nvram_interface(mconfig, *this),
 	m_dsr_page(0),
@@ -380,7 +380,7 @@ WRITE_LINE_MEMBER( snug_enhanced_video_device::ready_line )
 void snug_enhanced_video_device::device_start()
 {
 	m_dsrrom = memregion(DSRROM)->base();
-	m_novram = std::make_unique<UINT8[]>(NOVRAM_SIZE);
+	m_novram = std::make_unique<uint8_t[]>(NOVRAM_SIZE);
 	m_console_conn = downcast<evpc_clock_connector*>(machine().device(EVPC_CONN_TAG));
 	save_item(NAME(m_address));
 	save_item(NAME(m_dsr_page));

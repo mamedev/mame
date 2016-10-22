@@ -25,7 +25,7 @@ const device_type SCC8530 = &device_creator<scc8530_t>;
     IMPLEMENTATION
 ***************************************************************************/
 
-scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SCC8530, "Zilog 8530 SCC (Legacy)", tag, owner, clock, "scc8530l", __FILE__), mode(0), reg(0), status(0), IRQV(0), MasterIRQEnable(0), lastIRQStat(0), IRQType(),
 	intrq_cb(*this)
 {
@@ -214,7 +214,7 @@ void scc8530_t::acknowledge()
     scc_getareg
 -------------------------------------------------*/
 
-UINT8 scc8530_t::getareg()
+uint8_t scc8530_t::getareg()
 {
 	/* Not yet implemented */
 	#if LOG_SCC
@@ -223,7 +223,7 @@ UINT8 scc8530_t::getareg()
 
 	if (reg == 0)
 	{
-		UINT8 rv = 0;
+		uint8_t rv = 0;
 
 		Chan *ourCh = &channel[0];
 
@@ -246,7 +246,7 @@ UINT8 scc8530_t::getareg()
     scc_getareg
 -------------------------------------------------*/
 
-UINT8 scc8530_t::getbreg()
+uint8_t scc8530_t::getbreg()
 {
 	#if LOG_SCC
 	printf("SCC: port B reg %i read 0x%02x\n", reg, channel[1].reg_val[reg]);
@@ -254,7 +254,7 @@ UINT8 scc8530_t::getbreg()
 
 	if (reg == 0)
 	{
-		UINT8 rv = 0;
+		uint8_t rv = 0;
 
 		Chan *ourCh = &channel[1];
 
@@ -285,7 +285,7 @@ UINT8 scc8530_t::getbreg()
     scc_putreg
 -------------------------------------------------*/
 
-void scc8530_t::putreg(int ch, UINT8 data)
+void scc8530_t::putreg(int ch, uint8_t data)
 {
 	Chan *pChan = &channel[ch];
 
@@ -417,7 +417,7 @@ void scc8530_t::putreg(int ch, UINT8 data)
     scc8530_get_reg_a
 -------------------------------------------------*/
 
-UINT8 scc8530_t::get_reg_a(int reg)
+uint8_t scc8530_t::get_reg_a(int reg)
 {
 	return channel[0].reg_val[reg];
 }
@@ -428,7 +428,7 @@ UINT8 scc8530_t::get_reg_a(int reg)
     scc8530_get_reg_b
 -------------------------------------------------*/
 
-UINT8 scc8530_t::get_reg_b(int reg)
+uint8_t scc8530_t::get_reg_b(int reg)
 {
 	return channel[1].reg_val[reg];
 }
@@ -439,7 +439,7 @@ UINT8 scc8530_t::get_reg_b(int reg)
     scc8530_set_reg_a
 -------------------------------------------------*/
 
-void scc8530_t::set_reg_a(int reg, UINT8 data)
+void scc8530_t::set_reg_a(int reg, uint8_t data)
 {
 	channel[0].reg_val[reg] = data;
 }
@@ -450,7 +450,7 @@ void scc8530_t::set_reg_a(int reg, UINT8 data)
     scc8530_set_reg_b
 -------------------------------------------------*/
 
-void scc8530_t::set_reg_b(int reg, UINT8 data)
+void scc8530_t::set_reg_b(int reg, uint8_t data)
 {
 	channel[1].reg_val[reg] = data;
 }
@@ -474,9 +474,9 @@ READ8_MEMBER(scc8530_t::reg_r)
 //  port for either SCC channel.
 //-------------------------------------------------
 
-UINT8 scc8530_t::read_reg(int offset)
+uint8_t scc8530_t::read_reg(int offset)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	switch(offset)
 	{
@@ -518,7 +518,7 @@ WRITE8_MEMBER( scc8530_t::reg_w )
 //  port for either SCC channel.
 //-------------------------------------------------
 
-void scc8530_t::write_reg(int offset, UINT8 data)
+void scc8530_t::write_reg(int offset, uint8_t data)
 {
 	//offset & 3;
 

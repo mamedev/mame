@@ -71,7 +71,7 @@ bool sdl_osd_interface::video_init()
 	{
 		osd_window_config conf;
 		memset(&conf, 0, sizeof(conf));
-		get_resolution(options().resolution(), options().resolution(index), &conf, TRUE);
+		get_resolution(options().resolution(), options().resolution(index), &conf, true);
 
 		// create window ...
 		std::shared_ptr<sdl_window_info> win = std::make_shared<sdl_window_info>(machine(), index, m_monitor_module->pick_monitor(reinterpret_cast<osd_options &>(options()), index), &conf);
@@ -190,7 +190,7 @@ void sdl_osd_interface::extract_video_config()
 
 	// if we are in debug mode, never go full screen
 	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		video_config.windowed = TRUE;
+		video_config.windowed = true;
 
 	// default to working video please
 	video_config.novideo = 0;

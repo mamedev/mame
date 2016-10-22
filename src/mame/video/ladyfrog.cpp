@@ -126,7 +126,7 @@ void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 VIDEO_START_MEMBER(ladyfrog_state,ladyfrog_common)
 {
-	m_spriteram = std::make_unique<UINT8[]>(160);
+	m_spriteram = std::make_unique<uint8_t[]>(160);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladyfrog_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_paletteram.resize(0x200);
@@ -156,7 +156,7 @@ VIDEO_START_MEMBER(ladyfrog_state,toucheme)
 }
 
 
-UINT32 ladyfrog_state::screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ladyfrog_state::screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

@@ -19,12 +19,12 @@ class m3comm_device : public device_t
 {
 public:
 	// construction/destruction
-	m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	required_shared_ptr<UINT16> m68k_ram;
+	required_shared_ptr<uint16_t> m68k_ram;
 	required_device<m68000_device> m_commcpu;
 
 	DECLARE_ADDRESS_MAP(m3_map, 32);
@@ -56,16 +56,16 @@ protected:
 	virtual void device_reset_after_children() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
-	UINT16 naomi_control;
-	UINT16 naomi_offset;
-	UINT16 m_status0;
-	UINT16 m_status1;
-	UINT16 m_commbank;
+	uint16_t naomi_control;
+	uint16_t naomi_offset;
+	uint16_t m_status0;
+	uint16_t m_status1;
+	uint16_t m_commbank;
 
-	UINT16 recv_offset;
-	UINT16 recv_size;
-	UINT16 send_offset;
-	UINT16 send_size;
+	uint16_t recv_offset;
+	uint16_t recv_size;
+	uint16_t send_offset;
+	uint16_t send_size;
 
 
 	emu_file m_line_rx;    // rx line - can be either differential, simple serial or toslink

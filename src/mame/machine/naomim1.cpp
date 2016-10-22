@@ -12,7 +12,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m1_board)
 	AM_INHERIT_FROM(naomi_board::submap)
 ADDRESS_MAP_END
 
-naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_M1_BOARD, "Sega NAOMI M1 Board", tag, owner, clock, "naomi_m1_board", __FILE__),
 		m_region(*this, DEVICE_SELF)
 {
@@ -45,7 +45,7 @@ void naomi_m1_board::device_start()
 		actel_id = 0;
 	}
 
-	buffer = std::make_unique<UINT8[]>(BUFFER_SIZE);
+	buffer = std::make_unique<uint8_t[]>(BUFFER_SIZE);
 
 	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
 	save_item(NAME(dict));
@@ -74,7 +74,7 @@ void naomi_m1_board::device_reset()
 	avail_bits = 0;
 }
 
-void naomi_m1_board::board_setup_address(UINT32 address, bool is_dma)
+void naomi_m1_board::board_setup_address(uint32_t address, bool is_dma)
 {
 	rom_cur_address = address & 0x1fffffff;
 	encryption = (!(address & 0x20000000)) && is_dma;
@@ -85,7 +85,7 @@ void naomi_m1_board::board_setup_address(UINT32 address, bool is_dma)
 	}
 }
 
-void naomi_m1_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
+void naomi_m1_board::board_get_buffer(uint8_t *&base, uint32_t &limit)
 {
 	if(encryption) {
 		base = buffer.get();
@@ -97,7 +97,7 @@ void naomi_m1_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 	}
 }
 
-void naomi_m1_board::board_advance(UINT32 size)
+void naomi_m1_board::board_advance(uint32_t size)
 {
 	if(encryption) {
 		if(size < buffer_actual_size) {
@@ -115,17 +115,17 @@ void naomi_m1_board::board_advance(UINT32 size)
 		rom_cur_address += size;
 }
 
-UINT32 naomi_m1_board::get_decrypted_32b()
+uint32_t naomi_m1_board::get_decrypted_32b()
 {
-	UINT8 *base = m_region->base() + rom_cur_address;
-	UINT8 a = base[0];
-	UINT8 b = base[1];
-	UINT8 c = base[2];
-	UINT8 d = base[3];
+	uint8_t *base = m_region->base() + rom_cur_address;
+	uint8_t a = base[0];
+	uint8_t b = base[1];
+	uint8_t c = base[2];
+	uint8_t d = base[3];
 
 	rom_cur_address += 4;
 
-	UINT32 res = key ^ (((b^d) << 24) | ((a^c) << 16) | (b << 8) | a);
+	uint32_t res = key ^ (((b^d) << 24) | ((a^c) << 16) | (b << 8) | a);
 	return res;
 }
 
@@ -135,7 +135,7 @@ void naomi_m1_board::gb_reset()
 	avail_bits = 0;
 }
 
-inline UINT32 naomi_m1_board::lookb(int bits)
+inline uint32_t naomi_m1_board::lookb(int bits)
 {
 	if(bits > avail_bits) {
 		avail_val = (avail_val << 32) | get_decrypted_32b();
@@ -149,9 +149,9 @@ inline void naomi_m1_board::skipb(int bits)
 	avail_bits -= bits;
 }
 
-inline UINT32 naomi_m1_board::getb(int bits)
+inline uint32_t naomi_m1_board::getb(int bits)
 {
-	UINT32 res = lookb(bits);
+	uint32_t res = lookb(bits);
 	skipb(bits);
 	return res;
 }
@@ -167,7 +167,7 @@ void naomi_m1_board::enc_reset()
 		elem = getb(8);
 }
 
-void naomi_m1_board::wb(UINT8 byte)
+void naomi_m1_board::wb(uint8_t byte)
 {
 	if(dict[0] & 64)
 		if(buffer_actual_size < 2)

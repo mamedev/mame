@@ -38,7 +38,7 @@ static constexpr int TILES_PER_PAGE = TILES_PER_PAGE_X * TILES_PER_PAGE_Y;
 
 const device_type MEGASYS1_TILEMAP = &device_creator<megasys1_tilemap_device>;
 
-megasys1_tilemap_device::megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+megasys1_tilemap_device::megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MEGASYS1_TILEMAP, "Mega System 1 Tilemap", tag, owner, clock, "ms1_tmap", __FILE__),
 		device_gfx_interface(mconfig, *this),
 		m_scrollram(*this, DEVICE_SELF),
@@ -64,7 +64,7 @@ void megasys1_tilemap_device::static_set_bits_per_color_code(device_t &device, i
 	downcast<megasys1_tilemap_device &>(device).m_bits_per_color_code = bits;
 }
 
-void megasys1_tilemap_device::static_set_colorbase(device_t &device, UINT16 colorbase)
+void megasys1_tilemap_device::static_set_colorbase(device_t &device, uint16_t colorbase)
 {
 	downcast<megasys1_tilemap_device &>(device).m_colorbase = colorbase;
 }
@@ -228,13 +228,13 @@ TILEMAP_MAPPER_MEMBER(megasys1_tilemap_device::scan_16x16)
 
 TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_8x8)
 {
-	UINT16 code = m_scrollram[tile_index];
+	uint16_t code = m_scrollram[tile_index];
 	SET_TILE_INFO_MEMBER(0, (code & 0xfff) * m_8x8_scroll_factor, code >> (16 - m_bits_per_color_code), 0);
 }
 
 TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_16x16)
 {
-	UINT16 code = m_scrollram[tile_index/4];
+	uint16_t code = m_scrollram[tile_index/4];
 	SET_TILE_INFO_MEMBER(0, (code & 0xfff) * m_16x16_scroll_factor + (tile_index & 3), code >> (16 - m_bits_per_color_code), 0);
 }
 
@@ -290,7 +290,7 @@ WRITE16_MEMBER(megasys1_tilemap_device::scroll_w)
 
 ***************************************************************************/
 
-void megasys1_tilemap_device::draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask)
+void megasys1_tilemap_device::draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask)
 {
 	m_tmap->set_scrollx(0, m_scrollx);
 	m_tmap->set_scrolly(0, m_scrolly);
@@ -302,7 +302,7 @@ void megasys1_tilemap_device::enable(bool enable)
 	m_tmap->enable(enable);
 }
 
-void megasys1_tilemap_device::set_flip(UINT32 attributes)
+void megasys1_tilemap_device::set_flip(uint32_t attributes)
 {
 	m_tmap->set_flip(attributes);
 }

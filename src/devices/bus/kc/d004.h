@@ -26,8 +26,8 @@ class kc_d004_device :
 {
 public:
 	// construction/destruction
-	kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -42,11 +42,11 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() override { return 0xa7; }
-	virtual void control_w(UINT8 data) override;
-	virtual void read(offs_t offset, UINT8 &data) override;
-	virtual void io_read(offs_t offset, UINT8 &data) override;
-	virtual void io_write(offs_t offset, UINT8 data) override;
+	virtual uint8_t module_id_r() override { return 0xa7; }
+	virtual void control_w(uint8_t data) override;
+	virtual void read(offs_t offset, uint8_t &data) override;
+	virtual void io_read(offs_t offset, uint8_t &data) override;
+	virtual void io_write(offs_t offset, uint8_t data) override;
 
 public:
 	DECLARE_READ8_MEMBER(hw_input_gate_r);
@@ -64,16 +64,16 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
-	required_shared_ptr<UINT8>  m_koppel_ram;
+	required_shared_ptr<uint8_t>  m_koppel_ram;
 
 	// internal state
 	emu_timer *         m_reset_timer;
 
-	UINT8 *             m_rom;
-	//UINT8               m_hw_input_gate;
-	UINT16              m_rom_base;
-	UINT8               m_enabled;
-	UINT8               m_connected;
+	uint8_t *             m_rom;
+	//uint8_t               m_hw_input_gate;
+	uint16_t              m_rom_base;
+	uint8_t               m_enabled;
+	uint8_t               m_connected;
 
 	floppy_image_device *m_floppy;
 };
@@ -86,7 +86,7 @@ class kc_d004_gide_device :
 {
 public:
 	// construction/destruction
-	kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -103,7 +103,7 @@ public:
 private:
 	required_device<ata_interface_device> m_ata;
 
-	UINT16              m_ata_data;
+	uint16_t              m_ata_data;
 	int                 m_lh;
 };
 

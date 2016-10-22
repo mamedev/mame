@@ -65,7 +65,7 @@ const device_type MSM6242 = &device_creator<msm6242_device>;
 //  msm6242_device - constructor
 //-------------------------------------------------
 
-msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSM6242, "MSM6242 RTC", tag, owner, clock, "msm6242", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_out_int_handler(*this)
@@ -168,7 +168,7 @@ void msm6242_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  irq
 //-------------------------------------------------
 
-void msm6242_device::irq(UINT8 irq_type)
+void msm6242_device::irq(uint8_t irq_type)
 {
 	// are we actually raising this particular IRQ?
 	if (m_irq_flag == 1 && m_irq_type == irq_type)
@@ -189,26 +189,26 @@ void msm6242_device::irq(UINT8 irq_type)
 //  bump
 //-------------------------------------------------
 
-UINT64 msm6242_device::bump(int rtc_register, UINT64 delta, UINT64 register_min, UINT64 register_range)
+uint64_t msm6242_device::bump(int rtc_register, uint64_t delta, uint64_t register_min, uint64_t register_range)
 {
-	UINT64 carry = 0;
+	uint64_t carry = 0;
 
 	if (delta > 0)
 	{
 		// get the register value
-		UINT64 register_value = (rtc_register == RTC_TICKS)
+		uint64_t register_value = (rtc_register == RTC_TICKS)
 			? m_tick
 			: get_clock_register(rtc_register);
 
 		// increment the value
-		UINT64 new_register_value = ((register_value - register_min + delta) % register_range) + register_min;
+		uint64_t new_register_value = ((register_value - register_min + delta) % register_range) + register_min;
 
 		// calculate the cary
 		carry = ((register_value - register_min) + delta) / register_range;
 
 		// store the new register value
 		if (rtc_register == RTC_TICKS)
-			m_tick = (UINT16) new_register_value;
+			m_tick = (uint16_t) new_register_value;
 		else
 			set_clock_register(rtc_register, (int) new_register_value);
 	}
@@ -222,7 +222,7 @@ UINT64 msm6242_device::bump(int rtc_register, UINT64 delta, UINT64 register_min,
 //  current_time
 //-------------------------------------------------
 
-UINT64 msm6242_device::current_time()
+uint64_t msm6242_device::current_time()
 {
 	return machine().time().as_ticks(clock());
 }
@@ -236,10 +236,10 @@ UINT64 msm6242_device::current_time()
 void msm6242_device::update_rtc_registers()
 {
 	// get the absolute current time, in ticks
-	UINT64 curtime = current_time();
+	uint64_t curtime = current_time();
 
 	// how long as it been since we last updated?
-	UINT64 delta = curtime - m_last_update_time;
+	uint64_t delta = curtime - m_last_update_time;
 
 	// set current time
 	m_last_update_time = curtime;
@@ -286,7 +286,7 @@ void msm6242_device::update_rtc_registers()
 
 void msm6242_device::update_timer()
 {
-	UINT64 callback_ticks = 0;
+	uint64_t callback_ticks = 0;
 	attotime callback_time = attotime::never;
 
 	// we only need to call back if the IRQ flag is on, and we have a handler
@@ -316,10 +316,10 @@ void msm6242_device::update_timer()
 	if (callback_ticks > 0)
 	{
 		// get the current time
-		UINT64 curtime = current_time();
+		uint64_t curtime = current_time();
 
 		// we need the absolute callback time, in ticks
-		UINT64 absolute_callback_ticks = curtime + callback_ticks;
+		uint64_t absolute_callback_ticks = curtime + callback_ticks;
 
 		// convert that to an attotime
 		attotime absolute_callback_time = attotime::from_ticks(absolute_callback_ticks, clock());
@@ -360,11 +360,11 @@ void msm6242_device::rtc_timer_callback()
 //  get_clock_nibble
 //-------------------------------------------------
 
-UINT8 msm6242_device::get_clock_nibble(int rtc_register, bool high)
+uint8_t msm6242_device::get_clock_nibble(int rtc_register, bool high)
 {
 	int value = get_clock_register(rtc_register);
 	value /= high ? 10 : 1;
-	return (UINT8) ((value % 10) & 0x0F);
+	return (uint8_t) ((value % 10) & 0x0F);
 }
 
 
@@ -373,7 +373,7 @@ UINT8 msm6242_device::get_clock_nibble(int rtc_register, bool high)
 //  get_clock_nibble
 //-------------------------------------------------
 
-const char *msm6242_device::irq_type_string(UINT8 irq_type)
+const char *msm6242_device::irq_type_string(uint8_t irq_type)
 {
 	switch(irq_type)
 	{
@@ -398,7 +398,7 @@ const char *msm6242_device::irq_type_string(UINT8 irq_type)
 READ8_MEMBER( msm6242_device::read )
 {
 	int hour, pm;
-	UINT8 result;
+	uint8_t result;
 
 	// update the registers; they may have changed
 	update_rtc_registers();
@@ -469,7 +469,7 @@ READ8_MEMBER( msm6242_device::read )
 			break;
 
 		case MSM6242_REG_W:
-			result = (UINT8) (get_clock_register(RTC_DAY_OF_WEEK) - 1);
+			result = (uint8_t) (get_clock_register(RTC_DAY_OF_WEEK) - 1);
 			break;
 
 		case MSM6242_REG_CD:

@@ -408,7 +408,7 @@ INPUT_PORTS_END
 READ8_MEMBER( ti99_8_state::cruread )
 {
 //  if (VERBOSE>6) logerror("read access to CRU address %04x\n", offset << 4);
-	UINT8 value = 0;
+	uint8_t value = 0;
 
 	// Similar to the bus8z_devices, just let the mapper, the gromport, and the p-box
 	// decide whether they want to change the value at the CRU address
@@ -445,7 +445,7 @@ static const char *const column[] = {
 READ8_MEMBER( ti99_8_state::read_by_9901 )
 {
 	int answer=0;
-	UINT8 joyst;
+	uint8_t joyst;
 	switch (offset & 0x03)
 	{
 	case TMS9901_CB_INT7:
@@ -475,7 +475,7 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 		break;
 
 	case TMS9901_INT8_INT15:
-		// Read pins INT8*-INT15* of TI99's 9901.
+		// Read pins int8_t*-INT15* of TI99's 9901.
 		//
 		// bit 0-2: keyboard status bits 2 to 4
 		// bit 3: tape input mirror
@@ -624,8 +624,8 @@ WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 		m_tms9901->rst1_line(state);
 
 		// Pull up the CRUS and PTGEN lines (9901 outputs have been deactivated, pull-up resistors on the board show effect)
-		m_mainboard->crus_in(TRUE); // assert
-		m_mainboard->ptgen_in(TRUE); // clear
+		m_mainboard->crus_in(true); // assert
+		m_mainboard->ptgen_in(true); // clear
 
 		// Setting ready to false so that automatic wait states are enabled
 		m_cpu->ready_line(CLEAR_LINE);

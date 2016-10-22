@@ -158,7 +158,7 @@ protected:
 	required_ioport m_io_console_buttons;
 	required_device<a78_cart_slot_device> m_cart;
 	required_device<screen_device> m_screen;
-	required_region_ptr<UINT8> m_bios;
+	required_region_ptr<uint8_t> m_bios;
 };
 
 
@@ -1307,7 +1307,7 @@ void a7800_state::machine_start()
 	save_item(NAME(m_maria_flag));
 
 	// set up RAM mirrors
-	UINT8 *ram = reinterpret_cast<UINT8 *>(memshare("6116_2")->ptr());
+	uint8_t *ram = reinterpret_cast<uint8_t *>(memshare("6116_2")->ptr());
 	membank("zpmirror")->set_base(ram + 0x0040);
 	membank("spmirror")->set_base(ram + 0x0140);
 
@@ -1436,7 +1436,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 {
-	m_ispal = FALSE;
+	m_ispal = false;
 	m_lines = 263;
 	m_p1_one_button = 1;
 	m_p2_one_button = 1;
@@ -1445,7 +1445,7 @@ DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 
 DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
 {
-	m_ispal = TRUE;
+	m_ispal = true;
 	m_lines = 313;
 	m_p1_one_button = 1;
 	m_p2_one_button = 1;

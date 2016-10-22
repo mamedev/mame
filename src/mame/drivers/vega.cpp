@@ -124,8 +124,8 @@ public:
 	int m_tmp;
 	int m_t1;
 
-	UINT8 m_ins8154_ram[0x80];
-	UINT8 m_txt_ram[0x400];
+	uint8_t m_ins8154_ram[0x80];
+	uint8_t m_txt_ram[0x400];
 
 	vega_obj    m_obj[NUM_OBJ];
 
@@ -163,7 +163,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(vega);
 	void draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
-	UINT32 screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 WRITE8_MEMBER(vega_state::extern_w)
@@ -495,7 +495,7 @@ PALETTE_INIT_MEMBER(vega_state, vega)
 void vega_state::draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	{
-	UINT8 *map_lookup = memregion("tilemaps")->base();
+	uint8_t *map_lookup = memregion("tilemaps")->base();
 
 	int offset_y=m_tilemap_offset_y;
 	int offset_x=m_tilemap_offset_x;
@@ -547,7 +547,7 @@ void vega_state::draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const
 
 }
 
-UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	++m_frame_counter;
 
@@ -559,7 +559,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 	{
 		int x,y;
 		int idx=0;
-		UINT8 *color_lookup = memregion("proms")->base() + 0x200;
+		uint8_t *color_lookup = memregion("proms")->base() + 0x200;
 
 		for(y=0;y<25;++y)
 			for(x=0;x<40;++x)
@@ -625,7 +625,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 			int x0=m_obj[OBJ_PLAYER].m_x;
 			int y0=255-m_obj[OBJ_PLAYER].m_y-32;
 
-			UINT8 *sprite_lookup = memregion("proms")->base();
+			uint8_t *sprite_lookup = memregion("proms")->base();
 
 
 			for(int x=0;x<16;++x)
@@ -883,7 +883,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(vega_state, vega)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x1000], 0x800);
 }
 

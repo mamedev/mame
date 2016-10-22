@@ -69,7 +69,7 @@
 
 const device_type BEEZER = &device_creator<beezer_sound_device>;
 
-beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BEEZER, "beezer SFX", tag, owner, clock, "beezer_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		//m_ptm_irq_state(0),
@@ -249,7 +249,7 @@ static inline void sh6840_apply_clock(struct sh6840_timer_channel_beez *t, int c
 
 int beezer_sound_device::sh6840_update_noise(int clocks)
 {
-	UINT32 newxor;
+	uint32_t newxor;
 	int noise_clocks = 0;
 	int i;
 
@@ -412,8 +412,8 @@ void beezer_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 		struct sh6840_timer_channel_beez *t;
 		int clocks_this_sample;
 		int clocks;
-		INT16 sample1, sample2, sample3, sample0;
-		INT16 sample = 0;
+		int16_t sample1, sample2, sample3, sample0;
+		int16_t sample = 0;
 		sample1 = sample2 = sample3 = sample0 = 0;
 
 		/* determine how many 6840 clocks this sample */
@@ -425,7 +425,7 @@ void beezer_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 		if ((sh6840_timer[0].cr & 0x01) == 0) // if we're not in reset...
 		{
 		// int noise_clocks_this_sample = 0;
-			UINT32 chan1_clocks;
+			uint32_t chan1_clocks;
 
 			/* generate noise if configured to do so */
 			if (noisy != 0)

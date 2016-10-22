@@ -28,13 +28,13 @@ void jvs_host::device_reset()
 	memset(recv_buffer, 0, sizeof(recv_buffer));
 }
 
-jvs_host::jvs_host(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+jvs_host::jvs_host(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), send_size(0), recv_size(0), recv_is_encoded(false)
 {
 	first_device = nullptr;
 }
 
-void jvs_host::push(UINT8 val)
+void jvs_host::push(uint8_t val)
 {
 	send_buffer[send_size++] = val;
 }
@@ -82,7 +82,7 @@ void jvs_host::commit_encoded()
 }
 
 
-void jvs_host::get_raw_reply(const UINT8 *&buffer, UINT32 &size)
+void jvs_host::get_raw_reply(const uint8_t *&buffer, uint32_t &size)
 {
 	if(recv_is_encoded) {
 		decode(recv_buffer, recv_size);
@@ -92,7 +92,7 @@ void jvs_host::get_raw_reply(const UINT8 *&buffer, UINT32 &size)
 	size = recv_size;
 }
 
-void jvs_host::get_encoded_reply(const UINT8 *&buffer, UINT32 &size)
+void jvs_host::get_encoded_reply(const uint8_t *&buffer, uint32_t &size)
 {
 	if(!recv_is_encoded) {
 		encode(recv_buffer, recv_size);
@@ -113,20 +113,20 @@ bool jvs_host::get_address_set_line()
 }
 
 
-void jvs_host::encode(UINT8 *buffer, UINT32 &size)
+void jvs_host::encode(uint8_t *buffer, uint32_t &size)
 {
 	if(!size)
 		return;
-	UINT32 add = 1;
-	UINT8 sum = 0;
-	for(UINT32 i=0; i<size; i++)
+	uint32_t add = 1;
+	uint8_t sum = 0;
+	for(uint32_t i=0; i<size; i++)
 		sum += buffer[i];
 	buffer[size++] = sum;
-	for(UINT32 i=0; i<size; i++)
+	for(uint32_t i=0; i<size; i++)
 		if(buffer[i] == 0xd0 || buffer[i] == 0xe0)
 			add++;
-	for(UINT32 i=size; i; i--) {
-		UINT8 t = buffer[i-1];
+	for(uint32_t i=size; i; i--) {
+		uint8_t t = buffer[i-1];
 		if(t == 0xd0 || t == 0xe0) {
 			buffer[i+add-1] = t-1;
 			buffer[i+add-2] = 0xd0;
@@ -138,13 +138,13 @@ void jvs_host::encode(UINT8 *buffer, UINT32 &size)
 	size += add;
 }
 
-void jvs_host::decode(UINT8 *buffer, UINT32 &size)
+void jvs_host::decode(uint8_t *buffer, uint32_t &size)
 {
 	if(!size)
 		return;
-	UINT32 pos = 0;
-	for(UINT32 i=0; i<size; i++) {
-		UINT8 t = buffer[i];
+	uint32_t pos = 0;
+	for(uint32_t i=0; i<size; i++) {
+		uint8_t t = buffer[i];
 		if(!i && t == 0xe0)
 			continue;
 		if(t == 0xd0) {

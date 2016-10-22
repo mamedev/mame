@@ -21,7 +21,7 @@ enum {
 	TOAPLAN1_REGION_OTHER
 };
 
-static const UINT8 toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER+1][2][4] =
+static const uint8_t toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER+1][2][4] =
 {
 	{ { 1, 1, 2, 2 }, { 1, 1, 2, 2 } }, /* TOAPLAN1_REGION_JAPAN */
 	{ { 1, 1, 2, 2 }, { 1, 1, 2, 2 } }, /* TOAPLAN1_REGION_US */
@@ -29,7 +29,7 @@ static const UINT8 toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER+1][2][4] =
 	{ { 1, 1, 1, 1 }, { 1, 1, 1, 1 } }  /* TOAPLAN1_REGION_OTHER */
 };
 
-static const UINT8 toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER+1][2][4] =
+static const uint8_t toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER+1][2][4] =
 {
 	{ { 1, 2, 1, 3 }, { 1, 2, 1, 3 } }, /* TOAPLAN1_REGION_JAPAN */
 	{ { 1, 2, 1, 3 }, { 1, 2, 1, 3 } }, /* TOAPLAN1_REGION_US */
@@ -72,7 +72,7 @@ READ16_MEMBER(toaplan1_state::demonwld_dsp_r)
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
-	UINT16 input_data = 0;
+	uint16_t input_data = 0;
 
 	switch (m_main_ram_seg) {
 		case 0xc00000: {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
@@ -181,7 +181,7 @@ READ16_MEMBER(toaplan1_state::samesame_port_6_word_r)
 
 READ16_MEMBER(toaplan1_state::vimana_system_port_r)
 {
-	static const UINT8 vimana_region[16] =
+	static const uint8_t vimana_region[16] =
 	{
 		TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_US   , TOAPLAN1_REGION_WORLD, TOAPLAN1_REGION_JAPAN,
 		TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_US   ,

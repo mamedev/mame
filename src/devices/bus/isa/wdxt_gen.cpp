@@ -189,7 +189,7 @@ machine_config_constructor wdxt_gen_device::device_mconfig_additions() const
 //  wdxt_gen_device - constructor
 //-------------------------------------------------
 
-wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA8_WDXT_GEN, "Western Digital WDXT-GEN (Amstrad PC1512/1640)", tag, owner, clock, "wdxt_gen", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_maincpu(*this, WD1015_TAG),
@@ -208,7 +208,7 @@ void wdxt_gen_device::device_start()
 	set_isa_device();
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, "hdc", "hdc");
 	m_isa->install_device(0x0320, 0x0323, READ8_DEVICE_DELEGATE(m_host, wd11c00_17_device, io_r), WRITE8_DEVICE_DELEGATE(m_host, wd11c00_17_device, io_w));
-	m_isa->set_dma_channel(3, this, FALSE);
+	m_isa->set_dma_channel(3, this, false);
 }
 
 
@@ -227,7 +227,7 @@ void wdxt_gen_device::device_reset()
 //  dack_r -
 //-------------------------------------------------
 
-UINT8 wdxt_gen_device::dack_r(int line)
+uint8_t wdxt_gen_device::dack_r(int line)
 {
 	return m_host->dack_r();
 }
@@ -237,7 +237,7 @@ UINT8 wdxt_gen_device::dack_r(int line)
 //  dack_w -
 //-------------------------------------------------
 
-void wdxt_gen_device::dack_w(int line, UINT8 data)
+void wdxt_gen_device::dack_w(int line, uint8_t data)
 {
 	m_host->dack_w(data);
 }
@@ -283,7 +283,7 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p1_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	logerror("%s P1 read %02x\n", machine().describe_context(), data);
 
@@ -339,7 +339,7 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p2_r )
 
 	*/
 
-	UINT8 data = 0x40;
+	uint8_t data = 0x40;
 
 	data |= m_host->ecc_not_0_r() << 7;
 

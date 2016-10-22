@@ -16,7 +16,7 @@ class taito_zoom_device : public device_t
 
 {
 public:
-	taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~taito_zoom_device() {}
 
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
@@ -40,9 +40,9 @@ private:
 	required_device<zsg2_device> m_zsg2;
 
 	// internal state
-	UINT16 m_reg_address;
-	UINT8 m_tms_ctrl;
-	std::unique_ptr<UINT8[]> m_snd_shared_ram;
+	uint16_t m_reg_address;
+	uint8_t m_tms_ctrl;
+	std::unique_ptr<uint8_t[]> m_snd_shared_ram;
 };
 
 extern const device_type TAITO_ZOOM;

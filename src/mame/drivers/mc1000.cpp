@@ -70,8 +70,8 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	required_shared_ptr<UINT8> m_mc6845_video_ram;
-	required_shared_ptr<UINT8> m_mc6847_video_ram;
+	required_shared_ptr<uint8_t> m_mc6845_video_ram;
+	required_shared_ptr<uint8_t> m_mc6847_video_ram;
 	required_ioport_array<8> m_y;
 	required_ioport_array<2> m_joy;
 	required_ioport m_modifiers;
@@ -107,7 +107,7 @@ public:
 	/* video state */
 	int m_hsync;
 	int m_vsync;
-	UINT8 m_mc6847_attr;
+	uint8_t m_mc6847_attr;
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
@@ -382,7 +382,7 @@ WRITE8_MEMBER( mc1000_state::keylatch_w )
 
 READ8_MEMBER( mc1000_state::keydata_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(m_keylatch, 0))
 	{
@@ -418,7 +418,7 @@ void mc1000_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* setup memory banking */
-	UINT8 *rom = m_rom->base();
+	uint8_t *rom = m_rom->base();
 
 	program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
 	membank("bank1")->configure_entry(0, rom);

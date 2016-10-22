@@ -24,45 +24,45 @@ public:
 		m_workram(*this, "workram"),
 		m_palette(*this, "palette") { }
 
-	static const UINT32 VRAM_PAGES      = 2;
-	static const UINT32 VRAM_PAGE_BYTES = 512 * 1024;
+	static const uint32_t VRAM_PAGES      = 2;
+	static const uint32_t VRAM_PAGE_BYTES = 512 * 1024;
 
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k056800_device> m_k056800;
-	required_shared_ptr<UINT32> m_workram;
+	required_shared_ptr<uint32_t> m_workram;
 	required_device<palette_device> m_palette;
 
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(int_ack_w);
 
-	UINT32 screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
-	std::unique_ptr<UINT8[]> m_vram;
-	UINT32 m_cpu_vram_page;
+	std::unique_ptr<uint8_t[]> m_vram;
+	uint32_t m_cpu_vram_page;
 };
 
 
 /*****************************************************************************/
 
-UINT32 ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *vram = m_vram.get() + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
+	uint8_t *vram = m_vram.get() + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		int fb_index = y * 1024;
-		UINT16 *dest = &bitmap.pix16(y, cliprect.min_x);
+		uint16_t *dest = &bitmap.pix16(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
-			UINT8 p1 = vram[BYTE4_XOR_BE(fb_index + x + 512)];
+			uint8_t p1 = vram[BYTE4_XOR_BE(fb_index + x + 512)];
 
 			if (p1 == 0)
 				*dest++ = vram[BYTE4_XOR_BE(fb_index + x)];
@@ -85,7 +85,7 @@ WRITE32_MEMBER(ultrsprt_state::int_ack_w)
 
 READ32_MEMBER(ultrsprt_state::eeprom_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	if (ACCESSING_BITS_24_31)
 		r |= ioport("SERVICE")->read();
@@ -109,7 +109,7 @@ WRITE32_MEMBER(ultrsprt_state::eeprom_w)
 		*/
 		ioport("EEPROMOUT")->write(data, 0xffffffff);
 
-		UINT32 vram_page = (data & 0x08000000) >> 27;
+		uint32_t vram_page = (data & 0x08000000) >> 27;
 
 		if (vram_page != m_cpu_vram_page)
 		{
@@ -186,9 +186,9 @@ void ultrsprt_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0xff000000, 0xff01ffff, FALSE, m_workram);
+	m_maincpu->ppcdrc_add_fastram(0xff000000, 0xff01ffff, false, m_workram);
 
-	m_vram = std::make_unique<UINT8[]>(VRAM_PAGE_BYTES * VRAM_PAGES);
+	m_vram = std::make_unique<uint8_t[]>(VRAM_PAGE_BYTES * VRAM_PAGES);
 
 	membank("vram")->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
 

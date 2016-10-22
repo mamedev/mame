@@ -6,10 +6,10 @@
 
 
 void taitoic_drawscanline( bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y,
-		const UINT16 *src, int transparent, UINT32 orient, bitmap_ind8 &priority, int pri)
+		const uint16_t *src, int transparent, uint32_t orient, bitmap_ind8 &priority, int pri)
 {
-	UINT16 *dsti = &bitmap.pix16(y, x);
-	UINT8 *dstp = &priority.pix8(y, x);
+	uint16_t *dsti = &bitmap.pix16(y, x);
+	uint8_t *dstp = &priority.pix8(y, x);
 	int length = cliprect.width();
 
 	src += cliprect.min_x;
@@ -19,7 +19,7 @@ void taitoic_drawscanline( bitmap_ind16 &bitmap, const rectangle &cliprect, int 
 	{
 		while (length--)
 		{
-			UINT32 spixel = *src++;
+			uint32_t spixel = *src++;
 
 			if (spixel < 0x7fff)
 			{

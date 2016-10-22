@@ -29,7 +29,7 @@
 
 PALETTE_INIT_MEMBER(dcheese_state, dcheese)
 {
-	const UINT16 *src = (UINT16 *)memregion("user1")->base();
+	const uint16_t *src = (uint16_t *)memregion("user1")->base();
 	int i;
 
 	/* really 65536 colors, but they don't use the later ones so we can stay */
@@ -83,7 +83,7 @@ void dcheese_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		dcheese_signal_irq(param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in dcheese_state::device_timer");
+		assert_always(false, "Unknown id in dcheese_state::device_timer");
 	}
 }
 
@@ -118,15 +118,15 @@ void dcheese_state::video_start()
  *
  *************************************/
 
-UINT32 dcheese_state::screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dcheese_state::screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
 	/* update the pixels */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dest = &bitmap.pix16(y);
-		UINT16 *src = &m_dstbitmap->pix16((y + m_blitter_vidparam[0x28/2]) % DSTBITMAP_HEIGHT);
+		uint16_t *dest = &bitmap.pix16(y);
+		uint16_t *src = &m_dstbitmap->pix16((y + m_blitter_vidparam[0x28/2]) % DSTBITMAP_HEIGHT);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			dest[x] = src[x];
@@ -157,18 +157,18 @@ void dcheese_state::do_clear(  )
 
 void dcheese_state::do_blit(  )
 {
-	INT32 srcminx = m_blitter_xparam[0] << 12;
-	INT32 srcmaxx = m_blitter_xparam[1] << 12;
-	INT32 srcminy = m_blitter_yparam[0] << 12;
-	INT32 srcmaxy = m_blitter_yparam[1] << 12;
-	INT32 srcx = ((m_blitter_xparam[2] & 0x0fff) | ((m_blitter_xparam[3] & 0x0fff) << 12)) << 7;
-	INT32 srcy = ((m_blitter_yparam[2] & 0x0fff) | ((m_blitter_yparam[3] & 0x0fff) << 12)) << 7;
-	INT32 dxdx = (INT32)(((m_blitter_xparam[4] & 0x0fff) | ((m_blitter_xparam[5] & 0x0fff) << 12)) << 12) >> 12;
-	INT32 dxdy = (INT32)(((m_blitter_xparam[6] & 0x0fff) | ((m_blitter_xparam[7] & 0x0fff) << 12)) << 12) >> 12;
-	INT32 dydx = (INT32)(((m_blitter_yparam[4] & 0x0fff) | ((m_blitter_yparam[5] & 0x0fff) << 12)) << 12) >> 12;
-	INT32 dydy = (INT32)(((m_blitter_yparam[6] & 0x0fff) | ((m_blitter_yparam[7] & 0x0fff) << 12)) << 12) >> 12;
-	UINT8 *src = memregion("gfx1")->base();
-	UINT32 pagemask = (memregion("gfx1")->bytes() - 1) / 0x40000;
+	int32_t srcminx = m_blitter_xparam[0] << 12;
+	int32_t srcmaxx = m_blitter_xparam[1] << 12;
+	int32_t srcminy = m_blitter_yparam[0] << 12;
+	int32_t srcmaxy = m_blitter_yparam[1] << 12;
+	int32_t srcx = ((m_blitter_xparam[2] & 0x0fff) | ((m_blitter_xparam[3] & 0x0fff) << 12)) << 7;
+	int32_t srcy = ((m_blitter_yparam[2] & 0x0fff) | ((m_blitter_yparam[3] & 0x0fff) << 12)) << 7;
+	int32_t dxdx = (int32_t)(((m_blitter_xparam[4] & 0x0fff) | ((m_blitter_xparam[5] & 0x0fff) << 12)) << 12) >> 12;
+	int32_t dxdy = (int32_t)(((m_blitter_xparam[6] & 0x0fff) | ((m_blitter_xparam[7] & 0x0fff) << 12)) << 12) >> 12;
+	int32_t dydx = (int32_t)(((m_blitter_yparam[4] & 0x0fff) | ((m_blitter_yparam[5] & 0x0fff) << 12)) << 12) >> 12;
+	int32_t dydy = (int32_t)(((m_blitter_yparam[6] & 0x0fff) | ((m_blitter_yparam[7] & 0x0fff) << 12)) << 12) >> 12;
+	uint8_t *src = memregion("gfx1")->base();
+	uint32_t pagemask = (memregion("gfx1")->bytes() - 1) / 0x40000;
 	int xstart = m_blitter_xparam[14];
 	int xend = m_blitter_xparam[15] + 1;
 	int ystart = m_blitter_yparam[14];
@@ -181,7 +181,7 @@ void dcheese_state::do_blit(  )
 	/* loop over target rows */
 	for (y = ystart; y <= yend; y++)
 	{
-		UINT16 *dst = &m_dstbitmap->pix16(y % DSTBITMAP_HEIGHT);
+		uint16_t *dst = &m_dstbitmap->pix16(y % DSTBITMAP_HEIGHT);
 
 		/* loop over target columns */
 		for (x = xstart; x <= xend; x++)

@@ -261,6 +261,8 @@ SOUNDS["VRC6"] = true
 SOUNDS["UPD1771"] = true
 SOUNDS["GB_SOUND"] = true
 SOUNDS["PCD3311"] = true
+SOUNDS["VOLT_REG"] = true
+SOUNDS["MEA8000"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -446,7 +448,6 @@ MACHINES["LSI53C810"] = true
 MACHINES["M68307"] = true
 MACHINES["M68340"] = true
 MACHINES["M6M80011AP"] = true
-MACHINES["MATSUCD"] = true
 MACHINES["MB14241"] = true
 MACHINES["MB3773"] = true
 MACHINES["MB8421"] = true
@@ -1245,8 +1246,6 @@ end
 --------------------------------------------------
 createMESSProjects(_target, _subtarget, "messshared")
 files {
-	MAME_DIR .. "src/mame/audio/mea8000.cpp",
-	MAME_DIR .. "src/mame/audio/mea8000.h",
 	MAME_DIR .. "src/mame/machine/microdrv.cpp",
 	MAME_DIR .. "src/mame/machine/microdrv.h",
 	MAME_DIR .. "src/mame/machine/teleprinter.cpp",

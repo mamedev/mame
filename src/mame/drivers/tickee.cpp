@@ -55,14 +55,14 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<tlc34076_device> m_tlc34076;
 
-	required_shared_ptr<UINT16> m_vram;
-	optional_shared_ptr<UINT16> m_control;
+	required_shared_ptr<uint16_t> m_vram;
+	optional_shared_ptr<uint16_t> m_control;
 
 	emu_timer *m_setup_gun_timer;
 	int m_beamxadd;
 	int m_beamyadd;
 	int m_palette_bank;
-	UINT8 m_gunx[2];
+	uint8_t m_gunx[2];
 	void get_crosshair_xy(int player, int &x, int &y);
 
 	DECLARE_WRITE16_MEMBER(rapidfir_transparent_w);
@@ -133,7 +133,7 @@ void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		setup_gun_interrupts(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tickee_state::device_timer");
+		assert_always(false, "Unknown id in tickee_state::device_timer");
 	}
 }
 
@@ -206,8 +206,8 @@ VIDEO_START_MEMBER(tickee_state,tickee)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 {
-	UINT16 *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	UINT32 *dest = &bitmap.pix32(scanline);
+	uint16_t *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
@@ -222,7 +222,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 		/* copy the non-blanked portions of this scanline */
 		for (x = params->heblnk; x < params->hsblnk; x += 2)
 		{
-			UINT16 pixels = src[coladdr++ & 0xff];
+			uint16_t pixels = src[coladdr++ & 0xff];
 			dest[x + 0] = pens[pixels & 0xff];
 			dest[x + 1] = pens[pixels >> 8];
 		}
@@ -231,8 +231,8 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
 {
-	UINT16 *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	UINT32 *dest = &bitmap.pix32(scanline);
+	uint16_t *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
@@ -251,7 +251,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
 		/* copy the non-blanked portions of this scanline */
 		for (x = params->heblnk; x < params->hsblnk; x += 2)
 		{
-			UINT16 pixels = src[coladdr++ & 0xff];
+			uint16_t pixels = src[coladdr++ & 0xff];
 			dest[x + 0] = pens[pixels & 0xff];
 			dest[x + 1] = pens[pixels >> 8];
 		}
@@ -321,7 +321,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_from_shiftreg)
 
 WRITE16_MEMBER(tickee_state::tickee_control_w)
 {
-	UINT16 olddata = m_control[offset];
+	uint16_t olddata = m_control[offset];
 
 	/* offsets:
 
@@ -745,7 +745,7 @@ static MACHINE_CONFIG_START( tickee, tickee_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(tickee_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
@@ -793,7 +793,7 @@ static MACHINE_CONFIG_START( rapidfir, tickee_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(rapidfir_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, rapidfir_scanline_update)       /* scanline callback (rgb32) */
@@ -827,7 +827,7 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(mouseatk_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */

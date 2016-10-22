@@ -27,10 +27,10 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteram;
 	optional_device<deco146_device> m_deco146;
-	required_shared_ptr<UINT16> m_pf1_rowscroll;
-	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	required_shared_ptr<uint16_t> m_pf1_rowscroll;
+	required_shared_ptr<uint16_t> m_pf2_rowscroll;
 	optional_device<decospr_device> m_sprgen;
 
 	/* devices */
@@ -39,7 +39,7 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	DECLARE_DRIVER_INIT(funkyjet);
 	virtual void machine_start() override;
-	UINT32 screen_update_funkyjet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_funkyjet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( funkyjet_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( funkyjet_protection_region_0_146_w );

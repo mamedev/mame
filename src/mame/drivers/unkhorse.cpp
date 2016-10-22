@@ -38,10 +38,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<4> m_inp_matrix;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 
-	std::unique_ptr<UINT8[]> m_colorram;
-	UINT8 m_output;
+	std::unique_ptr<uint8_t[]> m_colorram;
+	uint8_t m_output;
 
 	DECLARE_READ8_MEMBER(colorram_r) { return m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] | 0x0f; }
 	DECLARE_WRITE8_MEMBER(colorram_w) { m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] = data & 0xf0; }
@@ -49,13 +49,13 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 
 	virtual void machine_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 };
 
 void horse_state::machine_start()
 {
-	m_colorram = std::make_unique<UINT8 []>(0x200);
+	m_colorram = std::make_unique<uint8_t []>(0x200);
 	save_pointer(NAME(m_colorram.get()), 0x200);
 	save_item(NAME(m_output));
 }
@@ -68,14 +68,14 @@ void horse_state::machine_start()
 
 ***************************************************************************/
 
-UINT32 horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			UINT8 data = m_vram[y << 5 | x];
-			UINT8 color = m_colorram[(y << 1 & 0x1e0) | x] >> 4;
+			uint8_t data = m_vram[y << 5 | x];
+			uint8_t color = m_colorram[(y << 1 & 0x1e0) | x] >> 4;
 
 			for (int i = 0; i < 8; i++)
 				bitmap.pix16(y, x << 3 | i) = (data >> i & 1) ? color : 0;

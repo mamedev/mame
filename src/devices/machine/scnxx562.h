@@ -129,7 +129,7 @@ class duscc_channel : public device_t,
 	friend class duscc_device;
 
 public:
-	duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -143,84 +143,84 @@ public:
 	virtual void rcv_complete() override;
 
 	// read register handlers
-	UINT8 do_dusccreg_cmr1_r();
-	UINT8 do_dusccreg_cmr2_r();
-	UINT8 do_dusccreg_s1r_r();
-	UINT8 do_dusccreg_s2r_r();
-	UINT8 do_dusccreg_tpr_r();
-	UINT8 do_dusccreg_ttr_r();
-	UINT8 do_dusccreg_rpr_r();
-	UINT8 do_dusccreg_rtr_r();
-	UINT8 do_dusccreg_ctprh_r();
-	UINT8 do_dusccreg_ctprl_r();
-	UINT8 do_dusccreg_ctcr_r();
-	UINT8 do_dusccreg_omr_r();
-	UINT8 do_dusccreg_cth_r();
-	UINT8 do_dusccreg_ctl_r();
-	UINT8 do_dusccreg_pcr_r();
-	UINT8 do_dusccreg_ccr_r();
-	UINT8 do_dusccreg_rxfifo_r();
-	UINT8 do_dusccreg_rsr_r();
-	UINT8 do_dusccreg_trsr_r();
-	UINT8 do_dusccreg_ictsr_r();
-	UINT8 do_dusccreg_gsr_r();
-	UINT8 do_dusccreg_ier_r();
-	UINT8 do_dusccreg_cid_r();
-	UINT8 do_dusccreg_ivr_ivrm_r();
-	UINT8 do_dusccreg_icr_r();
-	UINT8 do_dusccreg_mrr_r();
-	UINT8 do_dusccreg_ier1_r();
-	UINT8 do_dusccreg_ier2_r();
-	UINT8 do_dusccreg_ier3_r();
-	UINT8 do_dusccreg_trcr_r();
-	UINT8 do_dusccreg_rflr_r();
-	UINT8 do_dusccreg_ftlr_r();
-	UINT8 do_dusccreg_trmsr_r();
-	UINT8 do_dusccreg_telr_r();
+	uint8_t do_dusccreg_cmr1_r();
+	uint8_t do_dusccreg_cmr2_r();
+	uint8_t do_dusccreg_s1r_r();
+	uint8_t do_dusccreg_s2r_r();
+	uint8_t do_dusccreg_tpr_r();
+	uint8_t do_dusccreg_ttr_r();
+	uint8_t do_dusccreg_rpr_r();
+	uint8_t do_dusccreg_rtr_r();
+	uint8_t do_dusccreg_ctprh_r();
+	uint8_t do_dusccreg_ctprl_r();
+	uint8_t do_dusccreg_ctcr_r();
+	uint8_t do_dusccreg_omr_r();
+	uint8_t do_dusccreg_cth_r();
+	uint8_t do_dusccreg_ctl_r();
+	uint8_t do_dusccreg_pcr_r();
+	uint8_t do_dusccreg_ccr_r();
+	uint8_t do_dusccreg_rxfifo_r();
+	uint8_t do_dusccreg_rsr_r();
+	uint8_t do_dusccreg_trsr_r();
+	uint8_t do_dusccreg_ictsr_r();
+	uint8_t do_dusccreg_gsr_r();
+	uint8_t do_dusccreg_ier_r();
+	uint8_t do_dusccreg_cid_r();
+	uint8_t do_dusccreg_ivr_ivrm_r();
+	uint8_t do_dusccreg_icr_r();
+	uint8_t do_dusccreg_mrr_r();
+	uint8_t do_dusccreg_ier1_r();
+	uint8_t do_dusccreg_ier2_r();
+	uint8_t do_dusccreg_ier3_r();
+	uint8_t do_dusccreg_trcr_r();
+	uint8_t do_dusccreg_rflr_r();
+	uint8_t do_dusccreg_ftlr_r();
+	uint8_t do_dusccreg_trmsr_r();
+	uint8_t do_dusccreg_telr_r();
 
 	// write register handlers
-	void do_dusccreg_cmr1_w(UINT8 data);
-	void do_dusccreg_cmr2_w(UINT8 data);
-	void do_dusccreg_s1r_w(UINT8 data);
-	void do_dusccreg_s2r_w(UINT8 data);
-	void do_dusccreg_tpr_w(UINT8 data);
-	void do_dusccreg_ttr_w(UINT8 data);
-	void do_dusccreg_rpr_w(UINT8 data);
-	void do_dusccreg_rtr_w(UINT8 data);
-	void do_dusccreg_ctprh_w(UINT8 data);
-	void do_dusccreg_ctprl_w(UINT8 data);
-	void do_dusccreg_ctcr_w(UINT8 data);
-	void do_dusccreg_omr_w(UINT8 data);
-	void do_dusccreg_pcr_w(UINT8 data);
-	void do_dusccreg_ccr_w(UINT8 data);
-	void do_dusccreg_txfifo_w(UINT8 data);
-	void do_dusccreg_rsr_w(UINT8 data);
-	void do_dusccreg_trsr_w(UINT8 data);
-	void do_dusccreg_ictsr_w(UINT8 data);
-	void do_dusccreg_gsr_w(UINT8 data);
-	void do_dusccreg_ier_w(UINT8 data);
-	//  void do_dusccreg_rea_w(UINT8 data); // Short cutted non complex feature
-	void do_dusccreg_ivr_w(UINT8 data);
-	void do_dusccreg_icr_w(UINT8 data);
-	void do_dusccreg_sea_rea_w(UINT8 data); // Short cutted non complex feature
-	void do_dusccreg_mrr_w(UINT8 data);
-	void do_dusccreg_ier1_w(UINT8 data);
-	void do_dusccreg_ier2_w(UINT8 data);
-	void do_dusccreg_ier3_w(UINT8 data);
-	void do_dusccreg_trcr_w(UINT8 data);
-	void do_dusccreg_ftlr_w(UINT8 data);
-	void do_dusccreg_trmsr_w(UINT8 data);
+	void do_dusccreg_cmr1_w(uint8_t data);
+	void do_dusccreg_cmr2_w(uint8_t data);
+	void do_dusccreg_s1r_w(uint8_t data);
+	void do_dusccreg_s2r_w(uint8_t data);
+	void do_dusccreg_tpr_w(uint8_t data);
+	void do_dusccreg_ttr_w(uint8_t data);
+	void do_dusccreg_rpr_w(uint8_t data);
+	void do_dusccreg_rtr_w(uint8_t data);
+	void do_dusccreg_ctprh_w(uint8_t data);
+	void do_dusccreg_ctprl_w(uint8_t data);
+	void do_dusccreg_ctcr_w(uint8_t data);
+	void do_dusccreg_omr_w(uint8_t data);
+	void do_dusccreg_pcr_w(uint8_t data);
+	void do_dusccreg_ccr_w(uint8_t data);
+	void do_dusccreg_txfifo_w(uint8_t data);
+	void do_dusccreg_rsr_w(uint8_t data);
+	void do_dusccreg_trsr_w(uint8_t data);
+	void do_dusccreg_ictsr_w(uint8_t data);
+	void do_dusccreg_gsr_w(uint8_t data);
+	void do_dusccreg_ier_w(uint8_t data);
+	//  void do_dusccreg_rea_w(uint8_t data); // Short cutted non complex feature
+	void do_dusccreg_ivr_w(uint8_t data);
+	void do_dusccreg_icr_w(uint8_t data);
+	void do_dusccreg_sea_rea_w(uint8_t data); // Short cutted non complex feature
+	void do_dusccreg_mrr_w(uint8_t data);
+	void do_dusccreg_ier1_w(uint8_t data);
+	void do_dusccreg_ier2_w(uint8_t data);
+	void do_dusccreg_ier3_w(uint8_t data);
+	void do_dusccreg_trcr_w(uint8_t data);
+	void do_dusccreg_ftlr_w(uint8_t data);
+	void do_dusccreg_trmsr_w(uint8_t data);
 
-	UINT8 read(offs_t &offset);
-	void write(UINT8 data, offs_t &offset);
+	uint8_t read(offs_t &offset);
+	void write(uint8_t data, offs_t &offset);
 
-	//  UINT8 data_read();
-	//  void data_write(UINT8 data);
+	//  uint8_t data_read();
+	//  void data_write(uint8_t data);
 
-	void receive_data(UINT8 data);
+	void receive_data(uint8_t data);
 	void m_tx_fifo_rp_step();
 	void m_rx_fifo_rp_step();
-	UINT8 m_rx_fifo_rp_data();
+	uint8_t m_rx_fifo_rp_data();
 
 	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
@@ -236,46 +236,46 @@ public:
 	int m_rcv;
 
 	// Register state
-	UINT8 m_cmr1;
-	UINT8 m_cmr2;
-	UINT8 m_s1r;
-	UINT8 m_s2r;
-	UINT8 m_tpr;
-	UINT8 m_ttr;
-	UINT8 m_rpr;
-	UINT8 m_rtr;
-	//  UINT8 m_ctprh;
-	//  UINT8 m_ctprl;
+	uint8_t m_cmr1;
+	uint8_t m_cmr2;
+	uint8_t m_s1r;
+	uint8_t m_s2r;
+	uint8_t m_tpr;
+	uint8_t m_ttr;
+	uint8_t m_rpr;
+	uint8_t m_rtr;
+	//  uint8_t m_ctprh;
+	//  uint8_t m_ctprl;
 	unsigned int m_ctpr;
-	UINT8 m_ctcr;
-	UINT8 m_omr;
-	//  UINT8 m_cth;
-	//  UINT8 m_ctl;
+	uint8_t m_ctcr;
+	uint8_t m_omr;
+	//  uint8_t m_cth;
+	//  uint8_t m_ctl;
 	unsigned int m_ct;
-	UINT8 m_pcr;
-	UINT8 m_ccr;
-	UINT8 m_txfifo[4];
-	UINT8 m_rxfifo[4];
-	UINT8 m_rsr;
-	UINT8 m_trsr;
-	UINT8 m_ictsr;
-	//  UINT8 m_gsr; // moved to the device since it is global
-	UINT8 m_ier;
-	//  UINT8 m_rea;
-	UINT8 m_cid;
-	//UINT8 m_ivr;
-	//UINT8 m_icr;
-	//  UINT8 m_sea;
-	//UINT8 m_ivrm;
-	UINT8 m_mrr;
-	UINT8 m_ier1;
-	UINT8 m_ier2;
-	UINT8 m_ier3;
-	UINT8 m_trcr;
-	UINT8 m_rflr;
-	UINT8 m_ftlr;
-	UINT8 m_trmsr;
-	UINT8 m_telr;
+	uint8_t m_pcr;
+	uint8_t m_ccr;
+	uint8_t m_txfifo[4];
+	uint8_t m_rxfifo[4];
+	uint8_t m_rsr;
+	uint8_t m_trsr;
+	uint8_t m_ictsr;
+	//  uint8_t m_gsr; // moved to the device since it is global
+	uint8_t m_ier;
+	//  uint8_t m_rea;
+	uint8_t m_cid;
+	//uint8_t m_ivr;
+	//uint8_t m_icr;
+	//  uint8_t m_sea;
+	//uint8_t m_ivrm;
+	uint8_t m_mrr;
+	uint8_t m_ier1;
+	uint8_t m_ier2;
+	uint8_t m_ier3;
+	uint8_t m_trcr;
+	uint8_t m_rflr;
+	uint8_t m_ftlr;
+	uint8_t m_trmsr;
+	uint8_t m_telr;
 
 protected:
 	enum // Needs to be 0-3 in unmodified prio level
@@ -495,8 +495,8 @@ protected:
 	emu_timer *rtxc_timer;
 	emu_timer *trxc_timer;
 
-	UINT8 m_rtxc;
-	UINT8 m_trxc;
+	uint8_t m_rtxc;
+	uint8_t m_trxc;
 
 
 	enum
@@ -513,9 +513,9 @@ protected:
 		TIMER_ID_TRXC
 	};
 
-	UINT16 m_brg_rx_rate;
-	UINT16 m_brg_tx_rate;
-	UINT16 m_brg_const;
+	uint16_t m_brg_rx_rate;
+	uint16_t m_brg_tx_rate;
+	uint16_t m_brg_const;
 
 	// TODO: Implement the 14.4K, 56K and 64K bauds available on the CDUSCC
 	static unsigned int get_baudrate(unsigned int br)
@@ -554,20 +554,20 @@ protected:
 
 	/* FIFOs and rx/tx status */
 	/* Receiver */
-	UINT8 m_rx_data_fifo[16];   // data FIFO
-	UINT8 m_rx_error_fifo[16];  // error FIFO
+	uint8_t m_rx_data_fifo[16];   // data FIFO
+	uint8_t m_rx_error_fifo[16];  // error FIFO
 	int m_rx_fifo_rp;           // FIFO read pointer
 	int m_rx_fifo_wp;           // FIFO write pointer
 	int m_rx_fifo_sz;           // FIFO size
-	UINT8 m_rx_error;           // current error
+	uint8_t m_rx_error;           // current error
 
 	/* Transmitter */
-	UINT8 m_tx_data_fifo[16];   // data FIFO
-	UINT8 m_tx_error_fifo[16];  // error FIFO
+	uint8_t m_tx_data_fifo[16];   // data FIFO
+	uint8_t m_tx_error_fifo[16];  // error FIFO
 	int m_tx_fifo_rp;           // FIFO read pointer
 	int m_tx_fifo_wp;           // FIFO write pointer
 	int m_tx_fifo_sz;           // FIFO size
-	UINT8 m_tx_error;           // current error
+	uint8_t m_tx_error;           // current error
 
 	int m_rx_clock;     // receive clock pulse count
 	int m_rx_first;     // first character received
@@ -579,14 +579,14 @@ protected:
 	int m_dcd;      // data carrier detect latch
 
 	// transmitter state
-	UINT8 m_tx_data;    // transmit data register
+	uint8_t m_tx_data;    // transmit data register
 	int m_tx_clock;     // transmit clock pulse count
 
 	int m_dtr;      // data terminal ready
 	int m_rts;      // request to send
 
 	// synchronous state
-	UINT16 m_sync;      // sync character
+	uint16_t m_sync;      // sync character
 
 	int m_rcv_mode;
 	int m_index;
@@ -607,8 +607,8 @@ class duscc_device :  public device_t
 
 public:
 	// construction/destruction
-	duscc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	duscc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	duscc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	duscc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_txda_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_txda_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dtra_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_dtra_cb.set_callback(object); }
@@ -674,7 +674,7 @@ protected:
 	// internal interrupt management
 	void check_interrupts();
 	void reset_interrupts();
-	UINT8 modify_vector(UINT8 vect, int i, UINT8 src);
+	uint8_t modify_vector(uint8_t vect, int i, uint8_t src);
 	void trigger_interrupt(int index, int state);
 	int get_channel_index(duscc_channel *ch) { return (ch == m_chanA) ? 0 : 1; }
 
@@ -727,10 +727,10 @@ protected:
 	int m_int_state[8]; // interrupt state
 
 	int m_variant;
-	UINT8 m_gsr;
-	UINT8 m_ivr;
-	UINT8 m_ivrm;
-	UINT8 m_icr;
+	uint8_t m_gsr;
+	uint8_t m_ivr;
+	uint8_t m_ivrm;
+	uint8_t m_icr;
 
 	enum
 	{
@@ -759,25 +759,25 @@ extern const device_type DUSCC68C562;
 class duscc26562_device : public duscc_device
 {
 public :
-	duscc26562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	duscc26562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class duscc26C562_device : public duscc_device
 {
 public :
-	duscc26C562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	duscc26C562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class duscc68562_device : public duscc_device
 {
 public :
-	duscc68562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	duscc68562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class duscc68C562_device : public duscc_device
 {
 public :
-	duscc68C562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	duscc68C562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 #endif // __SCNXX562_H__

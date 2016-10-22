@@ -135,13 +135,13 @@ public:
 	int m_dmadis;
 	int m_sysscc;
 	int m_sysfs;
-	UINT8 m_cause;
+	uint8_t m_cause;
 	int m_partst;               // parity test
 
 	// peripherals
 	int m_cs7;                  // card select address bit 7
 	int m_bus0;                 // BUS 0 selected
-	UINT8 m_csb;                // card select
+	uint8_t m_csb;                // card select
 	int m_atce;                 // V.24 channel A external clock enable
 	int m_btce;                 // V.24 channel B external clock enable
 };

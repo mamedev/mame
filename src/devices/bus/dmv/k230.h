@@ -29,8 +29,8 @@ class dmv_k230_device :
 {
 public:
 	// construction/destruction
-	dmv_k230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -69,7 +69,7 @@ class dmv_k231_device :
 {
 public:
 	// construction/destruction
-	dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -83,7 +83,7 @@ class dmv_k234_device :
 {
 public:
 	// construction/destruction
-	dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(snr_r);
 	DECLARE_WRITE8_MEMBER(snr_w);
@@ -113,7 +113,7 @@ class dmv_k235_device :
 {
 public:
 	// construction/destruction
-	dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// optional information overrides

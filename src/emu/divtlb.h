@@ -37,7 +37,7 @@
 ***************************************************************************/
 
 /* represents an entry in the VTLB */
-typedef UINT32 vtlb_entry;
+typedef uint32_t vtlb_entry;
 
 
 // ======================> device_vtlb_interface
@@ -54,9 +54,9 @@ public:
 	void set_vtlb_fixed_entries(int entries) { m_fixed = entries; }
 
 	// filling
-	int vtlb_fill(offs_t address, int intention);
+	bool vtlb_fill(offs_t address, int intention);
 	void vtlb_load(int entrynum, int numpages, offs_t address, vtlb_entry value);
-	void vtlb_dynload(UINT32 index, offs_t address, vtlb_entry value);
+	void vtlb_dynload(uint32_t index, offs_t address, vtlb_entry value);
 
 	// flushing
 	void vtlb_flush_dynamic();

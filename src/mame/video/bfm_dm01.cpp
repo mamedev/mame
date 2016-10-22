@@ -54,7 +54,7 @@ Standard dm01 memorymap
 const device_type BF_DM01 = &device_creator<bfmdm01_device>;
 
 
-bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BF_DM01, "BFM Dotmatrix 01", tag, owner, clock, "bfm_dm01", __FILE__),
 	m_matrixcpu(*this, "matrix"),
 	m_screen(*this, "dmd"),
@@ -194,7 +194,7 @@ WRITE8_MEMBER( bfmdm01_device::mux_w )
 
 			while ( p < (DM_BYTESPERROW) )
 			{
-				UINT8 d = m_scanline[p];
+				uint8_t d = m_scanline[p];
 
 				for (int bitpos=0; bitpos <8; bitpos++)
 				{
@@ -207,8 +207,8 @@ WRITE8_MEMBER( bfmdm01_device::mux_w )
 				p++;
 			}
 
-			UINT16* pix = &m_tmpbitmap.pix16(row*2);
-			UINT16* pix2 = &m_tmpbitmap.pix16((row*2)+1);
+			uint16_t* pix = &m_tmpbitmap.pix16(row*2);
+			uint16_t* pix2 = &m_tmpbitmap.pix16((row*2)+1);
 			for (int pos=0;pos<65;pos++)
 			{
 				pix[0 + (pos * 2)] = m_segbuffer[(pos)]+1;
@@ -274,7 +274,7 @@ ADDRESS_MAP_START( bfm_dm01_memmap, AS_PROGRAM, 8, bfmdm01_device )
 ADDRESS_MAP_END
 
 
-UINT32 bfmdm01_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bfmdm01_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0,       cliprect);
 	return 0;
@@ -312,7 +312,7 @@ machine_config_constructor bfmdm01_device::device_mconfig_additions() const
 
 ///////////////////////////////////////////////////////////////////////////
 
-void bfmdm01_device::writedata(UINT8 data)
+void bfmdm01_device::writedata(uint8_t data)
 {
 	m_comdata = data;
 	m_data_avail = 1;

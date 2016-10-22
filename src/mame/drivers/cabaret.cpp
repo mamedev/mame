@@ -41,14 +41,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT8> m_fg_tile_ram;
-	required_shared_ptr<UINT8> m_fg_color_ram;
-	required_shared_ptr<UINT8> m_bg_scroll;
-	required_shared_ptr<UINT8> m_bg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
+	required_shared_ptr<uint8_t> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_bg_tile_ram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	int m_nmi_enable;
-	UINT8 m_out[3];
+	uint8_t m_out[3];
 	DECLARE_WRITE8_MEMBER(bg_scroll_w);
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
@@ -60,7 +60,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cabaret_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -122,7 +122,7 @@ void cabaret_state::video_start()
 }
 
 
-UINT32 cabaret_state::screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cabaret_state::screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -369,7 +369,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(cabaret_state,cabaret)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */

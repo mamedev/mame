@@ -658,7 +658,7 @@ void itech8_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		delayed_z80_control_w(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in itech8_state::device_timer");
+		assert_always(false, "Unknown id in itech8_state::device_timer");
 	}
 }
 

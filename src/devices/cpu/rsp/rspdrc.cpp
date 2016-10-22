@@ -31,7 +31,7 @@ using namespace uml;
 
 CPU_DISASSEMBLE( rsp );
 
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
+extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
 
 /***************************************************************************
     CONSTANTS
@@ -64,7 +64,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
     descriptor
 -------------------------------------------------*/
 
-static inline UINT32 epc(const opcode_desc *desc)
+static inline uint32_t epc(const opcode_desc *desc)
 {
 	return ((desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 3) : desc->pc) | 0x1000;
 }
@@ -181,7 +181,7 @@ static void cfunc_write32(void *param)
     rspdrc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void rsp_device::rspdrc_set_options(UINT32 options)
+void rsp_device::rspdrc_set_options(uint32_t options)
 {
 	if (!allow_drc()) return;
 	m_drcoptions = options;
@@ -221,7 +221,7 @@ static void cfunc_get_cop0_reg(void *param)
 inline void rsp_device::ccfunc_set_cop0_reg()
 {
 	int reg = m_rsp_state->arg0;
-	UINT32 data = m_rsp_state->arg1;
+	uint32_t data = m_rsp_state->arg1;
 
 	if (reg >= 0 && reg < 8)
 	{
@@ -266,7 +266,7 @@ void rsp_device::execute_run_drc()
 	/* reset the cache if dirty */
 	if (m_cache_dirty)
 		code_flush_cache();
-	m_cache_dirty = FALSE;
+	m_cache_dirty = false;
 
 	/* execute */
 	do
@@ -308,7 +308,7 @@ void rsp_device::execute_run_drc()
 void rsp_device::rspdrc_flush_drc_cache()
 {
 	if (!allow_drc()) return;
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 }
 
 /*-------------------------------------------------
@@ -329,12 +329,12 @@ void rsp_device::code_flush_cache()
 		static_generate_out_of_cycles();
 
 		/* add subroutines for memory accesses */
-		static_generate_memory_accessor(1, FALSE, "read8",       m_read8);
-		static_generate_memory_accessor(1, TRUE,  "write8",      m_write8);
-		static_generate_memory_accessor(2, FALSE, "read16",      m_read16);
-		static_generate_memory_accessor(2, TRUE,  "write16",     m_write16);
-		static_generate_memory_accessor(4, FALSE, "read32",      m_read32);
-		static_generate_memory_accessor(4, TRUE,  "write32",     m_write32);
+		static_generate_memory_accessor(1, false, "read8",       m_read8);
+		static_generate_memory_accessor(1, true,  "write8",      m_write8);
+		static_generate_memory_accessor(2, false, "read16",      m_read16);
+		static_generate_memory_accessor(2, true,  "write16",     m_write16);
+		static_generate_memory_accessor(4, false, "read32",      m_read32);
+		static_generate_memory_accessor(4, true,  "write32",     m_write32);
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
@@ -354,7 +354,7 @@ void rsp_device::code_compile_block(offs_t pc)
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
 	const opcode_desc *desclist;
-	int override = FALSE;
+	int override = false;
 	drcuml_block *block;
 
 	g_profiler.start(PROFILER_DRC_COMPILE);
@@ -374,7 +374,7 @@ void rsp_device::code_compile_block(offs_t pc)
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
-				UINT32 nextpc;
+				uint32_t nextpc;
 
 				/* add a code log entry */
 				if (drcuml->logging())
@@ -394,7 +394,7 @@ void rsp_device::code_compile_block(offs_t pc)
 				/* are recompiling due to being out of sync and allow future overrides */
 				else if (seqhead == desclist)
 				{
-					override = TRUE;
+					override = true;
 					UML_HASH(block, 0, seqhead->pc);                                        // hash    mode,pc
 				}
 
@@ -428,7 +428,7 @@ void rsp_device::code_compile_block(offs_t pc)
 					nextpc = seqlast->pc + (seqlast->skipslots + 1) * 4;
 
 				/* count off cycles and go there */
-				generate_update_cycles(block, &compiler, nextpc, TRUE);            // <subtract cycles>
+				generate_update_cycles(block, &compiler, nextpc, true);            // <subtract cycles>
 
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
 				if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
@@ -458,7 +458,7 @@ void rsp_device::code_compile_block(offs_t pc)
 
 inline void rsp_device::ccfunc_unimplemented()
 {
-	UINT32 opcode = m_rsp_state->arg0;
+	uint32_t opcode = m_rsp_state->arg0;
 	fatalerror("PC=%08X: Unimplemented op %08X (%02X,%02X)\n", m_rsp_state->pc, opcode, opcode >> 26, opcode & 0x3f);
 }
 
@@ -638,7 +638,7 @@ void rsp_device::static_generate_memory_accessor(int size, int iswrite, const ch
     subtract cycles from the icount and generate
     an exception if out
 -------------------------------------------------*/
-void rsp_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception)
+void rsp_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
 {
 	/* account for cycles */
 	if (compiler->cycles > 0)
@@ -667,7 +667,7 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			UINT32 sum = seqhead->opptr.l[0];
+			uint32_t sum = seqhead->opptr.l[0];
 			void *base = m_direct->read_ptr(seqhead->physpc | 0x1000);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                         // load    i0,base,0,dword
 
@@ -689,7 +689,7 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 	/* full verification; sum up everything */
 	else
 	{
-		UINT32 sum = 0;
+		uint32_t sum = 0;
 		void *base = m_direct->read_ptr(seqhead->physpc | 0x1000);
 		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                             // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
@@ -783,7 +783,7 @@ void rsp_device::generate_branch(drcuml_block *block, compiler_state *compiler, 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
-		generate_update_cycles(block, &compiler_temp, desc->targetpc, TRUE);    // <subtract cycles>
+		generate_update_cycles(block, &compiler_temp, desc->targetpc, true);    // <subtract cycles>
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
 			UML_JMP(block, desc->targetpc | 0x80000000);                        // jmp     desc->targetpc
 		else
@@ -791,7 +791,7 @@ void rsp_device::generate_branch(drcuml_block *block, compiler_state *compiler, 
 	}
 	else
 	{
-		generate_update_cycles(block, &compiler_temp, mem(&m_rsp_state->jmpdest), TRUE);    // <subtract cycles>
+		generate_update_cycles(block, &compiler_temp, mem(&m_rsp_state->jmpdest), true);    // <subtract cycles>
 		UML_HASHJMP(block, 0, mem(&m_rsp_state->jmpdest), *m_nocode);                       // hashjmp <mode>,<rsreg>,nocode
 	}
 }
@@ -800,10 +800,10 @@ void rsp_device::generate_branch(drcuml_block *block, compiler_state *compiler, 
     generate_delay_slot_and_branch
 ------------------------------------------------------------------*/
 
-void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg)
+void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t linkreg)
 {
 	compiler_state compiler_temp = *compiler;
-	UINT32 op = desc->opptr.l[0];
+	uint32_t op = desc->opptr.l[0];
 
 	/* fetch the target register if dynamic, in case it is modified by the delay slot */
 	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
@@ -815,7 +815,7 @@ void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_st
 	/* set the link if needed -- before the delay slot */
 	if (linkreg != 0)
 	{
-		UML_MOV(block, R32(linkreg), (INT32)(desc->pc + 8));                    // mov    <linkreg>,desc->pc + 8
+		UML_MOV(block, R32(linkreg), (int32_t)(desc->pc + 8));                    // mov    <linkreg>,desc->pc + 8
 	}
 
 	/* compile the delay slot using temporary compiler state */
@@ -832,11 +832,11 @@ void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_st
 	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                             // mapvar  CYCLES,compiler->cycles
 }
 
-int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+bool rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = op >> 26;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = op >> 26;
 	code_label skip;
 
 	switch (opswitch)
@@ -853,25 +853,25 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 
 		case 0x02:  /* J - MIPS I */
 			generate_delay_slot_and_branch(block, compiler, desc, 0);      // <next instruction + hashjmp>
-			return TRUE;
+			return true;
 
 		case 0x03:  /* JAL - MIPS I */
 			generate_delay_slot_and_branch(block, compiler, desc, 31);     // <next instruction + hashjmp>
-			return TRUE;
+			return true;
 
 		case 0x04:  /* BEQ - MIPS I */
 			UML_CMP(block, R32(RSREG), R32(RTREG));                             // cmp    <rsreg>,<rtreg>
 			UML_JMPc(block, COND_NE, skip = compiler->labelnum++);              // jmp    skip,NE
 			generate_delay_slot_and_branch(block, compiler, desc, 0);      // <next instruction + hashjmp>
 			UML_LABEL(block, skip);                                             // skip:
-			return TRUE;
+			return true;
 
 		case 0x05:  /* BNE - MIPS I */
 			UML_CMP(block, R32(RSREG), R32(RTREG));                             // dcmp    <rsreg>,<rtreg>
 			UML_JMPc(block, COND_E, skip = compiler->labelnum++);                       // jmp     skip,E
 			generate_delay_slot_and_branch(block, compiler, desc, 0);      // <next instruction + hashjmp>
 			UML_LABEL(block, skip);                                             // skip:
-			return TRUE;
+			return true;
 
 		case 0x06:  /* BLEZ - MIPS I */
 			if (RSREG != 0)
@@ -883,14 +883,14 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			}
 			else
 				generate_delay_slot_and_branch(block, compiler, desc, 0);  // <next instruction + hashjmp>
-			return TRUE;
+			return true;
 
 		case 0x07:  /* BGTZ - MIPS I */
 			UML_CMP(block, R32(RSREG), 0);                                  // dcmp    <rsreg>,0
 			UML_JMPc(block, COND_LE, skip = compiler->labelnum++);                  // jmp     skip,LE
 			generate_delay_slot_and_branch(block, compiler, desc, 0);      // <next instruction + hashjmp>
 			UML_LABEL(block, skip);                                             // skip:
-			return TRUE;
+			return true;
 
 
 		/* ----- immediate arithmetic ----- */
@@ -898,7 +898,7 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 		case 0x0f:  /* LUI - MIPS I */
 			if (RTREG != 0)
 				UML_MOV(block, R32(RTREG), SIMMVAL << 16);                  // dmov    <rtreg>,SIMMVAL << 16
-			return TRUE;
+			return true;
 
 		case 0x08:  /* ADDI - MIPS I */
 		case 0x09:  /* ADDIU - MIPS I */
@@ -906,7 +906,7 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			{
 				UML_ADD(block, R32(RTREG), R32(RSREG), SIMMVAL);                // add     i0,<rsreg>,SIMMVAL,V
 			}
-			return TRUE;
+			return true;
 
 		case 0x0a:  /* SLTI - MIPS I */
 			if (RTREG != 0)
@@ -914,7 +914,7 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 				UML_CMP(block, R32(RSREG), SIMMVAL);                            // dcmp    <rsreg>,SIMMVAL
 				UML_SETc(block, COND_L, R32(RTREG));                                    // dset    <rtreg>,l
 			}
-			return TRUE;
+			return true;
 
 		case 0x0b:  /* SLTIU - MIPS I */
 			if (RTREG != 0)
@@ -922,23 +922,23 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 				UML_CMP(block, R32(RSREG), SIMMVAL);                            // dcmp    <rsreg>,SIMMVAL
 				UML_SETc(block, COND_B, R32(RTREG));                                    // dset    <rtreg>,b
 			}
-			return TRUE;
+			return true;
 
 
 		case 0x0c:  /* ANDI - MIPS I */
 			if (RTREG != 0)
 				UML_AND(block, R32(RTREG), R32(RSREG), UIMMVAL);                // dand    <rtreg>,<rsreg>,UIMMVAL
-			return TRUE;
+			return true;
 
 		case 0x0d:  /* ORI - MIPS I */
 			if (RTREG != 0)
 				UML_OR(block, R32(RTREG), R32(RSREG), UIMMVAL);             // dor     <rtreg>,<rsreg>,UIMMVAL
-			return TRUE;
+			return true;
 
 		case 0x0e:  /* XORI - MIPS I */
 			if (RTREG != 0)
 				UML_XOR(block, R32(RTREG), R32(RSREG), UIMMVAL);                // dxor    <rtreg>,<rsreg>,UIMMVAL
-			return TRUE;
+			return true;
 
 		/* ----- memory load operations ----- */
 
@@ -948,8 +948,8 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			if (RTREG != 0)
 				UML_SEXT(block, R32(RTREG), I0, SIZE_BYTE);                     // dsext   <rtreg>,i0,byte
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			return true;
 
 		case 0x21:  /* LH - MIPS I */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
@@ -957,8 +957,8 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			if (RTREG != 0)
 				UML_SEXT(block, R32(RTREG), I0, SIZE_WORD);                     // dsext   <rtreg>,i0,word
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			return true;
 
 		case 0x23:  /* LW - MIPS I */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
@@ -966,8 +966,8 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			if (RTREG != 0)
 				UML_MOV(block, R32(RTREG), I0);
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			return true;
 
 		case 0x24:  /* LBU - MIPS I */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
@@ -975,8 +975,8 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			if (RTREG != 0)
 				UML_AND(block, R32(RTREG), I0, 0xff);                   // dand    <rtreg>,i0,0xff
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			return true;
 
 		case 0x25:  /* LHU - MIPS I */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
@@ -984,8 +984,8 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			if (RTREG != 0)
 				UML_AND(block, R32(RTREG), I0, 0xffff);                 // dand    <rtreg>,i0,0xffff
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			return true;
 
 		case 0x32:  /* LWC2 - MIPS I */
 			return m_cop2->generate_lwc2(block, compiler, desc);
@@ -998,24 +998,24 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			UML_MOV(block, I1, R32(RTREG));                                 // mov     i1,<rtreg>
 			UML_CALLH(block, *m_write8);                               // callh   write8
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			return true;
 
 		case 0x29:  /* SH - MIPS I */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_MOV(block, I1, R32(RTREG));                                 // mov     i1,<rtreg>
 			UML_CALLH(block, *m_write16);                              // callh   write16
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			return true;
 
 		case 0x2b:  /* SW - MIPS I */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_MOV(block, I1, R32(RTREG));                                 // mov     i1,<rtreg>
 			UML_CALLH(block, *m_write32);                              // callh   write32
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			return true;
 
 		case 0x3a:  /* SWC2 - MIPS I */
 			return m_cop2->generate_swc2(block, compiler, desc);
@@ -1034,7 +1034,7 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 		//default:    /* ??? */       invalid_instruction(op);                                                break;
 	}
 
-	return FALSE;
+	return false;
 }
 
 
@@ -1043,10 +1043,10 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
     'SPECIAL' group
 -------------------------------------------------*/
 
-int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+bool rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = op & 63;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = op & 63;
 	//code_label skip;
 
 	switch (opswitch)
@@ -1058,42 +1058,42 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 			{
 				UML_SHL(block, R32(RDREG), R32(RTREG), SHIFT);
 			}
-			return TRUE;
+			return true;
 
 		case 0x02:  /* SRL - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SHR(block, R32(RDREG), R32(RTREG), SHIFT);
 			}
-			return TRUE;
+			return true;
 
 		case 0x03:  /* SRA - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SAR(block, R32(RDREG), R32(RTREG), SHIFT);
 			}
-			return TRUE;
+			return true;
 
 		case 0x04:  /* SLLV - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SHL(block, R32(RDREG), R32(RTREG), R32(RSREG));
 			}
-			return TRUE;
+			return true;
 
 		case 0x06:  /* SRLV - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SHR(block, R32(RDREG), R32(RTREG), R32(RSREG));
 			}
-			return TRUE;
+			return true;
 
 		case 0x07:  /* SRAV - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SAR(block, R32(RDREG), R32(RTREG), R32(RSREG));
 			}
-			return TRUE;
+			return true;
 
 		/* ----- basic arithmetic ----- */
 
@@ -1103,7 +1103,7 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 			{
 				UML_ADD(block, R32(RDREG), R32(RSREG), R32(RTREG));
 			}
-			return TRUE;
+			return true;
 
 		case 0x22:  /* SUB - MIPS I */
 		case 0x23:  /* SUBU - MIPS I */
@@ -1111,7 +1111,7 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 			{
 				UML_SUB(block, R32(RDREG), R32(RSREG), R32(RTREG));
 			}
-			return TRUE;
+			return true;
 
 		/* ----- basic logical ops ----- */
 
@@ -1120,29 +1120,29 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 			{
 				UML_AND(block, R32(RDREG), R32(RSREG), R32(RTREG));             // dand     <rdreg>,<rsreg>,<rtreg>
 			}
-			return TRUE;
+			return true;
 
 		case 0x25:  /* OR - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_OR(block, R32(RDREG), R32(RSREG), R32(RTREG));                  // dor      <rdreg>,<rsreg>,<rtreg>
 			}
-			return TRUE;
+			return true;
 
 		case 0x26:  /* XOR - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_XOR(block, R32(RDREG), R32(RSREG), R32(RTREG));             // dxor     <rdreg>,<rsreg>,<rtreg>
 			}
-			return TRUE;
+			return true;
 
 		case 0x27:  /* NOR - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_OR(block, I0, R32(RSREG), R32(RTREG));                  // dor      i0,<rsreg>,<rtreg>
-				UML_XOR(block, R32(RDREG), I0, (UINT64)~0);             // dxor     <rdreg>,i0,~0
+				UML_XOR(block, R32(RDREG), I0, (uint64_t)~0);             // dxor     <rdreg>,i0,~0
 			}
-			return TRUE;
+			return true;
 
 
 		/* ----- basic comparisons ----- */
@@ -1153,7 +1153,7 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 				UML_CMP(block, R32(RSREG), R32(RTREG));                         // dcmp    <rsreg>,<rtreg>
 				UML_SETc(block, COND_L, R32(RDREG));                                    // dset    <rdreg>,l
 			}
-			return TRUE;
+			return true;
 
 		case 0x2b:  /* SLTU - MIPS I */
 			if (RDREG != 0)
@@ -1161,18 +1161,18 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 				UML_CMP(block, R32(RSREG), R32(RTREG));                         // dcmp    <rsreg>,<rtreg>
 				UML_SETc(block, COND_B, R32(RDREG));                                    // dset    <rdreg>,b
 			}
-			return TRUE;
+			return true;
 
 
 		/* ----- jumps and branches ----- */
 
 		case 0x08:  /* JR - MIPS I */
 			generate_delay_slot_and_branch(block, compiler, desc, 0);      // <next instruction + hashjmp>
-			return TRUE;
+			return true;
 
 		case 0x09:  /* JALR - MIPS I */
 			generate_delay_slot_and_branch(block, compiler, desc, RDREG);  // <next instruction + hashjmp>
-			return TRUE;
+			return true;
 
 
 		/* ----- system calls ----- */
@@ -1186,9 +1186,9 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 			generate_branch(block, compiler, desc);
 
 			UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
-			return TRUE;
+			return true;
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1198,10 +1198,10 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
     'REGIMM' group
 -------------------------------------------------*/
 
-int rsp_device::generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+bool rsp_device::generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = RTREG;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = RTREG;
 	code_label skip;
 
 	switch (opswitch)
@@ -1216,7 +1216,7 @@ int rsp_device::generate_regimm(drcuml_block *block, compiler_state *compiler, c
 																					// <next instruction + hashjmp>
 				UML_LABEL(block, skip);                                         // skip:
 			}
-			return TRUE;
+			return true;
 
 		case 0x01:  /* BGEZ */
 		case 0x11:  /* BGEZAL */
@@ -1231,9 +1231,9 @@ int rsp_device::generate_regimm(drcuml_block *block, compiler_state *compiler, c
 			else
 				generate_delay_slot_and_branch(block, compiler, desc, (opswitch & 0x10) ? 31 : 0);
 																					// <next instruction + hashjmp>
-			return TRUE;
+			return true;
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1241,10 +1241,10 @@ int rsp_device::generate_regimm(drcuml_block *block, compiler_state *compiler, c
     generate_cop0 - compile COP0 opcodes
 -------------------------------------------------*/
 
-int rsp_device::generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+bool rsp_device::generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = RSREG;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = RSREG;
 
 	switch (opswitch)
 	{
@@ -1256,20 +1256,20 @@ int rsp_device::generate_cop0(drcuml_block *block, compiler_state *compiler, con
 				UML_CALLC(block, cfunc_get_cop0_reg, this);                          // callc   cfunc_get_cop0_reg
 				if(RDREG == 2)
 				{
-					generate_update_cycles(block, compiler, mem(&m_rsp_state->pc), TRUE);
+					generate_update_cycles(block, compiler, mem(&m_rsp_state->pc), true);
 					UML_HASHJMP(block, 0, mem(&m_rsp_state->pc), *m_nocode);
 				}
 			}
-			return TRUE;
+			return true;
 
 		case 0x04:  /* MTCz */
 			UML_MOV(block, mem(&m_rsp_state->arg0), RDREG);                   // mov     [arg0],<rdreg>
 			UML_MOV(block, mem(&m_rsp_state->arg1), R32(RTREG));                  // mov     [arg1],rtreg
 			UML_CALLC(block, cfunc_set_cop0_reg, this);                              // callc   cfunc_set_cop0_reg
-			return TRUE;
+			return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 /***************************************************************************
@@ -1281,7 +1281,7 @@ int rsp_device::generate_cop0(drcuml_block *block, compiler_state *compiler, con
     including disassembly of a RSP instruction
 -------------------------------------------------*/
 
-void rsp_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
+void rsp_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op)
 {
 	if (m_drcuml->logging())
 	{

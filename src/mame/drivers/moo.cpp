@@ -157,7 +157,7 @@ WRITE16_MEMBER(moo_state::control2_w)
 void moo_state::moo_objdma()
 {
 	int num_inactive;
-	UINT16 *src, *dst;
+	uint16_t *src, *dst;
 	int counter = m_k053246->k053247_get_dy();
 
 	m_k053246->k053247_get_ram( &dst);
@@ -282,7 +282,7 @@ WRITE16_MEMBER(moo_state::k053247_scattered_word_w)
 
 WRITE16_MEMBER(moo_state::moo_prot_w)
 {
-	UINT32 src1, src2, dst, length, a, b, res;
+	uint32_t src1, src2, dst, length, a, b, res;
 
 	COMBINE_DATA(&m_protram[offset]);
 

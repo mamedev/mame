@@ -124,7 +124,7 @@ const tiny_rom_entry *m1comm_device::device_rom_region() const
 //  m1comm_device - constructor
 //-------------------------------------------------
 
-m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M1COMM, "MODEL-1 COMMUNICATION BD", tag, owner, clock, "m1comm", __FILE__),
 	m_commcpu(*this, Z80_TAG),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
@@ -177,7 +177,7 @@ READ8_MEMBER(m1comm_device::dlc_reg_r)
 	}
 	// dirty hack to keep Z80 in RESET state
 
-	UINT8 result = m_dlc_reg[offset];
+	uint8_t result = m_dlc_reg[offset];
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-dlc_reg_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -194,7 +194,7 @@ WRITE8_MEMBER(m1comm_device::dlc_reg_w)
 
 READ8_MEMBER(m1comm_device::dma_reg_r)
 {
-	UINT8 result = m_dma_reg[offset];
+	uint8_t result = m_dma_reg[offset];
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-dma_reg_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -211,7 +211,7 @@ WRITE8_MEMBER(m1comm_device::dma_reg_w)
 
 READ8_MEMBER(m1comm_device::syn_r)
 {
-	UINT8 result = m_syn | 0xFC;
+	uint8_t result = m_syn | 0xFC;
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-syn_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -242,7 +242,7 @@ WRITE8_MEMBER(m1comm_device::syn_w)
 
 READ8_MEMBER(m1comm_device::zfg_r)
 {
-	UINT8 result = m_zfg | (~m_fg << 7) | 0x7e;
+	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-zfg_r: read register %02x for value %02x\n", offset, result);
 #endif

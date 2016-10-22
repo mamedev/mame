@@ -524,9 +524,9 @@ typedef float VECTOR3[3];
 
 struct taitotz_polydata
 {
-	UINT32 texture;
-	UINT32 alpha;
-	UINT32 flags;
+	uint32_t texture;
+	uint32_t alpha;
+	uint32_t flags;
 	int diffuse_r, diffuse_g, diffuse_b;
 	int ambient_r, ambient_g, ambient_b;
 	int specular_r, specular_g, specular_b;
@@ -551,8 +551,8 @@ public:
 
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_iocpu;
-	required_shared_ptr<UINT64> m_work_ram;
-	required_shared_ptr<UINT16> m_mbox_ram;
+	required_shared_ptr<uint64_t> m_work_ram;
+	required_shared_ptr<uint16_t> m_mbox_ram;
 	required_device<ata_interface_device> m_ata;
 	required_device<screen_device> m_screen;
 
@@ -565,19 +565,19 @@ public:
 	DECLARE_READ64_MEMBER(video_fifo_r);
 	DECLARE_WRITE64_MEMBER(video_fifo_w);
 
-	std::unique_ptr<UINT32[]> m_screen_ram;
-	std::unique_ptr<UINT32[]> m_frame_ram;
-	std::unique_ptr<UINT32[]> m_texture_ram;
-	UINT32 m_video_unk_reg[0x10];
+	std::unique_ptr<uint32_t[]> m_screen_ram;
+	std::unique_ptr<uint32_t[]> m_frame_ram;
+	std::unique_ptr<uint32_t[]> m_texture_ram;
+	uint32_t m_video_unk_reg[0x10];
 
-	UINT32 m_video_fifo_ptr;
-	UINT32 m_video_ram_ptr;
-	UINT32 m_video_reg;
-	UINT32 m_scr_base;
+	uint32_t m_video_fifo_ptr;
+	uint32_t m_video_ram_ptr;
+	uint32_t m_video_reg;
+	uint32_t m_scr_base;
 
-	UINT64 m_video_fifo_mem[4];
+	uint64_t m_video_fifo_mem[4];
 
-	UINT16 m_io_share_ram[0x2000];
+	uint16_t m_io_share_ram[0x2000];
 
 	const char *m_hdd_serial_number;
 
@@ -586,10 +586,10 @@ public:
 	DECLARE_READ8_MEMBER(tlcs_rtc_r);
 	DECLARE_WRITE8_MEMBER(tlcs_rtc_w);
 
-	UINT8 m_rtcdata[8];
+	uint8_t m_rtcdata[8];
 
 
-	UINT32 m_reg105;
+	uint32_t m_reg105;
 	int m_count;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
@@ -604,16 +604,16 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitotz_vbi);
 	DECLARE_READ16_MEMBER(tlcs_ide0_r);
 	DECLARE_READ16_MEMBER(tlcs_ide1_r);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	void draw_tile(UINT32 pos, UINT32 tile);
-	UINT32 video_mem_r(UINT32 address);
-	void video_mem_w(UINT32 address, UINT32 data);
-	UINT32 video_reg_r(UINT32 reg);
-	void video_reg_w(UINT32 reg, UINT32 data);
+	void draw_tile(uint32_t pos, uint32_t tile);
+	uint32_t video_mem_r(uint32_t address);
+	void video_mem_w(uint32_t address, uint32_t data);
+	uint32_t video_reg_r(uint32_t reg);
+	void video_reg_w(uint32_t reg, uint32_t data);
 	void init_taitotz_152();
 	void init_taitotz_111a();
 };
@@ -621,7 +621,7 @@ public:
 class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
 {
 public:
-	taitotz_renderer(taitotz_state &state, int width, int height, UINT32 *scrram, UINT32 *texram)
+	taitotz_renderer(taitotz_state &state, int width, int height, uint32_t *scrram, uint32_t *texram)
 		: poly_manager<float, taitotz_polydata, 6, 50000>(state.machine()),
 			m_state(state)
 	{
@@ -641,17 +641,17 @@ public:
 	}
 
 	void render_displaylist(const rectangle &cliprect);
-	void draw_object(UINT32 address, float scale, UINT8 alpha);
+	void draw_object(uint32_t address, float scale, uint8_t alpha);
 	float line_plane_intersection(const vertex_t *v1, const vertex_t *v2, PLANE cp);
 	int clip_polygon(const vertex_t *v, int num_vertices, PLANE cp, vertex_t *vout);
 	void setup_viewport(int x, int y, int width, int height, int center_x, int center_y);
-	void draw_scanline_noz(INT32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
-	void draw_scanline(INT32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
+	void draw_scanline_noz(int32_t scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
+	void draw_scanline(int32_t scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
 
-	void push_tnl_fifo(UINT32 data);
-	void push_direct_poly_fifo(UINT32 data);
+	void push_tnl_fifo(uint32_t data);
+	void push_direct_poly_fifo(uint32_t data);
 
-	void render_tnl_object(UINT32 address, float scale, UINT8 alpha);
+	void render_tnl_object(uint32_t address, float scale, uint8_t alpha);
 
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -671,8 +671,8 @@ private:
 	taitotz_state &m_state;
 	std::unique_ptr<bitmap_rgb32> m_fb;
 	std::unique_ptr<bitmap_ind32> m_zbuffer;
-	UINT32 *m_texture;
-	UINT32 *m_screen_ram;
+	uint32_t *m_texture;
+	uint32_t *m_screen_ram;
 
 	rectangle m_cliprect;
 
@@ -701,15 +701,15 @@ private:
 	float m_vp_y;
 	float m_vp_mul;
 
-	UINT32 m_reg_100;
-	UINT32 m_reg_101;
-	UINT32 m_reg_102;
+	uint32_t m_reg_100;
+	uint32_t m_reg_101;
+	uint32_t m_reg_102;
 
-	UINT32 m_reg_10000100;
-	UINT32 m_reg_10000101;
+	uint32_t m_reg_10000100;
+	uint32_t m_reg_10000101;
 
-	UINT32 m_tnl_fifo[64];
-	UINT32 m_direct_fifo[64];
+	uint32_t m_tnl_fifo[64];
+	uint32_t m_direct_fifo[64];
 	int m_tnl_fifo_ptr;
 	int m_direct_fifo_ptr;
 };
@@ -727,30 +727,30 @@ void taitotz_state::taitotz_exit()
     file = fopen("screen_ram.bin","wb");
     for (i=0; i < 0x200000; i++)
     {
-        fputc((UINT8)(m_screen_ram[i] >> 24), file);
-        fputc((UINT8)(m_screen_ram[i] >> 16), file);
-        fputc((UINT8)(m_screen_ram[i] >> 8), file);
-        fputc((UINT8)(m_screen_ram[i] >> 0), file);
+        fputc((uint8_t)(m_screen_ram[i] >> 24), file);
+        fputc((uint8_t)(m_screen_ram[i] >> 16), file);
+        fputc((uint8_t)(m_screen_ram[i] >> 8), file);
+        fputc((uint8_t)(m_screen_ram[i] >> 0), file);
     }
     fclose(file);
 
     file = fopen("frame_ram.bin","wb");
     for (i=0; i < 0x80000; i++)
     {
-        fputc((UINT8)(m_frame_ram[i] >> 24), file);
-        fputc((UINT8)(m_frame_ram[i] >> 16), file);
-        fputc((UINT8)(m_frame_ram[i] >> 8), file);
-        fputc((UINT8)(m_frame_ram[i] >> 0), file);
+        fputc((uint8_t)(m_frame_ram[i] >> 24), file);
+        fputc((uint8_t)(m_frame_ram[i] >> 16), file);
+        fputc((uint8_t)(m_frame_ram[i] >> 8), file);
+        fputc((uint8_t)(m_frame_ram[i] >> 0), file);
     }
     fclose(file);
 
     file = fopen("texture_ram.bin","wb");
     for (i=0; i < 0x800000; i++)
     {
-        fputc((UINT8)(m_texture_ram[i] >> 24), file);
-        fputc((UINT8)(m_texture_ram[i] >> 16), file);
-        fputc((UINT8)(m_texture_ram[i] >> 8), file);
-        fputc((UINT8)(m_texture_ram[i] >> 0), file);
+        fputc((uint8_t)(m_texture_ram[i] >> 24), file);
+        fputc((uint8_t)(m_texture_ram[i] >> 16), file);
+        fputc((uint8_t)(m_texture_ram[i] >> 8), file);
+        fputc((uint8_t)(m_texture_ram[i] >> 0), file);
     }
     fclose(file);
 
@@ -761,9 +761,9 @@ void taitotz_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_screen_ram = std::make_unique<UINT32[]>(0x200000);
-	m_frame_ram = std::make_unique<UINT32[]>(0x80000);
-	m_texture_ram = std::make_unique<UINT32[]>(0x800000);
+	m_screen_ram = std::make_unique<uint32_t[]>(0x200000);
+	m_frame_ram = std::make_unique<uint32_t[]>(0x80000);
+	m_texture_ram = std::make_unique<uint32_t[]>(0x800000);
 
 	/* create renderer */
 	m_renderer = std::make_unique<taitotz_renderer>(*this, width, height, m_screen_ram.get(), m_texture_ram.get());
@@ -788,13 +788,13 @@ static inline float dot_product_vec3(VECTOR3 a, VECTOR3 b)
 // Adapted from http://en.wikipedia.org/wiki/Fast_inverse_square_root
 static inline float finvsqrt(float number)
 {
-	UINT32 i;
+	uint32_t i;
 	float x2, y;
 	const float threehalfs = 1.5f;
 
 	x2 = number * 0.5f;
 	y  = number;
-	i  = *(UINT32*)&y;
+	i  = *(uint32_t*)&y;
 	i  = 0x5f3759df - ( i >> 1 );
 	y  = *(float*)&i;
 	y  = y * ( threehalfs - ( x2 * y * y ) );
@@ -819,10 +819,10 @@ static inline float clamp_pos(float v)
 		return v;
 }
 
-static inline UINT32 generate_texel_address(int iu, int iv)
+static inline uint32_t generate_texel_address(int iu, int iv)
 {
 	// generate texel address from U and V
-	UINT32 addr = 0;
+	uint32_t addr = 0;
 	addr += (iu & 0x01) ? 1 : 0;
 	addr += (iu >> 1) * 4;
 	addr += (iv & 0x01) ? 2 : 0;
@@ -831,16 +831,16 @@ static inline UINT32 generate_texel_address(int iu, int iv)
 	return addr;
 }
 
-void taitotz_renderer::draw_scanline_noz(INT32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid)
+void taitotz_renderer::draw_scanline_noz(int32_t scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid)
 {
-	UINT32 *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix32(scanline);
 
 	float u = extent.param[POLY_U].start;
 	float v = extent.param[POLY_V].start;
 	float du = extent.param[POLY_U].dpdx;
 	float dv = extent.param[POLY_V].dpdx;
 
-	UINT32 *texram = &m_texture[extradata.texture * 0x1000];
+	uint32_t *texram = &m_texture[extradata.texture * 0x1000];
 
 	int shift = 16;     // TODO: subtexture
 
@@ -849,9 +849,9 @@ void taitotz_renderer::draw_scanline_noz(INT32 scanline, const extent_t &extent,
 		int iu = (int)(u) & 0x3f;
 		int iv = (int)(v) & 0x3f;
 
-		UINT32 addr = generate_texel_address(iu, iv);
+		uint32_t addr = generate_texel_address(iu, iv);
 
-		UINT32 texel = (texram[addr] >> shift) & 0xffff;
+		uint32_t texel = (texram[addr] >> shift) & 0xffff;
 		if (!(texel & 0x8000))
 		{
 			int r = (texel & 0x7c00) << 9;
@@ -865,9 +865,9 @@ void taitotz_renderer::draw_scanline_noz(INT32 scanline, const extent_t &extent,
 	}
 }
 
-void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid)
+void taitotz_renderer::draw_scanline(int32_t scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid)
 {
-	UINT32 *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix32(scanline);
 	float *zb = (float*)&m_zbuffer->pix32(scanline);
 
 	float ooz = extent.param[POLY_Z].start;
@@ -884,9 +884,9 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 	float nz = extent.param[POLY_NZ].start;
 	float dnz = extent.param[POLY_NZ].dpdx;
 
-	UINT32 *texram = &m_texture[extradata.texture * 0x1000];
-	UINT32 alpha = extradata.alpha & 0x1f;
-	UINT32 alpha_enable = extradata.alpha & 0x80;
+	uint32_t *texram = &m_texture[extradata.texture * 0x1000];
+	uint32_t alpha = extradata.alpha & 0x1f;
+	uint32_t alpha_enable = extradata.alpha & 0x80;
 
 	int texmode = extradata.flags & 0x3;
 
@@ -930,10 +930,10 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 			int iu = (int)(u) & 0x3f;
 			int iv = (int)(v) & 0x3f;
 
-			UINT32 addr = generate_texel_address(iu, iv);
+			uint32_t addr = generate_texel_address(iu, iv);
 
-			UINT32 texel = texram[addr];
-			UINT32 texel0 = (texel >> tex0_shift) & 0xffff;
+			uint32_t texel = texram[addr];
+			uint32_t texel0 = (texel >> tex0_shift) & 0xffff;
 			if (!(texel0 & 0x8000))
 			{
 				// extract texel0 RGB
@@ -943,7 +943,7 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 
 #if ENABLE_LIGHTING
 				// fetch texture1 and apply normal map
-				UINT32 texel1 = (texel >> tex1_shift) & 0xffff;
+				uint32_t texel1 = (texel >> tex1_shift) & 0xffff;
 
 				VECTOR3 normal;
 				VECTOR3 half;
@@ -1003,7 +1003,7 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 					int b0 = (texel0 & 0x001f) << 3;
 
 					// fetch texture1
-					UINT32 texel1 = (texel >> tex1_shift) & 0xffff;
+					uint32_t texel1 = (texel >> tex1_shift) & 0xffff;
 
 					if (!(texel1 & 0x8000))
 					{
@@ -1033,7 +1033,7 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 					int b0 = texel0 & 0x1f;
 
 					// fetch texture1
-					UINT32 texel1 = (texel >> tex1_shift) & 0xffff;
+					uint32_t texel1 = (texel >> tex1_shift) & 0xffff;
 
 					int r1 = (texel1 & 0x7c00) >> 7;
 					int g1 = (texel1 & 0x03e0) >> 2;
@@ -1224,9 +1224,9 @@ void taitotz_renderer::setup_viewport(int x, int y, int width, int height, int c
 	m_clip_plane[4].d = 0.1f;
 }
 
-void taitotz_renderer::render_tnl_object(UINT32 address, float scale, UINT8 alpha)
+void taitotz_renderer::render_tnl_object(uint32_t address, float scale, uint8_t alpha)
 {
-	UINT32 *src = &m_screen_ram[address];
+	uint32_t *src = &m_screen_ram[address];
 	vertex_t v[10];
 
 	bool end = false;
@@ -1253,23 +1253,23 @@ void taitotz_renderer::render_tnl_object(UINT32 address, float scale, UINT8 alph
 		for (int i=0; i < num_verts; i++)
 		{
 			// texture coords
-			UINT8 tu = src[index] >> 8;
-			UINT8 tv = src[index] & 0xff;
+			uint8_t tu = src[index] >> 8;
+			uint8_t tv = src[index] & 0xff;
 			v[i].p[POLY_U] = (float)(tu);
 			v[i].p[POLY_V] = (float)(tv);
 
 			// coords
-			INT16 x = src[index + 1] & 0xffff;
-			INT16 y = src[index + 2] & 0xffff;
-			INT16 z = src[index + 3] & 0xffff;
+			int16_t x = src[index + 1] & 0xffff;
+			int16_t y = src[index + 2] & 0xffff;
+			int16_t z = src[index + 3] & 0xffff;
 			float px = ((float)(x) / 256.0f) * scale;
 			float py = ((float)(y) / 256.0f) * scale;
 			float pz = ((float)(z) / 256.0f) * scale;
 
 			// normals
-			INT8 inx = (src[index + 1] >> 16) & 0xff;
-			INT8 iny = (src[index + 2] >> 16) & 0xff;
-			INT8 inz = (src[index + 3] >> 16) & 0xff;
+			int8_t inx = (src[index + 1] >> 16) & 0xff;
+			int8_t iny = (src[index + 2] >> 16) & 0xff;
+			int8_t inz = (src[index + 3] >> 16) & 0xff;
 			float nx = (float)(inx) / 128.0f;
 			float ny = (float)(iny) / 128.0f;
 			float nz = (float)(inz) / 128.0f;
@@ -1339,7 +1339,7 @@ void taitotz_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	m_zbuffer->fill(*(int*)&zvalue, cliprect);
 }
 
-void taitotz_renderer::push_tnl_fifo(UINT32 data)
+void taitotz_renderer::push_tnl_fifo(uint32_t data)
 {
 	m_tnl_fifo[m_tnl_fifo_ptr] = data;
 	m_tnl_fifo_ptr++;
@@ -1365,7 +1365,7 @@ void taitotz_renderer::push_tnl_fifo(UINT32 data)
 		if (scale < 1.0f)
 			scale *= 2.0f;
 
-		UINT32 alpha = m_tnl_fifo[2];
+		uint32_t alpha = m_tnl_fifo[2];
 		render_tnl_object(m_tnl_fifo[0] & 0x1fffff, scale, alpha);
 
 //      printf("TNL FIFO: %08X, %f, %08X, %08X\n", m_tnl_fifo[0], u2f(m_tnl_fifo[1]), m_tnl_fifo[2], m_tnl_fifo[3]);
@@ -1373,7 +1373,7 @@ void taitotz_renderer::push_tnl_fifo(UINT32 data)
 	}
 }
 
-void taitotz_renderer::push_direct_poly_fifo(UINT32 data)
+void taitotz_renderer::push_direct_poly_fifo(uint32_t data)
 {
 	m_direct_fifo[m_direct_fifo_ptr] = data;
 	m_direct_fifo_ptr++;
@@ -1403,7 +1403,7 @@ void taitotz_renderer::push_direct_poly_fifo(UINT32 data)
 			v[i].y = m_direct_fifo[index+0] & 0xffff;
 			v[i].p[POLY_U] = (m_direct_fifo[index+2] >> 20) & 0xfff;
 			v[i].p[POLY_V] = (m_direct_fifo[index+2] >> 4) & 0xfff;
-			//UINT16 z = m_direct_fifo[index+1] & 0xffff;
+			//uint16_t z = m_direct_fifo[index+1] & 0xffff;
 
 			index += 4;
 		}
@@ -1419,18 +1419,18 @@ void taitotz_renderer::push_direct_poly_fifo(UINT32 data)
 	}
 }
 
-UINT32 taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_renderer->draw(bitmap, cliprect);
 
-	UINT16 *screen_src = (UINT16*)&m_screen_ram[m_scr_base];
+	uint16_t *screen_src = (uint16_t*)&m_screen_ram[m_scr_base];
 
 	for (int j=0; j < 384; j++)
 	{
-		UINT32 *fb = &bitmap.pix32(j);
+		uint32_t *fb = &bitmap.pix32(j);
 		for (int i=0; i < 512; i++)
 		{
-			UINT16 p = *screen_src++;
+			uint16_t p = *screen_src++;
 			if (p & 0x8000)     // draw 2D framebuffer if there's an opaque pixel
 			{
 				int r = ((p >> 10) & 0x1f) << (3+16);
@@ -1444,7 +1444,7 @@ UINT32 taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-void taitotz_state::draw_tile(UINT32 pos, UINT32 tile)
+void taitotz_state::draw_tile(uint32_t pos, uint32_t tile)
 {
 	int tileu = (tile & 0x1f) * 16;
 	int tilev = ((tile >> 5)) * 16;
@@ -1452,8 +1452,8 @@ void taitotz_state::draw_tile(UINT32 pos, UINT32 tile)
 	int tilex = (pos & 0x1f) * 16;
 	int tiley = ((pos >> 5) & 0x1f) * 16;
 
-	UINT16 *src_tile = (UINT16*)&m_screen_ram[0x180000];
-	UINT16 *dst = (UINT16*)&m_screen_ram[m_scr_base];
+	uint16_t *src_tile = (uint16_t*)&m_screen_ram[0x180000];
+	uint16_t *dst = (uint16_t*)&m_screen_ram[m_scr_base];
 
 	int v = tilev;
 
@@ -1462,7 +1462,7 @@ void taitotz_state::draw_tile(UINT32 pos, UINT32 tile)
 		int u = tileu;
 		for (int i=tilex; i < (tilex+16); i++)
 		{
-			UINT16 p = src_tile[((v*512) + u)];
+			uint16_t p = src_tile[((v*512) + u)];
 			dst[(j*512) + i] = p;
 			u++;
 		}
@@ -1486,7 +1486,7 @@ void taitotz_state::draw_tile(UINT32 pos, UINT32 tile)
     batlgr2 into 0x9e0000
 */
 
-UINT32 taitotz_state::video_mem_r(UINT32 address)
+uint32_t taitotz_state::video_mem_r(uint32_t address)
 {
 	if (address >= 0x800000 && address < 0x1000000)
 	{
@@ -1507,7 +1507,7 @@ UINT32 taitotz_state::video_mem_r(UINT32 address)
 	}
 }
 
-void taitotz_state::video_mem_w(UINT32 address, UINT32 data)
+void taitotz_state::video_mem_w(uint32_t address, uint32_t data)
 {
 	if (address >= 0x800000 && address < 0x1000000)
 	{
@@ -1527,7 +1527,7 @@ void taitotz_state::video_mem_w(UINT32 address, UINT32 data)
 	}
 }
 
-UINT32 taitotz_state::video_reg_r(UINT32 reg)
+uint32_t taitotz_state::video_reg_r(uint32_t reg)
 {
 	switch ((reg >> 28) & 0xf)
 	{
@@ -1590,7 +1590,7 @@ video_reg_w: r: 20000003 d: 019501AA
 video_reg_w: r: 20000004 d: 00000000
 */
 
-void taitotz_state::video_reg_w(UINT32 reg, UINT32 data)
+void taitotz_state::video_reg_w(uint32_t reg, uint32_t data)
 {
 	switch ((reg >> 28) & 0xf)
 	{
@@ -1618,8 +1618,8 @@ void taitotz_state::video_reg_w(UINT32 reg, UINT32 data)
 		}
 	case 0x3:       // Draw 16x16 tile
 		{
-			UINT32 pos = (data >> 12) & 0xfff;
-			UINT32 tile = data & 0xfff;
+			uint32_t pos = (data >> 12) & 0xfff;
+			uint32_t tile = data & 0xfff;
 			draw_tile(pos, tile);
 			break;
 		}
@@ -1639,8 +1639,8 @@ void taitotz_state::video_reg_w(UINT32 reg, UINT32 data)
 
 READ64_MEMBER(taitotz_state::video_chip_r)
 {
-	UINT64 r = 0;
-	UINT32 reg = offset * 8;
+	uint64_t r = 0;
+	uint32_t reg = offset * 8;
 
 	if (ACCESSING_BITS_0_31)
 	{
@@ -1665,13 +1665,13 @@ READ64_MEMBER(taitotz_state::video_chip_r)
 		{
 			case 0x0:
 				{
-					r |= (UINT64)(video_reg_r(m_video_reg)) << 32;
+					r |= (uint64_t)(video_reg_r(m_video_reg)) << 32;
 					break;
 				}
 
 			case 0x10:
 				{
-					r |= (UINT64)(0xff) << 32;      // busy flags? landhigh expects this
+					r |= (uint64_t)(0xff) << 32;      // busy flags? landhigh expects this
 					break;
 				}
 
@@ -1688,13 +1688,13 @@ READ64_MEMBER(taitotz_state::video_chip_r)
 
 WRITE64_MEMBER(taitotz_state::video_chip_w)
 {
-	UINT32 reg = offset * 8;
-	UINT32 regdata;
+	uint32_t reg = offset * 8;
+	uint32_t regdata;
 
 	if (ACCESSING_BITS_0_31)
 	{
 		reg += 4;
-		regdata = (UINT32)(data);
+		regdata = (uint32_t)(data);
 		switch (reg)
 		{
 			default:
@@ -1706,7 +1706,7 @@ WRITE64_MEMBER(taitotz_state::video_chip_w)
 	}
 	if (ACCESSING_BITS_32_63)
 	{
-		regdata = (UINT32)(data >> 32);
+		regdata = (uint32_t)(data >> 32);
 		switch (reg)
 		{
 			case 0:
@@ -1763,15 +1763,15 @@ WRITE64_MEMBER(taitotz_state::video_chip_w)
 
 READ64_MEMBER(taitotz_state::video_fifo_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(video_mem_r(m_video_ram_ptr)) << 32;
+		r |= (uint64_t)(video_mem_r(m_video_ram_ptr)) << 32;
 		m_video_ram_ptr++;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		r |= (UINT64)(video_mem_r(m_video_ram_ptr));
+		r |= (uint64_t)(video_mem_r(m_video_ram_ptr));
 		m_video_ram_ptr++;
 	}
 
@@ -1789,7 +1789,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				video_mem_w(m_video_ram_ptr, (UINT32)(data >> 32));
+				video_mem_w(m_video_ram_ptr, (uint32_t)(data >> 32));
 				m_video_ram_ptr++;
 			}
 			m_video_fifo_ptr++;
@@ -1798,7 +1798,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				video_mem_w(m_video_ram_ptr, (UINT32)(data));
+				video_mem_w(m_video_ram_ptr, (uint32_t)(data));
 				m_video_ram_ptr++;
 			}
 			m_video_fifo_ptr++;
@@ -1812,8 +1812,8 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				m_renderer->push_direct_poly_fifo((UINT32)(data >> 32));
-				//logerror("FIFO packet w: %08X at %08X\n", (UINT32)(data >> 32), space.device().safe_pc());
+				m_renderer->push_direct_poly_fifo((uint32_t)(data >> 32));
+				//logerror("FIFO packet w: %08X at %08X\n", (uint32_t)(data >> 32), space.device().safe_pc());
 			}
 			m_video_fifo_ptr++;
 		}
@@ -1821,8 +1821,8 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				m_renderer->push_direct_poly_fifo((UINT32)(data));
-				//logerror("FIFO packet w: %08X at %08X\n", (UINT32)(data), space.device().safe_pc());
+				m_renderer->push_direct_poly_fifo((uint32_t)(data));
+				//logerror("FIFO packet w: %08X at %08X\n", (uint32_t)(data), space.device().safe_pc());
 			}
 			m_video_fifo_ptr++;
 		}
@@ -1835,7 +1835,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				m_renderer->push_tnl_fifo((UINT32)(data >> 32));
+				m_renderer->push_tnl_fifo((uint32_t)(data >> 32));
 			}
 			m_video_fifo_ptr++;
 		}
@@ -1843,7 +1843,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				m_renderer->push_tnl_fifo((UINT32)(data));
+				m_renderer->push_tnl_fifo((uint32_t)(data));
 			}
 			m_video_fifo_ptr++;
 		}
@@ -1854,7 +1854,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				printf("FIFO write with cmd %02X: %08X\n", command, (UINT32)(data >> 32));
+				printf("FIFO write with cmd %02X: %08X\n", command, (uint32_t)(data >> 32));
 			}
 			m_video_fifo_ptr++;
 		}
@@ -1862,7 +1862,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				printf("FIFO write with cmd %02X: %08X\n", command, (UINT32)(data));
+				printf("FIFO write with cmd %02X: %08X\n", command, (uint32_t)(data));
 			}
 			m_video_fifo_ptr++;
 		}
@@ -1878,13 +1878,13 @@ READ64_MEMBER(taitotz_state::ieee1394_r)
 		return U64(0xffffffffffffffff);
 	}
 
-	//logerror("ieee1394_r: %08X, %08X%08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	//logerror("ieee1394_r: %08X, %08X%08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 	return 0;
 }
 
 WRITE64_MEMBER(taitotz_state::ieee1394_w)
 {
-	//logerror("ieee1394_w: %08X, %08X%08X, %08X%08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	//logerror("ieee1394_w: %08X, %08X%08X, %08X%08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 	if (ACCESSING_BITS_32_63)
 	{
 	}
@@ -1895,7 +1895,7 @@ WRITE64_MEMBER(taitotz_state::ieee1394_w)
 
 READ64_MEMBER(taitotz_state::ppc_common_r)
 {
-	UINT64 res = 0;
+	uint64_t res = 0;
 
 	if (ACCESSING_BITS_0_15)
 	{
@@ -1903,7 +1903,7 @@ READ64_MEMBER(taitotz_state::ppc_common_r)
 	}
 	if (ACCESSING_BITS_32_47)
 	{
-		res |= (UINT64)(m_io_share_ram[(offset * 2) + 0]) << 32;
+		res |= (uint64_t)(m_io_share_ram[(offset * 2) + 0]) << 32;
 	}
 
 	return res;
@@ -1913,11 +1913,11 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 {
 	if (ACCESSING_BITS_0_15)
 	{
-		m_io_share_ram[(offset * 2) + 1] = (UINT16)(data);
+		m_io_share_ram[(offset * 2) + 1] = (uint16_t)(data);
 	}
 	if (ACCESSING_BITS_32_47)
 	{
-		m_io_share_ram[(offset * 2) + 0] = (UINT16)(data >> 32);
+		m_io_share_ram[(offset * 2) + 0] = (uint16_t)(data >> 32);
 	}
 
 	if (offset == 0x7ff)
@@ -2023,7 +2023,7 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 	{
 		for (int i=0; i < 0x80; i++)
 		{
-			UINT16 w = m_io_share_ram[0x900+i];
+			uint16_t w = m_io_share_ram[0x900+i];
 			printf("%c%c", w & 0xff, (w >> 8) & 0xff);
 		}
 		printf("\n");
@@ -2033,7 +2033,7 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 	{
 		for (int i=0; i < 0x80; i++)
 		{
-			UINT16 w = m_io_share_ram[0xb00+i];
+			uint16_t w = m_io_share_ram[0xb00+i];
 			printf("%c%c", w & 0xff, (w >> 8) & 0xff);
 		}
 		printf("\n");
@@ -2072,11 +2072,11 @@ READ8_MEMBER(taitotz_state::tlcs_common_r)
 {
 	if (offset & 1)
 	{
-		return (UINT8)(m_io_share_ram[offset / 2] >> 8);
+		return (uint8_t)(m_io_share_ram[offset / 2] >> 8);
 	}
 	else
 	{
-		return (UINT8)(m_io_share_ram[offset / 2]);
+		return (uint8_t)(m_io_share_ram[offset / 2]);
 	}
 }
 
@@ -2085,7 +2085,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_common_w)
 	if (offset & 1)
 	{
 		m_io_share_ram[offset / 2] &= 0x00ff;
-		m_io_share_ram[offset / 2] |= (UINT16)(data) << 8;
+		m_io_share_ram[offset / 2] |= (uint16_t)(data) << 8;
 	}
 	else
 	{
@@ -2102,7 +2102,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_common_w)
 			m_io_share_ram[0xffe] != 0x1022)
 		{
 			printf("TLCS -> PPC cmd %04X\n", m_io_share_ram[0xffe]);
-			//printf("0x40080104 = %08X\n", (UINT32)(m_work_ram[0x80104/8]));
+			//printf("0x40080104 = %08X\n", (uint32_t)(m_work_ram[0x80104/8]));
 		}
 #endif
 
@@ -2175,7 +2175,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 
 READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 {
-	UINT16 d = m_ata->read_cs0(space, offset, mem_mask);
+	uint16_t d = m_ata->read_cs0(space, offset, mem_mask);
 	if (offset == 7)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2184,7 +2184,7 @@ READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 
 READ16_MEMBER(taitotz_state::tlcs_ide1_r)
 {
-	UINT16 d = m_ata->read_cs1(space, offset, mem_mask);
+	uint16_t d = m_ata->read_cs1(space, offset, mem_mask);
 	if (offset == 6)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2204,7 +2204,7 @@ READ16_MEMBER(taitotz_state::tlcs_ide1_r)
 // 0xfc0147:    INT5            -
 // 0xfc0148:    INT6            -
 // 0xfc0149:    INT7            -
-// 0xfc014a:    INT8            Sound chip interrupt?
+// 0xfc014a:    int8_t            Sound chip interrupt?
 // 0xfc0120:    INTAD           -
 // 0xfc0120:    INTTR8-A        -
 // 0xfc0120:    INTT0           -
@@ -2527,7 +2527,7 @@ void taitotz_state::machine_reset()
 	if (m_hdd_serial_number != nullptr)
 	{
 		ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-		UINT16 *identify_device = hdd->identify_device_buffer();
+		uint16_t *identify_device = hdd->identify_device_buffer();
 
 		for (int i=0; i < 10; i++)
 		{
@@ -2542,7 +2542,7 @@ void taitotz_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x40000000, 0x40ffffff, FALSE, m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x40000000, 0x40ffffff, false, m_work_ram);
 }
 
 
@@ -2607,7 +2607,7 @@ MACHINE_CONFIG_END
 // Init for BIOS v1.52
 void taitotz_state::init_taitotz_152()
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	rom[(0x2c87c^4)/4] = 0x38600000;    // skip sound load timeout...
 //  rom[(0x2c620^4)/4] = 0x48000014;    // ID check skip (not needed with correct serial number)
 
@@ -2621,7 +2621,7 @@ void taitotz_state::init_taitotz_152()
 // Init for BIOS 1.11a
 void taitotz_state::init_taitotz_111a()
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	rom[(0x2b748^4)/4] = 0x480000b8;    // skip sound load timeout
 }
 

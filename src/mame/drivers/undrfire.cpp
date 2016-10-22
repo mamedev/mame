@@ -211,7 +211,7 @@ void undrfire_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(5, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in undrfire_state::device_timer");
+		assert_always(false, "Unknown id in undrfire_state::device_timer");
 	}
 }
 
@@ -1098,8 +1098,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 {
-	UINT32 offset,i;
-	UINT8 *gfx = memregion("gfx3")->base();
+	uint32_t offset,i;
+	uint8_t *gfx = memregion("gfx3")->base();
 	int size=memregion("gfx3")->bytes();
 	int data;
 
@@ -1127,8 +1127,8 @@ DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 
 DRIVER_INIT_MEMBER(undrfire_state,cbombers)
 {
-	UINT32 offset,i;
-	UINT8 *gfx = memregion("gfx3")->base();
+	uint32_t offset,i;
+	uint8_t *gfx = memregion("gfx3")->base();
 	int size=memregion("gfx3")->bytes();
 	int data;
 

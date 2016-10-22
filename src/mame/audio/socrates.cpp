@@ -23,7 +23,7 @@ const device_type SOCRATES_SOUND = &device_creator<socrates_snd_device>;
 //  socrates_snd_device - constructor
 //-------------------------------------------------
 
-socrates_snd_device::socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+socrates_snd_device::socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SOCRATES_SOUND, "Socrates Sound", tag, owner, clock, "socrates_snd", __FILE__),
 	device_sound_interface(mconfig, *this)
 {
@@ -61,7 +61,7 @@ void socrates_snd_device::sound_stream_update(sound_stream &stream, stream_sampl
 }
 
 
-const UINT8 socrates_snd_device::s_volumeLUT[16] =
+const uint8_t socrates_snd_device::s_volumeLUT[16] =
 {
 0, 61, 100, 132, 158, 183, 201, 218,
 233, 242, 253, 255, 250, 240, 224, 211

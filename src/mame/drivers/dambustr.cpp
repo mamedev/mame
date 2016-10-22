@@ -213,9 +213,9 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 {
 	int i, j, tmp;
 	int tmpram[16];
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *usr = memregion("user1")->base();
-	UINT8 *gfx = memregion("gfx1")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *usr = memregion("user1")->base();
+	uint8_t *gfx = memregion("gfx1")->base();
 
 	// Bit swap addresses
 	for(i=0; i<4096*4; i++) {
@@ -282,7 +282,7 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	MCFG_VIDEO_START_OVERRIDE(dambustr_state,dambustr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END

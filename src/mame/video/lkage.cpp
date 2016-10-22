@@ -101,8 +101,8 @@ void lkage_state::video_start()
 
 void lkage_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT8 *source = m_spriteram;
-	const UINT8 *finish = source + 0x60;
+	const uint8_t *source = m_spriteram;
+	const uint8_t *finish = source + 0x60;
 
 	while (source < finish)
 	{
@@ -165,7 +165,7 @@ void lkage_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 }
 
-UINT32 lkage_state::screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lkage_state::screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bank;
 

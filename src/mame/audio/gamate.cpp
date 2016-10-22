@@ -16,7 +16,7 @@ enum { ClockDelay=32 };
 const device_type GAMATE_SND = &device_creator<gamate_sound_device>;
 
 const int gamate_sound_device::DAConverter[]={ 0, 3, 7, 13,  23, 41, 75, 137,  249, 453, 825, 1499,  2726, 4956, 9011, 16383 }; // (*.55) on the real below index 8 bareless measureable
-const UINT8 Mask[]={ 0xff, 0x0f, 0xff, 0x0f, 0xff, 0x0f, 0x1f, 0x3f,  0x1f, 0x1f, 0x1f, 0xff, 0xff, 0xf };
+const uint8_t Mask[]={ 0xff, 0x0f, 0xff, 0x0f, 0xff, 0x0f, 0x1f, 0x3f,  0x1f, 0x1f, 0x1f, 0xff, 0xff, 0xf };
 const int EnvelopeVolumes[]={ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0  };
 //**************************************************************************
 //  LIVE DEVICE
@@ -26,7 +26,7 @@ const int EnvelopeVolumes[]={ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
 //  gamate_sound_device - constructor
 //-------------------------------------------------
 
-gamate_sound_device::gamate_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gamate_sound_device::gamate_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GAMATE_SND, "Gamate Audio Custom", tag, owner, clock, "gamate_sound", __FILE__)
 	, device_sound_interface(mconfig, *this)
 	, m_mixer_channel(nullptr)
@@ -174,7 +174,7 @@ void gamate_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 WRITE8_MEMBER( gamate_sound_device::device_w )
 {
-	UINT16 size;
+	uint16_t size;
 
 	m_mixer_channel->update();
 	reg[offset] = data;
@@ -245,7 +245,7 @@ WRITE8_MEMBER( gamate_sound_device::device_w )
 
 READ8_MEMBER( gamate_sound_device::device_r )
 {
-	UINT8 data=0;
+	uint8_t data=0;
 	if ((offset&0xf)<ARRAY_LENGTH(Mask))
 		data=reg[offset&0xf]&Mask[offset&0xf]; // unused bits set to last write value? in this area
 	return data;

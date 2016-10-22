@@ -39,27 +39,27 @@ const device_type NES_SOROM_A = &device_creator<nes_sorom_a_device>;
 
 
 
-nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_reg_write_enable(0), m_latch(0), m_count(0)
 				{
 }
 
-nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_nrom_device(mconfig, NES_SXROM, "NES Cart SxROM (MMC-1) PCB", tag, owner, clock, "nes_sxrom", __FILE__), m_reg_write_enable(0), m_latch(0), m_count(0)
 				{
 }
 
-nes_sorom_device::nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sorom_device::nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_sxrom_device(mconfig, NES_SOROM, "NES Cart SOROM (MMC-1) PCB", tag, owner, clock, "nes_sorom", __FILE__)
 {
 }
 
-nes_sxrom_a_device::nes_sxrom_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sxrom_a_device::nes_sxrom_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_sxrom_device(mconfig, NES_SXROM_A, "NES Cart SxROM (MMC-1A) PCB", tag, owner, clock, "nes_sxrom_a", __FILE__)
 {
 }
 
-nes_sorom_a_device::nes_sorom_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sorom_a_device::nes_sorom_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_sxrom_device(mconfig, NES_SOROM_A, "NES Cart SOROM (MMC-1A) PCB", tag, owner, clock, "nes_sorom_a", __FILE__)
 {
 }
@@ -144,7 +144,7 @@ TIMER_CALLBACK_MEMBER( nes_sxrom_device::resync_callback )
 
 void nes_sxrom_device::set_prg()
 {
-	UINT8 prg_mode, prg_offset;
+	uint8_t prg_mode, prg_offset;
 
 	prg_mode = m_reg[0] & 0x0c;
 	/* prg_mode&0x8 determines bank size: 32k (if 0) or 16k (if 1)? when in 16k mode,
@@ -179,7 +179,7 @@ void nes_sxrom_device::set_prg()
 
 void nes_sxrom_device::set_chr()
 {
-	UINT8 chr_mode = BIT(m_reg[0], 4);
+	uint8_t chr_mode = BIT(m_reg[0], 4);
 
 	if (chr_mode)
 	{
@@ -267,7 +267,7 @@ WRITE8_MEMBER( nes_sxrom_device::write_h )
 
 WRITE8_MEMBER(nes_sxrom_device::write_m)
 {
-	UINT8 bank = (m_reg[1] >> 2) & 3;
+	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (!BIT(m_reg[3], 4))  // WRAM enabled
@@ -281,7 +281,7 @@ WRITE8_MEMBER(nes_sxrom_device::write_m)
 
 READ8_MEMBER(nes_sxrom_device::read_m)
 {
-	UINT8 bank = (m_reg[1] >> 2) & 3;
+	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom read_m, offset: %04x\n", offset));
 
 	if (!BIT(m_reg[3], 4))  // WRAM enabled
@@ -298,7 +298,7 @@ READ8_MEMBER(nes_sxrom_device::read_m)
 // SOROM has two RAM banks, the first is not battery backed up, the second is.
 WRITE8_MEMBER(nes_sorom_device::write_m)
 {
-	UINT8 type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
+	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (!BIT(m_reg[3], 4))  // WRAM enabled
@@ -312,7 +312,7 @@ WRITE8_MEMBER(nes_sorom_device::write_m)
 
 READ8_MEMBER(nes_sorom_device::read_m)
 {
-	UINT8 type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
+	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom read_m, offset: %04x\n", offset));
 
 	if (!BIT(m_reg[3], 4))  // WRAM enabled
@@ -329,7 +329,7 @@ READ8_MEMBER(nes_sorom_device::read_m)
 // MMC1A boards have no wram enable/disable bit
 WRITE8_MEMBER(nes_sxrom_a_device::write_m)
 {
-	UINT8 bank = (m_reg[1] >> 2) & 3;
+	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom_a write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (!m_battery.empty())
@@ -340,7 +340,7 @@ WRITE8_MEMBER(nes_sxrom_a_device::write_m)
 
 READ8_MEMBER(nes_sxrom_a_device::read_m)
 {
-	UINT8 bank = (m_reg[1] >> 2) & 3;
+	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom_a read_m, offset: %04x\n", offset));
 
 	if (!m_battery.empty())
@@ -353,7 +353,7 @@ READ8_MEMBER(nes_sxrom_a_device::read_m)
 
 WRITE8_MEMBER(nes_sorom_a_device::write_m)
 {
-	UINT8 type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
+	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom_a write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (type)
@@ -364,7 +364,7 @@ WRITE8_MEMBER(nes_sorom_a_device::write_m)
 
 READ8_MEMBER(nes_sorom_a_device::read_m)
 {
-	UINT8 type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
+	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom_a read_m, offset: %04x\n", offset));
 
 	if (type)

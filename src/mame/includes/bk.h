@@ -19,13 +19,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette") { }
 
-	UINT16 m_scrool;
-	required_shared_ptr<UINT16> m_bk0010_video_ram;
-	UINT16 m_kbd_state;
-	UINT16 m_key_code;
-	UINT16 m_key_pressed;
-	UINT16 m_key_irq_vector;
-	UINT16 m_drive;
+	uint16_t m_scrool;
+	required_shared_ptr<uint16_t> m_bk0010_video_ram;
+	uint16_t m_kbd_state;
+	uint16_t m_key_code;
+	uint16_t m_key_pressed;
+	uint16_t m_key_irq_vector;
+	uint16_t m_drive;
 	DECLARE_READ16_MEMBER(bk_key_state_r);
 	DECLARE_READ16_MEMBER(bk_key_code_r);
 	DECLARE_READ16_MEMBER(bk_vid_scrool_r);
@@ -40,7 +40,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_bk0010(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bk0010(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
 	IRQ_CALLBACK_MEMBER(bk0010_irq_callback);
 	required_device<cpu_device> m_maincpu;

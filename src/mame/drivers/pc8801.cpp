@@ -286,15 +286,15 @@
 
 struct crtc_t
 {
-	UINT8 cmd,param_count,cursor_on,status,irq_mask;
-	UINT8 param[8][5];
-	UINT8 inverse;
+	uint8_t cmd,param_count,cursor_on,status,irq_mask;
+	uint8_t param[8][5];
+	uint8_t inverse;
 };
 
 struct mouse_t
 {
-	UINT8 phase;
-	UINT8 x,y;
+	uint8_t phase;
+	uint8_t x,y;
 	attotime time;
 };
 
@@ -324,65 +324,65 @@ public:
 	required_device<ym2203_device> m_opn;
 	required_device<palette_device> m_palette;
 
-	std::unique_ptr<UINT8[]> m_work_ram;
-	std::unique_ptr<UINT8[]> m_hi_work_ram;
-	std::unique_ptr<UINT8[]> m_ext_work_ram;
-	std::unique_ptr<UINT8[]> m_gvram;
-	UINT8 *m_n80rom;
-	UINT8 *m_n88rom;
-	UINT8 *m_kanji_rom;
-	UINT8 *m_cg_rom;
+	std::unique_ptr<uint8_t[]> m_work_ram;
+	std::unique_ptr<uint8_t[]> m_hi_work_ram;
+	std::unique_ptr<uint8_t[]> m_ext_work_ram;
+	std::unique_ptr<uint8_t[]> m_gvram;
+	uint8_t *m_n80rom;
+	uint8_t *m_n88rom;
+	uint8_t *m_kanji_rom;
+	uint8_t *m_cg_rom;
 
-	UINT8 m_i8255_0_pc;
-	UINT8 m_i8255_1_pc;
-	UINT8 m_fdc_irq_opcode;
-	UINT8 m_ext_rom_bank;
-	UINT8 m_gfx_ctrl;
-	UINT8 m_vram_sel;
-	UINT8 m_misc_ctrl;
-	UINT8 m_device_ctrl_data;
-	UINT8 m_window_offset_bank;
-	UINT8 m_layer_mask;
-	UINT16 m_dma_counter[4];
-	UINT16 m_dma_address[4];
-	UINT8 m_alu_reg[3];
-	UINT8 m_dmac_mode;
-	UINT8 m_alu_ctrl1;
-	UINT8 m_alu_ctrl2;
-	UINT8 m_extram_mode;
-	UINT8 m_extram_bank;
-	UINT8 m_txt_width;
-	UINT8 m_txt_color;
+	uint8_t m_i8255_0_pc;
+	uint8_t m_i8255_1_pc;
+	uint8_t m_fdc_irq_opcode;
+	uint8_t m_ext_rom_bank;
+	uint8_t m_gfx_ctrl;
+	uint8_t m_vram_sel;
+	uint8_t m_misc_ctrl;
+	uint8_t m_device_ctrl_data;
+	uint8_t m_window_offset_bank;
+	uint8_t m_layer_mask;
+	uint16_t m_dma_counter[4];
+	uint16_t m_dma_address[4];
+	uint8_t m_alu_reg[3];
+	uint8_t m_dmac_mode;
+	uint8_t m_alu_ctrl1;
+	uint8_t m_alu_ctrl2;
+	uint8_t m_extram_mode;
+	uint8_t m_extram_bank;
+	uint8_t m_txt_width;
+	uint8_t m_txt_color;
 #ifdef USE_PROPER_I8214
-	UINT8 m_timer_irq_mask;
-	UINT8 m_vblank_irq_mask;
-	UINT8 m_sound_irq_mask;
-	UINT8 m_int_state;
+	uint8_t m_timer_irq_mask;
+	uint8_t m_vblank_irq_mask;
+	uint8_t m_sound_irq_mask;
+	uint8_t m_int_state;
 #else
-	UINT8 m_i8214_irq_level;
-	UINT8 m_vrtc_irq_mask;
-	UINT8 m_vrtc_irq_latch;
-	UINT8 m_timer_irq_mask;
-	UINT8 m_timer_irq_latch;
-	UINT8 m_sound_irq_mask;
-	UINT8 m_sound_irq_latch;
-	UINT8 m_sound_irq_pending;
+	uint8_t m_i8214_irq_level;
+	uint8_t m_vrtc_irq_mask;
+	uint8_t m_vrtc_irq_latch;
+	uint8_t m_timer_irq_mask;
+	uint8_t m_timer_irq_latch;
+	uint8_t m_sound_irq_mask;
+	uint8_t m_sound_irq_latch;
+	uint8_t m_sound_irq_pending;
 #endif
-	UINT8 m_has_clock_speed;
-	UINT8 m_clock_setting;
-	UINT8 m_baudrate_val;
-	UINT8 m_has_dictionary;
-	UINT8 m_dic_ctrl;
-	UINT8 m_dic_bank;
-	UINT8 m_has_cdrom;
-	UINT8 m_cdrom_reg[0x10];
+	uint8_t m_has_clock_speed;
+	uint8_t m_clock_setting;
+	uint8_t m_baudrate_val;
+	uint8_t m_has_dictionary;
+	uint8_t m_dic_ctrl;
+	uint8_t m_dic_bank;
+	uint8_t m_has_cdrom;
+	uint8_t m_cdrom_reg[0x10];
 	crtc_t m_crtc;
 	mouse_t m_mouse;
-	struct { UINT8 r, g, b; } m_palram[8];
-	UINT8 m_dmac_ff;
-	UINT32 m_knj_addr[2];
-	UINT32 m_extram_size;
-	UINT8 m_has_opna;
+	struct { uint8_t r, g, b; } m_palram[8];
+	uint8_t m_dmac_ff;
+	uint32_t m_knj_addr[2];
+	uint32_t m_extram_size;
+	uint8_t m_has_opna;
 
 	DECLARE_READ8_MEMBER(pc8801_alu_r);
 	DECLARE_WRITE8_MEMBER(pc8801_alu_w);
@@ -458,17 +458,17 @@ public:
 	DECLARE_READ8_MEMBER(pc8801_unk_r);
 	DECLARE_WRITE8_MEMBER(pc8801_unk_w);
 
-	UINT8 pc8801_pixel_clock(void);
+	uint8_t pc8801_pixel_clock(void);
 	void pc8801_dynamic_res_change(void);
 	void draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	UINT8 calc_cursor_pos(int x,int y,int yi);
-	UINT8 extract_text_attribute(UINT32 address,int x, UINT8 width, UINT8 &non_special);
-	void pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,
-							UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width, UINT8 non_special);
-	void draw_text(bitmap_ind16 &bitmap,int y_size, UINT8 width);
+	uint8_t calc_cursor_pos(int x,int y,int yi);
+	uint8_t extract_text_attribute(uint32_t address,int x, uint8_t width, uint8_t &non_special);
+	void pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gfx_mode,uint8_t reverse,uint8_t secret,
+							uint8_t blink,uint8_t upper,uint8_t lower,int y_size,int width, uint8_t non_special);
+	void draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(pc8801);
 protected:
 
@@ -537,9 +537,9 @@ void pc8801_state::video_start()
 void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int x,y,xi;
-	UINT32 count;
-	UINT16 y_size;
-	UINT16 y_double;
+	uint32_t count;
+	uint16_t y_size;
+	uint16_t y_double;
 
 	count = 0;
 
@@ -584,9 +584,9 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int x,y,xi;
-	UINT32 count;
-	UINT8 color;
-	UINT8 is_cursor;
+	uint32_t count;
+	uint8_t color;
+	uint8_t is_cursor;
 
 	count = 0;
 	color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
@@ -655,7 +655,7 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 	}
 }
 
-UINT8 pc8801_state::calc_cursor_pos(int x,int y,int yi)
+uint8_t pc8801_state::calc_cursor_pos(int x,int y,int yi)
 {
 	if(!(m_crtc.cursor_on)) // don't bother if cursor is off
 		return 0;
@@ -681,9 +681,9 @@ UINT8 pc8801_state::calc_cursor_pos(int x,int y,int yi)
 
 
 
-UINT8 pc8801_state::extract_text_attribute(UINT32 address,int x, UINT8 width, UINT8 &non_special)
+uint8_t pc8801_state::extract_text_attribute(uint32_t address,int x, uint8_t width, uint8_t &non_special)
 {
-	UINT8 *vram = m_work_ram.get();
+	uint8_t *vram = m_work_ram.get();
 	int i;
 	int fifo_size;
 	int offset;
@@ -719,13 +719,13 @@ UINT8 pc8801_state::extract_text_attribute(UINT32 address,int x, UINT8 width, UI
 	return vram[address-3+offset];
 }
 
-void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width, UINT8 non_special)
+void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gfx_mode,uint8_t reverse,uint8_t secret,uint8_t blink,uint8_t upper,uint8_t lower,int y_size,int width, uint8_t non_special)
 {
 	int xi,yi;
-	UINT8 *vram = m_work_ram.get();
-	UINT8 is_cursor;
-	UINT8 y_height, y_double;
-	UINT8 y_step;
+	uint8_t *vram = m_work_ram.get();
+	uint8_t is_cursor;
+	uint8_t y_height, y_double;
+	uint8_t y_step;
 
 	y_height = lines_per_char;
 	y_double = (pc8801_pixel_clock());
@@ -754,7 +754,7 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 
 				if(gfx_mode)
 				{
-					UINT8 mask;
+					uint8_t mask;
 
 					mask = (xi & 4) ? 0x10 : 0x01;
 					mask <<= ((yi & (0x6 << y_double)) >> (1+y_double));
@@ -762,8 +762,8 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 				}
 				else
 				{
-					UINT8 char_data;
-					UINT8 blink_mask;
+					uint8_t char_data;
+					uint8_t blink_mask;
 
 					blink_mask = 0;
 					if(blink && ((machine().first_screen()->frame_number() / blink_speed) & 3) == 1)
@@ -805,18 +805,18 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 	}
 }
 
-void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, UINT8 width)
+void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
 {
 	int x,y;
-	UINT8 attr;
-	UINT8 reverse;
-	UINT8 gfx_mode;
-	UINT8 secret;
-	UINT8 upper;
-	UINT8 lower;
-	UINT8 blink;
+	uint8_t attr;
+	uint8_t reverse;
+	uint8_t gfx_mode;
+	uint8_t secret;
+	uint8_t upper;
+	uint8_t lower;
+	uint8_t blink;
 	int pal;
-	UINT8 non_special;
+	uint8_t non_special;
 
 	for(y=0;y<y_size;y++)
 	{
@@ -860,7 +860,7 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, UINT8 width)
 	}
 }
 
-UINT32 pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
@@ -889,7 +889,7 @@ UINT32 pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
 READ8_MEMBER(pc8801_state::pc8801_alu_r)
 {
 	int i;
-	UINT8 b,r,g;
+	uint8_t b,r,g;
 
 	/* store data to ALU regs */
 	for(i=0;i<3;i++)
@@ -913,7 +913,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_alu_w)
 	{
 		case 0x00: //logic operation
 		{
-			UINT8 logic_op;
+			uint8_t logic_op;
 
 			for(i=0;i<3;i++)
 			{
@@ -1004,14 +1004,14 @@ WRITE8_MEMBER(pc8801_state::pc8801_high_wram_w)
 
 READ8_MEMBER(pc8801_state::pc8801ma_dic_r)
 {
-	UINT8 *dic_rom = memregion("dictionary")->base();
+	uint8_t *dic_rom = memregion("dictionary")->base();
 
 	return dic_rom[offset];
 }
 
 READ8_MEMBER(pc8801_state::pc8801_cdbios_rom_r)
 {
-	UINT8 *cdrom_bios = memregion("cdrom")->base();
+	uint8_t *cdrom_bios = memregion("cdrom")->base();
 
 	return cdrom_bios[offset];
 }
@@ -1039,7 +1039,7 @@ READ8_MEMBER(pc8801_state::pc8801_mem_r)
 	}
 	else if(offset >= 0x8000 && offset <= 0x83ff) // work RAM window
 	{
-		UINT32 window_offset;
+		uint32_t window_offset;
 
 		if(m_gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
 			return pc8801_wram_r(space,offset);
@@ -1103,7 +1103,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_mem_w)
 			pc8801_wram_w(space,offset,data);
 		else
 		{
-			UINT32 window_offset;
+			uint32_t window_offset;
 
 			window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
@@ -1234,7 +1234,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_ext_rom_bank_w)
 	m_ext_rom_bank = data;
 }
 
-UINT8 pc8801_state::pc8801_pixel_clock(void)
+uint8_t pc8801_state::pc8801_pixel_clock(void)
 {
 	int ysize = machine().first_screen()->height(); /* TODO: correct condition*/
 
@@ -2248,7 +2248,7 @@ static const cassette_interface pc88_cassette_interface =
 #endif
 
 #ifdef USE_PROPER_I8214
-void pc8801_state::pc8801_raise_irq(UINT8 irq,UINT8 state)
+void pc8801_state::pc8801_raise_irq(uint8_t irq,uint8_t state)
 {
 	if(state)
 	{
@@ -2290,7 +2290,7 @@ static I8214_INTERFACE( pic_intf )
 
 IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
 {
-	UINT8 vector = (7 - m_pic->a_r());
+	uint8_t vector = (7 - m_pic->a_r());
 
 	m_int_state &= ~(1<<vector);
 	m_maincpu->set_input_line(0,CLEAR_LINE);
@@ -2394,10 +2394,10 @@ void pc8801_state::machine_start()
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
-	m_work_ram = make_unique_clear<UINT8[]>(0x10000);
-	m_hi_work_ram = make_unique_clear<UINT8[]>(0x1000);
-	m_ext_work_ram = make_unique_clear<UINT8[]>(0x8000*0x100);
-	m_gvram = make_unique_clear<UINT8[]>(0xc000);
+	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
+	m_hi_work_ram = make_unique_clear<uint8_t[]>(0x1000);
+	m_ext_work_ram = make_unique_clear<uint8_t[]>(0x8000*0x100);
+	m_gvram = make_unique_clear<uint8_t[]>(0xc000);
 	m_n80rom = memregion("n80rom")->base();
 	m_n88rom = memregion("n88rom")->base();
 	m_kanji_rom = memregion("kanji")->base();
@@ -2413,7 +2413,7 @@ void pc8801_state::machine_reset()
 {
 	#define kB 1024
 	#define MB 1024*1024
-	const UINT32 extram_type[] = { 0*kB, 32*kB,64*kB,128*kB,128*kB,256*kB,512*kB,1*MB,2*MB,4*MB,8*MB,1*MB+128*kB,2*MB+128*kB,4*MB+128*kB, 0*kB, 0*kB };
+	const uint32_t extram_type[] = { 0*kB, 32*kB,64*kB,128*kB,128*kB,256*kB,512*kB,1*MB,2*MB,4*MB,8*MB,1*MB+128*kB,2*MB+128*kB,4*MB+128*kB, 0*kB, 0*kB };
 	#undef kB
 	#undef MB
 
@@ -2539,7 +2539,7 @@ READ8_MEMBER(pc8801_state::opn_porta_r)
 {
 	if(ioport("BOARD_CONFIG")->read() & 2)
 	{
-		UINT8 shift,res;
+		uint8_t shift,res;
 
 		shift = (m_mouse.phase & 1) ? 0 : 4;
 		res = (m_mouse.phase & 2) ? m_mouse.y : m_mouse.x;

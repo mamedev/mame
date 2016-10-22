@@ -216,7 +216,7 @@ void gaplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		namcoio_run(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in gaplus_state::device_timer");
+		assert_always(false, "Unknown id in gaplus_state::device_timer");
 	}
 }
 
@@ -979,7 +979,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gaplus_state,gaplus)
 {
-	UINT8 *rom;
+	uint8_t *rom;
 
 	rom = memregion("gfx1")->base();
 	for (int i = 0;i < 0x2000;i++)

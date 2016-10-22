@@ -25,7 +25,7 @@ class k054338_device : public device_t,
 						public device_video_interface
 {
 public:
-	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k054338_device() {}
 
 	// static configuration
@@ -52,7 +52,7 @@ protected:
 
 private:
 	// internal state
-	UINT16      m_regs[32];
+	uint16_t      m_regs[32];
 	int         m_shd_rgb[9];
 	int         m_alpha_inv;
 	const char  *m_k055555_tag;

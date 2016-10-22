@@ -41,7 +41,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		sorcerer_reset(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sorcerer_state::device_timer");
+		assert_always(false, "Unknown id in sorcerer_state::device_timer");
 	}
 }
 
@@ -50,7 +50,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 {
-	UINT8 cass_ws = 0;
+	uint8_t cass_ws = 0;
 	switch (m_fe & 0xc0)        /*/ bit 7 low indicates cassette */
 	{
 		case 0x00:              /* Cassette 300 baud */
@@ -164,7 +164,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fd_w)
 
 WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 {
-	UINT8 changed_bits = (m_fe ^ data) & 0xf0;
+	uint8_t changed_bits = (m_fe ^ data) & 0xf0;
 	m_fe = data;
 
 	/* bits 0..3 */
@@ -246,7 +246,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 
 READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
 {
-	UINT8 data = m_uart->get_received_data();
+	uint8_t data = m_uart->get_received_data();
 	m_uart->set_input_pin(AY31015_RDAV, 0);
 	m_uart->set_input_pin(AY31015_RDAV, 1);
 	return data;
@@ -255,7 +255,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
 READ8_MEMBER(sorcerer_state::sorcerer_fd_r)
 {
 	/* set unused bits high */
-	UINT8 data = 0xe0;
+	uint8_t data = 0xe0;
 
 	m_uart->set_input_pin(AY31015_SWE, 0);
 	data |= m_uart->get_output_pin(AY31015_TBMT) ? 0x01 : 0;
@@ -275,7 +275,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
 	 - not emulated
 	 - tied high, allowing PARIN and PAROUT bios routines to run */
 
-	UINT8 data = 0xc0;
+	uint8_t data = 0xc0;
 
 	/* bit 5 - vsync */
 	data |= m_iop_vs->read();
@@ -292,9 +292,9 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
 
 SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 {
-	UINT8 *RAM = memregion(m_maincpu->tag())->base();
+	uint8_t *RAM = memregion(m_maincpu->tag())->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 header[28];
+	uint8_t header[28];
 	unsigned char s_byte;
 
 	/* check size */
@@ -343,7 +343,7 @@ void sorcerer_state::machine_start()
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
 
-	UINT16 endmem = 0xbfff;
+	uint16_t endmem = 0xbfff;
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
@@ -371,7 +371,7 @@ MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
 
-	UINT16 endmem = 0xbbff;
+	uint16_t endmem = 0xbbff;
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
@@ -418,7 +418,7 @@ void sorcerer_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 {
-	UINT16 execute_address, start_address, end_address;
+	uint16_t execute_address, start_address, end_address;
 	int autorun;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -445,8 +445,8 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 
 		if (((start_address == 0x1d5) || (execute_address == 0xc858)) && (space.read_byte(0xdffa) == 0xc3))
 		{
-			UINT8 i;
-			static const UINT8 data[]={
+			uint8_t i;
+			static const uint8_t data[]={
 				0xcd, 0x26, 0xc4,   // CALL C426    ;set up other pointers
 				0x21, 0xd4, 1,      // LD HL,01D4   ;start of program address (used by C689)
 				0x36, 0,        // LD (HL),00   ;make sure dummy end-of-line is there

@@ -20,20 +20,20 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	optional_shared_ptr<UINT8> m_bg_vram; /* prosport */
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_scratchram;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_bg_vram; /* prosport */
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_scratchram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	UINT8 *m_fg_gfx;   /* prosoccr */
-	std::unique_ptr<UINT8[]> m_charram;   /* prosoccr */
-	UINT8 m_io_ram[16];
+	uint8_t *m_fg_gfx;   /* prosoccr */
+	std::unique_ptr<uint8_t[]> m_charram;   /* prosoccr */
+	uint8_t m_io_ram[16];
 
 	int m_bank;
 	int m_latch;
-	UINT8 m_gfx_rom_readback;
+	uint8_t m_gfx_rom_readback;
 	int m_background_color;
 	int m_background_disable;
 
@@ -77,10 +77,10 @@ public:
 	DECLARE_VIDEO_START(prosport);
 	DECLARE_VIDEO_START(boomrang);
 	DECLARE_VIDEO_START(prosoccr);
-	UINT32 screen_update_liberate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_prosport(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_boomrang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_prosoccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_liberate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_prosport(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_boomrang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_prosoccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco16_interrupt);
 	void liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

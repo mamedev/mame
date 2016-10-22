@@ -14,7 +14,7 @@
 
 PALETTE_INIT_MEMBER(lvcards_state,ponttehk)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for ( i = 0; i < palette.entries(); i++ )
@@ -50,7 +50,7 @@ PALETTE_INIT_MEMBER(lvcards_state,ponttehk)
 
 PALETTE_INIT_MEMBER(lvcards_state, lvcards)//Ever so slightly different, but different enough.
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for ( i = 0; i < palette.entries(); i++ )
@@ -112,7 +112,7 @@ void lvcards_state::video_start()
 			8, 8, 32, 32);
 }
 
-UINT32 lvcards_state::screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lvcards_state::screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

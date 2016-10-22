@@ -37,23 +37,23 @@ class lr35902_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	lr35902_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	lr35902_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_timer_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_timer_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_incdec16_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_incdec16_func.set_callback(object); }
 	static void set_halt_bug(device_t &device) { downcast<lr35902_cpu_device &>(device).m_has_halt_bug = true; }
 
-	UINT8 get_speed();
-	void set_speed(UINT8 speed_request);
+	uint8_t get_speed();
+	void set_speed(uint8_t speed_request);
 
-	inline UINT8 get_ie() { return m_IE; }
-	inline void set_ie(UINT8 data) { m_IE = data; }
+	inline uint8_t get_ie() { return m_IE; }
+	inline void set_ie(uint8_t data) { m_IE = data; }
 
-	inline UINT8 get_if() { return m_IF; }
-	inline void set_if(UINT8 data) { m_IF = data; }
+	inline uint8_t get_if() { return m_IF; }
+	inline void set_if(uint8_t data) { m_IF = data; }
 
-	inline void dma_cycles_to_burn(UINT16 cycles_to_burn) { m_dma_cycles_to_burn += cycles_to_burn; }
+	inline void dma_cycles_to_burn(uint16_t cycles_to_burn) { m_dma_cycles_to_burn += cycles_to_burn; }
 
 	// Needed for some gameboy operation which needs to read the results
 	// of setting an input during the currently running timeslice.
@@ -77,9 +77,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 16; }
-	virtual UINT32 execute_input_lines() const override { return 5; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 16; }
+	virtual uint32_t execute_input_lines() const override { return 5; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -89,34 +89,34 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
-	inline void cycles_passed(UINT8 cycles);
-	inline UINT8 mem_read_byte(UINT16 addr);
-	inline void mem_write_byte(UINT16 addr, UINT8 data);
-	inline UINT16 mem_read_word(UINT16 addr);
-	inline void mem_write_word(UINT16 addr, UINT16 data);
+	inline void cycles_passed(uint8_t cycles);
+	inline uint8_t mem_read_byte(uint16_t addr);
+	inline void mem_write_byte(uint16_t addr, uint8_t data);
+	inline uint16_t mem_read_word(uint16_t addr);
+	inline void mem_write_word(uint16_t addr, uint16_t data);
 	inline void check_interrupts();
 
 	address_space_config m_program_config;
 
-	UINT8 m_A;
-	UINT8 m_F;
-	UINT8 m_B;
-	UINT8 m_C;
-	UINT8 m_D;
-	UINT8 m_E;
-	UINT8 m_H;
-	UINT8 m_L;
+	uint8_t m_A;
+	uint8_t m_F;
+	uint8_t m_B;
+	uint8_t m_C;
+	uint8_t m_D;
+	uint8_t m_E;
+	uint8_t m_H;
+	uint8_t m_L;
 
-	UINT16 m_SP;
-	UINT16 m_PC;
+	uint16_t m_SP;
+	uint16_t m_PC;
 
 	/* Interrupt related */
-	UINT8 m_IE;
-	UINT8 m_IF;
+	uint8_t m_IE;
+	uint8_t m_IF;
 	int m_irq_state;
 	bool m_handle_ei_delay;
 	lr35902_cpu_device *m_device;
@@ -125,14 +125,14 @@ protected:
 
 	/* Fetch & execute related */
 	int m_execution_state;
-	UINT8 m_op;
+	uint8_t m_op;
 
 	/* Others */
 	int m_gb_speed;
 	int m_gb_speed_change_pending;
 	int m_enable;
 	bool m_has_halt_bug;
-	UINT32 m_dma_cycles_to_burn;
+	uint32_t m_dma_cycles_to_burn;
 	bool m_entering_halt;
 
 	/* Callbacks */

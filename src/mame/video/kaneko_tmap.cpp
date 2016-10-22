@@ -96,7 +96,7 @@ There are more!
 
 const device_type KANEKO_TMAP = &device_creator<kaneko_view2_tilemap_device>;
 
-kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KANEKO_TMAP, "Kaneko VIEW2 Tilemaps", tag, owner, clock, "kaneko_view2_tilemap", __FILE__)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
@@ -136,8 +136,8 @@ void kaneko_view2_tilemap_device::set_invert_flip(device_t &device, int invert_f
 
 void kaneko_view2_tilemap_device::get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-	UINT16 code_hi = m_vram[_N_][ 2 * tile_index + 0];
-	UINT16 code_lo = m_vram[_N_][ 2 * tile_index + 1];
+	uint16_t code_hi = m_vram[_N_][ 2 * tile_index + 0];
+	uint16_t code_lo = m_vram[_N_][ 2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(m_tilebase, code_lo + m_vram_tile_addition[_N_], (code_hi >> 2) & 0x3f, TILE_FLIPXY( code_hi & 3 ));
 	tileinfo.category   =   (code_hi >> 8) & 7;
 }
@@ -151,11 +151,11 @@ void kaneko_view2_tilemap_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_vram[0] = make_unique_clear<UINT16[]>(0x1000/2);
-	m_vram[1] = make_unique_clear<UINT16[]>(0x1000/2);
-	m_vscroll[0] = make_unique_clear<UINT16[]>(0x1000/2);
-	m_vscroll[1] = make_unique_clear<UINT16[]>(0x1000/2);
-	m_regs = make_unique_clear<UINT16[]>(0x20/2);
+	m_vram[0] = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_vram[1] = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_vscroll[0] = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_vscroll[1] = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_regs = make_unique_clear<uint16_t[]>(0x20/2);
 
 	m_tmap[0] = &machine().tilemap().create(
 			*m_gfxdecode,
@@ -197,7 +197,7 @@ void kaneko_view2_tilemap_device::device_reset()
 }
 
 
-void kaneko_view2_tilemap_device::kaneko16_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
+void kaneko_view2_tilemap_device::kaneko16_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_)
 {
 	COMBINE_DATA(&m_vram[_N_][offset]);
 	m_tmap[_N_]->mark_tile_dirty(offset/2);
@@ -210,8 +210,8 @@ template<class _BitmapClass>
 void kaneko_view2_tilemap_device::kaneko16_prepare_common(_BitmapClass &bitmap, const rectangle &cliprect)
 {
 	int layers_flip_0;
-	UINT16 layer0_scrollx, layer0_scrolly;
-	UINT16 layer1_scrollx, layer1_scrolly;
+	uint16_t layer0_scrollx, layer0_scrolly;
+	uint16_t layer1_scrollx, layer1_scrolly;
 	int i;
 
 	layers_flip_0 = m_regs[ 4 ];
@@ -247,7 +247,7 @@ void kaneko_view2_tilemap_device::kaneko16_prepare_common(_BitmapClass &bitmap, 
 
 	for (i=0; i<0x200; i++)
 	{
-		UINT16 scroll;
+		uint16_t scroll;
 		scroll = (layers_flip_0 & 0x0800) ? m_vscroll[0][i] : 0;
 		m_tmap[0]->set_scrollx(i,(layer0_scrollx + scroll) >> 6 );
 		scroll = (layers_flip_0 & 0x0008) ? m_vscroll[1][i] : 0;

@@ -328,7 +328,7 @@ WRITE16_MEMBER(macrossp_state::palette_fade_w)
 	if (data >> 8 != 0xff)
 	{
 		// range seems to be 40 (brightest) to 252 (darkest)
-		UINT8 fade = ((data >> 8) - 40) / 212.0 * 255.0;
+		uint8_t fade = ((data >> 8) - 40) / 212.0 * 255.0;
 		m_screen->set_brightness(0xff - fade);
 	}
 }

@@ -30,7 +30,7 @@ void wave_device::static_set_cassette_tag(device_t &device, const char *cassette
 
 const device_type WAVE = &device_creator<wave_device>;
 
-wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WAVE, "Wave", tag, owner, clock, "wave", __FILE__),
 		device_sound_interface(mconfig, *this), m_cass(nullptr)
 {
@@ -96,9 +96,9 @@ void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 		for (i = samples - 1; i >= 0; i--)
 		{
-			left_buffer[i] = ((INT16 *) left_buffer)[i];
+			left_buffer[i] = ((int16_t *) left_buffer)[i];
 			if (speakers > 1)
-				right_buffer[i] = ((INT16 *) right_buffer)[i];
+				right_buffer[i] = ((int16_t *) right_buffer)[i];
 		}
 	}
 	else

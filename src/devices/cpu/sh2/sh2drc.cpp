@@ -12,7 +12,7 @@
 #include "sh2.h"
 #include "sh2comn.h"
 
-extern unsigned DasmSH2(char *buffer, unsigned pc, UINT16 opcode);
+extern unsigned DasmSH2(char *buffer, unsigned pc, uint16_t opcode);
 
 using namespace uml;
 
@@ -62,7 +62,7 @@ using namespace uml;
     descriptor
 -------------------------------------------------*/
 
-UINT32 sh2_device::epc(const opcode_desc *desc)
+uint32_t sh2_device::epc(const opcode_desc *desc)
 {
 	return (desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 1) : desc->pc;
 }
@@ -127,36 +127,36 @@ static void cfunc_printf_probe(void *param)
 
 void sh2_device::func_printf_probe()
 {
-	UINT32 pc = m_sh2_state->pc;
+	uint32_t pc = m_sh2_state->pc;
 
 	printf(" PC=%08X          r0=%08X  r1=%08X  r2=%08X\n",
 		pc,
-		(UINT32)m_sh2_state->r[0],
-		(UINT32)m_sh2_state->r[1],
-		(UINT32)m_sh2_state->r[2]);
+		(uint32_t)m_sh2_state->r[0],
+		(uint32_t)m_sh2_state->r[1],
+		(uint32_t)m_sh2_state->r[2]);
 	printf(" r3=%08X  r4=%08X  r5=%08X  r6=%08X\n",
-		(UINT32)m_sh2_state->r[3],
-		(UINT32)m_sh2_state->r[4],
-		(UINT32)m_sh2_state->r[5],
-		(UINT32)m_sh2_state->r[6]);
+		(uint32_t)m_sh2_state->r[3],
+		(uint32_t)m_sh2_state->r[4],
+		(uint32_t)m_sh2_state->r[5],
+		(uint32_t)m_sh2_state->r[6]);
 	printf(" r7=%08X  r8=%08X  r9=%08X  r10=%08X\n",
-		(UINT32)m_sh2_state->r[7],
-		(UINT32)m_sh2_state->r[8],
-		(UINT32)m_sh2_state->r[9],
-		(UINT32)m_sh2_state->r[10]);
+		(uint32_t)m_sh2_state->r[7],
+		(uint32_t)m_sh2_state->r[8],
+		(uint32_t)m_sh2_state->r[9],
+		(uint32_t)m_sh2_state->r[10]);
 	printf(" r11=%08X  r12=%08X  r13=%08X  r14=%08X\n",
-		(UINT32)m_sh2_state->r[11],
-		(UINT32)m_sh2_state->r[12],
-		(UINT32)m_sh2_state->r[13],
-		(UINT32)m_sh2_state->r[14]);
+		(uint32_t)m_sh2_state->r[11],
+		(uint32_t)m_sh2_state->r[12],
+		(uint32_t)m_sh2_state->r[13],
+		(uint32_t)m_sh2_state->r[14]);
 	printf(" r15=%08X  macl=%08X  mach=%08X  gbr=%08X\n",
-		(UINT32)m_sh2_state->r[15],
-		(UINT32)m_sh2_state->macl,
-		(UINT32)m_sh2_state->mach,
-		(UINT32)m_sh2_state->gbr);
+		(uint32_t)m_sh2_state->r[15],
+		(uint32_t)m_sh2_state->macl,
+		(uint32_t)m_sh2_state->mach,
+		(uint32_t)m_sh2_state->gbr);
 	printf(" evec %x irqsr %x pc=%08x\n",
-		(UINT32)m_sh2_state->evec,
-		(UINT32)m_sh2_state->irqsr, (UINT32)m_sh2_state->pc);
+		(uint32_t)m_sh2_state->evec,
+		(uint32_t)m_sh2_state->irqsr, (uint32_t)m_sh2_state->pc);
 }
 
 /*-------------------------------------------------
@@ -202,9 +202,9 @@ static void cfunc_MAC_W(void *param)
 
 void sh2_device::func_MAC_W()
 {
-	INT32 tempm, tempn, dest, src, ans;
-	UINT32 templ;
-	UINT16 opcode;
+	int32_t tempm, tempn, dest, src, ans;
+	uint32_t templ;
+	uint16_t opcode;
 	int n, m;
 
 	// recover the opcode
@@ -214,17 +214,17 @@ void sh2_device::func_MAC_W()
 	n = Rn;
 	m = Rm;
 
-	tempn = (INT32) RW( m_sh2_state->r[n] );
+	tempn = (int32_t) RW( m_sh2_state->r[n] );
 	m_sh2_state->r[n] += 2;
-	tempm = (INT32) RW( m_sh2_state->r[m] );
+	tempm = (int32_t) RW( m_sh2_state->r[m] );
 	m_sh2_state->r[m] += 2;
 	templ = m_sh2_state->macl;
-	tempm = ((INT32) (short) tempn * (INT32) (short) tempm);
-	if ((INT32) m_sh2_state->macl >= 0)
+	tempm = ((int32_t) (short) tempn * (int32_t) (short) tempm);
+	if ((int32_t) m_sh2_state->macl >= 0)
 		dest = 0;
 	else
 		dest = 1;
-	if ((INT32) tempm >= 0)
+	if ((int32_t) tempm >= 0)
 	{
 		src = 0;
 		tempn = 0;
@@ -236,7 +236,7 @@ void sh2_device::func_MAC_W()
 	}
 	src += dest;
 	m_sh2_state->macl += tempm;
-	if ((INT32) m_sh2_state->macl >= 0)
+	if ((int32_t) m_sh2_state->macl >= 0)
 		ans = 0;
 	else
 		ans = 1;
@@ -289,10 +289,10 @@ static void cfunc_MAC_L(void *param)
 
 void sh2_device::func_MAC_L()
 {
-	UINT32 RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	UINT32 temp0, temp1, temp2, temp3;
-	INT32 tempm, tempn, fnLmL;
-	UINT16 opcode;
+	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
+	uint32_t temp0, temp1, temp2, temp3;
+	int32_t tempm, tempn, fnLmL;
+	uint16_t opcode;
 	int n, m;
 
 	// recover the opcode
@@ -302,11 +302,11 @@ void sh2_device::func_MAC_L()
 	n = Rn;
 	m = Rm;
 
-	tempn = (INT32) RL( m_sh2_state->r[n] );
+	tempn = (int32_t) RL( m_sh2_state->r[n] );
 	m_sh2_state->r[n] += 4;
-	tempm = (INT32) RL( m_sh2_state->r[m] );
+	tempm = (int32_t) RL( m_sh2_state->r[m] );
 	m_sh2_state->r[m] += 4;
-	if ((INT32) (tempn ^ tempm) < 0)
+	if ((int32_t) (tempn ^ tempm) < 0)
 		fnLmL = -1;
 	else
 		fnLmL = 0;
@@ -314,8 +314,8 @@ void sh2_device::func_MAC_L()
 		tempn = 0 - tempn;
 	if (tempm < 0)
 		tempm = 0 - tempm;
-	temp1 = (UINT32) tempn;
-	temp2 = (UINT32) tempm;
+	temp1 = (uint32_t) tempn;
+	temp2 = (uint32_t) tempm;
 	RnL = temp1 & 0x0000ffff;
 	RnH = (temp1 >> 16) & 0x0000ffff;
 	RmL = temp2 & 0x0000ffff;
@@ -347,12 +347,12 @@ void sh2_device::func_MAC_L()
 		if (m_sh2_state->macl > Res0)
 			Res2++;
 		Res2 += (m_sh2_state->mach & 0x0000ffff);
-		if (((INT32) Res2 < 0) && (Res2 < 0xffff8000))
+		if (((int32_t) Res2 < 0) && (Res2 < 0xffff8000))
 		{
 			Res2 = 0x00008000;
 			Res0 = 0x00000000;
 		}
-		else if (((INT32) Res2 > 0) && (Res2 > 0x00007fff))
+		else if (((int32_t) Res2 > 0) && (Res2 > 0x00007fff))
 		{
 			Res2 = 0x00007fff;
 			Res0 = 0xffffffff;
@@ -381,9 +381,9 @@ static void cfunc_DIV1(void *param)
 
 void sh2_device::func_DIV1()
 {
-	UINT32 tmp0;
-	UINT32 old_q;
-	UINT16 opcode;
+	uint32_t tmp0;
+	uint32_t old_q;
+	uint16_t opcode;
 	int n, m;
 
 	// recover the opcode
@@ -490,8 +490,8 @@ static void cfunc_ADDV(void *param)
 
 void sh2_device::func_ADDV()
 {
-	INT32 dest, src, ans;
-	UINT16 opcode;
+	int32_t dest, src, ans;
+	uint16_t opcode;
 	int n, m;
 
 	// recover the opcode
@@ -501,17 +501,17 @@ void sh2_device::func_ADDV()
 	n = Rn;
 	m = Rm;
 
-	if ((INT32) m_sh2_state->r[n] >= 0)
+	if ((int32_t) m_sh2_state->r[n] >= 0)
 		dest = 0;
 	else
 		dest = 1;
-	if ((INT32) m_sh2_state->r[m] >= 0)
+	if ((int32_t) m_sh2_state->r[m] >= 0)
 		src = 0;
 	else
 		src = 1;
 	src += dest;
 	m_sh2_state->r[n] += m_sh2_state->r[m];
-	if ((INT32) m_sh2_state->r[n] >= 0)
+	if ((int32_t) m_sh2_state->r[n] >= 0)
 		ans = 0;
 	else
 		ans = 1;
@@ -537,8 +537,8 @@ static void cfunc_SUBV(void *param)
 
 void sh2_device::func_SUBV()
 {
-	INT32 dest, src, ans;
-	UINT16 opcode;
+	int32_t dest, src, ans;
+	uint16_t opcode;
 	int n, m;
 
 	// recover the opcode
@@ -548,17 +548,17 @@ void sh2_device::func_SUBV()
 	n = Rn;
 	m = Rm;
 
-	if ((INT32) m_sh2_state->r[n] >= 0)
+	if ((int32_t) m_sh2_state->r[n] >= 0)
 		dest = 0;
 	else
 		dest = 1;
-	if ((INT32) m_sh2_state->r[m] >= 0)
+	if ((int32_t) m_sh2_state->r[m] >= 0)
 		src = 0;
 	else
 		src = 1;
 	src += dest;
 	m_sh2_state->r[n] -= m_sh2_state->r[m];
-	if ((INT32) m_sh2_state->r[n] >= 0)
+	if ((int32_t) m_sh2_state->r[n] >= 0)
 		ans = 0;
 	else
 		ans = 1;
@@ -598,19 +598,19 @@ void sh2_device::code_flush_cache()
 		static_generate_entry_point();
 
 		/* add subroutines for memory accesses */
-		static_generate_memory_accessor(1, FALSE, "read8", &m_read8);
-		static_generate_memory_accessor(1, TRUE,  "write8", &m_write8);
-		static_generate_memory_accessor(2, FALSE, "read16", &m_read16);
-		static_generate_memory_accessor(2, TRUE,  "write16", &m_write16);
-		static_generate_memory_accessor(4, FALSE, "read32", &m_read32);
-		static_generate_memory_accessor(4, TRUE,  "write32", &m_write32);
+		static_generate_memory_accessor(1, false, "read8", &m_read8);
+		static_generate_memory_accessor(1, true,  "write8", &m_write8);
+		static_generate_memory_accessor(2, false, "read16", &m_read16);
+		static_generate_memory_accessor(2, true,  "write16", &m_write16);
+		static_generate_memory_accessor(4, false, "read32", &m_read32);
+		static_generate_memory_accessor(4, true,  "write32", &m_write32);
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
 		fatalerror("Unable to generate SH2 static code\n");
 	}
 
-	m_cache_dirty = FALSE;
+	m_cache_dirty = false;
 }
 
 /* Execute cycles - returns number of cycles actually run */
@@ -662,13 +662,13 @@ void sh2_device::execute_run_drc()
     given mode at the specified pc
 -------------------------------------------------*/
 
-void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
+void sh2_device::code_compile_block(uint8_t mode, offs_t pc)
 {
 	drcuml_state *drcuml = m_drcuml.get();
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
 	const opcode_desc *desclist;
-	int override = FALSE;
+	bool override = false;
 	drcuml_block *block;
 
 	g_profiler.start(PROFILER_DRC_COMPILE);
@@ -690,7 +690,7 @@ void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
-				UINT32 nextpc;
+				uint32_t nextpc;
 
 				/* add a code log entry */
 				if (drcuml->logging())
@@ -710,7 +710,7 @@ void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
 				/* are recompiling due to being out of sync and allow future overrides */
 				else if (seqhead == desclist)
 				{
-					override = TRUE;
+					override = true;
 					UML_HASH(block, mode, seqhead->pc);                                     // hash    mode,pc
 				}
 
@@ -751,7 +751,7 @@ void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
 				}
 
 				/* count off cycles and go there */
-				generate_update_cycles(block, &compiler, nextpc, TRUE);                // <subtract cycles>
+				generate_update_cycles(block, &compiler, nextpc, true);                // <subtract cycles>
 
 				/* SH2 has no modes */
 				if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
@@ -938,8 +938,8 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 	{
 		if (elem.base != nullptr && (!iswrite || !elem.readonly))
 		{
-			void *fastbase = (UINT8 *)elem.base - elem.start;
-			UINT32 skip = label++;
+			void *fastbase = (uint8_t *)elem.base - elem.start;
+			uint32_t skip = label++;
 			if (elem.end != 0xffffffff)
 			{
 				UML_CMP(block, I0, elem.end);   // cmp     i0,end
@@ -1038,7 +1038,7 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
     flags
 -------------------------------------------------*/
 
-const char *sh2_device::log_desc_flags_to_string(UINT32 flags)
+const char *sh2_device::log_desc_flags_to_string(uint32_t flags)
 {
 	static char tempbuf[30];
 	char *dest = tempbuf;
@@ -1092,7 +1092,7 @@ const char *sh2_device::log_desc_flags_to_string(UINT32 flags)
     log_register_list - log a list of GPR registers
 -------------------------------------------------*/
 
-void sh2_device::log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist)
+void sh2_device::log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist)
 {
 	int count = 0;
 	int regnum;
@@ -1205,7 +1205,7 @@ void sh2_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
     including disassembly of an SH2 instruction
 -------------------------------------------------*/
 
-void sh2_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
+void sh2_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op)
 {
 	if (m_drcuml->logging())
 	{
@@ -1220,14 +1220,14 @@ void sh2_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 o
     subtract cycles from the icount and generate
     an exception if out
 -------------------------------------------------*/
-void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception)
+void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
 {
 	/* check full interrupts if pending */
 	if (compiler->checkints)
 	{
 		code_label skip = compiler->labelnum++;
 
-		compiler->checkints = FALSE;
+		compiler->checkints = false;
 		compiler->labelnum += 4;
 
 		/* check for interrupts */
@@ -1329,7 +1329,7 @@ void sh2_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 				UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));   // exne    nocode,seqhead->pc
 			}
 #else
-		UINT32 sum = 0;
+		uint32_t sum = 0;
 		void *base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x4);                              // load    i0,base,word
 		sum += seqhead->opptr.w[0];
@@ -1353,7 +1353,7 @@ void sh2_device::generate_checksum_block(drcuml_block *block, compiler_state *co
     for a single instruction in a sequence
 -------------------------------------------------*/
 
-void sh2_device::generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 ovrpc)
+void sh2_device::generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
 {
 	offs_t expc;
 
@@ -1438,7 +1438,7 @@ void sh2_device::generate_sequence_instruction(drcuml_block *block, compiler_sta
     generate_delay_slot
 ------------------------------------------------------------------*/
 
-void sh2_device::generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 ovrpc)
+void sh2_device::generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
 {
 	compiler_state compiler_temp = *compiler;
 
@@ -1455,12 +1455,12 @@ void sh2_device::generate_delay_slot(drcuml_block *block, compiler_state *compil
     opcode
 -------------------------------------------------*/
 
-int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 ovrpc)
+bool sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
 {
-	UINT32 scratch, scratch2;
-	INT32 disp;
-	UINT16 opcode = desc->opptr.w[0];
-	UINT8 opswitch = opcode >> 12;
+	uint32_t scratch, scratch2;
+	int32_t disp;
+	uint16_t opcode = desc->opptr.w[0];
+	uint8_t opswitch = opcode >> 12;
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
 
 	switch (opswitch)
@@ -1476,8 +1476,8 @@ int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			UML_CALLH(block, *m_write32);
 
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 2, true);
+			return true;
 
 		case  2:
 			return generate_group_2(block, compiler, desc, opcode, in_delay_slot, ovrpc);
@@ -1494,17 +1494,17 @@ int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			UML_MOV(block, R32(Rn), I0);            // mov Rn, r0
 
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 2, true);
+			return true;
 
 		case  6:
 			return generate_group_6(block, compiler, desc, opcode, in_delay_slot, ovrpc);
 
 		case  7:    // ADDI
 			scratch = opcode & 0xff;
-			scratch2 = (UINT32)(INT32)(INT16)(INT8)scratch;
+			scratch2 = (uint32_t)(int32_t)(int16_t)(int8_t)scratch;
 			UML_ADD(block, R32(Rn), R32(Rn), scratch2); // add Rn, Rn, scratch2
-			return TRUE;
+			return true;
 
 		case  8:
 			return generate_group_8(block, compiler, desc, opcode, in_delay_slot, ovrpc);
@@ -1528,37 +1528,37 @@ int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			}
 			else
 			{
-				scratch2 = (UINT32)(INT32)(INT16) RW(scratch);
+				scratch2 = (uint32_t)(int32_t)(int16_t) RW(scratch);
 				UML_MOV(block, R32(Rn), scratch2);          // mov Rn, scratch2
 			}
 
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 2, true);
+			return true;
 
 		case 10:    // BRA
-			disp = ((INT32)opcode << 20) >> 20;
+			disp = ((int32_t)opcode << 20) >> 20;
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;            // m_sh2_state->ea = pc+4 + disp*2 + 2
 
 			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
 
-			generate_update_cycles(block, compiler, m_sh2_state->ea, TRUE);    // <subtract cycles>
+			generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
 			UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // hashjmp m_sh2_state->ea
-			return TRUE;
+			return true;
 
 		case 11:    // BSR
 			// panicstr @ 403da22 relies on the delay slot clobbering the PR set by a BSR, so
 			// do this before running the delay slot
 			UML_ADD(block, mem(&m_sh2_state->pr), desc->pc, 4); // add m_pr, desc->pc, #4 (skip the current insn & delay slot)
 
-			disp = ((INT32)opcode << 20) >> 20;
+			disp = ((int32_t)opcode << 20) >> 20;
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;            // m_sh2_state->ea = pc+4 + disp*2 + 2
 
 			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
 
-			generate_update_cycles(block, compiler, m_sh2_state->ea, TRUE);    // <subtract cycles>
+			generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
 			UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // hashjmp m_sh2_state->ea
-			return TRUE;
+			return true;
 
 		case 12:
 			return generate_group_12(block, compiler, desc, opcode, in_delay_slot, ovrpc);
@@ -1586,23 +1586,23 @@ int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			}
 
 			if (!in_delay_slot)
-				generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-			return TRUE;
+				generate_update_cycles(block, compiler, desc->pc + 2, true);
+			return true;
 
 		case 14:    // MOVI
 			scratch = opcode & 0xff;
-			scratch2 = (UINT32)(INT32)(INT16)(INT8)scratch;
+			scratch2 = (uint32_t)(int32_t)(int16_t)(int8_t)scratch;
 			UML_MOV(block, R32(Rn), scratch2);
-			return TRUE;
+			return true;
 
 		case 15:
-			return FALSE;
+			return false;
 	}
 
-	return FALSE;
+	return false;
 }
 
-int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+bool sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 0x3F)
 	{
@@ -1621,14 +1621,14 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 	case 0x39:
 	case 0x3a:
 	case 0x3b:
-		return FALSE;
+		return false;
 
 	case 0x09: // NOP();
-		return TRUE;
+		return true;
 
 	case 0x02: // STCSR(Rn);
 		UML_MOV(block, R32(Rn), mem(&m_sh2_state->sr));
-		return TRUE;
+		return true;
 
 	case 0x03: // BSRF(Rn);
 		if (m_cpu_type > CPU_TYPE_SH1)
@@ -1642,9 +1642,9 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 
 			generate_delay_slot(block, compiler, desc, m_sh2_state->target);
 
-			generate_update_cycles(block, compiler, mem(&m_sh2_state->target), TRUE);  // <subtract cycles>
+			generate_update_cycles(block, compiler, mem(&m_sh2_state->target), true);  // <subtract cycles>
 			UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode); // jmp target
-			return TRUE;
+			return true;
 		}
 		break;
 
@@ -1657,8 +1657,8 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write8);             // call write8
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x05: // MOVWS0(Rm, Rn);
 	case 0x15: // MOVWS0(Rm, Rn);
@@ -1669,8 +1669,8 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write16);                // call write16
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x06: // MOVLS0(Rm, Rn);
 	case 0x16: // MOVLS0(Rm, Rn);
@@ -1681,8 +1681,8 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write32);                // call write32
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x07: // MULL(Rm, Rn);
 	case 0x17: // MULL(Rm, Rn);
@@ -1691,26 +1691,26 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 		if (m_cpu_type > CPU_TYPE_SH1)
 		{
 			UML_MULU(block, mem(&m_sh2_state->macl), mem(&m_sh2_state->ea), R32(Rn), R32(Rm));  // mulu macl, ea, Rn, Rm
-			return TRUE;
+			return true;
 		}
 		break;
 
 	case 0x08: // CLRT();
 		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and r0, sr, ~T (clear the T bit)
-		return TRUE;
+		return true;
 
 	case 0x0a: // STSMACH(Rn);
 		UML_MOV(block, R32(Rn), mem(&m_sh2_state->mach));       // mov Rn, mach
-		return TRUE;
+		return true;
 
 	case 0x0b: // RTS();
 		UML_MOV(block, mem(&m_sh2_state->target), mem(&m_sh2_state->pr));   // mov target, pr (in case of d-slot shenanigans)
 
 		generate_delay_slot(block, compiler, desc, m_sh2_state->target);
 
-		generate_update_cycles(block, compiler, mem(&m_sh2_state->target), TRUE);  // <subtract cycles>
+		generate_update_cycles(block, compiler, mem(&m_sh2_state->target), true);  // <subtract cycles>
 		UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode);
-		return TRUE;
+		return true;
 
 	case 0x0c: // MOVBL0(Rm, Rn);
 	case 0x1c: // MOVBL0(Rm, Rn);
@@ -1721,8 +1721,8 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 		UML_SEXT(block, R32(Rn), I0, SIZE_BYTE);        // sext Rn, r0, BYTE
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x0d: // MOVWL0(Rm, Rn);
 	case 0x1d: // MOVWL0(Rm, Rn);
@@ -1733,8 +1733,8 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 		UML_SEXT(block, R32(Rn), I0, SIZE_WORD);        // sext Rn, r0, WORD
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x0e: // MOVLL0(Rm, Rn);
 	case 0x1e: // MOVLL0(Rm, Rn);
@@ -1745,8 +1745,8 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 		UML_MOV(block, R32(Rn), I0);            // mov Rn, r0
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x0f: // MAC_L(Rm, Rn);
 	case 0x1f: // MAC_L(Rm, Rn);
@@ -1758,25 +1758,25 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 			UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
 			UML_CALLC(block, cfunc_MAC_L, this);
 			load_fast_iregs(block);
-			return TRUE;
+			return true;
 		}
 		break;
 
 	case 0x12: // STCGBR(Rn);
 		UML_MOV(block, R32(Rn), mem(&m_sh2_state->gbr));        // mov Rn, gbr
-		return TRUE;
+		return true;
 
 	case 0x18: // SETT();
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), T); // or sr, sr, T
-		return TRUE;
+		return true;
 
 	case 0x19: // DIV0U();
 		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~(M|Q|T)); // and sr, sr, ~(M|Q|T)
-		return TRUE;
+		return true;
 
 	case 0x1a: // STSMACL(Rn);
 		UML_MOV(block, R32(Rn), mem(&m_sh2_state->macl));       // mov Rn, macl
-		return TRUE;
+		return true;
 
 	case 0x1b: // SLEEP();
 		UML_MOV(block, I0, mem(&m_sh2_state->sleep_mode));                          // mov i0, sleep_mode
@@ -1784,20 +1784,20 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 		UML_JMPc(block, COND_E, compiler->labelnum);                        // beq labelnum
 		// sleep mode != 2
 		UML_MOV(block, mem(&m_sh2_state->sleep_mode), 0x1);                         // mov sleep_mode, #1
-		generate_update_cycles(block, compiler, desc->pc, TRUE);       // repeat this insn
+		generate_update_cycles(block, compiler, desc->pc, true);       // repeat this insn
 		UML_JMP(block, compiler->labelnum+1);                               // jmp labelnum+1
 
 		UML_LABEL(block, compiler->labelnum++);                             // labelnum:
 		// sleep_mode == 2
 		UML_MOV(block, mem(&m_sh2_state->sleep_mode), 0x0);                         // sleep_mode = 0
-		generate_update_cycles(block, compiler, desc->pc+2, TRUE);     // go to next insn
+		generate_update_cycles(block, compiler, desc->pc+2, true);     // go to next insn
 
 		UML_LABEL(block, compiler->labelnum++);                             // labelnum+1:
-		return TRUE;
+		return true;
 
 	case 0x22: // STCVBR(Rn);
 		UML_MOV(block, R32(Rn), mem(&m_sh2_state->vbr));        // mov Rn, vbr
-		return TRUE;
+		return true;
 
 	case 0x23: // BRAF(Rn);
 		if (m_cpu_type > CPU_TYPE_SH1)
@@ -1806,24 +1806,24 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 
 			generate_delay_slot(block, compiler, desc, m_sh2_state->target);
 
-			generate_update_cycles(block, compiler, mem(&m_sh2_state->target), TRUE);  // <subtract cycles>
+			generate_update_cycles(block, compiler, mem(&m_sh2_state->target), true);  // <subtract cycles>
 			UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode); // jmp target
-			return TRUE;
+			return true;
 		}
 		break;
 
 	case 0x28: // CLRMAC();
 		UML_MOV(block, mem(&m_sh2_state->macl), 0);     // mov macl, #0
 		UML_MOV(block, mem(&m_sh2_state->mach), 0);     // mov mach, #0
-		return TRUE;
+		return true;
 
 	case 0x29: // MOVT(Rn);
 		UML_AND(block, R32(Rn), mem(&m_sh2_state->sr), T);      // and Rn, sr, T
-		return TRUE;
+		return true;
 
 	case 0x2a: // STSPR(Rn);
 		UML_MOV(block, R32(Rn), mem(&m_sh2_state->pr));         // mov Rn, pr
-		return TRUE;
+		return true;
 
 	case 0x2b: // RTE();
 		generate_delay_slot(block, compiler, desc, 0xffffffff);
@@ -1838,18 +1838,18 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);          // mov sr, r0
 		UML_ADD(block, R32(15), R32(15), 4);        // add R15, R15, #4
 
-		compiler->checkints = TRUE;
+		compiler->checkints = true;
 		UML_MOV(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->pc));       // mov ea, pc
-		generate_update_cycles(block, compiler, mem(&m_sh2_state->ea), TRUE);  // <subtract cycles>
+		generate_update_cycles(block, compiler, mem(&m_sh2_state->ea), true);  // <subtract cycles>
 		UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); // and jump to the "resume PC"
 
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
-int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+bool sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 15)
 	{
@@ -1859,8 +1859,8 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write8);
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  1: // MOVWS(Rm, Rn);
 		UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
@@ -1868,8 +1868,8 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write16);
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  2: // MOVLS(Rm, Rn);
 		UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
@@ -1877,11 +1877,11 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write32);
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  3:
-		return FALSE;
+		return false;
 
 	case  4: // MOVBM(Rm, Rn);
 		UML_MOV(block, I1, R32(Rm));        // mov r1, Rm
@@ -1890,8 +1890,8 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write8);         // call write8
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  5: // MOVWM(Rm, Rn);
 		UML_MOV(block, I1, R32(Rm));        // mov r1, Rm
@@ -1900,8 +1900,8 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write16);            // call write16
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  6: // MOVLM(Rm, Rn);
 		UML_MOV(block, I1, R32(Rm));        // mov r1, Rm
@@ -1910,8 +1910,8 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write32);            // call write32
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 13: // XTRCT(Rm, Rn);
 		UML_SHL(block, I0, R32(Rm), 16);        // shl r0, Rm, #16
@@ -1921,7 +1921,7 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 		UML_AND(block, I1, I1, 0xffff);     // and r1, r1, #0x0000ffff
 
 		UML_OR(block, R32(Rn), I0, I1);     // or Rn, r0, r1
-		return TRUE;
+		return true;
 
 	case  7: // DIV0S(Rm, Rn);
 		UML_MOV(block, I0, mem(&m_sh2_state->sr));              // move r0, sr
@@ -1946,7 +1946,7 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 		UML_OR(block, I0, I0, T);               // or r0, r0, T
 		UML_LABEL(block, compiler->labelnum++);             // labelnum:
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);              // mov sr, r0
-		return TRUE;
+		return true;
 
 	case  8: // TST(Rm, Rn);
 		UML_AND(block, I0, mem(&m_sh2_state->sr), ~T);  // and r0, sr, ~T (clear the T bit)
@@ -1957,7 +1957,7 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 		UML_LABEL(block, compiler->labelnum++);         // desc->pc:
 
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
-		return TRUE;
+		return true;
 
 	case 12: // CMPSTR(Rm, Rn);
 		UML_XOR(block, I0, R32(Rn), R32(Rm));   // xor r0, Rn, Rm       (temp)
@@ -1988,37 +1988,37 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), T); // or sr, sr, T
 
 		UML_LABEL(block, compiler->labelnum++);     // labelnum+1:
-		return TRUE;
+		return true;
 
 	case  9: // AND(Rm, Rn);
 		UML_AND(block, R32(Rn), R32(Rn), R32(Rm));  // and Rn, Rn, Rm
-		return TRUE;
+		return true;
 
 	case 10: // XOR(Rm, Rn);
 		UML_XOR(block, R32(Rn), R32(Rn), R32(Rm));  // xor Rn, Rn, Rm
-		return TRUE;
+		return true;
 
 	case 11: // OR(Rm, Rn);
 		UML_OR(block, R32(Rn), R32(Rn), R32(Rm));   // or Rn, Rn, Rm
-		return TRUE;
+		return true;
 
 	case 14: // MULU(Rm, Rn);
 		UML_AND(block, I0, R32(Rm), 0xffff);                // and r0, Rm, 0xffff
 		UML_AND(block, I1, R32(Rn), 0xffff);                // and r1, Rn, 0xffff
 		UML_MULU(block, mem(&m_sh2_state->macl), mem(&m_sh2_state->ea), I0, I1);    // mulu macl, ea, r0, r1
-		return TRUE;
+		return true;
 
 	case 15: // MULS(Rm, Rn);
 		UML_SEXT(block, I0, R32(Rm), SIZE_WORD);                // sext r0, Rm
 		UML_SEXT(block, I1, R32(Rn), SIZE_WORD);                // sext r1, Rn
 		UML_MULS(block, mem(&m_sh2_state->macl), mem(&m_sh2_state->ea), I0, I1);    // muls macl, ea, r0, r1
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
-int sh2_device::generate_group_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, UINT32 ovrpc)
+bool sh2_device::generate_group_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, uint32_t ovrpc)
 {
 	switch (opcode & 15)
 	{
@@ -2026,48 +2026,48 @@ int sh2_device::generate_group_3(drcuml_block *block, compiler_state *compiler, 
 		UML_CMP(block, R32(Rn), R32(Rm));       // cmp Rn, Rm
 		UML_SETc(block, COND_E, I0);            // set E, r0
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, 1); // rolins sr, r0, 0, 1
-		return TRUE;
+		return true;
 
 	case  2: // CMPHS(Rm, Rn); (unsigned greater than or equal)
 		UML_CMP(block, R32(Rn), R32(Rm));       // cmp Rn, Rm
 		UML_SETc(block, COND_AE, I0);       // set AE, r0
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, 1); // rolins sr, r0, 0, 1
-		return TRUE;
+		return true;
 
 	case  3: // CMPGE(Rm, Rn); (signed greater than or equal)
 		UML_CMP(block, R32(Rn), R32(Rm));       // cmp Rn, Rm
 		UML_SETc(block, COND_GE, I0);       // set GE, r0
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, 1); // rolins sr, r0, 0, 1
-		return TRUE;
+		return true;
 
 	case  6: // CMPHI(Rm, Rn); (unsigned greater than)
 		UML_CMP(block, R32(Rn), R32(Rm));       // cmp Rn, Rm
 		UML_SETc(block, COND_A, I0);            // set A, r0
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, 1); // rolins sr, r0, 0, 1
-		return TRUE;
+		return true;
 
 	case  7: // CMPGT(Rm, Rn); (signed greater than)
 		UML_CMP(block, R32(Rn), R32(Rm));       // cmp Rn, Rm
 		UML_SETc(block, COND_G, I0);            // set G, r0
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, 1); // rolins sr, r0, 0, 1
-		return TRUE;
+		return true;
 
 	case  1:
 	case  9:
-		return FALSE;
+		return false;
 
 	case  4: // DIV1(Rm, Rn);
 		save_fast_iregs(block);
 		UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
 		UML_CALLC(block, cfunc_DIV1, this);
 		load_fast_iregs(block);
-		return TRUE;
+		return true;
 
 	case  5: // DMULU(Rm, Rn);
 		if (m_cpu_type > CPU_TYPE_SH1)
 		{
 			UML_MULU(block, mem(&m_sh2_state->macl), mem(&m_sh2_state->mach), R32(Rn), R32(Rm));
-			return TRUE;
+			return true;
 		}
 		break;
 
@@ -2075,24 +2075,24 @@ int sh2_device::generate_group_3(drcuml_block *block, compiler_state *compiler, 
 		if (m_cpu_type > CPU_TYPE_SH1)
 		{
 			UML_MULS(block, mem(&m_sh2_state->macl), mem(&m_sh2_state->mach), R32(Rn), R32(Rm));
-			return TRUE;
+			return true;
 		}
 		break;
 
 	case  8: // SUB(Rm, Rn);
 		UML_SUB(block, R32(Rn), R32(Rn), R32(Rm));  // sub Rn, Rn, Rm
-		return TRUE;
+		return true;
 
 	case 12: // ADD(Rm, Rn);
 		UML_ADD(block, R32(Rn), R32(Rn), R32(Rm));  // add Rn, Rn, Rm
-		return TRUE;
+		return true;
 
 	case 10: // SUBC(Rm, Rn);
 		UML_CARRY(block, mem(&m_sh2_state->sr), 0); // carry = T (T is bit 0 of SR)
 		UML_SUBB(block, R32(Rn), R32(Rn), R32(Rm)); // addc Rn, Rn, Rm
 		UML_SETc(block, COND_C, I0);                // setc    i0, C
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins sr,i0,0,T
-		return TRUE;
+		return true;
 
 	case 11: // SUBV(Rm, Rn);
 #if ADDSUBV_DIRECT
@@ -2105,14 +2105,14 @@ int sh2_device::generate_group_3(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLC(block, cfunc_SUBV, this);
 		load_fast_iregs(block);
 #endif
-		return TRUE;
+		return true;
 
 	case 14: // ADDC(Rm, Rn);
 		UML_CARRY(block, mem(&m_sh2_state->sr), 0); // carry = T (T is bit 0 of SR)
 		UML_ADDC(block, R32(Rn), R32(Rn), R32(Rm)); // addc Rn, Rn, Rm
 		UML_SETc(block, COND_C, I0);                // setc    i0, C
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins sr,i0,0,T
-		return TRUE;
+		return true;
 
 	case 15: // ADDV(Rm, Rn);
 #if ADDSUBV_DIRECT
@@ -2125,12 +2125,12 @@ int sh2_device::generate_group_3(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLC(block, cfunc_ADDV, this);
 		load_fast_iregs(block);
 #endif
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+bool sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 0x3F)
 	{
@@ -2138,25 +2138,25 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_SHL(block, R32(Rn), R32(Rn), 1);        // shl Rn, Rn, 1
 		UML_SETc(block, COND_C, I0);                    // set i0,C
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins [sr],i0,0,T
-		return TRUE;
+		return true;
 
 	case 0x01: // SHLR(Rn);
 		UML_SHR(block, R32(Rn), R32(Rn), 1);        // shr Rn, Rn, 1
 		UML_SETc(block, COND_C, I0);                    // set i0,C
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins [sr],i0,0,T
-		return TRUE;
+		return true;
 
 	case 0x04: // ROTL(Rn);
 		UML_ROL(block, R32(Rn), R32(Rn), 1);        // rol Rn, Rn, 1
 		UML_SETc(block, COND_C, I0);                    // set i0,C
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins [sr],i0,0,T
-		return TRUE;
+		return true;
 
 	case 0x05: // ROTR(Rn);
 		UML_ROR(block, R32(Rn), R32(Rn), 1);        // ror Rn, Rn, 1
 		UML_SETc(block, COND_C, I0);                    // set i0,C
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins [sr],i0,0,T
-		return TRUE;
+		return true;
 
 	case 0x02: // STSMMACH(Rn);
 		UML_SUB(block, R32(Rn), R32(Rn), 4);    // sub Rn, Rn, #4
@@ -2166,8 +2166,8 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write32);            // call write32
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x03: // STCMSR(Rn);
 		UML_SUB(block, R32(Rn), R32(Rn), 4);    // sub Rn, Rn, #4
@@ -2177,8 +2177,8 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write32);            // call write32
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x06: // LDSMMACH(Rn);
 		UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
@@ -2188,8 +2188,8 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_MOV(block, mem(&m_sh2_state->mach), I0);    // mov mach, r0
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x07: // LDCMSR(Rn);
 		UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
@@ -2198,39 +2198,39 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_ADD(block, R32(Rn), R32(Rn), 4);    // add Rn, #4
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov sr, r0
 
-		compiler->checkints = TRUE;
+		compiler->checkints = true;
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 
 	case 0x08: // SHLL2(Rn);
 		UML_SHL(block, R32(Rn), R32(Rn), 2);
-		return TRUE;
+		return true;
 
 	case 0x09: // SHLR2(Rn);
 		UML_SHR(block, R32(Rn), R32(Rn), 2);
-		return TRUE;
+		return true;
 
 	case 0x18: // SHLL8(Rn);
 		UML_SHL(block, R32(Rn), R32(Rn), 8);
-		return TRUE;
+		return true;
 
 	case 0x19: // SHLR8(Rn);
 		UML_SHR(block, R32(Rn), R32(Rn), 8);
-		return TRUE;
+		return true;
 
 	case 0x28: // SHLL16(Rn);
 		UML_SHL(block, R32(Rn), R32(Rn), 16);
-		return TRUE;
+		return true;
 
 	case 0x29: // SHLR16(Rn);
 		UML_SHR(block, R32(Rn), R32(Rn), 16);
-		return TRUE;
+		return true;
 
 	case 0x0a: // LDSMACH(Rn);
 		UML_MOV(block, mem(&m_sh2_state->mach), R32(Rn));       // mov mach, Rn
-		return TRUE;
+		return true;
 
 	case 0x0b: // JSR(Rn);
 		UML_MOV(block, mem(&m_sh2_state->target), R32(Rn));     // mov target, Rn
@@ -2239,17 +2239,17 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 
 		generate_delay_slot(block, compiler, desc, m_sh2_state->target-4);
 
-		generate_update_cycles(block, compiler, mem(&m_sh2_state->target), TRUE);  // <subtract cycles>
+		generate_update_cycles(block, compiler, mem(&m_sh2_state->target), true);  // <subtract cycles>
 		UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode); // and do the jump
-		return TRUE;
+		return true;
 
 	case 0x0e: // LDCSR(Rn);
 		UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
 		UML_AND(block, I0, I0, FLAGS);  // and r0, r0, FLAGS
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);
 
-		compiler->checkints = TRUE;
-		return TRUE;
+		compiler->checkints = true;
+		return true;
 
 	case 0x0f: // MAC_W(Rm, Rn);
 	case 0x1f: // MAC_W(Rm, Rn);
@@ -2259,7 +2259,7 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
 		UML_CALLC(block, cfunc_MAC_W, this);
 		load_fast_iregs(block);
-		return TRUE;
+		return true;
 
 	case 0x10: // DT(Rn);
 		if (m_cpu_type > CPU_TYPE_SH1)
@@ -2272,7 +2272,7 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 			UML_LABEL(block, compiler->labelnum++);         // desc->pc:
 
 			UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
-			return TRUE;
+			return true;
 		}
 		break;
 
@@ -2286,7 +2286,7 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_LABEL(block, compiler->labelnum++);         // desc->pc:
 
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
-		return TRUE;
+		return true;
 
 	case 0x15: // CMPPL(Rn);
 		UML_AND(block, I0, mem(&m_sh2_state->sr), ~T);  // and r0, sr, ~T (clear the T bit)
@@ -2300,7 +2300,7 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 
 		UML_LABEL(block, compiler->labelnum++);         // desc->pc:
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
-		return TRUE;
+		return true;
 
 	case 0x12: // STSMMACL(Rn);
 		UML_SUB(block, R32(Rn), R32(Rn), 4);    // sub Rn, Rn, #4
@@ -2310,8 +2310,8 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write32);            // call write32
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x13: // STCMGBR(Rn);
 		UML_SUB(block, R32(Rn), R32(Rn), 4);    // sub Rn, Rn, #4
@@ -2321,8 +2321,8 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write32);            // call write32
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x16: // LDSMMACL(Rn);
 		UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
@@ -2332,8 +2332,8 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_MOV(block, mem(&m_sh2_state->macl), I0);    // mov macl, r0
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x17: // LDCMGBR(Rn);
 		UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
@@ -2343,12 +2343,12 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_MOV(block, mem(&m_sh2_state->gbr), I0); // mov gbr, r0
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x1a: // LDSMACL(Rn);
 		UML_MOV(block, mem(&m_sh2_state->macl), R32(Rn));       // mov macl, Rn
-		return TRUE;
+		return true;
 
 	case 0x1b: // TAS(Rn);
 		UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
@@ -2370,12 +2370,12 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write8);         // write the value back
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x1e: // LDCGBR(Rn);
 		UML_MOV(block, mem(&m_sh2_state->gbr), R32(Rn));    // mov gbr, Rn
-		return TRUE;
+		return true;
 
 	case 0x20: // SHAL(Rn);
 		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and sr, sr, ~T
@@ -2383,14 +2383,14 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_AND(block, I0, I0, T);      // and r0, r0, T
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), I0);    // or sr, sr, r0
 		UML_SHL(block, R32(Rn), R32(Rn), 1);        // shl Rn, Rn, 1
-		return TRUE;
+		return true;
 
 	case 0x21: // SHAR(Rn);
 		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and sr, sr, ~T
 		UML_AND(block, I0, R32(Rn), T);     // and r0, Rn, T
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), I0);    // or sr, sr, r0
 		UML_SAR(block, R32(Rn), R32(Rn), 1);        // sar Rn, Rn, 1
-		return TRUE;
+		return true;
 
 	case 0x22: // STSMPR(Rn);
 		UML_SUB(block, R32(Rn), R32(Rn), 4);        // sub Rn, Rn, 4
@@ -2400,8 +2400,8 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write32);                // call write32
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x23: // STCMVBR(Rn);
 		UML_SUB(block, R32(Rn), R32(Rn), 4);        // sub Rn, Rn, 4
@@ -2411,22 +2411,22 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write32);                // call write32
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x24: // ROTCL(Rn);
 		UML_CARRY(block, mem(&m_sh2_state->sr), 0);         // carry sr,0
 		UML_ROLC(block, R32(Rn), R32(Rn), 1);           // rolc  Rn,Rn,1
 		UML_SETc(block, COND_C, I0);                        // set   i0,C
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins sr,i0,0,T
-		return TRUE;
+		return true;
 
 	case 0x25: // ROTCR(Rn);
 		UML_CARRY(block, mem(&m_sh2_state->sr), 0);         // carry sr,0
 		UML_RORC(block, R32(Rn), R32(Rn), 1);           // rorc  Rn,Rn,1
 		UML_SETc(block, COND_C, I0);                        // set   i0,C
 		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins sr,i0,0,T
-		return TRUE;
+		return true;
 
 	case 0x26: // LDSMPR(Rn);
 		UML_MOV(block, I0, R32(Rn));            // mov r0, Rn
@@ -2436,8 +2436,8 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_ADD(block, R32(Rn), R32(Rn), 4);        // add Rn, Rn, #4
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x27: // LDCMVBR(Rn);
 		UML_MOV(block, I0, R32(Rn));            // mov r0, Rn
@@ -2447,25 +2447,25 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 		UML_ADD(block, R32(Rn), R32(Rn), 4);        // add Rn, Rn, #4
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case 0x2a: // LDSPR(Rn);
 		UML_MOV(block, mem(&m_sh2_state->pr), R32(Rn));         // mov m_pr, Rn
-		return TRUE;
+		return true;
 
 	case 0x2b: // JMP(Rn);
 		UML_MOV(block, mem(&m_sh2_state->target), R32(Rn));     // mov target, Rn
 
 		generate_delay_slot(block, compiler, desc, m_sh2_state->target);
 
-		generate_update_cycles(block, compiler, mem(&m_sh2_state->target), TRUE);  // <subtract cycles>
+		generate_update_cycles(block, compiler, mem(&m_sh2_state->target), true);  // <subtract cycles>
 		UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode); // jmp (target)
-		return TRUE;
+		return true;
 
 	case 0x2e: // LDCVBR(Rn);
 		UML_MOV(block, mem(&m_sh2_state->vbr), R32(Rn));        //  mov vbr, Rn
-		return TRUE;
+		return true;
 
 	case 0x0c:
 	case 0x0d:
@@ -2489,13 +2489,13 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 	case 0x3c:
 	case 0x3d:
 	case 0x3e:
-		return FALSE;
+		return false;
 	}
 
-	return FALSE;
+	return false;
 }
 
-int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+bool sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 15)
 	{
@@ -2506,8 +2506,8 @@ int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, 
 		UML_SEXT(block, R32(Rn), I0, SIZE_BYTE);    // sext Rn, r0, BYTE
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  1: // MOVWL(Rm, Rn);
 		UML_MOV(block, I0, R32(Rm));        // mov r0, Rm
@@ -2516,8 +2516,8 @@ int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, 
 		UML_SEXT(block, R32(Rn), I0, SIZE_WORD);    // sext Rn, r0, WORD
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  2: // MOVLL(Rm, Rn);
 		UML_MOV(block, I0, R32(Rm));        // mov r0, Rm
@@ -2526,40 +2526,40 @@ int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, 
 		UML_MOV(block, R32(Rn), I0);        // mov Rn, r0
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  3: // MOV(Rm, Rn);
 		UML_MOV(block, R32(Rn), R32(Rm));       // mov Rn, Rm
-		return TRUE;
+		return true;
 
 	case  7: // NOT(Rm, Rn);
 		UML_XOR(block, R32(Rn), R32(Rm), 0xffffffff);   // xor Rn, Rm, 0xffffffff
-		return TRUE;
+		return true;
 
 	case  9: // SWAPW(Rm, Rn);
 		UML_ROL(block, R32(Rn), R32(Rm), 16);   // rol Rn, Rm, 16
-		return TRUE;
+		return true;
 
 	case 11: // NEG(Rm, Rn);
 		UML_SUB(block, R32(Rn), 0, R32(Rm));    // sub Rn, 0, Rm
-		return TRUE;
+		return true;
 
 	case 12: // EXTUB(Rm, Rn);
 		UML_AND(block, R32(Rn), R32(Rm), 0x000000ff);   // and Rn, Rm, 0xff
-		return TRUE;
+		return true;
 
 	case 13: // EXTUW(Rm, Rn);
 		UML_AND(block, R32(Rn), R32(Rm), 0x0000ffff);   // and Rn, Rm, 0xffff
-		return TRUE;
+		return true;
 
 	case 14: // EXTSB(Rm, Rn);
 		UML_SEXT(block, R32(Rn), R32(Rm), SIZE_BYTE);       // sext Rn, Rm, BYTE
-		return TRUE;
+		return true;
 
 	case 15: // EXTSW(Rm, Rn);
 		UML_SEXT(block, R32(Rn), R32(Rm), SIZE_WORD);       // sext Rn, Rm, WORD
-		return TRUE;
+		return true;
 
 	case  4: // MOVBP(Rm, Rn);
 		UML_MOV(block, I0, R32(Rm));        // mov r0, Rm
@@ -2570,8 +2570,8 @@ int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, 
 			UML_ADD(block, R32(Rm), R32(Rm), 1);    // add Rm, Rm, #1
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  5: // MOVWP(Rm, Rn);
 		UML_MOV(block, I0, R32(Rm));        // mov r0, Rm
@@ -2582,8 +2582,8 @@ int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, 
 			UML_ADD(block, R32(Rm), R32(Rm), 2);    // add Rm, Rm, #2
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  6: // MOVLP(Rm, Rn);
 		UML_MOV(block, I0, R32(Rm));        // mov r0, Rm
@@ -2594,8 +2594,8 @@ int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, 
 			UML_ADD(block, R32(Rm), R32(Rm), 4);    // add Rm, Rm, #4
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  8: // SWAPB(Rm, Rn);
 		UML_AND(block, I0, R32(Rm), 0xffff0000);    // and r0, Rm, #0xffff0000
@@ -2605,7 +2605,7 @@ int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, 
 		UML_SHR(block, I2, I2, 8);      // shr r2, r2, #8
 		UML_OR(block, I0, I0, I1);      // or r0, r0, r1
 		UML_OR(block, R32(Rn), I0, I2);     // or Rn, r0, r2
-		return TRUE;
+		return true;
 
 	case 10: // NEGC(Rm, Rn);
 		UML_MOV(block, I0, mem(&m_sh2_state->sr));      // mov r0, sr (save SR)
@@ -2619,16 +2619,16 @@ int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, 
 
 		UML_LABEL(block, compiler->labelnum++);     // labelnum:
 
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
-int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+bool sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	INT32 disp;
-	UINT32 udisp;
+	int32_t disp;
+	uint32_t udisp;
 	code_label templabel;
 
 	switch ( opcode  & (15<<8) )
@@ -2640,8 +2640,8 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write8);             // call write8
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  1 << 8: // MOVWS4(opcode & 0x0f, Rm);
 		udisp = (opcode & 0x0f) * 2;
@@ -2650,8 +2650,8 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 		UML_CALLH(block, *m_write16);                // call write16
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  2<< 8:
 	case  3<< 8:
@@ -2660,7 +2660,7 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 	case 10<< 8:
 	case 12<< 8:
 	case 14<< 8:
-		return FALSE;
+		return false;
 
 	case  4<< 8: // MOVBL4(Rm, opcode & 0x0f);
 		udisp = opcode & 0x0f;
@@ -2670,8 +2670,8 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 		UML_SEXT(block, R32(0), I0, SIZE_BYTE);         // sext R0, r0, BYTE
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  5<< 8: // MOVWL4(Rm, opcode & 0x0f);
 		udisp = (opcode & 0x0f)*2;
@@ -2681,8 +2681,8 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 		UML_SEXT(block, R32(0), I0, SIZE_WORD);         // sext R0, r0, WORD
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  8<< 8: // CMPIM(opcode & 0xff);
 		UML_AND(block, I0, mem(&m_sh2_state->sr), ~T);  // and r0, sr, ~T (clear the T bit)
@@ -2695,33 +2695,33 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 
 		UML_LABEL(block, compiler->labelnum++);         // labelnum:
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
-		return TRUE;
+		return true;
 
 	case  9<< 8: // BT(opcode & 0xff);
 		UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
 		UML_JMPc(block, COND_Z, compiler->labelnum);    // jz compiler->labelnum
 
-		disp = ((INT32)opcode << 24) >> 24;
+		disp = ((int32_t)opcode << 24) >> 24;
 		m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;    // m_sh2_state->ea = destination
 
-		generate_update_cycles(block, compiler, m_sh2_state->ea, TRUE);    // <subtract cycles>
+		generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
 		UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // jmp m_sh2_state->ea
 
 		UML_LABEL(block, compiler->labelnum++);         // labelnum:
-		return TRUE;
+		return true;
 
 	case 11<< 8: // BF(opcode & 0xff);
 		UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
 		UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum
 
-		disp = ((INT32)opcode << 24) >> 24;
+		disp = ((int32_t)opcode << 24) >> 24;
 		m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
-		generate_update_cycles(block, compiler, m_sh2_state->ea, TRUE);    // <subtract cycles>
+		generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
 		UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // jmp m_sh2_state->ea
 
 		UML_LABEL(block, compiler->labelnum++);         // labelnum:
-		return TRUE;
+		return true;
 
 	case 13<< 8: // BTS(opcode & 0xff);
 		if (m_cpu_type > CPU_TYPE_SH1)
@@ -2729,18 +2729,18 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 			UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
 			UML_JMPc(block, COND_Z, compiler->labelnum);    // jz compiler->labelnum
 
-			disp = ((INT32)opcode << 24) >> 24;
+			disp = ((int32_t)opcode << 24) >> 24;
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
 			templabel = compiler->labelnum;         // save our label
 			compiler->labelnum++;               // make sure the delay slot doesn't use it
 			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
 
-			generate_update_cycles(block, compiler, m_sh2_state->ea, TRUE);    // <subtract cycles>
+			generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
 			UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // jmp m_sh2_state->ea
 
 			UML_LABEL(block, templabel);            // labelnum:
-			return TRUE;
+			return true;
 		}
 		break;
 
@@ -2750,28 +2750,28 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 			UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
 			UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum
 
-			disp = ((INT32)opcode << 24) >> 24;
+			disp = ((int32_t)opcode << 24) >> 24;
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
 			templabel = compiler->labelnum;         // save our label
 			compiler->labelnum++;               // make sure the delay slot doesn't use it
 			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2); // delay slot only if the branch is taken
 
-			generate_update_cycles(block, compiler, m_sh2_state->ea, TRUE);    // <subtract cycles>
+			generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
 			UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // jmp m_sh2_state->ea
 
 			UML_LABEL(block, templabel);            // labelnum:
-			return TRUE;
+			return true;
 		}
 		break;
 	}
 
-	return FALSE;
+	return false;
 }
 
-int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+bool sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UINT32 scratch;
+	uint32_t scratch;
 
 	switch (opcode & (15<<8))
 	{
@@ -2782,8 +2782,8 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_CALLH(block, *m_write8);             // call write8
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  1<<8: // MOVWSG(opcode & 0xff);
 		scratch = (opcode & 0xff) * 2;
@@ -2792,8 +2792,8 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_CALLH(block, *m_write16);                // call write16
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  2<<8: // MOVLSG(opcode & 0xff);
 		scratch = (opcode & 0xff) * 4;
@@ -2802,8 +2802,8 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_CALLH(block, *m_write32);                // call write32
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  3<<8: // TRAPA(opcode & 0xff);
 		scratch = (opcode & 0xff) * 4;
@@ -2823,7 +2823,7 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_CALLH(block, *m_read32);                 // read32
 		UML_HASHJMP(block, 0, I0, *m_nocode);        // jmp (r0)
 
-		return TRUE;
+		return true;
 
 	case  4<<8: // MOVBLG(opcode & 0xff);
 		scratch = (opcode & 0xff);
@@ -2832,8 +2832,8 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_SEXT(block, R32(0), I0, SIZE_BYTE);         // sext R0, r0, BYTE
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  5<<8: // MOVWLG(opcode & 0xff);
 		scratch = (opcode & 0xff) * 2;
@@ -2842,8 +2842,8 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_SEXT(block, R32(0), I0, SIZE_WORD);         // sext R0, r0, WORD
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  6<<8: // MOVLLG(opcode & 0xff);
 		scratch = (opcode & 0xff) * 4;
@@ -2852,15 +2852,15 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_MOV(block, R32(0), I0);         // mov R0, r0
 
 		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, TRUE);
-		return TRUE;
+			generate_update_cycles(block, compiler, desc->pc + 2, true);
+		return true;
 
 	case  7<<8: // MOVA(opcode & 0xff);
 		scratch = (opcode & 0xff) * 4;
 		scratch += ((desc->pc + 4) & ~3);
 
 		UML_MOV(block, R32(0), scratch);            // mov R0, scratch
-		return TRUE;
+		return true;
 
 	case  8<<8: // TSTI(opcode & 0xff);
 		scratch = opcode & 0xff;
@@ -2873,19 +2873,19 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), T); // or sr, sr, T
 
 		UML_LABEL(block, compiler->labelnum++);         // labelnum:
-		return TRUE;
+		return true;
 
 	case  9<<8: // ANDI(opcode & 0xff);
 		UML_AND(block, R32(0), R32(0), opcode & 0xff);  // and r0, r0, opcode & 0xff
-		return TRUE;
+		return true;
 
 	case 10<<8: // XORI(opcode & 0xff);
 		UML_XOR(block, R32(0), R32(0), opcode & 0xff);  // xor r0, r0, opcode & 0xff
-		return TRUE;
+		return true;
 
 	case 11<<8: // ORI(opcode & 0xff);
 		UML_OR(block, R32(0), R32(0), opcode & 0xff);   // or r0, r0, opcode & 0xff
-		return TRUE;
+		return true;
 
 	case 12<<8: // TSTM(opcode & 0xff);
 		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and sr, sr, ~T (clear the T bit)
@@ -2899,7 +2899,7 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), T); // or sr, sr, T
 
 		UML_LABEL(block, compiler->labelnum++);         // labelnum:
-		return TRUE;
+		return true;
 
 	case 13<<8: // ANDM(opcode & 0xff);
 		UML_ADD(block, I0, R32(0), mem(&m_sh2_state->gbr)); // add r0, R0, gbr
@@ -2909,7 +2909,7 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_ADD(block, I0, R32(0), mem(&m_sh2_state->gbr)); // add r0, R0, gbr
 		SETEA(0);
 		UML_CALLH(block, *m_write8);             // write8
-		return TRUE;
+		return true;
 
 	case 14<<8: // XORM(opcode & 0xff);
 		UML_ADD(block, I0, R32(0), mem(&m_sh2_state->gbr)); // add r0, R0, gbr
@@ -2919,7 +2919,7 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_ADD(block, I0, R32(0), mem(&m_sh2_state->gbr)); // add r0, R0, gbr
 		SETEA(0);
 		UML_CALLH(block, *m_write8);             // write8
-		return TRUE;
+		return true;
 
 	case 15<<8: // ORM(opcode & 0xff);
 		UML_ADD(block, I0, R32(0), mem(&m_sh2_state->gbr)); // add r0, R0, gbr
@@ -2929,10 +2929,10 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 		UML_ADD(block, I0, R32(0), mem(&m_sh2_state->gbr)); // add r0, R0, gbr
 		SETEA(0);
 		UML_CALLH(block, *m_write8);             // write8
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 /***************************************************************************
@@ -2943,7 +2943,7 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
     sh2drc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void sh2_device::sh2drc_set_options(UINT32 options)
+void sh2_device::sh2drc_set_options(uint32_t options)
 {
 	if (!allow_drc()) return;
 	m_drcoptions = options;
@@ -2969,7 +2969,7 @@ void sh2_device::sh2drc_add_pcflush(offs_t address)
     region
 -------------------------------------------------*/
 
-void sh2_device::sh2drc_add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
+void sh2_device::sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
 {
 	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
 	{

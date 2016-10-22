@@ -29,10 +29,10 @@
 // Opcode structure
 struct opcodeinfo
 {
-	UINT8   opcode;     // 8-bit opcode value
-	UINT8   length;     // Opcode length in bytes
+	uint8_t   opcode;     // 8-bit opcode value
+	uint8_t   length;     // Opcode length in bytes
 	char    name[6];    // Opcode name
-	UINT8   mode;       // Addressing mode
+	uint8_t   mode;       // Addressing mode
 	unsigned flags;     // Disassembly flags
 };
 
@@ -608,12 +608,13 @@ static const char *const tfm_s[] = { "%s+,%s+", "%s-,%s-", "%s+,%s", "%s,%s+" };
 
 CPU_DISASSEMBLE( hd6309 )
 {
-	UINT8 opcode, mode, pb, pbm, reg;
-	const UINT8 *operandarray;
+	uint8_t opcode, mode, pb, pbm, reg;
+	const uint8_t *operandarray;
 	unsigned int ea, flags;
 	int numoperands, offset, indirect;
 
-	int i, p = 0, page = 0, opcode_found;
+	int i, p = 0, page = 0;
+	bool opcode_found;
 
 	do
 	{
@@ -623,7 +624,7 @@ CPU_DISASSEMBLE( hd6309 )
 				break;
 
 		if (i < hd6309_numops[page])
-			opcode_found = TRUE;
+			opcode_found = true;
 		else
 		{
 			strcpy(buffer, "Illegal Opcode");
@@ -633,7 +634,7 @@ CPU_DISASSEMBLE( hd6309 )
 		if (hd6309_pgpointers[page][i].mode >= PG1)
 		{
 			page = hd6309_pgpointers[page][i].mode - PG1 + 1;
-			opcode_found = FALSE;
+			opcode_found = false;
 		}
 	} while (!opcode_found);
 
@@ -712,12 +713,12 @@ CPU_DISASSEMBLE( hd6309 )
 		break;
 
 	case REL:
-		offset = (INT8)operandarray[0];
+		offset = (int8_t)operandarray[0];
 		buffer += sprintf(buffer, "$%04X", (pc + offset) & 0xffff);
 		break;
 
 	case LREL:
-		offset = (INT16)((operandarray[0] << 8) + operandarray[1]);
+		offset = (int16_t)((operandarray[0] << 8) + operandarray[1]);
 		buffer += sprintf(buffer, "$%04X", (pc + offset) & 0xffff);
 		break;
 
@@ -749,7 +750,7 @@ CPU_DISASSEMBLE( hd6309 )
 
 		reg = (pb >> 5) & 3;
 		pbm = pb & 0x8f;
-		indirect = ((pb & 0x90) == 0x90 )? TRUE : FALSE;
+		indirect = ((pb & 0x90) == 0x90 )? true : false;
 
 		// open brackets if indirect
 		if (indirect && pbm != 0x82)
@@ -766,7 +767,7 @@ CPU_DISASSEMBLE( hd6309 )
 					buffer += sprintf(buffer, ",W");
 					break;
 				case 0x01:
-					offset = (INT16)((opram[p+0] << 8) + opram[p+1]);
+					offset = (int16_t)((opram[p+0] << 8) + opram[p+1]);
 					p += 2;
 					buffer += sprintf(buffer, "%s", (offset < 0) ? "-" : "");
 					buffer += sprintf(buffer, "$%04X,W", (offset < 0) ? -offset : offset);
@@ -815,14 +816,14 @@ CPU_DISASSEMBLE( hd6309 )
 			break;
 
 		case 0x88:  // (+/- 7 bit offset),R
-			offset = (INT8)opram[p++];
+			offset = (int8_t)opram[p++];
 			buffer += sprintf(buffer, "%s", (offset < 0) ? "-" : "");
 			buffer += sprintf(buffer, "$%02X,", (offset < 0) ? -offset : offset);
 			buffer += sprintf(buffer, "%s", hd6309_regs[reg]);
 			break;
 
 		case 0x89:  // (+/- 15 bit offset),R
-			offset = (INT16)((opram[p+0] << 8) + opram[p+1]);
+			offset = (int16_t)((opram[p+0] << 8) + opram[p+1]);
 			p += 2;
 			buffer += sprintf(buffer, "%s", (offset < 0) ? "-" : "");
 			buffer += sprintf(buffer, "$%04X,", (offset < 0) ? -offset : offset);
@@ -838,13 +839,13 @@ CPU_DISASSEMBLE( hd6309 )
 			break;
 
 		case 0x8c:  // (+/- 7 bit offset),PC
-			offset = (INT8)opram[p++];
+			offset = (int8_t)opram[p++];
 			buffer += sprintf(buffer, "%s", (offset < 0) ? "-" : "");
 			buffer += sprintf(buffer, "$%02X,PC", (offset < 0) ? -offset : offset);
 			break;
 
 		case 0x8d:  // (+/- 15 bit offset),PC
-			offset = (INT16)((opram[p+0] << 8) + opram[p+1]);
+			offset = (int16_t)((opram[p+0] << 8) + opram[p+1]);
 			p += 2;
 			buffer += sprintf(buffer, "%s", (offset < 0) ? "-" : "");
 			buffer += sprintf(buffer, "$%04X,PC", (offset < 0) ? -offset : offset);
@@ -857,7 +858,7 @@ CPU_DISASSEMBLE( hd6309 )
 		case 0x8f:  // address or operations relative to W
 			if (indirect)
 			{
-				ea = (UINT16)((opram[p+0] << 8) + opram[p+1]);
+				ea = (uint16_t)((opram[p+0] << 8) + opram[p+1]);
 				p += 2;
 				buffer += sprintf(buffer, "$%04X", ea);
 				break;
@@ -870,7 +871,7 @@ CPU_DISASSEMBLE( hd6309 )
 					buffer += sprintf(buffer, ",W");
 					break;
 				case 0x01:
-					offset = (INT16)((opram[p+0] << 8) + opram[p+1]);
+					offset = (int16_t)((opram[p+0] << 8) + opram[p+1]);
 					p += 2;
 					buffer += sprintf(buffer, "%s", (offset < 0) ? "-" : "");
 					buffer += sprintf(buffer, "$%04X,W", (offset < 0) ? -offset : offset);

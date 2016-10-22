@@ -9,7 +9,7 @@
 #include "psx.h"
 #include "gte.h"
 
-static char *make_signed_hex_str_16( UINT32 value )
+static char *make_signed_hex_str_16( uint32_t value )
 {
 	static char s_hex[ 20 ];
 
@@ -122,23 +122,23 @@ static const char *const s_gtelm[] =
 	" lm=s16", " lm=u15"
 };
 
-static char *effective_address( psxcpu_state *state, UINT32 pc, UINT32 op )
+static char *effective_address( psxcpu_state *state, uint32_t pc, uint32_t op )
 {
 	static char s_address[ 30 ];
 
 	if( state != nullptr && state->pc() == pc )
 	{
 		sprintf( s_address, "%s(%s) ; 0x%08x", make_signed_hex_str_16( INS_IMMEDIATE( op ) ), s_cpugenreg[ INS_RS( op ) ],
-			(UINT32)( state->r( INS_RS( op ) ) + (INT16)INS_IMMEDIATE( op ) ) );
+			(uint32_t)( state->r( INS_RS( op ) ) + (int16_t)INS_IMMEDIATE( op ) ) );
 		return s_address;
 	}
 	sprintf( s_address, "%s(%s)", make_signed_hex_str_16( INS_IMMEDIATE( op ) ), s_cpugenreg[ INS_RS( op ) ] );
 	return s_address;
 }
 
-static UINT32 relative_address( psxcpu_state *state, UINT32 pc, UINT32 op )
+static uint32_t relative_address( psxcpu_state *state, uint32_t pc, uint32_t op )
 {
-	UINT32 nextpc = pc + 4;
+	uint32_t nextpc = pc + 4;
 	if( state != nullptr && state->pc() == pc && state->delayr() == PSXCPU_DELAYR_PC )
 	{
 		nextpc = state->delayv();
@@ -147,9 +147,9 @@ static UINT32 relative_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 	return nextpc + ( PSXCPU_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 );
 }
 
-static UINT32 jump_address( psxcpu_state *state, UINT32 pc, UINT32 op )
+static uint32_t jump_address( psxcpu_state *state, uint32_t pc, uint32_t op )
 {
-	UINT32 nextpc = pc + 4;
+	uint32_t nextpc = pc + 4;
 	if( state != nullptr && state->pc() == pc && state->delayr() == PSXCPU_DELAYR_PC )
 	{
 		nextpc = state->delayv();
@@ -157,15 +157,15 @@ static UINT32 jump_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 	return ( nextpc & 0xf0000000 ) + ( INS_TARGET( op ) << 2 );
 }
 
-static UINT32 fetch_op( const UINT8 *opram )
+static uint32_t fetch_op( const uint8_t *opram )
 {
 	return ( opram[ 3 ] << 24 ) | ( opram[ 2 ] << 16 ) | ( opram[ 1 ] << 8 ) | ( opram[ 0 ] << 0 );
 }
 
-static char *upper_address( UINT32 op, const UINT8 *opram )
+static char *upper_address( uint32_t op, const uint8_t *opram )
 {
 	static char s_address[ 20 ];
-	UINT32 nextop = fetch_op( opram );
+	uint32_t nextop = fetch_op( opram );
 
 	if( INS_OP( nextop ) == OP_ORI && INS_RT( op ) == INS_RS( nextop ) )
 	{
@@ -173,7 +173,7 @@ static char *upper_address( UINT32 op, const UINT8 *opram )
 	}
 	else if( INS_OP( nextop ) == OP_ADDIU && INS_RT( op ) == INS_RS( nextop ) )
 	{
-		sprintf( s_address, "$%04x ; 0x%08x", INS_IMMEDIATE( op ), ( INS_IMMEDIATE( op ) << 16 ) + (INT16) INS_IMMEDIATE( nextop ) );
+		sprintf( s_address, "$%04x ; 0x%08x", INS_IMMEDIATE( op ), ( INS_IMMEDIATE( op ) << 16 ) + (int16_t) INS_IMMEDIATE( nextop ) );
 	}
 	else
 	{
@@ -183,11 +183,11 @@ static char *upper_address( UINT32 op, const UINT8 *opram )
 	return s_address;
 }
 
-unsigned DasmPSXCPU( psxcpu_state *state, char *buffer, UINT32 pc, const UINT8 *opram )
+unsigned DasmPSXCPU( psxcpu_state *state, char *buffer, uint32_t pc, const uint8_t *opram )
 {
-	UINT32 op;
-	const UINT8 *oldopram;
-	UINT32 flags = 0;
+	uint32_t op;
+	const uint8_t *oldopram;
+	uint32_t flags = 0;
 
 	oldopram = opram;
 	op = fetch_op( opram );

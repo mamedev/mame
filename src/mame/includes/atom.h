@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( motor_w );
 
 	/* video state */
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* keyboard state */
 	int m_keylatch;

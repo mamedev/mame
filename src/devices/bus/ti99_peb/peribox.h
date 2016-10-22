@@ -36,8 +36,8 @@ class peribox_device : public bus8z_device
 {
 	friend class peribox_slot_device;
 public:
-	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	peribox_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	peribox_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &static_set_inta_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_inta.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_intb_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_intb.set_callback(object); }
@@ -113,7 +113,7 @@ protected:
 class peribox_ev_device : public peribox_device
 {
 public:
-	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -125,7 +125,7 @@ protected:
 class peribox_sg_device : public peribox_device
 {
 public:
-	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -137,7 +137,7 @@ protected:
 class peribox_gen_device : public peribox_device
 {
 public:
-	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -149,7 +149,7 @@ protected:
 class peribox_998_device : public peribox_device
 {
 public:
-	peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -163,7 +163,7 @@ class peribox_slot_device : public bus8z_device, public device_slot_interface
 {
 	friend class peribox_device;
 public:
-	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Called from the box (direction to card)
 	DECLARE_READ8Z_MEMBER(readz) override;
@@ -208,7 +208,7 @@ class ti_expansion_card_device : public bus8z_device, public device_slot_card_in
 	friend class peribox_slot_device;
 
 public:
-	ti_expansion_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	ti_expansion_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_card_interface(mconfig, *this), m_selected(false), m_cru_base(0), m_select_mask(0), m_select_value(0)
 {
@@ -231,10 +231,10 @@ protected:
 	int m_senila;
 	int m_senilb;
 
-	// When TRUE, card is accessible. Indicated by a LED.
+	// When true, card is accessible. Indicated by a LED.
 	bool    m_selected;
 
-	// When TRUE, GenMod is selected. Modified by peribox_slot_device.
+	// When true, GenMod is selected. Modified by peribox_slot_device.
 	bool    m_genmod;
 
 	// CRU base. Used to configure the address by which a card is selected.

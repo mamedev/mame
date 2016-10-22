@@ -64,7 +64,7 @@
 #define TRACE_WRITE 0
 #define TRACE_CRU 0
 
-horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : ti_expansion_card_device(mconfig, TI99_HORIZON, "Horizon 4000 Ramdisk", tag, owner, clock,"ti99_horizon",__FILE__),
 	device_nvram_interface(mconfig, *this),
 	m_ram(*this, RAMREGION),
@@ -106,7 +106,7 @@ void horizon_ramdisk_device::nvram_read(emu_file &file)
 	int size = 2097152*(1 << ioport("HORIZONSIZE")->read());
 
 	// NVRAM plus ROS
-	UINT8* buffer = global_alloc_array_clear<UINT8>(MAXSIZE + ROSSIZE);
+	uint8_t* buffer = global_alloc_array_clear<uint8_t>(MAXSIZE + ROSSIZE);
 
 	memset(m_nvram->pointer(), 0,  size);
 	memset(m_ros->pointer(), 0, ROSSIZE);
@@ -135,7 +135,7 @@ void horizon_ramdisk_device::nvram_write(emu_file &file)
 {
 	int nvramsize = 2097152*(1 << ioport("HORIZONSIZE")->read());
 
-	UINT8* buffer = global_alloc_array_clear<UINT8>(nvramsize + ROSSIZE);
+	uint8_t* buffer = global_alloc_array_clear<uint8_t>(nvramsize + ROSSIZE);
 	memcpy(buffer, m_nvram->pointer(), nvramsize);
 	memcpy(buffer + nvramsize, m_ros->pointer(), ROSSIZE);
 

@@ -5,19 +5,19 @@
     Istrebiteli driver by MetalliC
 
     TODO:
-      sound emulation
+      hardware-like noice sound generation
       accurate sprite collision
 
-	how to play:
+    how to play:
       insert one or more coins, each coin gives 2 minutes of play time, then press 1 or 2 player game start
-	  hit enemy 15 or more times to get bonus game
-	
-	test mode:
-	  insert 12 or more coins then press 2 player start
+      hit enemy 15 or more times to get bonus game
 
-    note:
+    test mode:
+      insert 12 or more coins then press 2 player start
+
+    notes:
       dumped PCB is early game version, have several bugs, possible test/prototype.
-      later version was seen in St.Petersburg arcade museum.
+      later version was seen in St.Petersburg arcade museum, CPU board have single 8Kx8 ROM.
 
 **************************************************************************/
 
@@ -33,9 +33,9 @@ class istrebiteli_sound_device : public device_t,
 	public device_sound_interface
 {
 public:
-	istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void sound_w(UINT8 data);
+	void sound_w(uint8_t data);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -45,13 +45,13 @@ protected:
 private:
 	// internal state
 	sound_stream *m_channel;
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 	int m_rom_cnt;
 	int m_rom_incr;
 	int m_sample_num;
 	bool m_cnt_reset;
 	bool m_rom_out_en;
-	UINT8 m_prev_data;
+	uint8_t m_prev_data;
 };
 
 extern const device_type ISTREBITELI_SOUND;
@@ -60,7 +60,7 @@ extern const device_type ISTREBITELI_SOUND;
 
 const device_type ISTREBITELI_SOUND = &device_creator<istrebiteli_sound_device>;
 
-istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISTREBITELI_SOUND, "Istrebiteli Sound", tag, owner, clock, "istrebiteli_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
@@ -91,8 +91,8 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_
 			smpl = (m_rom[m_rom_cnt] >> m_sample_num) & 1;
 
 		// below is huge guess
-		if ((m_prev_data & 0x40) == 0)				// b6 noice enable ?
-			smpl &= rand() & 1;	
+		if ((m_prev_data & 0x40) == 0)              // b6 noice enable ?
+			smpl &= rand() & 1;
 		smpl *= (m_prev_data & 0x80) ? 1000 : 4000; // b7 volume ?
 
 		*sample++ = smpl;
@@ -100,7 +100,7 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_
 	}
 }
 
-void istrebiteli_sound_device::sound_w(UINT8 data)
+void istrebiteli_sound_device::sound_w(uint8_t data)
 {
 	m_cnt_reset = (data & 2) ? true : false;
 	m_sample_num = (data >> 2) & 7;
@@ -113,8 +113,8 @@ void istrebiteli_sound_device::sound_w(UINT8 data)
 	}
 	else
 		m_rom_incr = 1;
-//	if (m_prev_data != data)
-//		printf("sound %02X rescnt %d sample %d outen %d b6 %d b7 %d\n", data, (data >> 1) & 1, (data >> 2) & 7, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);
+//  if (m_prev_data != data)
+//      printf("sound %02X rescnt %d sample %d outen %d b6 %d b7 %d\n", data, (data >> 1) & 1, (data >> 2) & 7, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);
 	m_prev_data = data;
 }
 
@@ -159,13 +159,13 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	tilemap_t *m_tilemap;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 coin_count;
-	UINT8 m_spr_ctrl[2];
-	UINT8 m_spr_collision[2];
-	UINT8 m_spr_xy[8];
-	UINT8 m_tileram[16];
+	uint8_t coin_count;
+	uint8_t m_spr_ctrl[2];
+	uint8_t m_spr_collision[2];
+	uint8_t m_spr_xy[8];
+	uint8_t m_tileram[16];
 };
 
 void istrebiteli_state::machine_start()
@@ -205,8 +205,8 @@ TILE_GET_INFO_MEMBER(istrebiteli_state::get_tile_info)
 
 void istrebiteli_state::video_start()
 {
-	UINT8 *gfx = memregion("sprite")->base();
-	UINT8 temp[64];
+	uint8_t *gfx = memregion("sprite")->base();
+	uint8_t temp[64];
 
 	for (int offs = 0; offs < 0x200; offs += 0x40)
 	{
@@ -222,7 +222,7 @@ void istrebiteli_state::video_start()
 	m_tilemap->set_scrolldx(96, 96);
 }
 
-UINT32 istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(1);
 
@@ -413,7 +413,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( istreb, istrebiteli_state)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_8MHz / 4)		// KR580VM80A
+	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_8MHz / 4)       // KR580VM80A
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -445,7 +445,11 @@ MACHINE_CONFIG_END
 
 ROM_START( istreb )
 	ROM_REGION( 0x1000, I8080_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "main.bin", 0x000, 0xa00, CRC(ae67c41c) SHA1(1f7807d486cd4d161ee49be991b81db7dc9b0f3b) )	// actually 5x 512B ROMs, TODO split
+	ROM_LOAD( "002-ia12.bin",   0x000, 0x200, CRC(de0bce75) SHA1(ca284e8220d0d55c1a4dd3e951b53404f40fc873) )
+	ROM_LOAD( "002-ia9.bin",    0x200, 0x200, CRC(e9a93ee7) SHA1(63c2001140d2b30657fceca97a639b1acbf614c2) )
+	ROM_LOAD( "002-ib11-2.bin", 0x400, 0x200, CRC(4bb8b875) SHA1(230193e08586f4585fe98b2b31c4c8aa57a83e70) )
+	ROM_LOAD( "002-ib9.bin",    0x600, 0x200, CRC(4eb948b5) SHA1(e9926591d1b0c528630b54956993c01139c58913) )
+	ROM_LOAD( "002-ib13.bin",   0x800, 0x200, CRC(4fec5b14) SHA1(72b01c28882d567cad6924e05849438e5fe7a133) )
 
 	ROM_REGION( 0x200, "chars", 0 )
 	ROM_LOAD( "003-g8.bin", 0x000, 0x200, CRC(5cd7ad47) SHA1(2142711c8a3640b7aa258a2059cfb0f14297a5ac) )

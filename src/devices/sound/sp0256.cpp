@@ -52,7 +52,7 @@
 /*  qtbl  -- Coefficient Quantization Table.  This comes from a             */
 /*              SP0250 data sheet, and should be correct for SP0256.        */
 /* ======================================================================== */
-static const INT16 qtbl[128] =
+static const int16_t qtbl[128] =
 {
 	0,      9,      17,     25,     33,     41,     49,     57,
 	65,     73,     81,     89,     97,     105,    113,    121,
@@ -82,7 +82,7 @@ const device_type SP0256 = &device_creator<sp0256_device>;
 //  LIVE DEVICE
 //**************************************************************************
 
-sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, SP0256, "SP0256", tag, owner, clock, "sp0256", __FILE__),
 					device_sound_interface(mconfig, *this),
 					m_rom(*this, DEVICE_SELF),
@@ -112,7 +112,7 @@ void sp0256_device::device_start()
 	/* -------------------------------------------------------------------- */
 	/*  Allocate a scratch buffer for generating ~10kHz samples.             */
 	/* -------------------------------------------------------------------- */
-	m_scratch = std::make_unique<INT16[]>(SCBUF_SIZE);
+	m_scratch = std::make_unique<int16_t[]>(SCBUF_SIZE);
 	save_pointer(NAME(m_scratch.get()), SCBUF_SIZE);
 
 	m_sc_head = m_sc_tail = 0;
@@ -202,7 +202,7 @@ void sp0256_device::device_reset()
 /* ======================================================================== */
 /*  LIMIT            -- Limiter function for digital sample output.         */
 /* ======================================================================== */
-static inline INT16 limit(INT16 s)
+static inline int16_t limit(int16_t s)
 {
 #ifdef HIGH_QUALITY /* Higher quality than the original, but who cares? */
 	if (s >  8191) return  8191;
@@ -217,10 +217,10 @@ static inline INT16 limit(INT16 s)
 /* ======================================================================== */
 /*  LPC12_UPDATE     -- Update the 12-pole filter, outputting samples.      */
 /* ======================================================================== */
-static inline int lpc12_update(struct lpc12_t *f, int num_samp, INT16 *out, UINT32 *optr)
+static inline int lpc12_update(struct lpc12_t *f, int num_samp, int16_t *out, uint32_t *optr)
 {
 	int i, j;
-	INT16 samp;
+	int16_t samp;
 	int do_int;
 	int oidx = *optr;
 
@@ -412,7 +412,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 
 enum { AM = 0, PR, B0, F0, B1, F1, B2, F2, B3, F3, B4, F4, B5, F5, IA, IP };
 
-static const UINT16 sp0256_datafmt[] =
+static const uint16_t sp0256_datafmt[] =
 {
 	/* -------------------------------------------------------------------- */
 	/*  OPCODE 1111: PAUSE                                                  */
@@ -686,7 +686,7 @@ static const UINT16 sp0256_datafmt[] =
 	/*  176 */  CR( 5,  0,  IP, 0,  0,  0,  0),     /*  Per. Intr.  */
 };
 
-static const INT16 sp0256_df_idx[16 * 8] =
+static const int16_t sp0256_df_idx[16 * 8] =
 {
 	/*  OPCODE 0000 */      -1, -1,     -1, -1,     -1, -1,     -1, -1,
 	/*  OPCODE 1000 */      -1, -1,     -1, -1,     -1, -1,     -1, -1,
@@ -709,7 +709,7 @@ static const INT16 sp0256_df_idx[16 * 8] =
 /* ======================================================================== */
 /*  BITREV32       -- Bit-reverse a 32-bit number.                            */
 /* ======================================================================== */
-static inline UINT32 bitrev32(UINT32 val)
+static inline uint32_t bitrev32(uint32_t val)
 {
 	val = ((val & 0xFFFF0000) >> 16) | ((val & 0x0000FFFF) << 16);
 	val = ((val & 0xFF00FF00) >>  8) | ((val & 0x00FF00FF) <<  8);
@@ -723,7 +723,7 @@ static inline UINT32 bitrev32(UINT32 val)
 /* ======================================================================== */
 /*  BITREV8       -- Bit-reverse a 8-bit number.                            */
 /* ======================================================================== */
-static inline UINT8 bitrev8(UINT8 val)
+static inline uint8_t bitrev8(uint8_t val)
 {
 	val = ((val & 0xF0) >>  4) | ((val & 0x0F) <<  4);
 	val = ((val & 0xCC) >>  2) | ((val & 0x33) <<  2);
@@ -735,7 +735,7 @@ static inline UINT8 bitrev8(UINT8 val)
 /* ======================================================================== */
 /*  BITREVBUFF       -- Bit-reverse a buffer.                               */
 /* ======================================================================== */
-void sp0256_device::bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length)
+void sp0256_device::bitrevbuff(uint8_t *buffer, unsigned int start, unsigned int length)
 {
 	for (unsigned int i = start; i < length; i++ )
 		buffer[i] = bitrev8(buffer[i]);
@@ -744,10 +744,10 @@ void sp0256_device::bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int l
 /* ======================================================================== */
 /*  SP0256_GETB  -- Get up to 8 bits at the current PC.                     */
 /* ======================================================================== */
-UINT32 sp0256_device::getb( int len )
+uint32_t sp0256_device::getb( int len )
 {
-	UINT32 data;
-	UINT32 d0, d1;
+	uint32_t data;
+	uint32_t d0, d1;
 
 	/* -------------------------------------------------------------------- */
 	/*  Fetch data from the FIFO or from the MASK                           */
@@ -806,9 +806,9 @@ UINT32 sp0256_device::getb( int len )
 /* ======================================================================== */
 void sp0256_device::micro()
 {
-	UINT8  immed4;
-	UINT8  opcode;
-	UINT16 cr;
+	uint8_t  immed4;
+	uint8_t  opcode;
+	uint16_t cr;
 	int ctrl_xfer;
 	int repeat;
 	int i, idx0, idx1;
@@ -886,7 +886,7 @@ void sp0256_device::micro()
 				/*  Otherwise, this is an RTS / HLT.                        */
 				/* -------------------------------------------------------- */
 				{
-					UINT32 btrg;
+					uint32_t btrg;
 
 					/* ---------------------------------------------------- */
 					/*  Figure out our branch target.                       */
@@ -1031,7 +1031,7 @@ void sp0256_device::micro()
 		for (i = idx0; i <= idx1; i++)
 		{
 			int len, shf, delta, field, prm, clra, clr5;
-			INT8 value;
+			int8_t value;
 
 			/* ------------------------------------------------------------ */
 			/*  Get the control word and pull out some important fields.    */

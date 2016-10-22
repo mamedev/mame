@@ -27,9 +27,9 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -45,8 +45,8 @@ public:
 	int m_flipscreen;
 
 	/* misc */
-	UINT8 m_wheel_old[2];
-	UINT8 m_wheel_return[2];
+	uint8_t m_wheel_old[2];
+	uint8_t m_wheel_return[2];
 
 	DECLARE_READ8_MEMBER(amspdwy_wheel_0_r);
 	DECLARE_READ8_MEMBER(amspdwy_wheel_1_r);
@@ -58,9 +58,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_back);
 
-	UINT32 screen_update_amspdwy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amspdwy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	UINT8 amspdwy_wheel_r( int index );
+	uint8_t amspdwy_wheel_r( int index );
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

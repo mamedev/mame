@@ -55,17 +55,17 @@ public:
 	TIMER_CALLBACK_MEMBER(gameking_timer);
 	TIMER_CALLBACK_MEMBER(gameking_timer2);
 
-	UINT32 screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameking_cart);
 
 	struct Gkio {
-		UINT8 input, input2;
-		UINT8 timer;
-		UINT8 res3[0x2f];
-		UINT8 bank4000_address; // 32
-		UINT8 bank4000_cart; //33 bit 0 only?
-		UINT8 bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
-		UINT8 res2[0x4c];
+		uint8_t input, input2;
+		uint8_t timer;
+		uint8_t res3[0x2f];
+		uint8_t bank4000_address; // 32
+		uint8_t bank4000_cart; //33 bit 0 only?
+		uint8_t bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
+		uint8_t res2[0x4c];
 	};
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -91,19 +91,19 @@ WRITE8_MEMBER(gameking_state::io_w)
 	maincpu_rom->base()[offset] = data;
 	if (offset == offsetof(Gkio, timer)) {
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-		timer1->enable(TRUE);
+		timer1->enable(true);
 		timer1->reset(m_maincpu->cycles_to_attotime(data * 300/*?*/));
 	}
 
 	Gkio *io = reinterpret_cast<Gkio*>(maincpu_rom->base());
 	if (offset == offsetof(Gkio, bank4000_address) || offset == offsetof(Gkio, bank4000_cart)) {
-		UINT8 bank = io->bank4000_address ^ 1;
-		UINT8 *base = io->bank4000_cart & 1/*?*/ && m_cart_rom ? m_cart_rom->base() : maincpu_rom->base() + 0x10000;
+		uint8_t bank = io->bank4000_address ^ 1;
+		uint8_t *base = io->bank4000_cart & 1/*?*/ && m_cart_rom ? m_cart_rom->base() : maincpu_rom->base() + 0x10000;
 		m_bank4000->set_base(base + bank * 0x4000);
 	}
 	if (offset == offsetof(Gkio, bank8000_cart)) {
-		UINT8 *base = io->bank8000_cart & 0x80/*?*/ && m_cart_rom ? m_cart_rom->base() : maincpu_rom->base() + 0x10000;
-		UINT8 bank = io->bank8000_cart & 0x7f;
+		uint8_t *base = io->bank8000_cart & 0x80/*?*/ && m_cart_rom ? m_cart_rom->base() : maincpu_rom->base() + 0x10000;
+		uint8_t bank = io->bank8000_cart & 0x7f;
 		m_bank8000->set_base(base + bank * 0x8000);
 	}
 }
@@ -111,7 +111,7 @@ WRITE8_MEMBER(gameking_state::io_w)
 READ8_MEMBER(gameking_state::io_r)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
-	UINT8 data = maincpu_rom->base()[offset];
+	uint8_t data = maincpu_rom->base()[offset];
 	switch (offset) {
 		case offsetof(Gkio, input):
 			data = m_io_joy->read() | ~3;
@@ -138,7 +138,7 @@ WRITE8_MEMBER( gameking_state::lcd_w )
 READ8_MEMBER(gameking_state::lcd_r)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
-	UINT8 data = maincpu_rom->base()[offset + 0x600];
+	uint8_t data = maincpu_rom->base()[offset + 0x600];
 	return data;
 }
 
@@ -185,14 +185,14 @@ PALETTE_INIT_MEMBER(gameking_state, gameking)
 }
 
 
-UINT32 gameking_state::screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gameking_state::screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y=31, i=0;i<32;i++,y--)
 	{
 		for (int x=0, j=0;j<48/4;x+=4, j++)
 		{
 			memory_region *maincpu_rom = memregion("maincpu");
-			UINT8 data=maincpu_rom->base()[0x600+j+i*12];
+			uint8_t data=maincpu_rom->base()[0x600+j+i*12];
 			bitmap.pix16(y, x+3)=data&3;
 			bitmap.pix16(y, x+2)=(data>>2)&3;
 			bitmap.pix16(y, x+1)=(data>>4)&3;
@@ -212,8 +212,8 @@ DRIVER_INIT_MEMBER(gameking_state, gameking)
 TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); // in reality int for vector at fff4
-	timer1->enable(FALSE);
-	timer2->enable(TRUE);
+	timer1->enable(false);
+	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(10/*?*/));
 }
 
@@ -221,15 +221,15 @@ TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer2)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); // in reality int for vector at fff4
-	timer2->enable(FALSE);
-	timer1->enable(TRUE);
+	timer2->enable(false);
+	timer1->enable(true);
 	Gkio *io = reinterpret_cast<Gkio*>(maincpu_rom->base());
 	timer1->reset(m_maincpu->cycles_to_attotime(io->timer * 300/*?*/));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( gameking_state, gameking_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size > 0x80000)
 	{

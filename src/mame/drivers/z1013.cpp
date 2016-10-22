@@ -72,13 +72,13 @@ public:
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	DECLARE_READ8_MEMBER(k7659_port_b_r);
-	required_shared_ptr<UINT8> m_p_videoram;
-	const UINT8 *m_p_chargen;
-	UINT8 m_keyboard_line;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	const uint8_t *m_p_chargen;
+	uint8_t m_keyboard_line;
 	bool m_keyboard_part;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( z1013 );
 };
 
@@ -224,16 +224,16 @@ void z1013_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 z1013_state::screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t z1013_state::screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 32; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma+32; x++)
 			{
@@ -274,7 +274,7 @@ READ8_MEMBER( z1013_state::port_b_r )
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"X%d", m_keyboard_line & 7);
-	UINT8 data = ioport(kbdrow)->read();
+	uint8_t data = ioport(kbdrow)->read();
 
 	if (m_keyboard_part)
 		data >>= 4;
@@ -311,8 +311,8 @@ SNAPSHOT_LOAD_MEMBER( z1013_state, z1013 )
 0020 up   - Program to load
 */
 
-	UINT8* data= auto_alloc_array(machine(), UINT8, snapshot_size);
-	UINT16 startaddr,endaddr,runaddr;
+	uint8_t* data= auto_alloc_array(machine(), uint8_t, snapshot_size);
+	uint16_t startaddr,endaddr,runaddr;
 
 	image.fread( data, snapshot_size);
 

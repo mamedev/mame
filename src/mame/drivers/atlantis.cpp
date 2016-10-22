@@ -95,7 +95,7 @@ public:
 	DECLARE_DRIVER_INIT(mwskins);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<mips3_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
@@ -105,19 +105,19 @@ public:
 	required_device<ns16550_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
 	required_device<nvram_device> m_rtc;
-	UINT8 m_rtc_data[0x8000];
+	uint8_t m_rtc_data[0x8000];
 
-	UINT32 m_last_offset;
+	uint32_t m_last_offset;
 	READ8_MEMBER(cmos_r);
 	WRITE8_MEMBER(cmos_w);
 	DECLARE_WRITE32_MEMBER(cmos_protect_w);
 	DECLARE_READ32_MEMBER(cmos_protect_r);
-	UINT32 m_cmos_write_enabled;
-	UINT32 m_serial_count;
+	uint32_t m_cmos_write_enabled;
+	uint32_t m_serial_count;
 
 	DECLARE_READ32_MEMBER(status_leds_r);
 	DECLARE_WRITE32_MEMBER(status_leds_w);
-	UINT8 m_status_leds;
+	uint8_t m_status_leds;
 
 	DECLARE_WRITE32_MEMBER(asic_fifo_w);
 	DECLARE_WRITE32_MEMBER(dcs3_fifo_full_w);
@@ -133,8 +133,8 @@ public:
 
 	DECLARE_READ32_MEMBER(board_ctrl_r);
 	DECLARE_WRITE32_MEMBER(board_ctrl_w);
-	UINT32 m_irq_state;
-	UINT8 board_ctrl[CTRL_SIZE];
+	uint32_t m_irq_state;
+	uint8_t board_ctrl[CTRL_SIZE];
 	void update_asic_irq();
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
@@ -148,7 +148,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
 	DECLARE_READ32_MEMBER(port_ctrl_r);
 	DECLARE_WRITE32_MEMBER(port_ctrl_w);
-	UINT32 m_port_ctrl_reg[0x8];
+	uint32_t m_port_ctrl_reg[0x8];
 };
 
 READ32_MEMBER(atlantis_state::green_r)
@@ -168,7 +168,7 @@ WRITE32_MEMBER(atlantis_state::green_w)
 
 READ8_MEMBER (atlantis_state::blue_r)
 {
-	//UINT8 data = m_red_data[offset];
+	//uint8_t data = m_red_data[offset];
 	logerror("%06X: blue_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, 0);
 	//return data;
 	return 0;
@@ -181,8 +181,8 @@ WRITE8_MEMBER(atlantis_state::blue_w)
 
 READ32_MEMBER(atlantis_state::board_ctrl_r)
 {
-	UINT32 newOffset = offset >> 17;
-	UINT32 data = board_ctrl[newOffset];
+	uint32_t newOffset = offset >> 17;
+	uint32_t data = board_ctrl[newOffset];
 	switch (newOffset) {
 	case CTRL_STATUS:
 		if (1 && m_screen->vblank())
@@ -202,8 +202,8 @@ READ32_MEMBER(atlantis_state::board_ctrl_r)
 
 WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 {
-	UINT32 newOffset = offset >> 17;
-	UINT32 changeData = board_ctrl[newOffset] ^ data;
+	uint32_t newOffset = offset >> 17;
+	uint32_t changeData = board_ctrl[newOffset] ^ data;
 	COMBINE_DATA(&board_ctrl[newOffset]);
 	switch (newOffset) {
 	case CTRL_POWER0:
@@ -226,8 +226,8 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 			// 0x1 VBlank clear?
 		if (changeData & 0x1) {
 			if ((data & 0x0001) == 0) {
-				//UINT32 status_bit = (1 << VBLANK_IRQ_SHIFT);
-				UINT32 status_bit = (1 << 7);
+				//uint32_t status_bit = (1 << VBLANK_IRQ_SHIFT);
+				uint32_t status_bit = (1 << 7);
 				board_ctrl[CTRL_CAUSE] &= ~status_bit;
 				board_ctrl[CTRL_STATUS] &= ~status_bit;
 				update_asic_irq();
@@ -255,7 +255,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 
 READ8_MEMBER(atlantis_state::cmos_r)
 {
-	UINT8 result = m_rtc_data[offset];
+	uint8_t result = m_rtc_data[offset];
 
 	switch (offset) {
 	case 0x7FF9:
@@ -302,7 +302,7 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 	}
 	else if (m_cmos_write_enabled) {
 		COMBINE_DATA(&m_rtc_data[offset]);
-		m_cmos_write_enabled = FALSE;
+		m_cmos_write_enabled = false;
 		switch (offset) {
 		case 0x7FF8: // M48T02 time
 			if (data & 0x40) {
@@ -331,7 +331,7 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 
 WRITE32_MEMBER(atlantis_state::cmos_protect_w)
 {
-	m_cmos_write_enabled = TRUE;
+	m_cmos_write_enabled = true;
 }
 
 READ32_MEMBER(atlantis_state::status_leds_r)
@@ -418,7 +418,7 @@ READ32_MEMBER(atlantis_state::user_io_input)
 *************************************/
 WRITE_LINE_MEMBER(atlantis_state::uart0_irq_callback)
 {
-	UINT32 status_bit = (1 << UART0_SHIFT);
+	uint32_t status_bit = (1 << UART0_SHIFT);
 	if (state && !(board_ctrl[CTRL_STATUS] & status_bit)) {
 		board_ctrl[CTRL_STATUS] |= status_bit;
 		update_asic_irq();
@@ -436,7 +436,7 @@ WRITE_LINE_MEMBER(atlantis_state::uart0_irq_callback)
 *************************************/
 WRITE_LINE_MEMBER(atlantis_state::uart1_irq_callback)
 {
-	UINT32 status_bit = (1 << UART1_SHIFT);
+	uint32_t status_bit = (1 << UART1_SHIFT);
 	if (state && !(board_ctrl[CTRL_STATUS] & status_bit)) {
 		board_ctrl[CTRL_STATUS] |= status_bit;
 		update_asic_irq();
@@ -519,9 +519,9 @@ void atlantis_state::update_asic_irq()
 {
 	// Uknown if CTRL_POWER1 is actually a separate power register.  Skip it for now.
 	for (int irqIndex = 1; irqIndex <= 4; irqIndex++) {
-		UINT32 irqBits = (board_ctrl[CTRL_GLOBAL_EN] & board_ctrl[CTRL_POWER1 + irqIndex] & board_ctrl[CTRL_STATUS]);
-		UINT32 causeBits = (board_ctrl[CTRL_GLOBAL_EN] & board_ctrl[CTRL_POWER1 + irqIndex] & board_ctrl[CTRL_CAUSE]);
-		UINT32 currState = m_irq_state & (1 << irqIndex);
+		uint32_t irqBits = (board_ctrl[CTRL_GLOBAL_EN] & board_ctrl[CTRL_POWER1 + irqIndex] & board_ctrl[CTRL_STATUS]);
+		uint32_t causeBits = (board_ctrl[CTRL_GLOBAL_EN] & board_ctrl[CTRL_POWER1 + irqIndex] & board_ctrl[CTRL_CAUSE]);
+		uint32_t currState = m_irq_state & (1 << irqIndex);
 		board_ctrl[CTRL_CAUSE] |= irqBits;
 		if (irqBits && !currState) {
 			m_maincpu->set_input_line(MIPS3_IRQ0 + irqIndex, ASSERT_LINE);
@@ -542,8 +542,8 @@ void atlantis_state::update_asic_irq()
 *************************************/
 READ32_MEMBER(atlantis_state::port_ctrl_r)
 {
-	UINT32 newOffset = offset >> 17;
-	UINT32 result = m_port_ctrl_reg[newOffset];
+	uint32_t newOffset = offset >> 17;
+	uint32_t result = m_port_ctrl_reg[newOffset];
 	if (LOG_PORT)
 		logerror("%s: port_ctrl_r newOffset = %02X data = %08X\n", machine().describe_context(), newOffset, result);
 	return result;
@@ -551,13 +551,13 @@ READ32_MEMBER(atlantis_state::port_ctrl_r)
 
 WRITE32_MEMBER(atlantis_state::port_ctrl_w)
 {
-	UINT32 newOffset = offset >> 17;
+	uint32_t newOffset = offset >> 17;
 	COMBINE_DATA(&m_port_ctrl_reg[newOffset]);
 
 	switch (newOffset) {
 	case 1:
 	{
-		UINT32 bits = ioport("KEYPAD")->read();
+		uint32_t bits = ioport("KEYPAD")->read();
 		m_port_ctrl_reg[2] = 0;
 		if (!(data & 0x8))
 			m_port_ctrl_reg[2] = bits & 7; // Row 0
@@ -586,7 +586,7 @@ WRITE32_MEMBER(atlantis_state::port_ctrl_w)
 
 CUSTOM_INPUT_MEMBER(atlantis_state::port_mod_r)
 {
-	UINT32 bits = ioport((const char *)param)->read();
+	uint32_t bits = ioport((const char *)param)->read();
 	//bits &= m_port_ctrl_reg[1];
 	//bits >>= m_port_ctrl_reg[1];
 	logerror("%s: port_mod_r read data %s = %08X m_port_ctrl_reg[1] = %08X\n", machine().describe_context(), (const char *)param, bits, m_port_ctrl_reg[1]);
@@ -596,7 +596,7 @@ CUSTOM_INPUT_MEMBER(atlantis_state::port_mod_r)
 /*************************************
  *  Video refresh
  *************************************/
-UINT32 atlantis_state::screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atlantis_state::screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -627,7 +627,7 @@ void atlantis_state::machine_reset()
 	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
 	m_user_io_state = 0;
-	m_cmos_write_enabled = FALSE;
+	m_cmos_write_enabled = false;
 	m_serial_count = 0;
 	m_irq_state = 0;
 	memset(board_ctrl, 0, sizeof(board_ctrl));

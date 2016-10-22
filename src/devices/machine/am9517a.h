@@ -50,8 +50,8 @@ class am9517a_device :  public device_t,
 
 public:
 	// construction/destruction
-	am9517a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
-	am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	am9517a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
+	am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_hreq_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_hreq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_eop_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_eop_cb.set_callback(object); }
@@ -95,15 +95,15 @@ protected:
 	virtual void end_of_process();
 
 	int m_icount;
-	UINT32 m_address_mask;
+	uint32_t m_address_mask;
 
 	struct
 	{
-		UINT32 m_address;
-		UINT16 m_count;
-		UINT32 m_base_address;
-		UINT16 m_base_count;
-		UINT8 m_mode;
+		uint32_t m_address;
+		uint16_t m_count;
+		uint32_t m_base_address;
+		uint16_t m_base_count;
+		uint8_t m_mode;
 	} m_channel[4];
 
 	int m_msb;
@@ -114,11 +114,11 @@ protected:
 	int m_state;
 	int m_current_channel;
 	int m_last_channel;
-	UINT8 m_command;
-	UINT8 m_mask;
-	UINT8 m_status;
-	UINT16 m_temp;
-	UINT8 m_request;
+	uint8_t m_command;
+	uint8_t m_mask;
+	uint8_t m_status;
+	uint16_t m_temp;
+	uint8_t m_request;
 
 private:
 	inline void dma_request(int channel, int state);
@@ -162,7 +162,7 @@ class upd71071_v53_device :  public am9517a_device
 {
 public:
 	// construction/destruction
-	upd71071_v53_device(const machine_config &mconfig,  const char *tag, device_t *owner, UINT32 clock);
+	upd71071_v53_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER( read ) override;
 	virtual DECLARE_WRITE8_MEMBER( write ) override;
@@ -174,7 +174,7 @@ protected:
 
 	int m_selected_channel;
 	int m_base;
-	UINT8 m_command_high;
+	uint8_t m_command_high;
 
 };
 
@@ -183,7 +183,7 @@ class pcxport_dmac_device : public am9517a_device
 {
 public:
 	// construction/destruction
-	pcxport_dmac_device(const machine_config &mconfig,  const char *tag, device_t *owner, UINT32 clock);
+	pcxport_dmac_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_reset() override;

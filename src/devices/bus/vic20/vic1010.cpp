@@ -51,7 +51,7 @@ machine_config_constructor vic1010_device::device_mconfig_additions() const
 //  vic1010_device - constructor
 //-------------------------------------------------
 
-vic1010_device::vic1010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vic1010_device::vic1010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIC1010, "VIC1010", tag, owner, clock, "vic1010", __FILE__),
 		device_vic20_expansion_card_interface(mconfig, *this),
 		m_slot1(*this, "slot1"),
@@ -97,11 +97,11 @@ void vic1010_device::device_reset()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic1010_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic1010_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	for (auto elem : m_expansion_slot)
 	{
-		UINT8 slot_data = elem->cd_r(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+		uint8_t slot_data = elem->cd_r(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 
 		if (data != slot_data)
 		{
@@ -117,7 +117,7 @@ UINT8 vic1010_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data
 //  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic1010_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic1010_device::vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	for (auto & elem : m_expansion_slot)
 	{

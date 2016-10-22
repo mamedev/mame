@@ -7,7 +7,7 @@
 const device_type MSX_S1985 = &device_creator<msx_s1985_device>;
 
 
-msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: msx_switched_device(mconfig, MSX_S1985, "MSX-Engine S1985", tag, owner, clock, "msx_s1985", __FILE__)
 	, m_6_1(0)
 	, m_6_2(0)
@@ -16,7 +16,7 @@ msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *ta
 }
 
 
-UINT8 msx_s1985_device::get_id()
+uint8_t msx_s1985_device::get_id()
 {
 	return 0xFE;
 }
@@ -31,7 +31,7 @@ READ8_MEMBER(msx_s1985_device::io_read)
 
 		case 7:
 			{
-				UINT8 data = (m_7 & 0x80) ? m_6_2 : m_6_1;
+				uint8_t data = (m_7 & 0x80) ? m_6_2 : m_6_1;
 				m_7 = ( m_7 << 1 ) | ( m_7 >> 7 );
 				return data;
 			}

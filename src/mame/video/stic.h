@@ -476,7 +476,7 @@ class stic_device :  public device_t
 {
 public:
 	// construction/destruction
-	stic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	stic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~stic_device();
 
 	DECLARE_READ16_MEMBER(read);
@@ -485,7 +485,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write);
 	DECLARE_WRITE16_MEMBER(gram_write);
 
-	void write_to_btb(int h, int w, UINT16 data) { m_backtab_buffer[h][w] = data; }
+	void write_to_btb(int h, int w, uint16_t data) { m_backtab_buffer[h][w] = data; }
 	int read_row_delay() { return m_row_delay; }
 	int read_stic_handshake() { return m_stic_handshake; }
 	void set_x_scale(int val) { m_x_scale = val; }
@@ -497,20 +497,20 @@ public:
 	virtual void device_reset() override;
 
 	void screenrefresh();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 
-	required_region_ptr<UINT8> m_grom;
+	required_region_ptr<uint8_t> m_grom;
 
-	void intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
-	UINT32 intv_get_pixel(bitmap_ind16 &bitmap, int x, int y);
+	void intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
+	uint32_t intv_get_pixel(bitmap_ind16 &bitmap, int x, int y);
 	void intv_plot_box(bitmap_ind16 &bm, int x, int y, int w, int h, int color);
-	int sprites_collide(int spriteNum1, int spriteNum2);
+	bool sprites_collide(int spriteNum1, int spriteNum2);
 	void determine_sprite_collisions();
 	void render_sprites();
-	void render_line(bitmap_ind16 &bitmap, UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor);
-	void render_colored_squares(bitmap_ind16 &bitmap, UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3);
+	void render_line(bitmap_ind16 &bitmap, uint8_t nextByte, uint16_t x, uint16_t y, uint8_t fgcolor, uint8_t bgcolor);
+	void render_colored_squares(bitmap_ind16 &bitmap, uint16_t x, uint16_t y, uint8_t color0, uint8_t color1, uint8_t color2, uint8_t color3);
 	void render_color_stack_mode(bitmap_ind16 &bitmap);
 	void render_fg_bg_mode(bitmap_ind16 &bitmap);
 	void copy_sprites_to_background(bitmap_ind16 &bitmap);
@@ -525,8 +525,8 @@ private:
 	bitmap_ind16 m_bitmap;
 
 	intv_sprite_type m_sprite[STIC_MOBS];
-	UINT8 m_sprite_buffers[STIC_MOBS][STIC_CARD_WIDTH * 2][STIC_CARD_HEIGHT * 4 * 2 * 2];
-	UINT16 m_backtab_buffer[STIC_BACKTAB_HEIGHT][STIC_BACKTAB_WIDTH];
+	uint8_t m_sprite_buffers[STIC_MOBS][STIC_CARD_WIDTH * 2][STIC_CARD_HEIGHT * 4 * 2 * 2];
+	uint16_t m_backtab_buffer[STIC_BACKTAB_HEIGHT][STIC_BACKTAB_WIDTH];
 	int m_color_stack_mode;
 	int m_stic_registers[STIC_REGISTERS];
 	int m_color_stack_offset;
@@ -539,9 +539,9 @@ private:
 	int m_x_scale;
 	int m_y_scale;
 
-	UINT8 m_gramdirty;
-	UINT8 m_gram[512];
-	UINT8 m_gramdirtybytes[512];
+	uint8_t m_gramdirty;
+	uint8_t m_gram[512];
+	uint8_t m_gramdirtybytes[512];
 };
 
 // device type definition

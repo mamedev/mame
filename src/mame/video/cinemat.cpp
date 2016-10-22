@@ -34,7 +34,7 @@ enum
  *
  *************************************/
 
-void cinemat_state::cinemat_vector_callback(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
+void cinemat_state::cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint8_t shift)
 {
 	const rectangle &visarea = m_screen->visible_area();
 	int intensity = 0xff;
@@ -202,7 +202,7 @@ VIDEO_START_MEMBER(cinemat_state,cinemat_qb3color)
  *
  *************************************/
 
-UINT32 cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vector->screen_update(screen, bitmap, cliprect);
 	m_vector->clear_list();
@@ -220,7 +220,7 @@ UINT32 cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 
  *
  *************************************/
 
-UINT32 cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int sw_option = ioport("INPUTS")->read();
 

@@ -23,7 +23,7 @@ const device_type GENERIC_LATCH_8 = &device_creator<generic_latch_8_device>;
 //  generic_latch_8_device - constructor
 //-------------------------------------------------
 
-generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GENERIC_LATCH_8, "Generic 8-bit latch", tag, owner, clock, "generic_latch_8", __FILE__),
 	m_latched_value(0),
 	m_latch_read(0)
@@ -66,9 +66,9 @@ WRITE_LINE_MEMBER( generic_latch_8_device::clear_w )
 //  callback to set a latch value
 //-------------------------------------------------
 
-void generic_latch_8_device::sync_callback(void *ptr, INT32 param)
+void generic_latch_8_device::sync_callback(void *ptr, int32_t param)
 {
-	UINT8 value = param;
+	uint8_t value = param;
 
 	// if the latch hasn't been read and the value is changed, log a warning
 	if (!m_latch_read && m_latched_value != value)
@@ -105,7 +105,7 @@ const device_type GENERIC_LATCH_16 = &device_creator<generic_latch_16_device>;
 //  generic_latch_16_device - constructor
 //-------------------------------------------------
 
-generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GENERIC_LATCH_16, "Generic 16-bit latch", tag, owner, clock, "generic_latch_16", __FILE__),
 	m_latched_value(0),
 	m_latch_read(0)
@@ -148,9 +148,9 @@ WRITE_LINE_MEMBER( generic_latch_16_device::clear_w )
 //  callback to set a latch value
 //-------------------------------------------------
 
-void generic_latch_16_device::sync_callback(void *ptr, INT32 param)
+void generic_latch_16_device::sync_callback(void *ptr, int32_t param)
 {
-	UINT16 value = param;
+	uint16_t value = param;
 
 	// if the latch hasn't been read and the value is changed, log a warning
 	if (!m_latch_read && m_latched_value != value)

@@ -124,7 +124,7 @@ WRITE16_MEMBER(galpani2_state::galpani2_eeprom_w)
 
 void galpani2_state::machine_start()
 {
-	UINT8 *ROM = memregion("subdata")->base();
+	uint8_t *ROM = memregion("subdata")->base();
 	membank("subdatabank")->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
 	membank("subdatabank")->set_entry(0);
 
@@ -172,7 +172,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_init_w)
 {
 	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
 	address_space &dstspace = m_subcpu->space(AS_PROGRAM);
-	UINT32 mcu_address, mcu_data;
+	uint32_t mcu_address, mcu_data;
 
 	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
 	{
@@ -186,7 +186,7 @@ void galpani2_state::galpani2_mcu_nmi1()
 {
 	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
 	address_space &dstspace = m_subcpu->space(AS_PROGRAM);
-	UINT32 mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
+	uint32_t mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
 
 	for ( mcu_list = 0x100021; mcu_list < (0x100021 + 0x40); mcu_list += 4 )
 	{
@@ -331,7 +331,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
 
 WRITE8_MEMBER(galpani2_state::galpani2_oki1_bank_w)
 {
-	UINT8 *ROM = memregion("oki1")->base();
+	uint8_t *ROM = memregion("oki1")->base();
 	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
 	memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }

@@ -227,8 +227,8 @@ MC6845_UPDATE_ROW( grip_device::crtc_update_row )
 {
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT16 address = (m_page << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
-		UINT8 data = m_video_ram[address];
+		uint16_t address = (m_page << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
+		uint8_t data = m_video_ram[address];
 
 		for (int bit = 0; bit < 8; bit++)
 		{
@@ -247,8 +247,8 @@ MC6845_UPDATE_ROW( grip_device::grip5_update_row )
 
     for (column = 0; column < x_count; column++)
     {
-        UINT16 address = (m_dpage << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
-        UINT8 data = m_video_ram[address];
+        uint16_t address = (m_dpage << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
+        uint8_t data = m_video_ram[address];
 
         for (bit = 0; bit < 8; bit++)
         {
@@ -265,7 +265,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( grip_device::grip5_addr_changed )
 }
 */
 
-static const INT16 speaker_levels[] = { -32768, 0, 32767, 0 };
+static const int16_t speaker_levels[] = { -32768, 0, 32767, 0 };
 
 //-------------------------------------------------
 //  I8255A interface
@@ -389,7 +389,7 @@ READ8_MEMBER( grip_device::sti_gpio_r )
 
 	*/
 
-	UINT8 data = 0x20;
+	uint8_t data = 0x20;
 
 	// display enable
 	data |= m_crtc->de_r() << 1;
@@ -613,7 +613,7 @@ ioport_constructor grip_device::device_input_ports() const
 //  grip_device - constructor
 //-------------------------------------------------
 
-grip_device::grip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+grip_device::grip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ECB_GRIP21, "GRIP-2.1", tag, owner, clock, "grip", __FILE__),
 	device_ecbbus_card_interface(mconfig, *this),
 	m_ppi(*this, I8255A_TAG),
@@ -750,7 +750,7 @@ READ8_MEMBER( grip_device::stat_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 	int js0 = 0, js1 = 0;
 
 	// JS0
@@ -858,9 +858,9 @@ WRITE8_MEMBER( grip5_state::dpage_w )
 //  ecbbus_io_r - I/O read
 //-------------------------------------------------
 
-UINT8 grip_device::ecbbus_io_r(offs_t offset)
+uint8_t grip_device::ecbbus_io_r(offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if ((offset & 0xfe) == m_base)
 	{
@@ -886,7 +886,7 @@ UINT8 grip_device::ecbbus_io_r(offs_t offset)
 //  ecbbus_io_w - I/O write
 //-------------------------------------------------
 
-void grip_device::ecbbus_io_w(offs_t offset, UINT8 data)
+void grip_device::ecbbus_io_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xfe) == m_base)
 	{

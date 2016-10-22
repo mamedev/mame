@@ -30,8 +30,8 @@ class hpc104_t :  public device_t,
 {
 public:
 	// construction/destruction
-	hpc104_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	hpc104_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hpc104_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	hpc104_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -50,13 +50,13 @@ protected:
 	// device_portfolio_expansion_slot_interface overrides
 	virtual bool nmd1() override { return m_ccm->cdet_r(); }
 
-	virtual UINT8 nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) override;
-	virtual void nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) override;
+	virtual uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
+	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
 
 private:
 	required_device<portfolio_memory_card_slot_t> m_ccm;
 	required_device<portfolio_expansion_slot_t> m_exp;
-	optional_shared_ptr<UINT8> m_nvram;
+	optional_shared_ptr<uint8_t> m_nvram;
 	required_ioport m_io_sw1;
 
 	bool m_sw1;
@@ -70,7 +70,7 @@ class hpc104_2_t :  public hpc104_t
 {
 public:
 	// construction/destruction
-	hpc104_2_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hpc104_2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

@@ -59,7 +59,7 @@ class qs1000_device :   public device_t,
 {
 public:
 	// construction/destruction
-	qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_external_rom(device_t &device, bool external_rom) { downcast<qs1000_device &>(device).m_external_rom = external_rom; }
 	template<class _Object> static devcb_base &set_in_p1_callback(device_t &device, _Object object) { return downcast<qs1000_device &>(device).m_in_p1_cb.set_callback(object); }
@@ -71,7 +71,7 @@ public:
 	//template<class _Object> static devcb_base &set_serial_w_callback(device_t &device, _Object object) { return downcast<qs1000_device &>(device).m_serial_w_cb.set_callback(object); }
 
 	// external
-	void serial_in(UINT8 data);
+	void serial_in(uint8_t data);
 	void set_irq(int state);
 
 protected:
@@ -132,22 +132,22 @@ public:
 	required_device<i8052_device>   m_cpu;
 
 	// Wavetable engine
-	UINT8                           m_serial_data_in;
-	UINT8                           m_wave_regs[18];
+	uint8_t                           m_serial_data_in;
+	uint8_t                           m_wave_regs[18];
 
 	struct qs1000_channel
 	{
-		UINT32          m_acc;
-		INT32           m_adpcm_signal;
-		UINT32          m_start;
-		UINT32          m_addr;
-		UINT32          m_adpcm_addr;
-		UINT32          m_loop_start;
-		UINT32          m_loop_end;
-		UINT16          m_freq;
-		UINT16          m_flags;
+		uint32_t          m_acc;
+		int32_t           m_adpcm_signal;
+		uint32_t          m_start;
+		uint32_t          m_addr;
+		uint32_t          m_adpcm_addr;
+		uint32_t          m_loop_start;
+		uint32_t          m_loop_end;
+		uint16_t          m_freq;
+		uint16_t          m_flags;
 
-		UINT8           m_regs[16]; // FIXME
+		uint8_t           m_regs[16]; // FIXME
 
 		oki_adpcm_state m_adpcm;
 	};

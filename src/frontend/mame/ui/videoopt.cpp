@@ -75,7 +75,7 @@ void menu_video_options::handle()
 	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((FPTR)menu_event->itemref)
+		switch ((uintptr_t)menu_event->itemref)
 		{
 			/* rotate adds rotation depending on the direction */
 			case VIDEO_ITEM_ROTATE:
@@ -145,9 +145,9 @@ void menu_video_options::handle()
 
 			/* anything else is a view item */
 			default:
-				if (menu_event->iptkey == IPT_UI_SELECT && (int)(FPTR)menu_event->itemref >= VIDEO_ITEM_VIEW)
+				if (menu_event->iptkey == IPT_UI_SELECT && (int)(uintptr_t)menu_event->itemref >= VIDEO_ITEM_VIEW)
 				{
-					target->set_view((FPTR)menu_event->itemref - VIDEO_ITEM_VIEW);
+					target->set_view((uintptr_t)menu_event->itemref - VIDEO_ITEM_VIEW);
 					changed = true;
 				}
 				break;
@@ -187,7 +187,7 @@ void menu_video_options::populate()
 		/* create a string for the item, replacing underscores with spaces */
 		tempstring.assign(name);
 		strreplace(tempstring, "_", " ");
-		item_append(tempstring, "", 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
+		item_append(tempstring, "", 0, (void *)(uintptr_t)(VIDEO_ITEM_VIEW + viewnum));
 	}
 
 	/* add a separator */

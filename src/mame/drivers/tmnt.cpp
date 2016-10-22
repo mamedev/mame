@@ -219,7 +219,7 @@ READ8_MEMBER(tmnt_state::tmnt_upd_busy_r)
 SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 {
 	int i;
-	UINT8 *source = memregion("title")->base();
+	uint8_t *source = memregion("title")->base();
 
 	save_item(NAME(m_sampledata));
 
@@ -264,7 +264,7 @@ void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tmnt_state::device_timer");
+		assert_always(false, "Unknown id in tmnt_state::device_timer");
 	}
 }
 
@@ -325,7 +325,7 @@ READ16_MEMBER(tmnt_state::ssriders_protection_r)
 
 		default:
 			popmessage("%06x: unknown protection read",space.device().safe_pc());
-			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",space.device().safe_pc(),(UINT32)space.device().state().state_int(M68K_D7),cmd,data);
+			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",space.device().safe_pc(),(uint32_t)space.device().state().state_int(M68K_D7),cmd,data);
 			return 0xffff;
 	}
 }
@@ -661,7 +661,7 @@ ADDRESS_MAP_END
 
 
 #if 1
-inline UINT32 tmnt_state::tmnt2_get_word( UINT32 addr )
+inline uint32_t tmnt_state::tmnt2_get_word( uint32_t addr )
 {
 	if (addr <= 0x07ffff / 2)
 		return(m_tmnt2_rom[addr]);
@@ -672,9 +672,9 @@ inline UINT32 tmnt_state::tmnt2_get_word( UINT32 addr )
 	return 0;
 }
 
-void tmnt_state::tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data )
+void tmnt_state::tmnt2_put_word( address_space &space, uint32_t addr, uint16_t data )
 {
-	UINT32 offs;
+	uint32_t offs;
 	if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2)
 	{
 		m_spriteram[addr - 0x180000 / 2] = data;
@@ -691,11 +691,11 @@ void tmnt_state::tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data 
 
 WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 {
-	UINT32 src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
+	uint32_t src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
 	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, i;
-	UINT16 *mcu;
-	UINT16 src[4], mod[24];
-	UINT8 keepaspect, xlock, ylock, zlock;
+	uint16_t *mcu;
+	uint16_t src[4], mod[24];
+	uint8_t keepaspect, xlock, ylock, zlock;
 
 	COMBINE_DATA(m_tmnt2_1c0800 + offset);
 
@@ -725,8 +725,8 @@ WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 	cmod  = mod[0x2a / 2] >> 8;
 	color = (cbase != 0x0f && cmod <= 0x1f && !zlock) ? cmod : cbase;
 
-	xoffs = (INT16)src[2];  // local x
-	yoffs = (INT16)src[3];  // local y
+	xoffs = (int16_t)src[2];  // local x
+	yoffs = (int16_t)src[3];  // local y
 
 	i = mod[0];
 	attr2 |= i & 0x0060;    // priority
@@ -736,9 +736,9 @@ WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 //  if (i & 0x????) { attr1 ^= 0x2000; yoffs = -yoffs; }    // flip y (not used?)
 	if (i & 0x4000) { attr1 ^= 0x1000; xoffs = -xoffs; }    // flip x
 
-	xmod = (INT16)mod[6];   // global x
-	ymod = (INT16)mod[7];   // global y
-	zmod = (INT16)mod[8];   // global z
+	xmod = (int16_t)mod[6];   // global x
+	ymod = (int16_t)mod[7];   // global y
+	zmod = (int16_t)mod[8];   // global z
 	xzoom = mod[0x1c / 2];
 	yzoom = (keepaspect) ? xzoom : mod[0x1e / 2];
 
@@ -804,8 +804,8 @@ WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 
 	tmnt2_put_word(space, dst_addr +  0, attr1);
 	tmnt2_put_word(space, dst_addr +  2, code);
-	tmnt2_put_word(space, dst_addr +  4, (UINT32)yoffs);
-	tmnt2_put_word(space, dst_addr +  6, (UINT32)xoffs);
+	tmnt2_put_word(space, dst_addr +  4, (uint32_t)yoffs);
+	tmnt2_put_word(space, dst_addr +  6, (uint32_t)xoffs);
 	tmnt2_put_word(space, dst_addr + 12, attr2 | color);
 }
 #else // for reference; do not remove
@@ -814,9 +814,9 @@ WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 	COMBINE_DATA(m_tmnt2_1c0800 + offset);
 	if (offset == 0x0008 && (m_tmnt2_1c0800[0x8] & 0xff00) == 0x8200)
 	{
-		UINT32 CellSrc;
-		UINT32 CellVar;
-		UINT16 *src;
+		uint32_t CellSrc;
+		uint32_t CellVar;
+		uint16_t *src;
 		int dst;
 		int x,y;
 
@@ -825,7 +825,7 @@ WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 		CellSrc = m_tmnt2_1c0800[0x00] | (m_tmnt2_1c0800[0x01] << 16 );
 //        if (CellDest >= 0x180000 && CellDest < 0x183fe0) {
 		CellVar -= 0x104000;
-		src = (UINT16 *)(memregion("maincpu")->base() + CellSrc);
+		src = (uint16_t *)(memregion("maincpu")->base() + CellSrc);
 
 		CellVar >>= 1;
 
@@ -2384,7 +2384,7 @@ MACHINE_CONFIG_END
 MACHINE_START_MEMBER(tmnt_state,prmrsocr)
 {
 	MACHINE_START_CALL_MEMBER(common);
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
@@ -4150,12 +4150,12 @@ ROM_END
 
 static void chunky_to_planar(memory_region *rgn)
 {
-	UINT32 *ROM = reinterpret_cast<UINT32 *>(rgn->base());
+	uint32_t *ROM = reinterpret_cast<uint32_t *>(rgn->base());
 	int len = rgn->bytes() / 4;
 
 	for (int i = 0; i < len; i++)
 	{
-		UINT32 data = little_endianize_int32(ROM[i]);
+		uint32_t data = little_endianize_int32(ROM[i]);
 		data = BITSWAP32(data,31,27,23,19,15,11,7,3,30,26,22,18,14,10,6,2,29,25,21,17,13,9,5,1,28,24,20,16,12,8,4,0);
 		ROM[i] = little_endianize_int32(data);
 	}
@@ -4168,9 +4168,9 @@ DRIVER_INIT_MEMBER(tmnt_state, mia)
 	chunky_to_planar(memregion("k051960"));
 
 	// unscramble the sprite ROM address lines
-	UINT32 *gfxdata = reinterpret_cast<UINT32 *>(memregion("k051960")->base());
+	uint32_t *gfxdata = reinterpret_cast<uint32_t *>(memregion("k051960")->base());
 	int len = memregion("k051960")->bytes() / 4;
-	std::vector<UINT32> temp(len);
+	std::vector<uint32_t> temp(len);
 	memcpy(&temp[0], gfxdata, len * 4);
 	for (int A = 0; A < len; A++)
 	{
@@ -4193,10 +4193,10 @@ DRIVER_INIT_MEMBER(tmnt_state, tmnt)
 	chunky_to_planar(memregion("k051960"));
 
 	// unscramble the sprite ROM address lines
-	const UINT8 *code_conv_table = memregion("proms")->base();
-	UINT32 *gfxdata = reinterpret_cast<UINT32 *>(memregion("k051960")->base());
+	const uint8_t *code_conv_table = memregion("proms")->base();
+	uint32_t *gfxdata = reinterpret_cast<uint32_t *>(memregion("k051960")->base());
 	int len = memregion("k051960")->bytes() / 4;
-	std::vector<UINT32> temp(len);
+	std::vector<uint32_t> temp(len);
 	memcpy(&temp[0], gfxdata, len * 4);
 
 	for (int A = 0; A < len; A++)
@@ -4216,7 +4216,7 @@ DRIVER_INIT_MEMBER(tmnt_state, tmnt)
 		/* 9 low bits of the sprite line address, which bit to pick it from. */
 		/* For example, when the PROM contains 4, which applies to 4x2 sprites, */
 		/* bit OA1 comes from CA5, OA2 from CA0, and so on. */
-		static const UINT8 bit_pick_table[10][8] =
+		static const uint8_t bit_pick_table[10][8] =
 		{
 			/*0(1x1) 1(2x1) 2(1x2) 3(2x2) 4(4x2) 5(2x4) 6(4x4) 7(8x8) */
 			{ CA3,   CA3,   CA3,   CA3,   CA3,   CA3,   CA3,   CA3 },   /* CA3 */

@@ -323,7 +323,7 @@ public:
 	required_device<via6522_device> m_via0; // only swyft uses this
 	required_device<via6522_device> m_via1; // only swyft uses this
 	optional_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT8> m_p_swyft_videoram;
+	required_shared_ptr<uint8_t> m_p_swyft_videoram;
 	/*optional_ioport m_y0;
 	optional_ioport m_y1;
 	optional_ioport m_y2;
@@ -337,7 +337,7 @@ public:
 	DECLARE_MACHINE_RESET(swyft);
 	DECLARE_VIDEO_START(swyft);
 
-	UINT32 screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(swyft_d0000);
 
@@ -374,8 +374,8 @@ public:
 	   The watchdog counter and the 6ms counter are both incremented
 	   every time the KTOBF pulses.
 	 */
-	UINT8 m_keyboard_line;
-	UINT8 m_floppy_control;
+	uint8_t m_keyboard_line;
+	uint8_t m_floppy_control;
 
 //protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -598,9 +598,9 @@ VIDEO_START_MEMBER(swyft_state,swyft)
 {
 }
 
-UINT32 swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 code;
+	uint16_t code;
 	int y, x, b;
 
 	int addr = 0;
@@ -622,7 +622,7 @@ UINT32 swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bit
 READ8_MEMBER( swyft_state::swyft_d0000 )
 {
 	// wtf is this supposed to be?
-	UINT8 byte = 0xFF; // ?
+	uint8_t byte = 0xFF; // ?
 	logerror("mystery device: read from 0x%5X, returning %02X\n", offset+0xD0000, byte);
 	return byte;
 }
@@ -639,7 +639,7 @@ static const char *const swyft_via_regnames[] = { "0: ORB/IRB", "1: ORA/IRA", "2
 READ8_MEMBER( swyft_state::swyft_via0_r )
 {
 	if (offset&0x000C3F) fprintf(stderr,"VIA0: read from invalid offset in 68k space: %06X!\n", offset);
-	UINT8 data = m_via0->read(space, (offset>>6)&0xF);
+	uint8_t data = m_via0->read(space, (offset>>6)&0xF);
 #ifdef DEBUG_SWYFT_VIA0
 	logerror("VIA0 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 #endif
@@ -658,7 +658,7 @@ WRITE8_MEMBER( swyft_state::swyft_via0_w )
 READ8_MEMBER( swyft_state::swyft_via1_r )
 {
 	if (offset&0x000C3F) fprintf(stderr," VIA1: read from invalid offset in 68k space: %06X!\n", offset);
-	UINT8 data = m_via1->read(space, (offset>>6)&0xF);
+	uint8_t data = m_via1->read(space, (offset>>6)&0xF);
 #ifdef DEBUG_SWYFT_VIA1
 	logerror(" VIA1 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 #endif

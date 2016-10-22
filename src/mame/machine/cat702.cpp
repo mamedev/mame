@@ -88,7 +88,7 @@
 
 const device_type CAT702 = &device_creator<cat702_device>;
 
-cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CAT702, "CAT702", tag, owner, clock, "cat702", __FILE__),
 	m_region(*this, DEVICE_SELF),
 	m_dataout_handler(*this)
@@ -124,10 +124,10 @@ void cat702_device::device_start()
 // Given the value for x7..x0 and linear transform coefficients a7..a0
 // compute the value of the transform
 #if 0
-static int c_linear(UINT8 x, UINT8 a)
+static int c_linear(uint8_t x, uint8_t a)
 {
 	int i;
-	UINT8 r;
+	uint8_t r;
 	x &= a;
 	r = 0;
 	for(i=0; i<8; i++)
@@ -138,12 +138,12 @@ static int c_linear(UINT8 x, UINT8 a)
 #endif
 
 // Derive the sbox xor mask for a given input and select bit
-UINT8 cat702_device::compute_sbox_coef(int sel, int bit)
+uint8_t cat702_device::compute_sbox_coef(int sel, int bit)
 {
 	if(!sel)
 		return m_transform[bit];
 
-	UINT8 r = compute_sbox_coef((sel-1) & 7, (bit-1) & 7);
+	uint8_t r = compute_sbox_coef((sel-1) & 7, (bit-1) & 7);
 	r = (r << 1)|(((r >> 7)^(r >> 6)) & 1);
 	if(bit != 7)
 		return r;
@@ -155,7 +155,7 @@ UINT8 cat702_device::compute_sbox_coef(int sel, int bit)
 void cat702_device::apply_bit_sbox(int sel)
 {
 	int i;
-	UINT8 r = 0;
+	uint8_t r = 0;
 	for(i=0; i<8; i++)
 		if(m_state & (1<<i))
 			r ^= compute_sbox_coef(sel, i);
@@ -164,10 +164,10 @@ void cat702_device::apply_bit_sbox(int sel)
 }
 
 // Apply a sbox
-void cat702_device::apply_sbox(const UINT8 *sbox)
+void cat702_device::apply_sbox(const uint8_t *sbox)
 {
 	int i;
-	UINT8 r = 0;
+	uint8_t r = 0;
 	for(i=0; i<8; i++)
 		if(m_state & (1<<i))
 			r ^= sbox[i];
@@ -195,7 +195,7 @@ WRITE_LINE_MEMBER(cat702_device::write_select)
 
 WRITE_LINE_MEMBER(cat702_device::write_clock)
 {
-	static const UINT8 initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
+	static const uint8_t initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
 
 	if (!state && m_clock && !m_select)
 	{

@@ -138,7 +138,7 @@ const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
 //  coco_multipak_device - constructor
 //-------------------------------------------------
 
-coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, COCO_MULTIPAK, "CoCo Multi-Pak Interface", tag, owner, clock, "coco_multipak", __FILE__),
 		device_cococart_interface( mconfig, *this ), m_owner(nullptr), m_select(0)
 	{
@@ -199,7 +199,7 @@ machine_config_constructor coco_multipak_device::device_mconfig_additions() cons
 //  get_cart_base
 //-------------------------------------------------
 
-UINT8* coco_multipak_device::get_cart_base()
+uint8_t* coco_multipak_device::get_cart_base()
 {
 	return active_cts_slot()->get_cart_base();
 }
@@ -243,9 +243,9 @@ WRITE8_MEMBER(coco_multipak_device::ff7f_write)
 //  set_select
 //-------------------------------------------------
 
-void coco_multipak_device::set_select(UINT8 new_select)
+void coco_multipak_device::set_select(uint8_t new_select)
 {
-	UINT8 xorval = m_select ^ new_select;
+	uint8_t xorval = m_select ^ new_select;
 	m_select = new_select;
 	if (xorval & 0x30)
 		cart_base_changed();

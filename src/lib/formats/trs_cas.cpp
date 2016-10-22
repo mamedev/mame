@@ -21,7 +21,7 @@ static int cas_size;
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-static inline int trs80l2_cas_cycle(INT16 *buffer, int sample_pos, int silence, int high, int low)
+static inline int trs80l2_cas_cycle(int16_t *buffer, int sample_pos, int silence, int high, int low)
 {
 	int i = 0;
 
@@ -48,7 +48,7 @@ static inline int trs80l2_cas_cycle(INT16 *buffer, int sample_pos, int silence, 
 }
 
 
-static int trs80l2_handle_cas(INT16 *buffer, const UINT8 *casdata)
+static int trs80l2_handle_cas(int16_t *buffer, const uint8_t *casdata)
 {
 	int data_pos, sample_count;
 
@@ -57,7 +57,7 @@ static int trs80l2_handle_cas(INT16 *buffer, const UINT8 *casdata)
 
 	while( data_pos < cas_size )
 	{
-		UINT8   data = casdata[data_pos];
+		uint8_t   data = casdata[data_pos];
 		int     i;
 
 		for ( i = 0; i < 8; i++ )
@@ -83,7 +83,7 @@ static int trs80l2_handle_cas(INT16 *buffer, const UINT8 *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int trs80l2_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int trs80l2_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	return trs80l2_handle_cas( buffer, bytes );
 }
@@ -92,7 +92,7 @@ static int trs80l2_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 /*******************************************************************
    Calculate the number of samples needed for this tape image
 ********************************************************************/
-static int trs80l2_cas_to_wav_size(const UINT8 *casdata, int caslen)
+static int trs80l2_cas_to_wav_size(const uint8_t *casdata, int caslen)
 {
 	cas_size = caslen;
 

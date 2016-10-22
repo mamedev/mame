@@ -20,7 +20,7 @@
 const device_type SNS_PFEST94 = &device_creator<sns_pfest94_device>;
 
 
-sns_pfest94_device::sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_pfest94_device::sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SNS_PFEST94, "SNES Powerfest '94", tag, owner, clock, "sns_pfest94", __FILE__),
 		device_sns_cart_interface(mconfig, *this),
 		m_upd7725(*this, "dsp"),
@@ -36,8 +36,8 @@ sns_pfest94_device::sns_pfest94_device(const machine_config &mconfig, const char
 
 void sns_pfest94_device::device_start()
 {
-	m_dsp_prg.resize(0x2000/sizeof(UINT32));
-	m_dsp_data.resize(0x800/sizeof(UINT16));
+	m_dsp_prg.resize(0x2000/sizeof(uint32_t));
+	m_dsp_data.resize(0x800/sizeof(uint16_t));
 	pfest94_timer = timer_alloc(TIMER_EVENT);
 	pfest94_timer->reset();
 
@@ -162,11 +162,11 @@ WRITE8_MEMBER( sns_pfest94_device::chip_write )
 //-------------------------------------------------
 
 // helpers
-inline UINT32 get_prg(UINT8 *CPU, UINT32 addr)
+inline uint32_t get_prg(uint8_t *CPU, uint32_t addr)
 {
 	return ((CPU[addr * 4] << 24) | (CPU[addr * 4 + 1] << 16) | (CPU[addr * 4 + 2] << 8) | 0x00);
 }
-inline UINT16 get_data(UINT8 *CPU, UINT32 addr)
+inline uint16_t get_data(uint8_t *CPU, uint32_t addr)
 {
 	return ((CPU[addr * 2] << 8) | CPU[addr * 2 + 1]);
 }

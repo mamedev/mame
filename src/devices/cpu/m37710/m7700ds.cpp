@@ -348,18 +348,18 @@ const m7700_opcode_struct m7700_opcode_struct::s_opcodes_prefix89[256] =
 
 } // anonymous namespace
 
-static inline unsigned int read_8(const UINT8 *oprom, unsigned int offset)
+static inline unsigned int read_8(const uint8_t *oprom, unsigned int offset)
 {
 	return oprom[offset];
 }
 
-static inline unsigned int read_16(const UINT8 *oprom, unsigned int offset)
+static inline unsigned int read_16(const uint8_t *oprom, unsigned int offset)
 {
 	unsigned int val = read_8(oprom, offset);
 	return val | (read_8(oprom, offset+1)<<8);
 }
 
-static inline unsigned int read_24(const UINT8 *oprom, unsigned int offset)
+static inline unsigned int read_24(const uint8_t *oprom, unsigned int offset)
 {
 	unsigned int val = read_8(oprom, offset);
 	val |= (read_8(oprom, offset+1)<<8);
@@ -395,7 +395,7 @@ static inline char* int_16_str(unsigned int val)
 }
 
 
-int m7700_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 *oprom, int m_flag, int x_flag)
+int m7700_disassemble(char* buff, unsigned int pc, unsigned int pb, const uint8_t *oprom, int m_flag, int x_flag)
 {
 	unsigned int instruction;
 	const m7700_opcode_struct *opcode;
@@ -405,7 +405,7 @@ int m7700_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 
 	int length = 1;
 	unsigned int address;
 	//unsigned int start;
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 
 	pb <<= 16;
 	address = pc | pb;

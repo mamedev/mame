@@ -581,7 +581,7 @@ INPUT_PORTS_END
 /* TODO: if you change the driver configuration then NVRAM contents gets screwed, needs mods in MAME framework */
 void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init[64] = {
+	static const uint8_t init[64] = {
 	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
 	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
 	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
@@ -913,9 +913,9 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-	m_scu_regs = make_unique_clear<UINT32[]>(0x100/4);
-	m_scsp_regs = make_unique_clear<UINT16[]>(0x1000/2);
-	m_backupram = make_unique_clear<UINT8[]>(0x8000);
+	m_scu_regs = make_unique_clear<uint32_t[]>(0x100/4);
+	m_scsp_regs = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 
 DRIVER_INIT_MEMBER(sat_console_state,saturnus)

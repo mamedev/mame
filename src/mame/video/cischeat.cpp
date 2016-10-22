@@ -361,7 +361,7 @@ void cischeat_state::cischeat_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 	rectangle rect      =   cliprect;
 	gfx_element *gfx        =   m_gfxdecode->gfx((road_num & 1) ? 2 : 1);
 
-	UINT16 *roadram         =   m_roadram[road_num & 1];
+	uint16_t *roadram         =   m_roadram[road_num & 1];
 
 	int min_y = rect.min_y;
 	int max_y = rect.max_y;
@@ -451,7 +451,7 @@ void cischeat_state::f1gpstar_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 	rectangle rect      =   cliprect;
 	gfx_element *gfx        =   m_gfxdecode->gfx((road_num & 1) ? 2 : 1);
 
-	UINT16 *roadram         =   m_roadram[road_num & 1];
+	uint16_t *roadram         =   m_roadram[road_num & 1];
 
 	int min_y = rect.min_y;
 	int max_y = rect.max_y;
@@ -565,8 +565,8 @@ void cischeat_state::cischeat_draw_sprites(bitmap_ind16 &bitmap , const rectangl
 
 	int min_priority, max_priority, high_sprites;
 
-	UINT16      *source =   m_spriteram;
-	const UINT16    *finish =   source + 0x1000/2;
+	uint16_t      *source =   m_spriteram;
+	const uint16_t    *finish =   source + 0x1000/2;
 
 
 	/* Move the priority values in place */
@@ -717,8 +717,8 @@ void cischeat_state::bigrun_draw_sprites(bitmap_ind16 &bitmap , const rectangle 
 
 	int min_priority, max_priority, high_sprites;
 
-	UINT16      *source =   m_spriteram;
-	const UINT16    *finish =   source + 0x1000/2;
+	uint16_t      *source =   m_spriteram;
+	const uint16_t    *finish =   source + 0x1000/2;
 
 	/* Move the priority values in place */
 	high_sprites = (priority1 >= 16) | (priority2 >= 16);
@@ -866,7 +866,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
                                 Big Run
 **************************************************************************/
 
-UINT32 cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	int active_layers1, flag;
@@ -887,8 +887,8 @@ UINT32 cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 
 
 	for (i = 7; i >= 4; i--)
 	{                                           /* bitmap, road, min_priority, max_priority, transparency */
-		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,FALSE);
-		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,TRUE);
+		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,false);
+		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,true);
 	}
 
 	flag = 0;
@@ -897,8 +897,8 @@ UINT32 cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 
 
 	for (i = 3; i >= 0; i--)
 	{                                           /* bitmap, road, min_priority, max_priority, transparency */
-		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,TRUE);
-		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,TRUE);
+		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,true);
+		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,true);
 	}
 
 	if (active_layers1 & 0x08) bigrun_draw_sprites(bitmap,cliprect,15,0);
@@ -913,7 +913,7 @@ UINT32 cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 
                                 Cisco Heat
 **************************************************************************/
 
-UINT32 cischeat_state::screen_update_cischeat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cischeat_state::screen_update_cischeat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int active_layers1, flag;
 
@@ -932,8 +932,8 @@ UINT32 cischeat_state::screen_update_cischeat(screen_device &screen, bitmap_ind1
 	bitmap.fill(0, cliprect);
 
 										/* bitmap, road, priority, transparency */
-	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,7,5,FALSE);
-	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,7,5,TRUE);
+	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,7,5,false);
+	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,7,5,true);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
@@ -941,11 +941,11 @@ UINT32 cischeat_state::screen_update_cischeat(screen_device &screen, bitmap_ind1
 	cischeat_tmap_DRAW(1)
 
 	if (active_layers1 & 0x08) cischeat_draw_sprites(bitmap,cliprect,15,3);
-	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,4,1,TRUE);
-	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,4,1,TRUE);
+	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,4,1,true);
+	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,4,1,true);
 	if (active_layers1 & 0x08) cischeat_draw_sprites(bitmap,cliprect,2,2);
-	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,0,0,TRUE);
-	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,0,0,TRUE);
+	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,0,0,true);
+	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,0,0,true);
 	if (active_layers1 & 0x08) cischeat_draw_sprites(bitmap,cliprect,1,0);
 	cischeat_tmap_DRAW(2)
 
@@ -961,7 +961,7 @@ UINT32 cischeat_state::screen_update_cischeat(screen_device &screen, bitmap_ind1
                             F1 GrandPrix Star
 **************************************************************************/
 
-UINT32 cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int active_layers1, flag;
 
@@ -982,8 +982,8 @@ UINT32 cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_ind1
 /*  1: clouds 5, grad 7, road 0     2: clouds 5, grad 7, road 0, tunnel roof 0 */
 
 	/* road 1!! 0!! */                  /* bitmap, road, min_priority, max_priority, transparency */
-	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,6,7,TRUE);
-	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,6,7,TRUE);
+	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,6,7,true);
+	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,6,7,true);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
@@ -991,14 +991,14 @@ UINT32 cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_ind1
 	cischeat_tmap_DRAW(1)
 
 	/* road 1!! 0!! */                  /* bitmap, road, min_priority, max_priority, transparency */
-	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,1,5,TRUE);
-	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,1,5,TRUE);
+	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,1,5,true);
+	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,1,5,true);
 
 	if (active_layers1 & 0x08) cischeat_draw_sprites(bitmap,cliprect,15,2);
 
 	/* road 1!! 0!! */                  /* bitmap, road, min_priority, max_priority, transparency */
-	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,0,0,TRUE);
-	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,0,0,TRUE);
+	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,0,0,true);
+	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,0,0,true);
 
 	if (active_layers1 & 0x08) cischeat_draw_sprites(bitmap,cliprect,1,1);
 	cischeat_tmap_DRAW(2)
@@ -1013,7 +1013,7 @@ UINT32 cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_ind1
                                 Scud Hammer
 **************************************************************************/
 
-UINT32 cischeat_state::screen_update_scudhamm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cischeat_state::screen_update_scudhamm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int active_layers1 = 0x0d;
 

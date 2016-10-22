@@ -72,7 +72,7 @@ TILEMAP_MAPPER_MEMBER(ninjakd2_state::omegaf_bg_scan)
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x70) << 5);
 }
 
-void ninjakd2_state::robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const UINT8* const videoram)
+void ninjakd2_state::robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const uint8_t* const videoram)
 {
 	int const lo = videoram[(tile_index << 1)];
 	int const hi = videoram[(tile_index << 1) | 1];
@@ -108,14 +108,14 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg2_tile_info)
  *
  *************************************/
 
-void ninjakd2_state::video_init_common(UINT32 vram_alloc_size)
+void ninjakd2_state::video_init_common(uint32_t vram_alloc_size)
 {
 	// create video ram
 	if (vram_alloc_size)
 	{
-		m_robokid_bg0_videoram = make_unique_clear<UINT8[]>(vram_alloc_size);
-		m_robokid_bg1_videoram = make_unique_clear<UINT8[]>(vram_alloc_size);
-		m_robokid_bg2_videoram = make_unique_clear<UINT8[]>(vram_alloc_size);
+		m_robokid_bg0_videoram = make_unique_clear<uint8_t[]>(vram_alloc_size);
+		m_robokid_bg1_videoram = make_unique_clear<uint8_t[]>(vram_alloc_size);
+		m_robokid_bg2_videoram = make_unique_clear<uint8_t[]>(vram_alloc_size);
 
 		save_pointer(NAME(m_robokid_bg0_videoram.get()), vram_alloc_size);
 		save_pointer(NAME(m_robokid_bg1_videoram.get()), vram_alloc_size);
@@ -139,11 +139,11 @@ void ninjakd2_state::video_init_common(UINT32 vram_alloc_size)
 	save_item(NAME(m_robokid_bg2_bank));
 }
 
-static int stencil_ninjakd2( UINT16 pal );
-static int stencil_mnight(   UINT16 pal );
-static int stencil_arkarea(  UINT16 pal );
-static int stencil_robokid(  UINT16 pal );
-static int stencil_omegaf(   UINT16 pal );
+static bool stencil_ninjakd2( uint16_t pal );
+static bool stencil_mnight(   uint16_t pal );
+static bool stencil_arkarea(  uint16_t pal );
+static bool stencil_robokid(  uint16_t pal );
+static bool stencil_omegaf(   uint16_t pal );
 
 void ninjakd2_state::video_start()
 {
@@ -339,7 +339,7 @@ void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
 	int const big_xshift = m_robokid_sprites ? 1 : 0;
 	int const big_yshift = m_robokid_sprites ? 0 : 1;
 
-	UINT8* sprptr = &m_spriteram[11];
+	uint8_t* sprptr = &m_spriteram[11];
 	int sprites_drawn = 0;
 
 	/* The sprite generator draws exactly 96 16x16 sprites per frame. When big
@@ -409,11 +409,11 @@ void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
 	}
 }
 
-static int stencil_ninjakd2( UINT16 pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static int stencil_mnight(   UINT16 pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static int stencil_arkarea(  UINT16 pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static int stencil_robokid(  UINT16 pal ) { return( (pal & 0xf0) <  0xe0 ); }
-static int stencil_omegaf(   UINT16 pal ) { return( TRUE ); }
+static bool stencil_ninjakd2( uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
+static bool stencil_mnight(   uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
+static bool stencil_arkarea(  uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
+static bool stencil_robokid(  uint16_t pal ) { return( (pal & 0xf0) <  0xe0 ); }
+static bool stencil_omegaf(   uint16_t pal ) { return( true ); }
 //////            OVERDRAW     STENCIL     UNKNOWN
 //////  NINJAKD2  023459ABCDE  F           1678
 //////    MNIGHT  0134568ABCDE F           279
@@ -438,7 +438,7 @@ void ninjakd2_state::erase_sprites( bitmap_ind16 &bitmap)
 		{
 			for (int x = 0; x < m_sprites_bitmap.width(); ++x)
 			{
-				UINT16* const ptr = &m_sprites_bitmap.pix16(y, x);
+				uint16_t* const ptr = &m_sprites_bitmap.pix16(y, x);
 				if ( (*m_stencil_compare_function)(*ptr) ) *ptr = 0xf;
 			}
 		}
@@ -458,7 +458,7 @@ void ninjakd2_state::update_sprites()
 }
 
 
-UINT32 ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// updating sprites here instead than in screen_eof avoids a palette glitch
 	// at the end of the "rainbow sky" screens.
@@ -474,7 +474,7 @@ UINT32 ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 ninjakd2_state::screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ninjakd2_state::screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_sprites();
 	m_sprites_updated = 1;
@@ -490,7 +490,7 @@ UINT32 ninjakd2_state::screen_update_robokid(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-UINT32 ninjakd2_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ninjakd2_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_sprites();
 	m_sprites_updated = 1;

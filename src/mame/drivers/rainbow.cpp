@@ -539,7 +539,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(GDC_EXTRA_REGISTER_w);
 
-	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -597,17 +597,17 @@ private:
 	required_device<com8116_device> m_dbrg;
 	required_device<i8251_device> m_kbd8251;
 	required_device<lk201_device> m_lk201;
-	required_shared_ptr<UINT8> m_p_ram;
-	required_shared_ptr<UINT8> m_p_vol_ram;
-	required_shared_ptr<UINT8> m_p_nvram;
-	required_shared_ptr<UINT8> m_shared;
+	required_shared_ptr<uint8_t> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_vol_ram;
+	required_shared_ptr<uint8_t> m_p_nvram;
+	required_shared_ptr<uint8_t> m_shared;
 
 	optional_device<ds1315_device> m_rtc;
 	
 	required_device<upd7220_device> m_hgdc;  // GDC-NEW
 	required_device<screen_device> m_screen2;
 	required_device<palette_device> m_palette2;
-	required_shared_ptr<UINT16> m_video_ram;
+	required_shared_ptr<uint16_t> m_video_ram;
 
 	void raise_8088_irq(int ref);
 	void lower_8088_irq(int ref);
@@ -623,16 +623,16 @@ private:
 
 	hard_disk_file *rainbow_hdc_file(int ref);
 
-	UINT8 m_GDC_WRITE_BUFFER[16]; // 16 x 8 bits for CPU, 8 x 16 for GDC   
-	UINT8 m_GDC_COLOR_MAP[32];
-	UINT8 m_GDC_SCROLL_BUFFER_PRELOAD[256];
-	UINT8 m_GDC_SCROLL_BUFFER[256];
+	uint8_t m_GDC_WRITE_BUFFER[16]; // 16 x 8 bits for CPU, 8 x 16 for GDC   
+	uint8_t m_GDC_COLOR_MAP[32];
+	uint8_t m_GDC_SCROLL_BUFFER_PRELOAD[256];
+	uint8_t m_GDC_SCROLL_BUFFER[256];
 
-	UINT8  m_GDC_INDIRECT_REGISTER, m_GDC_MODE_REGISTER, m_GDC_scroll_index, m_GDC_color_map_index, m_GDC_write_buffer_index;
-	UINT8  m_GDC_ALU_PS_REGISTER, m_GDC_FG_BG;
-	UINT8  m_vpat, m_patmult, m_patcnt, m_patidx;
+	uint8_t  m_GDC_INDIRECT_REGISTER, m_GDC_MODE_REGISTER, m_GDC_scroll_index, m_GDC_color_map_index, m_GDC_write_buffer_index;
+	uint8_t  m_GDC_ALU_PS_REGISTER, m_GDC_FG_BG;
+	uint8_t  m_vpat, m_patmult, m_patcnt, m_patidx;
 	 
-	UINT16 m_GDC_WRITE_MASK;
+	uint16_t m_GDC_WRITE_MASK;
 	bool m_scroll_buffer_changed, m_color_map_changed;
 	bool m_ONBOARD_GRAPHICS_SELECTED;   // (internal switch, on board video to mono out)
 	 
@@ -649,10 +649,10 @@ private:
 
 	int MOTOR_DISABLE_counter;
 
-	UINT8 m_diagnostic;
+	uint8_t m_diagnostic;
 
-	UINT8 m_z80_private[0x800];     // Z80 private 2K
-	UINT8 m_z80_mailbox, m_8088_mailbox;
+	uint8_t m_z80_private[0x800];     // Z80 private 2K
+	uint8_t m_z80_mailbox, m_8088_mailbox;
 
 	void update_kbd_irq();
 	virtual void machine_reset() override;
@@ -661,7 +661,7 @@ private:
 	floppy_image_device *m_floppy;
 
 	int m_irq_high;
-	UINT32 m_irq_mask;
+	uint32_t m_irq_mask;
 
 	int m_bdl_irq;
 	int m_hdc_buf_offset;
@@ -674,7 +674,7 @@ private:
 	bool m_hdc_drive_ready;
 	bool m_hdc_write_fault;
 
-	UINT8 m_hdc_buffer[2048];
+	uint8_t m_hdc_buffer[2048];
 
 	bool m_POWER_GOOD;
 	emu_timer   *cmd_timer;
@@ -705,7 +705,7 @@ printf("\n** NEC 7220 GDC RESET **\n");
 UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 {
 #ifdef BOOST_DEBUG_PERFORMANCE
-	UINT8 *ram = memregion("maincpu")->base();
+	uint8_t *ram = memregion("maincpu")->base();
    if( !(m_p_vol_ram[0x84] == 0x00) ) 
 	{	
 		if( (MOTOR_DISABLE_counter) || (ram[0xEFFFE] & 16) ) // if HDD/FDD ACTIVITY -OR- SMOOTH SCROLL IN PROGRESS
@@ -716,8 +716,8 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 	const rgb_t *paletteX = m_palette2->palette()->entry_list_raw();
 
 	int xi;
-	UINT16 plane0, plane1, plane2, plane3; 
-	UINT8 pen;
+	uint16_t plane0, plane1, plane2, plane3; 
+	uint8_t pen;
 
 	if(!(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_VIDEO))
 		return; // no output from graphics option 
@@ -729,7 +729,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 			// HIGH RES (2 planes, 2 color bits, 4 color map entries / 4 MONOCHROME SHADES)
 			// MANUAL:  (GDC "sees" 2 planes X 16 bits X 16K words)!
 
-		    // !!! m_video_ram is defined as UINT16 !!!
+		    // !!! m_video_ram is defined as uint16_t !!!
 			plane0 = m_video_ram[  ((address & 0x7fff) + 0x00000) >> 1     ]; // Video Ram is defined as LITTLE_ENDIAN, 16 (?):
 			plane1 = m_video_ram[  ((address & 0x7fff) + 0x20000) >> 1     ]; // 8 x 32 K is 0x40000, see page 16
 			plane2 = 0;
@@ -798,7 +798,7 @@ void rainbow_state::machine_start()
 	save_item(NAME(m_irq_mask));
 
 #ifdef WORKAROUND_RAINBOW_B
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B (5.01)    0x35 would test for V5.05
 	{
 		rom[0xf4000 + 0x0303] = 0x00; // disable CRC check
@@ -1040,12 +1040,12 @@ void rainbow_state::machine_reset()
 {
 	// Configure RAM
 	address_space &program = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
-	UINT32 unmap_start = m_inp8->read();
+	uint32_t unmap_start = m_inp8->read();
 
 	// Verify RAM size matches hardware (DIP switches)
-	UINT8 *nv = memregion("maincpu")->base();
-	UINT8 NVRAM_LOCATION;
-	UINT32 check;
+	uint8_t *nv = memregion("maincpu")->base();
+	uint8_t NVRAM_LOCATION;
+	uint32_t check;
 
 #ifdef ASSUME_RAINBOW_A_HARDWARE
 	printf("\n*** RAINBOW A MODEL ASSUMED (64 - 832 K RAM).\n");
@@ -1110,7 +1110,7 @@ void rainbow_state::machine_reset()
 			{
 				output().set_value("led1", 1);
 
-				UINT32 max_sector = (info->cylinders) * (info->heads) * (info->sectors);
+				uint32_t max_sector = (info->cylinders) * (info->heads) * (info->sectors);
 				printf("\n%u MB HARD DISK MOUNTED. GEOMETRY: %d HEADS (1..8 ARE OK). %d CYLINDERS (151..1024 ARE OK). %d SECTORS / TRACK (16 ARE OK). %d BYTES / SECTOR (128 1024 ARE OK).\n", max_sector * 512 / 1000000,
 					info->heads, info->cylinders, info->sectors, info->sectorbytes);
 			}
@@ -1190,12 +1190,12 @@ void rainbow_state::device_timer(emu_timer &timer, device_timer_id tid, int para
 	} // switch
 }
 
-UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static int old_palette, old_monitor;
 
 #ifdef BOOST_DEBUG_PERFORMANCE
-	UINT8 *ram = memregion("maincpu")->base();
+	uint8_t *ram = memregion("maincpu")->base();
     if( !(m_p_vol_ram[0x84] == 0x00) ) 
 	{	
 		if( (MOTOR_DISABLE_counter) || (ram[0xEFFFE] & 16) ) // if HDD/FDD ACTIVITY -OR- SMOOTH SCROLL IN PROGRESS
@@ -1423,7 +1423,7 @@ READ8_MEMBER(rainbow_state::rtc_r)
 		}
 	}
 
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	return rom[RTC_BASE + offset];  // Return ROM to prevent crashes
 }
 // ------------------------/ ClikClok (for model B; DS1315)  ---------------------------------
@@ -1490,7 +1490,7 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 	}
 	else
 	{
-		UINT32 max_sector = info->cylinders * info->heads * info->sectors;
+		uint32_t max_sector = info->cylinders * info->heads * info->sectors;
 		printf("%u MB HARD DISK: HEADS (1..8 OK) = %d / CYL. (151..1024 OK) = %d / SPT. (16 OK) = %d / SECTOR_BYTES (128..1024 OK) = %d\n", max_sector * 512 / 1000000,
 			info->heads, info->cylinders, info->sectors, info->sectorbytes);
 
@@ -1500,13 +1500,13 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 }
 
 // LBA sector from CHS
-static UINT32 get_and_print_lbasector(device_t *device, hard_disk_info *info, UINT16 cylinder, UINT8 head, UINT8 sector_number)
+static uint32_t get_and_print_lbasector(device_t *device, hard_disk_info *info, uint16_t cylinder, uint8_t head, uint8_t sector_number)
 {
 	if (info == nullptr)
 		return 0;
 
 	// LBA_ADDRESS = (C * HEADS + H) * NUMBER_SECTORS + (S - 1)
-	UINT32 lbasector = (double)cylinder * info->heads; // LBA : ( x 4 )
+	uint32_t lbasector = (double)cylinder * info->heads; // LBA : ( x 4 )
 	lbasector += head;
 	lbasector *= info->sectors;   // LBA : ( x 16 )
 	lbasector += (sector_number - 1); // + (sector number - 1)
@@ -1523,7 +1523,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 
 	if (!m_hdc_write_gate) // do not read when WRITE GATE is on
 	{
-		UINT8 SDH = (m_hdc->read(generic_space(), 0x06));
+		uint8_t SDH = (m_hdc->read(generic_space(), 0x06));
 		int drv = (SDH & (8 + 16)) >> 3; // get DRIVE from SDH register
 
 		if ((state == 0) && (last_state == 1) && (drv == 0))
@@ -1532,8 +1532,8 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 			output().set_value("led1", 0);
 
 			int hi = (m_hdc->read(generic_space(), 0x05)) & 0x07;
-			UINT16 cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
-			UINT8 sector_number = m_hdc->read(generic_space(), 0x03);
+			uint16_t cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
+			uint8_t sector_number = m_hdc->read(generic_space(), 0x03);
 
 			hard_disk_file *local_hard_disk;
 			local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
@@ -1549,14 +1549,14 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 					output().set_value("led1", 1);
 
 					// Pointer to info + C + H + S
-					UINT32 lbasector = get_and_print_lbasector(this, info, cylinder, SDH & 0x07, sector_number);
+					uint32_t lbasector = get_and_print_lbasector(this, info, cylinder, SDH & 0x07, sector_number);
 
 					if ((cylinder <= info->cylinders) &&                          // filter invalid ranges
 						(SECTOR_SIZES[(SDH >> 5) & 0x03] == info->sectorbytes)    // may not vary in image!
 						)
 					{
 						read_status = 5;
-						if (hard_disk_read(local_hard_disk, lbasector, m_hdc_buffer)) // accepts LBA sector (UINT32) !
+						if (hard_disk_read(local_hard_disk, lbasector, m_hdc_buffer)) // accepts LBA sector (uint32_t) !
 							read_status = 0; //  logerror("...success!\n");
 					}
 				}
@@ -1649,10 +1649,10 @@ int rainbow_state::do_write_sector()
 			feedback = 10;
 			output().set_value("led1", 1); // OFF
 
-			UINT8 SDH = (m_hdc->read(generic_space(), 0x06));
+			uint8_t SDH = (m_hdc->read(generic_space(), 0x06));
 
 			int hi = (m_hdc->read(generic_space(), 0x05)) & 0x07;
-			UINT16 cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
+			uint16_t cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
 
 			int sector_number = m_hdc->read(generic_space(), 0x03);
 			int sector_count = m_hdc->read(generic_space(), 0x02); // (1 = single sector)
@@ -1667,12 +1667,12 @@ int rainbow_state::do_write_sector()
 				return 50;
 			}
 			// Pointer to info + C + H + S
-			UINT32 lbasector = get_and_print_lbasector(this, info, cylinder, SDH & 0x07, sector_number);
+			uint32_t lbasector = get_and_print_lbasector(this, info, cylinder, SDH & 0x07, sector_number);
 
 			if (sector_count != 1) // ignore all SECTOR_COUNTS != 1
 				return 88; // logerror(" - ** IGNORED (SECTOR_COUNT !=1) **\n");
 
-			if (hard_disk_write(local_hard_disk, lbasector, m_hdc_buffer))  // accepts LBA sector (UINT32) !
+			if (hard_disk_write(local_hard_disk, lbasector, m_hdc_buffer))  // accepts LBA sector (uint32_t) !
 				feedback = 99; // success
 			else
 				logerror("...FAILURE **** \n");
@@ -1830,7 +1830,7 @@ READ8_MEMBER(rainbow_state::hd_status_69_r)
 	int HS = m_hdc->read(space, 0x06) & (1 + 2 + 4); // SDH bits 0-2 = HEAD #
 //  logerror("(x69 READ) %i = HEAD SELECT WD1010\n", HS);
 
-	UINT8 data = (HS << 1);
+	uint8_t data = (HS << 1);
 
 	// DRIVE SELECT: 2 bits in SDH register of WDx010 could address 4 drives.
 	// External circuit supports 1 drive here (DRIVE 0 selected or deselected)
@@ -2179,7 +2179,7 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 		track = m_fdc->track_r(space, 0);
 
 	// Print HEX track number
-	static UINT8 bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
+	static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
 	// 0...9 ,A (0x77), b (0x7c), C (0x39) , d (0x5e), E (0x79), F (0x71)
 	output().set_digit_value(0, bcd2hex[(track >> 4) & 0x0f]);
 	output().set_digit_value(1, bcd2hex[(track - ((track >> 4) << 4)) & 0x0f]);
@@ -2344,12 +2344,12 @@ IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
 // VERIFY: SCROLL_MAP & COLOR_MAP are updated at the next VSYNC (not immediately)... Are there more registers?
 WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 {
-	UINT8 red, green, blue, mono;
+	uint8_t red, green, blue, mono;
 	int xi;
 
 	// VIDEO LEVELS:  0 is 100 % output; F is 0 % output
 	// Levels for 100-B model, taken from page 46 of PDF, multiplied by 2.55 to obtain a range of 0...255
-	const UINT8 v_levels[16] = { 255, 217,  201,186, 171, 156, 140, 125, 110, 97, 79, 66, 54, 31, 18, 0 };
+	const uint8_t v_levels[16] = { 255, 217,  201,186, 171, 156, 140, 125, 110, 97, 79, 66, 54, 31, 18, 0 };
 
 	if(m_scroll_buffer_changed)
 	{	
@@ -2365,8 +2365,8 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 
 		for(xi=0;xi<16;xi++) // DELAYED LOAD OF PALETTE ... 
 		{	
-						UINT8 colordata1  = m_GDC_COLOR_MAP[xi];
-						UINT8 colordata2 = m_GDC_COLOR_MAP[xi + 16];  	// Does it matter if the palette is incomplete...?
+						uint8_t colordata1  = m_GDC_COLOR_MAP[xi];
+						uint8_t colordata2 = m_GDC_COLOR_MAP[xi + 16];  	// Does it matter if the palette is incomplete...?
 
 						//				Color map:  32 x 8
 						//				2nd 16 Byte 	1st 16 Bytes (colordata1)
@@ -2392,16 +2392,16 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 
 								case 2: // SHADES OF GREEN    
 									// For now, a hand picked value from VTVIDEO * is coarsly transformed into a RGB value. 
-									red   = UINT8( ( 35.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) ); // 80 % = NORMAL *
-									green = UINT8( (145.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) );
-									blue  = UINT8( ( 75.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) );
+									red   = uint8_t( ( 35.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) ); // 80 % = NORMAL *
+									green = uint8_t( (145.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) );
+									blue  = uint8_t( ( 75.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) );
 									m_palette2->set_pen_color(xi + 16, rgb_t( red, green, blue) ); 
 									break;
 
 								case 3: // AMBER. Assumption: "normal" value at 80 % is 213, 146, 82 (decimal)
-									red   = UINT8( (213.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) ); // 80 % = NORMAL * is 3.19f (100 % would be 2.55f)
-									green = UINT8( (146.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) );
-									blue  = UINT8( ( 82.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) );
+									red   = uint8_t( (213.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) ); // 80 % = NORMAL * is 3.19f (100 % would be 2.55f)
+									green = uint8_t( (146.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) );
+									blue  = uint8_t( ( 82.0f / 80.0f) *  ( v_levels[ mono ] / 3.19f) );
 									m_palette2->set_pen_color(xi + 16, rgb_t( red, green, blue) ); 
 									break;
 								}
@@ -2681,7 +2681,7 @@ READ16_MEMBER(rainbow_state::vram_r)
 // Rainbow has separate registers for fore and background.
 WRITE16_MEMBER(rainbow_state::vram_w)
 {
-	//UINT8 *video_ram8 = (UINT8 *)(&m_video_ram[0]);
+	//uint8_t *video_ram8 = (uint8_t *)(&m_video_ram[0]);
 
 	if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) // NOT VECTOR MODE
 	{
@@ -2706,7 +2706,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 	}
 
 	offset &= 0xffff; // same as in VT240?
-	UINT16 chr = data; // VT240 : UINT8 
+	uint16_t chr = data; // VT240 : uint8_t 
 
 	if(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR) // VT240 : if(SELECT_VECTOR_PATTERN_REGISTER) 
 	{
@@ -2733,16 +2733,16 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 		// ALU_PS register: controls logic used in writing to the bitmap / inhibiting of writing to specified planes.
 		//     plane select and logic operations on write buffer... (and more)  **** SEE  PAGE 36 ****
 		int ps = m_GDC_ALU_PS_REGISTER & 0x0F; // PLANE SELECT 0..3    // VT 240 : ~m_GDC_ALU_PS_REGISTER & 3;
-  		UINT8 fore = ( (m_GDC_FG_BG & 0xf0) ) >> 4;
-		UINT8 back =   (m_GDC_FG_BG & 0x0f);		// background : 0..3 confirmed, see p.39 AA-AE36A (PDF)
+  		uint8_t fore = ( (m_GDC_FG_BG & 0xf0) ) >> 4;
+		uint8_t back =   (m_GDC_FG_BG & 0x0f);		// background : 0..3 confirmed, see p.39 AA-AE36A (PDF)
 
 		for(int i = 0; i <= 3; i++)
 		{
 			if( BIT(ps,i ) )
 			{
-				UINT16 mem = m_video_ram[(offset & 0xffff) + (0x8000 * i)]; 	// VT240
+				uint16_t mem = m_video_ram[(offset & 0xffff) + (0x8000 * i)]; 	// VT240
 
-				UINT16 out = 0; // VT240 : UINT8
+				uint16_t out = 0; // VT240 : uint8_t
 				for(int j = 0; j <= 15; j++)  // REPLACE MODE : one replaced by FG, zero by BG ( 16 instead of 8 bit on VT240 )
 						out |= BIT(chr, j) ? ((fore & 1) << j) : ((back & 1) << j);
 	

@@ -39,13 +39,13 @@ public:
 		m_eeprom0(*this, "eeprom0"),
 		m_palette(*this, "palette")  { }
 
-	UINT32 m_test_x,m_test_y,m_start_offs;
-	UINT8 m_type;
+	uint32_t m_test_x,m_test_y,m_start_offs;
+	uint8_t m_type;
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_WRITE64_MEMBER(eeprom_w);
 	DECLARE_READ64_MEMBER(hwver_r);
 	virtual void video_start() override;
-	UINT32 screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ns16550_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
@@ -58,10 +58,10 @@ void aristmk6_state::video_start()
 {
 }
 
-UINT32 aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
-	const UINT8 *blit_ram = memregion("maincpu")->base();
+	const uint8_t *blit_ram = memregion("maincpu")->base();
 
 	if(machine().input().code_pressed(KEYCODE_Z))
 		m_test_x++;
@@ -102,7 +102,7 @@ UINT32 aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rgb3
 		{
 			if(m_type)
 			{
-				UINT16 vram;
+				uint16_t vram;
 				int r,g,b;
 
 				vram = blit_ram[count+0] | blit_ram[count+1]<<8;
@@ -122,7 +122,7 @@ UINT32 aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rgb3
 			}
 			else
 			{
-				UINT8 color;
+				uint8_t color;
 
 				color = blit_ram[count];
 

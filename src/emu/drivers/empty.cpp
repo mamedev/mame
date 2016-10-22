@@ -30,7 +30,7 @@ public:
 		emulator_info::display_ui_chooser(machine());
 	}
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
 		bitmap.fill(rgb_t::black);
 		return 0;

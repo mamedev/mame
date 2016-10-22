@@ -50,7 +50,7 @@ inline void lethalj_state::get_crosshair_xy(int player, int *x, int *y)
 
 READ16_MEMBER(lethalj_state::lethalj_gun_r)
 {
-	UINT16 result = 0;
+	uint16_t result = 0;
 	int beamx, beamy;
 
 	switch (offset)
@@ -87,10 +87,10 @@ READ16_MEMBER(lethalj_state::lethalj_gun_r)
 void lethalj_state::video_start()
 {
 	/* allocate video RAM for screen */
-	m_screenram = std::make_unique<UINT16[]>(BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
+	m_screenram = std::make_unique<uint16_t[]>(BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
-	m_blitter_base = (UINT16 *)memregion("gfx1")->base();
+	m_blitter_base = (uint16_t *)memregion("gfx1")->base();
 	m_blitter_rows = memregion("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
 }
 
@@ -110,19 +110,19 @@ void lethalj_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in lethalj_state::device_timer");
+		assert_always(false, "Unknown id in lethalj_state::device_timer");
 	}
 }
 
 
 void lethalj_state::do_blit()
 {
-	int dsty = (INT16)m_blitter_data[1];
-	int srcx = (UINT16)m_blitter_data[2];
-	int srcy = (UINT16)(m_blitter_data[3] + 1);
-	int width = (UINT16)m_blitter_data[5];
-	int dstx = (INT16)m_blitter_data[6];
-	int height = (UINT16)m_blitter_data[7];
+	int dsty = (int16_t)m_blitter_data[1];
+	int srcx = (uint16_t)m_blitter_data[2];
+	int srcy = (uint16_t)(m_blitter_data[3] + 1);
+	int width = (uint16_t)m_blitter_data[5];
+	int dstx = (int16_t)m_blitter_data[6];
+	int height = (uint16_t)m_blitter_data[7];
 	int y;
 /*
     logerror("blitter data = %04X %04X %04X %04X %04X %04X %04X %04X\n",
@@ -135,8 +135,8 @@ void lethalj_state::do_blit()
 		/* clip in Y */
 		if (dsty >= 0 && dsty < BLITTER_DEST_HEIGHT/2)
 		{
-			UINT16 *source = m_blitter_base + (srcy % m_blitter_rows) * BLITTER_SOURCE_WIDTH;
-			UINT16 *dest = m_screenram.get() + (dsty + (m_vispage ^ 1) * 256) * BLITTER_DEST_WIDTH;
+			uint16_t *source = m_blitter_base + (srcy % m_blitter_rows) * BLITTER_SOURCE_WIDTH;
+			uint16_t *dest = m_screenram.get() + (dsty + (m_vispage ^ 1) * 256) * BLITTER_DEST_WIDTH;
 			int sx = srcx;
 			int dx = dstx;
 			int x;
@@ -187,8 +187,8 @@ WRITE16_MEMBER(lethalj_state::lethalj_blitter_w)
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(lethalj_state::scanline_update)
 {
-	UINT16 *src = &m_screenram[(m_vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
-	UINT16 *dest = &bitmap.pix16(scanline);
+	uint16_t *src = &m_screenram[(m_vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
+	uint16_t *dest = &bitmap.pix16(scanline);
 	int coladdr = params->coladdr << 1;
 	int x;
 

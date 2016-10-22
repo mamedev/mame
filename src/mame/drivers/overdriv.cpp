@@ -43,7 +43,7 @@
 
 ***************************************************************************/
 
-static const UINT16 overdriv_default_eeprom[64] =
+static const uint16_t overdriv_default_eeprom[64] =
 {
 	0x7758,0xFFFF,0x0078,0x9000,0x0078,0x7000,0x0078,0x5000,
 	0x5441,0x4B51,0x3136,0x4655,0x4AFF,0x0300,0x0270,0x0250,
@@ -186,7 +186,7 @@ WRITE16_MEMBER( overdriv_state::overdriv_k053246_word_w )
 {
 	m_k053246->k053246_word_w(space,offset,data,mem_mask);
 
-	UINT16 *src, *dst;
+	uint16_t *src, *dst;
 
 	m_k053246->k053247_get_ram(&dst);
 

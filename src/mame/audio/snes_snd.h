@@ -29,7 +29,7 @@ ALLOW_SAVE_TYPE(env_state_t32);
 
 struct voice_state_type                      /* Voice state type             */
 {
-	UINT16          mem_ptr;        /* Sample data memory pointer   */
+	uint16_t          mem_ptr;        /* Sample data memory pointer   */
 	int             end;            /* End or loop after block      */
 	int             envcnt;         /* Counts to envelope update    */
 	env_state_t32   envstate;       /* Current envelope state       */
@@ -41,17 +41,17 @@ struct voice_state_type                      /* Voice state type             */
 	int             on_cnt;         /* Is it time to turn on yet?   */
 	int             pitch;          /* Sample pitch (4096->32000Hz) */
 	int             range;          /* Last header's range          */
-	UINT32          samp_id;        /* Sample ID#                   */
+	uint32_t          samp_id;        /* Sample ID#                   */
 	int             sampptr;        /* Where in sampbuf we are      */
-	INT32           smp1;           /* Last sample (for BRR filter) */
-	INT32           smp2;           /* Second-to-last sample decoded*/
+	int32_t           smp1;           /* Last sample (for BRR filter) */
+	int32_t           smp2;           /* Second-to-last sample decoded*/
 	short           sampbuf[4];   /* Buffer for Gaussian interp   */
 };
 
 struct src_dir_type                      /* Source directory entry       */
 {
-	UINT16  vptr;           /* Ptr to start of sample data  */
-	UINT16  lptr;           /* Loop pointer in sample data  */
+	uint16_t  vptr;           /* Ptr to start of sample data  */
+	uint16_t  lptr;           /* Loop pointer in sample data  */
 };
 
 
@@ -63,7 +63,7 @@ class snes_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~snes_sound_device() {}
 
 	void set_volume(int volume);
@@ -75,7 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER( spc_ram_w );
 	DECLARE_WRITE8_MEMBER( spc_port_in );
 
-//  UINT8 *spc_get_ram() { return m_ram; }
+//  uint8_t *spc_get_ram() { return m_ram; }
 
 protected:
 	// device-level overrides
@@ -97,10 +97,10 @@ private:
 	void state_register();
 
 	// internal state
-	std::unique_ptr<UINT8[]>                   m_ram;
+	std::unique_ptr<uint8_t[]>                   m_ram;
 	sound_stream            *m_channel;
-	UINT8                   m_dsp_regs[256];      /* DSP registers */
-	UINT8                   m_ipl_region[64];     /* SPC top 64 bytes */
+	uint8_t                   m_dsp_regs[256];      /* DSP registers */
+	uint8_t                   m_ipl_region[64];     /* SPC top 64 bytes */
 
 	int                     m_keyed_on;
 	int                     m_keys;               /* 8-bits for 8 voices */
@@ -120,12 +120,12 @@ private:
 
 	/* timers */
 	emu_timer               *m_timer[3];
-	UINT8                   m_enabled[3];
-	UINT16                  m_counter[3];
+	uint8_t                   m_enabled[3];
+	uint16_t                  m_counter[3];
 
 	/* IO ports */
-	UINT8                   m_port_in[4];         /* SPC input ports */
-	UINT8                   m_port_out[4];        /* SPC output ports */
+	uint8_t                   m_port_in[4];         /* SPC input ports */
+	uint8_t                   m_port_out[4];        /* SPC output ports */
 };
 
 extern const device_type SNES;

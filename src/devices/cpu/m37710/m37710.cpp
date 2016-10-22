@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 // many other combinations of RAM and ROM size exist
 
 
-m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_delegate map_delegate)
+m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_delegate map_delegate)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, map_delegate)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -102,25 +102,25 @@ m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type 
 }
 
 
-m37702m2_device::m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m37702m2_device::m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m37710_cpu_device(mconfig, M37702M2, "M37702M2", tag, owner, clock, "m37702m2", __FILE__, address_map_delegate(FUNC(m37702m2_device::map), this))
 {
 }
 
 
-m37702m2_device::m37702m2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+m37702m2_device::m37702m2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: m37710_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(m37702m2_device::map), this))
 {
 }
 
 
-m37702s1_device::m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m37702s1_device::m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m37710_cpu_device(mconfig, M37702S1, "M37702S1", tag, owner, clock, "m37702s1", __FILE__, address_map_delegate(FUNC(m37702s1_device::map), this))
 {
 }
 
 
-m37710s4_device::m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m37710s4_device::m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m37710_cpu_device(mconfig, M37710S4, "M37710S4", tag, owner, clock, "m37710s4", __FILE__, address_map_delegate(FUNC(m37710s4_device::map), this))
 {
 }
@@ -458,9 +458,9 @@ void m37710_cpu_device::m37710_recalc_timer(int timer)
 	}
 }
 
-UINT8 m37710_cpu_device::m37710_internal_r(int offset)
+uint8_t m37710_cpu_device::m37710_internal_r(int offset)
 {
-	UINT8 d;
+	uint8_t d;
 
 	#if M37710_DEBUG
 	if (offset > 1)
@@ -567,11 +567,11 @@ UINT8 m37710_cpu_device::m37710_internal_r(int offset)
 	return m_m37710_regs[offset];
 }
 
-void m37710_cpu_device::m37710_internal_w(int offset, UINT8 data)
+void m37710_cpu_device::m37710_internal_w(int offset, uint8_t data)
 {
 	int i;
-	UINT8 prevdata;
-	UINT8 d;
+	uint8_t prevdata;
+	uint8_t d;
 
 	#if M37710_DEBUG
 	if (offset != 0x60) // filter out watchdog
@@ -661,7 +661,7 @@ void m37710_cpu_device::m37710_internal_w(int offset, UINT8 data)
 
 READ16_MEMBER( m37710_cpu_device::m37710_internal_word_r )
 {
-	UINT16 ret = 0;
+	uint16_t ret = 0;
 
 	if (mem_mask & 0x00ff)
 		ret |= m37710_internal_r(offset*2);
@@ -943,7 +943,7 @@ CPU_DISASSEMBLE( m37710 )
 }
 
 
-offs_t m37710_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m37710_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
 }
@@ -1183,7 +1183,7 @@ void m37710_cpu_device::execute_set_input(int inputnum, int state)
 }
 
 
-void m37710_cpu_device::m37710i_set_execution_mode(UINT32 mode)
+void m37710_cpu_device::m37710i_set_execution_mode(uint32_t mode)
 {
 	m_opcodes = m37710i_opcodes[mode];
 	m_opcodes42 = m37710i_opcodes2[mode];
@@ -1199,7 +1199,7 @@ void m37710_cpu_device::m37710i_set_execution_mode(UINT32 mode)
 /* =============================== INTERRUPTS ============================= */
 /* ======================================================================== */
 
-void m37710_cpu_device::m37710i_interrupt_software(UINT32 vector)
+void m37710_cpu_device::m37710i_interrupt_software(uint32_t vector)
 {
 	CLK(13);
 	m37710i_push_8(REG_PB>>16);

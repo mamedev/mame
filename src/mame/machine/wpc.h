@@ -102,17 +102,17 @@
 class wpc_device : public device_t
 {
 public:
-	wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	UINT16 get_memprotect_mask() { return m_memprotect_mask; }
+	uint16_t get_memprotect_mask() { return m_memprotect_mask; }
 	bool memprotect_active() { if(m_memprotect == 0xb4) return false; else return true; }
-	UINT16 get_alphanumeric(UINT8 offset) { if(offset < 40) return m_alpha_data[offset]; else return 0; }
+	uint16_t get_alphanumeric(uint8_t offset) { if(offset < 40) return m_alpha_data[offset]; else return 0; }
 	void reset_alphanumeric() { memset(m_alpha_data,0,40*2); }
-	UINT8 get_visible_page() { return m_dmd_visiblepage; }
-	UINT8 get_dmd_firq_line() { return m_dmd_irqline; }
+	uint8_t get_visible_page() { return m_dmd_visiblepage; }
+	uint8_t get_dmd_firq_line() { return m_dmd_irqline; }
 	void set_dmd_firq() { m_dmd_irqsrc = true; }
 	void set_snd_firq() { m_snd_irqsrc = true; }
 
@@ -136,21 +136,21 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8 m_shift_addr_high;
-	UINT8 m_shift_addr_low;
-	UINT8 m_shift_bit1;
-	UINT8 m_shift_bit2;
-	UINT8 m_memprotect;
-	UINT16 m_memprotect_mask;
-	UINT8 m_switch_col;  // select switch column
-	UINT8 m_alpha_pos;  // selected LED position
-	UINT16 m_alpha_data[40];
+	uint8_t m_shift_addr_high;
+	uint8_t m_shift_addr_low;
+	uint8_t m_shift_bit1;
+	uint8_t m_shift_bit2;
+	uint8_t m_memprotect;
+	uint16_t m_memprotect_mask;
+	uint8_t m_switch_col;  // select switch column
+	uint8_t m_alpha_pos;  // selected LED position
+	uint16_t m_alpha_data[40];
 	bool m_zerocross;
-	UINT32 m_irq_count;
-	UINT8 m_dmd_visiblepage;
+	uint32_t m_irq_count;
+	uint8_t m_dmd_visiblepage;
 	bool m_dmd_irqsrc;
 	bool m_snd_irqsrc;
-	UINT8 m_dmd_irqline;
+	uint8_t m_dmd_irqline;
 	emu_timer* m_zc_timer;
 
 	devcb_write_line m_irq_cb;

@@ -73,7 +73,7 @@ i960 CPU, needs to write its clip and raster values byteswapped.
 //  namco_c116_device -- constructor
 //-------------------------------------------------
 
-namco_c116_device::namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_c116_device::namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_C116, "Namco C116 Video Controller", tag, owner, clock, "namco_c116", __FILE__),
 		device_gfx_interface(mconfig, *this),
 		device_video_interface(mconfig, *this)
@@ -101,7 +101,7 @@ void namco_c116_device::device_start()
 
 READ8_MEMBER(namco_c116_device::read)
 {
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 	switch (offset & 0x1800)
 	{
@@ -130,7 +130,7 @@ READ8_MEMBER(namco_c116_device::read)
 
 WRITE8_MEMBER(namco_c116_device::write)
 {
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 	switch (offset & 0x1800)
 	{

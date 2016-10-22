@@ -61,12 +61,12 @@ static cassette_image::error coco_cas_identify(cassette_image *cassette, struct 
 
 
 
-static int get_cas_block(cassette_image *cassette, UINT64 *offset, UINT8 *block, int *block_len)
+static bool get_cas_block(cassette_image *cassette, uint64_t *offset, uint8_t *block, int *block_len)
 {
-	UINT8 block_length = 0;
-	UINT8 block_checksum = 0;
-	UINT64 current_offset;
-	UINT64 image_size;
+	uint8_t block_length = 0;
+	uint8_t block_checksum = 0;
+	uint64_t current_offset;
+	uint64_t image_size;
 	PAIR p;
 	int i;
 	int state = 0;
@@ -130,13 +130,13 @@ static int get_cas_block(cassette_image *cassette, UINT64 *offset, UINT8 *block,
 						if (p.b.l != block_checksum)
 						{
 							/* checksum failure */
-							return FALSE;
+							return false;
 						}
 						else
 						{
 							/* checksum success */
 							*offset = current_offset;
-							return TRUE;
+							return true;
 						}
 					}
 				}
@@ -145,26 +145,26 @@ static int get_cas_block(cassette_image *cassette, UINT64 *offset, UINT8 *block,
 	}
 
 	/* no more blocks */
-	return FALSE;
+	return false;
 }
 
 
 
-static cassette_image::error cas_load(cassette_image *cassette, UINT8 silence)
+static cassette_image::error cas_load(cassette_image *cassette, uint8_t silence)
 {
 	cassette_image::error err;
-	UINT64 offset;
-	UINT64 image_size;
-	UINT8 block[258];   /* 255 bytes per block + 3 (type, length, checksum) */
+	uint64_t offset;
+	uint64_t image_size;
+	uint8_t block[258];   /* 255 bytes per block + 3 (type, length, checksum) */
 	int block_length = 0;
-	UINT8 last_blocktype;
+	uint8_t last_blocktype;
 	double time_index = 0.0;
 	double time_displacement;
-	static const UINT8 magic_bytes[2] = { 0x55, 0x3C };
+	static const uint8_t magic_bytes[2] = { 0x55, 0x3C };
 
 #if 0
 	{
-		static const UINT8 dummy_bytes[] =
+		static const uint8_t dummy_bytes[] =
 		{
 			0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
 			0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,

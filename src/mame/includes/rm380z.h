@@ -52,7 +52,7 @@ private:
 	void init_graphic_chars();
 
 	void putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bitmap,unsigned char* chsb,int vmode);
-	void decode_videoram_char(int pos,UINT8& chr,UINT8& attrib);
+	void decode_videoram_char(int pos,uint8_t& chr,uint8_t& attrib);
 	void scroll_videoram();
 	void config_videomode();
 	void check_scroll_register();
@@ -65,18 +65,18 @@ protected:
 
 public:
 
-	UINT8 m_port0;
-	UINT8 m_port0_kbd;
-	UINT8 m_port1;
-	UINT8 m_fbfd;
-	UINT8 m_fbfe;
+	uint8_t m_port0;
+	uint8_t m_port0_kbd;
+	uint8_t m_port1;
+	uint8_t m_fbfd;
+	uint8_t m_fbfe;
 
-	UINT8 m_graphic_chars[0x80][(RM380Z_CHDIMX+1)*(RM380Z_CHDIMY+1)];
+	uint8_t m_graphic_chars[0x80][(RM380Z_CHDIMX+1)*(RM380Z_CHDIMY+1)];
 
-	UINT8   m_mainVideoram[RM380Z_VIDEORAM_SIZE];
-	UINT8   m_vramchars[RM380Z_SCREENSIZE];
-	UINT8   m_vramattribs[RM380Z_SCREENSIZE];
-	UINT8   m_vram[RM380Z_SCREENSIZE];
+	uint8_t   m_mainVideoram[RM380Z_VIDEORAM_SIZE];
+	uint8_t   m_vramchars[RM380Z_SCREENSIZE];
+	uint8_t   m_vramattribs[RM380Z_SCREENSIZE];
+	uint8_t   m_vram[RM380Z_SCREENSIZE];
 
 	int m_rasterlineCtr;
 	emu_timer* m_vblankTimer;
@@ -111,7 +111,7 @@ public:
 	DECLARE_READ8_MEMBER( videoram_read );
 	DECLARE_WRITE8_MEMBER( videoram_write );
 
-	UINT8 hiram[0x1000];
+	uint8_t hiram[0x1000];
 	DECLARE_READ8_MEMBER( hiram_read );
 	DECLARE_WRITE8_MEMBER( hiram_write );
 
@@ -126,7 +126,7 @@ public:
 
 	void config_memory_map();
 	void update_screen(bitmap_ind16 &bitmap);
-	UINT32 screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(static_vblank_timer);
 };
 

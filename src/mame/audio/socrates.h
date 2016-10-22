@@ -9,7 +9,7 @@ class socrates_snd_device : public device_t,
 							public device_sound_interface
 {
 public:
-	socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void reg0_w(int data);
 	void reg1_w(int data);
@@ -25,17 +25,17 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 private:
 	void snd_clock();
-	static const UINT8 s_volumeLUT[];
+	static const uint8_t s_volumeLUT[];
 
 	// internal state
 	sound_stream *  m_stream;
-	UINT8           m_freq[2];      // channel 1,2 frequencies
-	UINT8           m_vol[2];       // channel 1,2 volume
-	UINT8           m_enable[2];    // channel 1,2 enable
-	UINT8           m_channel3;     // channel 3 weird register
-	UINT8           m_state[3];     // output states for channels 1,2,3
-	UINT8           m_accum[3];     // accumulators for channels 1,2,3
-	UINT16          m_DAC_output;   // output
+	uint8_t           m_freq[2];      // channel 1,2 frequencies
+	uint8_t           m_vol[2];       // channel 1,2 volume
+	uint8_t           m_enable[2];    // channel 1,2 enable
+	uint8_t           m_channel3;     // channel 3 weird register
+	uint8_t           m_state[3];     // output states for channels 1,2,3
+	uint8_t           m_accum[3];     // accumulators for channels 1,2,3
+	uint16_t          m_DAC_output;   // output
 };
 
 extern const device_type SOCRATES_SOUND;

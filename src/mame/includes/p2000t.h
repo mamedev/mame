@@ -33,7 +33,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_ioport_array<10> m_keyboard;
 	DECLARE_READ8_MEMBER(p2000t_port_000f_r);
 	DECLARE_READ8_MEMBER(p2000t_port_202f_r);
@@ -45,14 +45,14 @@ public:
 	DECLARE_WRITE8_MEMBER(p2000t_port_8c90_w);
 	DECLARE_WRITE8_MEMBER(p2000t_port_9494_w);
 	DECLARE_READ8_MEMBER(videoram_r);
-	UINT8 m_port_101f;
-	UINT8 m_port_202f;
-	UINT8 m_port_303f;
-	UINT8 m_port_707f;
-	INT8 m_frame_count;
+	uint8_t m_port_101f;
+	uint8_t m_port_202f;
+	uint8_t m_port_303f;
+	uint8_t m_port_707f;
+	int8_t m_frame_count;
 	DECLARE_VIDEO_START(p2000m);
 	DECLARE_PALETTE_INIT(p2000m);
-	UINT32 screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);
 };
 

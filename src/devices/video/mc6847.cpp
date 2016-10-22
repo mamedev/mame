@@ -97,7 +97,7 @@
 #define LOG_INPUT               0
 
 
-const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
+const uint32_t mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 {
 	rgb_t(0x07, 0xff, 0x00), /* GREEN */
 	rgb_t(0xff, 0xff, 0x00), /* YELLOW */
@@ -129,8 +129,8 @@ const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 //  ctor
 //-------------------------------------------------
 
-mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
-		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, const char *shortname, const char *source)
+mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,
+		const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_write_hsync(*this),
 		m_write_fsync(*this),
@@ -474,7 +474,7 @@ void mc6847_friend_device::enter_bottom_border(void)
 //  record_border_scanline
 //-------------------------------------------------
 
-void mc6847_friend_device::record_border_scanline(UINT16 physical_scanline)
+void mc6847_friend_device::record_border_scanline(uint16_t physical_scanline)
 {
 }
 
@@ -484,11 +484,11 @@ void mc6847_friend_device::record_border_scanline(UINT16 physical_scanline)
 //  get_clocks_since_hsync
 //-------------------------------------------------
 
-INT32 mc6847_friend_device::get_clocks_since_hsync()
+int32_t mc6847_friend_device::get_clocks_since_hsync()
 {
-	UINT64 hsync_on_clocks = attotime_to_clocks(m_hsync_on_timer->start());
-	UINT64 current_clocks = attotime_to_clocks(machine().time());
-	return (INT32) (current_clocks - hsync_on_clocks);
+	uint64_t hsync_on_clocks = attotime_to_clocks(m_hsync_on_timer->start());
+	uint64_t current_clocks = attotime_to_clocks(machine().time());
+	return (int32_t) (current_clocks - hsync_on_clocks);
 }
 
 
@@ -505,7 +505,7 @@ void mc6847_friend_device::video_flush()
 	//   3.  We're in the body
 	if (m_supports_partial_body_scanlines && !m_recording_scanline && (m_logical_scanline_zone == SCANLINE_ZONE_BODY))
 	{
-		UINT32 new_partial_scanline_clocks = get_clocks_since_hsync();
+		uint32_t new_partial_scanline_clocks = get_clocks_since_hsync();
 		if (m_partial_scanline_clocks < new_partial_scanline_clocks)
 		{
 			if (LOG_FLUSH)
@@ -546,7 +546,7 @@ const char *mc6847_friend_device::describe_context(void)
 //  ctor
 //-------------------------------------------------
 
-mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, const char *shortname, const char *source) :
+mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, const char *shortname, const char *source) :
 	mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, true, shortname, source),
 	m_input_cb(*this),
 	m_black_and_white(false),
@@ -625,9 +625,9 @@ void mc6847_base_device::device_reset()
 //  input
 //-------------------------------------------------
 
-UINT8 mc6847_base_device::input(UINT16 address)
+uint8_t mc6847_base_device::input(uint16_t address)
 {
-	UINT8 data = m_input_cb(address);
+	uint8_t data = m_input_cb(address);
 	if (LOG_INPUT)
 		logerror("%s: input: address=0x%04X data=0x%02X\n", describe_context(), address, data);
 	return data;
@@ -640,17 +640,17 @@ UINT8 mc6847_base_device::input(UINT16 address)
 //-------------------------------------------------
 
 template<int sample_count, int yres>
-void mc6847_base_device::record_scanline_res(int scanline, INT32 start_pos, INT32 end_pos)
+void mc6847_base_device::record_scanline_res(int scanline, int32_t start_pos, int32_t end_pos)
 {
 	// determine the "sample_modulo" (e.g. - for 32 samples per row, query the video RAM every
 	// position, for 16 samples per row, query every other position)
 	const int sample_modulo = 32 / sample_count;
 	static_assert((32 / sample_modulo) == sample_count, "Expected 32 to be divisible by sample_count");
 
-	UINT8 current_sample_count = (start_pos > 0) ? m_data[scanline].m_sample_count : 0;
+	uint8_t current_sample_count = (start_pos > 0) ? m_data[scanline].m_sample_count : 0;
 
 	// main loop
-	for (INT32 pos = start_pos; pos < end_pos; pos++)
+	for (int32_t pos = start_pos; pos < end_pos; pos++)
 	{
 		// set address at beginning of line
 		if (pos == 0)
@@ -660,7 +660,7 @@ void mc6847_base_device::record_scanline_res(int scanline, INT32 start_pos, INT3
 		if ((pos % sample_modulo) == 0)
 		{
 			// input data
-			UINT8 data = input(m_video_address++);
+			uint8_t data = input(m_video_address++);
 
 			if (pos < 32)
 			{
@@ -684,7 +684,7 @@ void mc6847_base_device::record_scanline_res(int scanline, INT32 start_pos, INT3
 //  record_body_scanline
 //-------------------------------------------------
 
-inline void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_pos, INT32 end_pos)
+inline void mc6847_base_device::record_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos)
 {
 	// sanity checks
 	assert(scanline < 192);
@@ -736,7 +736,7 @@ inline void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, U
 //  record_body_scanline
 //-------------------------------------------------
 
-void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 scanline)
+void mc6847_base_device::record_body_scanline(uint16_t physical_scanline, uint16_t scanline)
 {
 	record_body_scanline(physical_scanline, scanline, 0, 32);
 }
@@ -747,10 +747,10 @@ void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 s
 //  record_partial_body_scanline
 //-------------------------------------------------
 
-void mc6847_base_device::record_partial_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_clock, INT32 end_clock)
+void mc6847_base_device::record_partial_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_clock, int32_t end_clock)
 {
-	INT32 start_pos = std::max(scanline_position_from_clock(start_clock), 0);
-	INT32 end_pos = std::min(scanline_position_from_clock(end_clock), 42);
+	int32_t start_pos = std::max(scanline_position_from_clock(start_clock), 0);
+	int32_t end_pos = std::min(scanline_position_from_clock(end_clock), 42);
 
 	if (start_pos < end_pos)
 		record_body_scanline(physical_scanline, scanline, start_pos, end_pos);
@@ -762,7 +762,7 @@ void mc6847_base_device::record_partial_body_scanline(UINT16 physical_scanline, 
 //  scanline_position_from_clock
 //-------------------------------------------------
 
-INT32 mc6847_base_device::scanline_position_from_clock(INT32 clocks_since_hsync)
+int32_t mc6847_base_device::scanline_position_from_clock(int32_t clocks_since_hsync)
 {
 	return (clocks_since_hsync - 20) / 4;
 }
@@ -786,7 +786,7 @@ void mc6847_base_device::field_sync_changed(bool line)
 //  border_value
 //-------------------------------------------------
 
-inline mc6847_base_device::pixel_t mc6847_base_device::border_value(UINT8 mode, const pixel_t *palette, bool is_mc6847t1)
+inline mc6847_base_device::pixel_t mc6847_base_device::border_value(uint8_t mode, const pixel_t *palette, bool is_mc6847t1)
 {
 	pixel_t result;
 	switch(mc6847_friend_device::border_value(mode, is_mc6847t1))
@@ -815,7 +815,7 @@ inline mc6847_base_device::pixel_t mc6847_base_device::border_value(UINT8 mode, 
 //  update
 //-------------------------------------------------
 
-UINT32 mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int base_x = 32;
 	int base_y = 25;
@@ -899,7 +899,7 @@ UINT32 mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 //  CHARACTER MAP
 //**************************************************************************
 
-mc6847_friend_device::character_map::character_map(const UINT8 *text_fontdata, bool is_mc6847t1)
+mc6847_friend_device::character_map::character_map(const uint8_t *text_fontdata, bool is_mc6847t1)
 {
 	int mode, i;
 
@@ -914,14 +914,14 @@ mc6847_friend_device::character_map::character_map(const UINT8 *text_fontdata, b
 	// loop through all modes
 	for (mode = 0; mode < ARRAY_LENGTH(m_entries); mode++)
 	{
-		const UINT8 *fontdata;
-		UINT8 character_mask;
-		UINT8 color_shift_0 = 0;
-		UINT8 color_shift_1 = 0;
-		UINT8 color_mask_0 = 0x00;
-		UINT8 color_mask_1 = 0x00;
-		UINT16 color_base_0;
-		UINT16 color_base_1;
+		const uint8_t *fontdata;
+		uint8_t character_mask;
+		uint8_t color_shift_0 = 0;
+		uint8_t color_shift_1 = 0;
+		uint8_t color_mask_0 = 0x00;
+		uint8_t color_mask_1 = 0x00;
+		uint16_t color_base_0;
+		uint16_t color_base_1;
 
 		if ((mode & MODE_INTEXT) && !is_mc6847t1)
 		{
@@ -977,7 +977,7 @@ mc6847_friend_device::character_map::character_map(const UINT8 *text_fontdata, b
 //  pal_round_fontdata8x12
 //-------------------------------------------------
 
-const UINT8 mc6847_friend_device::pal_round_fontdata8x12[] =
+const uint8_t mc6847_friend_device::pal_round_fontdata8x12[] =
 {
 	0x00, 0x00, 0x38, 0x44, 0x04, 0x34, 0x4C, 0x4C, 0x38, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x10, 0x28, 0x44, 0x44, 0x7C, 0x44, 0x44, 0x00, 0x00, 0x00,
@@ -1085,7 +1085,7 @@ const UINT8 mc6847_friend_device::pal_round_fontdata8x12[] =
 //  pal_square_fontdata8x12
 //-------------------------------------------------
 
-const UINT8 mc6847_friend_device::pal_square_fontdata8x12[] =
+const uint8_t mc6847_friend_device::pal_square_fontdata8x12[] =
 {
 	0x00, 0x00, 0x00, 0x1C, 0x22, 0x02, 0x1A, 0x2A, 0x2A, 0x1C, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x08, 0x14, 0x22, 0x22, 0x3E, 0x22, 0x22, 0x00, 0x00,
@@ -1193,7 +1193,7 @@ const UINT8 mc6847_friend_device::pal_square_fontdata8x12[] =
 //  ntsc_round_fontdata8x12
 //-------------------------------------------------
 
-const UINT8 mc6847_friend_device::ntsc_round_fontdata8x12[] =
+const uint8_t mc6847_friend_device::ntsc_round_fontdata8x12[] =
 {
 	0x00, 0x00, 0x38, 0x44, 0x04, 0x34, 0x4C, 0x4C, 0x38, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x10, 0x28, 0x44, 0x44, 0x7C, 0x44, 0x44, 0x00, 0x00, 0x00,
@@ -1301,7 +1301,7 @@ const UINT8 mc6847_friend_device::ntsc_round_fontdata8x12[] =
 //  ntsc_square_fontdata8x12
 //-------------------------------------------------
 
-const UINT8 mc6847_friend_device::ntsc_square_fontdata8x12[] =
+const uint8_t mc6847_friend_device::ntsc_square_fontdata8x12[] =
 {
 	0x00, 0x00, 0x00, 0x1C, 0x22, 0x02, 0x1A, 0x2A, 0x2A, 0x1C, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x08, 0x14, 0x22, 0x22, 0x3E, 0x22, 0x22, 0x00, 0x00,
@@ -1409,7 +1409,7 @@ const UINT8 mc6847_friend_device::ntsc_square_fontdata8x12[] =
 //  s68047_fontdata8x12
 //-------------------------------------------------
 
-const UINT8 mc6847_friend_device::s68047_fontdata8x12[] =
+const uint8_t mc6847_friend_device::s68047_fontdata8x12[] =
 {
 	0x00, 0x00, 0x00, 0x1C, 0x22, 0x2A, 0x2A, 0x2C, 0x20, 0x1E, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x08, 0x14, 0x22, 0x22, 0x3E, 0x22, 0x22, 0x00, 0x00,
@@ -1517,7 +1517,7 @@ const UINT8 mc6847_friend_device::s68047_fontdata8x12[] =
 //  semigraphics4_fontdata8x12
 //-------------------------------------------------
 
-const UINT8 mc6847_friend_device::semigraphics4_fontdata8x12[] =
+const uint8_t mc6847_friend_device::semigraphics4_fontdata8x12[] =
 {
 	/* Block Graphics (Semigraphics 4 Graphics ) */
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1544,7 +1544,7 @@ const UINT8 mc6847_friend_device::semigraphics4_fontdata8x12[] =
 //  semigraphics6_fontdata8x12
 //-------------------------------------------------
 
-const UINT8 mc6847_friend_device::semigraphics6_fontdata8x12[] =
+const uint8_t mc6847_friend_device::semigraphics6_fontdata8x12[] =
 {
 	/* Semigraphics 6 */
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1694,7 +1694,7 @@ void mc6847_base_device::artifacter::update_colors(pixel_t c0, pixel_t c1)
 		0.000, 0.000, 0.236  /* [14] - black-red   (reverse 13) */
 	};
 
-	static const UINT8 artifact_correction[128] =
+	static const uint8_t artifact_correction[128] =
 	{
 		0,  0,       0,  0,      0,  6,      0,  2,
 		5,  7,       5,  7,      1,  3,      1, 11,
@@ -1749,9 +1749,9 @@ void mc6847_base_device::artifacter::update_colors(pixel_t c0, pixel_t c1)
 //  artifacter::update
 //-------------------------------------------------
 
-mc6847_base_device::pixel_t mc6847_base_device::artifacter::mix_color(double factor, UINT8 c0, UINT8 c1)
+mc6847_base_device::pixel_t mc6847_base_device::artifacter::mix_color(double factor, uint8_t c0, uint8_t c1)
 {
-	return (UINT32) (UINT8) ((c0 * (1.0 - factor)) + (c1 * (0.0 + factor)) + 0.5);
+	return (uint32_t) (uint8_t) ((c0 * (1.0 - factor)) + (c1 * (0.0 + factor)) + 0.5);
 }
 
 
@@ -1775,7 +1775,7 @@ const device_type M5C6847P1 = &device_creator<m5c6847p1_device>;
 //  mc6847_ntsc_device
 //-------------------------------------------------
 
-mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847_NTSC, "MC6847_NTSC", tag, owner, clock, ntsc_square_fontdata8x12, 262.0, "mc6847_ntsc", __FILE__)
 {
 }
@@ -1786,7 +1786,7 @@ mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char
 //  mc6847_pal_device
 //-------------------------------------------------
 
-mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847_PAL, "MC6847_PAL", tag, owner, clock, pal_square_fontdata8x12, 313.0, "mc6847_pal", __FILE__)
 {
 }
@@ -1797,7 +1797,7 @@ mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *
 //  mc6847y_ntsc_device
 //-------------------------------------------------
 
-mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847Y_NTSC, "MC6847Y_NTSC", tag, owner, clock, ntsc_square_fontdata8x12, 262.5, "mc6847y", __FILE__)
 {
 }
@@ -1808,7 +1808,7 @@ mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const ch
 //  mc6847y_pal_device
 //-------------------------------------------------
 
-mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847Y_PAL, "MC6847Y_PAL", tag, owner, clock, pal_square_fontdata8x12, 313.0, "mc6847y_pal", __FILE__)
 {
 }
@@ -1819,7 +1819,7 @@ mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char
 //  mc6847t1_ntsc_device
 //-------------------------------------------------
 
-mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847T1_NTSC, "MC6847T1_NTSC", tag, owner, clock, ntsc_round_fontdata8x12, 262.0, "mc6847t1_ntsc", __FILE__)
 {
 }
@@ -1830,7 +1830,7 @@ mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const 
 //  mc6847t1_pal_device
 //-------------------------------------------------
 
-mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847T1_PAL, "MC6847T1_PAL", tag, owner, clock, pal_round_fontdata8x12, 313.0, "mc6847t1_pal", __FILE__)
 {
 }
@@ -1841,7 +1841,7 @@ mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const ch
 //  s68047_device
 //-------------------------------------------------
 
-s68047_device::s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s68047_device::s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, S68047, "S68047", tag, owner, clock, s68047_fontdata8x12, 262.0, "s68047", __FILE__)
 {
 }
@@ -1862,7 +1862,7 @@ void s68047_device::hack_black_becomes_blue(bool flag)
 	set_custom_palette( flag ? s_s68047_hack_palette : nullptr );
 }
 
-const UINT32 s68047_device::s_s68047_hack_palette[16] =
+const uint32_t s68047_device::s_s68047_hack_palette[16] =
 {
 	rgb_t(0x07, 0xff, 0x00), /* GREEN */
 	rgb_t(0xff, 0xff, 0x00), /* YELLOW */
@@ -1890,7 +1890,7 @@ const UINT32 s68047_device::s_s68047_hack_palette[16] =
 //  m5c6847p1_device
 //-------------------------------------------------
 
-m5c6847p1_device::m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m5c6847p1_device::m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, M5C6847P1, "M5C6847P-1", tag, owner, clock, ntsc_square_fontdata8x12, 262.5, "m5c6847p1", __FILE__)
 {
 }

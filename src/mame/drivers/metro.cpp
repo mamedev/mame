@@ -135,7 +135,7 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 
 	*/
 
-	UINT16 res = 0;
+	uint16_t res = 0;
 	for (int i = 0; i < 8; i++)
 		res |= (m_requested_int[i] << i);
 
@@ -149,12 +149,12 @@ void metro_state::update_irq_state()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/*  Get the pending IRQs (only the enabled ones, e.g. where irq_enable is *0*)  */
-	UINT16 irq = metro_irq_cause_r(space, 0, 0xffff) & ~*m_irq_enable;
+	uint16_t irq = metro_irq_cause_r(space, 0, 0xffff) & ~*m_irq_enable;
 
 	if (m_irq_line == -1)    /* mouja, gakusai, gakusai2, dokyusei, dokyusp */
 	{
 		/*  This is for games that supply an *IRQ Vector* on the data bus together with an IRQ level for each possible IRQ source */
-		UINT8 irq_level[8] = { 0 };
+		uint8_t irq_level[8] = { 0 };
 		int i;
 
 		for (i = 0; i < 8; i++)
@@ -213,7 +213,7 @@ void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		metro_blit_done(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in metro_state::device_timer");
+		assert_always(false, "Unknown id in metro_state::device_timer");
 	}
 }
 
@@ -267,7 +267,7 @@ INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
 READ_LINE_MEMBER(metro_state::metro_rxd_r)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 data = m_soundlatch->read(space, 0);
+	uint8_t data = m_soundlatch->read(space, 0);
 
 	m_soundlatch->write(space, 0, data >> 1);
 
@@ -307,7 +307,7 @@ WRITE16_MEMBER(metro_state::metro_soundstatus_w)
 WRITE8_MEMBER(metro_state::metro_sound_rombank_w)
 {
 	int bankaddress;
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x03) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x0000;
@@ -318,7 +318,7 @@ WRITE8_MEMBER(metro_state::metro_sound_rombank_w)
 WRITE8_MEMBER(metro_state::daitorid_sound_rombank_w)
 {
 	int bankaddress;
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x07) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x10000;
@@ -483,7 +483,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 
 READ16_MEMBER(metro_state::metro_bankedrom_r)
 {
-	UINT8 *ROM = memregion("gfx1")->base();
+	uint8_t *ROM = memregion("gfx1")->base();
 	size_t len = memregion("gfx1")->bytes();
 
 	offset = offset * 2 + 0x10000 * (*m_rombank);
@@ -549,12 +549,12 @@ TIMER_CALLBACK_MEMBER(metro_state::metro_blit_done)
 	update_irq_state();
 }
 
-inline int metro_state::blt_read( const UINT8 *ROM, const int offs )
+inline int metro_state::blt_read( const uint8_t *ROM, const int offs )
 {
 	return ROM[offs];
 }
 
-void metro_state::blt_write( address_space &space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
+void metro_state::blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask )
 {
 	switch(tmap)
 	{
@@ -572,15 +572,15 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 
 	if (offset == 0x0c / 2)
 	{
-		UINT8 *src     = memregion("gfx1")->base();
+		uint8_t *src     = memregion("gfx1")->base();
 		size_t src_len = memregion("gfx1")->bytes();
 
-		UINT32 tmap     = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
-		UINT32 src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
-		UINT32 dst_offs = (m_blitter_regs[0x08 / 2] << 16) + m_blitter_regs[0x0a / 2];
+		uint32_t tmap     = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
+		uint32_t src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
+		uint32_t dst_offs = (m_blitter_regs[0x08 / 2] << 16) + m_blitter_regs[0x0a / 2];
 
 		int shift   = (dst_offs & 0x80) ? 0 : 8;
-		UINT16 mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
+		uint16_t mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
 //      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
 
@@ -598,7 +598,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 
 		while (1)
 		{
-			UINT16 b1, b2, count;
+			uint16_t b1, b2, count;
 
 			src_offs %= src_len;
 			b1 = blt_read(src, src_offs);
@@ -739,9 +739,9 @@ ADDRESS_MAP_END
 /* Really weird way of mapping 3 DSWs */
 READ16_MEMBER(metro_state::balcube_dsw_r)
 {
-	UINT16 dsw1 = ioport("DSW0")->read() >> 0;
-	UINT16 dsw2 = ioport("DSW0")->read() >> 8;
-	UINT16 dsw3 = ioport("IN2")->read();
+	uint16_t dsw1 = ioport("DSW0")->read() >> 0;
+	uint16_t dsw2 = ioport("DSW0")->read() >> 8;
+	uint16_t dsw3 = ioport("IN2")->read();
 
 	switch (offset * 2)
 	{
@@ -1195,7 +1195,7 @@ WRITE16_MEMBER(metro_state::gakusai_oki_bank_lo_w)
 
 READ16_MEMBER(metro_state::gakusai_input_r)
 {
-	UINT16 input_sel = (*m_input_sel) ^ 0x3e;
+	uint16_t input_sel = (*m_input_sel) ^ 0x3e;
 	// Bit 0 ??
 	if (input_sel & 0x0002) return ioport("KEY0")->read();
 	if (input_sel & 0x0004) return ioport("KEY1")->read();
@@ -1596,7 +1596,7 @@ WRITE16_MEMBER(metro_state::blzntrnd_sound_w)
 
 WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
 {
-	UINT8 *RAM = memregion("audiocpu")->base();
+	uint8_t *RAM = memregion("audiocpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
@@ -1713,7 +1713,7 @@ ADDRESS_MAP_END
 
 class puzzlet_io_device : public device_t {
 public:
-	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
@@ -1729,13 +1729,13 @@ private:
 	required_ioport port;
 	int ce, clk;
 	int cur_bit;
-	UINT8 value;
+	uint8_t value;
 };
 
 const device_type PUZZLET_IO = &device_creator<puzzlet_io_device>;
 
 
-puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PUZZLET_IO, "Puzzlet Coin/Start I/O", tag, owner, clock, "puzzlet_io", __FILE__),
 		data_cb(*this),
 		port(*this, ":IN0")
@@ -6269,7 +6269,7 @@ DRIVER_INIT_MEMBER(metro_state,daitorid)
 /* Unscramble the GFX ROMs */
 DRIVER_INIT_MEMBER(metro_state,balcube)
 {
-	UINT8 *ROM         = memregion("gfx1")->base();
+	uint8_t *ROM         = memregion("gfx1")->base();
 	const unsigned len = memregion("gfx1")->bytes();
 
 	for (unsigned i = 0; i < len; i+=2)
@@ -6284,12 +6284,12 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 
 DRIVER_INIT_MEMBER(metro_state,dharmak)
 {
-	UINT8 *src = memregion( "gfx1" )->base();
+	uint8_t *src = memregion( "gfx1" )->base();
 	int i;
 
 	for (i = 0; i < 0x200000; i += 4)
 	{
-		UINT8 dat;
+		uint8_t dat;
 		dat = src[i + 1];
 		dat = BITSWAP8(dat, 7,3,2,4, 5,6,1,0);
 		src[i + 1] = dat;

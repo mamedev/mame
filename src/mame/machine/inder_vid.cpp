@@ -13,7 +13,7 @@
 extern const device_type INDER_VIDEO = &device_creator<inder_vid_device>;
 
 
-inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INDER_VIDEO, "Inder / Dinamic TMS Video", tag, owner, clock, "indervd", __FILE__),
 /*  device_video_interface(mconfig, *this, false), */
 		m_vram(*this, "vram"),
@@ -37,8 +37,8 @@ ADDRESS_MAP_END
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(inder_vid_device::scanline)
 {
-	UINT16 *vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	UINT32 *dest = &bitmap.pix32(scanline);
+	uint16_t *vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *dest = &bitmap.pix32(scanline);
 
 	const pen_t *paldata = m_palette->pens();
 
@@ -47,7 +47,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(inder_vid_device::scanline)
 
 	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
-		UINT16 pixels = vram[coladdr++ & 0xff];
+		uint16_t pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = paldata[pixels & 0xff];
 		dest[x + 1] = paldata[pixels >> 8];
 	}
@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_FRAGMENT( inder_vid )
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz/12) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(inder_vid_device, scanline)     /* scanline updater (RGB32) */

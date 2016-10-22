@@ -13,9 +13,9 @@
 
 static int cas_size;
 
-static int fm7_fill_wave(INT16* buffer, UINT8 high, UINT8 low, int sample_pos)
+static int fm7_fill_wave(int16_t* buffer, uint8_t high, uint8_t low, int sample_pos)
 {
-	UINT16 data = (high << 8) + low;
+	uint16_t data = (high << 8) + low;
 	int sample_count = 0;
 	int x = 0;
 	int count = (data & 0x7fff);
@@ -41,7 +41,7 @@ static int fm7_fill_wave(INT16* buffer, UINT8 high, UINT8 low, int sample_pos)
 	return sample_count;
 }
 
-static int fm7_handle_t77(INT16* buffer, const UINT8* casdata)
+static int fm7_handle_t77(int16_t* buffer, const uint8_t* casdata)
 {
 	int sample_count = 0;
 	int data_pos = 16;
@@ -61,7 +61,7 @@ static int fm7_handle_t77(INT16* buffer, const UINT8* casdata)
 /*******************************************************************
    Calculate the number of samples needed for this tape image
 ********************************************************************/
-static int fm7_cas_to_wav_size (const UINT8 *casdata, int caslen)
+static int fm7_cas_to_wav_size (const uint8_t *casdata, int caslen)
 {
 	cas_size = caslen;
 
@@ -71,7 +71,7 @@ static int fm7_cas_to_wav_size (const UINT8 *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int fm7_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int fm7_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	return fm7_handle_t77(buffer,bytes);
 }

@@ -490,8 +490,8 @@ void cps_state::fcrash_render_sprites( screen_device &screen, bitmap_ind16 &bitm
 	int base = m_sprite_base / 2;
 	int num_sprites = m_gfxdecode->gfx(2)->elements();
 	int last_sprite_offset = 0x1ffc;
-	UINT16 *sprite_ram = m_gfxram;
-	UINT16 tileno,flipx,flipy,colour,xpos,ypos;
+	uint16_t *sprite_ram = m_gfxram;
+	uint16_t tileno,flipx,flipy,colour,xpos,ypos;
 
 	/* if we have separate sprite ram, use it */
 	if (m_bootleg_sprite_ram) sprite_ram = m_bootleg_sprite_ram.get();
@@ -577,7 +577,7 @@ void cps_state::fcrash_build_palette()
 	}
 }
 
-UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = m_cps_a_regs[0x22 / 2];
@@ -1421,7 +1421,7 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(cps_state,fcrash)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
@@ -1484,7 +1484,7 @@ MACHINE_START_MEMBER(cps_state, cawingbl)
 
 MACHINE_START_MEMBER(cps_state, sf2mdt)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
@@ -1508,7 +1508,7 @@ MACHINE_START_MEMBER(cps_state, sf2mdt)
 
 MACHINE_START_MEMBER(cps_state, knightsb)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 
@@ -1527,7 +1527,7 @@ MACHINE_START_MEMBER(cps_state, knightsb)
 
 MACHINE_START_MEMBER(cps_state, sf2m1)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
@@ -1937,7 +1937,7 @@ DRIVER_INIT_MEMBER(cps_state, kodb)
 
 	/* the original game alternates between 2 sprite ram areas to achieve flashing sprites - the bootleg doesn't do the write to the register to achieve this
 	mapping both sprite ram areas to the same bootleg sprite ram - similar to how sf2mdt works */
-	m_bootleg_sprite_ram = std::make_unique<UINT16[]>(0x2000);
+	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x900000, 0x903fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x904000, 0x907fff, m_bootleg_sprite_ram.get()); /* both of these need to be mapped */
 
@@ -2241,7 +2241,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cps_state, dinopic)
 {
-	m_bootleg_sprite_ram = std::make_unique<UINT16[]>(0x2000);
+	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
 	DRIVER_INIT_CALL(cps1);
 }
@@ -2518,7 +2518,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cps_state, punipic)
 {
-	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 	mem16[0x5A8/2] = 0x4E71; // set data pointers
 	mem16[0x4DF0/2] = 0x33ED;
 	mem16[0x4DF2/2] = 0xDB2E;
@@ -2531,7 +2531,7 @@ DRIVER_INIT_MEMBER(cps_state, punipic)
 
 DRIVER_INIT_MEMBER(cps_state, punipic3)
 {
-	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 	mem16[0x5A6/2] = 0x4E71; // set data pointers
 	mem16[0x5A8/2] = 0x4E71;
 
@@ -2608,7 +2608,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cps_state, sf2m1)
 {
-	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 	mem16[0x64E/2] = 0x6046; // fix priorities
 
 	DRIVER_INIT_CALL(dinopic);
@@ -2789,9 +2789,9 @@ ROM_END
 DRIVER_INIT_MEMBER(cps_state, sf2mdt)
 {
 	int i;
-	UINT32 gfx_size = memregion( "gfx" )->bytes();
-	UINT8 *rom = memregion( "gfx" )->base();
-	UINT8 tmp;
+	uint32_t gfx_size = memregion( "gfx" )->bytes();
+	uint8_t *rom = memregion( "gfx" )->base();
+	uint8_t tmp;
 
 	for( i = 0; i < gfx_size; i += 8 )
 	{
@@ -2812,9 +2812,9 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdt)
 DRIVER_INIT_MEMBER(cps_state, sf2mdtb)
 {
 	int i;
-	UINT32 gfx_size = memregion( "gfx" )->bytes();
-	UINT8 *rom = memregion( "gfx" )->base();
-	UINT8 tmp;
+	uint32_t gfx_size = memregion( "gfx" )->bytes();
+	uint8_t *rom = memregion( "gfx" )->base();
+	uint8_t tmp;
 
 	for( i = 0; i < gfx_size; i += 8 )
 	{
@@ -2827,7 +2827,7 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdtb)
 	}
 
 	/* bootleg sprite ram */
-	m_bootleg_sprite_ram = std::make_unique<UINT16[]>(0x2000);
+	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get()); /* both of these need to be mapped  */
 
@@ -2838,11 +2838,11 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdtb)
 DRIVER_INIT_MEMBER(cps_state, sf2mdta)
 {
 	/* bootleg sprite ram */
-	m_bootleg_sprite_ram = std::make_unique<UINT16[]>(0x2000);
+	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get()); /* both of these need to be mapped - see the "Magic Delta Turbo" text on the title screen */
 
-	m_bootleg_work_ram = std::make_unique<UINT16[]>(0x8000);
+	m_bootleg_work_ram = std::make_unique<uint16_t[]>(0x8000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0xfc0000, 0xfcffff, m_bootleg_work_ram.get()); /* this has moved */
 
 	DRIVER_INIT_CALL(cps1);
@@ -2851,7 +2851,7 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdta)
 DRIVER_INIT_MEMBER(cps_state, sf2b)
 {
 	/* bootleg sprite ram */
-	m_bootleg_sprite_ram = std::make_unique<UINT16[]>(0x2000);
+	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get());
 

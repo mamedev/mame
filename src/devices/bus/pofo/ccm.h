@@ -91,12 +91,12 @@ public:
 
 	virtual bool cdet() { return 1; }
 
-	virtual UINT8 nrdi_r(address_space &space, offs_t offset) { return 0xff; };
-	virtual void nwri_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual uint8_t nrdi_r(address_space &space, offs_t offset) { return 0xff; };
+	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data) { };
 
 protected:
-	optional_shared_ptr<UINT8> m_rom;
-	optional_shared_ptr<UINT8> m_nvram;
+	optional_shared_ptr<uint8_t> m_rom;
+	optional_shared_ptr<uint8_t> m_nvram;
 
 	portfolio_memory_card_slot_t *m_slot;
 };
@@ -110,7 +110,7 @@ class portfolio_memory_card_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	portfolio_memory_card_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	portfolio_memory_card_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~portfolio_memory_card_slot_t() { }
 
 	// computer interface

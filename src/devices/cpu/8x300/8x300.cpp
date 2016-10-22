@@ -39,14 +39,14 @@
 const device_type N8X300 = &device_creator<n8x300_cpu_device>;
 
 
-n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, N8X300, "Signetics 8X300", tag, owner, clock, "8x300", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 14, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
 {
 }
 
-void n8x300_cpu_device::set_reg(UINT8 reg, UINT8 val)
+void n8x300_cpu_device::set_reg(uint8_t reg, uint8_t val)
 {
 	switch(reg)
 	{
@@ -65,7 +65,7 @@ void n8x300_cpu_device::set_reg(UINT8 reg, UINT8 val)
 	}
 }
 
-UINT8 n8x300_cpu_device::get_reg(UINT8 reg)
+uint8_t n8x300_cpu_device::get_reg(uint8_t reg)
 {
 	switch(reg)
 	{
@@ -146,16 +146,6 @@ void n8x300_cpu_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void n8x300_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
-{
-	switch (entry.index())
-	{
-//      case STATE_GENFLAGS:
-//          string.printf("%c%c%c%c%c%c",
-//          break;
-	}
-}
-
 void n8x300_cpu_device::device_reset()
 {
 	/* zero registers */
@@ -168,12 +158,12 @@ void n8x300_cpu_device::execute_run()
 {
 	do
 	{
-		UINT16 opcode;
-		UINT8 src;
-		UINT8 dst;
-		UINT8 rotlen;  // rotate amount or I/O field length
-		UINT8 mask;
-		UINT16 result;
+		uint16_t opcode;
+		uint8_t src;
+		uint8_t dst;
+		uint8_t rotlen;  // rotate amount or I/O field length
+		uint8_t mask;
+		uint16_t result;
 
 		/* fetch the opcode */
 		debugger_instruction_hook(this, m_genPC);
@@ -553,7 +543,7 @@ void n8x300_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-offs_t n8x300_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t n8x300_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( n8x300 );
 	return CPU_DISASSEMBLE_NAME(n8x300)(this, buffer, pc, oprom, opram, options);

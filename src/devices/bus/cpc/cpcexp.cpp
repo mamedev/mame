@@ -41,7 +41,7 @@ device_cpc_expansion_card_interface::~device_cpc_expansion_card_interface()
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, CPC_EXPANSION_SLOT, "Amstrad CPC expansion port", tag, owner, clock, "cpc_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_out_irq_cb(*this),

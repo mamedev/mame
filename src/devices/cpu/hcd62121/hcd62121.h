@@ -37,7 +37,7 @@ class hcd62121_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -45,9 +45,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 4; }
-	virtual UINT32 execute_max_cycles() const override { return 48; }
-	virtual UINT32 execute_input_lines() const override { return 2; }
+	virtual uint32_t execute_min_cycles() const override { return 4; }
+	virtual uint32_t execute_max_cycles() const override { return 48; }
+	virtual uint32_t execute_input_lines() const override { return 2; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -57,36 +57,36 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 18; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 18; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
-	UINT8 read_op();
-	UINT8 datasize( UINT8 op );
-	void read_reg( int size, UINT8 op1 );
-	void write_reg( int size, UINT8 op1 );
-	void read_regreg( int size, UINT8 op1, UINT8 op2, bool op_is_logical );
-	void write_regreg( int size, UINT8 op1, UINT8 op2 );
-	void read_iregreg( int size, UINT8 op1, UINT8 op2 );
-	void write_iregreg( int size, UINT8 op1, UINT8 op2 );
-	void write_iregreg2( int size, UINT8 op1, UINT8 op2 );
-	int check_cond( UINT8 op );
+	uint8_t read_op();
+	uint8_t datasize( uint8_t op );
+	void read_reg( int size, uint8_t op1 );
+	void write_reg( int size, uint8_t op1 );
+	void read_regreg( int size, uint8_t op1, uint8_t op2, bool op_is_logical );
+	void write_regreg( int size, uint8_t op1, uint8_t op2 );
+	void read_iregreg( int size, uint8_t op1, uint8_t op2 );
+	void write_iregreg( int size, uint8_t op1, uint8_t op2 );
+	void write_iregreg2( int size, uint8_t op1, uint8_t op2 );
+	int check_cond( uint8_t op );
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	UINT32 m_prev_pc;
-	UINT16 m_sp;
-	UINT16 m_ip;
-	UINT8 m_dsize;
-	UINT8 m_cseg;
-	UINT8 m_dseg;
-	UINT8 m_sseg;
-	UINT8 m_f;
-	UINT16 m_lar;
-	UINT8 m_reg[0x80];
-	UINT8 m_temp1[0x10];
-	UINT8 m_temp2[0x10];
+	uint32_t m_prev_pc;
+	uint16_t m_sp;
+	uint16_t m_ip;
+	uint8_t m_dsize;
+	uint8_t m_cseg;
+	uint8_t m_dseg;
+	uint8_t m_sseg;
+	uint8_t m_f;
+	uint16_t m_lar;
+	uint8_t m_reg[0x80];
+	uint8_t m_temp1[0x10];
+	uint8_t m_temp2[0x10];
 
 	address_space *m_program;
 	address_space *m_io;

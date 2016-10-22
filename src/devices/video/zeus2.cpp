@@ -20,7 +20,7 @@ zeus2_renderer::zeus2_renderer(zeus2_device *state)
 
 const device_type ZEUS2 = &device_creator<zeus2_device>;
 
-zeus2_device::zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+zeus2_device::zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ZEUS2, "Midway Zeus2", tag, owner, clock, "zeus2", __FILE__),
 	m_vblank(*this), m_irq(*this), m_atlantis(0)
 {
@@ -67,9 +67,9 @@ TIMER_CALLBACK_MEMBER(zeus2_device::int_timer_callback)
 void zeus2_device::device_start()
 {
 	/* allocate memory for "wave" RAM */
-	waveram = auto_alloc_array(machine(), UINT32, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
-	m_frameColor = std::make_unique<UINT32[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
-	m_frameDepth = std::make_unique<UINT16[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	waveram = auto_alloc_array(machine(), uint32_t, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
+	m_frameColor = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	m_frameDepth = std::make_unique<uint16_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 
 	/* initialize polygon engine */
 	poly = auto_alloc(machine(), zeus2_renderer(this));
@@ -147,7 +147,7 @@ void zeus2_device::device_stop()
 	myfile.open(fileName.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 
 	if (myfile.is_open())
-		myfile.write((char *)waveram, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 2 * sizeof(UINT32));
+		myfile.write((char *)waveram, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 2 * sizeof(uint32_t));
 	myfile.close();
 #endif
 
@@ -194,7 +194,7 @@ void zeus2_device::device_stop()
  *
  *************************************/
 
-UINT32 zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// Wait until configuration is completed before transfering anything
 	if (m_zeusbase[0x30] == 0)
@@ -213,10 +213,10 @@ UINT32 zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		int xoffs = screen.visible_area().min_x;
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *colorptr = &m_frameColor[frame_addr_from_xy(0, y, false)];
-			UINT32 *dest = &bitmap.pix32(y);
+			uint32_t *colorptr = &m_frameColor[frame_addr_from_xy(0, y, false)];
+			uint32_t *dest = &bitmap.pix32(y);
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++) {
-				UINT32 bufX = x - xoffs;
+				uint32_t bufX = x - xoffs;
 				dest[x] = colorptr[bufX];
 			}
 		}
@@ -244,15 +244,15 @@ UINT32 zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		int xoffs = screen.visible_area().min_x;
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *dest = &bitmap.pix32(y);
+			uint32_t *dest = &bitmap.pix32(y);
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				if (1) {
-					UINT8 tex = get_texel_8bit((UINT64 *)base, y, x, texel_width);
+					uint8_t tex = get_texel_8bit((uint64_t *)base, y, x, texel_width);
 					dest[x] = (tex << 16) | (tex << 8) | tex;
 				}
 				else {
-					dest[x] = ((UINT32 *)(base))[((y * WAVERAM1_WIDTH)) + x - xoffs];
+					dest[x] = ((uint32_t *)(base))[((y * WAVERAM1_WIDTH)) + x - xoffs];
 				}
 			}
 		}
@@ -276,7 +276,7 @@ READ32_MEMBER( zeus2_device::zeus2_r )
 		offset != 0x48 && offset != 0x49 &&
 		offset != 0x54 && offset != 0x58 && offset != 0x59 && offset != 0x5a);
 	logit &= LOG_REGS;
-	UINT32 result = m_zeusbase[offset];
+	uint32_t result = m_zeusbase[offset];
 #if TRACK_REG_USAGE
 	regread_count[offset]++;
 #endif
@@ -342,9 +342,9 @@ WRITE32_MEMBER( zeus2_device::zeus2_w )
  *
  *************************************/
 
-void zeus2_device::zeus2_register32_w(offs_t offset, UINT32 data, int logit)
+void zeus2_device::zeus2_register32_w(offs_t offset, uint32_t data, int logit)
 {
-	UINT32 oldval = m_zeusbase[offset];
+	uint32_t oldval = m_zeusbase[offset];
 
 #if TRACK_REG_USAGE
 regwrite_count[offset]++;
@@ -388,7 +388,7 @@ if (regdata_count[offset] < 256)
  *
  *************************************/
 
-void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit)
+void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int logit)
 {
 	/* handle the writes; only trigger on low accesses */
 	switch (offset)
@@ -446,7 +446,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 
 		case 0x38:
 			{
-				UINT32 temp = m_zeusbase[0x38];
+				uint32_t temp = m_zeusbase[0x38];
 				m_zeusbase[0x38] = oldval;
 				m_screen->update_partial(m_screen->vpos());
 				log_fifo = machine().input().code_pressed(KEYCODE_L);
@@ -493,7 +493,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 			else if ((((m_zeusbase[0x40] >> 24) & 0xff) == 0x38) ||
 				(((m_zeusbase[0x40] >> 24) & 0xff) == 0x2d)) {
 				// Direct command buffer
-				m_directCmd = (UINT32*)waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
+				m_directCmd = (uint32_t*)waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
 				if (logit)
 					logerror("\t-- direct cmd: %08X addr: %08X", m_zeusbase[0x40], m_zeusbase[0x41]);
 				{
@@ -521,8 +521,8 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 					}
 				}
 				if (1 && logit) {
-					UINT32 *wavePtr = (UINT32*)WAVERAM_BLOCK0(m_zeusbase[0x41]);
-					UINT32 waveData;
+					uint32_t *wavePtr = (uint32_t*)WAVERAM_BLOCK0(m_zeusbase[0x41]);
+					uint32_t waveData;
 					int size = m_zeusbase[0x40] & 0xff;
 					logerror("\n Setup size=%d [40]=%08X [41]=%08X [4e]=%08X\n", zeus_quad_size, m_zeusbase[0x40], m_zeusbase[0x41], m_zeusbase[0x4e]);
 					for (int i = 0; i <= size; ++i) {
@@ -616,8 +616,8 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 				// crusnexo: 0x007831FF => clear one frame
 				// thegrid:  0x008831FF => clear one frame
 				// thegrid:  0x0079FFFF => clear entire frame buffer at 51=0 then 51=00800000, only seen at initial tests in thegrid
-				UINT32 addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
-				UINT32 numBytes = (m_zeusbase[0x50] & 0xffff) + 1;
+				uint32_t addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
+				uint32_t numBytes = (m_zeusbase[0x50] & 0xffff) + 1;
 				numBytes *= 0x40;
 				if (m_zeusbase[0x50] & 0x10000) {
 					addr = 0x0;
@@ -673,7 +673,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 			/* thegrid uses this to write either left or right halves of pixels */
 			//if (m_zeusbase[0x50] == 0x00e90000)
 			//{
-			//  UINT32 addr = frame_addr_from_reg51();
+			//  uint32_t addr = frame_addr_from_reg51();
 			//  if (m_zeusbase[0x57] & 1)
 			//      m_frameColor[addr] = m_zeusbase[0x58];
 			//  if (m_zeusbase[0x57] & 4)
@@ -725,14 +725,14 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 /*************************************
 *  Load pal table from waveram
 *************************************/
-void zeus2_device::load_pal_table(void *wavePtr, UINT32 ctrl, int logit)
+void zeus2_device::load_pal_table(void *wavePtr, uint32_t ctrl, int logit)
 {
-	UINT32 *tablePtr = m_pal_table;
+	uint32_t *tablePtr = m_pal_table;
 	int count = ctrl & 0xff;
-	UINT32 cmd = ctrl >> 24;
+	uint32_t cmd = ctrl >> 24;
 	if (cmd == 0x0) {
 		// Convert from RGB555
-		UINT16 *src = (UINT16*)wavePtr;
+		uint16_t *src = (uint16_t*)wavePtr;
 		for (int i = 0; i <= count; ++i) {
 			*tablePtr++ = conv_rgb555_to_rgb32(*src++);
 			*tablePtr++ = conv_rgb555_to_rgb32(*src++);
@@ -741,7 +741,7 @@ void zeus2_device::load_pal_table(void *wavePtr, UINT32 ctrl, int logit)
 		}
 	} else if (cmd==0xc0) {
 		// The data seems to be in ARGB32 format
-		UINT32 *src = (UINT32*)wavePtr;
+		uint32_t *src = (uint32_t*)wavePtr;
 		for (int i = 0; i <= count; ++i) {
 			*tablePtr++ = *src++;
 			*tablePtr++ = *src++;
@@ -755,7 +755,7 @@ void zeus2_device::load_pal_table(void *wavePtr, UINT32 ctrl, int logit)
  *
  *************************************/
 
-void zeus2_device::zeus2_pointer_write(UINT8 which, UINT32 value, int logit)
+void zeus2_device::zeus2_pointer_write(uint8_t which, uint32_t value, int logit)
 {
 #if TRACK_REG_USAGE
 subregwrite_count[which]++;
@@ -826,7 +826,7 @@ if (subregdata_count[which] < 256)
  *  Process the FIFO
  *************************************/
 
-int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
+bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 {
 	int dataoffs = 0;
 
@@ -839,13 +839,13 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		if (((data[0] >> 16) & 0x7f) == 0x0) {
 			if (log_fifo && (data[0] & 0xfff) != 0x2c0)
 				log_fifo_command(data, numwords, " -- ignored\n");
-			return TRUE;
+			return true;
 		}
 		// Drop through to 0x05 command
 	/* 0x05: write 32-bit value to low registers */
 	case 0x05:
 		if (numwords < 2)
-			return FALSE;
+			return false;
 		if (log_fifo)
 			log_fifo_command(data, numwords, " -- reg32");
 		if (((data[0] >> 16) & 0x7f) != 0x08)
@@ -855,13 +855,13 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		/* 0x08: set matrix and point (thegrid) */
 		case 0x08:
 			if (numwords < 14)
-				return FALSE;
+				return false;
 			dataoffs = 1;
 
 		/* 0x07: set matrix and point (crusnexo) */
 		case 0x07:
 			if (numwords < 13)
-				return FALSE;
+				return false;
 
 			/* extract the matrix from the raw data */
 			zeus_matrix[0][0] = convert_float(data[dataoffs + 1]);
@@ -899,7 +899,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		case 0x15:
 		case 0x16:
 			if (numwords < 4)
-				return FALSE;
+				return false;
 
 			/* extract the translation point from the raw data */
 			zeus_point[0] = convert_float(data[1]);
@@ -920,7 +920,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		case 0x1c:
 			if (m_thegrid) {
 				if (numwords < 3)
-					return FALSE;
+					return false;
 				if (log_fifo)
 					log_fifo_command(data, numwords, " -- unknown control\n");
 				break;
@@ -931,7 +931,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		case 0x10:
 		case 0x1b:
 			if (numwords < 4)
-				return FALSE;
+				return false;
 			if (log_fifo)
 			{
 				log_fifo_command(data, numwords, " -- unknown control + happens after clear screen\n");
@@ -950,7 +950,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		// thegrid ???
 		case 0x1d:
 			if (numwords < 2)
-				return FALSE;
+				return false;
 			if (log_fifo)
 			{
 				log_fifo_command(data, numwords, " -- unknown\n");
@@ -966,7 +966,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		case 0x23:
 		case 0x24:
 			if (numwords < 2)
-				return FALSE;
+				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, "");
 			zeus2_draw_model(data[1], data[0] & 0xffff, log_fifo);
@@ -975,7 +975,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		// 0x2d; set direct render pixels location (atlantis)
 		case 0x2d:
 			if (numwords < 2)
-				return FALSE;
+				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, "\n");
 			m_renderAddr = frame_addr_from_phys_addr(data[1]);
@@ -997,14 +997,14 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		case 0x38:
 			if (data[0] == 0x38000000) {
 				if (numwords < 3)
-					return FALSE;
+					return false;
 				// Direct write to frame buffer
-				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((UINT16)data[1]);
-				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((UINT16)(data[1] >> 16));
-				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((UINT16)data[2]);
-				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((UINT16)(data[2] >> 16));
+				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)data[1]);
+				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)(data[1] >> 16));
+				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)data[2]);
+				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)(data[2] >> 16));
 			} else if (numwords < 12)
-				return FALSE;
+				return false;
 			//print_fifo_command(data, numwords, "\n");
 			if (log_fifo)
 				log_fifo_command(data, numwords, "\n");
@@ -1019,19 +1019,19 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 			}
 			break;
 	}
-	return TRUE;
+	return true;
 }
 
 /*************************************
  *  Draw a model in waveram
  *************************************/
 
-void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
+void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit)
 {
-	UINT32 databuffer[32];
+	uint32_t databuffer[32];
 	int databufcount = 0;
-	int model_done = FALSE;
-	UINT32 texdata = 0;
+	int model_done = false;
+	uint32_t texdata = 0;
 
 	if (logit)
 		logerror(" -- model @ %08X, len %04X\n", baseaddr, count);
@@ -1051,8 +1051,8 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 		for (curoffs = 0; curoffs <= count; curoffs++)
 		{
 			int countneeded = 2;
-			UINT8 cmd;
-			UINT8 subCmd;
+			uint8_t cmd;
+			uint8_t subCmd;
 
 			/* accumulate 2 words of data */
 			databuffer[databufcount++] = WAVERAM_READ32(base, curoffs * 2 + 0);
@@ -1118,9 +1118,9 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 					case 0x38:  /* crusnexo/thegrid */
 						if (subCmd == 0x38) {
 							// Direct commands from waveram buffer
-							//UINT32 cmdData[2];
+							//uint32_t cmdData[2];
 							//for (int subIndex = 0; subIndex < 2; ++subIndex) {
-							//	UINT32 offset = (databuffer[subIndex] & 0xff) * 6;
+							//	uint32_t offset = (databuffer[subIndex] & 0xff) * 6;
 							//	//printf("directRead curoffs: 0x%X\n", curoffs);
 							//	for (int cmdIndex = 0; cmdIndex < 3; ++cmdIndex) {
 							//		cmdData[0] = m_directCmd[offset + cmdIndex * 2 + 0];
@@ -1140,8 +1140,8 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 							//	}
 							//}
 							//void *palbase = waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
-							//UINT8 texel = databuffer[0];
-							//UINT32 color = WAVERAM_READ16(palbase, texel);
+							//uint8_t texel = databuffer[0];
+							//uint32_t color = WAVERAM_READ16(palbase, texel);
 							//m_frameDepth[m_renderAddr] = 0;
 							//m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32(color);
 							//texel = databuffer[1];
@@ -1187,7 +1187,7 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 /*************************************
  *  Draw a quad
  *************************************/
-void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, int logit)
+void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdata, int logit)
 {
 	z2_poly_vertex clipvert[8];
 	z2_poly_vertex vert[4];
@@ -1196,8 +1196,8 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 	//  int val1, val2, texwshift;
 	int numverts;
 	int i;
-	//  INT16 normal[3];
-	//  INT32 rotnormal[3];
+	//  int16_t normal[3];
+	//  int32_t rotnormal[3];
 
 	if (logit)
 		m_state->logerror("quad %d\n", m_state->zeus_quad_size);
@@ -1262,53 +1262,53 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 	if (m_state->m_atlantis) {
 			// Atlantis quad 14
 		texdata = databuffer[1];
-		vert[0].x = (INT16)databuffer[2];
-		vert[0].y = (INT16)databuffer[3];
-		vert[0].p[0] = (INT16)databuffer[4];
+		vert[0].x = (int16_t)databuffer[2];
+		vert[0].y = (int16_t)databuffer[3];
+		vert[0].p[0] = (int16_t)databuffer[4];
 		vert[0].p[1] = (databuffer[5] >> 0) & 0xff;
 		vert[0].p[2] = (databuffer[5] >> 8) & 0xff;
 
-		vert[1].x = (INT16)(databuffer[2] >> 16);
-		vert[1].y = (INT16)(databuffer[3] >> 16);
-		vert[1].p[0] = (INT16)(databuffer[4] >> 16);
+		vert[1].x = (int16_t)(databuffer[2] >> 16);
+		vert[1].y = (int16_t)(databuffer[3] >> 16);
+		vert[1].p[0] = (int16_t)(databuffer[4] >> 16);
 		vert[1].p[1] = (databuffer[5] >> 16) & 0xff;
 		vert[1].p[2] = (databuffer[5] >> 24) & 0xff;
 
-		vert[2].x = (INT16)databuffer[6];
-		vert[2].y = (INT16)databuffer[7];
-		vert[2].p[0] = (INT16)databuffer[8];
+		vert[2].x = (int16_t)databuffer[6];
+		vert[2].y = (int16_t)databuffer[7];
+		vert[2].p[0] = (int16_t)databuffer[8];
 		vert[2].p[1] = (databuffer[9] >> 0) & 0xff;
 		vert[2].p[2] = (databuffer[9] >> 8) & 0xff;
 
-		vert[3].x = (INT16)(databuffer[6] >> 16);
-		vert[3].y = (INT16)(databuffer[7] >> 16);
-		vert[3].p[0] = (INT16)(databuffer[8] >> 16);
+		vert[3].x = (int16_t)(databuffer[6] >> 16);
+		vert[3].y = (int16_t)(databuffer[7] >> 16);
+		vert[3].p[0] = (int16_t)(databuffer[8] >> 16);
 		vert[3].p[1] = (databuffer[9] >> 16) & 0xff;
 		vert[3].p[2] = (databuffer[9] >> 24) & 0xff;
 	}
 	else {
 		//printf("R40: %06X\n", m_state->m_renderRegs[0x40]);
-		vert[0].x = (INT16)databuffer[2];
-		vert[0].y = (INT16)databuffer[3];
-		vert[0].p[0] = (INT16)databuffer[6];
+		vert[0].x = (int16_t)databuffer[2];
+		vert[0].y = (int16_t)databuffer[3];
+		vert[0].p[0] = (int16_t)databuffer[6];
 		vert[0].p[1] = (databuffer[1] >> 2) & 0xff;
 		vert[0].p[2] = (databuffer[1] >> 18) & 0xff;
 
-		vert[1].x = (INT16)(databuffer[2] >> 16);
-		vert[1].y = (INT16)(databuffer[3] >> 16);
-		vert[1].p[0] = (INT16)(databuffer[6] >> 16);
+		vert[1].x = (int16_t)(databuffer[2] >> 16);
+		vert[1].y = (int16_t)(databuffer[3] >> 16);
+		vert[1].p[0] = (int16_t)(databuffer[6] >> 16);
 		vert[1].p[1] = (databuffer[4] >> 2) & 0xff;
 		vert[1].p[2] = (databuffer[4] >> 12) & 0xff;
 
-		vert[2].x = (INT16)databuffer[8];
-		vert[2].y = (INT16)databuffer[9];
-		vert[2].p[0] = (INT16)databuffer[7];
+		vert[2].x = (int16_t)databuffer[8];
+		vert[2].y = (int16_t)databuffer[9];
+		vert[2].p[0] = (int16_t)databuffer[7];
 		vert[2].p[1] = (databuffer[4] >> 22) & 0xff;
 		vert[2].p[2] = (databuffer[5] >> 2) & 0xff;
 
-		vert[3].x = (INT16)(databuffer[8] >> 16);
-		vert[3].y = (INT16)(databuffer[9] >> 16);
-		vert[3].p[0] = (INT16)(databuffer[7] >> 16);
+		vert[3].x = (int16_t)(databuffer[8] >> 16);
+		vert[3].y = (int16_t)(databuffer[9] >> 16);
+		vert[3].p[0] = (int16_t)(databuffer[7] >> 16);
 		vert[3].p[1] = (databuffer[5] >> 12) & 0xff;
 		vert[3].p[2] = (databuffer[5] >> 22) & 0xff;
 	}
@@ -1317,43 +1317,43 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 	if (m_state->zeus_quad_size == 14) {
 		// buffer 10-13 ???? 00000000 1FF7FC00 00000000 1FF7FC00 -- mwskinsa quad 14
 		/* 10:13 16 bit coordinates */
-		unknown[0] = (INT16)databuffer[10];
-		unknown[1] = (INT16)(databuffer[10] >> 16);
-		unknown[2] = (INT16)databuffer[11];
-		unknown[3] = (INT16)(databuffer[11] >> 16);
-		unknown[4] = (INT16)databuffer[12];
-		unknown[5] = (INT16)(databuffer[12] >> 16);
-		unknown[6] = (INT16)databuffer[13];
-		unknown[7] = (INT16)(databuffer[13] >> 16);
+		unknown[0] = (int16_t)databuffer[10];
+		unknown[1] = (int16_t)(databuffer[10] >> 16);
+		unknown[2] = (int16_t)databuffer[11];
+		unknown[3] = (int16_t)(databuffer[11] >> 16);
+		unknown[4] = (int16_t)databuffer[12];
+		unknown[5] = (int16_t)(databuffer[12] >> 16);
+		unknown[6] = (int16_t)databuffer[13];
+		unknown[7] = (int16_t)(databuffer[13] >> 16);
 		unknownFloat[0] = m_state->convert_float(databuffer[10]);
 		unknownFloat[1] = m_state->convert_float(databuffer[11]);
 		unknownFloat[2] = m_state->convert_float(databuffer[12]);
 		unknownFloat[3] = m_state->convert_float(databuffer[13]);
 	}
 	/*
-	vert[0].x = (INT16)databuffer[1];
-	vert[0].y = (INT16)databuffer[3];
-	vert[0].p[0] = (INT16)databuffer[5];
-	vert[0].p[1] = (UINT16)databuffer[2];
-	vert[0].p[2] = (UINT16)(databuffer[2] >> 16);
+	vert[0].x = (int16_t)databuffer[1];
+	vert[0].y = (int16_t)databuffer[3];
+	vert[0].p[0] = (int16_t)databuffer[5];
+	vert[0].p[1] = (uint16_t)databuffer[2];
+	vert[0].p[2] = (uint16_t)(databuffer[2] >> 16);
 
-	vert[1].x = (INT16)(databuffer[1] >> 16);
-	vert[1].y = (INT16)(databuffer[3] >> 16);
-	vert[1].p[0] = (INT16)(databuffer[5] >> 16);
-	vert[1].p[1] = (UINT16)databuffer[4];
-	vert[1].p[2] = (UINT16)(databuffer[4] >> 16);
+	vert[1].x = (int16_t)(databuffer[1] >> 16);
+	vert[1].y = (int16_t)(databuffer[3] >> 16);
+	vert[1].p[0] = (int16_t)(databuffer[5] >> 16);
+	vert[1].p[1] = (uint16_t)databuffer[4];
+	vert[1].p[2] = (uint16_t)(databuffer[4] >> 16);
 
-	vert[2].x = (INT16)databuffer[9];
-	vert[2].y = (INT16)databuffer[10];
-	vert[2].p[0] = (INT16)databuffer[11];
-	vert[2].p[1] = (UINT16)databuffer[6];
-	vert[2].p[2] = (UINT16)(databuffer[6] >> 16);
+	vert[2].x = (int16_t)databuffer[9];
+	vert[2].y = (int16_t)databuffer[10];
+	vert[2].p[0] = (int16_t)databuffer[11];
+	vert[2].p[1] = (uint16_t)databuffer[6];
+	vert[2].p[2] = (uint16_t)(databuffer[6] >> 16);
 
-	vert[3].x = (INT16)(databuffer[9] >> 16);
-	vert[3].y = (INT16)(databuffer[10] >> 16);
-	vert[3].p[0] = (INT16)(databuffer[11] >> 16);
-	vert[3].p[1] = (UINT16)databuffer[7];
-	vert[3].p[2] = (UINT16)(databuffer[7] >> 16);
+	vert[3].x = (int16_t)(databuffer[9] >> 16);
+	vert[3].y = (int16_t)(databuffer[10] >> 16);
+	vert[3].p[0] = (int16_t)(databuffer[11] >> 16);
+	vert[3].p[1] = (uint16_t)databuffer[7];
+	vert[3].p[2] = (uint16_t)(databuffer[7] >> 16);
 	*/
 
 	int logextra = 1;
@@ -1396,7 +1396,7 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 		// back face cull using polygon normal and first vertex
 		if (1 && i == 0)
 		{
-			INT8 normal[3];
+			int8_t normal[3];
 			float rotnormal[3];
 
 			normal[0] = databuffer[0] >> 0;
@@ -1522,7 +1522,7 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 
 	//default:
 	//{
-	//  static UINT8 hits[0x10000];
+	//  static uint8_t hits[0x10000];
 	//  if (!hits[(texdata & 0xffff)])
 	//  {
 	//      hits[(texdata & 0xffff)] = 1;
@@ -1563,31 +1563,31 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 *  Rasterizers
 *************************************/
 
-void zeus2_renderer::render_poly_8bit(INT32 scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid)
+void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid)
 {
-	INT32 curz = extent.param[0].start;
-	INT32 curu = extent.param[1].start;
-	INT32 curv = extent.param[2].start;
-	//  INT32 curi = extent.param[3].start;
-	INT32 dzdx = extent.param[0].dpdx;
-	INT32 dudx = extent.param[1].dpdx;
-	INT32 dvdx = extent.param[2].dpdx;
-	//  INT32 didx = extent.param[3].dpdx;
+	int32_t curz = extent.param[0].start;
+	int32_t curu = extent.param[1].start;
+	int32_t curv = extent.param[2].start;
+	//  int32_t curi = extent.param[3].start;
+	int32_t dzdx = extent.param[0].dpdx;
+	int32_t dudx = extent.param[1].dpdx;
+	int32_t dvdx = extent.param[2].dpdx;
+	//  int32_t didx = extent.param[3].dpdx;
 	const void *texbase = object.texbase;
 	//const void *palbase = object.palbase;
-	UINT16 transcolor = object.transcolor;
+	uint16_t transcolor = object.transcolor;
 	int texwidth = object.texwidth;
 	int x;
 
-	UINT32 addr = m_state->frame_addr_from_xy(0, scanline, true);
-	UINT16 *depthptr = &m_state->m_frameDepth[addr];
-	UINT32 *colorptr = &m_state->m_frameColor[addr];
+	uint32_t addr = m_state->frame_addr_from_xy(0, scanline, true);
+	uint16_t *depthptr = &m_state->m_frameDepth[addr];
+	uint32_t *colorptr = &m_state->m_frameColor[addr];
 	for (x = extent.startx; x < extent.stopx; x++)
 	{
 		bool depth_pass = true;
 		if (object.depth_test_enable) {
-			//UINT16 *depthptr = WAVERAM_PTRDEPTH(m_state->zeus_renderbase, scanline, x);
-			INT32 depth = (curz >> 16) + object.zoffset;
+			//uint16_t *depthptr = WAVERAM_PTRDEPTH(m_state->zeus_renderbase, scanline, x);
+			int32_t depth = (curz >> 16) + object.zoffset;
 			//if (depth > 0x7fff) depth = 0x7fff;
 			if (depth > 0xffff) depth = 0xffff;
 			if (depth < 0 || depth > depthptr[x])
@@ -1600,22 +1600,22 @@ void zeus2_renderer::render_poly_8bit(INT32 scanline, const extent_t& extent, co
 			int v0 = (curv >> 8);// & 255;
 			int u1 = (u0 + 1);
 			int v1 = (v0 + 1);
-			UINT8 texel0 = m_state->get_texel_8bit(texbase, v0, u0, texwidth);
+			uint8_t texel0 = m_state->get_texel_8bit(texbase, v0, u0, texwidth);
 			if (texel0 == object.transcolor)
 				continue;
-			UINT8 texel1 = m_state->get_texel_8bit(texbase, v0, u1, texwidth);
-			UINT8 texel2 = m_state->get_texel_8bit(texbase, v1, u0, texwidth);
-			UINT8 texel3 = m_state->get_texel_8bit(texbase, v1, u1, texwidth);
+			uint8_t texel1 = m_state->get_texel_8bit(texbase, v0, u1, texwidth);
+			uint8_t texel2 = m_state->get_texel_8bit(texbase, v1, u0, texwidth);
+			uint8_t texel3 = m_state->get_texel_8bit(texbase, v1, u1, texwidth);
 			if (texel0 != transcolor)
 			{
-				UINT32 color0 = m_state->m_pal_table[texel0];
-				UINT32 color1 = m_state->m_pal_table[texel1];
-				UINT32 color2 = m_state->m_pal_table[texel2];
-				UINT32 color3 = m_state->m_pal_table[texel3];
-				//UINT32 color0 = WAVERAM_READ16(palbase, texel0);
-				//UINT32 color1 = WAVERAM_READ16(palbase, texel1);
-				//UINT32 color2 = WAVERAM_READ16(palbase, texel2);
-				//UINT32 color3 = WAVERAM_READ16(palbase, texel3);
+				uint32_t color0 = m_state->m_pal_table[texel0];
+				uint32_t color1 = m_state->m_pal_table[texel1];
+				uint32_t color2 = m_state->m_pal_table[texel2];
+				uint32_t color3 = m_state->m_pal_table[texel3];
+				//uint32_t color0 = WAVERAM_READ16(palbase, texel0);
+				//uint32_t color1 = WAVERAM_READ16(palbase, texel1);
+				//uint32_t color2 = WAVERAM_READ16(palbase, texel2);
+				//uint32_t color3 = WAVERAM_READ16(palbase, texel3);
 				//color0 = ((color0 & 0x7c00) << 9) | ((color0 & 0x3e0) << 6) | ((color0 & 0x1f) << 3);
 				//color1 = ((color1 & 0x7c00) << 9) | ((color1 & 0x3e0) << 6) | ((color1 & 0x1f) << 3);
 				//color2 = ((color2 & 0x7c00) << 9) | ((color2 & 0x3e0) << 6) | ((color2 & 0x1f) << 3);
@@ -1637,7 +1637,7 @@ void zeus2_renderer::render_poly_8bit(INT32 scanline, const extent_t& extent, co
  *  Debugging tools
  *************************************/
 
-void zeus2_device::log_fifo_command(const UINT32 *data, int numwords, const char *suffix)
+void zeus2_device::log_fifo_command(const uint32_t *data, int numwords, const char *suffix)
 {
 	int wordnum;
 	logerror("Zeus cmd %02X :", data[0] >> 24);
@@ -1646,7 +1646,7 @@ void zeus2_device::log_fifo_command(const UINT32 *data, int numwords, const char
 	logerror("%s", suffix);
 }
 
-void zeus2_device::print_fifo_command(const UINT32 *data, int numwords, const char *suffix)
+void zeus2_device::print_fifo_command(const uint32_t *data, int numwords, const char *suffix)
 {
 	int wordnum;
 	printf("Zeus cmd %02X :", data[0] >> 24);
@@ -1655,7 +1655,7 @@ void zeus2_device::print_fifo_command(const UINT32 *data, int numwords, const ch
 	printf("%s", suffix);
 }
 
-void zeus2_device::log_render_info(UINT32 texdata)
+void zeus2_device::log_render_info(uint32_t texdata)
 {
 	logerror("-- RMode0 R40 = %08X texdata = %08X", m_renderRegs[0x40], texdata);
 	logerror("\n-- RMode1 ");

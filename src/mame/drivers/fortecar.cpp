@@ -342,7 +342,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 	DECLARE_WRITE8_MEMBER(ppi0_portc_w);
 	DECLARE_READ8_MEMBER(ppi0_portc_r);
 	DECLARE_WRITE8_MEMBER(ayporta_w);
@@ -351,7 +351,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fortecar);
-	UINT32 screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -366,7 +366,7 @@ void fortecar_state::video_start()
 {
 }
 
-UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, count;
 	count = 0;
@@ -395,7 +395,7 @@ UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind1
 
 PALETTE_INIT_MEMBER(fortecar_state, fortecar)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 /* Video resistors...
 
 O1 (LS374) R1K  RED

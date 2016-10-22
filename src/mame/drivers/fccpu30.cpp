@@ -234,7 +234,7 @@ fccpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	/* Interrupt  support */
 	//  IRQ_CALLBACK_MEMBER(maincpu_iack_callback);
 	DECLARE_WRITE_LINE_MEMBER(fga_irq_callback);
-	UINT8 fga_irq_state;
+	uint8_t fga_irq_state;
 	//  int fga_irq_vector;
 	int fga_irq_level;
 
@@ -272,8 +272,8 @@ private:
 	void update_irq_to_maincpu();
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	UINT32  *m_sysrom;
-	UINT32  m_sysram[2];
+	uint32_t  *m_sysrom;
+	uint32_t  m_sysram[2];
 };
 
 static ADDRESS_MAP_START (fccpu30_mem, AS_PROGRAM, 32, fccpu30_state)
@@ -307,7 +307,7 @@ void fccpu30_state::machine_start ()
 	save_pointer (NAME (m_sysram), sizeof(m_sysram));
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (UINT32*)(memregion ("roms")->base () + 0x800000);
+	m_sysrom = (uint32_t*)(memregion ("roms")->base () + 0x800000);
 }
 
 void fccpu30_state::machine_reset ()
@@ -316,7 +316,7 @@ void fccpu30_state::machine_reset ()
 
 	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
-		m_sysrom = (UINT32*)(memregion ("roms")->base () + 0x800000);
+		m_sysrom = (uint32_t*)(memregion ("roms")->base () + 0x800000);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
@@ -459,7 +459,7 @@ WRITE8_MEMBER (fccpu30_state::pit2c_w){
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (fccpu30_state::vme_a24_r){
 	LOG (logerror ("vme_a24_r\n"));
-	return (UINT16) 0;
+	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (fccpu30_state::vme_a24_w){
@@ -468,7 +468,7 @@ WRITE16_MEMBER (fccpu30_state::vme_a24_w){
 
 READ16_MEMBER (fccpu30_state::vme_a16_r){
 	LOG (logerror ("vme_16_r\n"));
-	return (UINT16) 0;
+	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (fccpu30_state::vme_a16_w){
@@ -714,30 +714,30 @@ ROM_END
  * Repeated setup for channel B
  *
  * FGA setup
-void fga002_device::do_fga002reg_icrtim0_w(UINT8)(00)
-void fga002_device::do_fga002reg_ctl3_w(UINT8)(0c)
-void fga002_device::do_fga002reg_icrlocal0_w(UINT8)(00)
-void fga002_device::do_fga002reg_icrlocal1_w(UINT8)(00)
-void fga002_device::do_fga002reg_icrlocal2_w(UINT8)(00)
-void fga002_device::do_fga002reg_icrlocal3_w(UINT8)(00)
-void fga002_device::do_fga002reg_icrlocal4_w(UINT8)(00)
-void fga002_device::do_fga002reg_icrlocal5_w(UINT8)(00)
-void fga002_device::do_fga002reg_icrlocal6_w(UINT8)(00)
-void fga002_device::do_fga002reg_icrlocal7_w(UINT8)(00)
+void fga002_device::do_fga002reg_icrtim0_w(uint8_t)(00)
+void fga002_device::do_fga002reg_ctl3_w(uint8_t)(0c)
+void fga002_device::do_fga002reg_icrlocal0_w(uint8_t)(00)
+void fga002_device::do_fga002reg_icrlocal1_w(uint8_t)(00)
+void fga002_device::do_fga002reg_icrlocal2_w(uint8_t)(00)
+void fga002_device::do_fga002reg_icrlocal3_w(uint8_t)(00)
+void fga002_device::do_fga002reg_icrlocal4_w(uint8_t)(00)
+void fga002_device::do_fga002reg_icrlocal5_w(uint8_t)(00)
+void fga002_device::do_fga002reg_icrlocal6_w(uint8_t)(00)
+void fga002_device::do_fga002reg_icrlocal7_w(uint8_t)(00)
 
  *  A Reg 10 <- 20
-UINT8 duscc_channel::do_dusccreg_rxfifo_r()
+uint8_t duscc_channel::do_dusccreg_rxfifo_r()
  - RX rp:0 wp:1 sz:4
  - RX reading out data:6e 'n'
 
-UINT8 duscc_channel::do_dusccreg_rxfifo_r()
+uint8_t duscc_channel::do_dusccreg_rxfifo_r()
  - RX rp:1 wp:2 sz:4
  - RX reading out data:6e 'n'
  *  A Reg 10 <- 6e
  *  A Reg 10 <- 0d
  *  A Reg 10 <- 0a
-void fga002_device::do_fga002reg_icrlocal2_w(UINT8)(4d)
-void fga002_device::do_fga002reg_icrlocal4_w(UINT8)(1c)
+void fga002_device::do_fga002reg_icrlocal2_w(uint8_t)(4d)
+void fga002_device::do_fga002reg_icrlocal4_w(uint8_t)(1c)
  *  A Reg 0f <- 00
  *  A Reg 0f <- 40
  *  A Reg 00 <- 07
@@ -749,11 +749,11 @@ void fga002_device::do_fga002reg_icrlocal4_w(UINT8)(1c)
  *  A Reg 07 <- 2d
  *  A Reg 05 <- 3d
  *  A Reg 1c <- 10
-void duscc_channel::do_dusccreg_ier_w(UINT8)(10)
+void duscc_channel::do_dusccreg_ier_w(uint8_t)(10)
 - RXRDY interrupts enabled
 :duscc void duscc_device::check_interrupts()()
 :duscc virtual int duscc_device::z80daisy_irq_state() A:[00][00][00][00] B:[00][00][00][00] Interrupt State 00
-void fga002_device::trigger_interrupt(UINT8)(34)
+void fga002_device::trigger_interrupt(uint8_t)(34)
 Interrupt Level 4, caused by ICR 1c with vector 34
 void fga002_device::check_interrupts()()
 :fga002 virtual int fga002_device::z80daisy_irq_state() Level 0-7:[00][00] [00][00] [01][00] [00][00]

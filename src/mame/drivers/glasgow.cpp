@@ -85,20 +85,20 @@ public:
 	DECLARE_MACHINE_RESET(glasgow);
 
 private:
-	UINT8 m_lcd_shift_counter;
-	UINT8 m_led7;
-	UINT8 m_key_select;
+	uint8_t m_lcd_shift_counter;
+	uint8_t m_led7;
+	uint8_t m_key_select;
 	bool m_lcd_invert;
 	bool m_key_selector;
-	UINT8 m_read_board_flag;
-	UINT8 m_mouse_hold;
-	UINT8 m_board_row;
-	UINT8 m_mouse_down;
-	UINT16 m_Line18_LED;
-	UINT16 m_Line18_REED;
-	UINT8 m_selected[2];
+	uint8_t m_read_board_flag;
+	uint8_t m_mouse_hold;
+	uint8_t m_board_row;
+	uint8_t m_mouse_down;
+	uint16_t m_Line18_LED;
+	uint16_t m_Line18_REED;
+	uint8_t m_selected[2];
 
-	UINT8 pos_to_num( UINT8 );
+	uint8_t pos_to_num( uint8_t );
 	void set_board( );
 	void glasgow_pieces_w( );
 
@@ -109,8 +109,8 @@ private:
 
 typedef struct
 	{
-	UINT8 field;
-	UINT8 piece;
+	uint8_t field;
+	uint8_t piece;
 	} BOARD_FIELD;
 
 BOARD_FIELD l_board[8][8];
@@ -130,7 +130,7 @@ const BOARD_FIELD l_start_board[8][8] =
 	{ {63,4}, {62,2}, {61,3}, {60,5}, {59,6}, {58,3}, {57,2}, {56,4} }
 };
 
-UINT8 glasgow_state::pos_to_num( UINT8 val )
+uint8_t glasgow_state::pos_to_num( uint8_t val )
 {
 	switch (val)
 	{
@@ -148,7 +148,7 @@ UINT8 glasgow_state::pos_to_num( UINT8 val )
 
 void glasgow_state::set_board( )
 {
-	UINT8 i_AH, i_18;
+	uint8_t i_AH, i_18;
 
 	for (i_AH = 0; i_AH < 8; i_AH++)
 	{
@@ -163,7 +163,7 @@ void glasgow_state::set_board( )
 void glasgow_state::glasgow_pieces_w( )
 {
 	// This causes the pieces to display on-screen
-	UINT8 i_18, i_AH;
+	uint8_t i_18, i_AH;
 
 	for (i_18 = 0; i_18 < 8; i_18++)
 		for (i_AH = 0; i_AH < 8; i_AH++)
@@ -172,7 +172,7 @@ void glasgow_state::glasgow_pieces_w( )
 
 WRITE16_MEMBER( glasgow_state::glasgow_lcd_w )
 {
-	UINT8 lcd_data = data >> 8;
+	uint8_t lcd_data = data >> 8;
 
 	if (m_led7 == 0)
 		output().set_digit_value(m_lcd_shift_counter, lcd_data);
@@ -183,7 +183,7 @@ WRITE16_MEMBER( glasgow_state::glasgow_lcd_w )
 
 WRITE16_MEMBER( glasgow_state::glasgow_lcd_flag_w )
 {
-	UINT16 lcd_flag = data & 0x8100;
+	uint16_t lcd_flag = data & 0x8100;
 
 	m_beep->set_state(BIT(lcd_flag, 8));
 
@@ -202,12 +202,12 @@ READ16_MEMBER( glasgow_state::glasgow_keys_r )
 	m_board_row &= 7;
 
 	// See if we are moving a piece
-	UINT8 data = m_keyboard[m_board_row]->read();
+	uint8_t data = m_keyboard[m_board_row]->read();
 
 	if ((data < 0xff) && (m_mouse_down == 0))
 	{
-		UINT8 pos2num_res = pos_to_num(data);
-		UINT8 piece = l_board[m_board_row][pos2num_res].piece;
+		uint8_t pos2num_res = pos_to_num(data);
+		uint8_t piece = l_board[m_board_row][pos2num_res].piece;
 
 		if (pos2num_res > 7)
 			logerror("Position out of bound!");
@@ -268,7 +268,7 @@ WRITE16_MEMBER( glasgow_state::glasgow_keys_w )
 
 READ16_MEMBER( glasgow_state::glasgow_board_r )
 {
-	UINT8 i_AH, data = 0;
+	uint8_t i_AH, data = 0;
 
 	if (m_Line18_REED < 8)
 	{
@@ -280,7 +280,7 @@ READ16_MEMBER( glasgow_state::glasgow_board_r )
 		}
 	}
 
-	m_read_board_flag = TRUE;
+	m_read_board_flag = true;
 
 	return data << 8;
 }
@@ -305,9 +305,9 @@ WRITE16_MEMBER( glasgow_state::glasgow_board_w )
 
 WRITE16_MEMBER( glasgow_state::glasgow_beeper_w )
 {
-	UINT8 i_AH, i_18;
-	UINT8 LED;
-	UINT16 LineAH = data >> 8;
+	uint8_t i_AH, i_18;
+	uint8_t LED;
+	uint16_t LineAH = data >> 8;
 
 	if (LineAH && m_Line18_LED)
 	{
@@ -352,7 +352,7 @@ WRITE16_MEMBER( glasgow_state::write_beeper )
 
 WRITE16_MEMBER( glasgow_state::write_lcd )
 {
-	UINT8 lcd_data = data >> 8;
+	uint8_t lcd_data = data >> 8;
 
 	output().set_digit_value(m_lcd_shift_counter, m_lcd_invert ? lcd_data^0xff : lcd_data);
 	m_lcd_shift_counter--;
@@ -363,7 +363,7 @@ WRITE16_MEMBER( glasgow_state::write_lcd )
 WRITE16_MEMBER( glasgow_state::write_lcd_flag )
 {
 	m_lcd_invert = 0;
-	UINT8 lcd_flag = data >> 8;
+	uint8_t lcd_flag = data >> 8;
 	//beep_set_state(0, lcd_flag & 1 ? 1 : 0);
 	if (lcd_flag == 0)
 		m_key_selector = 1;
@@ -382,7 +382,7 @@ READ16_MEMBER( glasgow_state::read_board )
 
 WRITE16_MEMBER( glasgow_state::write_board )
 {
-	UINT8 board = data >> 8;
+	uint8_t board = data >> 8;
 
 	if (board == 0xff)
 		m_key_selector = 0;
@@ -401,7 +401,7 @@ WRITE16_MEMBER( glasgow_state::write_irq_flag )
 
 READ16_MEMBER( glasgow_state::read_newkeys16 )  //Amsterdam, Roma
 {
-	UINT16 data;
+	uint16_t data;
 
 	if (m_key_selector)
 		data = ioport("LINE1")->read();
@@ -430,7 +430,7 @@ READ16_MEMBER(read_test)
 
 WRITE32_MEMBER( glasgow_state::write_lcd32 )
 {
-	UINT8 lcd_data = data >> 8;
+	uint8_t lcd_data = data >> 8;
 
 	output().set_digit_value(m_lcd_shift_counter, m_lcd_invert ? lcd_data^0xff : lcd_data);
 	m_lcd_shift_counter--;
@@ -440,7 +440,7 @@ WRITE32_MEMBER( glasgow_state::write_lcd32 )
 
 WRITE32_MEMBER( glasgow_state::write_lcd_flag32 )
 {
-	UINT8 lcd_flag = data >> 24;
+	uint8_t lcd_flag = data >> 24;
 
 	m_lcd_invert = 0;
 
@@ -463,7 +463,7 @@ WRITE32_MEMBER( glasgow_state::write_keys32 )
 
 READ32_MEMBER( glasgow_state::read_newkeys32 ) // Dallas 32, Roma 32
 {
-	UINT32 data;
+	uint32_t data;
 
 	if (m_key_selector)
 		data = ioport("LINE1")->read();
@@ -491,7 +491,7 @@ READ16_MEMBER(read_board_amsterd)
 
 WRITE32_MEMBER( glasgow_state::write_board32 )
 {
-	UINT8 board = data >> 24;
+	uint8_t board = data >> 24;
 	if (board == 0xff)
 		m_key_selector = 0;
 	logerror("Write Board = %x \n", data);

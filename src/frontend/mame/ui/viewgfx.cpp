@@ -29,7 +29,7 @@ enum ui_gfx_modes
 	UI_GFX_TILEMAP
 };
 
-const UINT8 MAX_GFX_DECODERS = 8;
+const uint8_t MAX_GFX_DECODERS = 8;
 
 
 
@@ -41,9 +41,9 @@ const UINT8 MAX_GFX_DECODERS = 8;
 struct ui_gfx_info
 {
 	device_gfx_interface *interface;    // pointer to device's gfx interface
-	UINT8 setcount;                     // how many gfx sets device has
-	UINT8 rotate[MAX_GFX_ELEMENTS];     // current rotation (orientation) value
-	UINT8 columns[MAX_GFX_ELEMENTS];    // number of items per row
+	uint8_t setcount;                     // how many gfx sets device has
+	uint8_t rotate[MAX_GFX_ELEMENTS];     // current rotation (orientation) value
+	uint8_t columns[MAX_GFX_ELEMENTS];    // number of items per row
 	int   offset[MAX_GFX_ELEMENTS];     // current offset of top,left item
 	int   color[MAX_GFX_ELEMENTS];      // current color selected
 };
@@ -51,7 +51,7 @@ struct ui_gfx_info
 struct ui_gfx_state
 {
 	bool            started;        // have we called ui_gfx_count_devices() yet?
-	UINT8           mode;           // which mode are we in?
+	uint8_t           mode;           // which mode are we in?
 
 	// intermediate bitmaps
 	bool            bitmap_dirty;   // is the bitmap dirty?
@@ -64,17 +64,17 @@ struct ui_gfx_state
 		palette_device *device;     // pointer to current device
 		int   devcount;             // how many palette devices exist
 		int   devindex;             // which palette device is visible
-		UINT8 which;                // which subset (pens or indirect colors)?
-		UINT8 columns;              // number of items per row
+		uint8_t which;                // which subset (pens or indirect colors)?
+		uint8_t columns;              // number of items per row
 		int   offset;               // current offset of top left item
 	} palette;
 
 	// graphics-specific data
 	struct
 	{
-		UINT8   devcount;   // how many gfx devices exist
-		UINT8   devindex;   // which device is visible
-		UINT8   set;        // which set is visible
+		uint8_t   devcount;   // how many gfx devices exist
+		uint8_t   devindex;   // which device is visible
+		uint8_t   set;        // which set is visible
 	} gfxset;
 
 	// information about each gfx device
@@ -87,7 +87,7 @@ struct ui_gfx_state
 		int   xoffs;                // current X offset
 		int   yoffs;                // current Y offset
 		int   zoom;                 // zoom factor
-		UINT8 rotate;               // current rotation (orientation) value
+		uint8_t rotate;               // current rotation (orientation) value
 	} tilemap;
 };
 
@@ -137,7 +137,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 void ui_gfx_init(running_machine &machine)
 {
 	ui_gfx_state *state = &ui_gfx;
-	UINT8 rotate = machine.system().flags & ORIENTATION_MASK;
+	uint8_t rotate = machine.system().flags & ORIENTATION_MASK;
 
 	// make sure we clean up after ourselves
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_gfx_exit), &machine));
@@ -149,8 +149,8 @@ void ui_gfx_init(running_machine &machine)
 	state->palette.columns = 16;
 
 	// set up the graphics state
-	for (UINT8 i = 0; i < MAX_GFX_DECODERS; i++)
-		for (UINT8 j = 0; j < MAX_GFX_ELEMENTS; j++)
+	for (uint8_t i = 0; i < MAX_GFX_DECODERS; i++)
+		for (uint8_t j = 0; j < MAX_GFX_ELEMENTS; j++)
 		{
 			state->gfxdev[i].rotate[j] = rotate;
 			state->gfxdev[i].columns[j] = 16;
@@ -180,7 +180,7 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 	for (device_gfx_interface &interface : gfx_interface_iterator(machine.root_device()))
 	{
 		// count the gfx sets in each device, skipping devices with none
-		UINT8 count = 0;
+		uint8_t count = 0;
 		while (count < MAX_GFX_ELEMENTS && interface.gfx(count) != nullptr)
 			count++;
 
@@ -240,7 +240,7 @@ bool ui_gfx_is_relevant(running_machine &machine)
 //  ui_gfx_ui_handler - primary UI handler
 //-------------------------------------------------
 
-UINT32 ui_gfx_ui_handler(render_container &container, mame_ui_manager &mui, bool uistate)
+uint32_t ui_gfx_ui_handler(render_container &container, mame_ui_manager &mui, bool uistate)
 {
 	ui_gfx_state &state = ui_gfx;
 
@@ -386,7 +386,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 		title_buf << (state.palette.which ? _(" COLORS") : _(" PENS"));
 
 	// if the mouse pointer is over one of our cells, add some info about the corresponding palette entry
-	INT32 mouse_target_x, mouse_target_y;
+	int32_t mouse_target_x, mouse_target_y;
 	float mouse_x, mouse_y;
 	bool mouse_button;
 	render_target *mouse_target = mui.machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
@@ -673,7 +673,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 
 	// if the mouse pointer is over a pixel in a tile, add some info about the tile and pixel
 	bool found_pixel = false;
-	INT32 mouse_target_x, mouse_target_y;
+	int32_t mouse_target_x, mouse_target_y;
 	float mouse_x, mouse_y;
 	bool mouse_button;
 	render_target *mouse_target = mui.machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
@@ -693,7 +693,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 				ypixel = (cellypix - 2) - ypixel;
 			if (info.rotate[set] & ORIENTATION_SWAP_XY)
 				std::swap(xpixel, ypixel);
-			UINT8 pixdata = gfx.get_data(code)[xpixel + ypixel * gfx.rowbytes()];
+			uint8_t pixdata = gfx.get_data(code)[xpixel + ypixel * gfx.rowbytes()];
 			util::stream_format(title_buf, " #%X:%X @ %d,%d = %X",
 								code, info.color[set], xpixel, ypixel,
 								gfx.colorbase() + info.color[set] * gfx.granularity() + pixdata);
@@ -959,14 +959,14 @@ static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int ind
 	// loop over rows in the cell
 	for (y = 0; y < height; y++)
 	{
-		UINT32 *dest = &bitmap.pix32(dsty + y, dstx);
-		const UINT8 *src = gfx.get_data(index);
+		uint32_t *dest = &bitmap.pix32(dsty + y, dstx);
+		const uint8_t *src = gfx.get_data(index);
 
 		// loop over columns in the cell
 		for (x = 0; x < width; x++)
 		{
 			int effx = x, effy = y;
-			const UINT8 *s;
+			const uint8_t *s;
 
 			// compute effective x,y values after rotation
 			if (!(rotate & ORIENTATION_SWAP_XY))
@@ -1019,8 +1019,8 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 
 	// get the size of the tilemap itself
 	tilemap_t *tilemap = mui.machine().tilemap().find(state.tilemap.which);
-	UINT32 mapwidth = tilemap->width();
-	UINT32 mapheight = tilemap->height();
+	uint32_t mapwidth = tilemap->width();
+	uint32_t mapheight = tilemap->height();
 	if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
 		std::swap(mapwidth, mapheight);
 
@@ -1077,7 +1077,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	util::stream_format(title_buf, "TILEMAP %d/%d", state.tilemap.which, mui.machine().tilemap().count() - 1);
 
 	// if the mouse pointer is over a tile, add some info about its coordinates and color
-	INT32 mouse_target_x, mouse_target_y;
+	int32_t mouse_target_x, mouse_target_y;
 	float mouse_x, mouse_y;
 	bool mouse_button;
 	render_target *mouse_target = mui.machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
@@ -1093,10 +1093,10 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 			ypixel = (mapboxheight - 1) - ypixel;
 		if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
 			std::swap(xpixel, ypixel);
-		UINT32 col = ((xpixel / pixelscale + state.tilemap.xoffs) / tilemap->tilewidth()) % tilemap->cols();
-		UINT32 row = ((ypixel / pixelscale + state.tilemap.yoffs) / tilemap->tileheight()) % tilemap->rows();
-		UINT8 gfxnum;
-		UINT32 code, color;
+		uint32_t col = ((xpixel / pixelscale + state.tilemap.xoffs) / tilemap->tilewidth()) % tilemap->cols();
+		uint32_t row = ((ypixel / pixelscale + state.tilemap.yoffs) / tilemap->tileheight()) % tilemap->rows();
+		uint8_t gfxnum;
+		uint32_t code, color;
 		tilemap->get_info_debug(col, row, gfxnum, code, color);
 		util::stream_format(title_buf, " @ %d,%d = GFX%d #%X:%X",
 							col * tilemap->tilewidth(), row * tilemap->tileheight(),
@@ -1155,8 +1155,8 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 
 	// cache some info in locals
 	tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
-	UINT32 mapwidth = tilemap->width();
-	UINT32 mapheight = tilemap->height();
+	uint32_t mapwidth = tilemap->width();
+	uint32_t mapheight = tilemap->height();
 
 	// handle zoom (minus,plus)
 	if (machine.ui_input().pressed(IPT_UI_ZOOM_OUT) && state.tilemap.zoom > 0)

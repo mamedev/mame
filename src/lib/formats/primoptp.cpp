@@ -26,9 +26,9 @@
 #define PRIMO_FILE_PILOT_LENGTH     ((4*PRIMO_BIT_1_LENGTH + 4*PRIMO_BIT_0_LENGTH)*512)
 #define PRIMO_BLOCK_PILOT_LENGTH    ((8*PRIMO_BIT_1_LENGTH)*96 + (5*PRIMO_BIT_1_LENGTH + 3*PRIMO_BIT_0_LENGTH)*3)
 
-static UINT32 primo_tape_image_length;
+static uint32_t primo_tape_image_length;
 
-static INT16 *primo_emit_level(INT16 *p, int count, int level)
+static int16_t *primo_emit_level(int16_t *p, int count, int level)
 {
 	int i;
 
@@ -37,7 +37,7 @@ static INT16 *primo_emit_level(INT16 *p, int count, int level)
 	return p;
 }
 
-static INT16* primo_output_bit(INT16 *p, UINT8 bit)
+static int16_t* primo_output_bit(int16_t *p, uint8_t bit)
 {
 	if (bit)
 	{
@@ -52,7 +52,7 @@ static INT16* primo_output_bit(INT16 *p, UINT8 bit)
 		return p;
 }
 
-static INT16* primo_output_byte(INT16 *p, UINT8 byte)
+static int16_t* primo_output_byte(int16_t *p, uint8_t byte)
 {
 	int i;
 
@@ -62,11 +62,11 @@ static INT16* primo_output_byte(INT16 *p, UINT8 byte)
 	return p;
 }
 
-static UINT32 primo_cassette_calculate_number_of_1(const UINT8 *bytes, UINT16 length)
+static uint32_t primo_cassette_calculate_number_of_1(const uint8_t *bytes, uint16_t length)
 {
 	int i,j;
 
-	UINT32 number_of_1 = 0;
+	uint32_t number_of_1 = 0;
 
 	for (i=0; i<length; i++)
 		for (j=0; j<8; j++)
@@ -76,18 +76,18 @@ static UINT32 primo_cassette_calculate_number_of_1(const UINT8 *bytes, UINT16 le
 	return number_of_1;
 }
 
-static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int primo_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	int i = 0, j = 0;
 
-	UINT8 *b = (UINT8*) bytes;
+	uint8_t *b = (uint8_t*) bytes;
 
-	UINT32 file_size = 0;
-	UINT16 block_size = 0;
+	uint32_t file_size = 0;
+	uint16_t block_size = 0;
 
-	UINT32 number_of_1 = 0;
-	UINT32 number_of_0 = 0;
-	UINT32 size_in_samples = 0;
+	uint32_t number_of_1 = 0;
+	uint32_t number_of_0 = 0;
+	uint32_t size_in_samples = 0;
 
 	primo_tape_image_length = length;
 
@@ -142,15 +142,15 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 	return size_in_samples;
 }
 
-static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int primo_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	int i = 0, j = 0, k;
 
-	INT16 *p = buffer;
-	UINT8 *b = bytes;
+	int16_t *p = buffer;
+	uint8_t *b = bytes;
 
-	UINT32 file_size = 0;
-	UINT16 block_size = 0;
+	uint32_t file_size = 0;
+	uint16_t block_size = 0;
 
 	LOG_FORMATS ("Image size: %d\n", length);
 

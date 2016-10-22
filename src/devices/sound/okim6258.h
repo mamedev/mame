@@ -45,7 +45,7 @@ class okim6258_device : public device_t,
 						public device_sound_interface
 {
 public:
-	okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~okim6258_device() { }
 
 	// static configuration
@@ -73,24 +73,24 @@ public:
 
 private:
 	void okim6258_state_save_register();
-	INT16 clock_adpcm(UINT8 nibble);
+	int16_t clock_adpcm(uint8_t nibble);
 
 private:
-	UINT8  m_status;
+	uint8_t  m_status;
 
-	UINT32 m_master_clock;    /* master clock frequency */
-	UINT32 m_start_divider;
-	UINT32 m_divider;         /* master clock divider */
-	UINT8 m_adpcm_type;       /* 3/4 bit ADPCM select */
-	UINT8 m_data_in;          /* ADPCM data-in register */
-	UINT8 m_nibble_shift;     /* nibble select */
+	uint32_t m_master_clock;    /* master clock frequency */
+	uint32_t m_start_divider;
+	uint32_t m_divider;         /* master clock divider */
+	uint8_t m_adpcm_type;       /* 3/4 bit ADPCM select */
+	uint8_t m_data_in;          /* ADPCM data-in register */
+	uint8_t m_nibble_shift;     /* nibble select */
 	sound_stream *m_stream;   /* which stream are we playing on? */
 
-	UINT8 m_output_bits;      /* D/A precision is 10-bits but 12-bit data can be
+	uint8_t m_output_bits;      /* D/A precision is 10-bits but 12-bit data can be
 	                           output serially to an external DAC */
 
-	INT32 m_signal;
-	INT32 m_step;
+	int32_t m_signal;
+	int32_t m_step;
 };
 
 extern const device_type OKIM6258;

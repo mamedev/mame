@@ -115,9 +115,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	std::unique_ptr<UINT8[]> m_videoram[3];
-	UINT8 m_rom_bank;
-	UINT8 m_bitplane_select;
+	std::unique_ptr<uint8_t[]> m_videoram[3];
+	uint8_t m_rom_bank;
+	uint8_t m_bitplane_select;
 	pen_t m_pens[NUM_PENS];
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_1_w);
@@ -130,7 +130,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(supertnk_interrupt);
 	required_device<cpu_device> m_maincpu;
 };
@@ -191,18 +191,18 @@ WRITE8_MEMBER(supertnk_state::supertnk_interrupt_ack_w)
 void supertnk_state::video_start()
 {
 	offs_t i;
-	const UINT8 *prom = memregion("proms")->base();
+	const uint8_t *prom = memregion("proms")->base();
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		UINT8 data = prom[i];
+		uint8_t data = prom[i];
 
 		m_pens[i] = rgb_t(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
 	}
 
-	m_videoram[0] = std::make_unique<UINT8[]>(0x2000);
-	m_videoram[1] = std::make_unique<UINT8[]>(0x2000);
-	m_videoram[2] = std::make_unique<UINT8[]>(0x2000);
+	m_videoram[0] = std::make_unique<uint8_t[]>(0x2000);
+	m_videoram[1] = std::make_unique<uint8_t[]>(0x2000);
+	m_videoram[2] = std::make_unique<uint8_t[]>(0x2000);
 }
 
 
@@ -223,7 +223,7 @@ WRITE8_MEMBER(supertnk_state::supertnk_videoram_w)
 
 READ8_MEMBER(supertnk_state::supertnk_videoram_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	if (m_bitplane_select < 3)
 		ret = m_videoram[m_bitplane_select][offset];
@@ -244,7 +244,7 @@ WRITE8_MEMBER(supertnk_state::supertnk_bitplane_select_1_w)
 }
 
 
-UINT32 supertnk_state::screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t supertnk_state::screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -252,16 +252,16 @@ UINT32 supertnk_state::screen_update_supertnk(screen_device &screen, bitmap_rgb3
 	{
 		int i;
 
-		UINT8 y = offs >> 5;
-		UINT8 x = offs << 3;
+		uint8_t y = offs >> 5;
+		uint8_t x = offs << 3;
 
-		UINT8 data0 = m_videoram[0][offs];
-		UINT8 data1 = m_videoram[1][offs];
-		UINT8 data2 = m_videoram[2][offs];
+		uint8_t data0 = m_videoram[0][offs];
+		uint8_t data1 = m_videoram[1][offs];
+		uint8_t data2 = m_videoram[2][offs];
 
 		for (i = 0; i < 8; i++)
 		{
-			UINT8 color = ((data0 & 0x80) >> 5) | ((data1 & 0x80) >> 6) | ((data2 & 0x80) >> 7);
+			uint8_t color = ((data0 & 0x80) >> 5) | ((data1 & 0x80) >> 6) | ((data2 & 0x80) >> 7);
 			bitmap.pix32(y, x) = m_pens[color];
 
 			data0 = data0 << 1;
@@ -482,7 +482,7 @@ DRIVER_INIT_MEMBER(supertnk_state,supertnk)
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	size_t len = memregion("maincpu")->bytes();
 
 	for (offs = 0; offs < len; offs++)

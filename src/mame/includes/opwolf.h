@@ -29,17 +29,17 @@ public:
 		m_msm2(*this, "msm2") { }
 
 	/* memory pointers */
-	optional_shared_ptr<UINT8> m_cchip_ram;
+	optional_shared_ptr<uint8_t> m_cchip_ram;
 
 	/* video-related */
-	UINT16       m_sprite_ctrl;
-	UINT16       m_sprites_flipscreen;
+	uint16_t       m_sprite_ctrl;
+	uint16_t       m_sprites_flipscreen;
 
 	/* misc */
-	UINT8        m_adpcm_b[0x08];
-	UINT8        m_adpcm_c[0x08];
-	UINT32       m_adpcm_pos[2];
-	UINT32       m_adpcm_end[2];
+	uint8_t        m_adpcm_b[0x08];
+	uint8_t        m_adpcm_c[0x08];
+	uint32_t       m_adpcm_pos[2];
+	uint32_t       m_adpcm_end[2];
 	int          m_adpcm_data[2];
 
 	int          m_opwolf_gun_xoffs;
@@ -50,28 +50,28 @@ public:
 
 	int          m_opwolf_region;
 
-	UINT8        m_current_bank;
-	UINT8        m_current_cmd;
-	UINT8        m_cchip_last_7a;
-	UINT8        m_cchip_last_04;
-	UINT8        m_cchip_last_05;
-	UINT8        m_cchip_coins_for_credit[2];
-	UINT8        m_cchip_credits_for_coin[2];
-	UINT8        m_cchip_coins[2];
-	UINT8        m_c588;
-	UINT8        m_c589;
-	UINT8        m_c58a; // These variables derived from the bootleg
-	UINT8        m_triggeredLevel1b; // These variables derived from comparison to unprotection version
-	UINT8        m_triggeredLevel2;
-	UINT8        m_triggeredLevel2b;
-	UINT8        m_triggeredLevel2c;
-	UINT8        m_triggeredLevel3b;
-	UINT8        m_triggeredLevel13b;
-	UINT8        m_triggeredLevel4;
-	UINT8        m_triggeredLevel5;
-	UINT8        m_triggeredLevel7;
-	UINT8        m_triggeredLevel8;
-	UINT8        m_triggeredLevel9;
+	uint8_t        m_current_bank;
+	uint8_t        m_current_cmd;
+	uint8_t        m_cchip_last_7a;
+	uint8_t        m_cchip_last_04;
+	uint8_t        m_cchip_last_05;
+	uint8_t        m_cchip_coins_for_credit[2];
+	uint8_t        m_cchip_credits_for_coin[2];
+	uint8_t        m_cchip_coins[2];
+	uint8_t        m_c588;
+	uint8_t        m_c589;
+	uint8_t        m_c58a; // These variables derived from the bootleg
+	uint8_t        m_triggeredLevel1b; // These variables derived from comparison to unprotection version
+	uint8_t        m_triggeredLevel2;
+	uint8_t        m_triggeredLevel2b;
+	uint8_t        m_triggeredLevel2c;
+	uint8_t        m_triggeredLevel3b;
+	uint8_t        m_triggeredLevel13b;
+	uint8_t        m_triggeredLevel4;
+	uint8_t        m_triggeredLevel5;
+	uint8_t        m_triggeredLevel7;
+	uint8_t        m_triggeredLevel8;
+	uint8_t        m_triggeredLevel9;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -109,7 +109,7 @@ public:
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(opwolf);
-	UINT32 screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
 	TIMER_CALLBACK_MEMBER(cchip_timer);
 	void updateDifficulty( int mode );

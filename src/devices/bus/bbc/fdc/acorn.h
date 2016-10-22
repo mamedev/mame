@@ -28,7 +28,7 @@ class bbc_acorn8271_device :
 {
 public:
 	// construction/destruction
-	bbc_acorn8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_acorn8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -59,7 +59,7 @@ class bbc_acorn1770_device :
 {
 public:
 	// construction/destruction
-	bbc_acorn1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_acorn1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 

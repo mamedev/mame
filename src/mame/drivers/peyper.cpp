@@ -62,8 +62,8 @@ public:
 	DECLARE_DRIVER_INIT(odin);
 	DECLARE_DRIVER_INIT(wolfman);
 private:
-	UINT8 m_digit;
-	UINT8 m_disp_layout[36];
+	uint8_t m_digit;
+	uint8_t m_disp_layout[36];
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_switch;
@@ -84,7 +84,7 @@ READ8_MEMBER( peyper_state::sw_r )
 
 WRITE8_MEMBER( peyper_state::disp_w )
 {
-	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 /*
 0 -> XA0 DPL25,DPL27
 1 -> XA1 DPL26,DPL28
@@ -104,8 +104,8 @@ WRITE8_MEMBER( peyper_state::disp_w )
 15 -> DPL31,DPL32
 */
 
-	UINT8 i,q,hex_a,a;
-	UINT8 p = m_digit << 1;
+	uint8_t i,q,hex_a,a;
+	uint8_t p = m_digit << 1;
 
 	for (i = 0; i < 2; i++)
 	{
@@ -174,7 +174,7 @@ WRITE8_MEMBER(peyper_state::sol_w)
 
 CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{

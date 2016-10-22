@@ -633,7 +633,7 @@ READ16_MEMBER(itech32_state::wcbowl_prot_result_r)
 
 READ32_MEMBER(itech32_state::itech020_prot_result_r)
 {
-	UINT32 result = ((UINT32 *)m_main_ram.target())[m_itech020_prot_address >> 2];
+	uint32_t result = ((uint32_t *)m_main_ram.target())[m_itech020_prot_address >> 2];
 	result >>= (~m_itech020_prot_address & 3) * 8;
 	return (result & 0xff) << 8;
 }
@@ -877,11 +877,11 @@ void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 	// if nvram is the main RAM, don't overwrite exception vectors
 	int start = (base == m_main_ram) ? 0x80 : 0x00;
 	for (int i = start; i < length; i++)
-		((UINT8 *)base)[i] = machine().rand();
+		((uint8_t *)base)[i] = machine().rand();
 
 	// due to accessing uninitialized RAM, we need this hack
 	if (m_is_drivedge)
-		((UINT32 *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
+		((uint32_t *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
 }
 
 
@@ -939,7 +939,7 @@ READ32_MEMBER(itech32_state::test1_r)
 	if (ACCESSING_BITS_16_23 && !m_written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0x100 + offset*4+1);
 	if (ACCESSING_BITS_8_15 && !m_written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0x100 + offset*4+2);
 	if (ACCESSING_BITS_0_7 && !m_written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0x100 + offset*4+3);
-	return ((UINT32 *)m_main_ram)[0x100/4 + offset];
+	return ((uint32_t *)m_main_ram)[0x100/4 + offset];
 }
 
 WRITE32_MEMBER(itech32_state::test1_w)
@@ -948,7 +948,7 @@ WRITE32_MEMBER(itech32_state::test1_w)
 	if (ACCESSING_BITS_16_23) m_written[0x100 + offset*4+1] = 1;
 	if (ACCESSING_BITS_8_15) m_written[0x100 + offset*4+2] = 1;
 	if (ACCESSING_BITS_0_7) m_written[0x100 + offset*4+3] = 1;
-	COMBINE_DATA(&((UINT32 *)m_main_ram)[0x100/4 + offset]);
+	COMBINE_DATA(&((uint32_t *)m_main_ram)[0x100/4 + offset]);
 }
 
 READ32_MEMBER(itech32_state::test2_r)
@@ -957,7 +957,7 @@ READ32_MEMBER(itech32_state::test2_r)
 	if (ACCESSING_BITS_16_23 && !m_written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0xc00 + offset*4+1);
 	if (ACCESSING_BITS_8_15 && !m_written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0xc00 + offset*4+2);
 	if (ACCESSING_BITS_0_7 && !m_written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0xc00 + offset*4+3);
-	return ((UINT32 *)m_main_ram)[0xc00/4 + offset];
+	return ((uint32_t *)m_main_ram)[0xc00/4 + offset];
 }
 
 WRITE32_MEMBER(itech32_state::test2_w)
@@ -966,7 +966,7 @@ WRITE32_MEMBER(itech32_state::test2_w)
 	if (ACCESSING_BITS_16_23) m_written[0xc00 + offset*4+1] = 1;
 	if (ACCESSING_BITS_8_15) m_written[0xc00 + offset*4+2] = 1;
 	if (ACCESSING_BITS_0_7) m_written[0xc00 + offset*4+3] = 1;
-	COMBINE_DATA(&((UINT32 *)m_main_ram)[0xc00/4 + offset]);
+	COMBINE_DATA(&((uint32_t *)m_main_ram)[0xc00/4 + offset]);
 }
 #endif
 

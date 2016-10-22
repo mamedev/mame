@@ -844,7 +844,7 @@ MACHINE_RESET_MEMBER(slapfght_state,getstar)
 
 void slapfght_state::init_banks()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
 	membank("bank1")->set_entry(0);
@@ -876,7 +876,7 @@ DRIVER_INIT_MEMBER(slapfght_state,getstarb1)
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
 	   that the bootleg simply shouldn't execute the code due to the modified roms */
 	/* TODO: find & fix the cause of the following happening. */
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x6d56] = 0xc3; // jp instead of jp z
 }
 

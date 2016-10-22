@@ -52,8 +52,8 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef UINT32 (*lc8670_lcd_update)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* vram, bool lcd_enabled, UINT8 stad);
-#define LC8670_LCD_UPDATE(name) UINT32 name(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* vram, bool lcd_enabled, UINT8 stad)
+typedef uint32_t (*lc8670_lcd_update)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* vram, bool lcd_enabled, uint8_t stad);
+#define LC8670_LCD_UPDATE(name) uint32_t name(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* vram, bool lcd_enabled, uint8_t stad)
 
 
 //**************************************************************************
@@ -77,10 +77,10 @@ class lc8670_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	lc8670_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	lc8670_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	// public interfaces
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// internal map handlers
 	DECLARE_READ8_MEMBER(regs_r);
@@ -91,7 +91,7 @@ public:
 	DECLARE_WRITE8_MEMBER(xram_w);
 
 	// static configuration helpers
-	static void static_set_cpu_clock(device_t &device, int _source, UINT32 _clock) { downcast<lc8670_cpu_device &>(device).m_clocks[_source] = _clock; }
+	static void static_set_cpu_clock(device_t &device, int _source, uint32_t _clock) { downcast<lc8670_cpu_device &>(device).m_clocks[_source] = _clock; }
 	static void static_set_lcd_update_cb(device_t &device, lc8670_lcd_update _cb) { downcast<lc8670_cpu_device &>(device).m_lcd_update_func = _cb; }
 	template<class _Object> static devcb_base & static_set_bankswitch_cb(device_t &device, _Object object) { return downcast<lc8670_cpu_device &>(device).m_bankswitch_func.set_callback(object); }
 
@@ -102,9 +102,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 7; }
-	virtual UINT32 execute_input_lines() const override { return 4; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 7; }
+	virtual uint32_t execute_input_lines() const override { return 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -116,34 +116,34 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	// helpers
-	inline UINT8 fetch();
-	inline void  push(UINT8 data);
-	inline UINT8 pop();
-	inline UINT8 read_data(UINT16 offset);
-	inline void write_data(UINT16 offset, UINT8 data);
-	inline UINT8 read_data_latch(UINT16 offset);
-	inline void write_data_latch(UINT16 offset, UINT8 data);
-	inline void update_port1(UINT8 data);
-	inline void set_pc(UINT16 new_pc);
-	inline UINT8 get_data();
-	inline UINT16 get_addr();
+	inline uint8_t fetch();
+	inline void  push(uint8_t data);
+	inline uint8_t pop();
+	inline uint8_t read_data(uint16_t offset);
+	inline void write_data(uint16_t offset, uint8_t data);
+	inline uint8_t read_data_latch(uint16_t offset);
+	inline void write_data_latch(uint16_t offset, uint8_t data);
+	inline void update_port1(uint8_t data);
+	inline void set_pc(uint16_t new_pc);
+	inline uint8_t get_data();
+	inline uint16_t get_addr();
 	inline void change_clock_source();
 	inline void check_p_flag();
 	inline void check_p3int();
 	inline void set_irq_flag(int source);
-	int decode_op(UINT8 op);
+	int decode_op(uint8_t op);
 	void check_irqs();
 	void timer0_prescaler_tick();
 	void timer0_tick(bool ext_line = false);
 	void timer1_tick();
 	void base_timer_tick();
-	static void dasm_arg(UINT8 op, char *buffer, offs_t pc, int arg, const UINT8 *oprom, int &pos);
+	static void dasm_arg(uint8_t op, char *buffer, offs_t pc, int arg, const uint8_t *oprom, int &pos);
 
 	// opcodes handlers
 	int op_nop();
@@ -212,32 +212,32 @@ private:
 
 	// internal state
 	int                 m_icount;
-	UINT16              m_pc;
-	UINT16              m_ppc;
-	UINT8               m_op;
-	UINT8               m_sfr[0x80];            // special function registers
-	UINT8               m_mram[0x200];          // main RAM
-	UINT8               m_xram[0xc6];           // XRAM
-	UINT8               m_vtrbf[0x200];         // work RAM
-	UINT16              m_irq_flag;
-	UINT8               m_irq_lev;
+	uint16_t              m_pc;
+	uint16_t              m_ppc;
+	uint8_t               m_op;
+	uint8_t               m_sfr[0x80];            // special function registers
+	uint8_t               m_mram[0x200];          // main RAM
+	uint8_t               m_xram[0xc6];           // XRAM
+	uint8_t               m_vtrbf[0x200];         // work RAM
+	uint16_t              m_irq_flag;
+	uint8_t               m_irq_lev;
 	bool                m_after_reti;
-	UINT8               m_p1_data;
-	UINT8               m_timer0_prescaler;
-	UINT8               m_timer0[2];
-	UINT8               m_timer1[2];
-	UINT8               m_timer1_comparator[2];
-	UINT8               m_base_timer[2];
+	uint8_t               m_p1_data;
+	uint8_t               m_timer0_prescaler;
+	uint8_t               m_timer0[2];
+	uint8_t               m_timer1[2];
+	uint8_t               m_timer1_comparator[2];
+	uint8_t               m_base_timer[2];
 	bool                m_clock_changed;
 	int                 m_input_lines[4];
 
 	// configuration
-	UINT32              m_clocks[3];            // clock sources
+	uint32_t              m_clocks[3];            // clock sources
 	devcb_write8       m_bankswitch_func;      // bankswitch CB
 	lc8670_lcd_update   m_lcd_update_func;      // LCD update CB
 
 	// interrupts vectors
-	static const UINT16 s_irq_vectors[16];
+	static const uint16_t s_irq_vectors[16];
 
 	// opcodes table
 	typedef int (lc8670_cpu_device::*op_handler)();
@@ -264,8 +264,8 @@ private:
 	struct dasm_entry
 	{
 		const char *str;
-		UINT8       arg1;
-		UINT8       arg2;
+		uint8_t       arg1;
+		uint8_t       arg2;
 		bool        inv;
 	};
 	static const dasm_entry s_dasm_table[80];

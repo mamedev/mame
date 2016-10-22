@@ -39,8 +39,8 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 private:
-	UINT8 m_t_c;
-	UINT8 segment[5];
+	uint8_t m_t_c;
+	uint8_t segment[5];
 };
 
 

@@ -105,7 +105,7 @@ READ16_MEMBER(symbolics_state::fep_paddle_id_prom_r) // bits 8 and 9 do somethin
 /*
 READ16_MEMBER(symbolics_state::ram_parity_hack_r)
 {
-    UINT16 *ram = (UINT16 *)(memregion("fepdram")->base());
+    uint16_t *ram = (uint16_t *)(memregion("fepdram")->base());
     //m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
     m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
     if (!(m_parity_error_has_occurred[offset]))
@@ -120,7 +120,7 @@ READ16_MEMBER(symbolics_state::ram_parity_hack_r)
 
 WRITE16_MEMBER(symbolics_state::ram_parity_hack_w)
 {
-    UINT16 *ram = (UINT16 *)(memregion("fepdram")->base());
+    uint16_t *ram = (uint16_t *)(memregion("fepdram")->base());
     m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
     if (!(m_parity_error_has_occurred[offset]))
     {
@@ -264,13 +264,13 @@ INPUT_PORTS_END
         outfifo_read_cb(ptr, param);
         break;
     default:
-        assert_always(FALSE, "Unknown id in symbolics_state::device_timer");
+        assert_always(false, "Unknown id in symbolics_state::device_timer");
     }
 }
 
 TIMER_CALLBACK_MEMBER(symbolics_state::outfifo_read_cb)
 {
-    UINT16 data;
+    uint16_t data;
 }
 */
 

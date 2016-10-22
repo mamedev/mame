@@ -57,7 +57,7 @@
  * </PRE>
  */
 
-diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DIABLO_HD, "Diablo Disk", tag, owner, clock, "diablo_hd", __FILE__),
 #if DIABLO_DEBUG
 	m_log_level(8),
@@ -230,20 +230,20 @@ void diablo_hd_device::set_sector_callback(void *cookie, void (*callback)(void *
  * 256 words data
  */
 typedef struct {
-	UINT8 pageno[2*DIABLO_PAGENO_WORDS];    //!< sector page number
-	UINT8 header[2*DIABLO_HEADER_WORDS];    //!< sector header words
-	UINT8 label[2*DIABLO_LABEL_WORDS];      //!< sector label words
-	UINT8 data[2*DIABLO_DATA_WORDS];        //!< sector data words
+	uint8_t pageno[2*DIABLO_PAGENO_WORDS];    //!< sector page number
+	uint8_t header[2*DIABLO_HEADER_WORDS];    //!< sector header words
+	uint8_t label[2*DIABLO_LABEL_WORDS];      //!< sector label words
+	uint8_t data[2*DIABLO_DATA_WORDS];        //!< sector data words
 }   diablo_sector_t;
 
 /**
- * @brief write a bit into an array of UINT32
+ * @brief write a bit into an array of uint32_t
  * @param bits pointer to array of bits
  * @param dst destination index
  * @param bit bit value
  * @return next destination index
  */
-static inline size_t WRBIT(UINT32* bits, size_t dst, int bit)
+static inline size_t WRBIT(uint32_t* bits, size_t dst, int bit)
 {
 	if (bit) {
 		bits[(dst)/32] |= 1 << ((dst) % 32);
@@ -254,13 +254,13 @@ static inline size_t WRBIT(UINT32* bits, size_t dst, int bit)
 }
 
 /**
- * @brief read a bit from an array of UINT32
+ * @brief read a bit from an array of uint32_t
  * @param bits pointer to array of bits
  * @param src source index
  * @param bit reference to the bit to set
  * @return next source index
  */
-static inline size_t RDBIT(UINT32* bits, size_t src, int& bit)
+static inline size_t RDBIT(uint32_t* bits, size_t src, int& bit)
 {
 	bit = (bits[src/32] >> (src % 32)) & 1;
 	return ++src;
@@ -306,7 +306,7 @@ void diablo_hd_device::read_sector()
 
 	if (m_disk) {
 		// allocate a buffer for this page
-		m_cache[m_page] = std::make_unique<UINT8[]>(sizeof(diablo_sector_t));
+		m_cache[m_page] = std::make_unique<uint8_t[]>(sizeof(diablo_sector_t));
 		// and read the page from the hard_disk image
 		if (hard_disk_read(m_disk, m_page, m_cache[m_page].get())) {
 			LOG_DRIVE((2,"[DHD%u]   CHS:%03d/%d/%02d => page:%d loaded\n", m_unit, m_cylinder, m_head, m_sector, m_page));
@@ -327,7 +327,7 @@ void diablo_hd_device::read_sector()
  * @param start start value for the checksum
  * @return returns the checksum of the record
  */
-int diablo_hd_device::cksum(UINT8 *src, size_t size, int start)
+int diablo_hd_device::cksum(uint8_t *src, size_t size, int start)
 {
 	int sum = start;
 	/* compute XOR of all words */
@@ -346,7 +346,7 @@ int diablo_hd_device::cksum(UINT8 *src, size_t size, int start)
  * @param size number of words to write
  * @return offset to next destination bit
  */
-size_t diablo_hd_device::expand_zeroes(UINT32 *bits, size_t dst, size_t size)
+size_t diablo_hd_device::expand_zeroes(uint32_t *bits, size_t dst, size_t size)
 {
 	for (size_t offs = 0; offs < 32 * size; offs += 2) {
 		dst = WRBIT(bits, dst, 1);      // write the clock bit
@@ -363,7 +363,7 @@ size_t diablo_hd_device::expand_zeroes(UINT32 *bits, size_t dst, size_t size)
  * @param size number of words to write
  * @return offset to next destination bit
  */
-size_t diablo_hd_device::expand_sync(UINT32 *bits, size_t dst, size_t size)
+size_t diablo_hd_device::expand_sync(uint32_t *bits, size_t dst, size_t size)
 {
 	for (size_t offs = 0; offs < 32 * size - 2; offs += 2) {
 		dst = WRBIT(bits, dst, 1);      // write the clock bit
@@ -383,7 +383,7 @@ size_t diablo_hd_device::expand_sync(UINT32 *bits, size_t dst, size_t size)
  * @param size size of the record in bytes
  * @return offset to next destination bit
  */
-size_t diablo_hd_device::expand_record(UINT32 *bits, size_t dst, UINT8 *field, size_t size)
+size_t diablo_hd_device::expand_record(uint32_t *bits, size_t dst, uint8_t *field, size_t size)
 {
 	for (size_t offs = 0; offs < size; offs += 2) {
 		int word = field[size - 2 - offs] + 256 * field[size - 2 - offs + 1];
@@ -405,7 +405,7 @@ size_t diablo_hd_device::expand_record(UINT32 *bits, size_t dst, UINT8 *field, s
  * @param size size of the record in bytes
  * @return offset to next destination bit
  */
-size_t diablo_hd_device::expand_cksum(UINT32 *bits, size_t dst, UINT8 *field, size_t size)
+size_t diablo_hd_device::expand_cksum(uint32_t *bits, size_t dst, uint8_t *field, size_t size)
 {
 	int word = cksum(field, size, 0521);
 	for (size_t bit = 0; bit < 32; bit += 2) {
@@ -422,7 +422,7 @@ size_t diablo_hd_device::expand_cksum(UINT32 *bits, size_t dst, UINT8 *field, si
  * @param page page number (0 to DRIVE_PAGES-1)
  * @return pointer to the newly allocated array of bits
  */
-UINT32* diablo_hd_device::expand_sector()
+uint32_t* diablo_hd_device::expand_sector()
 {
 	size_t dst;
 
@@ -440,7 +440,7 @@ UINT32* diablo_hd_device::expand_sector()
 	diablo_sector_t *s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page].get());
 
 	/* allocate a bits image */
-	UINT32 *bits = auto_alloc_array_clear(machine(), UINT32, 400);
+	uint32_t *bits = auto_alloc_array_clear(machine(), uint32_t, 400);
 
 	if (m_diablo31) {
 		/* write sync bit after (MFROBL-MRPAL) words - 1 bit */
@@ -492,7 +492,7 @@ UINT32* diablo_hd_device::expand_sector()
 }
 
 #if DIABLO_DEBUG
-void diablo_hd_device::dump_ascii(UINT8 *src, size_t size)
+void diablo_hd_device::dump_ascii(uint8_t *src, size_t size)
 {
 	size_t offs;
 	LOG_DRIVE((0," ["));
@@ -511,7 +511,7 @@ void diablo_hd_device::dump_ascii(UINT8 *src, size_t size)
  * @param size size of the record in bytes
  * @param name name to print before the dump
  */
-size_t diablo_hd_device::dump_record(UINT8 *src, size_t addr, size_t size, const char *name, int cr)
+size_t diablo_hd_device::dump_record(uint8_t *src, size_t addr, size_t size, const char *name, int cr)
 {
 	size_t offs;
 	LOG_DRIVE((0,"%s:", name));
@@ -545,9 +545,9 @@ size_t diablo_hd_device::dump_record(UINT8 *src, size_t addr, size_t size, const
  * @param size number of words to scan for a sync word
  * @return next source index for reading
  */
-size_t diablo_hd_device::squeeze_sync(UINT32 *bits, size_t src, size_t size)
+size_t diablo_hd_device::squeeze_sync(uint32_t *bits, size_t src, size_t size)
 {
-	UINT32 accu = 0;
+	uint32_t accu = 0;
 	/* hunt for the first 0x0001 word */
 	for (size_t bitcount = 0, offs = 0; offs < size; /* */) {
 		/*
@@ -581,9 +581,9 @@ size_t diablo_hd_device::squeeze_sync(UINT32 *bits, size_t src, size_t size)
  * @param size number of words to scan for a sync word
  * @return next source index for reading
  */
-size_t diablo_hd_device::squeeze_unsync(UINT32 *bits, size_t src, size_t size)
+size_t diablo_hd_device::squeeze_unsync(uint32_t *bits, size_t src, size_t size)
 {
-	UINT32 accu = 0;
+	uint32_t accu = 0;
 	/* hunt for the first 0 word (16 x 0 bits) */
 	for (size_t bitcount = 0, offs = 0; offs < size; /* */) {
 		/*
@@ -617,9 +617,9 @@ size_t diablo_hd_device::squeeze_unsync(UINT32 *bits, size_t src, size_t size)
  * @param size size of the record in bytes
  * @return next source index for reading
  */
-size_t diablo_hd_device::squeeze_record(UINT32 *bits, size_t src, UINT8 *field, size_t size)
+size_t diablo_hd_device::squeeze_record(uint32_t *bits, size_t src, uint8_t *field, size_t size)
 {
-	UINT32 accu = 0;
+	uint32_t accu = 0;
 	for (size_t bitcount = 0, offs = 0; offs < size; /* */) {
 		int bit;
 		src = RDBIT(bits,src,bit);      // skip clock
@@ -646,9 +646,9 @@ size_t diablo_hd_device::squeeze_record(UINT32 *bits, size_t src, UINT8 *field, 
  * @param cksum pointer to an int to receive the checksum word
  * @return next source index for reading
  */
-size_t diablo_hd_device::squeeze_cksum(UINT32 *bits, size_t src, int *cksum)
+size_t diablo_hd_device::squeeze_cksum(uint32_t *bits, size_t src, int *cksum)
 {
-	UINT32 accu = 0;
+	uint32_t accu = 0;
 
 	for (size_t bitcount = 0; bitcount < 32; bitcount += 2) {
 		int bit;
@@ -719,7 +719,7 @@ void diablo_hd_device::squeeze_sector()
 		LOG_DRIVE((0,"[DHD%u]   no bits\n", m_unit));
 		return;
 	}
-	UINT32 *bits = m_bits[m_page];
+	uint32_t *bits = m_bits[m_page];
 
 	// pointer to sector buffer
 	s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page].get());
@@ -1159,7 +1159,7 @@ void diablo_hd_device::wr_data(int index, int wrdata)
 		return; // invalid page
 	}
 
-	UINT32 *bits = expand_sector();
+	uint32_t *bits = expand_sector();
 	if (!bits) {
 		LOG_DRIVE((0,"[DHD%u]   no bits\n", m_unit));
 		return; // invalid unit
@@ -1211,7 +1211,7 @@ int diablo_hd_device::rd_data(int index)
 		return 1;   // invalid unit
 	}
 
-	UINT32 *bits = expand_sector();
+	uint32_t *bits = expand_sector();
 	if (!bits) {
 		LOG_DRIVE((0,"[DHD%u]   no bits\n", m_unit));
 		return 1;   // invalid page
@@ -1254,7 +1254,7 @@ int diablo_hd_device::rd_clock(int index)
 		return 1;   // invalid page
 	}
 
-	UINT32 *bits = expand_sector();
+	uint32_t *bits = expand_sector();
 	if (!bits) {
 		LOG_DRIVE((0,"[DHD%u]   no bits\n", m_unit));
 		return 1;   // invalid unit
@@ -1399,7 +1399,7 @@ void diablo_hd_device::device_reset()
 	if (!m_handle)
 		return;
 	// for units with a CHD assigned to them start the timer
-	m_bits = auto_alloc_array_clear(machine(), UINT32*, m_pages);
+	m_bits = auto_alloc_array_clear(machine(), uint32_t*, m_pages);
 	timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
 	read_sector();
 }

@@ -62,7 +62,7 @@ void riot6532_device::update_irqstate()
     according to the DDR
 -------------------------------------------------*/
 
-UINT8 riot6532_device::apply_ddr(const riot6532_port *port)
+uint8_t riot6532_device::apply_ddr(const riot6532_port *port)
 {
 	return (port->m_out & port->m_ddr) | (port->m_in & ~port->m_ddr);
 }
@@ -75,7 +75,7 @@ UINT8 riot6532_device::apply_ddr(const riot6532_port *port)
 
 void riot6532_device::update_pa7_state()
 {
-	UINT8 data = apply_ddr(&m_port[0]) & 0x80;
+	uint8_t data = apply_ddr(&m_port[0]) & 0x80;
 
 	/* if the state changed in the correct direction, set the PA7 flag and update IRQs */
 	if ((m_pa7prev ^ data) && (m_pa7dir ^ data) == 0)
@@ -91,7 +91,7 @@ void riot6532_device::update_pa7_state()
     get_timer - return the current timer value
 -------------------------------------------------*/
 
-UINT8 riot6532_device::get_timer()
+uint8_t riot6532_device::get_timer()
 {
 	/* if idle, return 0 */
 	if (m_timerstate == TIMER_IDLE)
@@ -151,14 +151,14 @@ WRITE8_MEMBER( riot6532_device::write )
 	reg_w(offset, data);
 }
 
-void riot6532_device::reg_w(UINT8 offset, UINT8 data)
+void riot6532_device::reg_w(uint8_t offset, uint8_t data)
 {
 	/* if A4 == 1 and A2 == 1, we are writing to the timer */
 	if ((offset & 0x14) == 0x14)
 	{
-		static const UINT8 timershift[4] = { 0, 3, 6, 10 };
+		static const uint8_t timershift[4] = { 0, 3, 6, 10 };
 		attotime curtime = machine().time();
-		INT64 target;
+		int64_t target;
 
 		/* A0-A1 contain the timer divisor */
 		m_timershift = timershift[offset & 3];
@@ -236,9 +236,9 @@ READ8_MEMBER( riot6532_device::read )
 	return reg_r(offset, space.debugger_access());
 }
 
-UINT8 riot6532_device::reg_r(UINT8 offset, bool debugger_access)
+uint8_t riot6532_device::reg_r(uint8_t offset, bool debugger_access)
 {
-	UINT8 val;
+	uint8_t val;
 
 	/* if A2 == 1 and A0 == 1, we are reading interrupt flags */
 	if ((offset & 0x05) == 0x05)
@@ -321,7 +321,7 @@ UINT8 riot6532_device::reg_r(UINT8 offset, bool debugger_access)
     porta_in_set - set port A input value
 -------------------------------------------------*/
 
-void riot6532_device::porta_in_set(UINT8 data, UINT8 mask)
+void riot6532_device::porta_in_set(uint8_t data, uint8_t mask)
 {
 	m_port[0].m_in = (m_port[0].m_in & ~mask) | (data & mask);
 	update_pa7_state();
@@ -332,7 +332,7 @@ void riot6532_device::porta_in_set(UINT8 data, UINT8 mask)
     portb_in_set - set port B input value
 -------------------------------------------------*/
 
-void riot6532_device::portb_in_set(UINT8 data, UINT8 mask)
+void riot6532_device::portb_in_set(uint8_t data, uint8_t mask)
 {
 	m_port[1].m_in = (m_port[1].m_in & ~mask) | (data & mask);
 }
@@ -342,7 +342,7 @@ void riot6532_device::portb_in_set(UINT8 data, UINT8 mask)
     porta_in_get - return port A input value
 -------------------------------------------------*/
 
-UINT8 riot6532_device::porta_in_get()
+uint8_t riot6532_device::porta_in_get()
 {
 	return m_port[0].m_in;
 }
@@ -352,7 +352,7 @@ UINT8 riot6532_device::porta_in_get()
     portb_in_get - return port B input value
 -------------------------------------------------*/
 
-UINT8 riot6532_device::portb_in_get()
+uint8_t riot6532_device::portb_in_get()
 {
 	return m_port[1].m_in;
 }
@@ -362,7 +362,7 @@ UINT8 riot6532_device::portb_in_get()
     porta_in_get - return port A output value
 -------------------------------------------------*/
 
-UINT8 riot6532_device::porta_out_get()
+uint8_t riot6532_device::porta_out_get()
 {
 	return m_port[0].m_out;
 }
@@ -372,7 +372,7 @@ UINT8 riot6532_device::porta_out_get()
     portb_in_get - return port B output value
 -------------------------------------------------*/
 
-UINT8 riot6532_device::portb_out_get()
+uint8_t riot6532_device::portb_out_get()
 {
 	return m_port[1].m_out;
 }
@@ -386,7 +386,7 @@ UINT8 riot6532_device::portb_out_get()
 //  riot6532_device - constructor
 //-------------------------------------------------
 
-riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RIOT6532, "6532 RIOT", tag, owner, clock, "riot6532", __FILE__),
 		m_in_pa_cb(*this),
 		m_out_pa_cb(*this),
@@ -483,6 +483,6 @@ void riot6532_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			timer_end();
 			break;
 		default:
-			assert_always(FALSE, "Unknown id in riot6532_device::device_timer");
+			assert_always(false, "Unknown id in riot6532_device::device_timer");
 	}
 }

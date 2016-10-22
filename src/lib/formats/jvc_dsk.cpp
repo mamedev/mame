@@ -39,9 +39,9 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 {
 	// The JVC format has a header whose size is the size of the image modulo 256.  Currently, we only
 	// handle up to five header bytes
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 	header_size = size % 256;
-	UINT8 header[5];
+	uint8_t header[5];
 
 	// if we know that this is a header of a bad size, we can fail
 	// immediately; otherwise read the header
@@ -75,13 +75,13 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 	return tracks * heads * sectors * sector_size == (size - header_size);
 }
 
-int jvc_format::identify(io_generic *io, UINT32 form_factor)
+int jvc_format::identify(io_generic *io, uint32_t form_factor)
 {
 	int header_size, tracks, heads, sectors, sector_size, sector_base_id;
 	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? 50 : 0;
 }
 
-bool jvc_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	int header_size, track_count, head_count, sector_count, sector_size, sector_base_id;
 
@@ -99,7 +99,7 @@ bool jvc_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		for (int head = 0; head < head_count ; head++)
 		{
 			desc_pc_sector sectors[256];
-			UINT8 sector_data[10000];
+			uint8_t sector_data[10000];
 			int sector_offset = 0;
 
 			for (int i = 0; i < sector_count; i++)
@@ -128,10 +128,10 @@ bool jvc_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 bool jvc_format::save(io_generic *io, floppy_image *image)
 {
-	UINT8 bitstream[500000/8];
-	UINT8 sector_data[50000];
+	uint8_t bitstream[500000/8];
+	uint8_t sector_data[50000];
 	desc_xs sectors[256];
-	UINT64 file_offset = 0;
+	uint64_t file_offset = 0;
 
 	int track_count, head_count;
 	image->get_actual_geometry(track_count, head_count);
@@ -139,7 +139,7 @@ bool jvc_format::save(io_generic *io, floppy_image *image)
 	// we'll write a header if the disk is two-sided
 	if (head_count == 2)
 	{
-		UINT8 header[2];
+		uint8_t header[2];
 		header[0] = 18;
 		header[1] = 2;
 		io_generic_write(io, header, file_offset, sizeof(header));

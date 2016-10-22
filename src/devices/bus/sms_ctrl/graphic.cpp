@@ -75,7 +75,7 @@ ioport_constructor sms_graphic_device::device_input_ports() const
 //  sms_graphic_device - constructor
 //-------------------------------------------------
 
-sms_graphic_device::sms_graphic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sms_graphic_device::sms_graphic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SMS_GRAPHIC, "Sega SMS Graphic Board", tag, owner, clock, "sms_graphic", __FILE__)
 	, device_sms_control_port_interface(mconfig, *this)
 	, m_buttons(*this, "BUTTONS")
@@ -103,7 +103,7 @@ void sms_graphic_device::device_start()
 //  sms_peripheral_r - joypad read
 //-------------------------------------------------
 
-UINT8 sms_graphic_device::peripheral_r()
+uint8_t sms_graphic_device::peripheral_r()
 {
 	switch (m_index)
 	{
@@ -138,7 +138,7 @@ UINT8 sms_graphic_device::peripheral_r()
 	return 0xff;
 }
 
-void sms_graphic_device::peripheral_w(UINT8 data)
+void sms_graphic_device::peripheral_w(uint8_t data)
 {
 	// Check for toggle on TH/TL
 	if ((data ^ m_previous_write) & 0xc0)

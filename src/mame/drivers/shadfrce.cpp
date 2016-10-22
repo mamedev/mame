@@ -234,7 +234,7 @@ WRITE16_MEMBER(shadfrce_state::flip_screen)
 
 READ16_MEMBER(shadfrce_state::input_ports_r)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	switch (offset)
 	{

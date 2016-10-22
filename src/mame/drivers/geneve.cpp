@@ -189,7 +189,7 @@
     the keyboard pulses the clock line low 9 times, and the Geneve samples all
     8 bits of data (plus one start bit) on each falling edge of the clock.
     When the key code buffer is full, the Geneve gate array asserts the kbdint*
-    line (connected to 9901 INT8*).  The Geneve gate array will hold the
+    line (connected to 9901 int8_t*).  The Geneve gate array will hold the
     CTS/clock line low as long as the keyboard buffer is full or CRU bit @>F78
     is 0.  Writing a 0 to >F79 will clear the Geneve keyboard buffer, and
     writing a 1 will resume normal operation: you need to write a 0 to >F78
@@ -419,7 +419,7 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 
 READ8_MEMBER( geneve_state::cruread )
 {
-	UINT8 value = 0;
+	uint8_t value = 0;
 	int addroff = offset << 4;
 
 	// Single step
@@ -464,7 +464,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 		break;
 
 	case TMS9901_INT8_INT15:
-		// Read pins INT8*-INT15* of Geneve 9901.
+		// Read pins int8_t*-INT15* of Geneve 9901.
 		//
 		// bit 0: keyboard interrupt
 		// bit 1: unused

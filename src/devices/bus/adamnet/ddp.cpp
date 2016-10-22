@@ -118,7 +118,7 @@ machine_config_constructor adam_digital_data_pack_device::device_mconfig_additio
 //  adam_digital_data_pack_device - constructor
 //-------------------------------------------------
 
-adam_digital_data_pack_device::adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adam_digital_data_pack_device::adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ADAM_DDP, "Adam DDP", tag, owner, clock, "adam_ddp", __FILE__),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
@@ -214,7 +214,7 @@ READ8_MEMBER( adam_digital_data_pack_device::p2_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_bus->reset_r())
 		data |= M6801_MODE_6;
@@ -284,7 +284,7 @@ READ8_MEMBER( adam_digital_data_pack_device::p4_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// drive 0
 	if (m_ddp0->exists())

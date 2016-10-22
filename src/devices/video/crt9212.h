@@ -68,7 +68,7 @@ class crt9212_t :  public device_t
 {
 public:
 	// construction/destruction
-	crt9212_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	crt9212_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_wen2(device_t &device, int state) { downcast<crt9212_t &>(device).m_wen2 = state; }
 
@@ -96,7 +96,7 @@ private:
 	devcb_write_line       m_write_wof;
 
 	// inputs
-	UINT8 m_data;
+	uint8_t m_data;
 	int m_clrcnt;
 	int m_tog;
 	int m_ren;
@@ -108,10 +108,10 @@ private:
 
 	// internal state
 	bool m_clrcnt_edge;
-	UINT8 m_data_latch;
+	uint8_t m_data_latch;
 	int m_ren_int;
 	int m_wen_int;
-	UINT8 m_ram[CRT9212_RAM_SIZE][2];
+	uint8_t m_ram[CRT9212_RAM_SIZE][2];
 	int m_buffer;
 	int m_rac;
 	int m_wac;

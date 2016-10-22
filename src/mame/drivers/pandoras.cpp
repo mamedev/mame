@@ -24,15 +24,16 @@ Boards:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/pandoras.h"
+#include "includes/konamipt.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "includes/konamipt.h"
-#include "includes/pandoras.h"
+#include "sound/volt_reg.h"
 
 
 #define MASTER_CLOCK        XTAL_18_432MHz
@@ -175,7 +176,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_i8039_io_map, AS_IO, 8, pandoras_state )
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
@@ -356,7 +357,7 @@ static MACHINE_CONFIG_START( pandoras, pandoras_state )
 	MCFG_PALETTE_INIT_OWNER(pandoras_state, pandoras)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -364,10 +365,11 @@ static MACHINE_CONFIG_START( pandoras, pandoras_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(pandoras_state, pandoras_portA_r))   // not used
 	MCFG_AY8910_PORT_B_READ_CB(READ8(pandoras_state, pandoras_portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

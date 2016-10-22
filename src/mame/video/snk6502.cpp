@@ -26,7 +26,7 @@
 ***************************************************************************/
 PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -188,7 +188,7 @@ VIDEO_START_MEMBER(snk6502_state,pballoon)
 }
 
 
-UINT32 snk6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snk6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -199,7 +199,7 @@ UINT32 snk6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 PALETTE_INIT_MEMBER(snk6502_state,satansat)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)

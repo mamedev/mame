@@ -76,11 +76,12 @@ DONE:
 */
 
 #include "cpu/i86/i86.h"
-#include "machine/pic8259.h"
 #include "machine/ay31015.h"
-#include "video/tms9927.h"
-#include "sound/dac.h"
+#include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/tms9927.h"
 
 class notetaker_state : public driver_device
 {
@@ -109,14 +110,14 @@ public:
 	required_device<ay31015_device> m_kbduart;
 	required_device<ay31015_device> m_eiauart;
 	required_device<crt5027_device> m_crtc;
-	required_device<dac_device> m_dac;
+	required_device<dac_word_interface> m_dac;
 	required_device<fd1791_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	floppy_image_device *m_floppy;
 
 //declarations
 	// screen
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// basic io
 	DECLARE_WRITE16_MEMBER(IPConReg_w);
 	DECLARE_WRITE16_MEMBER(FIFOReg_w);
@@ -143,50 +144,50 @@ public:
 	DECLARE_DRIVER_INIT(notetakr);
 	//variables
 	//  IPConReg
-	UINT8 m_BootSeqDone;
-	UINT8 m_ProcLock;
-	UINT8 m_CharCtr;
-	UINT8 m_DisableROM;
-	UINT8 m_CorrOn_q;
-	UINT8 m_LedInd6;
-	UINT8 m_LedInd7;
-	UINT8 m_LedInd8;
+	uint8_t m_BootSeqDone;
+	uint8_t m_ProcLock;
+	uint8_t m_CharCtr;
+	uint8_t m_DisableROM;
+	uint8_t m_CorrOn_q;
+	uint8_t m_LedInd6;
+	uint8_t m_LedInd7;
+	uint8_t m_LedInd8;
 	//  FIFOReg
-	UINT8 m_TabletYOn;
-	UINT8 m_TabletXOn;
-	UINT8 m_FrSel2;
-	UINT8 m_FrSel1;
-	UINT8 m_FrSel0;
-	UINT8 m_SHConB;
-	UINT8 m_SHConA;
-	UINT8 m_SetSH;
+	uint8_t m_TabletYOn;
+	uint8_t m_TabletXOn;
+	uint8_t m_FrSel2;
+	uint8_t m_FrSel1;
+	uint8_t m_FrSel0;
+	uint8_t m_SHConB;
+	uint8_t m_SHConA;
+	uint8_t m_SetSH;
 	// DiskReg
-	UINT8 m_ADCSpd0;
-	UINT8 m_ADCSpd1;
-	UINT8 m_StopWordClock_q;
-	UINT8 m_ClrDiskCont_q;
-	UINT8 m_ProgBitClk1;
-	UINT8 m_ProgBitClk2;
-	UINT8 m_ProgBitClk3;
-	UINT8 m_AnSel4;
-	UINT8 m_AnSel2;
-	UINT8 m_AnSel1;
-	UINT8 m_DriveSel1;
-	UINT8 m_DriveSel2;
-	UINT8 m_DriveSel3;
-	UINT8 m_SideSelect;
-	UINT8 m_Disk5VOn;
-	UINT8 m_Disk12VOn;
+	uint8_t m_ADCSpd0;
+	uint8_t m_ADCSpd1;
+	uint8_t m_StopWordClock_q;
+	uint8_t m_ClrDiskCont_q;
+	uint8_t m_ProgBitClk1;
+	uint8_t m_ProgBitClk2;
+	uint8_t m_ProgBitClk3;
+	uint8_t m_AnSel4;
+	uint8_t m_AnSel2;
+	uint8_t m_AnSel1;
+	uint8_t m_DriveSel1;
+	uint8_t m_DriveSel2;
+	uint8_t m_DriveSel3;
+	uint8_t m_SideSelect;
+	uint8_t m_Disk5VOn;
+	uint8_t m_Disk12VOn;
 	// output fifo, for DAC
-	UINT16 m_outfifo[16]; // technically three 74LS225 5bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo (one bit unused per chip)
-	UINT8 m_outfifo_count;
-	UINT8 m_outfifo_tail_ptr;
-	UINT8 m_outfifo_head_ptr;
+	uint16_t m_outfifo[16]; // technically three 74LS225 5bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo (one bit unused per chip)
+	uint8_t m_outfifo_count;
+	uint8_t m_outfifo_tail_ptr;
+	uint8_t m_outfifo_head_ptr;
 	// fifo timer
 	emu_timer *m_FIFO_timer;
 	TIMER_CALLBACK_MEMBER(timer_fifoclk);
 	// framebuffer display starting address
-	UINT16 m_DispAddr;
+	uint16_t m_DispAddr;
 
 // separate cpu resets
 	void ip_reset();
@@ -208,13 +209,13 @@ void notetaker_state::device_timer(emu_timer &timer, device_timer_id id, int par
 		timer_fifoclk(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in notetaker_state::device_timer");
+		assert_always(false, "Unknown id in notetaker_state::device_timer");
 	}
 }
 
 TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 {
-	UINT16 data;
+	uint16_t data;
 	//pop a value off the fifo and send it to the dac.
 #ifdef FIFO_VERBOSE
 	if (m_outfifo_count == 0) logerror("output fifo is EMPTY! repeating previous sample!\n");
@@ -227,25 +228,25 @@ TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 		m_outfifo_count--;
 	}
 	m_outfifo_tail_ptr&=0xF;
-	m_dac->write_unsigned16(data);
+	m_dac->write(data);
 	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter), divided by 4 (mc14568B with divider 1 pins set to 4), divided by 1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
 }
 
-UINT32 notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// have to figure out what resolution we're drawing to here and draw appropriately to screen
 	// code borrowed/stolen from video/mac.cpp
-	UINT32 video_base;
-	UINT16 word;
-	UINT16 *line;
+	uint32_t video_base;
+	uint16_t word;
+	uint16_t *line;
 	int y, x, b;
 
 	video_base = (m_DispAddr << 3)&0x1FFFF;
 #ifdef DEBUG_VIDEO
 	logerror("Video Base = 0x%05x\n", video_base);
 #endif
-	const UINT16 *video_ram_field1 = (UINT16 *)(memregion("mainram")->base()+video_base);
-	const UINT16 *video_ram_field2 = (UINT16 *)(memregion("mainram")->base()+video_base+0x4B00);
+	const uint16_t *video_ram_field1 = (uint16_t *)(memregion("mainram")->base()+video_base);
+	const uint16_t *video_ram_field2 = (uint16_t *)(memregion("mainram")->base()+video_base+0x4B00);
 
 	for (y = 0; y < 480; y++)
 	{
@@ -285,7 +286,7 @@ READ16_MEMBER( notetaker_state::ReadKeyData_r )
 
 READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 provides 4 bits, inverted
 {
-	UINT16 data = 0xFFF0;
+	uint16_t data = 0xFFF0;
 	data |= (m_outfifo_count >= 1) ? 0 : 0x08; // m_FIFOOutRdy is true if the fifo has at least 1 word in it, false otherwise
 	data |= (m_outfifo_count < 16) ? 0 : 0x04; // m_FIFOInRdy is true if the fifo has less than 16 words in it, false otherwise
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
@@ -349,7 +350,7 @@ WRITE16_MEMBER(notetaker_state::FIFOBus_w)
 #endif
 		return;
 	}
-	m_outfifo[m_outfifo_head_ptr] = data;
+	m_outfifo[m_outfifo_head_ptr] = data >> 4;
 	m_outfifo_head_ptr++;
 	m_outfifo_count++;
 	m_outfifo_head_ptr&=0xF;
@@ -420,7 +421,7 @@ READ16_MEMBER( notetaker_state::ReadEIAData_r )
 
 READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1 provides 2 bits, inverted
 {
-	UINT16 data = 0xFFFC;
+	uint16_t data = 0xFFFC;
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
 	data |= m_eiauart->get_output_pin(AY31015_DAV ) ? 0 : 0x02; // DR - pin 19
 	data |= m_eiauart->get_output_pin(AY31015_TBMT) ? 0 : 0x01; // TBRE - pin 22
@@ -459,9 +460,9 @@ WRITE16_MEMBER( notetaker_state::EIAChipReset_w )
 /* These next two members are memory map related for the iocpu */
 READ16_MEMBER(notetaker_state::iocpu_r)
 {
-	UINT16 *rom = (UINT16 *)(memregion("iocpu")->base());
+	uint16_t *rom = (uint16_t *)(memregion("iocpu")->base());
 	rom += 0x7f800;
-	UINT16 *ram = (UINT16 *)(memregion("mainram")->base());
+	uint16_t *ram = (uint16_t *)(memregion("mainram")->base());
 	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
 	{
 		rom += (offset&0x7FF);
@@ -478,8 +479,8 @@ READ16_MEMBER(notetaker_state::iocpu_r)
 
 WRITE16_MEMBER(notetaker_state::iocpu_w)
 {
-	//UINT16 tempword;
-	UINT16 *ram = (UINT16 *)(memregion("mainram")->base());
+	//uint16_t tempword;
+	uint16_t *ram = (uint16_t *)(memregion("mainram")->base());
 	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
 	{
 		logerror("attempt to write %04X to ROM-mapped area at %06X ignored\n", data, offset<<1);
@@ -824,10 +825,11 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono") // TODO: should be stereo
-	MCFG_SOUND_ADD("dac", DAC, 0) /* DAC1200, set up with two sample and hold HA2425 chips outside it to do stereo */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	// TODO: hook DAC up to two HA2425 (sample and hold) chips and hook those up to the speakers
+	MCFG_SOUND_ADD("dac", DAC1200, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(notetaker_state,notetakr)
@@ -836,11 +838,11 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 	// interfacing with older xerox technologies which used A0 and D0 as the MSB bits
 	// or maybe because someone screwed up somewhere along the line. we may never know.
 	// see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/schematics/19790423_Notetaker_IO_Processor.pdf pages 12 and onward
-	UINT16 *romsrc = (UINT16 *)(memregion("iocpuload")->base());
-	UINT16 *romdst = (UINT16 *)(memregion("iocpu")->base());
-	UINT16 *temppointer;
-	UINT16 wordtemp;
-	UINT16 addrtemp;
+	uint16_t *romsrc = (uint16_t *)(memregion("iocpuload")->base());
+	uint16_t *romdst = (uint16_t *)(memregion("iocpu")->base());
+	uint16_t *temppointer;
+	uint16_t wordtemp;
+	uint16_t addrtemp;
 		// leave the src pointer alone, since we've only used a 0x1000 long address space
 		romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
 		for (int i = 0; i < 0x800; i++)

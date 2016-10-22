@@ -112,7 +112,7 @@ protected:
 
 	// internal state
 	bool                        m_flip;                 // screen flip?
-	UINT8                       m_bank[16];             // banking redirection
+	uint8_t                       m_bank[16];             // banking redirection
 	int m_xoffs, m_yoffs;
 	int m_xoffs_flipped, m_yoffs_flipped;
 
@@ -125,14 +125,14 @@ class sega_hangon_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	// memory regions
-	required_region_ptr<UINT16> m_sprite_region_ptr;
+	required_region_ptr<uint16_t> m_sprite_region_ptr;
 };
 
 
@@ -142,14 +142,14 @@ class sega_sharrier_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	// memory regions
-	required_region_ptr<UINT32> m_sprite_region_ptr;
+	required_region_ptr<uint32_t> m_sprite_region_ptr;
 };
 
 
@@ -159,9 +159,9 @@ class sega_outrun_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool xboard_variant, const char *shortname, const char *source);
+	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool xboard_variant, const char *shortname, const char *source);
 
 protected:
 	// subclass overrides
@@ -169,14 +169,14 @@ protected:
 
 	// configuration
 	bool            m_is_xboard;
-	required_region_ptr<UINT32> m_sprite_region_ptr;
+	required_region_ptr<uint32_t> m_sprite_region_ptr;
 };
 
 class sega_xboard_sprite_device : public sega_outrun_sprite_device
 {
 public:
 	// construction/destruction
-	sega_xboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_xboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -186,14 +186,14 @@ class sega_sys16a_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	// memory regions
-	required_region_ptr<UINT16> m_sprite_region_ptr;
+	required_region_ptr<uint16_t> m_sprite_region_ptr;
 };
 
 
@@ -203,20 +203,20 @@ class bootleg_sys16a_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	static void static_set_remap(device_t &device, UINT8 offs0, UINT8 offs1, UINT8 offs2, UINT8 offs3, UINT8 offs4, UINT8 offs5, UINT8 offs6, UINT8 offs7);
+	static void static_set_remap(device_t &device, uint8_t offs0, uint8_t offs1, uint8_t offs2, uint8_t offs3, uint8_t offs4, uint8_t offs5, uint8_t offs6, uint8_t offs7);
 
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	// memory regions
-	required_region_ptr<UINT16> m_sprite_region_ptr;
+	required_region_ptr<uint16_t> m_sprite_region_ptr;
 
 	// internal state
-	UINT8       m_addrmap[8];
+	uint8_t       m_addrmap[8];
 };
 
 
@@ -226,14 +226,14 @@ class sega_sys16b_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	// memory regions
-	required_region_ptr<UINT16> m_sprite_region_ptr;
+	required_region_ptr<uint16_t> m_sprite_region_ptr;
 };
 
 
@@ -243,14 +243,14 @@ class sega_yboard_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_rotate_ptr(rotate_info* segaic16_rotate) { m_segaic16_rotate = segaic16_rotate; }
 
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
-	required_region_ptr<UINT64>     m_sprite_region_ptr;
+	required_region_ptr<uint64_t>     m_sprite_region_ptr;
 	rotate_info*                    m_segaic16_rotate;
 };
 

@@ -43,7 +43,7 @@ class aakart_device : public device_t
 {
 public:
 	// construction/destruction
-	aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_tx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_tx_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_rx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_rx_cb.set_callback(object); }
@@ -51,8 +51,8 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	void send_keycode_down(UINT8 row, UINT8 col);
-	void send_keycode_up(UINT8 row, UINT8 col);
+	void send_keycode_down(uint8_t row, uint8_t col);
+	void send_keycode_up(uint8_t row, uint8_t col);
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -72,16 +72,16 @@ private:
 
 	devcb_write_line        m_out_tx_cb;
 	devcb_write_line        m_out_rx_cb;
-	UINT8 m_tx_latch;
-	//UINT8 m_rx_latch;
-	UINT8 m_rx;
-	UINT8 m_new_command;
-	UINT8 m_status;
-	UINT8 m_mouse_enable;
-	UINT8 m_keyb_enable;
-	UINT8 m_keyb_row;
-	UINT8 m_keyb_col;
-	UINT8 m_keyb_state;
+	uint8_t m_tx_latch;
+	//uint8_t m_rx_latch;
+	uint8_t m_rx;
+	uint8_t m_new_command;
+	uint8_t m_status;
+	uint8_t m_mouse_enable;
+	uint8_t m_keyb_enable;
+	uint8_t m_keyb_row;
+	uint8_t m_keyb_col;
+	uint8_t m_keyb_state;
 
 };
 

@@ -53,7 +53,7 @@ void debug_view_textbuf::view_update()
 		m_total.x = 80;
 
 	// determine the starting sequence number
-	UINT32 curseq = 0;
+	uint32_t curseq = 0;
 	if (!m_at_bottom)
 	{
 		curseq = m_topseq;
@@ -72,16 +72,16 @@ void debug_view_textbuf::view_update()
 
 	// loop over visible rows
 	debug_view_char *dest = &m_viewdata[0];
-	for (UINT32 row = 0; row < m_visible.y; row++)
+	for (uint32_t row = 0; row < m_visible.y; row++)
 	{
 		const char *line = text_buffer_get_seqnum_line(&m_textbuf, curseq++);
-		UINT32 col = 0;
+		uint32_t col = 0;
 
 		// if this visible row is valid, add it to the buffer
 		if (line != nullptr)
 		{
 			size_t len = strlen(line);
-			UINT32 effcol = m_topleft.x;
+			uint32_t effcol = m_topleft.x;
 
 			// copy data
 			while (col < m_visible.x && effcol < len)

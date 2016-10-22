@@ -35,7 +35,7 @@ class cclimber_audio_device : public device_t
 {
 public:
 	// construction/destruction
-	cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( sample_trigger_w );
 	DECLARE_WRITE8_MEMBER( sample_rate_w );
@@ -52,12 +52,12 @@ protected:
 	void play_sample(int start,int freq,int volume);
 
 private:
-	std::unique_ptr<INT16[]> m_sample_buf;    /* buffer to decode samples at run time */
+	std::unique_ptr<int16_t[]> m_sample_buf;    /* buffer to decode samples at run time */
 	int m_sample_num;
 	int m_sample_freq;
 	int m_sample_volume;
 	optional_device<samples_device> m_samples;
-	optional_region_ptr<UINT8> m_samples_region;
+	optional_region_ptr<uint8_t> m_samples_region;
 };
 
 

@@ -19,7 +19,7 @@
 
 using namespace uml;
 
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
+extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
 
 /***************************************************************************
     Helpful Defines
@@ -36,7 +36,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 
 #define VREG_B(reg, offset)         m_v[(reg)].b[(offset)^1]
 #define W_VREG_S(reg, offset)       m_v[(reg)].s[(offset)]
-#define VREG_S(reg, offset)         (INT16)m_v[(reg)].s[(offset)]
+#define VREG_S(reg, offset)         (int16_t)m_v[(reg)].s[(offset)]
 
 #define VEC_EL_2(x,z)               (vector_elements_2[(x)][(z)])
 
@@ -53,10 +53,10 @@ static void cfunc_cfc2(void *param);
 static void cfunc_mtc2(void *param);
 static void cfunc_ctc2(void *param);
 
-#define ACCUM_H(x)           (UINT16)m_accum[x].w[3]
-#define ACCUM_M(x)           (UINT16)m_accum[x].w[2]
-#define ACCUM_L(x)           (UINT16)m_accum[x].w[1]
-#define ACCUM_LL(x)          (UINT16)m_accum[x].w[0]
+#define ACCUM_H(x)           (uint16_t)m_accum[x].w[3]
+#define ACCUM_M(x)           (uint16_t)m_accum[x].w[2]
+#define ACCUM_L(x)           (uint16_t)m_accum[x].w[1]
+#define ACCUM_LL(x)          (uint16_t)m_accum[x].w[0]
 #define ACCUM(x)             m_accum[x].q
 
 #define SET_ACCUM_H(v, x)       m_accum[x].w[3] = v;
@@ -132,7 +132,7 @@ static const int vector_elements_2[16][8] =
 
 void rsp_cop2_drc::cfunc_unimplemented_opcode()
 {
-	const UINT32 ppc = m_rsp.m_ppc;
+	const uint32_t ppc = m_rsp.m_ppc;
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		char string[200];
@@ -152,100 +152,100 @@ void rsp_cop2_drc::state_string_export(const int index, std::string &str) const
 	switch (index)
 	{
 		case RSP_V0:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 0, 0), (UINT16)VREG_S( 0, 1), (UINT16)VREG_S( 0, 2), (UINT16)VREG_S( 0, 3), (UINT16)VREG_S( 0, 4), (UINT16)VREG_S( 0, 5), (UINT16)VREG_S( 0, 6), (UINT16)VREG_S( 0, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S( 0, 0), (uint16_t)VREG_S( 0, 1), (uint16_t)VREG_S( 0, 2), (uint16_t)VREG_S( 0, 3), (uint16_t)VREG_S( 0, 4), (uint16_t)VREG_S( 0, 5), (uint16_t)VREG_S( 0, 6), (uint16_t)VREG_S( 0, 7));
 			break;
 		case RSP_V1:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 1, 0), (UINT16)VREG_S( 1, 1), (UINT16)VREG_S( 1, 2), (UINT16)VREG_S( 1, 3), (UINT16)VREG_S( 1, 4), (UINT16)VREG_S( 1, 5), (UINT16)VREG_S( 1, 6), (UINT16)VREG_S( 1, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S( 1, 0), (uint16_t)VREG_S( 1, 1), (uint16_t)VREG_S( 1, 2), (uint16_t)VREG_S( 1, 3), (uint16_t)VREG_S( 1, 4), (uint16_t)VREG_S( 1, 5), (uint16_t)VREG_S( 1, 6), (uint16_t)VREG_S( 1, 7));
 			break;
 		case RSP_V2:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 2, 0), (UINT16)VREG_S( 2, 1), (UINT16)VREG_S( 2, 2), (UINT16)VREG_S( 2, 3), (UINT16)VREG_S( 2, 4), (UINT16)VREG_S( 2, 5), (UINT16)VREG_S( 2, 6), (UINT16)VREG_S( 2, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S( 2, 0), (uint16_t)VREG_S( 2, 1), (uint16_t)VREG_S( 2, 2), (uint16_t)VREG_S( 2, 3), (uint16_t)VREG_S( 2, 4), (uint16_t)VREG_S( 2, 5), (uint16_t)VREG_S( 2, 6), (uint16_t)VREG_S( 2, 7));
 			break;
 		case RSP_V3:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 3, 0), (UINT16)VREG_S( 3, 1), (UINT16)VREG_S( 3, 2), (UINT16)VREG_S( 3, 3), (UINT16)VREG_S( 3, 4), (UINT16)VREG_S( 3, 5), (UINT16)VREG_S( 3, 6), (UINT16)VREG_S( 3, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S( 3, 0), (uint16_t)VREG_S( 3, 1), (uint16_t)VREG_S( 3, 2), (uint16_t)VREG_S( 3, 3), (uint16_t)VREG_S( 3, 4), (uint16_t)VREG_S( 3, 5), (uint16_t)VREG_S( 3, 6), (uint16_t)VREG_S( 3, 7));
 			break;
 		case RSP_V4:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 4, 0), (UINT16)VREG_S( 4, 1), (UINT16)VREG_S( 4, 2), (UINT16)VREG_S( 4, 3), (UINT16)VREG_S( 4, 4), (UINT16)VREG_S( 4, 5), (UINT16)VREG_S( 4, 6), (UINT16)VREG_S( 4, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S( 4, 0), (uint16_t)VREG_S( 4, 1), (uint16_t)VREG_S( 4, 2), (uint16_t)VREG_S( 4, 3), (uint16_t)VREG_S( 4, 4), (uint16_t)VREG_S( 4, 5), (uint16_t)VREG_S( 4, 6), (uint16_t)VREG_S( 4, 7));
 			break;
 		case RSP_V5:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 5, 0), (UINT16)VREG_S( 5, 1), (UINT16)VREG_S( 5, 2), (UINT16)VREG_S( 5, 3), (UINT16)VREG_S( 5, 4), (UINT16)VREG_S( 5, 5), (UINT16)VREG_S( 5, 6), (UINT16)VREG_S( 5, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S( 5, 0), (uint16_t)VREG_S( 5, 1), (uint16_t)VREG_S( 5, 2), (uint16_t)VREG_S( 5, 3), (uint16_t)VREG_S( 5, 4), (uint16_t)VREG_S( 5, 5), (uint16_t)VREG_S( 5, 6), (uint16_t)VREG_S( 5, 7));
 			break;
 		case RSP_V6:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 6, 0), (UINT16)VREG_S( 6, 1), (UINT16)VREG_S( 6, 2), (UINT16)VREG_S( 6, 3), (UINT16)VREG_S( 6, 4), (UINT16)VREG_S( 6, 5), (UINT16)VREG_S( 6, 6), (UINT16)VREG_S( 6, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S( 6, 0), (uint16_t)VREG_S( 6, 1), (uint16_t)VREG_S( 6, 2), (uint16_t)VREG_S( 6, 3), (uint16_t)VREG_S( 6, 4), (uint16_t)VREG_S( 6, 5), (uint16_t)VREG_S( 6, 6), (uint16_t)VREG_S( 6, 7));
 			break;
 		case RSP_V7:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 7, 0), (UINT16)VREG_S( 7, 1), (UINT16)VREG_S( 7, 2), (UINT16)VREG_S( 7, 3), (UINT16)VREG_S( 7, 4), (UINT16)VREG_S( 7, 5), (UINT16)VREG_S( 7, 6), (UINT16)VREG_S( 7, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S( 7, 0), (uint16_t)VREG_S( 7, 1), (uint16_t)VREG_S( 7, 2), (uint16_t)VREG_S( 7, 3), (uint16_t)VREG_S( 7, 4), (uint16_t)VREG_S( 7, 5), (uint16_t)VREG_S( 7, 6), (uint16_t)VREG_S( 7, 7));
 			break;
 		case RSP_V8:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 8, 0), (UINT16)VREG_S( 8, 1), (UINT16)VREG_S( 8, 2), (UINT16)VREG_S( 8, 3), (UINT16)VREG_S( 8, 4), (UINT16)VREG_S( 8, 5), (UINT16)VREG_S( 8, 6), (UINT16)VREG_S( 8, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S( 8, 0), (uint16_t)VREG_S( 8, 1), (uint16_t)VREG_S( 8, 2), (uint16_t)VREG_S( 8, 3), (uint16_t)VREG_S( 8, 4), (uint16_t)VREG_S( 8, 5), (uint16_t)VREG_S( 8, 6), (uint16_t)VREG_S( 8, 7));
 			break;
 		case RSP_V9:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 9, 0), (UINT16)VREG_S( 9, 1), (UINT16)VREG_S( 9, 2), (UINT16)VREG_S( 9, 3), (UINT16)VREG_S( 9, 4), (UINT16)VREG_S( 9, 5), (UINT16)VREG_S( 9, 6), (UINT16)VREG_S( 9, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S( 9, 0), (uint16_t)VREG_S( 9, 1), (uint16_t)VREG_S( 9, 2), (uint16_t)VREG_S( 9, 3), (uint16_t)VREG_S( 9, 4), (uint16_t)VREG_S( 9, 5), (uint16_t)VREG_S( 9, 6), (uint16_t)VREG_S( 9, 7));
 			break;
 		case RSP_V10:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(10, 0), (UINT16)VREG_S(10, 1), (UINT16)VREG_S(10, 2), (UINT16)VREG_S(10, 3), (UINT16)VREG_S(10, 4), (UINT16)VREG_S(10, 5), (UINT16)VREG_S(10, 6), (UINT16)VREG_S(10, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(10, 0), (uint16_t)VREG_S(10, 1), (uint16_t)VREG_S(10, 2), (uint16_t)VREG_S(10, 3), (uint16_t)VREG_S(10, 4), (uint16_t)VREG_S(10, 5), (uint16_t)VREG_S(10, 6), (uint16_t)VREG_S(10, 7));
 			break;
 		case RSP_V11:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(11, 0), (UINT16)VREG_S(11, 1), (UINT16)VREG_S(11, 2), (UINT16)VREG_S(11, 3), (UINT16)VREG_S(11, 4), (UINT16)VREG_S(11, 5), (UINT16)VREG_S(11, 6), (UINT16)VREG_S(11, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(11, 0), (uint16_t)VREG_S(11, 1), (uint16_t)VREG_S(11, 2), (uint16_t)VREG_S(11, 3), (uint16_t)VREG_S(11, 4), (uint16_t)VREG_S(11, 5), (uint16_t)VREG_S(11, 6), (uint16_t)VREG_S(11, 7));
 			break;
 		case RSP_V12:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(12, 0), (UINT16)VREG_S(12, 1), (UINT16)VREG_S(12, 2), (UINT16)VREG_S(12, 3), (UINT16)VREG_S(12, 4), (UINT16)VREG_S(12, 5), (UINT16)VREG_S(12, 6), (UINT16)VREG_S(12, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(12, 0), (uint16_t)VREG_S(12, 1), (uint16_t)VREG_S(12, 2), (uint16_t)VREG_S(12, 3), (uint16_t)VREG_S(12, 4), (uint16_t)VREG_S(12, 5), (uint16_t)VREG_S(12, 6), (uint16_t)VREG_S(12, 7));
 			break;
 		case RSP_V13:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(13, 0), (UINT16)VREG_S(13, 1), (UINT16)VREG_S(13, 2), (UINT16)VREG_S(13, 3), (UINT16)VREG_S(13, 4), (UINT16)VREG_S(13, 5), (UINT16)VREG_S(13, 6), (UINT16)VREG_S(13, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(13, 0), (uint16_t)VREG_S(13, 1), (uint16_t)VREG_S(13, 2), (uint16_t)VREG_S(13, 3), (uint16_t)VREG_S(13, 4), (uint16_t)VREG_S(13, 5), (uint16_t)VREG_S(13, 6), (uint16_t)VREG_S(13, 7));
 			break;
 		case RSP_V14:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(14, 0), (UINT16)VREG_S(14, 1), (UINT16)VREG_S(14, 2), (UINT16)VREG_S(14, 3), (UINT16)VREG_S(14, 4), (UINT16)VREG_S(14, 5), (UINT16)VREG_S(14, 6), (UINT16)VREG_S(14, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(14, 0), (uint16_t)VREG_S(14, 1), (uint16_t)VREG_S(14, 2), (uint16_t)VREG_S(14, 3), (uint16_t)VREG_S(14, 4), (uint16_t)VREG_S(14, 5), (uint16_t)VREG_S(14, 6), (uint16_t)VREG_S(14, 7));
 			break;
 		case RSP_V15:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(15, 0), (UINT16)VREG_S(15, 1), (UINT16)VREG_S(15, 2), (UINT16)VREG_S(15, 3), (UINT16)VREG_S(15, 4), (UINT16)VREG_S(15, 5), (UINT16)VREG_S(15, 6), (UINT16)VREG_S(15, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(15, 0), (uint16_t)VREG_S(15, 1), (uint16_t)VREG_S(15, 2), (uint16_t)VREG_S(15, 3), (uint16_t)VREG_S(15, 4), (uint16_t)VREG_S(15, 5), (uint16_t)VREG_S(15, 6), (uint16_t)VREG_S(15, 7));
 			break;
 		case RSP_V16:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(16, 0), (UINT16)VREG_S(16, 1), (UINT16)VREG_S(16, 2), (UINT16)VREG_S(16, 3), (UINT16)VREG_S(16, 4), (UINT16)VREG_S(16, 5), (UINT16)VREG_S(16, 6), (UINT16)VREG_S(16, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(16, 0), (uint16_t)VREG_S(16, 1), (uint16_t)VREG_S(16, 2), (uint16_t)VREG_S(16, 3), (uint16_t)VREG_S(16, 4), (uint16_t)VREG_S(16, 5), (uint16_t)VREG_S(16, 6), (uint16_t)VREG_S(16, 7));
 			break;
 		case RSP_V17:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(17, 0), (UINT16)VREG_S(17, 1), (UINT16)VREG_S(17, 2), (UINT16)VREG_S(17, 3), (UINT16)VREG_S(17, 4), (UINT16)VREG_S(17, 5), (UINT16)VREG_S(17, 6), (UINT16)VREG_S(17, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(17, 0), (uint16_t)VREG_S(17, 1), (uint16_t)VREG_S(17, 2), (uint16_t)VREG_S(17, 3), (uint16_t)VREG_S(17, 4), (uint16_t)VREG_S(17, 5), (uint16_t)VREG_S(17, 6), (uint16_t)VREG_S(17, 7));
 			break;
 		case RSP_V18:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(18, 0), (UINT16)VREG_S(18, 1), (UINT16)VREG_S(18, 2), (UINT16)VREG_S(18, 3), (UINT16)VREG_S(18, 4), (UINT16)VREG_S(18, 5), (UINT16)VREG_S(18, 6), (UINT16)VREG_S(18, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(18, 0), (uint16_t)VREG_S(18, 1), (uint16_t)VREG_S(18, 2), (uint16_t)VREG_S(18, 3), (uint16_t)VREG_S(18, 4), (uint16_t)VREG_S(18, 5), (uint16_t)VREG_S(18, 6), (uint16_t)VREG_S(18, 7));
 			break;
 		case RSP_V19:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(19, 0), (UINT16)VREG_S(19, 1), (UINT16)VREG_S(19, 2), (UINT16)VREG_S(19, 3), (UINT16)VREG_S(19, 4), (UINT16)VREG_S(19, 5), (UINT16)VREG_S(19, 6), (UINT16)VREG_S(19, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(19, 0), (uint16_t)VREG_S(19, 1), (uint16_t)VREG_S(19, 2), (uint16_t)VREG_S(19, 3), (uint16_t)VREG_S(19, 4), (uint16_t)VREG_S(19, 5), (uint16_t)VREG_S(19, 6), (uint16_t)VREG_S(19, 7));
 			break;
 		case RSP_V20:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(20, 0), (UINT16)VREG_S(20, 1), (UINT16)VREG_S(20, 2), (UINT16)VREG_S(20, 3), (UINT16)VREG_S(20, 4), (UINT16)VREG_S(20, 5), (UINT16)VREG_S(20, 6), (UINT16)VREG_S(20, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(20, 0), (uint16_t)VREG_S(20, 1), (uint16_t)VREG_S(20, 2), (uint16_t)VREG_S(20, 3), (uint16_t)VREG_S(20, 4), (uint16_t)VREG_S(20, 5), (uint16_t)VREG_S(20, 6), (uint16_t)VREG_S(20, 7));
 			break;
 		case RSP_V21:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(21, 0), (UINT16)VREG_S(21, 1), (UINT16)VREG_S(21, 2), (UINT16)VREG_S(21, 3), (UINT16)VREG_S(21, 4), (UINT16)VREG_S(21, 5), (UINT16)VREG_S(21, 6), (UINT16)VREG_S(21, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(21, 0), (uint16_t)VREG_S(21, 1), (uint16_t)VREG_S(21, 2), (uint16_t)VREG_S(21, 3), (uint16_t)VREG_S(21, 4), (uint16_t)VREG_S(21, 5), (uint16_t)VREG_S(21, 6), (uint16_t)VREG_S(21, 7));
 			break;
 		case RSP_V22:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(22, 0), (UINT16)VREG_S(22, 1), (UINT16)VREG_S(22, 2), (UINT16)VREG_S(22, 3), (UINT16)VREG_S(22, 4), (UINT16)VREG_S(22, 5), (UINT16)VREG_S(22, 6), (UINT16)VREG_S(22, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(22, 0), (uint16_t)VREG_S(22, 1), (uint16_t)VREG_S(22, 2), (uint16_t)VREG_S(22, 3), (uint16_t)VREG_S(22, 4), (uint16_t)VREG_S(22, 5), (uint16_t)VREG_S(22, 6), (uint16_t)VREG_S(22, 7));
 			break;
 		case RSP_V23:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(23, 0), (UINT16)VREG_S(23, 1), (UINT16)VREG_S(23, 2), (UINT16)VREG_S(23, 3), (UINT16)VREG_S(23, 4), (UINT16)VREG_S(23, 5), (UINT16)VREG_S(23, 6), (UINT16)VREG_S(23, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(23, 0), (uint16_t)VREG_S(23, 1), (uint16_t)VREG_S(23, 2), (uint16_t)VREG_S(23, 3), (uint16_t)VREG_S(23, 4), (uint16_t)VREG_S(23, 5), (uint16_t)VREG_S(23, 6), (uint16_t)VREG_S(23, 7));
 			break;
 		case RSP_V24:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(24, 0), (UINT16)VREG_S(24, 1), (UINT16)VREG_S(24, 2), (UINT16)VREG_S(24, 3), (UINT16)VREG_S(24, 4), (UINT16)VREG_S(24, 5), (UINT16)VREG_S(24, 6), (UINT16)VREG_S(24, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(24, 0), (uint16_t)VREG_S(24, 1), (uint16_t)VREG_S(24, 2), (uint16_t)VREG_S(24, 3), (uint16_t)VREG_S(24, 4), (uint16_t)VREG_S(24, 5), (uint16_t)VREG_S(24, 6), (uint16_t)VREG_S(24, 7));
 			break;
 		case RSP_V25:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(25, 0), (UINT16)VREG_S(25, 1), (UINT16)VREG_S(25, 2), (UINT16)VREG_S(25, 3), (UINT16)VREG_S(25, 4), (UINT16)VREG_S(25, 5), (UINT16)VREG_S(25, 6), (UINT16)VREG_S(25, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(25, 0), (uint16_t)VREG_S(25, 1), (uint16_t)VREG_S(25, 2), (uint16_t)VREG_S(25, 3), (uint16_t)VREG_S(25, 4), (uint16_t)VREG_S(25, 5), (uint16_t)VREG_S(25, 6), (uint16_t)VREG_S(25, 7));
 			break;
 		case RSP_V26:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(26, 0), (UINT16)VREG_S(26, 1), (UINT16)VREG_S(26, 2), (UINT16)VREG_S(26, 3), (UINT16)VREG_S(26, 4), (UINT16)VREG_S(26, 5), (UINT16)VREG_S(26, 6), (UINT16)VREG_S(26, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(26, 0), (uint16_t)VREG_S(26, 1), (uint16_t)VREG_S(26, 2), (uint16_t)VREG_S(26, 3), (uint16_t)VREG_S(26, 4), (uint16_t)VREG_S(26, 5), (uint16_t)VREG_S(26, 6), (uint16_t)VREG_S(26, 7));
 			break;
 		case RSP_V27:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(27, 0), (UINT16)VREG_S(27, 1), (UINT16)VREG_S(27, 2), (UINT16)VREG_S(27, 3), (UINT16)VREG_S(27, 4), (UINT16)VREG_S(27, 5), (UINT16)VREG_S(27, 6), (UINT16)VREG_S(27, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(27, 0), (uint16_t)VREG_S(27, 1), (uint16_t)VREG_S(27, 2), (uint16_t)VREG_S(27, 3), (uint16_t)VREG_S(27, 4), (uint16_t)VREG_S(27, 5), (uint16_t)VREG_S(27, 6), (uint16_t)VREG_S(27, 7));
 			break;
 		case RSP_V28:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(28, 0), (UINT16)VREG_S(28, 1), (UINT16)VREG_S(28, 2), (UINT16)VREG_S(28, 3), (UINT16)VREG_S(28, 4), (UINT16)VREG_S(28, 5), (UINT16)VREG_S(28, 6), (UINT16)VREG_S(28, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(28, 0), (uint16_t)VREG_S(28, 1), (uint16_t)VREG_S(28, 2), (uint16_t)VREG_S(28, 3), (uint16_t)VREG_S(28, 4), (uint16_t)VREG_S(28, 5), (uint16_t)VREG_S(28, 6), (uint16_t)VREG_S(28, 7));
 			break;
 		case RSP_V29:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(29, 0), (UINT16)VREG_S(29, 1), (UINT16)VREG_S(29, 2), (UINT16)VREG_S(29, 3), (UINT16)VREG_S(29, 4), (UINT16)VREG_S(29, 5), (UINT16)VREG_S(29, 6), (UINT16)VREG_S(29, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(29, 0), (uint16_t)VREG_S(29, 1), (uint16_t)VREG_S(29, 2), (uint16_t)VREG_S(29, 3), (uint16_t)VREG_S(29, 4), (uint16_t)VREG_S(29, 5), (uint16_t)VREG_S(29, 6), (uint16_t)VREG_S(29, 7));
 			break;
 		case RSP_V30:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(30, 0), (UINT16)VREG_S(30, 1), (UINT16)VREG_S(30, 2), (UINT16)VREG_S(30, 3), (UINT16)VREG_S(30, 4), (UINT16)VREG_S(30, 5), (UINT16)VREG_S(30, 6), (UINT16)VREG_S(30, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(30, 0), (uint16_t)VREG_S(30, 1), (uint16_t)VREG_S(30, 2), (uint16_t)VREG_S(30, 3), (uint16_t)VREG_S(30, 4), (uint16_t)VREG_S(30, 5), (uint16_t)VREG_S(30, 6), (uint16_t)VREG_S(30, 7));
 			break;
 		case RSP_V31:
-			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(31, 0), (UINT16)VREG_S(31, 1), (UINT16)VREG_S(31, 2), (UINT16)VREG_S(31, 3), (UINT16)VREG_S(31, 4), (UINT16)VREG_S(31, 5), (UINT16)VREG_S(31, 6), (UINT16)VREG_S(31, 7));
+			str = string_format("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (uint16_t)VREG_S(31, 0), (uint16_t)VREG_S(31, 1), (uint16_t)VREG_S(31, 2), (uint16_t)VREG_S(31, 3), (uint16_t)VREG_S(31, 4), (uint16_t)VREG_S(31, 5), (uint16_t)VREG_S(31, 6), (uint16_t)VREG_S(31, 7));
 			break;
 	}
 }
@@ -266,9 +266,9 @@ void rsp_cop2_drc::state_string_export(const int index, std::string &str) const
 
 void rsp_cop2_drc::lbv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 
-	UINT32 ea;
+	uint32_t ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -299,7 +299,7 @@ static void cfunc_lbv(void *param)
 
 void rsp_cop2_drc::lsv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xe;
@@ -309,7 +309,7 @@ void rsp_cop2_drc::lsv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 2) : (offset * 2);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 2) : (offset * 2);
 	int end = index + 2;
 	for (int i = index; i < end; i++)
 	{
@@ -335,8 +335,8 @@ static void cfunc_lsv(void *param)
 
 void rsp_cop2_drc::llv()
 {
-	UINT32 op = m_rspcop2_state->op;
-	UINT32 ea;
+	uint32_t op = m_rspcop2_state->op;
+	uint32_t ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xc;
@@ -374,8 +374,8 @@ static void cfunc_llv(void *param)
 
 void rsp_cop2_drc::ldv()
 {
-	UINT32 op = m_rspcop2_state->op;
-	UINT32 ea;
+	uint32_t op = m_rspcop2_state->op;
+	uint32_t ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0x8;
@@ -413,7 +413,7 @@ static void cfunc_ldv(void *param)
 
 void rsp_cop2_drc::lqv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int offset = (op & 0x7f);
@@ -422,7 +422,7 @@ void rsp_cop2_drc::lqv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 	int end = 16 - (ea & 0xf);
 	if (end > 16) end = 16;
@@ -451,7 +451,7 @@ static void cfunc_lqv(void *param)
 
 void rsp_cop2_drc::lrv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -461,7 +461,7 @@ void rsp_cop2_drc::lrv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 	index = 16 - ((ea & 0xf) - index);
 	ea &= ~0xf;
@@ -490,7 +490,7 @@ static void cfunc_lrv(void *param)
 
 void rsp_cop2_drc::lpv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -500,7 +500,7 @@ void rsp_cop2_drc::lpv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -525,7 +525,7 @@ static void cfunc_lpv(void *param)
 
 void rsp_cop2_drc::luv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -535,7 +535,7 @@ void rsp_cop2_drc::luv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -560,7 +560,7 @@ static void cfunc_luv(void *param)
 
 void rsp_cop2_drc::lhv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -570,7 +570,7 @@ void rsp_cop2_drc::lhv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -594,7 +594,7 @@ static void cfunc_lhv(void *param)
 
 void rsp_cop2_drc::lfv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -604,7 +604,7 @@ void rsp_cop2_drc::lfv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 	// not sure what happens if 16-byte boundary is crossed...
 
@@ -635,7 +635,7 @@ static void cfunc_lfv(void *param)
 
 void rsp_cop2_drc::lwv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -645,7 +645,7 @@ void rsp_cop2_drc::lwv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 	int end = (16 - index) + 16;
 
 	for (int i = (16 - index); i < end; i++)
@@ -672,7 +672,7 @@ static void cfunc_lwv(void *param)
 
 void rsp_cop2_drc::ltv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -689,7 +689,7 @@ void rsp_cop2_drc::ltv()
 
 	int element;
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 	ea = ((ea + 8) & ~0xf) + (index & 1);
 	for (int i = vs; i < ve; i++)
@@ -707,9 +707,9 @@ static void cfunc_ltv(void *param)
 }
 
 
-int rsp_cop2_drc::generate_lwc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
+bool rsp_cop2_drc::generate_lwc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
+	uint32_t op = desc->opptr.l[0];
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -721,65 +721,65 @@ int rsp_cop2_drc::generate_lwc2(drcuml_block *block, rsp_device::compiler_state 
 		case 0x00:      /* LBV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lbv, this);
-			return TRUE;
+			return true;
 
 		case 0x01:      /* LSV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lsv, this);
-			return TRUE;
+			return true;
 
 		case 0x02:      /* LLV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_llv, this);
-			return TRUE;
+			return true;
 
 		case 0x03:      /* LDV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_ldv, this);
-			return TRUE;
+			return true;
 
 		case 0x04:      /* LQV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lqv, this);
-			return TRUE;
+			return true;
 
 		case 0x05:      /* LRV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lrv, this);
-			return TRUE;
+			return true;
 
 		case 0x06:      /* LPV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lpv, this);
-			return TRUE;
+			return true;
 
 		case 0x07:      /* LUV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_luv, this);
-			return TRUE;
+			return true;
 
 		case 0x08:      /* LHV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lhv, this);
-			return TRUE;
+			return true;
 
 		case 0x09:      /* LFV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lfv, this);
-			return TRUE;
+			return true;
 
 		case 0x0a:      /* LWV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lwv, this);
-			return TRUE;
+			return true;
 
 		case 0x0b:      /* LTV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_ltv, this);
-			return TRUE;
+			return true;
 
 		default:
-			return FALSE;
+			return false;
 	}
 }
 
@@ -799,7 +799,7 @@ int rsp_cop2_drc::generate_lwc2(drcuml_block *block, rsp_device::compiler_state 
 
 void rsp_cop2_drc::sbv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -809,7 +809,7 @@ void rsp_cop2_drc::sbv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + offset : offset;
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + offset : offset;
 	m_rsp.DM_WRITE8(ea, VREG_B(dest, index));
 }
 
@@ -830,7 +830,7 @@ static void cfunc_sbv(void *param)
 
 void rsp_cop2_drc::ssv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -840,7 +840,7 @@ void rsp_cop2_drc::ssv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 2) : (offset * 2);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 2) : (offset * 2);
 
 	int end = index + 2;
 	for (int i = index; i < end; i++)
@@ -867,7 +867,7 @@ static void cfunc_ssv(void *param)
 
 void rsp_cop2_drc::slv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -877,7 +877,7 @@ void rsp_cop2_drc::slv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 4) : (offset * 4);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 4) : (offset * 4);
 
 	int end = index + 4;
 	for (int i = index; i < end; i++)
@@ -904,7 +904,7 @@ static void cfunc_slv(void *param)
 
 void rsp_cop2_drc::sdv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0x8;
@@ -913,7 +913,7 @@ void rsp_cop2_drc::sdv()
 	{
 		offset |= 0xffffffc0;
 	}
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 	int end = index + 8;
 	for (int i = index; i < end; i++)
@@ -940,7 +940,7 @@ static void cfunc_sdv(void *param)
 
 void rsp_cop2_drc::sqv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -950,7 +950,7 @@ void rsp_cop2_drc::sqv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 	int end = index + (16 - (ea & 0xf));
 	for (int i=index; i < end; i++)
 	{
@@ -976,7 +976,7 @@ static void cfunc_sqv(void *param)
 
 void rsp_cop2_drc::srv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -986,7 +986,7 @@ void rsp_cop2_drc::srv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 	int end = index + (ea & 0xf);
 	int o = (16 - (ea & 0xf)) & 0xf;
@@ -1016,7 +1016,7 @@ static void cfunc_srv(void *param)
 
 void rsp_cop2_drc::spv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1026,7 +1026,7 @@ void rsp_cop2_drc::spv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 	int end = index + 8;
 	for (int i=index; i < end; i++)
 	{
@@ -1059,7 +1059,7 @@ static void cfunc_spv(void *param)
 
 void rsp_cop2_drc::suv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1069,7 +1069,7 @@ void rsp_cop2_drc::suv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 	int end = index + 8;
 	for (int i=index; i < end; i++)
 	{
@@ -1102,7 +1102,7 @@ static void cfunc_suv(void *param)
 
 void rsp_cop2_drc::shv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1112,11 +1112,11 @@ void rsp_cop2_drc::shv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 	for (int i=0; i < 8; i++)
 	{
 		int element = index + (i << 1);
-		UINT8 d = (VREG_B(dest, (element & 0xf)) << 1) |
+		uint8_t d = (VREG_B(dest, (element & 0xf)) << 1) |
 					(VREG_B(dest, ((element + 1) & 0xf)) >> 7);
 		m_rsp.DM_WRITE8(ea, d);
 		ea += 2;
@@ -1140,7 +1140,7 @@ static void cfunc_shv(void *param)
 
 void rsp_cop2_drc::sfv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1150,7 +1150,7 @@ void rsp_cop2_drc::sfv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 	int eaoffset = ea & 0xf;
 	ea &= ~0xf;
 
@@ -1181,7 +1181,7 @@ static void cfunc_sfv(void *param)
 
 void rsp_cop2_drc::swv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1191,7 +1191,7 @@ void rsp_cop2_drc::swv()
 		offset |= 0xffffffc0;
 	}
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 	int eaoffset = ea & 0xf;
 	ea &= ~0xf;
 
@@ -1220,7 +1220,7 @@ static void cfunc_swv(void *param)
 
 void rsp_cop2_drc::stv()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1240,7 +1240,7 @@ void rsp_cop2_drc::stv()
 
 	int element = 8 - (index >> 1);
 
-	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+	uint32_t ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 	int eaoffset = (ea & 0xf) + (element * 2);
 	ea &= ~0xf;
 
@@ -1257,9 +1257,9 @@ static void cfunc_stv(void *param)
 	((rsp_cop2 *)param)->stv();
 }
 
-int rsp_cop2_drc::generate_swc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
+bool rsp_cop2_drc::generate_swc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
+	uint32_t op = desc->opptr.l[0];
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -1271,69 +1271,69 @@ int rsp_cop2_drc::generate_swc2(drcuml_block *block, rsp_device::compiler_state 
 		case 0x00:      /* SBV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_sbv, this);
-			return TRUE;
+			return true;
 
 		case 0x01:      /* SSV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_ssv, this);
-			return TRUE;
+			return true;
 
 		case 0x02:      /* SLV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_slv, this);
-			return TRUE;
+			return true;
 
 		case 0x03:      /* SDV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_sdv, this);
-			return TRUE;
+			return true;
 
 		case 0x04:      /* SQV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_sqv, this);
-			return TRUE;
+			return true;
 
 		case 0x05:      /* SRV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_srv, this);
-			return TRUE;
+			return true;
 
 		case 0x06:      /* SPV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_spv, this);
-			return TRUE;
+			return true;
 
 		case 0x07:      /* SUV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_suv, this);
-			return TRUE;
+			return true;
 
 		case 0x08:      /* SHV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_shv, this);
-			return TRUE;
+			return true;
 
 		case 0x09:      /* SFV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_sfv, this);
-			return TRUE;
+			return true;
 
 		case 0x0a:      /* SWV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_swv, this);
-			return TRUE;
+			return true;
 
 		case 0x0b:      /* STV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_stv, this);
-			return TRUE;
+			return true;
 
 		default:
 			m_rsp.unimplemented_opcode(op);
-			return FALSE;
+			return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -1356,11 +1356,11 @@ void rsp_cop2_drc::vmulf()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (INT32)(INT16)w1;
-		INT32 s2 = (INT32)(INT16)w2;
+		int32_t s1 = (int32_t)(int16_t)w1;
+		int32_t s2 = (int32_t)(int16_t)w2;
 
 		if (s1 == -32768 && s2 == -32768)
 		{
@@ -1370,7 +1370,7 @@ void rsp_cop2_drc::vmulf()
 		}
 		else
 		{
-			ACCUM(i) = (INT64)(s1 * s2 * 2 + 0x8000) << 16; // rounding?
+			ACCUM(i) = (int64_t)(s1 * s2 * 2 + 0x8000) << 16; // rounding?
 			m_vres[i] = ACCUM_M(i);
 		}
 	}
@@ -1397,13 +1397,13 @@ void rsp_cop2_drc::vmulu()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (INT32)(INT16)w1;
-		INT32 s2 = (INT32)(INT16)w2;
+		int32_t s1 = (int32_t)(int16_t)w1;
+		int32_t s2 = (int32_t)(int16_t)w2;
 
-		INT64 r = s1 * s2 * 2 + 0x8000; // rounding?
+		int64_t r = s1 * s2 * 2 + 0x8000; // rounding?
 
 		ACCUM(i) = r << 16;
 
@@ -1411,7 +1411,7 @@ void rsp_cop2_drc::vmulu()
 		{
 			m_vres[i] = 0;
 		}
-		else if (((INT16)(ACCUM_H(i)) ^ (INT16)(ACCUM_M(i))) < 0)
+		else if (((int16_t)(ACCUM_H(i)) ^ (int16_t)(ACCUM_M(i))) < 0)
 		{
 			m_vres[i] = -1;
 		}
@@ -1446,11 +1446,11 @@ void rsp_cop2_drc::vmudl()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		UINT32 s1 = (UINT32)(UINT16)w1;
-		UINT32 s2 = (UINT32)(UINT16)w2;
+		uint32_t s1 = (uint32_t)(uint16_t)w1;
+		uint32_t s2 = (uint32_t)(uint16_t)w2;
 
 		ACCUM(i) = s1 * s2;
 
@@ -1482,13 +1482,13 @@ void rsp_cop2_drc::vmudm()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (INT32)(INT16)w1;
-		INT32 s2 = (UINT16)w2;
+		int32_t s1 = (int32_t)(int16_t)w1;
+		int32_t s2 = (uint16_t)w2;
 
-		ACCUM(i) = (INT64)(s1 * s2) << 16;
+		ACCUM(i) = (int64_t)(s1 * s2) << 16;
 
 		m_vres[i] = ACCUM_M(i);
 	}
@@ -1518,17 +1518,17 @@ void rsp_cop2_drc::vmudn()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (UINT16)w1;
-		INT32 s2 = (INT32)(INT16)w2;
+		int32_t s1 = (uint16_t)w1;
+		int32_t s2 = (int32_t)(int16_t)w2;
 
-		INT32 r = s1 * s2;
+		int32_t r = s1 * s2;
 
-		ACCUM(i) = (INT64)(s1 * s2) << 16;
+		ACCUM(i) = (int64_t)(s1 * s2) << 16;
 
-		m_vres[i] = (UINT16)(r);
+		m_vres[i] = (uint16_t)(r);
 	}
 	WRITEBACK_RESULT();
 }
@@ -1556,19 +1556,19 @@ void rsp_cop2_drc::vmudh()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (INT32)(INT16)w1;
-		INT32 s2 = (INT32)(INT16)w2;
+		int32_t s1 = (int32_t)(int16_t)w1;
+		int32_t s2 = (int32_t)(int16_t)w2;
 
-		INT32 r = s1 * s2;
+		int32_t r = s1 * s2;
 
-		ACCUM(i) = (INT64)r << 32;
+		ACCUM(i) = (int64_t)r << 32;
 
 		if (r < -32768) r = -32768;
 		if (r >  32767) r = 32767;
-		m_vres[i] = (INT16)(r);
+		m_vres[i] = (int16_t)(r);
 	}
 	WRITEBACK_RESULT();
 }
@@ -1593,13 +1593,13 @@ void rsp_cop2_drc::vmacf()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (INT32)(INT16)w1;
-		INT32 s2 = (INT32)(INT16)w2;
+		int32_t s1 = (int32_t)(int16_t)w1;
+		int32_t s2 = (int32_t)(int16_t)w2;
 
-		ACCUM(i) += (INT64)(s1 * s2 * 2) << 16;
+		ACCUM(i) += (int64_t)(s1 * s2 * 2) << 16;
 
 		m_vres[i] = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 	}
@@ -1626,15 +1626,15 @@ void rsp_cop2_drc::vmacu()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (INT32)(INT16)w1;
-		INT32 s2 = (INT32)(INT16)w2;
+		int32_t s1 = (int32_t)(int16_t)w1;
+		int32_t s2 = (int32_t)(int16_t)w2;
 
-		ACCUM(i) += (INT64)(s1 * s2 * 2) << 16;
+		ACCUM(i) += (int64_t)(s1 * s2 * 2) << 16;
 
-		if ((INT16)ACCUM_H(i) < 0)
+		if ((int16_t)ACCUM_H(i) < 0)
 		{
 			m_vres[i] = 0;
 		}
@@ -1642,13 +1642,13 @@ void rsp_cop2_drc::vmacu()
 		{
 			if (ACCUM_H(i) != 0)
 			{
-				m_vres[i] = (INT16)0xffff;
+				m_vres[i] = (int16_t)0xffff;
 			}
 			else
 			{
-				if ((INT16)ACCUM_M(i) < 0)
+				if ((int16_t)ACCUM_M(i) < 0)
 				{
-					m_vres[i] = (INT16)0xffff;
+					m_vres[i] = (int16_t)0xffff;
 				}
 				else
 				{
@@ -1683,11 +1683,11 @@ void rsp_cop2_drc::vmadl()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		UINT32 s1 = w1;
-		UINT32 s2 = w2;
+		uint32_t s1 = w1;
+		uint32_t s2 = w2;
 
 		ACCUM(i) += (s1 * s2) & 0xffff0000;
 
@@ -1711,13 +1711,13 @@ void rsp_cop2_drc::vmadm()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		UINT32 s1 = (INT32)(INT16)w1;
-		UINT32 s2 = (UINT16)w2;
+		uint32_t s1 = (int32_t)(int16_t)w1;
+		uint32_t s2 = (uint16_t)w2;
 
-		ACCUM(i) += (INT64)(INT32)(s1 * s2) << 16;
+		ACCUM(i) += (int64_t)(int32_t)(s1 * s2) << 16;
 
 		m_vres[i] = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 	}
@@ -1739,13 +1739,13 @@ void rsp_cop2_drc::vmadn()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (UINT16)w1;
-		INT32 s2 = (INT32)(INT16)w2;
+		int32_t s1 = (uint16_t)w1;
+		int32_t s2 = (int32_t)(int16_t)w2;
 
-		ACCUM(i) += (INT64)(s1 * s2) << 16;
+		ACCUM(i) += (int64_t)(s1 * s2) << 16;
 
 		m_vres[i] = SATURATE_ACCUM(i, 0, 0x0000, 0xffff);
 	}
@@ -1775,13 +1775,13 @@ void rsp_cop2_drc::vmadh()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 w1, w2;
+		int16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (INT32)(INT16)w1;
-		INT32 s2 = (INT32)(INT16)w2;
+		int32_t s1 = (int32_t)(int16_t)w1;
+		int32_t s2 = (int32_t)(int16_t)w2;
 
-		ACCUM(i) += (INT64)(s1 * s2) << 32;
+		ACCUM(i) += (int64_t)(s1 * s2) << 32;
 
 		m_vres[i] = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 	}
@@ -1808,18 +1808,18 @@ void rsp_cop2_drc::vadd()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 w1, w2;
+		int16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (INT32)(INT16)w1;
-		INT32 s2 = (INT32)(INT16)w2;
-		INT32 r = s1 + s2 + (((CARRY_FLAG(i)) != 0) ? 1 : 0);
+		int32_t s1 = (int32_t)(int16_t)w1;
+		int32_t s2 = (int32_t)(int16_t)w2;
+		int32_t r = s1 + s2 + (((CARRY_FLAG(i)) != 0) ? 1 : 0);
 
-		SET_ACCUM_L((INT16)(r), i);
+		SET_ACCUM_L((int16_t)(r), i);
 
 		if (r > 32767) r = 32767;
 		if (r < -32768) r = -32768;
-		m_vres[i] = (INT16)(r);
+		m_vres[i] = (int16_t)(r);
 	}
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
@@ -1848,19 +1848,19 @@ void rsp_cop2_drc::vsub()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 w1, w2;
+		int16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (INT32)(INT16)w1;
-		INT32 s2 = (INT32)(INT16)w2;
-		INT32 r = s1 - s2 - (((CARRY_FLAG(i)) != 0) ? 1 : 0);
+		int32_t s1 = (int32_t)(int16_t)w1;
+		int32_t s2 = (int32_t)(int16_t)w2;
+		int32_t r = s1 - s2 - (((CARRY_FLAG(i)) != 0) ? 1 : 0);
 
-		SET_ACCUM_L((INT16)(r), i);
+		SET_ACCUM_L((int16_t)(r), i);
 
 		if (r > 32767) r = 32767;
 		if (r < -32768) r = -32768;
 
-		m_vres[i] = (INT16)(r);
+		m_vres[i] = (int16_t)(r);
 	}
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
@@ -1888,7 +1888,7 @@ void rsp_cop2_drc::vabs()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 s1, s2;
+		int16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 
@@ -1942,15 +1942,15 @@ void rsp_cop2_drc::vaddc()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 w1, w2;
+		int16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (UINT32)(UINT16)w1;
-		INT32 s2 = (UINT32)(UINT16)w2;
-		INT32 r = s1 + s2;
+		int32_t s1 = (uint32_t)(uint16_t)w1;
+		int32_t s2 = (uint32_t)(uint16_t)w2;
+		int32_t r = s1 + s2;
 
-		m_vres[i] = (INT16)(r);
-		SET_ACCUM_L((INT16)r, i);
+		m_vres[i] = (int16_t)(r);
+		SET_ACCUM_L((int16_t)r, i);
 
 		if (r & 0xffff0000)
 		{
@@ -1985,17 +1985,17 @@ void rsp_cop2_drc::vsubc()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 w1, w2;
+		int16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
-		INT32 s1 = (UINT32)(UINT16)w1;
-		INT32 s2 = (UINT32)(UINT16)w2;
-		INT32 r = s1 - s2;
+		int32_t s1 = (uint32_t)(uint16_t)w1;
+		int32_t s2 = (uint32_t)(uint16_t)w2;
+		int32_t r = s1 - s2;
 
-		m_vres[i] = (INT16)(r);
-		SET_ACCUM_L((UINT16)r, i);
+		m_vres[i] = (int16_t)(r);
+		SET_ACCUM_L((uint16_t)r, i);
 
-		if ((UINT16)(r) != 0)
+		if ((uint16_t)(r) != 0)
 		{
 			SET_ZERO_FLAG(i);
 		}
@@ -2029,17 +2029,17 @@ void rsp_cop2_drc::vaddb()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 w1, w2;
+		uint16_t w1, w2;
 		GET_VS1(w1, i);
 		GET_VS2(w2, i);
 
-		UINT8 hb1 = w1 >> 8;
-		UINT8 lb1 = w1 & 0xff;
-		UINT8 hb2 = w2 >> 8;
-		UINT8 lb2 = w2 & 0xff;
+		uint8_t hb1 = w1 >> 8;
+		uint8_t lb1 = w1 & 0xff;
+		uint8_t hb2 = w2 >> 8;
+		uint8_t lb2 = w2 & 0xff;
 
-		UINT16 hs = hb1 + hb2 + round;
-		UINT16 ls = lb1 + lb2 + round;
+		uint16_t hs = hb1 + hb2 + round;
+		uint16_t ls = lb1 + lb2 + round;
 
 		SET_ACCUM_L((hs << 8) | ls, i);
 
@@ -2137,7 +2137,7 @@ void rsp_cop2_drc::vlt()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 s1, s2;
+		int16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 
@@ -2195,7 +2195,7 @@ void rsp_cop2_drc::veq()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 s1, s2;
+		int16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 
@@ -2242,7 +2242,7 @@ void rsp_cop2_drc::vne()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 s1, s2;
+		int16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 
@@ -2289,7 +2289,7 @@ void rsp_cop2_drc::vge()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 s1, s2;
+		int16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 		if ((s1 == s2 && (ZERO_FLAG(i) == 0 || CARRY_FLAG(i) == 0)) || s1 > s2)
@@ -2331,7 +2331,7 @@ void rsp_cop2_drc::vcl()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 s1, s2;
+		int16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 
@@ -2341,7 +2341,7 @@ void rsp_cop2_drc::vcl()
 			{
 				if (COMPARE_FLAG(i) != 0)
 				{
-					SET_ACCUM_L(-(UINT16)s2, i);
+					SET_ACCUM_L(-(uint16_t)s2, i);
 				}
 				else
 				{
@@ -2352,27 +2352,27 @@ void rsp_cop2_drc::vcl()
 			{
 				if (CLIP1_FLAG(i) != 0)
 				{
-					if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) > 0x10000)
+					if (((uint32_t)(uint16_t)(s1) + (uint32_t)(uint16_t)(s2)) > 0x10000)
 					{
 						SET_ACCUM_L(s1, i);
 						CLEAR_COMPARE_FLAG(i);
 					}
 					else
 					{
-						SET_ACCUM_L(-((UINT16)s2), i);
+						SET_ACCUM_L(-((uint16_t)s2), i);
 						SET_COMPARE_FLAG(i);
 					}
 				}
 				else
 				{
-					if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) != 0)
+					if (((uint32_t)(uint16_t)(s1) + (uint32_t)(uint16_t)(s2)) != 0)
 					{
 						SET_ACCUM_L(s1, i);
 						CLEAR_COMPARE_FLAG(i);
 					}
 					else
 					{
-						SET_ACCUM_L(-((UINT16)s2), i);
+						SET_ACCUM_L(-((uint16_t)s2), i);
 						SET_COMPARE_FLAG(i);
 					}
 				}
@@ -2393,7 +2393,7 @@ void rsp_cop2_drc::vcl()
 			}
 			else
 			{
-				if (((INT32)(UINT16)s1 - (INT32)(UINT16)s2) >= 0)
+				if (((int32_t)(uint16_t)s1 - (int32_t)(uint16_t)s2) >= 0)
 				{
 					SET_ACCUM_L(s2, i);
 					SET_CLIP2_FLAG(i);
@@ -2438,10 +2438,10 @@ void rsp_cop2_drc::vch()
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CLIP2_FLAGS();
 
-	UINT32 vce;
+	uint32_t vce;
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 s1, s2;
+		int16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 
@@ -2457,7 +2457,7 @@ void rsp_cop2_drc::vch()
 			if ((s1 + s2) <= 0)
 			{
 				SET_COMPARE_FLAG(i);
-				m_vres[i] = -((UINT16)s2);
+				m_vres[i] = -((uint16_t)s2);
 			}
 			else
 			{
@@ -2527,11 +2527,11 @@ void rsp_cop2_drc::vcr()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 s1, s2;
+		int16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 
-		if ((INT16)(s1 ^ s2) < 0)
+		if ((int16_t)(s1 ^ s2) < 0)
 		{
 			if (s2 < 0)
 			{
@@ -2539,7 +2539,7 @@ void rsp_cop2_drc::vcr()
 			}
 			if ((s1 + s2) <= 0)
 			{
-				SET_ACCUM_L(~((UINT16)s2), i);
+				SET_ACCUM_L(~((uint16_t)s2), i);
 				SET_COMPARE_FLAG(i);
 			}
 			else
@@ -2590,7 +2590,7 @@ void rsp_cop2_drc::vmrg()
 
 	for (int i = 0; i < 8; i++)
 	{
-		INT16 s1, s2;
+		int16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 		if (COMPARE_FLAG(i) != 0)
@@ -2628,7 +2628,7 @@ void rsp_cop2_drc::vand()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 s1, s2;
+		uint16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 		m_vres[i] = s1 & s2;
@@ -2658,7 +2658,7 @@ void rsp_cop2_drc::vnand()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 s1, s2;
+		uint16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 		m_vres[i] = ~((s1 & s2));
@@ -2688,7 +2688,7 @@ void rsp_cop2_drc::vor()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 s1, s2;
+		uint16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 		m_vres[i] = s1 | s2;
@@ -2718,7 +2718,7 @@ void rsp_cop2_drc::vnor()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 s1, s2;
+		uint16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 		m_vres[i] = ~(s1 | s2);
@@ -2748,7 +2748,7 @@ void rsp_cop2_drc::vxor()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 s1, s2;
+		uint16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 		m_vres[i] = s1 ^ s2;
@@ -2778,7 +2778,7 @@ void rsp_cop2_drc::vnxor()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT16 s1, s2;
+		uint16_t s1, s2;
 		GET_VS1(s1, i);
 		GET_VS2(s2, i);
 		m_vres[i] = ~(s1 ^ s2);
@@ -2806,9 +2806,9 @@ void rsp_cop2_drc::vrcp()
 {
 	CACHE_VALUES();
 
-	INT32 shifter = 0;
-	INT32 rec = (INT16)(VREG_S(vs2reg, el & 7));
-	INT32 datainput = (rec < 0) ? (-rec) : rec;
+	int32_t shifter = 0;
+	int32_t rec = (int16_t)(VREG_S(vs2reg, el & 7));
+	int32_t datainput = (rec < 0) ? (-rec) : rec;
 	if (datainput)
 	{
 		for (int i = 0; i < 32; i++)
@@ -2825,9 +2825,9 @@ void rsp_cop2_drc::vrcp()
 		shifter = 0x10;
 	}
 
-	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
-	INT32 fetchval = rsp_divtable[address];
-	INT32 temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
+	int32_t address = ((datainput << shifter) & 0x7fc00000) >> 22;
+	int32_t fetchval = rsp_divtable[address];
+	int32_t temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
 	if (rec < 0)
 	{
 		temp = ~temp;
@@ -2845,7 +2845,7 @@ void rsp_cop2_drc::vrcp()
 	m_reciprocal_res = rec;
 	m_dp_allowed = 0;
 
-	W_VREG_S(vdreg, vs1reg & 7) = (UINT16)rec;
+	W_VREG_S(vdreg, vs1reg & 7) = (uint16_t)rec;
 	for (int i = 0; i < 8; i++)
 	{
 		SET_ACCUM_L(VREG_S(vs2reg, VEC_EL_2(el, i)), i);
@@ -2871,9 +2871,9 @@ void rsp_cop2_drc::vrcpl()
 {
 	CACHE_VALUES();
 
-	INT32 shifter = 0;
-	INT32 rec = (INT16)VREG_S(vs2reg, el & 7);
-	INT32 datainput = rec;
+	int32_t shifter = 0;
+	int32_t rec = (int16_t)VREG_S(vs2reg, el & 7);
+	int32_t datainput = rec;
 
 	if (m_dp_allowed)
 	{
@@ -2911,9 +2911,9 @@ void rsp_cop2_drc::vrcpl()
 		}
 	}
 
-	UINT32 address = (datainput << shifter) >> 22;
-	INT32 fetchval = rsp_divtable[address & 0x1ff];
-	INT32 temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
+	uint32_t address = (datainput << shifter) >> 22;
+	int32_t fetchval = rsp_divtable[address & 0x1ff];
+	int32_t temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
 	temp ^= rec >> 31;
 
 	if (!rec)
@@ -2929,7 +2929,7 @@ void rsp_cop2_drc::vrcpl()
 	m_reciprocal_res = rec;
 	m_dp_allowed = 0;
 
-	W_VREG_S(vdreg, vs1reg & 7) = (UINT16)rec;
+	W_VREG_S(vdreg, vs1reg & 7) = (uint16_t)rec;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -2964,7 +2964,7 @@ void rsp_cop2_drc::vrcph()
 		SET_ACCUM_L(VREG_S(vs2reg, VEC_EL_2(el, i)), i);
 	}
 
-	W_VREG_S(vdreg, vs1reg & 7) = (INT16)(m_reciprocal_res >> 16);
+	W_VREG_S(vdreg, vs1reg & 7) = (int16_t)(m_reciprocal_res >> 16);
 }
 
 static void cfunc_vrcph(void *param)
@@ -3012,9 +3012,9 @@ void rsp_cop2_drc::vrsq()
 {
 	CACHE_VALUES();
 
-	INT32 shifter = 0;
-	INT32 rec = (INT16)VREG_S(vs2reg, el & 7);
-	INT32 datainput = (rec < 0) ? (-rec) : (rec);
+	int32_t shifter = 0;
+	int32_t rec = (int16_t)VREG_S(vs2reg, el & 7);
+	int32_t datainput = (rec < 0) ? (-rec) : (rec);
 
 	if (rec < 0)
 	{
@@ -3044,11 +3044,11 @@ void rsp_cop2_drc::vrsq()
 		shifter = 0;
 	}
 
-	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
+	int32_t address = ((datainput << shifter) & 0x7fc00000) >> 22;
 	address = ((address | 0x200) & 0x3fe) | (shifter & 1);
 
-	INT32 fetchval = rsp_divtable[address];
-	INT32 temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
+	int32_t fetchval = rsp_divtable[address];
+	int32_t temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
 	if (rec < 0)
 	{
 		temp = ~temp;
@@ -3117,7 +3117,7 @@ void rsp_cop2_drc::vrsq()
 	}
 	rec = temp;
 
-	W_VREG_S(vdreg, vs1reg & 7) = (UINT16)rec;
+	W_VREG_S(vdreg, vs1reg & 7) = (uint16_t)rec;
 	for (int i = 0; i < 8; i++)
 	{
 		SET_ACCUM_L(VREG_S(vs2reg, VEC_EL_2(el, i)), i);
@@ -3143,9 +3143,9 @@ void rsp_cop2_drc::vrsql()
 {
 	CACHE_VALUES();
 
-	INT32 shifter = 0;
-	INT32 rec = (INT16)VREG_S(vs2reg, el & 7);
-	INT32 datainput = rec;
+	int32_t shifter = 0;
+	int32_t rec = (int16_t)VREG_S(vs2reg, el & 7);
+	int32_t datainput = rec;
 
 	if (m_dp_allowed)
 	{
@@ -3183,11 +3183,11 @@ void rsp_cop2_drc::vrsql()
 		}
 	}
 
-	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
+	int32_t address = ((datainput << shifter) & 0x7fc00000) >> 22;
 	address = ((address | 0x200) & 0x3fe) | (shifter & 1);
 
-	INT32 fetchval = rsp_divtable[address];
-	INT32 temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
+	int32_t fetchval = rsp_divtable[address];
+	int32_t temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
 	temp ^= rec >> 31;
 
 	if (!rec)
@@ -3203,7 +3203,7 @@ void rsp_cop2_drc::vrsql()
 	m_reciprocal_res = rec;
 	m_dp_allowed = 0;
 
-	W_VREG_S(vdreg, vs1reg & 7) = (UINT16)(rec & 0xffff);
+	W_VREG_S(vdreg, vs1reg & 7) = (uint16_t)(rec & 0xffff);
 	for (int i = 0; i < 8; i++)
 	{
 		SET_ACCUM_L(VREG_S(vs2reg, VEC_EL_2(el, i)), i);
@@ -3237,7 +3237,7 @@ void rsp_cop2_drc::vrsqh()
 		SET_ACCUM_L(VREG_S(vs2reg, VEC_EL_2(el, i)), i);
 	}
 
-	W_VREG_S(vdreg, vs1reg & 7) = (INT16)(m_reciprocal_res >> 16);  // store high part
+	W_VREG_S(vdreg, vs1reg & 7) = (int16_t)(m_reciprocal_res >> 16);  // store high part
 }
 
 static void cfunc_vrsqh(void *param)
@@ -3251,9 +3251,9 @@ static void cfunc_vrsqh(void *param)
     vector opcode
 -------------------------------------------------*/
 
-int rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
+bool rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
+	uint32_t op = desc->opptr.l[0];
 	// Opcode legend:
 	//    E = VS2 element type
 	//    S = VS1, Source vector 1
@@ -3265,226 +3265,226 @@ int rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compil
 		case 0x00:      /* VMULF */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmulf, this);
-			return TRUE;
+			return true;
 
 		case 0x01:      /* VMULU */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmulu, this);
-			return TRUE;
+			return true;
 
 		case 0x04:      /* VMUDL */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmudl, this);
-			return TRUE;
+			return true;
 
 		case 0x05:      /* VMUDM */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmudm, this);
-			return TRUE;
+			return true;
 
 		case 0x06:      /* VMUDN */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmudn, this);
-			return TRUE;
+			return true;
 
 		case 0x07:      /* VMUDH */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmudh, this);
-			return TRUE;
+			return true;
 
 		case 0x08:      /* VMACF */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmacf, this);
-			return TRUE;
+			return true;
 
 		case 0x09:      /* VMACU */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmacu, this);
-			return TRUE;
+			return true;
 
 		case 0x0c:      /* VMADL */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmadl, this);
-			return TRUE;
+			return true;
 
 		case 0x0d:      /* VMADM */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmadm, this);
-			return TRUE;
+			return true;
 
 		case 0x0e:      /* VMADN */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmadn, this);
-			return TRUE;
+			return true;
 
 		case 0x0f:      /* VMADH */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmadh, this);
-			return TRUE;
+			return true;
 
 		case 0x10:      /* VADD */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vadd, this);
-			return TRUE;
+			return true;
 
 		case 0x11:      /* VSUB */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vsub, this);
-			return TRUE;
+			return true;
 
 		case 0x13:      /* VABS */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vabs, this);
-			return TRUE;
+			return true;
 
 		case 0x14:      /* VADDC */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vaddc, this);
-			return TRUE;
+			return true;
 
 		case 0x15:      /* VSUBC */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vsubc, this);
-			return TRUE;
+			return true;
 
 		case 0x16:      /* VADDB */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vaddb, this);
-			return TRUE;
+			return true;
 
 		case 0x17:      /* VSUBB (reserved, functionally identical to VADDB) */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vaddb, this);
-			return TRUE;
+			return true;
 
 		case 0x18:      /* VACCB (reserved, functionally identical to VADDB) */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vaddb, this);
-			return TRUE;
+			return true;
 
 		case 0x19:      /* VSUCB (reserved, functionally identical to VADDB) */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vaddb, this);
-			return TRUE;
+			return true;
 
 		case 0x1d:      /* VSAW */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vsaw, this);
-			return TRUE;
+			return true;
 
 		case 0x20:      /* VLT */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vlt, this);
-			return TRUE;
+			return true;
 
 		case 0x21:      /* VEQ */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_veq, this);
-			return TRUE;
+			return true;
 
 		case 0x22:      /* VNE */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vne, this);
-			return TRUE;
+			return true;
 
 		case 0x23:      /* VGE */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vge, this);
-			return TRUE;
+			return true;
 
 		case 0x24:      /* VCL */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vcl, this);
-			return TRUE;
+			return true;
 
 		case 0x25:      /* VCH */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vch, this);
-			return TRUE;
+			return true;
 
 		case 0x26:      /* VCR */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vcr, this);
-			return TRUE;
+			return true;
 
 		case 0x27:      /* VMRG */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmrg, this);
-			return TRUE;
+			return true;
 
 		case 0x28:      /* VAND */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vand, this);
-			return TRUE;
+			return true;
 
 		case 0x29:      /* VNAND */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vnand, this);
-			return TRUE;
+			return true;
 
 		case 0x2a:      /* VOR */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vor, this);
-			return TRUE;
+			return true;
 
 		case 0x2b:      /* VNOR */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vnor, this);
-			return TRUE;
+			return true;
 
 		case 0x2c:      /* VXOR */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vxor, this);
-			return TRUE;
+			return true;
 
 		case 0x2d:      /* VNXOR */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vnxor, this);
-			return TRUE;
+			return true;
 
 		case 0x30:      /* VRCP */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrcp, this);
-			return TRUE;
+			return true;
 
 		case 0x31:      /* VRCPL */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrcpl, this);
-			return TRUE;
+			return true;
 
 		case 0x32:      /* VRCPH */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrcph, this);
-			return TRUE;
+			return true;
 
 		case 0x33:      /* VMOV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmov, this);
-			return TRUE;
+			return true;
 
 		case 0x34:      /* VRSQ */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);         // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrsq, this);
-			return TRUE;
+			return true;
 
 		case 0x35:      /* VRSQL */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrsql, this);
-			return TRUE;
+			return true;
 
 		case 0x36:      /* VRSQH */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrsqh, this);
-			return TRUE;
+			return true;
 
 		case 0x37:      /* VNOP */
 		case 0x3F:      /* VNULL */
-			return TRUE;
+			return true;
 
 		default:
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, unimplemented_opcode, &m_rsp);
-			return FALSE;
+			return false;
 	}
 }
 
@@ -3495,12 +3495,12 @@ int rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compil
 
 void rsp_cop2_drc::mfc2()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int el = (op >> 7) & 0xf;
 
-	UINT16 b1 = VREG_B(VS1REG, (el+0) & 0xf);
-	UINT16 b2 = VREG_B(VS1REG, (el+1) & 0xf);
-	if (RTREG) RTVAL = (INT32)(INT16)((b1 << 8) | (b2));
+	uint16_t b1 = VREG_B(VS1REG, (el+0) & 0xf);
+	uint16_t b2 = VREG_B(VS1REG, (el+1) & 0xf);
+	if (RTREG) RTVAL = (int32_t)(int16_t)((b1 << 8) | (b2));
 }
 
 static void cfunc_mfc2(void *param)
@@ -3510,7 +3510,7 @@ static void cfunc_mfc2(void *param)
 
 void rsp_cop2_drc::cfc2()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	if (RTREG)
 	{
 		switch(RDREG)
@@ -3575,7 +3575,7 @@ static void cfunc_cfc2(void *param)
 
 void rsp_cop2_drc::mtc2()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	int el = (op >> 7) & 0xf;
 	VREG_B(VS1REG, (el+0) & 0xf) = (RTVAL >> 8) & 0xff;
 	VREG_B(VS1REG, (el+1) & 0xf) = (RTVAL >> 0) & 0xff;
@@ -3589,7 +3589,7 @@ static void cfunc_mtc2(void *param)
 
 void rsp_cop2_drc::ctc2()
 {
-	UINT32 op = m_rspcop2_state->op;
+	uint32_t op = m_rspcop2_state->op;
 	switch(RDREG)
 	{
 		case 0:
@@ -3695,10 +3695,10 @@ static void cfunc_ctc2(void *param)
     COP2 Opcode Compilation
 ***************************************************************************/
 
-int rsp_cop2_drc::generate_cop2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
+bool rsp_cop2_drc::generate_cop2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = RSREG;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = RSREG;
 
 	switch (opswitch)
 	{
@@ -3708,7 +3708,7 @@ int rsp_cop2_drc::generate_cop2(drcuml_block *block, rsp_device::compiler_state 
 				UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_mfc2, this);             // callc   mfc2
 			}
-			return TRUE;
+			return true;
 
 		case 0x02:  /* CFCz */
 			if (RTREG != 0)
@@ -3716,21 +3716,21 @@ int rsp_cop2_drc::generate_cop2(drcuml_block *block, rsp_device::compiler_state 
 				UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_cfc2, this);             // callc   cfc2
 			}
-			return TRUE;
+			return true;
 
 		case 0x04:  /* MTCz */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_mtc2, this);             // callc   mtc2
-			return TRUE;
+			return true;
 
 		case 0x06:  /* CTCz */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_ctc2, this);             // callc   ctc2
-			return TRUE;
+			return true;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			return generate_vector_opcode(block, compiler, desc);
 	}
-	return FALSE;
+	return false;
 }

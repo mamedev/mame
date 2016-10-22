@@ -66,11 +66,11 @@ class cbm2_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// computer interface
-	UINT8 read(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3);
-	void write(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3);
+	uint8_t read(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
+	void write(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
 
 	// cartridge interface
 	int phi2() { return clock(); }
@@ -113,13 +113,13 @@ public:
 	device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_cbm2_expansion_card_interface();
 
-	virtual UINT8 cbm2_bd_r(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3) { return data; };
-	virtual void cbm2_bd_w(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3) { };
+	virtual uint8_t cbm2_bd_r(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { return data; };
+	virtual void cbm2_bd_w(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { };
 
 protected:
-	optional_shared_ptr<UINT8> m_bank1;
-	optional_shared_ptr<UINT8> m_bank2;
-	optional_shared_ptr<UINT8> m_bank3;
+	optional_shared_ptr<uint8_t> m_bank1;
+	optional_shared_ptr<uint8_t> m_bank2;
+	optional_shared_ptr<uint8_t> m_bank3;
 
 	cbm2_expansion_slot_device *m_slot;
 };

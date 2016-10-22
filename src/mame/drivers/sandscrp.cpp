@@ -105,11 +105,11 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 
-	UINT8 m_sprite_irq;
-	UINT8 m_unknown_irq;
-	UINT8 m_vblank_irq;
-	UINT8 m_latch1_full;
-	UINT8 m_latch2_full;
+	uint8_t m_sprite_irq;
+	uint8_t m_unknown_irq;
+	uint8_t m_vblank_irq;
+	uint8_t m_latch1_full;
+	uint8_t m_latch2_full;
 
 	DECLARE_READ16_MEMBER(irq_cause_r);
 	DECLARE_WRITE16_MEMBER(irq_cause_w);
@@ -125,7 +125,7 @@ public:
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
@@ -134,7 +134,7 @@ public:
 
 
 
-UINT32 sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 

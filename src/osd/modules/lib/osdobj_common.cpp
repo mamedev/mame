@@ -514,7 +514,7 @@ void osd_common_t::debugger_update()
 //  stream
 //-------------------------------------------------
 
-void osd_common_t::update_audio_stream(const INT16 *buffer, int samples_this_frame)
+void osd_common_t::update_audio_stream(const int16_t *buffer, int samples_this_frame)
 {
 	//
 	// This method is called whenever the system has new audio data to stream.
@@ -579,7 +579,7 @@ std::vector<ui::menu_item> osd_common_t::get_slider_list()
 //  to an AVI recording if one is active
 //-------------------------------------------------
 
-void osd_common_t::add_audio_to_recording(const INT16 *buffer, int samples_this_frame)
+void osd_common_t::add_audio_to_recording(const int16_t *buffer, int samples_this_frame)
 {
 	// Do nothing
 }
@@ -623,7 +623,7 @@ bool osd_common_t::execute_command(const char *command)
 
 }
 
-static void output_notifier_callback(const char *outname, INT32 value, void *param)
+static void output_notifier_callback(const char *outname, int32_t value, void *param)
 {
 	osd_common_t *osd = (osd_common_t*)param;
 	osd->notify(outname, value);

@@ -150,7 +150,7 @@ const tiny_rom_entry *isa8_mda_device::device_rom_region() const
 //  isa8_mda_device - constructor
 //-------------------------------------------------
 
-isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA8_MDA, "IBM Monochrome Display and Printer Adapter", tag, owner, clock, "isa_ibm_mda", __FILE__),
 		device_isa8_card_interface(mconfig, *this), m_framecnt(0), m_mode_control(0),
 		m_update_row_type(-1), m_chr_gen(nullptr), m_vsync(0), m_hsync(0), m_pixel(0),
@@ -158,7 +158,7 @@ isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this), m_framecnt(0), m_mode_control(0),
 		m_update_row_type(-1), m_chr_gen(nullptr), m_vsync(0), m_hsync(0), m_pixel(0),
@@ -222,19 +222,19 @@ void isa8_mda_device::device_reset()
 MC6845_UPDATE_ROW( isa8_mda_device::mda_text_inten_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
-	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
 	if ( y == 0 ) MDA_LOG(1,"mda_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
-		UINT8 chr = m_videoram[ offset ];
-		UINT8 attr = m_videoram[ offset + 1 ];
-		UINT8 data = m_chr_gen[ chr_base + chr * 8 ];
-		UINT8 fg = ( attr & 0x08 ) ? 3 : 2;
-		UINT8 bg = 0;
+		uint16_t offset = ( ( ma + i ) << 1 ) & 0x0FFF;
+		uint8_t chr = m_videoram[ offset ];
+		uint8_t attr = m_videoram[ offset + 1 ];
+		uint8_t data = m_chr_gen[ chr_base + chr * 8 ];
+		uint8_t fg = ( attr & 0x08 ) ? 3 : 2;
+		uint8_t bg = 0;
 
 		if ( ( attr & ~0x88 ) == 0 )
 		{
@@ -295,19 +295,19 @@ MC6845_UPDATE_ROW( isa8_mda_device::mda_text_inten_update_row )
 MC6845_UPDATE_ROW( isa8_mda_device::mda_text_blink_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
-	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
 	if ( y == 0 ) MDA_LOG(1,"mda_text_blink_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
-		UINT8 chr = m_videoram[ offset ];
-		UINT8 attr = m_videoram[ offset + 1 ];
-		UINT8 data = m_chr_gen[ chr_base + chr * 8 ];
-		UINT8 fg = ( attr & 0x08 ) ? 3 : 2;
-		UINT8 bg = 0;
+		uint16_t offset = ( ( ma + i ) << 1 ) & 0x0FFF;
+		uint8_t chr = m_videoram[ offset ];
+		uint8_t attr = m_videoram[ offset + 1 ];
+		uint8_t data = m_chr_gen[ chr_base + chr * 8 ];
+		uint8_t fg = ( attr & 0x08 ) ? 3 : 2;
+		uint8_t bg = 0;
 
 		if ( ( attr & ~0x88 ) == 0 )
 		{
@@ -587,7 +587,7 @@ const tiny_rom_entry *isa8_hercules_device::device_rom_region() const
 //  isa8_hercules_device - constructor
 //-------------------------------------------------
 
-isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		isa8_mda_device(mconfig, ISA8_HERCULES, "Hercules Graphics Card", tag, owner, clock, "isa_hercules", __FILE__), m_configuration_switch(0)
 {
 }
@@ -633,13 +633,13 @@ void isa8_hercules_device::device_reset()
 MC6845_UPDATE_ROW( isa8_hercules_device::hercules_gfx_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
-	UINT16  gfx_base = ( ( m_mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  gfx_base = ( ( m_mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;
 	if ( y == 0 ) MDA_LOG(1,"hercules_gfx_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT8   data = m_videoram[ gfx_base + ( ( ma + i ) << 1 ) ];
+		uint8_t   data = m_videoram[ gfx_base + ( ( ma + i ) << 1 ) ];
 
 		*p = palette[( data & 0x80 ) ? 2 : 0]; p++;
 		*p = palette[( data & 0x40 ) ? 2 : 0]; p++;
@@ -793,7 +793,7 @@ machine_config_constructor isa8_ec1840_0002_device::device_mconfig_additions() c
 //  isa8_ec1840_0002_device - constructor
 //-------------------------------------------------
 
-isa8_ec1840_0002_device::isa8_ec1840_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_ec1840_0002_device::isa8_ec1840_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		isa8_mda_device( mconfig, ISA8_EC1840_0002, "EC 1840.0002 (MDA)", tag, owner, clock, "ec1840_0002", __FILE__), m_soft_chr_gen(nullptr)
 {
 }
@@ -806,7 +806,7 @@ void isa8_ec1840_0002_device::device_start()
 {
 	isa8_mda_device::device_start();
 
-	m_soft_chr_gen = std::make_unique<UINT8[]>(0x2000);
+	m_soft_chr_gen = std::make_unique<uint8_t[]>(0x2000);
 	m_isa->install_bank(0xdc000, 0xddfff, "bank_chargen", m_soft_chr_gen.get());
 	m_isa->install_bank(0xde000, 0xdffff, "bank_chargen", m_soft_chr_gen.get());
 }
@@ -827,19 +827,19 @@ void isa8_ec1840_0002_device::device_reset()
 MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_inten_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
-	UINT16  chr_base = ra;
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ra;
 	int i;
 
 	if ( y == 0 ) MDA_LOG(1,"mda_lowres_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
-		UINT8 chr = m_videoram[ offset ];
-		UINT8 attr = m_videoram[ offset + 1 ];
-		UINT8 data = m_chr_gen[ (chr_base + chr * 16) << 1 ];
-		UINT8 fg = ( attr & 0x08 ) ? 3 : 2;
-		UINT8 bg = 0;
+		uint16_t offset = ( ( ma + i ) << 1 ) & 0x0FFF;
+		uint8_t chr = m_videoram[ offset ];
+		uint8_t attr = m_videoram[ offset + 1 ];
+		uint8_t data = m_chr_gen[ (chr_base + chr * 16) << 1 ];
+		uint8_t fg = ( attr & 0x08 ) ? 3 : 2;
+		uint8_t bg = 0;
 
 		if ( ( attr & ~0x88 ) == 0 )
 		{
@@ -891,19 +891,19 @@ MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_inten_update_row )
 MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_blink_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
-	UINT16  chr_base = ra;
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ra;
 	int i;
 
 	if ( y == 0 ) MDA_LOG(1,"mda_lowres_text_blink_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
-		UINT8 chr = m_videoram[ offset ];
-		UINT8 attr = m_videoram[ offset + 1 ];
-		UINT8 data = m_chr_gen[ (chr_base + chr * 16) << 1 ];
-		UINT8 fg = ( attr & 0x08 ) ? 3 : 2;
-		UINT8 bg = 0;
+		uint16_t offset = ( ( ma + i ) << 1 ) & 0x0FFF;
+		uint8_t chr = m_videoram[ offset ];
+		uint8_t attr = m_videoram[ offset + 1 ];
+		uint8_t data = m_chr_gen[ (chr_base + chr * 16) << 1 ];
+		uint8_t fg = ( attr & 0x08 ) ? 3 : 2;
+		uint8_t bg = 0;
 
 		if ( ( attr & ~0x88 ) == 0 )
 		{

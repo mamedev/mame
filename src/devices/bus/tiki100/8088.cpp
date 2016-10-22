@@ -91,7 +91,7 @@ machine_config_constructor tiki100_8088_t::device_mconfig_additions() const
 //  tiki100_8088_t - constructor
 //-------------------------------------------------
 
-tiki100_8088_t::tiki100_8088_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+tiki100_8088_t::tiki100_8088_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TIKI100_8088, "TIKI-100 8/16", tag, owner, clock, "tiki100_8088", __FILE__),
 	device_tiki100bus_card_interface(mconfig, *this),
 	m_maincpu(*this, I8088_TAG),
@@ -125,7 +125,7 @@ void tiki100_8088_t::device_reset()
 //  tiki100bus_iorq_r - I/O read
 //-------------------------------------------------
 
-UINT8 tiki100_8088_t::iorq_r(address_space &space, offs_t offset, UINT8 data)
+uint8_t tiki100_8088_t::iorq_r(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff) == 0x7f)
 	{
@@ -140,7 +140,7 @@ UINT8 tiki100_8088_t::iorq_r(address_space &space, offs_t offset, UINT8 data)
 //  tiki100bus_iorq_w - I/O write
 //-------------------------------------------------
 
-void tiki100_8088_t::iorq_w(address_space &space, offs_t offset, UINT8 data)
+void tiki100_8088_t::iorq_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff) == 0x7f)
 	{

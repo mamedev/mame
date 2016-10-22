@@ -459,7 +459,7 @@ public:
 	DECLARE_WRITE64_MEMBER(gc_exi_w);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
 };
 
@@ -493,7 +493,7 @@ void triforce_state::video_start()
 {
 }
 
-UINT32 triforce_state::screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t triforce_state::screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -503,18 +503,18 @@ INPUT_PORTS_END
 
 // bootrom descrambler reversed by segher
 // Copyright 2008 Segher Boessenkool <segher@kernel.crashing.org>
-static void descrambler(UINT8* data, UINT32 size)
+static void descrambler(uint8_t* data, uint32_t size)
 {
-	UINT8 acc = 0;
-	UINT8 nacc = 0;
+	uint8_t acc = 0;
+	uint8_t nacc = 0;
 
-	UINT16 t = 0x2953;
-	UINT16 u = 0xd9c2;
-	UINT16 v = 0x3ff1;
+	uint16_t t = 0x2953;
+	uint16_t u = 0xd9c2;
+	uint16_t v = 0x3ff1;
 
-	UINT8 x = 1;
+	uint8_t x = 1;
 
-	for (UINT32 it = 0; it < size;)
+	for (uint32_t it = 0; it < size;)
 	{
 		int t0 = t & 1;
 		int t1 = (t >> 1) & 1;
@@ -560,7 +560,7 @@ void triforce_state::machine_start()
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
-	UINT8 *rom = (UINT8*)memregion("maincpu")->base();
+	uint8_t *rom = (uint8_t*)memregion("maincpu")->base();
 	descrambler(&rom[0x100], 0x1afe00);
 }
 

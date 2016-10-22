@@ -69,14 +69,14 @@ public:
 	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
 	DECLARE_WRITE8_MEMBER(wpc_dmdbank_w);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	UINT16 m_vblank_count;
-	UINT32 m_irq_count;
-	UINT8 m_bankmask;
-	UINT8 m_ram[0x3000];
-	UINT8 m_dmdram[0x2000];
+	uint16_t m_vblank_count;
+	uint32_t m_irq_count;
+	uint8_t m_bankmask;
+	uint8_t m_ram[0x3000];
+	uint8_t m_dmdram[0x2000];
 	emu_timer* m_vblank_timer;
 	emu_timer* m_irq_timer;
 };

@@ -54,7 +54,7 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std
 	if (value.HasMember("strings"))
 	{
 		const Value& string_array = value["strings"];
-		for (UINT32 i = 0; i < string_array.Size(); i++)
+		for (uint32_t i = 0; i < string_array.Size(); i++)
 		{
 			if (!READER_CHECK(string_array[i].IsString(), (prefix + "Slider '" + name + "': strings[" + std::to_string(i) + "]: must be a string\n").c_str()))
 			{
@@ -131,7 +131,7 @@ bool slider_reader::get_values(const Value& value, std::string prefix, std::stri
 {
 	const char* name_str = name.c_str();
 	const Value& value_array = value[name_str];
-	for (UINT32 i = 0; i < value_array.Size() && i < count; i++)
+	for (uint32_t i = 0; i < value_array.Size() && i < count; i++)
 	{
 		if (!READER_CHECK(value_array[i].IsNumber(), (prefix + "Entry " + std::to_string(i) + " must be a number\n").c_str())) return false;
 		values[i] = value_array[i].GetFloat();

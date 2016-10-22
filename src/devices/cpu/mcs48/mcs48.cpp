@@ -200,7 +200,7 @@ static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs48_cpu_device)
 ADDRESS_MAP_END
 
 
-mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size, UINT8 feature_mask)
+mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int rom_size, int ram_size, uint8_t feature_mask)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0
 		, ( ( rom_size == 1024 ) ? ADDRESS_MAP_NAME(program_10bit) : ( ( rom_size == 2048 ) ? ADDRESS_MAP_NAME(program_11bit) : ( ( rom_size == 4096 ) ? ADDRESS_MAP_NAME(program_12bit) : nullptr ) ) ))
@@ -223,115 +223,115 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 	}
 }
 
-i8021_device::i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8021_device::i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8021, "I8021", tag, owner, clock, "i8021", 1024, 64)
 {
 }
 
-i8022_device::i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8022_device::i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8022, "I8022", tag, owner, clock, "i8022", 2048, 128)
 {
 }
 
-i8035_device::i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8035_device::i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8035, "I8035", tag, owner, clock, "i8035", 0, 64)
 {
 }
 
-i8048_device::i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8048_device::i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8048, "I8048", tag, owner, clock, "i8048", 1024, 64)
 {
 }
 
-i8648_device::i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8648_device::i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8648, "I8648", tag, owner, clock, "i8648", 1024, 64)
 {
 }
 
-i8748_device::i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8748_device::i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8748, "I8748", tag, owner, clock, "i8748", 1024, 64)
 {
 }
 
-i8039_device::i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8039_device::i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8039, "I8039", tag, owner, clock, "i8039", 0, 128)
 {
 }
 
-i8049_device::i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8049_device::i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8049, "I8049", tag, owner, clock, "i8049", 2048, 128)
 {
 }
 
-i8749_device::i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8749_device::i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8749, "I8749", tag, owner, clock, "i8749", 2048, 128)
 {
 }
 
-i8040_device::i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8040_device::i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8040, "I8040", tag, owner, clock, "i8040", 0, 256)
 {
 }
 
-i8050_device::i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8050_device::i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, I8050, "I8050", tag, owner, clock, "i8050", 4096, 256)
 {
 }
 
-mb8884_device::mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mb8884_device::mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, MB8884, "MB8884", tag, owner, clock, "mb8884", 0, 64)
 {
 }
 
-n7751_device::n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+n7751_device::n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, N7751, "N7751", tag, owner, clock, "n7751", 1024, 64)
 {
 }
 
-m58715_device::m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m58715_device::m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs48_cpu_device(mconfig, M58715, "M58715", tag, owner, clock, "m58715", 2048, 128)
 {
 }
 
-upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size)
+upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int rom_size, int ram_size)
 	: mcs48_cpu_device(mconfig, type, name, tag, owner, clock, shortname, rom_size, ram_size, UPI41_FEATURE)
 {
 }
 
-i8041_device::i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8041_device::i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upi41_cpu_device(mconfig, I8041, "I8041", tag, owner, clock, "i8041", 1024, 128)
 {
 }
 
-i8741_device::i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8741_device::i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upi41_cpu_device(mconfig, I8741, "I8741", tag, owner, clock, "i8741", 1024, 128)
 {
 }
 
-i8042_device::i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8042_device::i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upi41_cpu_device(mconfig, I8042, "I8042", tag, owner, clock, "i8042", 2048, 256)
 {
 }
 
-i8242_device::i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8242_device::i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upi41_cpu_device(mconfig, I8242, "I8242", tag, owner, clock, "i8242", 2048, 256)
 {
 }
 
-i8742_device::i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8742_device::i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upi41_cpu_device(mconfig, I8742, "I8742", tag, owner, clock, "i8742", 2048, 256)
 {
 }
 
 
-offs_t mcs48_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t mcs48_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( mcs48 );
 	return CPU_DISASSEMBLE_NAME(mcs48)(this, buffer, pc, oprom, opram, options);
 }
 
 
-offs_t upi41_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t upi41_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upi41 );
 	return CPU_DISASSEMBLE_NAME(upi41)(this, buffer, pc, oprom, opram, options);
@@ -345,7 +345,7 @@ offs_t upi41_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
     opcode_fetch - fetch an opcode byte
 -------------------------------------------------*/
 
-UINT8 mcs48_cpu_device::opcode_fetch()
+uint8_t mcs48_cpu_device::opcode_fetch()
 {
 	return m_direct->read_byte(m_pc++);
 }
@@ -356,7 +356,7 @@ UINT8 mcs48_cpu_device::opcode_fetch()
     byte
 -------------------------------------------------*/
 
-UINT8 mcs48_cpu_device::argument_fetch()
+uint8_t mcs48_cpu_device::argument_fetch()
 {
 	return m_direct->read_byte(m_pc++);
 }
@@ -369,7 +369,7 @@ UINT8 mcs48_cpu_device::argument_fetch()
 
 void mcs48_cpu_device::update_regptr()
 {
-	m_regptr = (UINT8 *)m_data->get_write_ptr((m_psw & B_FLAG) ? 24 : 0);
+	m_regptr = (uint8_t *)m_data->get_write_ptr((m_psw & B_FLAG) ? 24 : 0);
 }
 
 
@@ -380,7 +380,7 @@ void mcs48_cpu_device::update_regptr()
 
 void mcs48_cpu_device::push_pc_psw()
 {
-	UINT8 sp = m_psw & 0x07;
+	uint8_t sp = m_psw & 0x07;
 	ram_w(8 + 2*sp, m_pc);
 	ram_w(9 + 2*sp, ((m_pc >> 8) & 0x0f) | (m_psw & 0xf0));
 	m_psw = (m_psw & 0xf8) | ((sp + 1) & 0x07);
@@ -394,7 +394,7 @@ void mcs48_cpu_device::push_pc_psw()
 
 void mcs48_cpu_device::pull_pc_psw()
 {
-	UINT8 sp = (m_psw - 1) & 0x07;
+	uint8_t sp = (m_psw - 1) & 0x07;
 	m_pc = ram_r(8 + 2*sp);
 	m_pc |= ram_r(9 + 2*sp) << 8;
 	m_psw = ((m_pc >> 8) & 0xf0) | 0x08 | sp;
@@ -410,7 +410,7 @@ void mcs48_cpu_device::pull_pc_psw()
 
 void mcs48_cpu_device::pull_pc()
 {
-	UINT8 sp = (m_psw - 1) & 0x07;
+	uint8_t sp = (m_psw - 1) & 0x07;
 	m_pc = ram_r(8 + 2*sp);
 	m_pc |= ram_r(9 + 2*sp) << 8;
 	m_pc &= 0xfff;
@@ -423,10 +423,10 @@ void mcs48_cpu_device::pull_pc()
     instruction
 -------------------------------------------------*/
 
-void mcs48_cpu_device::execute_add(UINT8 dat)
+void mcs48_cpu_device::execute_add(uint8_t dat)
 {
-	UINT16 temp = m_a + dat;
-	UINT16 temp4 = (m_a & 0x0f) + (dat & 0x0f);
+	uint16_t temp = m_a + dat;
+	uint16_t temp4 = (m_a & 0x0f) + (dat & 0x0f);
 
 	m_psw &= ~(C_FLAG | A_FLAG);
 	m_psw |= (temp4 << 2) & A_FLAG;
@@ -440,11 +440,11 @@ void mcs48_cpu_device::execute_add(UINT8 dat)
     instruction
 -------------------------------------------------*/
 
-void mcs48_cpu_device::execute_addc(UINT8 dat)
+void mcs48_cpu_device::execute_addc(uint8_t dat)
 {
-	UINT8 carryin = (m_psw & C_FLAG) >> 7;
-	UINT16 temp = m_a + dat + carryin;
-	UINT16 temp4 = (m_a & 0x0f) + (dat & 0x0f) + carryin;
+	uint8_t carryin = (m_psw & C_FLAG) >> 7;
+	uint16_t temp = m_a + dat + carryin;
+	uint16_t temp4 = (m_a & 0x0f) + (dat & 0x0f) + carryin;
 
 	m_psw &= ~(C_FLAG | A_FLAG);
 	m_psw |= (temp4 << 2) & A_FLAG;
@@ -458,9 +458,9 @@ void mcs48_cpu_device::execute_addc(UINT8 dat)
     instruction
 -------------------------------------------------*/
 
-void mcs48_cpu_device::execute_jmp(UINT16 address)
+void mcs48_cpu_device::execute_jmp(uint16_t address)
 {
-	UINT16 a11 = (m_irq_in_progress) ? 0 : m_a11;
+	uint16_t a11 = (m_irq_in_progress) ? 0 : m_a11;
 	m_pc = address | a11;
 }
 
@@ -470,7 +470,7 @@ void mcs48_cpu_device::execute_jmp(UINT16 address)
     instruction
 -------------------------------------------------*/
 
-void mcs48_cpu_device::execute_call(UINT16 address)
+void mcs48_cpu_device::execute_call(uint16_t address)
 {
 	push_pc_psw();
 	execute_jmp(address);
@@ -482,9 +482,9 @@ void mcs48_cpu_device::execute_call(UINT16 address)
     conditional jump instruction
 -------------------------------------------------*/
 
-void mcs48_cpu_device::execute_jcc(UINT8 result)
+void mcs48_cpu_device::execute_jcc(uint8_t result)
 {
-	UINT8 offset = argument_fetch();
+	uint8_t offset = argument_fetch();
 	if (result != 0)
 		m_pc = ((m_pc - 1) & 0xf00) | offset;
 }
@@ -495,9 +495,9 @@ void mcs48_cpu_device::execute_jcc(UINT8 result)
     code can directly affect
 -------------------------------------------------*/
 
-UINT8 mcs48_cpu_device::p2_mask()
+uint8_t mcs48_cpu_device::p2_mask()
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 	if ((m_feature_mask & UPI41_FEATURE) == 0)
 		return result;
 	if (m_flags_enabled)
@@ -513,7 +513,7 @@ UINT8 mcs48_cpu_device::p2_mask()
     the 8243 expander chip
 -------------------------------------------------*/
 
-void mcs48_cpu_device::expander_operation(UINT8 operation, UINT8 port)
+void mcs48_cpu_device::expander_operation(uint8_t operation, uint8_t port)
 {
 	/* put opcode/data on low 4 bits of P2 */
 	port_w(2, m_p2 = (m_p2 & 0xf0) | (operation << 2) | (port & 3));
@@ -640,8 +640,8 @@ OPHANDLER( dec_r5 )         { R5--; return 1; }
 OPHANDLER( dec_r6 )         { R6--; return 1; }
 OPHANDLER( dec_r7 )         { R7--; return 1; }
 
-OPHANDLER( dis_i )          { m_xirq_enabled = FALSE; return 1; }
-OPHANDLER( dis_tcnti )      { m_tirq_enabled = FALSE; m_timer_overflow = FALSE; return 1; }
+OPHANDLER( dis_i )          { m_xirq_enabled = false; return 1; }
+OPHANDLER( dis_tcnti )      { m_tirq_enabled = false; m_timer_overflow = false; return 1; }
 
 OPHANDLER( djnz_r0 )        { execute_jcc(--R0 != 0); return 2; }
 OPHANDLER( djnz_r1 )        { execute_jcc(--R1 != 0); return 2; }
@@ -652,10 +652,10 @@ OPHANDLER( djnz_r5 )        { execute_jcc(--R5 != 0); return 2; }
 OPHANDLER( djnz_r6 )        { execute_jcc(--R6 != 0); return 2; }
 OPHANDLER( djnz_r7 )        { execute_jcc(--R7 != 0); return 2; }
 
-OPHANDLER( en_i )           { m_xirq_enabled = TRUE; return 1 + check_irqs(); }
-OPHANDLER( en_tcnti )       { m_tirq_enabled = TRUE; return 1 + check_irqs(); }
-OPHANDLER( en_dma )         { m_dma_enabled = TRUE; port_w(2, m_p2); return 1; }
-OPHANDLER( en_flags )       { m_flags_enabled = TRUE; port_w(2, m_p2); return 1; }
+OPHANDLER( en_i )           { m_xirq_enabled = true; return 1 + check_irqs(); }
+OPHANDLER( en_tcnti )       { m_tirq_enabled = true; return 1 + check_irqs(); }
+OPHANDLER( en_dma )         { m_dma_enabled = true; port_w(2, m_p2); return 1; }
+OPHANDLER( en_flags )       { m_flags_enabled = true; port_w(2, m_p2); return 1; }
 OPHANDLER( ent0_clk )
 {
 	logerror("MCS-48 PC:%04X - Unimplemented opcode = %02x\n", m_pc - 1, program_r(m_pc - 1));
@@ -709,7 +709,7 @@ OPHANDLER( jnt_0 )          { execute_jcc(test_r(0) == 0); return 2; }
 OPHANDLER( jnt_1 )          { execute_jcc(test_r(1) == 0); return 2; }
 OPHANDLER( jnz )            { execute_jcc(m_a != 0); return 2; }
 OPHANDLER( jobf )           { execute_jcc((m_sts & STS_OBF) != 0); return 2; }
-OPHANDLER( jtf )            { execute_jcc(m_timer_flag); m_timer_flag = FALSE; return 2; }
+OPHANDLER( jtf )            { execute_jcc(m_timer_flag); m_timer_flag = false; return 2; }
 OPHANDLER( jt_0 )           { execute_jcc(test_r(0) != 0); return 2; }
 OPHANDLER( jt_1 )           { execute_jcc(test_r(1) != 0); return 2; }
 OPHANDLER( jz )             { execute_jcc(m_a == 0); return 2; }
@@ -803,7 +803,7 @@ OPHANDLER( orld_p7_a )      { expander_operation(MCS48_EXPANDER_OP_OR, 7); retur
 
 OPHANDLER( outl_bus_a )     { bus_w(m_a); return 2; }
 OPHANDLER( outl_p1_a )      { port_w(1, m_p1 = m_a); return 2; }
-OPHANDLER( outl_p2_a )      { UINT8 mask = p2_mask(); port_w(2, m_p2 = (m_p2 & ~mask) | (m_a & mask)); return 2; }
+OPHANDLER( outl_p2_a )      { uint8_t mask = p2_mask(); port_w(2, m_p2 = (m_p2 & ~mask) | (m_a & mask)); return 2; }
 OPHANDLER( out_dbb_a )
 {
 	/* copy to the DBBO and update the bit in STS */
@@ -823,15 +823,15 @@ OPHANDLER( retr )
 	pull_pc_psw();
 
 	/* implicitly clear the IRQ in progress flip flop and re-check interrupts */
-	m_irq_in_progress = FALSE;
+	m_irq_in_progress = false;
 	return 2 + check_irqs();
 }
 
 OPHANDLER( rl_a )           { m_a = (m_a << 1) | (m_a >> 7); return 1; }
-OPHANDLER( rlc_a )          { UINT8 newc = m_a & C_FLAG; m_a = (m_a << 1) | (m_psw >> 7); m_psw = (m_psw & ~C_FLAG) | newc; return 1; }
+OPHANDLER( rlc_a )          { uint8_t newc = m_a & C_FLAG; m_a = (m_a << 1) | (m_psw >> 7); m_psw = (m_psw & ~C_FLAG) | newc; return 1; }
 
 OPHANDLER( rr_a )           { m_a = (m_a >> 1) | (m_a << 7); return 1; }
-OPHANDLER( rrc_a )          { UINT8 newc = (m_a << 7) & C_FLAG; m_a = (m_a >> 1) | (m_psw & C_FLAG); m_psw = (m_psw & ~C_FLAG) | newc; return 1; }
+OPHANDLER( rrc_a )          { uint8_t newc = (m_a << 7) & C_FLAG; m_a = (m_a >> 1) | (m_psw & C_FLAG); m_psw = (m_psw & ~C_FLAG) | newc; return 1; }
 
 OPHANDLER( sel_mb0 )        { m_a11 = 0x000; return 1; }
 OPHANDLER( sel_mb1 )        { m_a11 = 0x800; return 1; }
@@ -846,19 +846,19 @@ OPHANDLER( strt_t )         { m_timecount_enabled = TIMER_ENABLED; m_prescaler =
 
 OPHANDLER( swap_a )         { m_a = (m_a << 4) | (m_a >> 4); return 1; }
 
-OPHANDLER( xch_a_r0 )       { UINT8 tmp = m_a; m_a = R0; R0 = tmp; return 1; }
-OPHANDLER( xch_a_r1 )       { UINT8 tmp = m_a; m_a = R1; R1 = tmp; return 1; }
-OPHANDLER( xch_a_r2 )       { UINT8 tmp = m_a; m_a = R2; R2 = tmp; return 1; }
-OPHANDLER( xch_a_r3 )       { UINT8 tmp = m_a; m_a = R3; R3 = tmp; return 1; }
-OPHANDLER( xch_a_r4 )       { UINT8 tmp = m_a; m_a = R4; R4 = tmp; return 1; }
-OPHANDLER( xch_a_r5 )       { UINT8 tmp = m_a; m_a = R5; R5 = tmp; return 1; }
-OPHANDLER( xch_a_r6 )       { UINT8 tmp = m_a; m_a = R6; R6 = tmp; return 1; }
-OPHANDLER( xch_a_r7 )       { UINT8 tmp = m_a; m_a = R7; R7 = tmp; return 1; }
-OPHANDLER( xch_a_xr0 )      { UINT8 tmp = m_a; m_a = ram_r(R0); ram_w(R0, tmp); return 1; }
-OPHANDLER( xch_a_xr1 )      { UINT8 tmp = m_a; m_a = ram_r(R1); ram_w(R1, tmp); return 1; }
+OPHANDLER( xch_a_r0 )       { uint8_t tmp = m_a; m_a = R0; R0 = tmp; return 1; }
+OPHANDLER( xch_a_r1 )       { uint8_t tmp = m_a; m_a = R1; R1 = tmp; return 1; }
+OPHANDLER( xch_a_r2 )       { uint8_t tmp = m_a; m_a = R2; R2 = tmp; return 1; }
+OPHANDLER( xch_a_r3 )       { uint8_t tmp = m_a; m_a = R3; R3 = tmp; return 1; }
+OPHANDLER( xch_a_r4 )       { uint8_t tmp = m_a; m_a = R4; R4 = tmp; return 1; }
+OPHANDLER( xch_a_r5 )       { uint8_t tmp = m_a; m_a = R5; R5 = tmp; return 1; }
+OPHANDLER( xch_a_r6 )       { uint8_t tmp = m_a; m_a = R6; R6 = tmp; return 1; }
+OPHANDLER( xch_a_r7 )       { uint8_t tmp = m_a; m_a = R7; R7 = tmp; return 1; }
+OPHANDLER( xch_a_xr0 )      { uint8_t tmp = m_a; m_a = ram_r(R0); ram_w(R0, tmp); return 1; }
+OPHANDLER( xch_a_xr1 )      { uint8_t tmp = m_a; m_a = ram_r(R1); ram_w(R1, tmp); return 1; }
 
-OPHANDLER( xchd_a_xr0 )     { UINT8 oldram = ram_r(R0); ram_w(R0, (oldram & 0xf0) | (m_a & 0x0f)); m_a = (m_a & 0xf0) | (oldram & 0x0f); return 1; }
-OPHANDLER( xchd_a_xr1 )     { UINT8 oldram = ram_r(R1); ram_w(R1, (oldram & 0xf0) | (m_a & 0x0f)); m_a = (m_a & 0xf0) | (oldram & 0x0f); return 1; }
+OPHANDLER( xchd_a_xr0 )     { uint8_t oldram = ram_r(R0); ram_w(R0, (oldram & 0xf0) | (m_a & 0x0f)); m_a = (m_a & 0xf0) | (oldram & 0x0f); return 1; }
+OPHANDLER( xchd_a_xr1 )     { uint8_t oldram = ram_r(R1); ram_w(R1, (oldram & 0xf0) | (m_a & 0x0f)); m_a = (m_a & 0xf0) | (oldram & 0x0f); return 1; }
 
 OPHANDLER( xrl_a_r0 )       { m_a ^= R0; return 1; }
 OPHANDLER( xrl_a_r1 )       { m_a ^= R1; return 1; }
@@ -1036,17 +1036,17 @@ void mcs48_cpu_device::device_reset()
 	m_p2 = 0xff;
 	port_w(1, m_p1);
 	port_w(2, m_p2);
-	m_tirq_enabled = FALSE;
-	m_xirq_enabled = FALSE;
+	m_tirq_enabled = false;
+	m_xirq_enabled = false;
 	m_timecount_enabled = 0;
-	m_timer_flag = FALSE;
+	m_timer_flag = false;
 	m_sts = 0;
-	m_flags_enabled = FALSE;
-	m_dma_enabled = FALSE;
+	m_flags_enabled = false;
+	m_dma_enabled = false;
 
 	/* confirmed from interrupt logic description */
-	m_irq_in_progress = FALSE;
-	m_timer_overflow = FALSE;
+	m_irq_in_progress = false;
+	m_timer_overflow = false;
 }
 
 
@@ -1068,7 +1068,7 @@ int mcs48_cpu_device::check_irqs()
 	/* external interrupts take priority */
 	if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
-		m_irq_in_progress = TRUE;
+		m_irq_in_progress = true;
 
 		/* transfer to location 0x03 */
 		push_pc_psw();
@@ -1082,14 +1082,14 @@ int mcs48_cpu_device::check_irqs()
 	/* timer overflow interrupts follow */
 	if (m_timer_overflow && m_tirq_enabled)
 	{
-		m_irq_in_progress = TRUE;
+		m_irq_in_progress = true;
 
 		/* transfer to location 0x07 */
 		push_pc_psw();
 		m_pc = 0x07;
 
 		/* timer overflow flip-flop is reset once taken */
-		m_timer_overflow = FALSE;
+		m_timer_overflow = false;
 		return 2;
 	}
 	return 0;
@@ -1103,12 +1103,12 @@ int mcs48_cpu_device::check_irqs()
 
 void mcs48_cpu_device::burn_cycles(int count)
 {
-	int timerover = FALSE;
+	int timerover = false;
 
 	/* if the timer is enabled, accumulate prescaler cycles */
 	if (m_timecount_enabled & TIMER_ENABLED)
 	{
-		UINT8 oldtimer = m_timer;
+		uint8_t oldtimer = m_timer;
 		m_prescaler += count;
 		m_timer += m_prescaler >> 5;
 		m_prescaler &= 0x1f;
@@ -1127,12 +1127,12 @@ void mcs48_cpu_device::burn_cycles(int count)
 	/* if either source caused a timer overflow, set the flags and check IRQs */
 	if (timerover)
 	{
-		m_timer_flag = TRUE;
+		m_timer_flag = true;
 
 		/* according to the docs, if an overflow occurs with interrupts disabled, the overflow is not stored */
 		if (m_tirq_enabled)
 		{
-			m_timer_overflow = TRUE;
+			m_timer_overflow = true;
 			check_irqs();
 		}
 	}
@@ -1212,8 +1212,8 @@ READ8_MEMBER( upi41_cpu_device::upi41_master_r )
 
 TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 {
-	UINT8 a0 = (param >> 8) & 1;
-	UINT8 data = param;
+	uint8_t a0 = (param >> 8) & 1;
+	uint8_t data = param;
 
 	/* data always goes to the input buffer */
 	m_dbbi = data;

@@ -876,7 +876,7 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(fromance_state,fromance)
 {
-	UINT8 *ROM = memregion("sub")->base();
+	uint8_t *ROM = memregion("sub")->base();
 
 	membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
 

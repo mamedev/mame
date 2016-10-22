@@ -59,7 +59,7 @@
 #undef VERBOSE
 #define VERBOSE 0
 
-static UINT16 config = 0;
+static uint16_t config = 0;
 
 /***************************************************************************
  apollo_config - check configuration setting
@@ -127,7 +127,7 @@ INPUT_PORTS_END
 class apollo_config_device : public device_t
 {
 public:
-	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -141,7 +141,7 @@ extern const device_type APOLLO_CONF;
 
 const device_type APOLLO_CONF = &device_creator<apollo_config_device>;
 
-apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APOLLO_CONF, "Apollo Configuration", tag, owner, clock, "apollo_config", __FILE__)
 {
 }
@@ -187,8 +187,8 @@ void apollo_config_device::device_reset()
 
 #define CPU_CONTROL_REGISTER_ADDRESS 0x010100
 
-static UINT16 cpu_status_register = APOLLO_CSR_SR_BIT15 | APOLLO_CSR_SR_SERVICE;
-static UINT16 cpu_control_register = 0x0000;
+static uint16_t cpu_status_register = APOLLO_CSR_SR_BIT15 | APOLLO_CSR_SR_SERVICE;
+static uint16_t cpu_control_register = 0x0000;
 
 /*-------------------------------------------------
   apollo_csr_get/set_servicemode
@@ -204,19 +204,19 @@ static void apollo_csr_set_servicemode(int mode)
 	apollo_csr_set_status_register(1, mode ? APOLLO_CSR_SR_SERVICE : 0);
 }
 
-UINT16 apollo_csr_get_control_register(void)
+uint16_t apollo_csr_get_control_register(void)
 {
 	return cpu_control_register;
 }
 
-UINT16 apollo_csr_get_status_register(void)
+uint16_t apollo_csr_get_status_register(void)
 {
 	return cpu_status_register;
 }
 
-void apollo_csr_set_status_register(UINT16 mask, UINT16 data)
+void apollo_csr_set_status_register(uint16_t mask, uint16_t data)
 {
-	UINT16 new_value = (cpu_status_register & ~mask) | (data & mask);
+	uint16_t new_value = (cpu_status_register & ~mask) | (data & mask);
 
 	if (new_value != cpu_status_register)
 	{
@@ -313,15 +313,15 @@ READ16_MEMBER(apollo_state::apollo_csr_control_register_r)
 #undef VERBOSE
 #define VERBOSE 0
 
-static UINT16 address_translation_map[0x400];
+static uint16_t address_translation_map[0x400];
 
-static UINT16 dma_page_register[16] =
+static uint16_t dma_page_register[16] =
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-static const UINT8 channel2page_register[8] = { 7, 3, 1, 2, 0, 11, 9, 10};
+static const uint8_t channel2page_register[8] = { 7, 3, 1, 2, 0, 11, 9, 10};
 
-static UINT8 dn3000_dma_channel1 = 1; // 1 = memory/ctape, 2 = floppy dma channel
-static UINT8 dn3000_dma_channel2 = 5; // 5 = memory dma channel
+static uint8_t dn3000_dma_channel1 = 1; // 1 = memory/ctape, 2 = floppy dma channel
+static uint8_t dn3000_dma_channel2 = 5; // 5 = memory dma channel
 
 /*-------------------------------------------------
  DN3000/DN3500 DMA Controller 1 at 0x9000/0x10c00
@@ -333,7 +333,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_1_w){
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_1_r){
-	UINT8 data = m_dma8237_1->read(space, offset);
+	uint8_t data = m_dma8237_1->read(space, offset);
 	SLOG1(("apollo_dma_1_r: reading DMA Controller 1 at offset %02x = %02x", offset, data));
 	return data;
 }
@@ -363,7 +363,7 @@ READ8_MEMBER(apollo_state::apollo_dma_2_r){
 			break;
 		}
 	}
-	UINT8 data = m_dma8237_2->read(space, offset / 2);
+	uint8_t data = m_dma8237_2->read(space, offset / 2);
 	SLOG1(("apollo_dma_2_r: reading DMA Controller 2 at offset %02x = %02x", offset/2, data));
 	return data;
 }
@@ -378,7 +378,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_page_register_w){
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_page_register_r){
-	UINT8 data = dma_page_register[offset & 0x0f];
+	uint8_t data = dma_page_register[offset & 0x0f];
 	SLOG1(("reading DMA Page Register at offset %02x = %02x", offset, data));
 	return data;
 }
@@ -393,13 +393,13 @@ WRITE16_MEMBER(apollo_state::apollo_address_translation_map_w){
 }
 
 READ16_MEMBER(apollo_state::apollo_address_translation_map_r){
-	UINT16 data = address_translation_map[offset & 0x3ff];
+	uint16_t data = address_translation_map[offset & 0x3ff];
 	SLOG2(("reading Address Translation Map at offset %02x = %04x", offset, data));
 	return data;
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_read_byte){
-	UINT8 data;
+	uint8_t data;
 	offs_t page_offset;
 
 	if (apollo_is_dn3000()) {
@@ -440,7 +440,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_byte){
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_read_word){
-	UINT16 data;
+	uint16_t data;
 	offs_t page_offset;
 
 	if (apollo_is_dn3000()) {
@@ -578,7 +578,7 @@ void apollo_state::apollo_pic_set_irq_line(int irq, int state)
 
 IRQ_CALLBACK_MEMBER(apollo_state::apollo_pic_acknowledge)
 {
-	UINT32 vector = m_pic8259_master->acknowledge();
+	uint32_t vector = m_pic8259_master->acknowledge();
 	if ((vector & 0x0f) == APOLLO_IRQ_PIC_SLAVE) {
 		vector = m_pic8259_slave->acknowledge();
 	}
@@ -694,7 +694,7 @@ WRITE8_MEMBER(apollo_state::apollo_rtc_w)
 
 READ8_MEMBER(apollo_state::apollo_rtc_r)
 {
-	UINT8 data;
+	uint8_t data;
 	m_rtc->write(space, 0, offset);
 	data = m_rtc->read(space, 1);
 	if (offset >= 0x0b && offset <= 0x0c)
@@ -725,7 +725,7 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 #define VERBOSE 0
 
 apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag,
-		device_t *owner, UINT32 clock) :
+		device_t *owner, uint32_t clock) :
 	mc68681_device(mconfig, tag, owner, clock),
 	m_csrb(0),
 	m_ip6(0)
@@ -734,7 +734,7 @@ apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag,
 
 void apollo_sio::device_reset()
 {
-	UINT8 input_data = apollo_get_ram_config_byte();
+	uint8_t input_data = apollo_get_ram_config_byte();
 	ip0_w((input_data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 	ip1_w((input_data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 	ip2_w((input_data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
@@ -881,7 +881,7 @@ const device_type APOLLO_NI = &device_creator<apollo_ni> ;
 //-------------------------------------------------
 
 apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag,
-		device_t *owner, UINT32 clock) :
+		device_t *owner, uint32_t clock) :
 	device_t(mconfig, APOLLO_NI, "Node ID", tag, owner, clock, "node_id",
 			__FILE__), device_image_interface(mconfig, *this)
 {
@@ -923,7 +923,7 @@ void apollo_ni::device_reset()
 //  set node ID
 //-------------------------------------------------
 
-void apollo_ni::set_node_id(UINT32 node_id)
+void apollo_ni::set_node_id(uint32_t node_id)
 {
 	m_node_id = node_id;
 	CLOG1(("apollo_ni::set_node_id: node ID is %x", node_id));
@@ -940,7 +940,7 @@ WRITE16_MEMBER(apollo_ni::write)
 
 READ16_MEMBER(apollo_ni::read)
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	switch (offset & 0x0f)
 	{
 	case 1: // msb
@@ -971,17 +971,17 @@ image_init_result apollo_ni::call_load()
 {
 	CLOG1(("apollo_ni::call_load: %s", filename()));
 
-	UINT64 size = length();
+	uint64_t size = length();
 		if (size != 32)
 	{
 		CLOG(("apollo_ni::call_load: %s has unexpected file size %d", filename(), size));
 	}
 	else
 	{
-		UINT8 data[32];
+		uint8_t data[32];
 		fread(data, sizeof(data));
 
-		UINT8 checksum = data[2] + data[4] + data[6];
+		uint8_t checksum = data[2] + data[4] + data[6];
 		if (checksum != data[30])
 		{
 			CLOG(("apollo_ni::call_load: checksum is %02x - should be %02x", checksum, data[30]));
@@ -1010,7 +1010,7 @@ image_init_result apollo_ni::call_create(int format_type, util::option_resolutio
 	}
 	else
 	{
-		UINT32 node_id = 0;
+		uint32_t node_id = 0;
 		sscanf(basename_noext(), "%x", &node_id);
 		if (node_id == 0 || node_id > 0xfffff)
 		{
@@ -1018,7 +1018,7 @@ image_init_result apollo_ni::call_create(int format_type, util::option_resolutio
 		}
 		else
 		{
-			UINT8 data[32];
+			uint8_t data[32];
 			memset(data, 0, sizeof(data));
 			data[2] = node_id >> 16;
 			data[4] = node_id >> 8;
@@ -1048,7 +1048,7 @@ void apollo_ni::call_unload()
 void apollo_ni::set_node_id_from_disk()
 {
 	omti8621_apollo_device *omti8621 = machine().device<omti8621_apollo_device>("isa1:wdc");
-	UINT8 db[0x50];
+	uint8_t db[0x50];
 
 	// check label of physical volume and get sector data of logical volume 1
 	// Note: sector data starts with 32 byte block header
@@ -1057,7 +1057,7 @@ void apollo_ni::set_node_id_from_disk()
 			&& omti8621->get_sector(0, db, sizeof(db), 0) == sizeof(db)
 			&& memcmp(db + 0x22, "APOLLO", 6) == 0)
 	{
-		UINT16 sector1 = apollo_is_dn5500() ? 4 : 1;
+		uint16_t sector1 = apollo_is_dn5500() ? 4 : 1;
 
 		if (omti8621->get_sector(sector1, db, sizeof(db), 0) == sizeof(db))
 		{
@@ -1228,7 +1228,7 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 MACHINE_RESET_MEMBER(apollo_state,apollo)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 year = apollo_rtc_r(space, 9);
+	uint8_t year = apollo_rtc_r(space, 9);
 
 	MLOG1(("machine_reset_apollo"));
 
@@ -1288,7 +1288,7 @@ const device_type APOLLO_STDIO = &device_creator<apollo_stdio_device> ;
 //-------------------------------------------------
 
 apollo_stdio_device::apollo_stdio_device(const machine_config &mconfig,
-		const char *tag, device_t *owner, UINT32 clock) :
+		const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APOLLO_STDIO, "Apollo STDIO", tag, owner, clock,
 			"apollo_stdio", __FILE__), device_serial_interface(mconfig, *this),
 			m_tx_w(*this)
@@ -1344,7 +1344,7 @@ void apollo_stdio_device::device_timer(emu_timer &timer, device_timer_id id,
 void apollo_stdio_device::rcv_complete() // Rx completed receiving byte
 {
 	receive_register_extract();
-	UINT8 data = get_received_char();
+	uint8_t data = get_received_char();
 
 	// output data to stdout (FIXME: '\r' may confuse ceterm)
 	if (data != '\r')
@@ -1383,7 +1383,7 @@ void apollo_stdio_device::tra_callback() // Tx send bit
 TIMER_CALLBACK_MEMBER(apollo_stdio_device::poll_timer)
 {
 #if defined(__linux__)
-	UINT8 data;
+	uint8_t data;
 	while (::read(STDIN_FILENO, &data, 1) == 1)
 	{
 		xmit_char(data == '\n' ? '\r' : data);
@@ -1391,7 +1391,7 @@ TIMER_CALLBACK_MEMBER(apollo_stdio_device::poll_timer)
 #endif
 }
 
-void apollo_stdio_device::xmit_char(UINT8 data)
+void apollo_stdio_device::xmit_char(uint8_t data)
 {
 	CLOG1(("xmit_char %02x - %c", data, data));
 

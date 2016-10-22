@@ -15,7 +15,7 @@
 class k053251_device : public device_t
 {
 public:
-	k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k053251_device() {}
 
 	/*
@@ -44,7 +44,7 @@ private:
 	// internal state
 	int      m_dirty_tmap[5];
 
-	UINT8    m_ram[16];
+	uint8_t    m_ram[16];
 	int      m_tilemaps_set;
 	int      m_palette_index[5];
 

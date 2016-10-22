@@ -179,7 +179,7 @@ WRITE16_MEMBER(xexex_state::k053247_scattered_word_w)
 void xexex_state::xexex_objdma( int limiter )
 {
 	int counter, num_inactive;
-	UINT16 *src, *dst;
+	uint16_t *src, *dst;
 
 	counter = m_frame;
 	m_frame = m_screen->frame_number();
@@ -704,8 +704,8 @@ DRIVER_INIT_MEMBER(xexex_state,xexex)
 	if (!strcmp(machine().system().name, "xexex"))
 	{
 		// Invulnerability
-//      *(UINT16 *)(memregion("maincpu")->base() + 0x648d4) = 0x4a79;
-//      *(UINT16 *)(memregion("maincpu")->base() + 0x00008) = 0x5500;
+//      *(uint16_t *)(memregion("maincpu")->base() + 0x648d4) = 0x4a79;
+//      *(uint16_t *)(memregion("maincpu")->base() + 0x00008) = 0x5500;
 		m_strip_0x1a = 1;
 	}
 }

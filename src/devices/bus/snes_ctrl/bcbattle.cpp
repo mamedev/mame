@@ -81,7 +81,7 @@ void snes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, in
 //  snes_bcbattle_device - constructor
 //-------------------------------------------------
 
-snes_bcbattle_device::snes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+snes_bcbattle_device::snes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, SNES_BARCODE_BATTLER, "Epoch Barcode Battler (SFC)", tag, owner, clock, "snes_bcbattle", __FILE__),
 					device_snes_control_port_interface(mconfig, *this),
 					m_reader(*this, "battler"), m_pending_code(0), m_new_code(0), m_transmitting(0), m_cur_bit(0), m_cur_byte(0), battler_timer(nullptr), m_strobe(0), m_idx(0)
@@ -171,9 +171,9 @@ void snes_bcbattle_device::port_poll()
 //  read
 //-------------------------------------------------
 
-UINT8 snes_bcbattle_device::read_pin4()
+uint8_t snes_bcbattle_device::read_pin4()
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (m_idx >= 80)
 		ret |= 0x00;
@@ -202,7 +202,7 @@ UINT8 snes_bcbattle_device::read_pin4()
 //  write
 //-------------------------------------------------
 
-void snes_bcbattle_device::write_strobe(UINT8 data)
+void snes_bcbattle_device::write_strobe(uint8_t data)
 {
 	int old = m_strobe;
 	m_strobe = data & 0x01;

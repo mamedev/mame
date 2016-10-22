@@ -19,8 +19,8 @@
 
 #define CLOCK_MULTIPLIER 1
 
-#define BITS(x,m,n) (((x)>>(n))&(((UINT32)1<<((m)-(n)+1))-1))
-#define CLR_BITS(x,m,n) ((x) & ~((((UINT32)1 << ((m) - (n) + 1)) - 1) << n))
+#define BITS(x,m,n) (((x)>>(n))&(((uint32_t)1<<((m)-(n)+1))-1))
+#define CLR_BITS(x,m,n) ((x) & ~((((uint32_t)1 << ((m) - (n) + 1)) - 1) << n))
 
 #if defined(DEVICE_S3C2400)
 
@@ -131,11 +131,11 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_reset()
 	lcd->timer->adjust( attotime::never);
 }
 
-rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_tft_16(UINT16 data)
+rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_tft_16(uint16_t data)
 {
 	if ((m_lcd.regs.lcdcon5 & (1 << 11)) == 0)
 	{
-		UINT8 r, g, b, i;
+		uint8_t r, g, b, i;
 		r = (BITS( data, 15, 11) << 3);
 		g = (BITS( data, 10, 6) << 3);
 		b = (BITS( data, 5, 1) << 3);
@@ -144,7 +144,7 @@ rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_tft_16(UINT16 data)
 	}
 	else
 	{
-		UINT8 r, g, b;
+		uint8_t r, g, b;
 		r = BITS( data, 15, 11) << 3;
 		g = BITS( data, 10, 5) << 2;
 		b = BITS( data, 4, 0) << 3;
@@ -154,9 +154,9 @@ rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_tft_16(UINT16 data)
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 
-rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_tft_24(UINT32 data)
+rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_tft_24(uint32_t data)
 {
-	UINT8 r, g, b;
+	uint8_t r, g, b;
 	r = BITS( data, 23, 16);
 	g = BITS( data, 15, 8);
 	b = BITS( data, 7, 0);
@@ -165,25 +165,25 @@ rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_tft_24(UINT32 data)
 
 #endif
 
-rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_12(UINT16 data)
+rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_12(uint16_t data)
 {
-	UINT8 r, g, b;
+	uint8_t r, g, b;
 	r = BITS( data, 11, 8) << 4;
 	g = BITS( data, 7, 4) << 4;
 	b = BITS( data, 3, 0) << 4;
 	return rgb_t( r, g, b);
 }
 
-rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_08( UINT8 data)
+rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_08( uint8_t data)
 {
-	UINT8 r, g, b;
+	uint8_t r, g, b;
 	r = ((m_lcd.regs.redlut   >> (BITS( data, 7, 5) << 2)) & 0xF) << 4;
 	g = ((m_lcd.regs.greenlut >> (BITS( data, 4, 2) << 2)) & 0xF) << 4;
 	b = ((m_lcd.regs.bluelut  >> (BITS( data, 1, 0) << 2)) & 0xF) << 4;
 	return rgb_t( r, g, b);
 }
 
-rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_01(UINT8 data)
+rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_01(uint8_t data)
 {
 	if ((data & 1) == 0)
 	{
@@ -195,16 +195,16 @@ rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_01(UINT8 data)
 	}
 }
 
-rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_02(UINT8 data)
+rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_02(uint8_t data)
 {
-	UINT8 r, g, b;
+	uint8_t r, g, b;
 	r = g = b = ((m_lcd.regs.bluelut >> (BITS( data, 1, 0) << 2)) & 0xF) << 4;
 	return rgb_t( r, g, b);
 }
 
-rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_04(UINT8 data)
+rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_04(uint8_t data)
 {
-	UINT8 r, g, b;
+	uint8_t r, g, b;
 	r = g = b = BITS( data, 3, 0) << 4;
 	return rgb_t( r, g, b);
 }
@@ -250,11 +250,11 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_dma_init()
 }
 
 #if 0
-UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
+uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 {
 	address_space& space = m_cpu->memory().space( AS_PROGRAM);
-	UINT8 *vram, data[4];
-	vram = (UINT8 *)space.get_read_ptr( m_lcd.vramaddr_cur);
+	uint8_t *vram, data[4];
+	vram = (uint8_t *)space.get_read_ptr( m_lcd.vramaddr_cur);
 	for (int i = 0; i < 2; i++)
 	{
 		data[i*2+0] = *vram++;
@@ -265,7 +265,7 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 		{
 			m_lcd.vramaddr_cur += m_lcd.offsize << 1;
 			m_lcd.pagewidth_cur = 0;
-			vram = (UINT8 *)space.get_read_ptr( m_lcd.vramaddr_cur);
+			vram = (uint8_t *)space.get_read_ptr( m_lcd.vramaddr_cur);
 		}
 	}
 	if (m_lcd.hwswp == 0)
@@ -293,11 +293,11 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 }
 #endif
 
-UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
+uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 {
 	address_space& space = m_cpu->memory().space( AS_PROGRAM);
-	UINT8 *vram, data[4];
-	vram = (UINT8 *)space.get_read_ptr( m_lcd.vramaddr_cur);
+	uint8_t *vram, data[4];
+	vram = (uint8_t *)space.get_read_ptr( m_lcd.vramaddr_cur);
 	for (int i = 0; i < 2; i++)
 	{
 		if (m_lcd.hwswp == 0)
@@ -348,7 +348,7 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 		{
 			m_lcd.vramaddr_cur += m_lcd.offsize << 1;
 			m_lcd.pagewidth_cur = 0;
-			vram = (UINT8 *)space.get_read_ptr( m_lcd.vramaddr_cur);
+			vram = (uint8_t *)space.get_read_ptr( m_lcd.vramaddr_cur);
 		}
 		else
 		{
@@ -365,9 +365,9 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 	}
 }
 
-UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read_bits(int count)
+uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read_bits(int count)
 {
-	UINT32 data;
+	uint32_t data;
 	if (count <= m_lcd.dma_bits)
 	{
 		m_lcd.dma_bits -= count;
@@ -384,7 +384,7 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read_bits(int count)
 			}
 			else
 			{
-				UINT32 temp = s3c24xx_lcd_dma_read();
+				uint32_t temp = s3c24xx_lcd_dma_read();
 				data = BITS( temp, 31, 32 - count);
 				m_lcd.dma_data = temp << count;
 				m_lcd.dma_bits = 32 - count;
@@ -392,7 +392,7 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read_bits(int count)
 		}
 		else
 		{
-			UINT32 temp = s3c24xx_lcd_dma_read();
+			uint32_t temp = s3c24xx_lcd_dma_read();
 			data = (m_lcd.dma_data >> (32 - count)) | BITS( temp, 31, 32 - (count - m_lcd.dma_bits));
 			m_lcd.dma_data = temp << (count - m_lcd.dma_bits);
 			m_lcd.dma_bits = 32 - (count - m_lcd.dma_bits);
@@ -404,10 +404,10 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read_bits(int count)
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tpal()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 color = s3c24xx_get_color_tpal();
+	uint32_t color = s3c24xx_get_color_tpal();
 	for (int y = m_lcd.vpos_min; y <= m_lcd.vpos_max; y++)
 	{
-		UINT32 *scanline = &bitmap.pix32(y, m_lcd.hpos_min);
+		uint32_t *scanline = &bitmap.pix32(y, m_lcd.hpos_min);
 		for (int x = m_lcd.hpos_min; x <= m_lcd.hpos_max; x++)
 		{
 			*scanline++ = color;
@@ -418,10 +418,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tpal()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_01()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c24xx_lcd_dma_read();
+		uint32_t data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 32; j++)
 		{
 			if (m_flags & S3C24XX_INTERFACE_LCD_REVERSE)
@@ -449,10 +449,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_01()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_02()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c24xx_lcd_dma_read();
+		uint32_t data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 16; j++)
 		{
 			*scanline++ = s3c24xx_get_color_stn_02((data >> 30) & 0x03);
@@ -472,10 +472,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_02()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_04()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c24xx_lcd_dma_read();
+		uint32_t data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 8; j++)
 		{
 			*scanline++ = s3c24xx_get_color_stn_04((data >> 28) & 0x0F);
@@ -495,10 +495,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_04()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_08()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c24xx_lcd_dma_read();
+		uint32_t data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 4; j++)
 		{
 			*scanline++ = s3c24xx_get_color_stn_08((data >> 24) & 0xFF);
@@ -518,7 +518,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_08()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_p()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 16; i++)
 	{
 		*scanline++ = s3c24xx_get_color_stn_12(s3c24xx_lcd_dma_read_bits(12));
@@ -536,10 +536,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_p()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_u() // not tested
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c24xx_lcd_dma_read();
+		uint32_t data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 2; j++)
 		{
 			*scanline++ = s3c24xx_get_color_stn_12((data >> 16) & 0x0FFF);
@@ -559,10 +559,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_u() // not tested
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_01()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c24xx_lcd_dma_read();
+		uint32_t data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 32; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 31) & 0x01);
@@ -582,10 +582,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_01()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_02()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c24xx_lcd_dma_read();
+		uint32_t data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 16; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 30) & 0x03);
@@ -605,10 +605,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_02()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_04()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c24xx_lcd_dma_read();
+		uint32_t data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 8; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 28) & 0x0F);
@@ -628,10 +628,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_04()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_08()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c24xx_lcd_dma_read();
+		uint32_t data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 4; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 24) & 0xFF);
@@ -651,10 +651,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_08()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_16()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	UINT32 *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c24xx_lcd_dma_read();
+		uint32_t data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 2; j++)
 		{
 			*scanline++ = s3c24xx_get_color_tft_16((data >> 16) & 0xFFFF);
@@ -674,7 +674,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_16()
 TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp )
 {
 	screen_device *screen = machine().first_screen();
-	UINT32 tpalen;
+	uint32_t tpalen;
 	verboselog( *this, 2, "LCD timer callback\n");
 	m_lcd.vpos = screen->vpos();
 	m_lcd.hpos = screen->hpos();
@@ -725,28 +725,28 @@ void S3C24_CLASS_NAME::bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bit
 {
 	for (int y = 0; y < bitmap_dst.height(); y++)
 	{
-		UINT32 *line0 = &bitmap_src_1.pix32(y);
-		UINT32 *line1 = &bitmap_src_2.pix32(y);
-		UINT32 *line2 = &bitmap_dst.pix32(y);
+		uint32_t *line0 = &bitmap_src_1.pix32(y);
+		uint32_t *line1 = &bitmap_src_2.pix32(y);
+		uint32_t *line2 = &bitmap_dst.pix32(y);
 		for (int x = 0; x < bitmap_dst.width(); x++)
 		{
-				UINT32 color0 = line0[x];
-				UINT32 color1 = line1[x];
-				UINT16 r0 = (color0 >> 16) & 0x000000ff;
-				UINT16 g0 = (color0 >>  8) & 0x000000ff;
-				UINT16 b0 = (color0 >>  0) & 0x000000ff;
-				UINT16 r1 = (color1 >> 16) & 0x000000ff;
-				UINT16 g1 = (color1 >>  8) & 0x000000ff;
-				UINT16 b1 = (color1 >>  0) & 0x000000ff;
-				UINT8 r = (UINT8)((r0 + r1) >> 1);
-				UINT8 g = (UINT8)((g0 + g1) >> 1);
-				UINT8 b = (UINT8)((b0 + b1) >> 1);
+				uint32_t color0 = line0[x];
+				uint32_t color1 = line1[x];
+				uint16_t r0 = (color0 >> 16) & 0x000000ff;
+				uint16_t g0 = (color0 >>  8) & 0x000000ff;
+				uint16_t b0 = (color0 >>  0) & 0x000000ff;
+				uint16_t r1 = (color1 >> 16) & 0x000000ff;
+				uint16_t g1 = (color1 >>  8) & 0x000000ff;
+				uint16_t b1 = (color1 >>  0) & 0x000000ff;
+				uint8_t r = (uint8_t)((r0 + r1) >> 1);
+				uint8_t g = (uint8_t)((g0 + g1) >> 1);
+				uint8_t b = (uint8_t)((b0 + b1) >> 1);
 				line2[x] = (r << 16) | (g << 8) | b;
 			}
 		}
 }
 
-UINT32 S3C24_CLASS_NAME::s3c24xx_video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t S3C24_CLASS_NAME::s3c24xx_video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_lcd.regs.lcdcon1 & (1 << 0))
 	{
@@ -767,13 +767,13 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_video_update(screen_device &screen, bitmap_rgb3
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
 {
-	UINT32 data = ((UINT32*)&m_lcd.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_lcd.regs)[offset];
 	switch (offset)
 	{
 		case S3C24XX_LCDCON1 :
 		{
 			// make sure line counter is going
-			UINT32 vpos = machine().first_screen()->vpos();
+			uint32_t vpos = machine().first_screen()->vpos();
 			if (vpos < m_lcd.vpos_min) vpos = m_lcd.vpos_min;
 			if (vpos > m_lcd.vpos_max) vpos = m_lcd.vpos_max;
 			data = (data & ~0xFFFC0000) | ((m_lcd.vpos_max - vpos) << 18);
@@ -781,7 +781,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
 		break;
 		case S3C24XX_LCDCON5 :
 		{
-			UINT32 vpos = machine().first_screen()->vpos();
+			uint32_t vpos = machine().first_screen()->vpos();
 			data = data & ~0x00018000;
 			if (vpos < m_lcd.vpos_min) data = data | 0x00000000;
 			if (vpos > m_lcd.vpos_max) data = data | 0x00018000;
@@ -796,9 +796,9 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure_tft()
 {
 	screen_device *screen = machine().first_screen();
-	UINT32 vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
+	uint32_t vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
 	double framerate, vclk;
-	UINT32 width, height;
+	uint32_t width, height;
 	rectangle visarea;
 	verboselog( *this, 5, "s3c24xx_lcd_configure_tft\n");
 	vspw = BITS( m_lcd.regs.lcdcon2, 5, 0);
@@ -830,15 +830,15 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_tft()
 	m_lcd.vpos_min = (vspw + 1) + (vbpd + 1);
 	m_lcd.vpos_max = m_lcd.vpos_min + (lineval + 1) - 1;
 	screen->configure( width, height, visarea, HZ_TO_ATTOSECONDS( m_lcd.framerate));
-	return TRUE;
+	return true;
 }
 
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 {
 	screen_device *screen = machine().first_screen();
-	UINT32 pnrmode, bppmode, clkval, lineval, wdly, hozval, lineblank, wlh, hclk;
+	uint32_t pnrmode, bppmode, clkval, lineval, wdly, hozval, lineblank, wlh, hclk;
 	double vclk, framerate;
-	UINT32 width, height;
+	uint32_t width, height;
 	rectangle visarea;
 	verboselog( *this, 5, "s3c24xx_lcd_configure_stn\n");
 	pnrmode = BITS( m_lcd.regs.lcdcon1, 6, 5);
@@ -853,7 +853,7 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 	verboselog( *this, 3, "LCD - pnrmode %d bppmode %d clkval %d lineval %d wdly %d hozval %d lineblank %d wlh %d hclk %d\n", pnrmode, bppmode, clkval, lineval, wdly, hozval, lineblank, wlh, hclk);
 	if (clkval == 0)
 	{
-		return FALSE;
+		return false;
 	}
 	vclk = (double)(hclk / ((clkval + 0) * 2));
 	verboselog( *this, 3, "LCD - vclk %f\n", vclk);
@@ -876,12 +876,12 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 	m_lcd.vpos_min = 0;
 	m_lcd.vpos_max = height - 1;
 	screen->configure( width, height, visarea, HZ_TO_ATTOSECONDS( m_lcd.framerate));
-	return TRUE;
+	return true;
 }
 
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure()
 {
-	UINT32 bppmode;
+	uint32_t bppmode;
 	verboselog( *this, 5, "s3c24xx_lcd_configure\n");
 	bppmode = BITS( m_lcd.regs.lcdcon1, 4, 1);
 	if ((bppmode & (1 << 3)) == 0)
@@ -925,9 +925,9 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_recalc()
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_w )
 {
-	UINT32 old_value = ((UINT32*)&m_lcd.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_lcd.regs)[offset];
 	verboselog( *this, 9, "(LCD) %08X <- %08X\n", S3C24XX_BASE_LCD + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_lcd.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_lcd.regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_LCDCON1 :
@@ -945,7 +945,7 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_w )
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_palette_r )
 {
-	UINT32 data = m_lcdpal.regs.data[offset];
+	uint32_t data = m_lcdpal.regs.data[offset];
 	verboselog( *this, 9, "(LCD) %08X -> %08X\n", S3C24XX_BASE_LCDPAL + (offset << 2), data);
 	return data;
 }
@@ -986,9 +986,9 @@ void S3C24_CLASS_NAME::s3c24xx_clkpow_reset()
 	clkpow->regs.clkslow = 4;
 }
 
-UINT32 S3C24_CLASS_NAME::s3c24xx_get_fclk()
+uint32_t S3C24_CLASS_NAME::s3c24xx_get_fclk()
 {
-	UINT32 mpllcon, clkslow, mdiv, pdiv, sdiv, fclk;
+	uint32_t mpllcon, clkslow, mdiv, pdiv, sdiv, fclk;
 	double temp1, temp2;
 	mpllcon = m_clkpow.regs.mpllcon;
 	mdiv = BITS( mpllcon, 19, 12);
@@ -1000,11 +1000,11 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_get_fclk()
 	temp1 = 2 * (mdiv + 8) * (double)clock();
 #endif
 	temp2 = (double)((pdiv + 2) * (1 << sdiv));
-	fclk = (UINT32)(temp1 / temp2);
+	fclk = (uint32_t)(temp1 / temp2);
 	clkslow = m_clkpow.regs.clkslow;
 	if (BIT( clkslow, 4) == 1)
 	{
-		UINT32 slow_val = BITS( clkslow, 2, 0);
+		uint32_t slow_val = BITS( clkslow, 2, 0);
 		if (slow_val > 0)
 		{
 			fclk = fclk / (2 * slow_val);
@@ -1013,7 +1013,7 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_get_fclk()
 	return fclk;
 }
 
-UINT32 S3C24_CLASS_NAME::s3c24xx_get_hclk()
+uint32_t S3C24_CLASS_NAME::s3c24xx_get_hclk()
 {
 #if defined(DEVICE_S3C2400) || defined(DEVICE_S3C2410)
 	return s3c24xx_get_fclk() / (BIT( m_clkpow.regs.clkdivn, 1) + 1);
@@ -1029,14 +1029,14 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_get_hclk()
 #endif
 }
 
-UINT32 S3C24_CLASS_NAME::s3c24xx_get_pclk()
+uint32_t S3C24_CLASS_NAME::s3c24xx_get_pclk()
 {
 	return s3c24xx_get_hclk() / (1 << BIT( m_clkpow.regs.clkdivn, 0));
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_clkpow_r )
 {
-	UINT32 data = ((UINT32*)&m_clkpow.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_clkpow.regs)[offset];
 	verboselog( *this, 9, "(CLKPOW) %08X -> %08X\n", S3C24XX_BASE_CLKPOW + (offset << 2), data);
 	return data;
 }
@@ -1044,7 +1044,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_clkpow_r )
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_clkpow_w )
 {
 	verboselog( *this, 9, "(CLKPOW) %08X <- %08X\n", S3C24XX_BASE_CLKPOW + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_clkpow.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_clkpow.regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_MPLLCON :
@@ -1080,7 +1080,7 @@ void S3C24_CLASS_NAME::s3c24xx_irq_reset()
 
 void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 {
-	UINT32 temp;
+	uint32_t temp;
 	// normal irq
 
 	if ((m_irq.regs.intpnd == 0) && (m_irq.regs.intoffset == 0)) // without this "touryuu" crashes
@@ -1088,7 +1088,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 		temp = (m_irq.regs.srcpnd & ~m_irq.regs.intmsk) & ~m_irq.regs.intmod;
 		if (temp != 0)
 		{
-			UINT32 int_type = 0;
+			uint32_t int_type = 0;
 			verboselog( *this, 5, "srcpnd %08X intmsk %08X intmod %08X\n", m_irq.regs.srcpnd, m_irq.regs.intmsk, m_irq.regs.intmod);
 			while ((temp & 1) == 0)
 			{
@@ -1121,7 +1121,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 	temp = (m_irq.regs.srcpnd & ~m_irq.regs.intmsk) & m_irq.regs.intmod;
 	if (temp != 0)
 	{
-		UINT32 int_type = 0;
+		uint32_t int_type = 0;
 		while ((temp & 1) == 0)
 		{
 			int_type++;
@@ -1145,7 +1145,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 	}
 }
 
-void S3C24_CLASS_NAME::s3c24xx_request_irq(UINT32 int_type)
+void S3C24_CLASS_NAME::s3c24xx_request_irq(uint32_t int_type)
 {
 	verboselog( *this, 5, "request irq %d\n", int_type);
 	m_irq.regs.srcpnd |= (1 << int_type);
@@ -1156,10 +1156,10 @@ void S3C24_CLASS_NAME::s3c24xx_request_irq(UINT32 int_type)
 
 void S3C24_CLASS_NAME::s3c24xx_check_pending_subirq()
 {
-	UINT32 temp = m_irq.regs.subsrcpnd & ~m_irq.regs.intsubmsk;
+	uint32_t temp = m_irq.regs.subsrcpnd & ~m_irq.regs.intsubmsk;
 	if (temp != 0)
 	{
-		UINT32 int_type = 0;
+		uint32_t int_type = 0;
 		while ((temp & 1) == 0)
 		{
 			int_type++;
@@ -1169,7 +1169,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_subirq()
 	}
 }
 
-ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_subirq( UINT32 int_type)
+ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_subirq( uint32_t int_type)
 {
 	verboselog( *this, 5, "request subirq %d\n", int_type);
 	m_irq.regs.subsrcpnd |= (1 << int_type);
@@ -1178,10 +1178,10 @@ ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_subirq( UINT32 int_type)
 
 void S3C24_CLASS_NAME::s3c24xx_check_pending_eint()
 {
-	UINT32 temp = m_gpio.regs.eintpend & ~m_gpio.regs.eintmask;
+	uint32_t temp = m_gpio.regs.eintpend & ~m_gpio.regs.eintmask;
 	if (temp != 0)
 	{
-		UINT32 int_type = 0;
+		uint32_t int_type = 0;
 		while ((temp & 1) == 0)
 		{
 			int_type++;
@@ -1198,7 +1198,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_eint()
 	}
 }
 
-ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_eint(UINT32 number)
+ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_eint(uint32_t number)
 {
 	verboselog( *this, 5, "request external interrupt %d\n", number);
 	if (number < 4)
@@ -1216,16 +1216,16 @@ ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_eint(UINT32 number)
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_irq_r )
 {
-	UINT32 data = ((UINT32*)&m_irq.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_irq.regs)[offset];
 	verboselog( *this, 9, "(IRQ) %08X -> %08X\n", S3C24XX_BASE_INT + (offset << 2), data);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_irq_w )
 {
-	UINT32 old_value = ((UINT32*)&m_irq.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_irq.regs)[offset];
 	verboselog( *this, 9, "(IRQ) %08X <- %08X\n", S3C24XX_BASE_INT + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_irq.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_irq.regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_SRCPND :
@@ -1275,10 +1275,10 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_reset()
 	}
 }
 
-UINT16 S3C24_CLASS_NAME::s3c24xx_pwm_calc_observation(int ch)
+uint16_t S3C24_CLASS_NAME::s3c24xx_pwm_calc_observation(int ch)
 {
 	double timeleft, x1, x2;
-	UINT32 cnto;
+	uint32_t cnto;
 	timeleft = m_pwm.timer[ch]->remaining( ).as_double();
 //  printf( "timeleft %f freq %d cntb %d cmpb %d\n", timeleft, m_pwm.freq[ch], m_pwm.cnt[ch], m_pwm.cmp[ch]);
 	x1 = 1 / ((double)m_pwm.freq[ch] / (m_pwm.cnt[ch]- m_pwm.cmp[ch] + 1));
@@ -1291,7 +1291,7 @@ UINT16 S3C24_CLASS_NAME::s3c24xx_pwm_calc_observation(int ch)
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_pwm_r )
 {
-	UINT32 data = ((UINT32*)&m_pwm.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_pwm.regs)[offset];
 	switch (offset)
 	{
 		case S3C24XX_TCNTO0 :
@@ -1329,7 +1329,7 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_start(int timer)
 	const int mux_table[] = { 2, 4, 8, 16};
 	const int prescaler_shift[] = { 0, 0, 8, 8, 8};
 	const int mux_shift[] = { 0, 4, 8, 12, 16};
-	UINT32 pclk, prescaler, mux, cnt, cmp, auto_reload;
+	uint32_t pclk, prescaler, mux, cnt, cmp, auto_reload;
 	double freq, hz;
 	verboselog( *this, 1, "PWM %d start\n", timer);
 	pclk = s3c24xx_get_pclk();
@@ -1431,9 +1431,9 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_recalc(int timer)
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_pwm_w )
 {
-	UINT32 old_value = ((UINT32*)&m_pwm.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_pwm.regs)[offset];
 	verboselog( *this, 9, "(PWM) %08X <- %08X\n", S3C24XX_BASE_PWM + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_pwm.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_pwm.regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_TCON :
@@ -1501,10 +1501,10 @@ void S3C24_CLASS_NAME::s3c24xx_dma_reload(int ch)
 void S3C24_CLASS_NAME::s3c24xx_dma_trigger(int ch)
 {
 	s3c24xx_dma_regs_t *regs = &m_dma[ch].regs;
-	UINT32 curr_tc, curr_src, curr_dst;
+	uint32_t curr_tc, curr_src, curr_dst;
 	address_space &space = m_cpu->memory().space( AS_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode, tsz;
-	const UINT32 ch_int[] = { S3C24XX_INT_DMA0, S3C24XX_INT_DMA1, S3C24XX_INT_DMA2, S3C24XX_INT_DMA3};
+	const uint32_t ch_int[] = { S3C24XX_INT_DMA0, S3C24XX_INT_DMA1, S3C24XX_INT_DMA2, S3C24XX_INT_DMA3};
 	verboselog( *this, 5, "DMA %d trigger\n", ch);
 	curr_tc = S3C24XX_DSTAT_GET_CURR_TC( regs->dstat);
 	dsz = S3C24XX_DCON_GET_DSZ( regs->dcon);
@@ -1584,9 +1584,9 @@ void S3C24_CLASS_NAME::s3c24xx_dma_request_pwm()
 
 void S3C24_CLASS_NAME::s3c24xx_dma_start(int ch)
 {
-	UINT32 addr_src, addr_dst, tc;
+	uint32_t addr_src, addr_dst, tc;
 	s3c24xx_dma_regs_t *regs = &m_dma[ch].regs;
-	UINT32 dsz, tsz, reload;
+	uint32_t dsz, tsz, reload;
 	int inc_src, inc_dst, _int, servmode, swhwsel, hwsrcsel;
 	verboselog( *this, 1, "DMA %d start\n", ch);
 	addr_src = S3C24XX_DISRC_GET_SADDR( regs->disrc);
@@ -1632,15 +1632,15 @@ void S3C24_CLASS_NAME::s3c24xx_dma_recalc(int ch)
 	}
 }
 
-UINT32 S3C24_CLASS_NAME::s3c24xx_dma_r(UINT32 ch, UINT32 offset)
+uint32_t S3C24_CLASS_NAME::s3c24xx_dma_r(uint32_t ch, uint32_t offset)
 {
-	return ((UINT32*)&m_dma[ch].regs)[offset];
+	return ((uint32_t*)&m_dma[ch].regs)[offset];
 }
 
-void S3C24_CLASS_NAME::s3c24xx_dma_w(UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
+void S3C24_CLASS_NAME::s3c24xx_dma_w(uint32_t ch, uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
-	UINT32 old_value = ((UINT32*)&m_dma[ch].regs)[offset];
-	COMBINE_DATA(&((UINT32*)&m_dma[ch].regs)[offset]);
+	uint32_t old_value = ((uint32_t*)&m_dma[ch].regs)[offset];
+	COMBINE_DATA(&((uint32_t*)&m_dma[ch].regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_DCON :
@@ -1667,28 +1667,28 @@ void S3C24_CLASS_NAME::s3c24xx_dma_w(UINT32 ch, UINT32 offset, UINT32 data, UINT
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_0_r )
 {
-	UINT32 data = s3c24xx_dma_r( 0, offset);
+	uint32_t data = s3c24xx_dma_r( 0, offset);
 	verboselog( *this, 9, "(DMA 0) %08X -> %08X\n", S3C24XX_BASE_DMA_0 + (offset << 2), data);
 	return data;
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_1_r )
 {
-	UINT32 data = s3c24xx_dma_r( 1, offset);
+	uint32_t data = s3c24xx_dma_r( 1, offset);
 	verboselog( *this, 9, "(DMA 1) %08X -> %08X\n", S3C24XX_BASE_DMA_1 + (offset << 2), data);
 	return data;
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_2_r )
 {
-	UINT32 data = s3c24xx_dma_r( 2, offset);
+	uint32_t data = s3c24xx_dma_r( 2, offset);
 	verboselog( *this, 9, "(DMA 2) %08X -> %08X\n", S3C24XX_BASE_DMA_2 + (offset << 2), data);
 	return data;
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_3_r )
 {
-	UINT32 data = s3c24xx_dma_r( 3, offset);
+	uint32_t data = s3c24xx_dma_r( 3, offset);
 	verboselog( *this, 9, "(DMA 3) %08X -> %08X\n", S3C24XX_BASE_DMA_3 + (offset << 2), data);
 	return data;
 }
@@ -1753,7 +1753,7 @@ void S3C24_CLASS_NAME::s3c24xx_gpio_reset()
 	#endif
 }
 
-UINT32 S3C24_CLASS_NAME::iface_gpio_port_r(int port, UINT32 mask)
+uint32_t S3C24_CLASS_NAME::iface_gpio_port_r(int port, uint32_t mask)
 {
 	if (!m_port_r_cb.isnull())
 	{
@@ -1768,7 +1768,7 @@ UINT32 S3C24_CLASS_NAME::iface_gpio_port_r(int port, UINT32 mask)
 	}
 }
 
-void S3C24_CLASS_NAME::iface_gpio_port_w(int port, UINT32 mask, UINT32 data)
+void S3C24_CLASS_NAME::iface_gpio_port_w(int port, uint32_t mask, uint32_t data)
 {
 	if (!m_port_w_cb.isnull())
 	{
@@ -1776,9 +1776,9 @@ void S3C24_CLASS_NAME::iface_gpio_port_w(int port, UINT32 mask, UINT32 data)
 	}
 }
 
-UINT16 S3C24_CLASS_NAME::s3c24xx_gpio_get_mask( UINT32 con, int val)
+uint16_t S3C24_CLASS_NAME::s3c24xx_gpio_get_mask( uint32_t con, int val)
 {
-	UINT16 mask = 0;
+	uint16_t mask = 0;
 	for (int i = 0; i < 16; i++)
 	{
 		if (((con >> (i << 1)) & 3) == val)
@@ -1792,7 +1792,7 @@ UINT16 S3C24_CLASS_NAME::s3c24xx_gpio_get_mask( UINT32 con, int val)
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_gpio_r )
 {
 	s3c24xx_gpio_t *gpio = &m_gpio;
-	UINT32 data = ((UINT32*)&m_gpio.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_gpio.regs)[offset];
 	switch (offset)
 	{
 		case S3C24XX_GPADAT :
@@ -1853,10 +1853,10 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_gpio_w )
 {
 	s3c24xx_gpio_t *gpio = &m_gpio;
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
-	UINT32 old_value = ((UINT32*)&m_gpio.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_gpio.regs)[offset];
 #endif
 	verboselog( *this, 9, "(GPIO) %08X <- %08X\n", S3C24XX_BASE_GPIO + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_gpio.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_gpio.regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_GPADAT :
@@ -1947,7 +1947,7 @@ void S3C24_CLASS_NAME::s3c24xx_memcon_reset()
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_memcon_r )
 {
 	assert(offset < ARRAY_LENGTH(m_memcon.regs.data));
-	UINT32 data = m_memcon.regs.data[offset];
+	uint32_t data = m_memcon.regs.data[offset];
 	verboselog( *this, 9, "(MEMCON) %08X -> %08X\n", S3C24XX_BASE_MEMCON + (offset << 2), data);
 	return data;
 }
@@ -1968,7 +1968,7 @@ void S3C24_CLASS_NAME::s3c24xx_usb_host_reset()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_host_r )
 {
-	UINT32 data = m_usbhost.regs.data[offset];
+	uint32_t data = m_usbhost.regs.data[offset];
 	switch (offset)
 	{
 		// HcCommandStatus
@@ -2021,9 +2021,9 @@ void S3C24_CLASS_NAME::s3c24xx_uart_reset()
 	}
 }
 
-UINT32 S3C24_CLASS_NAME::s3c24xx_uart_r(UINT32 ch, UINT32 offset)
+uint32_t S3C24_CLASS_NAME::s3c24xx_uart_r(uint32_t ch, uint32_t offset)
 {
-	UINT32 data = ((UINT32*)&m_uart[ch].regs)[offset];
+	uint32_t data = ((uint32_t*)&m_uart[ch].regs)[offset];
 	switch (offset)
 	{
 		case S3C24XX_UTRSTAT :
@@ -2033,7 +2033,7 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_uart_r(UINT32 ch, UINT32 offset)
 		break;
 		case S3C24XX_URXH :
 		{
-			UINT8 rxdata = data & 0xFF;
+			uint8_t rxdata = data & 0xFF;
 			verboselog( *this, 5, "UART %d read %02X (%c)\n", ch, rxdata, ((rxdata >= 32) && (rxdata < 128)) ? (char)rxdata : '?');
 			m_uart[ch].regs.utrstat &= ~1; // [bit 0] Receive buffer data ready
 		}
@@ -2042,9 +2042,9 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_uart_r(UINT32 ch, UINT32 offset)
 	return data;
 }
 
-void S3C24_CLASS_NAME::s3c24xx_uart_w(UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
+void S3C24_CLASS_NAME::s3c24xx_uart_w(uint32_t ch, uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&((UINT32*)&m_uart[ch].regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_uart[ch].regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_UFCON :
@@ -2054,7 +2054,7 @@ void S3C24_CLASS_NAME::s3c24xx_uart_w(UINT32 ch, UINT32 offset, UINT32 data, UIN
 		break;
 		case S3C24XX_UTXH :
 		{
-			UINT8 txdata = data & 0xFF;
+			uint8_t txdata = data & 0xFF;
 			verboselog( *this, 5, "UART %d write %02X (%c)\n", ch, txdata, ((txdata >= 32) && (txdata < 128)) ? (char)txdata : '?');
 #ifdef UART_PRINTF
 			printf( "%c", ((txdata >= 32) && (txdata < 128)) ? (char)txdata : '?');
@@ -2066,14 +2066,14 @@ void S3C24_CLASS_NAME::s3c24xx_uart_w(UINT32 ch, UINT32 offset, UINT32 data, UIN
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_0_r )
 {
-	UINT32 data = s3c24xx_uart_r( 0, offset);
+	uint32_t data = s3c24xx_uart_r( 0, offset);
 //  verboselog( *this, 9, "(UART 0) %08X -> %08X\n", S3C24XX_BASE_UART_0 + (offset << 2), data);
 	return data;
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_1_r )
 {
-	UINT32 data = s3c24xx_uart_r( 1, offset);
+	uint32_t data = s3c24xx_uart_r( 1, offset);
 //  verboselog( *this, 9, "(UART 1) %08X -> %08X\n", S3C24XX_BASE_UART_1 + (offset << 2), data);
 	return data;
 }
@@ -2082,7 +2082,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_1_r )
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_2_r )
 {
-	UINT32 data = s3c24xx_uart_r( 2, offset);
+	uint32_t data = s3c24xx_uart_r( 2, offset);
 //  verboselog( *this, 9, "(UART 2) %08X -> %08X\n", S3C24XX_BASE_UART_2 + (offset << 2), data);
 	return data;
 }
@@ -2111,7 +2111,7 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_2_w )
 
 #endif
 
-void S3C24_CLASS_NAME::s3c24xx_uart_fifo_w(int uart, UINT8 data)
+void S3C24_CLASS_NAME::s3c24xx_uart_fifo_w(int uart, uint8_t data)
 {
 //  printf( "s3c24xx_uart_fifo_w (%c)\n", data);
 	m_uart[uart].regs.urxh = data;
@@ -2143,7 +2143,7 @@ void S3C24_CLASS_NAME::s3c24xx_usb_device_reset()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_device_r )
 {
-	UINT32 data = m_usbdev.regs.data[offset];
+	uint32_t data = m_usbdev.regs.data[offset];
 	verboselog( *this, 9, "(USB D) %08X -> %08X\n", S3C24XX_BASE_USBDEV + (offset << 2), data);
 	return data;
 }
@@ -2168,10 +2168,10 @@ void S3C24_CLASS_NAME::s3c24xx_wdt_reset()
 
 #if defined(DEVICE_S3C2410)
 
-UINT16 S3C24_CLASS_NAME::s3c24xx_wdt_calc_current_count()
+uint16_t S3C24_CLASS_NAME::s3c24xx_wdt_calc_current_count()
 {
 	double timeleft, x1, x2;
-	UINT32 cnt;
+	uint32_t cnt;
 	timeleft = m_wdt.timer->remaining( ).as_double();
 //  printf( "timeleft %f freq %d cnt %d\n", timeleft, m_wdt.freq, m_wdt.cnt);
 	x1 = 1 / ((double)m_wdt.freq / m_wdt.cnt);
@@ -2184,7 +2184,7 @@ UINT16 S3C24_CLASS_NAME::s3c24xx_wdt_calc_current_count()
 
 #else
 
-UINT16 S3C24_CLASS_NAME::s3c24xx_wdt_calc_current_count()
+uint16_t S3C24_CLASS_NAME::s3c24xx_wdt_calc_current_count()
 {
 	return 0;
 }
@@ -2193,7 +2193,7 @@ UINT16 S3C24_CLASS_NAME::s3c24xx_wdt_calc_current_count()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_wdt_r )
 {
-	UINT32 data = ((UINT32*)&m_wdt.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_wdt.regs)[offset];
 	switch (offset)
 	{
 		case S3C24XX_WTCNT :
@@ -2212,7 +2212,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_wdt_r )
 
 void S3C24_CLASS_NAME::s3c24xx_wdt_start()
 {
-	UINT32 pclk, prescaler, clock;
+	uint32_t pclk, prescaler, clock;
 	double freq, hz;
 	verboselog( *this, 1, "WDT start\n");
 	pclk = s3c24xx_get_pclk();
@@ -2249,9 +2249,9 @@ void S3C24_CLASS_NAME::s3c24xx_wdt_recalc()
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_wdt_w )
 {
-	UINT32 old_value = ((UINT32*)&m_wdt.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_wdt.regs)[offset];
 	verboselog( *this, 9, "(WDT) %08X <- %08X\n", S3C24XX_BASE_WDT + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_wdt.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_wdt.regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_WTCON :
@@ -2341,9 +2341,9 @@ void S3C24_CLASS_NAME::i2c_send_stop()
 	iface_i2c_scl_w( 0);
 }
 
-UINT8 S3C24_CLASS_NAME::i2c_receive_byte(int ack)
+uint8_t S3C24_CLASS_NAME::i2c_receive_byte(int ack)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	verboselog( *this, 5, "i2c_receive_byte ...\n");
 	iface_i2c_sda_w( 1);
 	for (int i = 0; i < 8; i++)
@@ -2360,7 +2360,7 @@ UINT8 S3C24_CLASS_NAME::i2c_receive_byte(int ack)
 	return data;
 }
 
-int S3C24_CLASS_NAME::i2c_send_byte(UINT8 data)
+int S3C24_CLASS_NAME::i2c_send_byte(uint8_t data)
 {
 	int ack;
 	verboselog( *this, 5, "i2c_send_byte ...\n");
@@ -2416,7 +2416,7 @@ void S3C24_CLASS_NAME::iic_resume()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_r )
 {
-	UINT32 data = ((UINT32*)&m_iic.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_iic.regs)[offset];
 	switch (offset)
 	{
 		case S3C24XX_IICSTAT :
@@ -2431,9 +2431,9 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_r )
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_w )
 {
-	UINT32 old_value = ((UINT32*)&m_iic.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_iic.regs)[offset];
 	verboselog( *this, 9, "(IIC) %08X <- %08X\n", S3C24XX_BASE_IIC + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_iic.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_iic.regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_IICCON :
@@ -2531,7 +2531,7 @@ void S3C24_CLASS_NAME::s3c24xx_iis_reset()
 	iis->timer->adjust( attotime::never);
 }
 
-void S3C24_CLASS_NAME::iface_i2s_data_w(int ch, UINT16 data)
+void S3C24_CLASS_NAME::iface_i2s_data_w(int ch, uint16_t data)
 {
 	if (!m_data_w_cb.isnull())
 	{
@@ -2541,7 +2541,7 @@ void S3C24_CLASS_NAME::iface_i2s_data_w(int ch, UINT16 data)
 
 void S3C24_CLASS_NAME::s3c24xx_iis_start()
 {
-	const UINT32 codeclk_table[] = { 256, 384};
+	const uint32_t codeclk_table[] = { 256, 384};
 	double freq;
 	int pclk, prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk;
 	verboselog( *this, 1, "IIS start\n");
@@ -2575,7 +2575,7 @@ void S3C24_CLASS_NAME::s3c24xx_iis_recalc()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_r )
 {
-	UINT32 data = ((UINT32*)&m_iis.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_iis.regs)[offset];
 #if 0
 	switch (offset)
 	{
@@ -2592,9 +2592,9 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_r )
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_w )
 {
-	UINT32 old_value = ((UINT32*)&m_iis.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_iis.regs)[offset];
 	verboselog( *this, 9, "(IIS) %08X <- %08X\n", S3C24XX_BASE_IIS + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_iis.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_iis.regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_IISCON :
@@ -2646,7 +2646,7 @@ void S3C24_CLASS_NAME::s3c24xx_rtc_reset()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_r )
 {
-	UINT32 data = ((UINT32*)&m_rtc.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_rtc.regs)[offset];
 	verboselog( *this, 9, "(RTC) %08X -> %08X\n", S3C24XX_BASE_RTC + (offset << 2), data);
 	return data;
 }
@@ -2655,7 +2655,7 @@ void S3C24_CLASS_NAME::s3c24xx_rtc_recalc()
 {
 	if (m_rtc.regs.ticnt & (1 << 7))
 	{
-		UINT32 ttc;
+		uint32_t ttc;
 		double freq;
 		ttc = BITS( m_rtc.regs.ticnt, 6, 0);
 		freq = 128 / (ttc + 1);
@@ -2671,7 +2671,7 @@ void S3C24_CLASS_NAME::s3c24xx_rtc_recalc()
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_w )
 {
 	verboselog( *this, 9, "(RTC) %08X <- %08X\n", S3C24XX_BASE_RTC + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_rtc.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_rtc.regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_TICNT :
@@ -2690,7 +2690,7 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_timer_tick_count_exp )
 
 void S3C24_CLASS_NAME::s3c24xx_rtc_update()
 {
-	UINT32 bcdday_max;
+	uint32_t bcdday_max;
 	// increase second
 	m_rtc.regs.bcdsec = bcd_adjust( m_rtc.regs.bcdsec + 1);
 	if (m_rtc.regs.bcdsec >= 0x60)
@@ -2771,7 +2771,7 @@ void S3C24_CLASS_NAME::s3c24xx_adc_reset()
 	#endif
 }
 
-UINT32 S3C24_CLASS_NAME::iface_adc_data_r(int ch)
+uint32_t S3C24_CLASS_NAME::iface_adc_data_r(int ch)
 {
 	if (!m_data_r_cb.isnull())
 	{
@@ -2792,7 +2792,7 @@ UINT32 S3C24_CLASS_NAME::iface_adc_data_r(int ch)
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_adc_r )
 {
-	UINT32 data = ((UINT32*)&m_adc.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_adc.regs)[offset];
 	switch (offset)
 	{
 #if defined(DEVICE_S3C2400)
@@ -2830,9 +2830,9 @@ void S3C24_CLASS_NAME::s3c24xx_adc_start()
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_adc_w )
 {
-	UINT32 old_value = ((UINT32*)&m_adc.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_adc.regs)[offset];
 	verboselog( *this, 9, "(ADC) %08X <- %08X\n", S3C24XX_BASE_ADC + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_adc.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_adc.regs)[offset]);
 	switch (offset)
 	{
 		case S3C24XX_ADCCON :
@@ -2872,9 +2872,9 @@ void S3C24_CLASS_NAME::s3c24xx_spi_reset()
 	}
 }
 
-UINT32 S3C24_CLASS_NAME::s3c24xx_spi_r(UINT32 ch, UINT32 offset)
+uint32_t S3C24_CLASS_NAME::s3c24xx_spi_r(uint32_t ch, uint32_t offset)
 {
-	UINT32 data = ((UINT32*)&m_spi[ch].regs)[offset];
+	uint32_t data = ((uint32_t*)&m_spi[ch].regs)[offset];
 	switch (offset)
 	{
 		case S3C24XX_SPSTA :
@@ -2886,14 +2886,14 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_spi_r(UINT32 ch, UINT32 offset)
 	return data;
 }
 
-void S3C24_CLASS_NAME::s3c24xx_spi_w(UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
+void S3C24_CLASS_NAME::s3c24xx_spi_w(uint32_t ch, uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&((UINT32*)&m_spi[ch].regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_spi[ch].regs)[offset]);
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_0_r )
 {
-	UINT32 data = s3c24xx_spi_r( 0, offset);
+	uint32_t data = s3c24xx_spi_r( 0, offset);
 	verboselog( *this, 9, "(SPI 0) %08X -> %08X\n", S3C24XX_BASE_SPI_0 + (offset << 2), data);
 	return data;
 }
@@ -2902,7 +2902,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_0_r )
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_1_r )
 {
-	UINT32 data = s3c24xx_spi_r( 1, offset);
+	uint32_t data = s3c24xx_spi_r( 1, offset);
 	verboselog( *this, 9, "(SPI 1) %08X -> %08X\n", S3C24XX_BASE_SPI_1 + (offset << 2), data);
 	return data;
 }
@@ -2937,7 +2937,7 @@ void S3C24_CLASS_NAME::s3c24xx_mmc_reset()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_mmc_r )
 {
-	UINT32 data = m_mmc.regs.data[offset];
+	uint32_t data = m_mmc.regs.data[offset];
 	verboselog( *this, 9, "(MMC) %08X -> %08X\n", S3C24XX_BASE_MMC + (offset << 2), data);
 	return data;
 }
@@ -2968,7 +2968,7 @@ void S3C24_CLASS_NAME::s3c24xx_sdi_reset()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_sdi_r )
 {
-	UINT32 data = m_sdi.regs.data[offset];
+	uint32_t data = m_sdi.regs.data[offset];
 	verboselog( *this, 9, "(SDI) %08X -> %08X\n", S3C24XX_BASE_SDI + (offset << 2), data);
 	return data;
 }
@@ -2995,7 +2995,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_reset()
 	#endif
 }
 
-void S3C24_CLASS_NAME::iface_nand_command_w(UINT8 data)
+void S3C24_CLASS_NAME::iface_nand_command_w(uint8_t data)
 {
 	if (!m_command_w_cb.isnull())
 	{
@@ -3003,7 +3003,7 @@ void S3C24_CLASS_NAME::iface_nand_command_w(UINT8 data)
 	}
 }
 
-void S3C24_CLASS_NAME::iface_nand_address_w(UINT8 data)
+void S3C24_CLASS_NAME::iface_nand_address_w(uint8_t data)
 {
 	if (!m_address_w_cb.isnull())
 	{
@@ -3011,7 +3011,7 @@ void S3C24_CLASS_NAME::iface_nand_address_w(UINT8 data)
 	}
 }
 
-UINT8 S3C24_CLASS_NAME::iface_nand_data_r()
+uint8_t S3C24_CLASS_NAME::iface_nand_data_r()
 {
 	if (!m_nand_data_r_cb.isnull())
 	{
@@ -3023,7 +3023,7 @@ UINT8 S3C24_CLASS_NAME::iface_nand_data_r()
 	}
 }
 
-void S3C24_CLASS_NAME::iface_nand_data_w(UINT8 data)
+void S3C24_CLASS_NAME::iface_nand_data_w(uint8_t data)
 {
 	if (!m_nand_data_w_cb.isnull())
 	{
@@ -3031,10 +3031,10 @@ void S3C24_CLASS_NAME::iface_nand_data_w(UINT8 data)
 	}
 }
 
-void S3C24_CLASS_NAME::nand_update_mecc( UINT8 *ecc, int pos, UINT8 data)
+void S3C24_CLASS_NAME::nand_update_mecc( uint8_t *ecc, int pos, uint8_t data)
 {
 	int bit[8];
-	UINT8 temp;
+	uint8_t temp;
 	bit[0] = (data >> 0) & 1;
 	bit[1] = (data >> 1) & 1;
 	bit[2] = (data >> 2) & 1;
@@ -3067,10 +3067,10 @@ void S3C24_CLASS_NAME::nand_update_mecc( UINT8 *ecc, int pos, UINT8 data)
 
 #if defined(DEVICE_S3C2440)
 
-void S3C24_CLASS_NAME::nand_update_secc( UINT8 *ecc, int pos, UINT8 data)
+void S3C24_CLASS_NAME::nand_update_secc( uint8_t *ecc, int pos, uint8_t data)
 {
 	int bit[8];
-	UINT8 temp;
+	uint8_t temp;
 	bit[0] = (data >> 0) & 1;
 	bit[1] = (data >> 1) & 1;
 	bit[2] = (data >> 2) & 1;
@@ -3096,10 +3096,10 @@ void S3C24_CLASS_NAME::nand_update_secc( UINT8 *ecc, int pos, UINT8 data)
 
 #endif
 
-void S3C24_CLASS_NAME::s3c24xx_nand_update_ecc(UINT8 data)
+void S3C24_CLASS_NAME::s3c24xx_nand_update_ecc(uint8_t data)
 {
 	s3c24xx_nand_t *nand = &m_nand;
-	UINT8 temp[4];
+	uint8_t temp[4];
 #if defined(DEVICE_S3C2410)
 	temp[0] = nand->mecc[0];
 	temp[1] = nand->mecc[1];
@@ -3129,29 +3129,29 @@ void S3C24_CLASS_NAME::s3c24xx_nand_update_ecc(UINT8 data)
 #endif
 }
 
-void S3C24_CLASS_NAME::s3c24xx_nand_command_w(UINT8 data)
+void S3C24_CLASS_NAME::s3c24xx_nand_command_w(uint8_t data)
 {
 	verboselog( *this, 5, "NAND write command %02X\n", data);
 	m_nand.data_count = 0;
 	iface_nand_command_w( data);
 }
 
-void S3C24_CLASS_NAME::s3c24xx_nand_address_w(UINT8 data)
+void S3C24_CLASS_NAME::s3c24xx_nand_address_w(uint8_t data)
 {
 	verboselog( *this, 5, "NAND write address %02X\n", data);
 	m_nand.data_count = 0;
 	iface_nand_address_w( data);
 }
 
-UINT8 S3C24_CLASS_NAME::s3c24xx_nand_data_r()
+uint8_t S3C24_CLASS_NAME::s3c24xx_nand_data_r()
 {
-	UINT8 data = iface_nand_data_r();
+	uint8_t data = iface_nand_data_r();
 	verboselog( *this, 5, "NAND read data %02X [%04X]\n", data, m_nand.data_count++);
 	s3c24xx_nand_update_ecc( data);
 	return data;
 }
 
-void S3C24_CLASS_NAME::s3c24xx_nand_data_w(UINT8 data)
+void S3C24_CLASS_NAME::s3c24xx_nand_data_w(uint8_t data)
 {
 	verboselog( *this, 5, "NAND write data %02X [%04X]\n", data, m_nand.data_count++);
 	iface_nand_data_w( data);
@@ -3160,7 +3160,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_data_w(UINT8 data)
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_nand_r )
 {
-	UINT32 data = ((UINT32*)&m_nand.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_nand.regs)[offset];
 	switch (offset)
 	{
 		case S3C24XX_NFDATA :
@@ -3226,9 +3226,9 @@ void S3C24_CLASS_NAME::s3c24xx_nand_init_ecc()
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_nand_w )
 {
-	UINT32 old_value = ((UINT32*)&m_nand.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_nand.regs)[offset];
 	verboselog( *this, 9, "(NAND) %08X <- %08X (%08X)\n", S3C24XX_BASE_NAND + (offset << 2), data, mem_mask);
-	COMBINE_DATA(&((UINT32*)&m_nand.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_nand.regs)[offset]);
 	switch (offset)
 	{
 #if defined(DEVICE_S3C2410)
@@ -3324,7 +3324,7 @@ void S3C24_CLASS_NAME::s3c24xx_cam_reset()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_cam_r )
 {
-	UINT32 data = m_cam.regs.data[offset];
+	uint32_t data = m_cam.regs.data[offset];
 	verboselog( *this, 9, "(CAM) %08X -> %08X\n", S3C24XX_BASE_CAM + (offset << 2), data);
 	return data;
 }
@@ -3349,7 +3349,7 @@ void S3C24_CLASS_NAME::s3c24xx_ac97_reset()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_ac97_r )
 {
-	UINT32 data = m_ac97.regs.data[offset];
+	uint32_t data = m_ac97.regs.data[offset];
 	verboselog( *this, 9, "(AC97) %08X -> %08X\n", S3C24XX_BASE_AC97 + (offset << 2), data);
 	return data;
 }
@@ -3373,7 +3373,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_auto_boot()
 	if ((om0 == 0) && (om1 == 0))
 	{
 			int ncon = iface_core_pin_r( S3C24XX_CORE_PIN_NCON);
-		UINT8 *ptr = m_steppingstone;
+		uint8_t *ptr = m_steppingstone;
 		int page_size, address_cycle;
 		#if defined(DEVICE_S3C2410)
 		page_size = 512;
@@ -3386,7 +3386,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_auto_boot()
 			address_cycle = 4; // byte-page-page-page
 		}
 		#elif defined(DEVICE_S3C2440)
-		UINT32 port_g = iface_gpio_port_r( S3C24XX_GPIO_PORT_G, 0);
+		uint32_t port_g = iface_gpio_port_r( S3C24XX_GPIO_PORT_G, 0);
 		if (ncon == 0)
 		{
 			if (BIT( port_g, 13) == 0)

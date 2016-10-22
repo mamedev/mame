@@ -48,8 +48,8 @@ class hfe_format : public floppy_image_format_t
 public:
 	hfe_format();
 
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
-	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
+	virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) override;
 	virtual bool save(io_generic *io, floppy_image *image) override;
 
 	virtual const char *name() const override;
@@ -61,8 +61,8 @@ public:
 	void set_encoding(encoding_t enc) { m_selected_encoding = enc; }
 
 private:
-	void generate_track_from_hfe_bitstream(int track, int head, int samplelength, const UINT8 *trackbuf, int track_end, floppy_image *image);
-	void generate_hfe_bitstream_from_track(int track, int head, int& samplelength, encoding_t& encoding, UINT8 *trackbuf, int track_end, floppy_image *image);
+	void generate_track_from_hfe_bitstream(int track, int head, int samplelength, const uint8_t *trackbuf, int track_end, floppy_image *image);
+	void generate_hfe_bitstream_from_track(int track, int head, int& samplelength, encoding_t& encoding, uint8_t *trackbuf, int track_end, floppy_image *image);
 
 	// Header fields from the HFE format
 	int m_cylinders;                 // Number of track in the file

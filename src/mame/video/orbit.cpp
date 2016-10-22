@@ -18,7 +18,7 @@ WRITE8_MEMBER(orbit_state::orbit_playfield_w)
 
 TILE_GET_INFO_MEMBER(orbit_state::get_tile_info)
 {
-	UINT8 code = m_playfield_ram[tile_index];
+	uint8_t code = m_playfield_ram[tile_index];
 	int flags = 0;
 
 	if (BIT(code, 6))
@@ -38,7 +38,7 @@ void orbit_state::video_start()
 
 void orbit_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT8* p = m_sprite_ram;
+	const uint8_t* p = m_sprite_ram;
 
 	int i;
 
@@ -77,7 +77,7 @@ void orbit_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 }
 
 
-UINT32 orbit_state::screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t orbit_state::screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_flip_screen = ioport("DSW2")->read() & 8;
 

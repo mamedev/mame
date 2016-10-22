@@ -50,7 +50,7 @@ const tiny_rom_entry *cumana_floppy_disk_interface_t::device_rom_region() const
 //  cumana_floppy_disk_interface_t - constructor
 //-------------------------------------------------
 
-cumana_floppy_disk_interface_t::cumana_floppy_disk_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cumana_floppy_disk_interface_t::cumana_floppy_disk_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CUMANA_FLOPPY_DISK_INTERFACE, "Cumana Floppy Disk Interface", tag, owner, clock, "ql_cumanafdi", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this)
 {
@@ -70,7 +70,7 @@ void cumana_floppy_disk_interface_t::device_start()
 //  read -
 //-------------------------------------------------
 
-UINT8 cumana_floppy_disk_interface_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t cumana_floppy_disk_interface_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -80,6 +80,6 @@ UINT8 cumana_floppy_disk_interface_t::read(address_space &space, offs_t offset, 
 //  write -
 //-------------------------------------------------
 
-void cumana_floppy_disk_interface_t::write(address_space &space, offs_t offset, UINT8 data)
+void cumana_floppy_disk_interface_t::write(address_space &space, offs_t offset, uint8_t data)
 {
 }

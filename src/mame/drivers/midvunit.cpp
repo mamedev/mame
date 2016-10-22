@@ -97,8 +97,8 @@ MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 
 READ32_MEMBER(midvunit_state::port0_r)
 {
-	UINT16 val = ioport("IN0")->read();
-	UINT16 diff = val ^ m_last_port0;
+	uint16_t val = ioport("IN0")->read();
+	uint16_t diff = val ^ m_last_port0;
 
 	/* make sure the shift controls are mutually exclusive */
 	if ((diff & 0x0400) && !(val & 0x0400))
@@ -187,7 +187,7 @@ READ32_MEMBER(midvunit_state::midvunit_cmos_r)
 
 WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 {
-	UINT16 olddata = m_control_data;
+	uint16_t olddata = m_control_data;
 	COMBINE_DATA(&m_control_data);
 
 	/* bit 7 is the LED */
@@ -207,7 +207,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 
 WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 {
-	UINT16 olddata = m_control_data;
+	uint16_t olddata = m_control_data;
 	COMBINE_DATA(&m_control_data);
 
 	/* bit 11 is the DCS sound reset */
@@ -246,7 +246,7 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = (m_timer[which]->time_elapsed() * m_timer_rate).as_double();
+		int32_t result = (m_timer[which]->time_elapsed() * m_timer_rate).as_double();
 //      logerror("%06X:tms32031_control_r(%02X) = %08X\n", space.device().safe_pc(), offset, result);
 		return result;
 	}
@@ -325,7 +325,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
  *************************************/
 
 /* values from offset 3, 6, and 10 must add up to 0x904752a2 */
-static const UINT32 bit_data[0x10] =
+static const uint32_t bit_data[0x10] =
 {
 	0x3017c636,0x3017c636,0x3017c636,0x3017c636,
 	0x3017c636,0x3017c636,0x3017c636,0x3017c636,
@@ -387,8 +387,8 @@ void midvunit_state::set_input(const char *s)
 
 WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 {
-	UINT8 op = (data >> 8) & 0xF;
-	UINT8 arg = data & 0xFF;
+	uint8_t op = (data >> 8) & 0xF;
+	uint8_t arg = data & 0xFF;
 	switch (op)
 	{
 		default:
@@ -419,7 +419,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 					break;
 
 				case 0x05:
-					for (UINT8 bit = 0; bit < 8; bit++)
+					for (uint8_t bit = 0; bit < 8; bit++)
 						output().set_lamp_value(bit, (arg >> bit) & 0x1);
 					break;
 
@@ -494,7 +494,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 
 READ32_MEMBER(midvunit_state::midvplus_misc_r)
 {
-	UINT32 result = m_midvplus_misc[offset];
+	uint32_t result = m_midvplus_misc[offset];
 
 	switch (offset)
 	{
@@ -519,8 +519,8 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 
 WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 {
-	UINT32 olddata = m_midvplus_misc[offset];
-	int logit = 1;
+	uint32_t olddata = m_midvplus_misc[offset];
+	bool logit = true;
 
 	COMBINE_DATA(&m_midvplus_misc[offset]);
 
@@ -531,12 +531,12 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 			if ((olddata ^ m_midvplus_misc[offset]) & 0x0010)
 			{
 				m_watchdog->reset_w(space, 0, 0);
-				logit = 0;
+				logit = false;
 			}
 			break;
 
 		case 3:
-			logit = 0;
+			logit = false;
 			break;
 	}
 
@@ -1903,7 +1903,7 @@ DRIVER_INIT_MEMBER(midvunit_state,offroadc)
 
 DRIVER_INIT_MEMBER(midvunit_state,wargods)
 {
-	UINT8 default_nvram[256];
+	uint8_t default_nvram[256];
 
 	/* initialize the subsystems */
 	m_adc_shift = 16;

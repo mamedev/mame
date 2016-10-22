@@ -12,7 +12,7 @@
 
 struct k001005_polydata
 {
-	UINT32 color;
+	uint32_t color;
 	int texture_x, texture_y;
 	int texture_width, texture_height;
 	int texture_page;
@@ -22,7 +22,7 @@ struct k001005_polydata
 	int light_r, light_g, light_b;
 	int ambient_r, ambient_g, ambient_b;
 	int fog_r, fog_g, fog_b;
-	UINT32 flags;
+	uint32_t flags;
 };
 
 enum k001005_param
@@ -47,18 +47,18 @@ public:
 	~k001005_renderer() {}
 
 	void reset();
-	void push_data(UINT32 data);
+	void push_data(uint32_t data);
 	void render_polygons();
 	void swap_buffers();
 	bool fifo_filled();
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void set_param(k001005_param param, UINT32 value);
+	void set_param(k001005_param param, uint32_t value);
 
-	void draw_scanline_2d(INT32 scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
-	void draw_scanline_2d_tex(INT32 scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
-	void draw_scanline(INT32 scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
-	void draw_scanline_tex(INT32 scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
-	void draw_scanline_gouraud_blend(INT32 scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
+	void draw_scanline_2d(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
+	void draw_scanline_2d_tex(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
+	void draw_scanline(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
+	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
+	void draw_scanline_gouraud_blend(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
 
 	static const int POLY_Z = 0;
 	static const int POLY_FOG = 1;
@@ -77,20 +77,20 @@ private:
 	rectangle m_cliprect;
 	int m_fb_page;
 
-	std::unique_ptr<UINT32[]> m_3dfifo;
+	std::unique_ptr<uint32_t[]> m_3dfifo;
 	int m_3dfifo_ptr;
 
 	vertex_t m_prev_v[4];
 
-	UINT32 m_light_r;
-	UINT32 m_light_g;
-	UINT32 m_light_b;
-	UINT32 m_ambient_r;
-	UINT32 m_ambient_g;
-	UINT32 m_ambient_b;
-	UINT32 m_fog_r;
-	UINT32 m_fog_g;
-	UINT32 m_fog_b;
+	uint32_t m_light_r;
+	uint32_t m_light_g;
+	uint32_t m_light_b;
+	uint32_t m_ambient_r;
+	uint32_t m_ambient_g;
+	uint32_t m_ambient_b;
+	uint32_t m_fog_r;
+	uint32_t m_fog_g;
+	uint32_t m_fog_b;
 	float m_far_z;
 
 	device_t *m_k001006;
@@ -103,7 +103,7 @@ class k001005_device : public device_t,
 								public device_video_interface
 {
 public:
-	k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k001005_device() {}
 
 	static void set_texel_chip(device_t &device, const char *tag);
@@ -126,14 +126,14 @@ private:
 	device_t *m_k001006;
 	const char *m_k001006_tag;
 
-	std::unique_ptr<UINT16[]>    m_ram[2];
-	std::unique_ptr<UINT32[]>     m_fifo;
-	UINT32 m_status;
+	std::unique_ptr<uint16_t[]>    m_ram[2];
+	std::unique_ptr<uint32_t[]>     m_fifo;
+	uint32_t m_status;
 
 	int m_ram_ptr;
 	int m_fifo_read_ptr;
 	int m_fifo_write_ptr;
-	UINT32 m_reg_far_z;
+	uint32_t m_reg_far_z;
 
 
 	k001005_renderer *m_renderer;

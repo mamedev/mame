@@ -378,7 +378,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
 //  INPUTS
 //**************************************************************************
 
-UINT16 amiga_state::joy0dat_r()
+uint16_t amiga_state::joy0dat_r()
 {
 	if (!m_input_device.found() || (m_input_device->read() & 0x10))
 		return m_joy0dat_port.read_safe(0xffff);
@@ -386,7 +386,7 @@ UINT16 amiga_state::joy0dat_r()
 		return (m_p1_mouse_y.read_safe(0xff) << 8) | m_p1_mouse_x.read_safe(0xff);
 }
 
-UINT16 amiga_state::joy1dat_r()
+uint16_t amiga_state::joy1dat_r()
 {
 	if (!m_input_device.found() || m_input_device->read() & 0x20)
 		return m_joy1dat_port.read_safe(0xffff);
@@ -396,7 +396,7 @@ UINT16 amiga_state::joy1dat_r()
 
 CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
 {
-	UINT8 bits = m_joy_ports[(int)(FPTR)param].read_safe(0xff);
+	uint8_t bits = m_joy_ports[(int)(uintptr_t)param].read_safe(0xff);
 
 	int up = (bits >> 0) & 1;
 	int down = (bits >> 1) & 1;
@@ -417,15 +417,15 @@ CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
  *
  *************************************/
 
-static UINT32 blit_ascending(amiga_state *state)
+static uint32_t blit_ascending(amiga_state *state)
 {
-	UINT32 shifta = (CUSTOM_REG(REG_BLTCON0) >> 12) & 0xf;
-	UINT32 shiftb = (CUSTOM_REG(REG_BLTCON1) >> 12) & 0xf;
-	UINT32 height = CUSTOM_REG(REG_BLTSIZV);
-	UINT32 width = CUSTOM_REG(REG_BLTSIZH);
-	UINT32 acca = 0, accb = 0;
-	UINT32 blitsum = 0;
-	UINT32 x, y;
+	uint32_t shifta = (CUSTOM_REG(REG_BLTCON0) >> 12) & 0xf;
+	uint32_t shiftb = (CUSTOM_REG(REG_BLTCON1) >> 12) & 0xf;
+	uint32_t height = CUSTOM_REG(REG_BLTSIZV);
+	uint32_t width = CUSTOM_REG(REG_BLTSIZH);
+	uint32_t acca = 0, accb = 0;
+	uint32_t blitsum = 0;
+	uint32_t x, y;
 
 	/* iterate over the height */
 	for (y = 0; y < height; y++)
@@ -433,9 +433,9 @@ static UINT32 blit_ascending(amiga_state *state)
 		/* iterate over the width */
 		for (x = 0; x < width; x++)
 		{
-			UINT16 abc0, abc1, abc2, abc3;
-			UINT32 tempa, tempd = 0;
-			UINT32 b;
+			uint16_t abc0, abc1, abc2, abc3;
+			uint32_t tempa, tempd = 0;
+			uint32_t b;
 
 			/* fetch data for A */
 			if (CUSTOM_REG(REG_BLTCON0) & 0x0800)
@@ -479,7 +479,7 @@ static UINT32 blit_ascending(amiga_state *state)
 			/* now loop over bits and compute the destination value */
 			for (b = 0; b < 4; b++)
 			{
-				UINT32 bit;
+				uint32_t bit;
 
 				/* shift previous data up 4 bits */
 				tempd <<= 4;
@@ -539,29 +539,29 @@ static UINT32 blit_ascending(amiga_state *state)
  *
  *************************************/
 
-static UINT32 blit_descending(amiga_state *state)
+static uint32_t blit_descending(amiga_state *state)
 {
-	UINT32 fill_exclusive = (CUSTOM_REG(REG_BLTCON1) >> 4);
-	UINT32 fill_inclusive = (CUSTOM_REG(REG_BLTCON1) >> 3);
-	UINT32 shifta = (CUSTOM_REG(REG_BLTCON0) >> 12) & 0xf;
-	UINT32 shiftb = (CUSTOM_REG(REG_BLTCON1) >> 12) & 0xf;
-	UINT32 height = CUSTOM_REG(REG_BLTSIZV);
-	UINT32 width = CUSTOM_REG(REG_BLTSIZH);
-	UINT32 acca = 0, accb = 0;
-	UINT32 blitsum = 0;
-	UINT32 x, y;
+	uint32_t fill_exclusive = (CUSTOM_REG(REG_BLTCON1) >> 4);
+	uint32_t fill_inclusive = (CUSTOM_REG(REG_BLTCON1) >> 3);
+	uint32_t shifta = (CUSTOM_REG(REG_BLTCON0) >> 12) & 0xf;
+	uint32_t shiftb = (CUSTOM_REG(REG_BLTCON1) >> 12) & 0xf;
+	uint32_t height = CUSTOM_REG(REG_BLTSIZV);
+	uint32_t width = CUSTOM_REG(REG_BLTSIZH);
+	uint32_t acca = 0, accb = 0;
+	uint32_t blitsum = 0;
+	uint32_t x, y;
 
 	/* iterate over the height */
 	for (y = 0; y < height; y++)
 	{
-		UINT32 fill_state = (CUSTOM_REG(REG_BLTCON1) >> 2) & 1;
+		uint32_t fill_state = (CUSTOM_REG(REG_BLTCON1) >> 2) & 1;
 
 		/* iterate over the width */
 		for (x = 0; x < width; x++)
 		{
-			UINT16 abc0, abc1, abc2, abc3;
-			UINT32 tempa, tempd = 0;
-			UINT32 b;
+			uint16_t abc0, abc1, abc2, abc3;
+			uint32_t tempa, tempd = 0;
+			uint32_t b;
 
 			/* fetch data for A */
 			if (CUSTOM_REG(REG_BLTCON0) & 0x0800)
@@ -604,8 +604,8 @@ static UINT32 blit_descending(amiga_state *state)
 			/* now loop over bits and compute the destination value */
 			for (b = 0; b < 4; b++)
 			{
-				UINT32 prev_fill_state;
-				UINT32 bit;
+				uint32_t prev_fill_state;
+				uint32_t bit;
 
 				/* shift previous data up 4 bits */
 				tempd >>= 4;
@@ -720,12 +720,12 @@ static UINT32 blit_descending(amiga_state *state)
     BLTAMOD = 4 * (dy - dx) and BLTBMOD = 4 * dy.
 */
 
-static UINT32 blit_line(amiga_state *state)
+static uint32_t blit_line(amiga_state *state)
 {
-	UINT32 singlemode = (CUSTOM_REG(REG_BLTCON1) & 0x0002) ? 0x0000 : 0xffff;
-	UINT32 singlemask = 0xffff;
-	UINT32 blitsum = 0;
-	UINT32 height;
+	uint32_t singlemode = (CUSTOM_REG(REG_BLTCON1) & 0x0002) ? 0x0000 : 0xffff;
+	uint32_t singlemask = 0xffff;
+	uint32_t blitsum = 0;
+	uint32_t height;
 
 	/* see if folks are breaking the rules */
 	if (CUSTOM_REG(REG_BLTSIZH) != 0x0002)
@@ -739,8 +739,8 @@ static UINT32 blit_line(amiga_state *state)
 	/* iterate over the line height */
 	while (height--)
 	{
-		UINT16 abc0, abc1, abc2, abc3;
-		UINT32 tempa, tempb, tempd = 0;
+		uint16_t abc0, abc1, abc2, abc3;
+		uint32_t tempa, tempb, tempd = 0;
 		int b, dx, dy;
 
 		/* fetch data for C */
@@ -766,7 +766,7 @@ static UINT32 blit_line(amiga_state *state)
 		/* now loop over bits and compute the destination value */
 		for (b = 0; b < 4; b++)
 		{
-			UINT32 bit;
+			uint32_t bit;
 
 			/* shift previous data up 4 bits */
 			tempd <<= 4;
@@ -831,7 +831,7 @@ static UINT32 blit_line(amiga_state *state)
 		if (dx)
 		{
 			/* adjust the A shift value */
-			UINT32 temp = CUSTOM_REG(REG_BLTCON0) + (INT32)(dx << 12);
+			uint32_t temp = CUSTOM_REG(REG_BLTCON0) + (int32_t)(dx << 12);
 			CUSTOM_REG(REG_BLTCON0) = temp;
 
 			/* if we went from 0xf to 0x0 or vice-versa, adjust the actual pointers */
@@ -846,8 +846,8 @@ static UINT32 blit_line(amiga_state *state)
 		if (dy)
 		{
 			/* BLTCMOD seems to be used for both C and D pointers */
-			CUSTOM_REG_LONG(REG_BLTCPTH) += dy * (INT16)(CUSTOM_REG_SIGNED(REG_BLTCMOD) & ~1);
-			CUSTOM_REG_LONG(REG_BLTDPTH) += dy * (INT16)(CUSTOM_REG_SIGNED(REG_BLTCMOD) & ~1);
+			CUSTOM_REG_LONG(REG_BLTCPTH) += dy * (int16_t)(CUSTOM_REG_SIGNED(REG_BLTCMOD) & ~1);
+			CUSTOM_REG_LONG(REG_BLTDPTH) += dy * (int16_t)(CUSTOM_REG_SIGNED(REG_BLTCMOD) & ~1);
 
 			/* reset the single mask since we're on a new line */
 			singlemask = 0xffff;
@@ -874,7 +874,7 @@ static UINT32 blit_line(amiga_state *state)
 TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
-	UINT32 blitsum = 0;
+	uint32_t blitsum = 0;
 
 	/* logging */
 	if (LOG_BLITS)
@@ -1027,7 +1027,7 @@ WRITE_LINE_MEMBER( amiga_state::centronics_select_w )
 
 READ16_MEMBER( amiga_state::cia_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	if ((offset & 0x1000/2) == 0 && ACCESSING_BITS_0_7)
 		data |= m_cia_0->read(space, offset >> 7);
@@ -1092,7 +1092,7 @@ WRITE_LINE_MEMBER( amiga_state::cia_0_irq )
 
 READ8_MEMBER( amiga_state::cia_1_port_a_read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// bit 0 to 2, centronics
 	data |= m_centronics_busy << 0;
@@ -1147,7 +1147,7 @@ void amiga_state::custom_chip_reset()
 READ16_MEMBER( amiga_state::custom_chip_r )
 {
 	amiga_state *state = this;
-	UINT16 temp;
+	uint16_t temp;
 
 	if (LOG_CUSTOM)
 		logerror("%06X:read from custom %s\n", space.device().safe_pc(), amiga_custom_names[offset & 0xff]);
@@ -1261,7 +1261,7 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 WRITE16_MEMBER( amiga_state::custom_chip_w )
 {
 	amiga_state *state = space.machine().driver_data<amiga_state>();
-	UINT16 temp;
+	uint16_t temp;
 	offset &= 0xff;
 
 	if (LOG_CUSTOM)
@@ -1390,13 +1390,13 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 		case REG_SPR0CTL:   case REG_SPR1CTL:   case REG_SPR2CTL:   case REG_SPR3CTL:
 		case REG_SPR4CTL:   case REG_SPR5CTL:   case REG_SPR6CTL:   case REG_SPR7CTL:
 			/* disable comparitor on writes here */
-			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0CTL) / 4, FALSE);
+			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0CTL) / 4, false);
 			break;
 
 		case REG_SPR0DATA:  case REG_SPR1DATA:  case REG_SPR2DATA:  case REG_SPR3DATA:
 		case REG_SPR4DATA:  case REG_SPR5DATA:  case REG_SPR6DATA:  case REG_SPR7DATA:
 			/* enable comparitor on writes here */
-			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0DATA) / 4, TRUE);
+			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0DATA) / 4, true);
 			break;
 
 		case REG_COP1LCH:
@@ -1574,8 +1574,8 @@ void amiga_state::serial_adjust()
 {
 	amiga_state *state = this;
 
-	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
-	UINT32 baud = m_sound->clock() / divisor;
+	uint32_t divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
+	uint32_t baud = m_sound->clock() / divisor;
 
 	m_serial_timer->adjust(attotime::from_hz(baud) / 2, 0, attotime::from_hz(baud));
 }

@@ -44,25 +44,25 @@ public:
 		}
 
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
-	required_shared_ptr<UINT16> m_ram;
-	optional_shared_ptr_array<UINT16,2> m_roadram;
-	optional_shared_ptr<UINT16> m_f1gpstr2_ioready;
+	required_shared_ptr<uint16_t> m_ram;
+	optional_shared_ptr_array<uint16_t,2> m_roadram;
+	optional_shared_ptr<uint16_t> m_f1gpstr2_ioready;
 
-	UINT16 *m_objectram;
-	UINT16 m_active_layers;
+	uint16_t *m_objectram;
+	uint16_t m_active_layers;
 
 	int m_prev;
 	int m_armold;
-	UINT16 m_scudhamm_motor_command;
+	uint16_t m_scudhamm_motor_command;
 	int m_ip_select;
-	UINT16 m_wildplt_output;
-	UINT8 m_drawmode_table[16];
+	uint16_t m_wildplt_output;
+	uint8_t m_drawmode_table[16];
 	int m_debugsprites;
 	int m_show_unknown;
-	UINT16 *m_spriteram;
+	uint16_t *m_spriteram;
 
-	UINT8 m_motor_value;
-	UINT8 m_io_value;
+	uint8_t m_motor_value;
+	uint8_t m_io_value;
 
 	DECLARE_WRITE16_MEMBER(scudhamm_motor_command_w);
 	DECLARE_WRITE16_MEMBER(scudhamm_leds_w);
@@ -104,10 +104,10 @@ public:
 	DECLARE_DRIVER_INIT(bigrun);
 	DECLARE_DRIVER_INIT(f1gpstar);
 	virtual void video_start() override;
-	UINT32 screen_update_bigrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_scudhamm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cischeat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_f1gpstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bigrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_scudhamm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cischeat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_f1gpstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bigrun_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(scudhamm_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);
@@ -137,12 +137,12 @@ public:
 
 	optional_device<timer_device> m_captflag_motor_left;
 	optional_device<timer_device> m_captflag_motor_right;
-	UINT16 m_captflag_motor_command[2];
-	UINT16 m_captflag_motor_pos[2];
+	uint16_t m_captflag_motor_command[2];
+	uint16_t m_captflag_motor_pos[2];
 
 	DECLARE_WRITE16_MEMBER(captflag_motor_command_right_w);
 	DECLARE_WRITE16_MEMBER(captflag_motor_command_left_w);
-	void captflag_motor_move(int side, UINT16 data);
+	void captflag_motor_move(int side, uint16_t data);
 	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_busy_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_pos_r);
 
@@ -150,7 +150,7 @@ public:
 	optional_memory_bank m_oki2_bank;
 	DECLARE_WRITE16_MEMBER(captflag_oki_bank_w);
 
-	UINT16 m_captflag_leds;
+	uint16_t m_captflag_leds;
 	DECLARE_WRITE16_MEMBER(captflag_leds_w);
 
 	DECLARE_DRIVER_INIT(captflag);

@@ -57,7 +57,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_nmitrigger_w)
 }
 
 
-static const UINT8 tokio_prot_data[] =
+static const uint8_t tokio_prot_data[] =
 {
 	0x6c,
 	0x7f,0x5f,0x7f,0x6f,0x5f,0x77,0x5f,0x7f,0x5f,0x7f,0x5f,0x7f,0x5b,0x7f,0x5f,0x7f,
@@ -100,7 +100,7 @@ void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_mcu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in bublbobl_state::device_timer");
+		assert_always(false, "Unknown id in bublbobl_state::device_timer");
 	}
 }
 

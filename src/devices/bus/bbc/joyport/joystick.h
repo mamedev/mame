@@ -27,7 +27,7 @@ class bbcmc_joystick_device :
 {
 public:
 	// construction/destruction
-	bbcmc_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbcmc_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -37,8 +37,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 cb_r() override;
-	virtual UINT8 pb_r() override;
+	virtual uint8_t cb_r() override;
+	virtual uint8_t pb_r() override;
 
 private:
 	required_ioport m_joy;

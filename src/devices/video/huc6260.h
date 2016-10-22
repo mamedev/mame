@@ -38,7 +38,7 @@ class huc6260_device :  public device_t,
 {
 public:
 	// construction/destruction
-	huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_next_pixel_data_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_next_pixel_data_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_time_til_next_event_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_time_til_next_event_cb.set_callback(object); }
@@ -79,13 +79,13 @@ private:
 	/* Callback function which gets called when hsync changes */
 	devcb_write_line                m_hsync_changed_cb;
 
-	UINT16  m_palette[512];
-	UINT16  m_address;
-	UINT8   m_greyscales;       /* Should the HuC6260 output grey or color graphics */
-	UINT8   m_blur;             /* Should the edges of graphics be blurred/Select screen height 0=262, 1=263 */
-	UINT8   m_pixels_per_clock; /* Number of pixels to output per colour clock */
-	UINT16  m_pixel_data;
-	UINT8   m_pixel_clock;
+	uint16_t  m_palette[512];
+	uint16_t  m_address;
+	uint8_t   m_greyscales;       /* Should the HuC6260 output grey or color graphics */
+	uint8_t   m_blur;             /* Should the edges of graphics be blurred/Select screen height 0=262, 1=263 */
+	uint8_t   m_pixels_per_clock; /* Number of pixels to output per colour clock */
+	uint16_t  m_pixel_data;
+	uint8_t   m_pixel_clock;
 
 	emu_timer   *m_timer;
 	std::unique_ptr<bitmap_ind16>   m_bmp;

@@ -36,7 +36,7 @@
 class nscsi_callback_device : public nscsi_device
 {
 public:
-	nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _line> void set_rst_callback(_line line) { m_write_rst.set_callback(line); }
 	template<class _line> void set_atn_callback(_line line) { m_write_atn.set_callback(line); }
@@ -50,9 +50,9 @@ public:
 
 	virtual void scsi_ctrl_changed() override;
 
-	UINT8 read() { return scsi_bus->data_r(); }
+	uint8_t read() { return scsi_bus->data_r(); }
 	DECLARE_READ8_MEMBER( read ) { return read(); }
-	void write(UINT8 data) { scsi_bus->data_w(scsi_refid, data); }
+	void write(uint8_t data) { scsi_bus->data_w(scsi_refid, data); }
 	DECLARE_WRITE8_MEMBER( write ) { write(data); }
 
 	DECLARE_READ_LINE_MEMBER( rst_r ) { return (m_ctrl & S_RST) ? 1 : 0; }
@@ -89,7 +89,7 @@ protected:
 	devcb_write_line m_write_sel;
 	devcb_write_line m_write_bsy;
 
-	UINT32 m_ctrl;
+	uint32_t m_ctrl;
 };
 
 extern const device_type NSCSI_CB;

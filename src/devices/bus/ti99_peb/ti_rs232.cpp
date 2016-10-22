@@ -121,7 +121,7 @@
 
 #define ESC 0x1b
 
-ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : ti_expansion_card_device(mconfig, TI99_RS232, "TI-99 RS232/PIO interface", tag, owner, clock, "ti99_rs232", __FILE__), m_piodev(nullptr), m_dsrrom(nullptr), m_pio_direction_in(false), m_pio_handshakeout(false), m_pio_handshakein(false), m_pio_spareout(false), m_pio_sparein(false), m_flag0(false), m_led(false), m_pio_out_buffer(0), m_pio_in_buffer(0), m_pio_readable(false), m_pio_writable(false), m_pio_write(false), m_ila(0)
 {
 }
@@ -130,13 +130,13 @@ ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const ch
 /**************************************************************************/
 /* Ports */
 
-ti_rs232_attached_device::ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_rs232_attached_device::ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, TI99_RS232_DEV, "Serial attached device", tag, owner, clock, "ti_rs232_attached", __FILE__),
 	device_image_interface(mconfig, *this)
 {
 }
 
-ti_pio_attached_device::ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_pio_attached_device::ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, TI99_PIO_DEV, "Parallel attached device", tag, owner, clock, "ti_pio_attached", __FILE__),
 	device_image_interface(mconfig, *this)
 {
@@ -270,7 +270,7 @@ READ8Z_MEMBER(ti_rs232_pio_device::crureadz)
 	{
 		if ((offset & 0x00c0)==0x0000)
 		{
-			UINT8 reply = 0x00;
+			uint8_t reply = 0x00;
 			if (m_pio_direction_in)         reply |= 0x02;
 			if (m_pio_handshakein)          reply |= 0x04;
 			if (m_pio_sparein)              reply |= 0x08;
@@ -336,7 +336,7 @@ WRITE8_MEMBER(ti_rs232_pio_device::cruwrite)
 					if (!m_pio_handshakeout)
 					{   /* write data strobe */
 						/* write data and acknowledge */
-						UINT8 buf = m_pio_out_buffer;
+						uint8_t buf = m_pio_out_buffer;
 						int ret = image->fwrite(&buf, 1);
 						if (ret)
 							m_pio_handshakein = 1;
@@ -353,7 +353,7 @@ WRITE8_MEMBER(ti_rs232_pio_device::cruwrite)
 					if (!m_pio_handshakeout)
 					{   /* receiver ready */
 						/* send data and strobe */
-						UINT8 buf;
+						uint8_t buf;
 						if (image->fread(&buf, 1))
 							m_pio_in_buffer = buf;
 						m_pio_handshakein = 0;
@@ -456,9 +456,9 @@ void ti_rs232_pio_device::incoming_dtr(int uartind, line_state value)
 /*
     Data transmission
 */
-void ti_rs232_pio_device::transmit_data(int uartind, UINT8 value)
+void ti_rs232_pio_device::transmit_data(int uartind, uint8_t value)
 {
-	UINT8 buf = value;
+	uint8_t buf = value;
 
 	device_image_interface *serial;
 	serial = dynamic_cast<device_image_interface *>(m_serdev[uartind]);
@@ -523,9 +523,9 @@ void ti_rs232_pio_device::transmit_data(int uartind, UINT8 value)
                           |-( 8) <--- DCD
 
 */
-UINT8 ti_rs232_pio_device::map_lines_out(int uartind, UINT8 value)
+uint8_t ti_rs232_pio_device::map_lines_out(int uartind, uint8_t value)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	int mapping = ioport("SERIALMAP")->read();
 
 	//    00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
@@ -595,9 +595,9 @@ UINT8 ti_rs232_pio_device::map_lines_out(int uartind, UINT8 value)
 	return ret;
 }
 
-UINT8 ti_rs232_pio_device::map_lines_in(int uartind, UINT8 value)
+uint8_t ti_rs232_pio_device::map_lines_in(int uartind, uint8_t value)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	int mapping = ioport("SERIALMAP")->read();
 
 	//    00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
@@ -692,7 +692,7 @@ UINT8 ti_rs232_pio_device::map_lines_in(int uartind, UINT8 value)
 void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 {
 	device_image_interface *serial;
-	UINT8 buffer;
+	uint8_t buffer;
 
 	serial = dynamic_cast<device_image_interface *>(m_serdev[uartind]);
 
@@ -801,9 +801,9 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 */
 void ti_rs232_pio_device::configure_interface(int uartind, int type, int value)
 {
-	UINT8 bufctrl[4];
+	uint8_t bufctrl[4];
 	device_image_interface *serial;
-	UINT8 esc = ESC;
+	uint8_t esc = ESC;
 
 	serial = dynamic_cast<device_image_interface *>(m_serdev[uartind]);
 
@@ -877,11 +877,11 @@ void ti_rs232_pio_device::set_bit(int uartind, int line, int value)
 /*
    Line changes
 */
-void ti_rs232_pio_device::output_exception(int uartind, int param, UINT8 value)
+void ti_rs232_pio_device::output_exception(int uartind, int param, uint8_t value)
 {
 	device_image_interface *serial;
-	UINT8 bufctrl[2];
-	UINT8 esc = ESC;
+	uint8_t bufctrl[2];
+	uint8_t esc = ESC;
 
 	serial = dynamic_cast<device_image_interface *>(m_serdev[uartind]);
 
@@ -903,11 +903,11 @@ void ti_rs232_pio_device::output_exception(int uartind, int param, UINT8 value)
 /*
    Line changes
 */
-void ti_rs232_pio_device::output_line_state(int uartind, int mask, UINT8 value)
+void ti_rs232_pio_device::output_line_state(int uartind, int mask, uint8_t value)
 {
 	device_image_interface *serial;
-	UINT8 bufctrl[2];
-	UINT8 esc = ESC;
+	uint8_t bufctrl[2];
+	uint8_t esc = ESC;
 
 	serial = dynamic_cast<device_image_interface *>(m_serdev[uartind]);
 
@@ -996,7 +996,7 @@ WRITE8_MEMBER( ti_rs232_pio_device::xmit1_callback )
 	transmit_data(1, data);
 }
 
-void ti_rs232_pio_device::ctrl_callback(int uartind, int offset, UINT8 data)
+void ti_rs232_pio_device::ctrl_callback(int uartind, int offset, uint8_t data)
 {
 	if ((offset & CONFIG)!=0)
 	{
@@ -1036,8 +1036,8 @@ void ti_rs232_pio_device::device_start()
 	m_serdev[1] = subdevice<ti_rs232_attached_device>("serdev1");
 	m_piodev = subdevice<ti_pio_attached_device>("piodev");
 	// Prepare the receive buffers
-	m_recvbuf[0] = std::make_unique<UINT8[]>(512);
-	m_recvbuf[1] = std::make_unique<UINT8[]>(512);
+	m_recvbuf[0] = std::make_unique<uint8_t[]>(512);
+	m_recvbuf[1] = std::make_unique<uint8_t[]>(512);
 	m_pio_write = true; // required for call_load of pio_attached_device
 	m_pio_writable = false;
 	m_pio_handshakein = false;

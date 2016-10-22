@@ -43,7 +43,7 @@ void electron_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		electron_scanline_interrupt(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in electron_state::device_timer");
+		assert_always(false, "Unknown id in electron_state::device_timer");
 	}
 }
 
@@ -145,7 +145,7 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 
 READ8_MEMBER(electron_state::electron_read_keyboard)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	//logerror( "PC=%04x: keyboard read from paged rom area, address: %04x", activecpu_get_pc(), offset );
 	for (int i = 0; i < 14; i++)
@@ -193,7 +193,7 @@ WRITE8_MEMBER(electron_state::electron_jim_w)
 
 READ8_MEMBER(electron_state::electron_sheila_r)
 {
-	UINT8 data = ((UINT8 *)memregion("user1")->base())[0x43E00 + offset];
+	uint8_t data = ((uint8_t *)memregion("user1")->base())[0x43E00 + offset];
 	switch ( offset & 0x0f )
 	{
 	case 0x00:  /* Interrupt status */
@@ -212,7 +212,7 @@ READ8_MEMBER(electron_state::electron_sheila_r)
 }
 
 static const int electron_palette_offset[4] = { 0, 4, 5, 1 };
-static const UINT16 electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
+static const uint16_t electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
 
 WRITE8_MEMBER(electron_state::electron_sheila_w)
 {
@@ -307,7 +307,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		m_ula.screen_mode = ( data >> 3 ) & 0x07;
 		m_ula.screen_base = electron_screen_base[ m_ula.screen_mode ];
 		m_ula.screen_size = 0x8000 - m_ula.screen_base;
-		m_ula.vram = (UINT8 *)m_ram->pointer() + m_ula.screen_base;
+		m_ula.vram = (uint8_t *)m_ram->pointer() + m_ula.screen_base;
 		logerror( "ULA: screen mode set to %d\n", m_ula.screen_mode );
 		m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
 		m_cassette->change_state(m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
@@ -375,12 +375,12 @@ void electron_state::machine_reset()
 	m_ula.screen_size = 0x8000 - 0x3000;
 	m_ula.screen_addr = 0;
 	m_ula.tape_running = 0;
-	m_ula.vram = (UINT8 *)m_ram->pointer() + m_ula.screen_base;
+	m_ula.vram = (uint8_t *)m_ram->pointer() + m_ula.screen_base;
 }
 
 void electron_state::machine_start()
 {
-	UINT8 *lo_rom, *up_rom;
+	uint8_t *lo_rom, *up_rom;
 	std::string region_tag;
 	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
@@ -409,7 +409,7 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 {
 	if (image.software_entry() == nullptr)
 	{
-		UINT32 filesize = image.length();
+		uint32_t filesize = image.length();
 
 		if (filesize != 16384)
 		{

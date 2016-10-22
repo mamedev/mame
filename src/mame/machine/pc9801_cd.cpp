@@ -5,7 +5,7 @@
 // device type definition
 const device_type PC9801_CD = &device_creator<pc9801_cd_device>;
 
-pc9801_cd_device::pc9801_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pc9801_cd_device::pc9801_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_cdrom_device(mconfig, PC9801_CD, "PC9801 CD-ROM Drive", tag, owner, clock, "pc9801_cd", __FILE__)
 {
 }

@@ -18,8 +18,8 @@ class md_jcart_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_jcart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_jcart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -34,7 +34,7 @@ public:
 	required_ioport m_jcart4;
 
 private:
-	UINT8 m_jcart_io_data[2];
+	uint8_t m_jcart_io_data[2];
 };
 
 // ======================> md_seprom_codemast_device
@@ -43,8 +43,8 @@ class md_seprom_codemast_device : public md_jcart_device
 {
 public:
 	// construction/destruction
-	md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -58,8 +58,8 @@ public:
 	required_device<i2cmem_device> m_i2cmem;
 
 private:
-	UINT8 m_jcart_io_data[2];
-	UINT8 m_i2c_mem, m_i2c_clk;
+	uint8_t m_jcart_io_data[2];
+	uint8_t m_i2c_mem, m_i2c_clk;
 };
 
 // ======================> md_seprom_mm96_device (same read/write as codemast, but different I2C type)
@@ -68,7 +68,7 @@ class md_seprom_mm96_device : public md_seprom_codemast_device
 {
 public:
 	// construction/destruction
-	md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

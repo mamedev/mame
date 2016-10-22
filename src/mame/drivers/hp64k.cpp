@@ -176,7 +176,7 @@ public:
 		virtual void video_start() override;
 		virtual void machine_reset() override;
 
-		UINT8 hp64k_crtc_filter(UINT8 data);
+		uint8_t hp64k_crtc_filter(uint8_t data);
 		DECLARE_WRITE16_MEMBER(hp64k_crtc_w);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_crtc_drq_w);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_crtc_vrtc_w);
@@ -252,33 +252,33 @@ private:
 		required_device<rs232_port_device> m_rs232;
 
 		// Character generator
-		const UINT8 *m_chargen;
+		const uint8_t *m_chargen;
 
-		UINT32 m_crtc_ptr;
+		uint32_t m_crtc_ptr;
 		bool m_crtc_drq;
 		bool m_vrtc;
 
 		// Interrupt handling
-		UINT8 m_irl_mask;
-		UINT8 m_irl_pending;
+		uint8_t m_irl_mask;
+		uint8_t m_irl_pending;
 
 		// State of keyboard
 		ioport_value m_kb_state[ 4 ];
-		UINT8 m_kb_row_col;
+		uint8_t m_kb_row_col;
 		bool m_kb_scan_on;
 		bool m_kb_pressed;
 
 		// Slot selection
-		std::vector<UINT16> m_low32k_ram;
-		UINT8 m_slot_select;
-		UINT8 m_slot_map;
+		std::vector<uint16_t> m_low32k_ram;
+		uint8_t m_slot_select;
+		uint8_t m_slot_map;
 
 		// Floppy I/F
-		UINT8 m_floppy_in_latch_msb;    // U23
-		UINT8 m_floppy_in_latch_lsb;    // U38
-		UINT8 m_floppy_out_latch_msb;   // U22
-		UINT8 m_floppy_out_latch_lsb;   // U37
-		UINT8 m_floppy_if_ctrl;     // U24
+		uint8_t m_floppy_in_latch_msb;    // U23
+		uint8_t m_floppy_in_latch_lsb;    // U38
+		uint8_t m_floppy_out_latch_msb;   // U22
+		uint8_t m_floppy_out_latch_lsb;   // U37
+		uint8_t m_floppy_if_ctrl;     // U24
 		bool m_floppy_dmaen;
 		bool m_floppy_dmai;
 		bool m_floppy_mdci;
@@ -286,8 +286,8 @@ private:
 		bool m_floppy_drq;
 		bool m_floppy0_wpt;
 		bool m_floppy1_wpt;
-		UINT8 m_floppy_drv_ctrl;    // U39
-		UINT8 m_floppy_status;      // U25
+		uint8_t m_floppy_drv_ctrl;    // U39
+		uint8_t m_floppy_status;      // U25
 
 		typedef enum {
 			HP64K_FLPST_IDLE,
@@ -303,7 +303,7 @@ private:
 		// RS232 I/F
 		bool m_16x_clk;
 		bool m_baud_clk;
-		UINT8 m_16x_div;
+		uint8_t m_16x_div;
 		bool m_loopback;
 		bool m_txd_state;
 		bool m_dtr_state;
@@ -415,7 +415,7 @@ void hp64k_state::machine_reset()
 
 }
 
-UINT8 hp64k_state::hp64k_crtc_filter(UINT8 data)
+uint8_t hp64k_state::hp64k_crtc_filter(uint8_t data)
 {
 		bool inv = (data & 0xe0) == 0xe0;
 
@@ -424,7 +424,7 @@ UINT8 hp64k_state::hp64k_crtc_filter(UINT8 data)
 
 WRITE16_MEMBER(hp64k_state::hp64k_crtc_w)
 {
-		m_crtc->write(space , offset == 0 , hp64k_crtc_filter((UINT8)data));
+		m_crtc->write(space , offset == 0 , hp64k_crtc_filter((uint8_t)data));
 }
 
 WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
@@ -436,7 +436,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
 		if (!prev_crtc && crtc_drq) {
 				address_space& prog_space = m_cpu->space(AS_PROGRAM);
 
-				UINT8 data = prog_space.read_byte(m_crtc_ptr);
+				uint8_t data = prog_space.read_byte(m_crtc_ptr);
 				m_crtc_ptr++;
 
 				m_crtc->dack_w(prog_space , 0 , hp64k_crtc_filter(data));
@@ -456,9 +456,9 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_vrtc_w)
 I8275_DRAW_CHARACTER_MEMBER(hp64k_state::crtc_display_pixels)
 {
 		const rgb_t *palette = m_palette->palette()->entry_list_raw();
-		UINT8 chargen_byte = m_chargen[ linecount  | ((unsigned)charcode << 4) ];
+		uint8_t chargen_byte = m_chargen[ linecount  | ((unsigned)charcode << 4) ];
 		bool lvid , livid;
-		UINT16 pixels_lvid , pixels_livid;
+		uint16_t pixels_lvid , pixels_livid;
 		unsigned i;
 
 		if (vsp) {
@@ -472,9 +472,9 @@ I8275_DRAW_CHARACTER_MEMBER(hp64k_state::crtc_display_pixels)
 				}
 		} else if (rvv) {
 				pixels_lvid = ~0;
-				pixels_livid = (UINT16)chargen_byte << 1;
+				pixels_livid = (uint16_t)chargen_byte << 1;
 		} else {
-				pixels_lvid = ~((UINT16)chargen_byte << 1);
+				pixels_lvid = ~((uint16_t)chargen_byte << 1);
 				pixels_livid = ~0;
 		}
 
@@ -517,7 +517,7 @@ void hp64k_state::hp64k_update_irl(void)
 
 WRITE16_MEMBER(hp64k_state::hp64k_irl_mask_w)
 {
-		m_irl_mask = (UINT8)data;
+		m_irl_mask = (uint8_t)data;
 		hp64k_update_irl();
 }
 
@@ -555,7 +555,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp64k_state::hp64k_kb_scan)
 
 READ16_MEMBER(hp64k_state::hp64k_kb_r)
 {
-		UINT16 ret = 0xff00 | m_kb_row_col;
+		uint16_t ret = 0xff00 | m_kb_row_col;
 
 		if (m_kb_pressed) {
 				BIT_SET(ret , 7);
@@ -628,8 +628,8 @@ WRITE16_MEMBER(hp64k_state::hp64k_slot_w)
 
 WRITE16_MEMBER(hp64k_state::hp64k_slot_sel_w)
 {
-		m_slot_map = (UINT8)offset;
-		m_slot_select = (UINT8)((data >> 8) & 0x3f);
+		m_slot_map = (uint8_t)offset;
+		m_slot_select = (uint8_t)((data >> 8) & 0x3f);
 }
 
 READ16_MEMBER(hp64k_state::hp64k_flp_r)
@@ -669,7 +669,7 @@ READ16_MEMBER(hp64k_state::hp64k_flp_r)
 
 		hp64k_update_floppy_irq();
 
-		return ((UINT16)m_floppy_out_latch_msb << 8) | (UINT16)m_floppy_out_latch_lsb;
+		return ((uint16_t)m_floppy_out_latch_msb << 8) | (uint16_t)m_floppy_out_latch_lsb;
 }
 
 WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
@@ -680,8 +680,8 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 				return;
 		}
 
-		m_floppy_in_latch_msb = (UINT8)(data >> 8);
-		m_floppy_in_latch_lsb = (UINT8)data;
+		m_floppy_in_latch_msb = (uint8_t)(data >> 8);
+		m_floppy_in_latch_lsb = (uint8_t)data;
 
 		switch (offset) {
 		case 0:
@@ -936,7 +936,7 @@ void hp64k_state::hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state)
 
 READ16_MEMBER(hp64k_state::hp64k_usart_r)
 {
-		UINT16 tmp;
+		uint16_t tmp;
 
 		if ((offset & 1) == 0) {
 				tmp = m_uart->status_r(space , 0);
@@ -958,9 +958,9 @@ READ16_MEMBER(hp64k_state::hp64k_usart_r)
 WRITE16_MEMBER(hp64k_state::hp64k_usart_w)
 {
 		if ((offset & 1) == 0) {
-				m_uart->control_w(space , 0 , (UINT8)(data & 0xff));
+				m_uart->control_w(space , 0 , (uint8_t)(data & 0xff));
 		} else {
-				m_uart->data_w(space , 0 , (UINT8)(data & 0xff));
+				m_uart->data_w(space , 0 , (uint8_t)(data & 0xff));
 		}
 }
 

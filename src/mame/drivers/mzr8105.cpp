@@ -212,10 +212,10 @@ required_device<cpu_device> m_maincpu;
 required_device<upd7201_device> m_updterm;
 
 // Pointer to System ROMs needed by bootvect_r
-// UINT16  *m_sysrom;
+// uint16_t  *m_sysrom;
 
 #if CARDSLOT
-UINT16  *m_usrrom;
+uint16_t  *m_usrrom;
 required_device<generic_slot_device> m_cart;
 #endif
 };
@@ -252,7 +252,7 @@ void mzr8105_state::machine_start ()
 		/* Map user ROM/RAM socket(s) */
 		if (m_cart->exists())
 		{
-				m_usrrom = (UINT16*)m_cart->get_rom_base();
+				m_usrrom = (uint16_t*)m_cart->get_rom_base();
 				m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(generic_slot_device::read16_rom), (generic_slot_device*)m_cart));
 		}
 #endif
@@ -261,7 +261,7 @@ void mzr8105_state::machine_start ()
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (mzr8105_state::vme_a24_r){
 		LOG (logerror ("vme_a24_r\n"));
-		return (UINT16) 0;
+		return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (mzr8105_state::vme_a24_w){
@@ -270,7 +270,7 @@ WRITE16_MEMBER (mzr8105_state::vme_a24_w){
 
 READ16_MEMBER (mzr8105_state::vme_a16_r){
 		LOG (logerror ("vme_16_r\n"));
-		return (UINT16) 0;
+		return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (mzr8105_state::vme_a16_w){
@@ -297,7 +297,7 @@ MACHINE_CONFIG_END
 ****************************/
 int mzr8105_state::mzr8105_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-		UINT32 size = slot->common_get_size("rom");
+		uint32_t size = slot->common_get_size("rom");
 
 		if (size > 0x20000) // Max 128Kb - not verified
 		{

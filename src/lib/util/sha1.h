@@ -38,9 +38,9 @@
 
 struct sha1_ctx
 {
-	UINT32 digest[_SHA1_DIGEST_LENGTH];   /* Message digest */
-	UINT32 count_low, count_high;         /* 64-bit block count */
-	UINT8 block[SHA1_DATA_SIZE];          /* SHA1 data buffer */
+	uint32_t digest[_SHA1_DIGEST_LENGTH];   /* Message digest */
+	uint32_t count_low, count_high;         /* 64-bit block count */
+	uint8_t block[SHA1_DATA_SIZE];          /* SHA1 data buffer */
 	unsigned int index;                     /* index into buffer */
 };
 
@@ -50,7 +50,7 @@ sha1_init(struct sha1_ctx *ctx);
 void
 sha1_update(struct sha1_ctx *ctx,
 		unsigned length,
-		const UINT8 *data);
+		const uint8_t *data);
 
 void
 sha1_final(struct sha1_ctx *ctx);
@@ -58,6 +58,6 @@ sha1_final(struct sha1_ctx *ctx);
 void
 sha1_digest(const struct sha1_ctx *ctx,
 		unsigned length,
-		UINT8 *digest);
+		uint8_t *digest);
 
 #endif /* NETTLE_SHA1_H_INCLUDED */

@@ -91,15 +91,15 @@ public:
 		m_palette(*this, "palette")  { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_wram;
-	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<uint16_t> m_wram;
+	required_shared_ptr<uint16_t> m_paletteram;
 
 	/* video-related */
 	int m_vbuffer;
 
 	/* memory */
-	UINT16       m_bitmap0[0x40000/2];
-	UINT16       m_bitmap1[0x40000/2];
+	uint16_t       m_bitmap0[0x40000/2];
+	uint16_t       m_bitmap1[0x40000/2];
 	DECLARE_WRITE16_MEMBER(pasha2_misc_w);
 	DECLARE_WRITE16_MEMBER(pasha2_palette_w);
 	DECLARE_WRITE16_MEMBER(vbuffer_set_w);
@@ -114,7 +114,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;
@@ -351,7 +351,7 @@ void pasha2_state::video_start()
 	save_item(NAME(m_bitmap1));
 }
 
-UINT32 pasha2_state::screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pasha2_state::screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, count;
 	int color;

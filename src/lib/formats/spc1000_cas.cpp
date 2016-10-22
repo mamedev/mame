@@ -33,7 +33,7 @@ IPL: This seems a quickload format containing RAM dump, not a real tape
 // image size
 static int spc1000_image_size;
 
-static int spc1000_put_samples(INT16 *buffer, int sample_pos, int count, int level)
+static int spc1000_put_samples(int16_t *buffer, int sample_pos, int count, int level)
 {
 	if (buffer)
 	{
@@ -44,7 +44,7 @@ static int spc1000_put_samples(INT16 *buffer, int sample_pos, int count, int lev
 	return count;
 }
 
-static int spc1000_output_bit(INT16 *buffer, int sample_pos, bool bit)
+static int spc1000_output_bit(int16_t *buffer, int sample_pos, bool bit)
 {
 	int samples = 0;
 
@@ -62,23 +62,23 @@ static int spc1000_output_bit(INT16 *buffer, int sample_pos, bool bit)
 	return samples;
 }
 
-static int spc1000_handle_tap(INT16 *buffer, const UINT8 *bytes)
+static int spc1000_handle_tap(int16_t *buffer, const uint8_t *bytes)
 {
-	UINT32 sample_count = 0;
+	uint32_t sample_count = 0;
 
 	/* data */
-	for (UINT32 i = 0; i < spc1000_image_size; i++)
+	for (uint32_t i = 0; i < spc1000_image_size; i++)
 		sample_count += spc1000_output_bit(buffer, sample_count, bytes[i] & 1);
 
 	return sample_count;
 }
 
-static int spc1000_handle_cas(INT16 *buffer, const UINT8 *bytes)
+static int spc1000_handle_cas(int16_t *buffer, const uint8_t *bytes)
 {
-	UINT32 sample_count = 0;
+	uint32_t sample_count = 0;
 
 	/* data (skipping first 16 bytes, which is CAS header) */
-	for (UINT32 i = 0x10; i < spc1000_image_size; i++)
+	for (uint32_t i = 0x10; i < spc1000_image_size; i++)
 		for (int j = 0; j < 8; j++)
 			sample_count += spc1000_output_bit(buffer, sample_count, (bytes[i] >> (7 - j)) & 1);
 
@@ -90,12 +90,12 @@ static int spc1000_handle_cas(INT16 *buffer, const UINT8 *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int spc1000_tap_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int spc1000_tap_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	return spc1000_handle_tap(buffer, bytes);
 }
 
-static int spc1000_cas_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int spc1000_cas_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	return spc1000_handle_cas(buffer, bytes);
 }
@@ -104,14 +104,14 @@ static int spc1000_cas_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
    Calculate the number of samples needed for this tape image
 ********************************************************************/
 
-static int spc1000_tap_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int spc1000_tap_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	spc1000_image_size = length;
 
 	return spc1000_handle_tap(nullptr, bytes);
 }
 
-static int spc1000_cas_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int spc1000_cas_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	spc1000_image_size = length;
 

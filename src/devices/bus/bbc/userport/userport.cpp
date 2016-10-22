@@ -50,7 +50,7 @@ device_bbc_userport_interface::~device_bbc_userport_interface()
 //  bbc_userport_slot_device - constructor
 //-------------------------------------------------
 
-bbc_userport_device::bbc_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bbc_userport_device::bbc_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, BBC_USERPORT_SLOT, "BBC Micro User port", tag, owner, clock, "bbc_userport_slot", __FILE__),
 		device_slot_interface(mconfig, *this), m_device(nullptr)
 {
@@ -76,9 +76,9 @@ void bbc_userport_device::device_start()
 }
 
 
-UINT8 bbc_userport_device::read_portb()
+uint8_t bbc_userport_device::read_portb()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (m_device)
 		data |= m_device->read_portb();
 	return data;

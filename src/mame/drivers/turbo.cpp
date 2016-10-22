@@ -362,7 +362,7 @@ WRITE8_MEMBER( turbo_state::scanlines_w )
 
 WRITE8_MEMBER( turbo_state::digit_w )
 {
-	static const UINT8 ls48_map[16] =
+	static const uint8_t ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	output().set_digit_value(m_i8279_scanlines * 2 + 0, ls48_map[data & 0x0f]);
@@ -1685,7 +1685,7 @@ void turbo_state::turbo_rom_decode()
 	 * F   03 03 03 03 02 02 02 02 01 01 01 01 00 00 00 00
 	 *
 	 */
-	static const UINT8 xortable[][32]=
+	static const uint8_t xortable[][32]=
 	{
 		/* Table 0 */
 		/* 0x0000-0x3ff */
@@ -1746,9 +1746,9 @@ void turbo_state::turbo_rom_decode()
 		2,1,2,1  /* 0x5000-0x5fff */
 	};
 
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	int offs, i, j;
-	UINT8 src;
+	uint8_t src;
 
 	for (offs = 0x0000; offs < 0x6000; offs++)
 	{

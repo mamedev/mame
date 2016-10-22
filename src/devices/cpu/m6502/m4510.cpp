@@ -13,7 +13,7 @@
 
 const device_type M4510 = &device_creator<m4510_device>;
 
-m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m65ce02_device(mconfig, M4510, "M4510", tag, owner, clock, "m4510", __FILE__),
 	map_enable(0),
 	nomap(false)
@@ -26,7 +26,7 @@ m4510_device::m4510_device(const machine_config &mconfig, const char *tag, devic
 	sprogram_config.m_page_shift = 13;
 }
 
-offs_t m4510_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m4510_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
 }
@@ -71,22 +71,22 @@ m4510_device::mi_4510_normal::mi_4510_normal(m4510_device *_base)
 	base = _base;
 }
 
-UINT8 m4510_device::mi_4510_normal::read(UINT16 adr)
+uint8_t m4510_device::mi_4510_normal::read(uint16_t adr)
 {
 	return program->read_byte(base->map(adr));
 }
 
-UINT8 m4510_device::mi_4510_normal::read_sync(UINT16 adr)
+uint8_t m4510_device::mi_4510_normal::read_sync(uint16_t adr)
 {
 	return sdirect->read_byte(base->map(adr));
 }
 
-UINT8 m4510_device::mi_4510_normal::read_arg(UINT16 adr)
+uint8_t m4510_device::mi_4510_normal::read_arg(uint16_t adr)
 {
 	return direct->read_byte(base->map(adr));
 }
 
-void m4510_device::mi_4510_normal::write(UINT16 adr, UINT8 val)
+void m4510_device::mi_4510_normal::write(uint16_t adr, uint8_t val)
 {
 	program->write_byte(base->map(adr), val);
 }
@@ -95,12 +95,12 @@ m4510_device::mi_4510_nd::mi_4510_nd(m4510_device *_base) : mi_4510_normal(_base
 {
 }
 
-UINT8 m4510_device::mi_4510_nd::read_sync(UINT16 adr)
+uint8_t m4510_device::mi_4510_nd::read_sync(uint16_t adr)
 {
 	return sprogram->read_byte(base->map(adr));
 }
 
-UINT8 m4510_device::mi_4510_nd::read_arg(UINT16 adr)
+uint8_t m4510_device::mi_4510_nd::read_arg(uint16_t adr)
 {
 	return program->read_byte(base->map(adr));
 }

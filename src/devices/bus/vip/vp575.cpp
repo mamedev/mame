@@ -92,7 +92,7 @@ machine_config_constructor vp575_device::device_mconfig_additions() const
 //  vp575_device - constructor
 //-------------------------------------------------
 
-vp575_device::vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vp575_device::vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VP575, "VP575", tag, owner, clock, "vp575", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this)
 {
@@ -124,9 +124,9 @@ void vp575_device::device_start()
 //  vip_program_r - program read
 //-------------------------------------------------
 
-UINT8 vp575_device::vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
+uint8_t vp575_device::vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (auto & elem : m_expansion_slot)
 	{
@@ -141,7 +141,7 @@ UINT8 vp575_device::vip_program_r(address_space &space, offs_t offset, int cs, i
 //  vip_program_w - program write
 //-------------------------------------------------
 
-void vp575_device::vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh)
+void vp575_device::vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	for (auto & elem : m_expansion_slot)
 	{
@@ -154,9 +154,9 @@ void vp575_device::vip_program_w(address_space &space, offs_t offset, UINT8 data
 //  vip_io_r - I/O read
 //-------------------------------------------------
 
-UINT8 vp575_device::vip_io_r(address_space &space, offs_t offset)
+uint8_t vp575_device::vip_io_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (auto & elem : m_expansion_slot)
 	{
@@ -171,7 +171,7 @@ UINT8 vp575_device::vip_io_r(address_space &space, offs_t offset)
 //  vip_io_w - I/O write
 //-------------------------------------------------
 
-void vp575_device::vip_io_w(address_space &space, offs_t offset, UINT8 data)
+void vp575_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_expansion_slot)
 	{
@@ -184,9 +184,9 @@ void vp575_device::vip_io_w(address_space &space, offs_t offset, UINT8 data)
 //  vip_dma_r - DMA read
 //-------------------------------------------------
 
-UINT8 vp575_device::vip_dma_r(address_space &space, offs_t offset)
+uint8_t vp575_device::vip_dma_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (auto & elem : m_expansion_slot)
 	{
@@ -201,7 +201,7 @@ UINT8 vp575_device::vip_dma_r(address_space &space, offs_t offset)
 //  vip_dma_w - DMA write
 //-------------------------------------------------
 
-void vp575_device::vip_dma_w(address_space &space, offs_t offset, UINT8 data)
+void vp575_device::vip_dma_w(address_space &space, offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_expansion_slot)
 	{
@@ -214,9 +214,9 @@ void vp575_device::vip_dma_w(address_space &space, offs_t offset, UINT8 data)
 //  vip_screen_update - screen update
 //-------------------------------------------------
 
-UINT32 vp575_device::vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vp575_device::vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 
 	for (auto & elem : m_expansion_slot)
 	{

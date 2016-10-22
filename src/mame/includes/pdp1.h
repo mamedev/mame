@@ -267,7 +267,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pdp1);
-	UINT32 screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pdp1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(pdp1_interrupt);
 	TIMER_CALLBACK_MEMBER(reader_callback);
@@ -275,7 +275,7 @@ public:
 	TIMER_CALLBACK_MEMBER(tyo_callback);
 	TIMER_CALLBACK_MEMBER(dpy_callback);
 	void pdp1_machine_stop();
-	inline void pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	inline void pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void pdp1_plot(int x, int y);
 	void pdp1_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
 	void pdp1_draw_multipleled(bitmap_ind16 &bitmap, int x, int y, int value, int nb_bits);
@@ -291,13 +291,13 @@ public:
 	void pdp1_draw_circle(bitmap_ind16 &bitmap, int x, int y, int radius, int color_);
 	void pdp1_erase_lightpen(bitmap_ind16 &bitmap);
 	void pdp1_draw_lightpen(bitmap_ind16 &bitmap);
-	int tape_read(UINT8 *reply);
+	int tape_read(uint8_t *reply);
 	void begin_tape_read(int binary, int nac);
-	void tape_write(UINT8 data);
-	void typewriter_out(UINT8 data);
+	void tape_write(uint8_t data);
+	void typewriter_out(uint8_t data);
 	void parallel_drum_set_il(int il);
-	UINT32 drum_read(int field, int position);
-	void drum_write(int field, int position, UINT32 data);
+	uint32_t drum_read(int field, int position);
+	void drum_write(int field, int position, uint32_t data);
 	void pdp1_keyboard();
 	void pdp1_lightpen();
 	int read_spacewar() { return m_spacewar->read(); }

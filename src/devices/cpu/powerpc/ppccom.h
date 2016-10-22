@@ -429,11 +429,11 @@ enum
  * in with the passed value.
  */
 
-#define D_OP(op)            (UINT32)((op & 0x3f) << 26)
-#define D_XO(xo)            (UINT32)((xo & 0x3ff) << 1)
-#define D_RT(r)             (UINT32)((r & 0x1f) << (31 - 10))
-#define D_RA(r)             (UINT32)((r & 0x1f) << (31 - 15))
-#define D_UIMM(u)           (UINT32)(u & 0xffff)
+#define D_OP(op)            (uint32_t)((op & 0x3f) << 26)
+#define D_XO(xo)            (uint32_t)((xo & 0x3ff) << 1)
+#define D_RT(r)             (uint32_t)((r & 0x1f) << (31 - 10))
+#define D_RA(r)             (uint32_t)((r & 0x1f) << (31 - 15))
+#define D_UIMM(u)           (uint32_t)(u & 0xffff)
 
 /*
  * Macros to Get Field Values

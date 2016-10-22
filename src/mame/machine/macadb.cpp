@@ -232,7 +232,7 @@ int mac_state::adb_pollmouse()
 	return 0;
 }
 
-void mac_state::adb_accummouse( UINT8 *MouseX, UINT8 *MouseY )
+void mac_state::adb_accummouse( uint8_t *MouseX, uint8_t *MouseY )
 {
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
@@ -272,8 +272,8 @@ void mac_state::adb_accummouse( UINT8 *MouseX, UINT8 *MouseY )
 
 	m_adb_lastbutton = m_mouse0->read() & 0x01;
 
-	*MouseX = (UINT8)MouseCountX;
-	*MouseY = (UINT8)MouseCountY;
+	*MouseX = (uint8_t)MouseCountX;
+	*MouseY = (uint8_t)MouseCountY;
 }
 
 void mac_state::adb_talk()
@@ -352,7 +352,7 @@ void mac_state::adb_talk()
 				m_adb_direction = 0;    // output to Mac
 				if (addr == m_adb_mouseaddr)
 				{
-					UINT8 mouseX, mouseY;
+					uint8_t mouseX, mouseY;
 
 					#if LOG_ADB || LOG_ADB_TALK_LISTEN
 					printf("Talking to mouse, register %x\n", reg);
@@ -758,7 +758,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_pmu_tick)
 	}
 }
 
-void mac_state::pmu_one_byte_reply(UINT8 result)
+void mac_state::pmu_one_byte_reply(uint8_t result)
 {
 	m_pm_out[0] = m_pm_out[1] = 1;  // length
 	m_pm_out[2] = result;
@@ -766,7 +766,7 @@ void mac_state::pmu_one_byte_reply(UINT8 result)
 	m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 }
 
-void mac_state::pmu_three_byte_reply(UINT8 result1, UINT8 result2, UINT8 result3)
+void mac_state::pmu_three_byte_reply(uint8_t result1, uint8_t result2, uint8_t result3)
 {
 	m_pm_out[0] = m_pm_out[1] = 3;  // length
 	m_pm_out[2] = result1;

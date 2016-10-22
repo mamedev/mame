@@ -392,7 +392,7 @@ void taitoh_state::taitoh_log_vram()
 
 /**************************************************************************/
 
-UINT32 taitoh_state::screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoh_state::screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tc0080vco->tilemap_update();
 
@@ -409,7 +409,7 @@ UINT32 taitoh_state::screen_update_syvalion(screen_device &screen, bitmap_ind16 
 }
 
 
-UINT32 taitoh_state::screen_update_recordbr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoh_state::screen_update_recordbr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tc0080vco->tilemap_update();
 
@@ -438,7 +438,7 @@ UINT32 taitoh_state::screen_update_recordbr(screen_device &screen, bitmap_ind16 
 }
 
 
-UINT32 taitoh_state::screen_update_dleague(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoh_state::screen_update_dleague(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tc0080vco->tilemap_update();
 

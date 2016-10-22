@@ -65,18 +65,18 @@ public:
 private:
 	void assert_fiq(int num);
 	void assert_irq(int num);
-	void ack_fiq(UINT16 mask);
-	void ack_irq(UINT16 mask);
-	void nokia_ccont_w(UINT8 data);
-	UINT8 nokia_ccont_r();
+	void ack_fiq(uint16_t mask);
+	void ack_irq(uint16_t mask);
+	void nokia_ccont_w(uint8_t data);
+	uint8_t nokia_ccont_r();
 
-	std::unique_ptr<UINT16[]>   m_ram;
-	std::unique_ptr<UINT16[]>   m_dsp_ram;
-	UINT8       m_power_on;
-	UINT16      m_fiq_status;
-	UINT16      m_irq_status;
-	UINT16      m_timer1_counter;
-	UINT16      m_timer0_counter;
+	std::unique_ptr<uint16_t[]>   m_ram;
+	std::unique_ptr<uint16_t[]>   m_dsp_ram;
+	uint8_t       m_power_on;
+	uint16_t      m_fiq_status;
+	uint16_t      m_irq_status;
+	uint16_t      m_timer1_counter;
+	uint16_t      m_timer0_counter;
 
 	emu_timer * m_timer0;
 	emu_timer * m_timer1;
@@ -87,17 +87,17 @@ private:
 	struct nokia_ccont
 	{
 		bool    dc;
-		UINT8   cmd;
-		UINT8   watchdog;
-		UINT8   regs[0x10];
+		uint8_t   cmd;
+		uint8_t   watchdog;
+		uint8_t   regs[0x10];
 	} m_ccont;
 
-	UINT8       m_mad2_regs[0x100];
+	uint8_t       m_mad2_regs[0x100];
 };
 
 
 #if LOG_MAD2_REGISTER_ACCESS
-static const char * nokia_mad2_reg_desc(UINT8 offset)
+static const char * nokia_mad2_reg_desc(uint8_t offset)
 {
 	switch(offset)
 	{
@@ -187,7 +187,7 @@ static const char * nokia_mad2_reg_desc(UINT8 offset)
 #endif
 
 #if LOG_CCONT_REGISTER_ACCESS
-static const char * nokia_ccont_reg_desc(UINT8 offset)
+static const char * nokia_ccont_reg_desc(uint8_t offset)
 {
 	switch(offset)
 	{
@@ -214,8 +214,8 @@ static const char * nokia_ccont_reg_desc(UINT8 offset)
 
 void noki3310_state::machine_start()
 {
-	m_ram = std::make_unique<UINT16[]>(0x40000);
-	m_dsp_ram = std::make_unique<UINT16[]>(0x800);      // DSP shared RAM
+	m_ram = std::make_unique<uint16_t[]>(0x40000);
+	m_dsp_ram = std::make_unique<uint16_t[]>(0x800);      // DSP shared RAM
 
 	// allocate timers
 	m_timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(noki3310_state::timer0), this));
@@ -296,7 +296,7 @@ void noki3310_state::assert_irq(int num)
 	}
 }
 
-void noki3310_state::ack_fiq(UINT16 mask)
+void noki3310_state::ack_fiq(uint16_t mask)
 {
 	m_fiq_status &= ~mask;
 
@@ -304,7 +304,7 @@ void noki3310_state::ack_fiq(UINT16 mask)
 		m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
-void noki3310_state::ack_irq(UINT16 mask)
+void noki3310_state::ack_irq(uint16_t mask)
 {
 	m_irq_status &= ~mask;
 
@@ -312,7 +312,7 @@ void noki3310_state::ack_irq(UINT16 mask)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void noki3310_state::nokia_ccont_w(UINT8 data)
+void noki3310_state::nokia_ccont_w(uint8_t data)
 {
 	if (m_ccont.dc == false)
 	{
@@ -323,14 +323,14 @@ void noki3310_state::nokia_ccont_w(UINT8 data)
 	}
 	else
 	{
-		UINT8 addr = (m_ccont.cmd >> 3) & 0x0f;
+		uint8_t addr = (m_ccont.cmd >> 3) & 0x0f;
 
 		switch(addr)
 		{
 			case 0x0:   // ADC
 			{
-				UINT16 ad_id = (data >> 4) & 0x07;
-				UINT16 ad_value = 0;
+				uint16_t ad_id = (data >> 4) & 0x07;
+				uint16_t ad_value = 0;
 				switch(ad_id)
 				{
 					case 0:     ad_value = 0x000;   break;  // Accessory Detect
@@ -372,10 +372,10 @@ void noki3310_state::nokia_ccont_w(UINT8 data)
 	m_ccont.dc = !m_ccont.dc;
 }
 
-UINT8 noki3310_state::nokia_ccont_r()
+uint8_t noki3310_state::nokia_ccont_r()
 {
-	UINT8 addr = (m_ccont.cmd >> 3) & 0x0f;
-	UINT8 data = m_ccont.regs[addr];
+	uint8_t addr = (m_ccont.cmd >> 3) & 0x0f;
+	uint8_t data = m_ccont.regs[addr];
 
 	system_time systime;
 	machine().current_datetime(systime);
@@ -403,7 +403,7 @@ PCD8544_SCREEN_UPDATE(noki3310_state::pcd8544_screen_update)
 	for (int r = 0; r < 6; r++)
 		for (int x = 0; x < 84; x++)
 		{
-			UINT8 gfx = vram[r*84 + x];
+			uint8_t gfx = vram[r*84 + x];
 
 			for (int y = 0; y < 8; y++)
 			{
@@ -483,7 +483,7 @@ WRITE16_MEMBER(noki3310_state::dsp_ram_w)
 
 READ8_MEMBER(noki3310_state::mad2_io_r)
 {
-	UINT8 data = m_mad2_regs[offset];
+	uint8_t data = m_mad2_regs[offset];
 
 	switch(offset)
 	{

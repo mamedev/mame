@@ -22,14 +22,14 @@
 class decodmd_type1_device : public device_t
 {
 public:
-	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	required_device<cpu_device> m_cpu;
 	required_memory_bank m_rombank1;
 	required_memory_bank m_rombank2;
 	required_device<ram_device> m_ram;
 	memory_region* m_rom;
 
-	UINT32 screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	uint32_t screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(data_w);
@@ -50,28 +50,28 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8 m_latch;
-	UINT8 m_status;
-	UINT8 m_ctrl;
-	UINT8 m_busy;
-	UINT8 m_command;
-	UINT8 m_bank;
-	UINT8 m_rowclock;
-	UINT8 m_rowdata;
-	UINT32 m_rowselect;
-	UINT8 m_blank;
-	UINT32 m_pxdata1;
-	UINT32 m_pxdata2;
-	UINT32 m_pxdata1_latched;
-	UINT32 m_pxdata2_latched;
+	uint8_t m_latch;
+	uint8_t m_status;
+	uint8_t m_ctrl;
+	uint8_t m_busy;
+	uint8_t m_command;
+	uint8_t m_bank;
+	uint8_t m_rowclock;
+	uint8_t m_rowdata;
+	uint32_t m_rowselect;
+	uint8_t m_blank;
+	uint32_t m_pxdata1;
+	uint32_t m_pxdata2;
+	uint32_t m_pxdata1_latched;
+	uint32_t m_pxdata2_latched;
 	bool m_frameswap;
-	UINT32 m_pixels[0x200];
-	UINT8 m_busy_lines;
-	UINT32 m_prevrow;
+	uint32_t m_pixels[0x200];
+	uint8_t m_busy_lines;
+	uint32_t m_prevrow;
 	const char* m_gfxtag;
 
 	void output_data();
-	void set_busy(UINT8 input, UINT8 val);
+	void set_busy(uint8_t input, uint8_t val);
 };
 
 extern const device_type DECODMD1;

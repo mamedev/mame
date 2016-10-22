@@ -46,7 +46,7 @@ READ8_MEMBER( c64_ieee488_device::tpi_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_bus->ren_r() << 2;
 	data |= m_bus->atn_r() << 3;
@@ -100,7 +100,7 @@ READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_bus->ifc_r();
 	data |= m_bus->srq_r() << 1;
@@ -173,7 +173,7 @@ machine_config_constructor c64_ieee488_device::device_mconfig_additions() const
 //  c64_ieee488_device - constructor
 //-------------------------------------------------
 
-c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_IEEE488, "IEEE-488", tag, owner, clock, "c64_ieee488", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_tpi(*this, MOS6525_TAG),
@@ -207,7 +207,7 @@ void c64_ieee488_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	data = m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 
@@ -228,7 +228,7 @@ UINT8 c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, UINT8 da
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_ieee488_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_ieee488_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2)
 	{

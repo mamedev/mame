@@ -49,7 +49,7 @@ ClawGrip, Jul 2006
 
 WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	int bank;
 
@@ -62,7 +62,7 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
 
 WRITE8_MEMBER(pokechmp_state::pokechmp_sound_bank_w)
 {
-	UINT8 *ROM = memregion("oki")->base();
+	uint8_t *ROM = memregion("oki")->base();
 	membank("okibank")->set_base(&ROM[data*0x8000]);
 }
 

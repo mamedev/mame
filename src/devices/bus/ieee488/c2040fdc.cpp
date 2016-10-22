@@ -69,7 +69,7 @@ const tiny_rom_entry *c2040_fdc_t::device_rom_region() const
 //  c2040_fdc_t - constructor
 //-------------------------------------------------
 
-c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C2040_FDC, "C2040 FDC", tag, owner, clock, "c2040fdc", __FILE__),
 	m_write_sync(*this),
 	m_write_ready(*this),
@@ -433,10 +433,10 @@ int c2040_fdc_t::get_next_bit(attotime &tm, const attotime &limit)
 
 READ8_MEMBER( c2040_fdc_t::read )
 {
-	UINT8 e = checkpoint_live.e;
+	uint8_t e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
 
-	UINT8 data = GCR_DECODE(e, i);
+	uint8_t data = GCR_DECODE(e, i);
 
 	if (LOG) logerror("%s %s VIA reads data %02x (%03x)\n", machine().time().as_string(), machine().describe_context(), data, checkpoint_live.shift_reg);
 

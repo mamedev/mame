@@ -29,23 +29,23 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {};
 
 	virtual void rom_alloc(size_t size, int width, endianness_t end, const char *tag);
-	virtual void ram_alloc(UINT32 size);
+	virtual void ram_alloc(uint32_t size);
 
-	UINT8* get_rom_base()  { return m_rom; }
-	UINT32 get_rom_size() { return m_rom_size; }
+	uint8_t* get_rom_base()  { return m_rom; }
+	uint32_t get_rom_size() { return m_rom_size; }
 
-	UINT8* get_region_base()  { if (m_region.found()) return m_region->base(); return nullptr; }
-	UINT32 get_region_size() { if (m_region.found()) return m_region->bytes(); return 0; }
+	uint8_t* get_region_base()  { if (m_region.found()) return m_region->base(); return nullptr; }
+	uint32_t get_region_size() { if (m_region.found()) return m_region->bytes(); return 0; }
 
-	UINT8* get_ram_base() { return &m_ram[0]; }
-	UINT32 get_ram_size() { return m_ram.size(); }
+	uint8_t* get_ram_base() { return &m_ram[0]; }
+	uint32_t get_ram_size() { return m_ram.size(); }
 
 	void save_ram()   { device().save_item(NAME(m_ram)); }
 
 	// internal state
-	UINT8  *m_rom;
-	UINT32  m_rom_size;
-	dynamic_buffer m_ram;
+	uint8_t  *m_rom;
+	uint32_t  m_rom_size;
+	std::vector<uint8_t> m_ram;
 
 	// this replaces m_rom for non-user configurable carts!
 	optional_memory_region  m_region;
@@ -64,7 +64,7 @@ enum
 
 
 #define MCFG_GENERIC_MANDATORY       \
-	static_cast<generic_slot_device *>(device)->set_must_be_loaded(TRUE);
+	static_cast<generic_slot_device *>(device)->set_must_be_loaded(true);
 
 #define MCFG_GENERIC_WIDTH(_width)       \
 	static_cast<generic_slot_device *>(device)->set_width(_width);
@@ -97,7 +97,7 @@ class generic_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	generic_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	generic_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~generic_slot_device();
 
 	static void static_set_device_load(device_t &device, device_image_load_delegate callback) { downcast<generic_slot_device &>(device).m_device_image_load = callback; }
@@ -119,8 +119,8 @@ public:
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	UINT32 common_get_size(const char *region);
-	void common_load_rom(UINT8 *ROM, UINT32 len, const char *region);
+	uint32_t common_get_size(const char *region);
+	void common_load_rom(uint8_t *ROM, uint32_t len, const char *region);
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 	virtual bool is_readable()  const override { return 1; }
@@ -143,9 +143,9 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
 	virtual void rom_alloc(size_t size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
-	virtual void ram_alloc(UINT32 size)  { if (m_cart) m_cart->ram_alloc(size); }
+	virtual void ram_alloc(uint32_t size)  { if (m_cart) m_cart->ram_alloc(size); }
 
-	UINT8* get_rom_base()  {
+	uint8_t* get_rom_base()  {
 		if (m_cart)
 		{
 			if (!user_loadable())
@@ -155,7 +155,7 @@ public:
 		}
 		return nullptr;
 	}
-	UINT32 get_rom_size()   {
+	uint32_t get_rom_size()   {
 		if (m_cart)
 		{
 			if (!user_loadable())
@@ -165,7 +165,7 @@ public:
 		}
 		return 0;
 	}
-	UINT8* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return nullptr; }
+	uint8_t* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return nullptr; }
 
 	void save_ram()   { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 

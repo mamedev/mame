@@ -27,9 +27,9 @@ public:
 	required_device<ym2413_device> m_ym2413;
 	required_memory_bank m_okibank;
 
-	UINT8           m_ym2413_volume;
-	UINT8           m_overall_volume;
-	UINT8           m_adpcm_bank;
+	uint8_t           m_ym2413_volume;
+	uint8_t           m_overall_volume;
+	uint8_t           m_adpcm_bank;
 	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(audio_control_w);
@@ -40,7 +40,7 @@ public:
 	DECLARE_MACHINE_START(relief);
 	DECLARE_MACHINE_RESET(relief);
 	DECLARE_VIDEO_START(relief);
-	UINT32 screen_update_relief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_relief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;
 };

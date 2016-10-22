@@ -21,9 +21,9 @@ class huc6270_device :  public device_t
 {
 public:
 	// construction/destruction
-	huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_vram_size(device_t &device, UINT32 vram_size) { downcast<huc6270_device &>(device).m_vram_size = vram_size; }
+	static void set_vram_size(device_t &device, uint32_t vram_size) { downcast<huc6270_device &>(device).m_vram_size = vram_size; }
 	template<class _Object> static devcb_base &set_irq_changed_callback(device_t &device, _Object object) { return downcast<huc6270_device &>(device).m_irq_changed_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
@@ -37,8 +37,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 
-	static const UINT16 HUC6270_SPRITE     = 0x0100;    // sprite colour information
-	static const UINT16 HUC6270_BACKGROUND = 0x0000;    // background colour information
+	static const uint16_t HUC6270_SPRITE     = 0x0100;    // sprite colour information
+	static const uint16_t HUC6270_BACKGROUND = 0x0000;    // background colour information
 
 protected:
 	// device-level overrides
@@ -70,34 +70,34 @@ private:
 
 
 	/* Size of Video ram (mandatory) */
-	UINT32 m_vram_size;
+	uint32_t m_vram_size;
 
 	/* Callback for when the irq line may have changed (mandatory) */
 	devcb_write_line    m_irq_changed_cb;
 
-	UINT8   m_register_index;
+	uint8_t   m_register_index;
 
 	/* HuC6270 registers */
-	UINT16  m_mawr;
-	UINT16  m_marr;
-	UINT16  m_vrr;
-	UINT16  m_vwr;
-	UINT16  m_cr;
-	UINT16  m_rcr;
-	UINT16  m_bxr;
-	UINT16  m_byr;
-	UINT16  m_mwr;
-	UINT16  m_hsr;
-	UINT16  m_hdr;
-	UINT16  m_vpr;
-	UINT16  m_vdw;
-	UINT16  m_vcr;
-	UINT16  m_dcr;
-	UINT16  m_sour;
-	UINT16  m_desr;
-	UINT16  m_lenr;
-	UINT16  m_dvssr;
-	UINT8   m_status;
+	uint16_t  m_mawr;
+	uint16_t  m_marr;
+	uint16_t  m_vrr;
+	uint16_t  m_vwr;
+	uint16_t  m_cr;
+	uint16_t  m_rcr;
+	uint16_t  m_bxr;
+	uint16_t  m_byr;
+	uint16_t  m_mwr;
+	uint16_t  m_hsr;
+	uint16_t  m_hdr;
+	uint16_t  m_vpr;
+	uint16_t  m_vdw;
+	uint16_t  m_vcr;
+	uint16_t  m_dcr;
+	uint16_t  m_sour;
+	uint16_t  m_desr;
+	uint16_t  m_lenr;
+	uint16_t  m_dvssr;
+	uint8_t   m_status;
 
 	/* To keep track of external hsync and vsync signals */
 	int m_hsync;
@@ -114,24 +114,24 @@ private:
 	int m_dvssr_written;
 	int m_satb_countdown;
 	int m_dma_enabled;
-	UINT16 m_byr_latched;
-	UINT16 m_bxr_latched;
-	UINT16 m_bat_address;
-	UINT16 m_bat_address_mask;
-	UINT16 m_bat_row;
-	UINT16 m_bat_column;
-	UINT8 m_bat_tile_row[8];
+	uint16_t m_byr_latched;
+	uint16_t m_bxr_latched;
+	uint16_t m_bat_address;
+	uint16_t m_bat_address_mask;
+	uint16_t m_bat_row;
+	uint16_t m_bat_column;
+	uint8_t m_bat_tile_row[8];
 	/* Internal sprite attribute table. SATB DMA is used to transfer data
 	   from VRAM to this internal table.
 	*/
-	UINT16 m_sat[4*64];
+	uint16_t m_sat[4*64];
 	int m_sprites_this_line;
 	int m_sprite_row_index;
-	UINT16  m_sprite_row[1024];
-	std::unique_ptr<UINT16[]>  m_vram;
-	UINT16  m_vram_mask;
+	uint16_t  m_sprite_row[1024];
+	std::unique_ptr<uint16_t[]>  m_vram;
+	uint16_t  m_vram_mask;
 
-	const static UINT8 vram_increments[4];
+	const static uint8_t vram_increments[4];
 };
 
 

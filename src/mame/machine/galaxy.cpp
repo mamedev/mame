@@ -51,7 +51,7 @@ INTERRUPT_GEN_MEMBER(galaxy_state::galaxy_interrupt)
 IRQ_CALLBACK_MEMBER(galaxy_state::galaxy_irq_callback)
 {
 	galaxy_set_timer();
-	m_interrupts_enabled = TRUE;
+	m_interrupts_enabled = true;
 	return 0xff;
 }
 
@@ -62,7 +62,7 @@ IRQ_CALLBACK_MEMBER(galaxy_state::galaxy_irq_callback)
 #define GALAXY_SNAPSHOT_V1_SIZE 8268
 #define GALAXY_SNAPSHOT_V2_SIZE 8244
 
-void galaxy_state::galaxy_setup_snapshot (const UINT8 * data, UINT32 size)
+void galaxy_state::galaxy_setup_snapshot (const uint8_t * data, uint32_t size)
 {
 	switch (size)
 	{
@@ -104,9 +104,9 @@ void galaxy_state::galaxy_setup_snapshot (const UINT8 * data, UINT32 size)
 			m_maincpu->set_state_int(Z80_HL2,  data[0x16] | data[0x17] << 8);
 
 			m_maincpu->set_state_int(Z80_IFF1, data[0x18] & 0x01);
-			m_maincpu->set_state_int(Z80_IFF2, (UINT64)0);
+			m_maincpu->set_state_int(Z80_IFF2, (uint64_t)0);
 
-			m_maincpu->set_state_int(Z80_HALT, (UINT64)0);
+			m_maincpu->set_state_int(Z80_HALT, (uint64_t)0);
 
 			m_maincpu->set_state_int(Z80_IM,   (data[0x18] >> 1) & 0x03);
 
@@ -124,13 +124,13 @@ void galaxy_state::galaxy_setup_snapshot (const UINT8 * data, UINT32 size)
 
 SNAPSHOT_LOAD_MEMBER( galaxy_state, galaxy )
 {
-	UINT8* snapshot_data;
+	uint8_t* snapshot_data;
 
 	switch (snapshot_size)
 	{
 		case GALAXY_SNAPSHOT_V1_SIZE:
 		case GALAXY_SNAPSHOT_V2_SIZE:
-			snapshot_data = auto_alloc_array(machine(), UINT8, snapshot_size);
+			snapshot_data = auto_alloc_array(machine(), uint8_t, snapshot_size);
 			break;
 		default:
 			return image_init_result::FAIL;
@@ -186,7 +186,7 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 	if (ioport("ROM2")->read())
 		membank("bank10")->set_base(memregion("maincpu")->base() + 0x1000);
 
-	m_interrupts_enabled = TRUE;
+	m_interrupts_enabled = true;
 }
 
 DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
@@ -196,7 +196,7 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
 
 MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	ROM[0x0037] = 0x29;
@@ -207,5 +207,5 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 	space.install_read_bank(0xe000, 0xefff, "bank11");
 	space.nop_write(0xe000, 0xefff);
 	membank("bank11")->set_base(memregion("maincpu")->base() + 0xe000);
-	m_interrupts_enabled = TRUE;
+	m_interrupts_enabled = true;
 }

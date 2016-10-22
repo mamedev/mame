@@ -120,22 +120,22 @@ public:
 		m_bm_palette(*this, "bm_palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_bitmap;
-	optional_shared_ptr<UINT8> m_bulletram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_bitmap;
+	optional_shared_ptr<uint8_t> m_bulletram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 
 	/* misc */
-	UINT8      m_nmi_enable;
-	UINT8      m_flip_x;
-	UINT8      m_flip_y;
-	UINT8      m_bitmap_disable;
-	UINT8      m_tilemap_bank;
-	UINT8      m_pri;
+	uint8_t      m_nmi_enable;
+	uint8_t      m_flip_x;
+	uint8_t      m_flip_y;
+	uint8_t      m_bitmap_disable;
+	uint8_t      m_tilemap_bank;
+	uint8_t      m_pri;
 	DECLARE_WRITE8_MEMBER(jollyjgr_videoram_w);
 	DECLARE_WRITE8_MEMBER(jollyjgr_attrram_w);
 	DECLARE_WRITE8_MEMBER(jollyjgr_misc_w);
@@ -145,8 +145,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jollyjgr);
-	UINT32 screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jollyjgr_interrupt);
 	void draw_bitmap( bitmap_rgb32 &bitmap );
 	required_device<cpu_device> m_maincpu;
@@ -420,7 +420,7 @@ INPUT_PORTS_END
 /* tilemap / sprites palette */
 PALETTE_INIT_MEMBER(jollyjgr_state, jollyjgr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -498,9 +498,9 @@ void jollyjgr_state::draw_bitmap( bitmap_rgb32 &bitmap )
 	}
 }
 
-UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	bitmap.fill(m_bm_palette->pen_color(0), cliprect);
@@ -553,7 +553,7 @@ UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-UINT32 jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// Draw bg and sprites
 	screen_update_jollyjgr(screen, bitmap, cliprect);
@@ -563,9 +563,9 @@ UINT32 jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_rgb32
 	Assume bullets to look the same as on Galaxian hw,
 	that is, simply 4 pixels. Colours are unknown. */
 	for (int offs=0;offs<0x10;offs+=2) {
-		UINT8 sy=~m_bulletram[offs];
-		UINT8 sx=~m_bulletram[offs|1];
-		UINT16 bc=(offs<4)?
+		uint8_t sy=~m_bulletram[offs];
+		uint8_t sx=~m_bulletram[offs|1];
+		uint16_t bc=(offs<4)?
 			7: // player, white
 			3; // enemy, yellow
 

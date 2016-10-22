@@ -23,7 +23,7 @@ const device_type SNS_LOROM_SUPERGB = &device_creator<sns_rom_sgb1_device>;
 const device_type SNS_LOROM_SUPERGB2 = &device_creator<sns_rom_sgb2_device>;
 
 
-sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: sns_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_sgb_cpu(*this, "sgb_cpu"),
 	m_sgb_apu(*this, "sgb_apu"),
@@ -47,13 +47,13 @@ sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_typ
 }
 
 
-sns_rom_sgb1_device::sns_rom_sgb1_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+sns_rom_sgb1_device::sns_rom_sgb1_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	sns_rom_sgb_device(mconfig, SNS_LOROM_SUPERGB, "SNES Super Game Boy Cart", tag, owner, clock, "sns_rom_sgb", __FILE__)
 {
 }
 
 
-sns_rom_sgb2_device::sns_rom_sgb2_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+sns_rom_sgb2_device::sns_rom_sgb2_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	sns_rom_sgb_device(mconfig, SNS_LOROM_SUPERGB2, "SNES Super Game Boy 2 Cart", tag, owner, clock, "sns_rom_sgb2", __FILE__)
 {
 }
@@ -242,7 +242,7 @@ READ8_MEMBER(sns_rom_sgb_device::read_h)
 
 READ8_MEMBER( sns_rom_sgb_device::chip_read )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	//LY counter
 	if (address == 0x6000)
@@ -284,7 +284,7 @@ READ8_MEMBER( sns_rom_sgb_device::chip_read )
 	//VRAM port
 	if (address == 0x7800)
 	{
-		UINT8 data = m_lcd_output[m_vram_offs];
+		uint8_t data = m_lcd_output[m_vram_offs];
 		m_vram_offs = (m_vram_offs + 1) % 320;
 		return data;
 	}
@@ -292,16 +292,16 @@ READ8_MEMBER( sns_rom_sgb_device::chip_read )
 	return 0x00;    // this should never happen?
 }
 
-void sns_rom_sgb_device::lcd_render(UINT32 *source)
+void sns_rom_sgb_device::lcd_render(uint32_t *source)
 {
-	memset(m_lcd_output, 0x00, 320 * sizeof(UINT16));
+	memset(m_lcd_output, 0x00, 320 * sizeof(uint16_t));
 
 	for (int y = 0; y < 8; y++)
 	{
 		for (int x = 0; x < 160; x++)
 		{
-			UINT32 pixel = *source++;
-			UINT16 addr = y * 2 + (x / 8 * 16);
+			uint32_t pixel = *source++;
+			uint16_t addr = y * 2 + (x / 8 * 16);
 			m_lcd_output[addr + 0] |= ((pixel & 1) >> 0) << (7 - (x & 7));
 			m_lcd_output[addr + 1] |= ((pixel & 2) >> 1) << (7 - (x & 7));
 		}
@@ -310,7 +310,7 @@ void sns_rom_sgb_device::lcd_render(UINT32 *source)
 
 WRITE8_MEMBER( sns_rom_sgb_device::chip_write )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	//VRAM port
 	if (address == 0x6001)
@@ -318,7 +318,7 @@ WRITE8_MEMBER( sns_rom_sgb_device::chip_write )
 		m_vram = data;
 		m_vram_offs = 0;
 
-		UINT8 offset = (m_sgb_row - (4 - (m_vram - (m_sgb_ly & 3)))) & 3;
+		uint8_t offset = (m_sgb_row - (4 - (m_vram - (m_sgb_ly & 3)))) & 3;
 		lcd_render(m_lcd_buffer + offset * 160 * 8);
 
 		return;

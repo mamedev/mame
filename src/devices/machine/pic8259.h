@@ -42,7 +42,7 @@
 class pic8259_device : public device_t
 {
 public:
-	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &static_set_out_int_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_out_int_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_sp_en_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_sp_en_func.set_callback(object); }
@@ -50,7 +50,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	UINT32 acknowledge();
+	uint32_t acknowledge();
 
 	DECLARE_WRITE_LINE_MEMBER( ir0_w ) { set_irq_line(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( ir1_w ) { set_irq_line(1, state); }
@@ -94,34 +94,34 @@ private:
 
 	pic8259_state_t m_state;
 
-	UINT8 m_isr;
-	UINT8 m_irr;
-	UINT8 m_prio;
-	UINT8 m_imr;
-	UINT8 m_irq_lines;
+	uint8_t m_isr;
+	uint8_t m_irr;
+	uint8_t m_prio;
+	uint8_t m_imr;
+	uint8_t m_irq_lines;
 
-	UINT8 m_input;
-	UINT8 m_ocw3;
+	uint8_t m_input;
+	uint8_t m_ocw3;
 
-	UINT8 m_master;
+	uint8_t m_master;
 	/* ICW1 state */
-	UINT8 m_level_trig_mode;
-	UINT8 m_vector_size;
-	UINT8 m_cascade;
-	UINT8 m_icw4_needed;
-	UINT32 m_vector_addr_low;
+	uint8_t m_level_trig_mode;
+	uint8_t m_vector_size;
+	uint8_t m_cascade;
+	uint8_t m_icw4_needed;
+	uint32_t m_vector_addr_low;
 	/* ICW2 state */
-	UINT8 m_base;
-	UINT8 m_vector_addr_high;
+	uint8_t m_base;
+	uint8_t m_vector_addr_high;
 
 	/* ICW3 state */
-	UINT8 m_slave;
+	uint8_t m_slave;
 
 	/* ICW4 state */
-	UINT8 m_nested;
-	UINT8 m_mode;
-	UINT8 m_auto_eoi;
-	UINT8 m_is_x86;
+	uint8_t m_nested;
+	uint8_t m_mode;
+	uint8_t m_auto_eoi;
+	uint8_t m_is_x86;
 };
 
 extern const device_type PIC8259;

@@ -42,7 +42,7 @@ class apricot_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_txd_wr_callback(device_t &device, _Object object) { return downcast<apricot_keyboard_device &>(device).m_write_txd.set_callback(object); }
 
@@ -51,7 +51,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	UINT8 read_keyboard();
+	uint8_t read_keyboard();
 
 	DECLARE_READ8_MEMBER( kb_lo_r );
 	DECLARE_READ8_MEMBER( kb_hi_r );
@@ -73,7 +73,7 @@ private:
 	required_ioport_array<13> m_y;
 	required_ioport m_modifiers;
 
-	UINT16 m_kb_y;
+	uint16_t m_kb_y;
 };
 
 

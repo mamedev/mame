@@ -32,7 +32,7 @@
 
 void harddriv_state::init_video()
 {
-	UINT32 *destmask, mask;
+	uint32_t *destmask, mask;
 	int i;
 
 	/* fill in the mask table */
@@ -270,10 +270,10 @@ READ16_MEMBER( harddriv_state::hdgsp_vram_2bpp_r )
 
 WRITE16_MEMBER( harddriv_state::hdgsp_vram_1bpp_w )
 {
-	UINT32 *dest = (UINT32 *)&m_gsp_vram[offset * 16];
-	UINT32 *mask = &m_mask_table[data * 4];
-	UINT32 color = m_gsp_control_lo[0] & 0xff;
-	UINT32 curmask;
+	uint32_t *dest = (uint32_t *)&m_gsp_vram[offset * 16];
+	uint32_t *mask = &m_mask_table[data * 4];
+	uint32_t color = m_gsp_control_lo[0] & 0xff;
+	uint32_t curmask;
 
 	color |= color << 8;
 	color |= color << 16;
@@ -298,10 +298,10 @@ WRITE16_MEMBER( harddriv_state::hdgsp_vram_1bpp_w )
 
 WRITE16_MEMBER( harddriv_state::hdgsp_vram_2bpp_w )
 {
-	UINT32 *dest = (UINT32 *)&m_gsp_vram[offset * 8];
-	UINT32 *mask = &m_mask_table[data * 2];
-	UINT32 color = m_gsp_control_lo[0];
-	UINT32 curmask;
+	uint32_t *dest = (uint32_t *)&m_gsp_vram[offset * 8];
+	uint32_t *mask = &m_mask_table[data * 2];
+	uint32_t color = m_gsp_control_lo[0];
+	uint32_t curmask;
 
 	color |= color << 16;
 
@@ -409,11 +409,11 @@ static void display_speedups(void)
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_driver)
 {
-	UINT8 *vram_base = &m_gsp_vram[(params->rowaddr << 12) & m_vram_mask];
+	uint8_t *vram_base = &m_gsp_vram[(params->rowaddr << 12) & m_vram_mask];
 
 	if (!vram_base) return;
 
-	UINT16 *dest = &bitmap.pix16(scanline);
+	uint16_t *dest = &bitmap.pix16(scanline);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 4) - 15 + (m_gfx_finescroll & 0x0f);
 	int x;
 
@@ -427,11 +427,11 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_driver)
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_multisync)
 {
-	UINT8 *vram_base = &m_gsp_vram[(params->rowaddr << 11) & m_vram_mask];
+	uint8_t *vram_base = &m_gsp_vram[(params->rowaddr << 11) & m_vram_mask];
 
 	if (!vram_base) return;
 
-	UINT16 *dest = &bitmap.pix16(scanline);
+	uint16_t *dest = &bitmap.pix16(scanline);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 3) - 7 + (m_gfx_finescroll & 0x07);
 	int x;
 

@@ -70,7 +70,7 @@ WRITE8_MEMBER(tank8_state::video_ram_w)
 
 TILE_GET_INFO_MEMBER(tank8_state::get_tile_info)
 {
-	UINT8 code = m_video_ram[tile_index];
+	uint8_t code = m_video_ram[tile_index];
 
 	int color = 0;
 
@@ -134,7 +134,7 @@ void tank8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	for (i = 0; i < 8; i++)
 	{
-		UINT8 code = ~m_pos_d_ram[i];
+		uint8_t code = ~m_pos_d_ram[i];
 
 		int x = get_x_pos(i);
 		int y = get_y_pos(i);
@@ -177,12 +177,12 @@ void tank8_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		set_collision(param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tank8_state::device_timer");
+		assert_always(false, "Unknown id in tank8_state::device_timer");
 	}
 }
 
 
-UINT32 tank8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tank8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens();
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -214,16 +214,16 @@ void tank8_state::screen_eof(screen_device &screen, bool state)
 		{
 			int _state = 0;
 
-			const UINT16* p1 = &m_helper1.pix16(y);
-			const UINT16* p2 = &m_helper2.pix16(y);
-			const UINT16* p3 = &m_helper3.pix16(y);
+			const uint16_t* p1 = &m_helper1.pix16(y);
+			const uint16_t* p2 = &m_helper2.pix16(y);
+			const uint16_t* p3 = &m_helper3.pix16(y);
 
 			if ((m_screen->frame_number() ^ y) & 1)
 				continue; /* video display is interlaced */
 
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
 			{
-				UINT8 index;
+				uint8_t index;
 
 				/* neither wall nor mine */
 				if ((p1[x] != 0x11) && (p1[x] != 0x13))

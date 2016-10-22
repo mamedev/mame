@@ -39,9 +39,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	std::unique_ptr<UINT8[]> m_videoram;
-	UINT8 m_port60;
-	UINT8 m_port70;
+	std::unique_ptr<uint8_t[]> m_videoram;
+	uint8_t m_port60;
+	uint8_t m_port70;
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
@@ -50,7 +50,7 @@ public:
 	DECLARE_DRIVER_INIT(quizo);
 	DECLARE_PALETTE_INIT(quizo);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -58,11 +58,11 @@ public:
 #define XTAL2   21477270
 
 
-static const UINT8 rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
+static const uint8_t rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
 PALETTE_INIT_MEMBER(quizo_state, quizo)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	for (i = 0;i < 16;i++)
 	{
@@ -88,7 +88,7 @@ PALETTE_INIT_MEMBER(quizo_state, quizo)
 	}
 }
 
-UINT32 quizo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t quizo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	for(y=0;y<200;y++)
@@ -268,7 +268,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(quizo_state,quizo)
 {
-	m_videoram=std::make_unique<UINT8[]>(0x4000*2);
+	m_videoram=std::make_unique<uint8_t[]>(0x4000*2);
 	membank("bank1")->configure_entries(0, 6, memregion("user1")->base(), 0x4000);
 
 	save_pointer(NAME(m_videoram.get()), 0x4000*2);

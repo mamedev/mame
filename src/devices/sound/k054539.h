@@ -42,7 +42,7 @@ public:
 	};
 
 	// construction/destruction
-	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	static void set_analog_callback(device_t &device, k054539_cb_delegate callback) { downcast<k054539_device &>(device).m_apan_cb = callback; }
@@ -80,34 +80,34 @@ protected:
 
 private:
 	struct channel {
-		UINT32 pos;
-		UINT32 pfrac;
-		INT32 val;
-		INT32 pval;
+		uint32_t pos;
+		uint32_t pfrac;
+		int32_t val;
+		int32_t pval;
 	};
 
 	double voltab[256];
 	double pantab[0xf];
 
 	double gain[8];
-	UINT8 posreg_latch[8][3];
+	uint8_t posreg_latch[8][3];
 	int flags;
 
 	unsigned char regs[0x230];
-	std::unique_ptr<UINT8[]> ram;
+	std::unique_ptr<uint8_t[]> ram;
 	int reverb_pos;
 
-	INT32 cur_ptr;
+	int32_t cur_ptr;
 	int cur_limit;
 	unsigned char *cur_zone;
-	required_region_ptr<UINT8> m_rom;
-	UINT32 rom_mask;
+	required_region_ptr<uint8_t> m_rom;
+	uint32_t rom_mask;
 
 	channel channels[8];
 	sound_stream *stream;
 
 	emu_timer          *m_timer;
-	UINT32             m_timer_state;
+	uint32_t             m_timer_state;
 	devcb_write_line   m_timer_handler;
 	k054539_cb_delegate m_apan_cb;
 

@@ -253,30 +253,30 @@ public:
 		m_palette(*this, "palette") {
 	}
 
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_reel3_scroll;
-	optional_shared_ptr<UINT8> m_reel2_scroll;
-	optional_shared_ptr<UINT8> m_reel1_scroll;
-	optional_shared_ptr<UINT8> m_reel1_ram;
-	optional_shared_ptr<UINT8> m_reel2_ram;
-	optional_shared_ptr<UINT8> m_reel3_ram;
-	optional_shared_ptr<UINT8> m_stbsub_out_c;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_reel3_scroll;
+	optional_shared_ptr<uint8_t> m_reel2_scroll;
+	optional_shared_ptr<uint8_t> m_reel1_scroll;
+	optional_shared_ptr<uint8_t> m_reel1_ram;
+	optional_shared_ptr<uint8_t> m_reel2_ram;
+	optional_shared_ptr<uint8_t> m_reel3_ram;
+	optional_shared_ptr<uint8_t> m_stbsub_out_c;
 
 	tilemap_t *m_tmap;
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
 	tilemap_t *m_reel3_tilemap;
 	int m_tiles_offset;
-	UINT8 m_out_c;
-	std::unique_ptr<UINT8[]> m_reel1_attr;
-	std::unique_ptr<UINT8[]> m_reel2_attr;
-	std::unique_ptr<UINT8[]> m_reel3_attr;
-	UINT8 m_flash_val;
-	UINT8 m_flash_packet;
-	UINT8 m_flash_packet_start;
+	uint8_t m_out_c;
+	std::unique_ptr<uint8_t[]> m_reel1_attr;
+	std::unique_ptr<uint8_t[]> m_reel2_attr;
+	std::unique_ptr<uint8_t[]> m_reel3_attr;
+	uint8_t m_flash_val;
+	uint8_t m_flash_packet;
+	uint8_t m_flash_packet_start;
 	int m_colordac_offs;
-	std::unique_ptr<UINT8[]> m_stbsub_colorram;
+	std::unique_ptr<uint8_t[]> m_stbsub_colorram;
 
 	ticket_dispenser_device *m_hopper;
 
@@ -322,9 +322,9 @@ public:
 	DECLARE_PALETTE_INIT(subsino_3proms);
 	DECLARE_VIDEO_START(subsino_reels);
 	DECLARE_VIDEO_START(stbsub);
-	UINT32 screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -362,8 +362,8 @@ WRITE8_MEMBER(subsino_state::subsino_colorram_w)
 
 TILE_GET_INFO_MEMBER(subsino_state::get_tile_info)
 {
-	UINT16 code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
-	UINT16 color = (code >> 8) & 0x0f;
+	uint16_t code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
+	uint16_t color = (code >> 8) & 0x0f;
 	code = ((code & 0xf000) >> 4) + ((code & 0xff) >> 0);
 	code += m_tiles_offset;
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -371,7 +371,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_tile_info)
 
 TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_tile_info)
 {
-	UINT16 code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
+	uint16_t code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	code&= 0x3fff;
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
@@ -503,14 +503,14 @@ VIDEO_START_MEMBER(subsino_state,stbsub)
 }
 
 
-UINT32 subsino_state::screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subsino_state::screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-UINT32 subsino_state::screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subsino_state::screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	bitmap.fill(0, cliprect);
@@ -539,7 +539,7 @@ UINT32 subsino_state::screen_update_subsino_reels(screen_device &screen, bitmap_
 }
 
 
-UINT32 subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	bitmap.fill(0, cliprect);
@@ -578,7 +578,7 @@ UINT32 subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap_i
 
 PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -605,7 +605,7 @@ PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
 
 PALETTE_INIT_MEMBER(subsino_state,subsino_3proms)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -3537,7 +3537,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino_state,smoto16)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x12d0] = 0x20; // "ERROR 951010"
 }
 
@@ -3798,13 +3798,13 @@ DRIVER_INIT_MEMBER(subsino_state,sharkpye)
 
 DRIVER_INIT_MEMBER(subsino_state,smoto20)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x12e1] = 0x20; // "ERROR 951010"
 }
 
 DRIVER_INIT_MEMBER(subsino_state,tisub)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3819,7 +3819,7 @@ DRIVER_INIT_MEMBER(subsino_state,tisub)
 
 DRIVER_INIT_MEMBER(subsino_state,tisuba)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3835,94 +3835,94 @@ DRIVER_INIT_MEMBER(subsino_state,tisuba)
 DRIVER_INIT_MEMBER(subsino_state,stbsub)
 {
 #if 1
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x1005] = 0x1d; //patch protection check
 	rom[0x7ab] = 0x18; //patch "winning protection" check
 	rom[0x957] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
+	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
-	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
-	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel1_attr = std::make_unique<uint8_t[]>(0x200);
+	m_reel2_attr = std::make_unique<uint8_t[]>(0x200);
+	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
 }
 
 DRIVER_INIT_MEMBER(subsino_state, stisub)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x0FA0] = 0x28;
 	rom[0x0FA1] = 0x1d; //patch protection check
 
-	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
+	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
-	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
-	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel1_attr = std::make_unique<uint8_t[]>(0x200);
+	m_reel2_attr = std::make_unique<uint8_t[]>(0x200);
+	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
 }
 
 DRIVER_INIT_MEMBER(subsino_state,tesorone)
 {
 #if 1
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x10a4] = 0x18; //patch protection check ("ERROR 08073"):
 	rom[0x10a5] = 0x11;
 	rom[0x8b6] = 0x18; //patch "winning protection" check
 	rom[0xa84] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
+	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
-	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
-	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel1_attr = std::make_unique<uint8_t[]>(0x200);
+	m_reel2_attr = std::make_unique<uint8_t[]>(0x200);
+	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
 }
 
 DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 {
 #if 1
-	UINT8 *rom = memregion( "maincpu" )->base();            //check this patch!!!!
+	uint8_t *rom = memregion( "maincpu" )->base();            //check this patch!!!!
 	rom[0x10a8] = 0x18; //patch protection check ("ERROR 08073"):
 	rom[0x10a9] = 0x11;
 	rom[0x8ba] = 0x18; //patch "winning protection" check
 	rom[0xa88] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
+	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
-	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
-	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel1_attr = std::make_unique<uint8_t[]>(0x200);
+	m_reel2_attr = std::make_unique<uint8_t[]>(0x200);
+	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
 }
 
 
 DRIVER_INIT_MEMBER(subsino_state,mtrainnv)
 {
-	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
+	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
-	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
-	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel1_attr = std::make_unique<uint8_t[]>(0x200);
+	m_reel2_attr = std::make_unique<uint8_t[]>(0x200);
+	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
 }
 
 /***************************************************************************

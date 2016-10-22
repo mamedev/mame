@@ -94,7 +94,7 @@ WRITE8_MEMBER(pes_state::pes_kbd_input)
 /* Helper Functions */
 READ8_MEMBER( pes_state::data_to_i8031)
 {
-	UINT8 data;
+	uint8_t data;
 	data = m_infifo[m_infifo_tail_ptr];
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
 	if (m_infifo_tail_ptr != m_infifo_head_ptr) m_infifo_tail_ptr++;
@@ -136,7 +136,7 @@ WRITE8_MEMBER( pes_state::port1_w )
 
 READ8_MEMBER( pes_state::port1_r )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 	data = m_speech->status_r(space, 0);
 #ifdef DEBUG_PORTS
 	logerror("port1 read: tms5220 data read: 0x%02X\n", data);
@@ -172,7 +172,7 @@ WRITE8_MEMBER( pes_state::port3_w )
 
 READ8_MEMBER( pes_state::port3_r )
 {
-	UINT8 data = m_port3_state & 0xE3; // return last written state with rts, /rdy and /int masked out
+	uint8_t data = m_port3_state & 0xE3; // return last written state with rts, /rdy and /int masked out
 	// check rts state; if virtual fifo is nonzero, rts is set, otherwise it is cleared
 	if (m_infifo_tail_ptr != m_infifo_head_ptr)
 	{

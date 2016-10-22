@@ -40,34 +40,34 @@
 ***************************************************************************/
 
 union vdc_t {
-	UINT8 reg[0x100];
+	uint8_t reg[0x100];
 	struct {
 		struct {
-			UINT8 y,x,color,res;
+			uint8_t y,x,color,res;
 		} sprites[4];
 		struct {
-			UINT8 y,x,ptr,color;
+			uint8_t y,x,ptr,color;
 		} foreground[12];
 		struct {
 			struct {
-				UINT8 y,x,ptr,color;
+				uint8_t y,x,ptr,color;
 			} single[4];
 		} quad[4];
-		UINT8 shape[4][8];
-		UINT8 control;
-		UINT8 status;
-		UINT8 collision;
-		UINT8 color;
-		UINT8 y;
-		UINT8 x;
-		UINT8 res;
-		UINT8 shift1;
-		UINT8 shift2;
-		UINT8 shift3;
-		UINT8 sound;
-		UINT8 res2[5+0x10];
-		UINT8 hgrid[2][0x10];
-		UINT8 vgrid[0x10];
+		uint8_t shape[4][8];
+		uint8_t control;
+		uint8_t status;
+		uint8_t collision;
+		uint8_t color;
+		uint8_t y;
+		uint8_t x;
+		uint8_t res;
+		uint8_t shift1;
+		uint8_t shift2;
+		uint8_t shift3;
+		uint8_t sound;
+		uint8_t res2[5+0x10];
+		uint8_t hgrid[2][0x10];
+		uint8_t vgrid[0x10];
 	} s;
 };
 
@@ -80,8 +80,8 @@ class i8244_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	i8244_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int lines, const char *shortname, const char *source);
+	i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8244_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int lines, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_screen_tag(device_t &device, const char *screen_tag) { downcast<i8244_device &>(device).m_screen_tag = screen_tag; }
@@ -94,7 +94,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(hblank);
 	DECLARE_PALETTE_INIT(i8244);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	inline bitmap_ind16 *get_bitmap() { return &m_tmp_bitmap; }
 
@@ -122,7 +122,7 @@ protected:
 	offs_t fix_register_mirrors( offs_t offset );
 
 	// Local constants
-	static const UINT8 VDC_CONTROL_REG_STROBE_XY = 0x02;
+	static const uint8_t VDC_CONTROL_REG_STROBE_XY = 0x02;
 
 	/* timers */
 	static const device_timer_id TIMER_LINE = 0;
@@ -142,11 +142,11 @@ protected:
 	int m_screen_lines;
 
 	vdc_t m_vdc;
-	UINT16 m_sh_count;
-	UINT8 m_x_beam_pos;
-	UINT8 m_y_beam_pos;
-	UINT8 m_control_status;
-	UINT8 m_collision_status;
+	uint16_t m_sh_count;
+	uint8_t m_x_beam_pos;
+	uint8_t m_y_beam_pos;
+	uint8_t m_control_status;
+	uint8_t m_collision_status;
 	int m_iff;
 };
 
@@ -155,7 +155,7 @@ class i8245_device :  public i8244_device
 {
 public:
 	// construction/destruction
-	i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static const int LINES = 312;
 };

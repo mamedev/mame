@@ -107,7 +107,7 @@ const tiny_rom_entry *egret_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-void egret_device::send_port(address_space &space, UINT8 offset, UINT8 data)
+void egret_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -208,7 +208,7 @@ WRITE8_MEMBER( egret_device::ddr_w )
 
 READ8_MEMBER( egret_device::ports_r )
 {
-	UINT8 incoming = 0;
+	uint8_t incoming = 0;
 
 	switch (offset)
 	{
@@ -333,7 +333,7 @@ WRITE8_MEMBER( egret_device::pram_w )
 //  egret_device - constructor
 //-------------------------------------------------
 
-egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EGRET, "Apple Egret", tag, owner, clock, "egret", __FILE__),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),
@@ -389,7 +389,7 @@ void egret_device::device_start()
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));
 
-	UINT8 *rom = device().machine().root_device().memregion(device().subtag(EGRET_CPU_TAG).c_str())->base();
+	uint8_t *rom = device().machine().root_device().memregion(device().subtag(EGRET_CPU_TAG).c_str())->base();
 
 	if (rom)
 	{

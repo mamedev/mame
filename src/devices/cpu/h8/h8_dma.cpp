@@ -4,7 +4,7 @@
 const device_type H8_DMA         = &device_creator<h8_dma_device>;
 const device_type H8_DMA_CHANNEL = &device_creator<h8_dma_channel_device>;
 
-h8_dma_device::h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8_dma_device::h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_DMA, "H8 DMA controller", tag, owner, clock, "h8_dma", __FILE__),
 	dmach0(*this, "0"),
 	dmach1(*this, "1")
@@ -85,7 +85,7 @@ WRITE16_MEMBER(h8_dma_device::dmabcr_w)
 
 
 
-h8_dma_channel_device::h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8_dma_channel_device::h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_DMA_CHANNEL, "H8 DMA channel", tag, owner, clock, "h8_dma_channel", __FILE__),
 	dmac(*this, "^"),
 	cpu(*this, "^^")
@@ -247,7 +247,7 @@ WRITE16_MEMBER(h8_dma_channel_device::dmacr_w)
 	start_test(-1);
 }
 
-void h8_dma_channel_device::set_bcr(bool _fae, bool _sae, UINT8 _dta, UINT8 _dte, UINT8 _dtie)
+void h8_dma_channel_device::set_bcr(bool _fae, bool _sae, uint8_t _dta, uint8_t _dte, uint8_t _dtie)
 {
 	fae  = _fae;
 	sae  = _sae;
@@ -291,7 +291,7 @@ void h8_dma_channel_device::start(int submodule)
 			state[submodule].dest = mar[1];
 			state[submodule].count = etcr[0] ? etcr[0] : 0x10000;
 			state[submodule].mode_16 = dmacr & 0x8000;
-			INT32 step = state[submodule].mode_16 ? 2 : 1;
+			int32_t step = state[submodule].mode_16 ? 2 : 1;
 			state[submodule].incs = dmacr & 0x2000 ? dmacr & 0x4000 ? -step : step : 0;
 			state[submodule].incd = dmacr & 0x0020 ? dmacr & 0x0040 ? -step : step : 0;
 			cpu->set_current_dma(state + submodule);

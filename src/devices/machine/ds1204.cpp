@@ -29,7 +29,7 @@ inline void ATTR_PRINTF( 3, 4 ) ds1204_device::verboselog( int n_level, const ch
 // device type definition
 const device_type DS1204 = &device_creator<ds1204_device>;
 
-ds1204_device::ds1204_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+ds1204_device::ds1204_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t( mconfig, DS1204, "DS1204", tag, owner, clock, "ds1204", __FILE__ ),
 	device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
@@ -80,7 +80,7 @@ void ds1204_device::nvram_default()
 	}
 	else
 	{
-		UINT8 *region = m_region->base();
+		uint8_t *region = m_region->base();
 
 		memcpy( m_unique_pattern, region, sizeof( m_unique_pattern ) ); region += sizeof( m_unique_pattern );
 		memcpy( m_identification, region, sizeof( m_identification ) ); region += sizeof( m_identification );
@@ -111,7 +111,7 @@ void ds1204_device::new_state( int state )
 	m_bit = 0;
 }
 
-void ds1204_device::writebit( UINT8 *buffer )
+void ds1204_device::writebit( uint8_t *buffer )
 {
 	if( m_clk )
 	{
@@ -131,7 +131,7 @@ void ds1204_device::writebit( UINT8 *buffer )
 	}
 }
 
-void ds1204_device::readbit( UINT8 *buffer )
+void ds1204_device::readbit( uint8_t *buffer )
 {
 	if( !m_clk )
 	{

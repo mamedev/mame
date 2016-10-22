@@ -19,7 +19,7 @@ const device_type FIFO7200 = &device_creator<fifo7200_device>;
 //  fifo7200_device - constructor
 //-------------------------------------------------
 
-fifo7200_device::fifo7200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fifo7200_device::fifo7200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FIFO7200, "IDT7200 FIFO", tag, owner, clock, "fifo7200", __FILE__),
 		m_ram_size(0), m_read_ptr(0), m_write_ptr(0), m_ef(0), m_ff(0), m_hf(0),
 		m_ef_handler(*this),
@@ -73,7 +73,7 @@ void fifo7200_device::device_reset()
 
 
 
-void fifo7200_device::fifo_write(UINT16 data)
+void fifo7200_device::fifo_write(uint16_t data)
 {
 	if (m_ff)
 	{
@@ -104,7 +104,7 @@ void fifo7200_device::fifo_write(UINT16 data)
 	}
 }
 
-UINT16 fifo7200_device::fifo_read()
+uint16_t fifo7200_device::fifo_read()
 {
 	if (m_ef)
 	{
@@ -112,7 +112,7 @@ UINT16 fifo7200_device::fifo_read()
 		return 0x1ff;
 	}
 
-	UINT16 ret = m_buffer[m_read_ptr];
+	uint16_t ret = m_buffer[m_read_ptr];
 	m_read_ptr = (m_read_ptr + 1) % m_ram_size;
 
 	// update flags

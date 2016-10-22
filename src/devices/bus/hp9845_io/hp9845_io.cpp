@@ -17,7 +17,7 @@ const device_type HP9845_IO_SLOT = &device_creator<hp9845_io_slot_device>;
 // +---------------------+
 // |hp9845_io_slot_device|
 // +---------------------+
-hp9845_io_slot_device::hp9845_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+hp9845_io_slot_device::hp9845_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
     device_t(mconfig, HP9845_IO_SLOT, "HP9845 I/O Slot", tag, owner, clock, "hp9845_io_slot", __FILE__),
     device_slot_interface(mconfig, *this)
 {
@@ -36,7 +36,7 @@ void hp9845_io_slot_device::device_start()
 // +---------------------+
 // |hp9845_io_card_device|
 // +---------------------+
-hp9845_io_card_device::hp9845_io_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+hp9845_io_card_device::hp9845_io_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
     device_t(mconfig, type, name, tag, owner, clock, shortname, source),
     device_slot_card_interface(mconfig, *this),
     m_sys(nullptr),

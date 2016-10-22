@@ -122,13 +122,13 @@ public:
 	required_device<floppy_image_device> m_floppy1;
 	required_device<rs232_port_device> m_rs232;
 	required_device<tandy2k_keyboard_device> m_kb;
-	required_shared_ptr<UINT16> m_hires_ram;
-	optional_shared_ptr<UINT8> m_char_ram;
+	required_shared_ptr<uint16_t> m_hires_ram;
+	optional_shared_ptr<uint8_t> m_char_ram;
 
 	virtual void machine_start() override;
 	virtual void device_reset_after_children() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_drq();
 	void dma_request(int line, int state);
@@ -183,13 +183,13 @@ public:
 	};
 
 	/* DMA state */
-	UINT8 m_dma_mux;
+	uint8_t m_dma_mux;
 	int m_busdmarq[4];
 
 	/* keyboard state */
 	int m_kbdclk;
 	int m_kbddat;
-	UINT8 m_kbdin;
+	uint8_t m_kbdin;
 
 	/* serial state */
 	int m_extclk;
@@ -200,20 +200,20 @@ public:
 	int m_pb_sel;
 
 	/* video state */
-	UINT8 m_vram_base;
+	uint8_t m_vram_base;
 	int m_vidouts;
 	int m_clkspd;
 	int m_clkcnt;
 	int m_blc;
 	int m_bkc;
 	int m_cblank;
-	UINT8 m_dblc;
-	UINT8 m_dbkc;
-	UINT8 m_dblank;
+	uint8_t m_dblc;
+	uint8_t m_dbkc;
+	uint8_t m_dblank;
 	int m_slg;
 	int m_sld;
-	UINT8 m_cgra;
-	UINT8 m_vidla;
+	uint8_t m_cgra;
+	uint8_t m_vidla;
 
 	/* sound state */
 	int m_outspkr;

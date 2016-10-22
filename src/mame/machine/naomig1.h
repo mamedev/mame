@@ -16,9 +16,9 @@ public:
 		DMA_GDROM_IRQ
 	};
 
-	typedef delegate<void (UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32 size, bool to_mainram)> dma_cb;
+	typedef delegate<void (uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram)> dma_cb;
 
-	naomi_g1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	naomi_g1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	template<class _cb> void set_irq_cb(_cb cb) { irq_cb.set_callback(cb); }
 	void set_dma_cb(dma_cb _cb) { _dma_cb = _cb; }
 
@@ -57,17 +57,17 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void dma_get_position(UINT8 *&base, UINT32 &limit, bool to_maincpu) = 0;
-	virtual void dma_advance(UINT32 size) = 0;
+	virtual void dma_get_position(uint8_t *&base, uint32_t &limit, bool to_maincpu) = 0;
+	virtual void dma_advance(uint32_t size) = 0;
 
 private:
-	UINT32 gdstar, gdlen, gddir, gden, gdst;
+	uint32_t gdstar, gdlen, gddir, gden, gdst;
 
 	emu_timer *timer;
 	devcb_write8 irq_cb;
 	dma_cb _dma_cb;
 
-	void dma(void *dma_ptr, UINT32 main_adr, UINT32 size, bool to_mainram);
+	void dma(void *dma_ptr, uint32_t main_adr, uint32_t size, bool to_mainram);
 };
 
 #endif

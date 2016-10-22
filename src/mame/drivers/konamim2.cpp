@@ -196,9 +196,9 @@ Notes:
 
 struct CDE_DMA
 {
-	UINT32 dst_addr;
+	uint32_t dst_addr;
 	int length;
-	UINT32 next_dst_addr;
+	uint32_t next_dst_addr;
 	int next_length;
 	int dma_done;
 };
@@ -212,18 +212,18 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub") { }
 
-	required_shared_ptr<UINT64> m_main_ram;
-	UINT32 m_vdl0_address;
-	UINT32 m_vdl1_address;
-	UINT32 m_irq_enable;
-	UINT32 m_irq_active;
-	UINT64 m_unk3;
-	UINT32 m_unk20004;
+	required_shared_ptr<uint64_t> m_main_ram;
+	uint32_t m_vdl0_address;
+	uint32_t m_vdl1_address;
+	uint32_t m_irq_enable;
+	uint32_t m_irq_active;
+	uint64_t m_unk3;
+	uint32_t m_unk20004;
 	int m_counter1;
 	int m_cde_num_status_bytes;
-	UINT32 m_cde_status_bytes[16];
+	uint32_t m_cde_status_bytes[16];
 	int m_cde_status_byte_ptr;
-	UINT32 m_cde_command_bytes[16];
+	uint32_t m_cde_command_bytes[16];
 	int m_cde_command_byte_ptr;
 	int m_cde_response;
 	int m_cde_drive_state;
@@ -253,7 +253,7 @@ public:
 	DECLARE_READ64_MEMBER(cpu_r);
 	DECLARE_DRIVER_INIT(m2);
 	virtual void video_start() override;
-	UINT32 screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m2);
 	void cde_init();
 	void cde_handle_command();
@@ -268,23 +268,23 @@ void konamim2_state::video_start()
 {
 }
 
-UINT32 konamim2_state::screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t konamim2_state::screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
 
-	UINT32 fb_start = 0xffffffff;
+	uint32_t fb_start = 0xffffffff;
 	if (m_vdl0_address != 0)
 	{
-		fb_start = *(UINT32*)&m_main_ram[(m_vdl0_address - 0x40000000) / 8] - 0x40000000;
+		fb_start = *(uint32_t*)&m_main_ram[(m_vdl0_address - 0x40000000) / 8] - 0x40000000;
 	}
 
 	if (fb_start <= 0x800000)
 	{
-		UINT16 *frame = (UINT16*)&m_main_ram[fb_start/8];
+		uint16_t *frame = (uint16_t*)&m_main_ram[fb_start/8];
 		for (j=0; j < 384; j++)
 		{
-			UINT16 *fb = &frame[(j*512)];
-			UINT16 *d = &bitmap.pix16(j);
+			uint16_t *fb = &frame[(j*512)];
+			uint16_t *d = &bitmap.pix16(j);
 			for (i=0; i < 512; i++)
 			{
 				d[i^3] = *fb++ & 0x7fff;
@@ -300,11 +300,11 @@ UINT32 konamim2_state::screen_update_m2(screen_device &screen, bitmap_ind16 &bit
 
 READ64_MEMBER(konamim2_state::irq_enable_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(m_irq_enable) << 32;
+		r |= (uint64_t)(m_irq_enable) << 32;
 	}
 
 	return r;
@@ -314,17 +314,17 @@ WRITE64_MEMBER(konamim2_state::irq_enable_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		m_irq_enable |= (UINT32)(data >> 32);
+		m_irq_enable |= (uint32_t)(data >> 32);
 	}
 }
 
 READ64_MEMBER(konamim2_state::irq_active_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(m_irq_active) << 32;
+		r |= (uint64_t)(m_irq_active) << 32;
 	}
 
 	return r;
@@ -343,7 +343,7 @@ READ64_MEMBER(konamim2_state::unk2_r)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		return (UINT64)0xa5 << 32;
+		return (uint64_t)0xa5 << 32;
 	}
 	return 0;
 }
@@ -357,13 +357,13 @@ READ64_MEMBER(konamim2_state::unk3_r)
 
 READ64_MEMBER(konamim2_state::unk4_r)
 {
-	UINT64 r = 0;
-//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), space.device().safe_pc());
+	uint64_t r = 0;
+//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), space.device().safe_pc());
 
 	if (ACCESSING_BITS_32_63)
 	{
 		// MCfg
-		r |= (UINT64)((0 << 13) | (5 << 10)) << 32;
+		r |= (uint64_t)((0 << 13) | (5 << 10)) << 32;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
@@ -374,8 +374,8 @@ READ64_MEMBER(konamim2_state::unk4_r)
 
 WRITE64_MEMBER(konamim2_state::unk4_w)
 {
-//  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data),
-//      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), space.device().safe_pc());
+//  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data),
+//      offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), space.device().safe_pc());
 
 	if (ACCESSING_BITS_0_31)
 	{
@@ -385,7 +385,7 @@ WRITE64_MEMBER(konamim2_state::unk4_w)
 			m_subcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
-		m_unk20004 = (UINT32)(data);
+		m_unk20004 = (uint32_t)(data);
 		return;
 	}
 }
@@ -393,7 +393,7 @@ WRITE64_MEMBER(konamim2_state::unk4_w)
 READ64_MEMBER(konamim2_state::unk30000_r)
 {
 	m_counter1++;
-	return (UINT64)(m_counter1 & 0x7f) << 32;
+	return (uint64_t)(m_counter1 & 0x7f) << 32;
 }
 
 READ64_MEMBER(konamim2_state::unk30030_r)
@@ -409,11 +409,11 @@ WRITE64_MEMBER(konamim2_state::video_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		m_vdl0_address = (UINT32)(data >> 32);
+		m_vdl0_address = (uint32_t)(data >> 32);
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		m_vdl1_address = (UINT32)(data);
+		m_vdl1_address = (uint32_t)(data);
 	}
 }
 
@@ -434,7 +434,7 @@ READ64_MEMBER(konamim2_state::unk4000280_r)
 {
 	// SysCfg
 
-	UINT32 sys_config = 0x03600000;
+	uint32_t sys_config = 0x03600000;
 
 	sys_config |= 0 << 0;           // Bit 0:       PAL/NTSC switch (default is selected by encoder)
 	sys_config |= 0 << 2;           // Bit 2-3:     Video Encoder (0 = MEIENC, 1 = VP536, 2 = BT9103, 3 = DENC)
@@ -450,7 +450,7 @@ READ64_MEMBER(konamim2_state::unk4000280_r)
 									//              0xf = Multiplayer (not allowed)
 	sys_config |= 3 << 29;          // Bit 29-30:   Audio chip (1 = CS4216, 3 = Asahi AK4309)
 
-	return ((UINT64)(sys_config) << 32);
+	return ((uint64_t)(sys_config) << 32);
 
 }
 
@@ -462,7 +462,7 @@ WRITE64_MEMBER(konamim2_state::unk4000010_w)
 	}
 	else
 	{
-//      osd_printf_debug("%c", (UINT8)(data & 0xff));
+//      osd_printf_debug("%c", (uint8_t)(data & 0xff));
 	}
 }
 
@@ -827,7 +827,7 @@ void konamim2_state::cde_handle_reports()
 
 void konamim2_state::cde_dma_transfer(address_space &space, int channel, int next)
 {
-	UINT32 address;
+	uint32_t address;
 	//int length;
 	int i;
 
@@ -851,7 +851,7 @@ void konamim2_state::cde_dma_transfer(address_space &space, int channel, int nex
 
 READ64_MEMBER(konamim2_state::cde_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	int reg = offset * 2;
 
 	if (ACCESSING_BITS_0_31)
@@ -916,27 +916,27 @@ READ64_MEMBER(konamim2_state::cde_r)
 
 	if (reg & 1)
 	{
-		return (UINT64)(r);
+		return (uint64_t)(r);
 	}
 	else
 	{
-		return (UINT64)(r) << 32;
+		return (uint64_t)(r) << 32;
 	}
 }
 
 WRITE64_MEMBER(konamim2_state::cde_w)
 {
 	int reg = offset * 2;
-	UINT32 d;
+	uint32_t d;
 
 	if (ACCESSING_BITS_0_31)
 	{
 		reg++;
-		d = (UINT32)(data);
+		d = (uint32_t)(data);
 	}
 	else
 	{
-		d = (UINT32)(data >> 32);
+		d = (uint32_t)(data >> 32);
 	}
 
 	switch (reg)
@@ -1079,7 +1079,7 @@ WRITE64_MEMBER(konamim2_state::cde_w)
 
 READ64_MEMBER(konamim2_state::device2_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	int reg = offset * 2;
 
 	if (ACCESSING_BITS_0_31)
@@ -1100,21 +1100,21 @@ READ64_MEMBER(konamim2_state::device2_r)
 
 	if (reg & 1)
 	{
-		return (UINT64)(r);
+		return (uint64_t)(r);
 	}
 	else
 	{
-		return (UINT64)(r) << 32;
+		return (uint64_t)(r) << 32;
 	}
 }
 
 READ64_MEMBER(konamim2_state::cpu_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (UINT64)((&space.device() != m_maincpu) ? 0x80000000 : 0);
+		r = (uint64_t)((&space.device() != m_maincpu) ? 0x80000000 : 0);
 		//r |= 0x40000000;  // sets Video-LowRes !?
 		return r << 32;
 	}

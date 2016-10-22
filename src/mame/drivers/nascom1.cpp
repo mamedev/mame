@@ -34,8 +34,8 @@
 
 struct nascom1_portstat_t
 {
-	UINT8   stat_flags;
-	UINT8   stat_count;
+	uint8_t   stat_flags;
+	uint8_t   stat_count;
 };
 
 class nascom_state : public driver_device
@@ -59,11 +59,11 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_ioport_array<9> m_keyboard;
 
 	int m_tape_size;
-	UINT8 *m_tape_image;
+	uint8_t *m_tape_image;
 	int m_tape_index;
 	nascom1_portstat_t m_portstat;
 
@@ -94,7 +94,7 @@ public:
 	nascom_state(mconfig, type, tag)
 	{}
 
-	UINT32 screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 };
@@ -114,7 +114,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
 	DECLARE_DRIVER_INIT(nascom2);
 	DECLARE_DRIVER_INIT(nascom2c);
-	UINT32 screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
@@ -183,7 +183,7 @@ WRITE8_MEMBER( nascom_state::nascom1_port_01_w )
 
 READ8_MEMBER( nascom_state::nascom1_port_02_r )
 {
-	UINT8 data = 0x31;
+	uint8_t data = 0x31;
 
 	m_hd6402->set_input_pin(AY31015_SWE, 0);
 	data |= m_hd6402->get_output_pin(AY31015_OR  ) ? 0x02 : 0;
@@ -208,7 +208,7 @@ WRITE8_MEMBER( nascom_state::nascom1_hd6402_so )
 DEVICE_IMAGE_LOAD_MEMBER( nascom_state, nascom1_cassette )
 {
 	m_tape_size = image.length();
-	m_tape_image = (UINT8*)image.ptr();
+	m_tape_image = (uint8_t*)image.ptr();
 
 	if (!m_tape_image)
 		return image_init_result::FAIL;
@@ -230,7 +230,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state, nascom1_cassette )
 
 SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 {
-	UINT8 line[35];
+	uint8_t line[35];
 
 	while (image.fread( &line, sizeof(line)) == sizeof(line))
 	{
@@ -287,25 +287,25 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 	// loading from software list. this supports multiple regions to load to
 	else
 	{
-		UINT8 *region_b000 = image.get_software_region("b000");
-		UINT8 *region_c000 = image.get_software_region("c000");
-		UINT8 *region_d000 = image.get_software_region("d000");
+		uint8_t *region_b000 = image.get_software_region("b000");
+		uint8_t *region_c000 = image.get_software_region("c000");
+		uint8_t *region_d000 = image.get_software_region("d000");
 
 		if (region_b000 != nullptr)
 		{
-			UINT32 size = image.get_software_region_length("b000");
+			uint32_t size = image.get_software_region_length("b000");
 			m_maincpu->space(AS_PROGRAM).install_rom(0xb000, 0xb000 + size - 1, region_b000);
 		}
 
 		if (region_c000 != nullptr)
 		{
-			UINT32 size = image.get_software_region_length("c000");
+			uint32_t size = image.get_software_region_length("c000");
 			m_maincpu->space(AS_PROGRAM).install_rom(0xc000, 0xc000 + size - 1, region_c000);
 		}
 
 		if (region_d000 != nullptr)
 		{
-			UINT32 size = image.get_software_region_length("d000");
+			uint32_t size = image.get_software_region_length("d000");
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd000, 0xd000 + size - 1, region_d000);
 		}
 	}
@@ -410,7 +410,7 @@ static GFXDECODE_START( nascom1 )
 	GFXDECODE_ENTRY("gfx1", 0x0000, nascom1_charlayout, 0, 1)
 GFXDECODE_END
 
-UINT32 nascom1_state::screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nascom1_state::screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update(bitmap, cliprect, 16);
 	return 0;
@@ -432,7 +432,7 @@ static GFXDECODE_START( nascom2 )
 	GFXDECODE_ENTRY("gfx1", 0x0000, nascom2_charlayout, 0, 1)
 GFXDECODE_END
 
-UINT32 nascom2_state::screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nascom2_state::screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update(bitmap, cliprect, 14);
 	return 0;

@@ -21,7 +21,7 @@ class t6a04_device : public device_t
 {
 public:
 	// construction/destruction
-	t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_size(device_t &device, int w, int h)
 	{
@@ -36,7 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(data_write);
 	DECLARE_READ8_MEMBER(data_read);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -45,22 +45,22 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
-	UINT8 m_busy_flag;
-	UINT8 m_lcd_ram[960];   //7680 bit (64*120)
-	UINT8 m_display_on;
-	UINT8 m_contrast;
-	UINT8 m_xpos;
-	UINT8 m_ypos;
-	UINT8 m_zpos;
-	INT8  m_direction;
-	UINT8 m_active_counter;
-	UINT8 m_word_len;
-	UINT8 m_opa1;
-	UINT8 m_opa2;
-	UINT8 m_output_reg;
+	uint8_t m_busy_flag;
+	uint8_t m_lcd_ram[960];   //7680 bit (64*120)
+	uint8_t m_display_on;
+	uint8_t m_contrast;
+	uint8_t m_xpos;
+	uint8_t m_ypos;
+	uint8_t m_zpos;
+	int8_t  m_direction;
+	uint8_t m_active_counter;
+	uint8_t m_word_len;
+	uint8_t m_opa1;
+	uint8_t m_opa2;
+	uint8_t m_output_reg;
 
-	UINT8 m_height;           // number of lines
-	UINT8 m_width;            // pixels for line
+	uint8_t m_height;           // number of lines
+	uint8_t m_width;            // pixels for line
 };
 
 // device type definition

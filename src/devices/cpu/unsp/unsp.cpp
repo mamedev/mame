@@ -16,14 +16,14 @@
 const device_type UNSP = &device_creator<unsp_device>;
 
 
-unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, UNSP, "u'nSP", tag, owner, clock, "unsp", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 23, -1), m_irq(0), m_fiq(0), m_curirq(0), m_sirq(0), m_sb(0), m_saved_sb(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
 {
 }
 
 
-offs_t unsp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t unsp_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( unsp );
 	return CPU_DISASSEMBLE_NAME(unsp)(this, buffer, pc, oprom, opram, options);
@@ -95,24 +95,24 @@ offs_t unsp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 #define WRITEBACK_OPA \
 		if(OP0 != 4 && OP0 < 12) \
 		{ \
-			UNSP_REG_I(OPA) = (UINT16)lres; \
+			UNSP_REG_I(OPA) = (uint16_t)lres; \
 		}
 
 /*****************************************************************************/
 
-void unsp_device::unimplemented_opcode(UINT16 op)
+void unsp_device::unimplemented_opcode(uint16_t op)
 {
 	fatalerror("UNSP: unknown opcode %04x at %04x\n", op, UNSP_LPC);
 }
 
 /*****************************************************************************/
 
-UINT16 unsp_device::READ16(UINT32 address)
+uint16_t unsp_device::READ16(uint32_t address)
 {
 	return m_program->read_word(address<<1);
 }
 
-void unsp_device::WRITE16(UINT32 address, UINT16 data)
+void unsp_device::WRITE16(uint32_t address, uint16_t data)
 {
 	m_program->write_word(address<<1, data);
 }
@@ -121,7 +121,7 @@ void unsp_device::WRITE16(UINT32 address, UINT16 data)
 
 void unsp_device::device_start()
 {
-	memset(m_r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
+	memset(m_r, 0, sizeof(uint16_t) * UNSP_GPR_COUNT);
 	m_irq = 0;
 	m_fiq = 0;
 	m_curirq = 0;
@@ -175,7 +175,7 @@ void unsp_device::state_import(const device_state_entry &entry)
 
 void unsp_device::device_reset()
 {
-	memset(m_r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
+	memset(m_r, 0, sizeof(uint16_t) * UNSP_GPR_COUNT);
 
 	UNSP_REG(PC) = READ16(0xfff7);
 	m_irq = 0;
@@ -184,49 +184,49 @@ void unsp_device::device_reset()
 
 /*****************************************************************************/
 
-void unsp_device::unsp_update_nz(UINT32 value)
+void unsp_device::unsp_update_nz(uint32_t value)
 {
 	UNSP_REG(SR) &= ~(UNSP_N | UNSP_Z);
 	if(value & 0x8000)
 	{
 		UNSP_REG(SR) |= UNSP_N;
 	}
-	if((UINT16)value == 0)
+	if((uint16_t)value == 0)
 	{
 		UNSP_REG(SR) |= UNSP_Z;
 	}
 }
 
-void unsp_device::unsp_update_nzsc(UINT32 value, UINT16 r0, UINT16 r1)
+void unsp_device::unsp_update_nzsc(uint32_t value, uint16_t r0, uint16_t r1)
 {
 	UNSP_REG(SR) &= ~(UNSP_C | UNSP_S);
 	unsp_update_nz(value);
-	if(value != (UINT16)value)
+	if(value != (uint16_t)value)
 	{
 		UNSP_REG(SR) |= UNSP_C;
 	}
 
-	if((INT16)r0 < (INT16)r1)
+	if((int16_t)r0 < (int16_t)r1)
 	{
 		UNSP_REG(SR) |= UNSP_S;
 	}
 }
 
-void unsp_device::unsp_push(UINT16 value, UINT16 *reg)
+void unsp_device::unsp_push(uint16_t value, uint16_t *reg)
 {
 	WRITE16((*reg)--, value);
 }
 
-UINT16 unsp_device::unsp_pop(UINT16 *reg)
+uint16_t unsp_device::unsp_pop(uint16_t *reg)
 {
 	return READ16(++(*reg));
 }
 
 void unsp_device::execute_run()
 {
-	UINT32 op;
-	UINT32 lres;
-	UINT16 r0, r1;
+	uint32_t op;
+	uint32_t lres;
+	uint16_t r0, r1;
 	lres = 0;
 
 	while (m_icount > 0)
@@ -547,7 +547,7 @@ void unsp_device::execute_run()
 							}
 							if(OP0 != 4 && OP0 < 12)
 							{
-								WRITE16(READ16(UNSP_LPC), (UINT16)lres);
+								WRITE16(READ16(UNSP_LPC), (uint16_t)lres);
 							}
 							UNSP_REG(PC)++;
 							break;
@@ -555,7 +555,7 @@ void unsp_device::execute_run()
 						// ALU, Shifted
 						default:
 						{
-							UINT32 shift = (UNSP_REG_I(OPB) << 4) | m_sb;
+							uint32_t shift = (UNSP_REG_I(OPB) << 4) | m_sb;
 							if(shift & 0x80000)
 							{
 								shift |= 0xf00000;
@@ -607,8 +607,8 @@ void unsp_device::execute_run()
 							case 9: // load r, r >> imm2
 								lres = ((UNSP_REG_I(OPB) << 4) | m_sb) >> (OPN - 3);
 								m_sb = lres & 0x0f;
-								unsp_update_nz((UINT16)(lres >> 4));
-								UNSP_REG_I(OPA) = (UINT16)(lres >> 4);
+								unsp_update_nz((uint16_t)(lres >> 4));
+								UNSP_REG_I(OPA) = (uint16_t)(lres >> 4);
 								break;
 							default:
 								unimplemented_opcode(op);
@@ -617,7 +617,7 @@ void unsp_device::execute_run()
 					}
 					else
 					{
-						UINT32 shift = ((m_sb << 16) | UNSP_REG_I(OPB)) << (OPN + 1);
+						uint32_t shift = ((m_sb << 16) | UNSP_REG_I(OPB)) << (OPN + 1);
 						m_sb = (shift >> 16) & 0x0f;
 						r0 = UNSP_REG_I(OPA);
 						r1 = shift & 0x0000ffff;
@@ -627,17 +627,17 @@ void unsp_device::execute_run()
 							case 0: // add r, r << imm2
 								lres = r0 + r1;
 								unsp_update_nzsc(lres, r0, r1);
-								UNSP_REG_I(OPA) = (UINT16)lres;
+								UNSP_REG_I(OPA) = (uint16_t)lres;
 								break;
 							case 9: // load r, r << imm2
 								lres = r1;
 								unsp_update_nz(lres);
-								UNSP_REG_I(OPA) = (UINT16)lres;
+								UNSP_REG_I(OPA) = (uint16_t)lres;
 								break;
 							case 10: // or r, r << imm2
 								lres = r0 | r1;
 								unsp_update_nz(lres);
-								UNSP_REG_I(OPA) = (UINT16)lres;
+								UNSP_REG_I(OPA) = (uint16_t)lres;
 								break;
 							default:
 								unimplemented_opcode(op);
@@ -652,13 +652,13 @@ void unsp_device::execute_run()
 					{
 						lres = ((((m_sb << 16) | UNSP_REG_I(OPB)) << 4) | m_sb) >> (OPN - 3);
 						m_sb = lres & 0x0f;
-						r1 = (UINT16)(lres >> 4);
+						r1 = (uint16_t)(lres >> 4);
 					}
 					else
 					{
 						lres = ((((m_sb << 16) | UNSP_REG_I(OPB)) << 4) | m_sb) << (OPN + 1);
 						m_sb = (lres >> 20) & 0x0f;
-						r1 = (UINT16)(lres >> 4);
+						r1 = (uint16_t)(lres >> 4);
 					}
 
 					switch(OP0)
@@ -717,7 +717,7 @@ void unsp_device::execute_run()
 							lres -= UNSP_REG_I(OPA) << 16;
 						}
 						UNSP_REG(R4) = lres >> 16;
-						UNSP_REG(R3) = (UINT16)lres;
+						UNSP_REG(R3) = (uint16_t)lres;
 						break;
 					}
 					else
@@ -740,7 +740,7 @@ void unsp_device::execute_run()
 							lres -= UNSP_REG_I(OPB) << 16;
 						}
 						UNSP_REG(R4) = lres >> 16;
-						UNSP_REG(R3) = (UINT16)lres;
+						UNSP_REG(R3) = (uint16_t)lres;
 						break;
 					}
 					else
@@ -805,7 +805,7 @@ void unsp_device::execute_run()
 
 void unsp_device::execute_set_input(int irqline, int state)
 {
-	UINT16 irq_vector = 0;
+	uint16_t irq_vector = 0;
 
 	m_sirq &= ~(1 << irqline);
 

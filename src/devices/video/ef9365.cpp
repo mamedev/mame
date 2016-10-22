@@ -170,7 +170,7 @@ const address_space_config *ef9365_device::memory_space_config(address_spacenum 
 //  ef9365_device - constructor
 //-------------------------------------------------
 
-ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EF9365, "EF9365", tag, owner, clock, "ef9365", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -264,7 +264,7 @@ void ef9365_device::static_set_display_mode(device_t &device, int display_mode )
 //  into the palette
 //-------------------------------------------------
 
-void ef9365_device::set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b )
+void ef9365_device::set_color_entry( int index, uint8_t r, uint8_t g, uint8_t b )
 {
 	if( index < nb_of_colors )
 	{
@@ -281,7 +281,7 @@ void ef9365_device::set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b )
 //  used by the chip to draw/fill the memory
 //-------------------------------------------------
 
-void ef9365_device::set_color_filler( UINT8 color )
+void ef9365_device::set_color_filler( uint8_t color )
 {
 	m_current_color = color;
 }
@@ -349,7 +349,7 @@ void ef9365_device::device_reset()
 
 	set_video_mode();
 
-	m_irq_handler(FALSE);
+	m_irq_handler(false);
 }
 
 //-------------------------------------------------
@@ -445,7 +445,7 @@ void ef9365_device::set_y_reg(unsigned int y)
 
 void ef9365_device::set_video_mode(void)
 {
-	UINT16 new_width = bitplane_xres;
+	uint16_t new_width = bitplane_xres;
 
 	if (m_screen->width() != new_width)
 	{
@@ -464,7 +464,7 @@ void ef9365_device::set_video_mode(void)
 //  bitplane words
 //-------------------------------------------------
 
-UINT8 ef9365_device::get_last_readback_word(int bitplane_number, int * pixel_offset)
+uint8_t ef9365_device::get_last_readback_word(int bitplane_number, int * pixel_offset)
 {
 	if( pixel_offset )
 		*pixel_offset = m_readback_latch_pix_offset;
@@ -484,7 +484,7 @@ UINT8 ef9365_device::get_last_readback_word(int bitplane_number, int * pixel_off
 //  ( No border for the moment ;) )
 //-------------------------------------------------
 
-void ef9365_device::draw_border(UINT16 line)
+void ef9365_device::draw_border(uint16_t line)
 {
 }
 
@@ -950,7 +950,7 @@ void ef9365_device::screen_scanning( int force_clear )
 // ef9365_exec: EF936X Command decoder and execution
 //-------------------------------------------------
 
-void ef9365_device::ef9365_exec(UINT8 cmd)
+void ef9365_device::ef9365_exec(uint8_t cmd)
 {
 	int tmp_delta_x,tmp_delta_y;
 	int busy_cycles = 0;
@@ -1149,7 +1149,7 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 // screen_update: Framebuffer video ouput
 //-------------------------------------------------
 
-UINT32 ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i,j,ptr,p;
 	unsigned char color_index;
@@ -1182,7 +1182,7 @@ UINT32 ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 // update_scanline: Scanline callback
 //-------------------------------------------------
 
-void ef9365_device::update_scanline(UINT16 scanline)
+void ef9365_device::update_scanline(uint16_t scanline)
 {
 	if (scanline == vsync_scanline_pos)
 	{

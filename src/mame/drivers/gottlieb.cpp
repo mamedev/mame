@@ -237,7 +237,7 @@ void gottlieb_state::machine_start()
 		m_laserdisc_philips_timer = timer_alloc(TIMER_LASERDISC_PHILIPS);
 
 		/* create some audio RAM */
-		m_laserdisc_audio_buffer = std::make_unique<UINT8[]>(AUDIORAM_SIZE);
+		m_laserdisc_audio_buffer = std::make_unique<uint8_t[]>(AUDIORAM_SIZE);
 		m_laserdisc_status = 0x38;
 
 		/* more save state registration */
@@ -385,7 +385,7 @@ READ8_MEMBER(gottlieb_state::laserdisc_status_r)
 	}
 	else
 	{
-		UINT8 result = m_laserdisc_audio_buffer[m_laserdisc_audio_address++];
+		uint8_t result = m_laserdisc_audio_buffer[m_laserdisc_audio_address++];
 		m_laserdisc_audio_address %= AUDIORAM_SIZE;
 		return result;
 	}
@@ -421,7 +421,7 @@ WRITE8_MEMBER(gottlieb_state::laserdisc_command_w)
 
 TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
 {
-	UINT32 newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
+	uint32_t newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, true);
 
 	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
 	   board receives notification and latches the most recent frame number */
@@ -448,8 +448,8 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_off_callback)
 
 TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
 {
-	UINT8 bitsleft = param >> 16;
-	UINT8 data = param;
+	uint8_t bitsleft = param >> 16;
+	uint8_t data = param;
 	attotime duration;
 
 	/* assert the line and set a timer for deassertion */
@@ -491,7 +491,7 @@ inline void gottlieb_state::audio_end_state()
 }
 
 
-void gottlieb_state::audio_process_clock(int logit)
+void gottlieb_state::audio_process_clock(bool logit)
 {
 	/* clock the bit through the shift register */
 	m_laserdisc_audio_bits >>= 1;
@@ -532,7 +532,7 @@ void gottlieb_state::audio_process_clock(int logit)
 }
 
 
-void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, int logit)
+void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, bool logit)
 {
 	/* compute time from last clock */
 	attotime deltaclock = zerotime - m_laserdisc_last_clock;
@@ -579,9 +579,9 @@ void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, int lo
 }
 
 
-void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
+void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)
 {
-	int logit = LOG_AUDIO_DECODE && machine().input().code_pressed(KEYCODE_L);
+	bool logit = LOG_AUDIO_DECODE && machine().input().code_pressed(KEYCODE_L);
 	attotime time_per_sample = attotime::from_hz(samplerate);
 	attotime curtime = m_laserdisc_last_time;
 	int cursamp;
@@ -599,7 +599,7 @@ void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int sampl
 	/* iterate over samples */
 	for (cursamp = 0; cursamp < samples; cursamp++)
 	{
-		INT16 sample = ch1[cursamp];
+		int16_t sample = ch1[cursamp];
 
 		/* start by logging the current sample and time */
 		if (logit)
@@ -652,7 +652,7 @@ void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int sampl
 //   a real kicker/knocker, hook it up via output "knocker0")
 //-------------------------------------------------
 
-void gottlieb_state::qbert_knocker(UINT8 knock)
+void gottlieb_state::qbert_knocker(uint8_t knock)
 {
 	output().set_value("knocker0", knock);
 
@@ -703,7 +703,7 @@ void gottlieb_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		nmi_clear(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in gottlieb_state::device_timer");
+		assert_always(false, "Unknown id in gottlieb_state::device_timer");
 	}
 }
 
@@ -1782,32 +1782,32 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// basic speaker configuration
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gottlieb1, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R1_ADD("r1sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gottlieb2, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R2_ADD("r2sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R2_ADD("r2sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(gottlieb_state::laserdisc_audio_process), (gottlieb_state*)owner))
 	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
 	/* right channel is processed as data */
 
 	MCFG_DEVICE_REMOVE("screen")
@@ -1856,8 +1856,8 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gottlieb1_votrax, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX("r1sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1891,15 +1891,16 @@ static MACHINE_CONFIG_DERIVED( screwloo, gottlieb2 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R2_ADD_COBRAM3("r2sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS()
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(gottlieb_state::laserdisc_audio_process), (gottlieb_state*)owner))
 	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
 	/* right channel is processed as data */
 
 	MCFG_DEVICE_REMOVE("screen")

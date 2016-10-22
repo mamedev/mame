@@ -57,7 +57,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
 	tilemap_t  *m_tmap;
@@ -77,7 +77,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(koikoi);
-	UINT32 screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -100,7 +100,7 @@ TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 
 PALETTE_INIT_MEMBER(koikoi_state, koikoi)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -136,7 +136,7 @@ PALETTE_INIT_MEMBER(koikoi_state, koikoi)
 	/* characters/sprites */
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -146,7 +146,7 @@ void koikoi_state::video_start()
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(koikoi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 koikoi_state::screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t koikoi_state::screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

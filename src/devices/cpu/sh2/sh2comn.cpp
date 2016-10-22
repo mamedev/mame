@@ -23,8 +23,8 @@ static const int div_tab[4] = { 3, 5, 7, 0 };
 void sh2_device::sh2_timer_resync()
 {
 	int divider = div_tab[(m_m[5] >> 8) & 3];
-	UINT64 cur_time = total_cycles();
-	UINT64 add = (cur_time - m_frc_base) >> divider;
+	uint64_t cur_time = total_cycles();
+	uint64_t add = (cur_time - m_frc_base) >> divider;
 
 	if (add > 0)
 	{
@@ -38,19 +38,19 @@ void sh2_device::sh2_timer_resync()
 void sh2_device::sh2_timer_activate()
 {
 	int max_delta = 0xfffff;
-	UINT16 frc;
+	uint16_t frc;
 
 	m_timer->adjust(attotime::never);
 
 	frc = m_frc;
 	if(!(m_m[4] & OCFA)) {
-		UINT16 delta = m_ocra - frc;
+		uint16_t delta = m_ocra - frc;
 		if(delta < max_delta)
 			max_delta = delta;
 	}
 
 	if(!(m_m[4] & OCFB) && (m_ocra <= m_ocrb || !(m_m[4] & 0x010000))) {
-		UINT16 delta = m_ocrb - frc;
+		uint16_t delta = m_ocrb - frc;
 		if(delta < max_delta)
 			max_delta = delta;
 	}
@@ -75,7 +75,7 @@ void sh2_device::sh2_timer_activate()
 
 TIMER_CALLBACK_MEMBER( sh2_device::sh2_timer_callback )
 {
-	UINT16 frc;
+	uint16_t frc;
 
 	sh2_timer_resync();
 
@@ -144,9 +144,9 @@ void sh2_device::sh2_notify_dma_data_available()
 
 void sh2_device::sh2_do_dma(int dma)
 {
-	UINT32 dmadata;
+	uint32_t dmadata;
 
-	UINT32 tempsrc, tempdst;
+	uint32_t tempsrc, tempdst;
 
 	if (m_active_dma_count[dma] > 0)
 	{
@@ -465,7 +465,7 @@ void sh2_device::sh2_dmac_check(int dma)
 
 WRITE32_MEMBER( sh2_device::sh7604_w )
 {
-	UINT32 old;
+	uint32_t old;
 
 	old = m_m[offset];
 	COMBINE_DATA(m_m+offset);
@@ -582,8 +582,8 @@ WRITE32_MEMBER( sh2_device::sh7604_w )
 		break;
 	case 0x41: // DVDNT
 		{
-			INT32 a = m_m[0x41];
-			INT32 b = m_m[0x40];
+			int32_t a = m_m[0x41];
+			int32_t b = m_m[0x40];
 			LOG(("SH2 '%s' div+mod %d/%d\n", tag(), a, b));
 			if (b)
 			{
@@ -610,13 +610,13 @@ WRITE32_MEMBER( sh2_device::sh7604_w )
 		break;
 	case 0x45: // DVDNTL
 		{
-			INT64 a = m_m[0x45] | ((UINT64)(m_m[0x44]) << 32);
-			INT64 b = (INT32)m_m[0x40];
+			int64_t a = m_m[0x45] | ((uint64_t)(m_m[0x44]) << 32);
+			int64_t b = (int32_t)m_m[0x40];
 			LOG(("SH2 '%s' div+mod %d/%d\n", tag(), a, b));
 			if (b)
 			{
-				INT64 q = a / b;
-				if (q != (INT32)q)
+				int64_t q = a / b;
+				if (q != (int32_t)q)
 				{
 					m_m[0x42] |= 0x00010000;
 					m_m[0x45] = 0x7fffffff;
@@ -891,7 +891,7 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 void sh2a_device::sh7032_dma_exec(int ch)
 {
 	const short dma_word_size[4] = { 0, +1, -1, 0 };
-	UINT8 rs = (m_dma[ch].chcr >> 8) & 0xf; /**< Resource Select bits */
+	uint8_t rs = (m_dma[ch].chcr >> 8) & 0xf; /**< Resource Select bits */
 	if(rs != 0xc) // Auto-Request
 	{
 		logerror("Warning: SH7032 DMA enables non auto-request transfer\n");
@@ -903,14 +903,14 @@ void sh2a_device::sh7032_dma_exec(int ch)
 		return;
 
 	printf("%08x %08x %04x\n",m_dma[ch].sar,m_dma[ch].dar,m_dma[ch].chcr);
-	UINT8 dm = (m_dma[ch].chcr >> 14) & 3;  /**< Destination Address Mode bits */
-	UINT8 sm = (m_dma[ch].chcr >> 12) & 3;  /**< Source Address Mode bits */
+	uint8_t dm = (m_dma[ch].chcr >> 14) & 3;  /**< Destination Address Mode bits */
+	uint8_t sm = (m_dma[ch].chcr >> 12) & 3;  /**< Source Address Mode bits */
 	bool ts = (m_dma[ch].chcr & 8);         /**< Transfer Size bit */
 	int src_word_size = dma_word_size[sm] * ((ts == true) ? 2 : 1);
 	int dst_word_size = dma_word_size[dm] * ((ts == true) ? 2 : 1);
-	UINT32 src_addr = m_dma[ch].sar;
-	UINT32 dst_addr = m_dma[ch].dar;
-	UINT32 size_index = m_dma[ch].tcr;
+	uint32_t src_addr = m_dma[ch].sar;
+	uint32_t dst_addr = m_dma[ch].dar;
+	uint32_t size_index = m_dma[ch].tcr;
 	if(size_index == 0)
 		size_index = 0x10000;
 

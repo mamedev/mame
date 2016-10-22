@@ -22,7 +22,7 @@ extern const device_type TI99_FDC;
 class ti_fdc_device : public ti_expansion_card_device
 {
 public:
-	ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
@@ -48,7 +48,7 @@ protected:
 
 private:
 	// For debugger access
-	void debug_read(offs_t offset, UINT8* value);
+	void debug_read(offs_t offset, uint8_t* value);
 
 	// Wait state logic
 	void operate_ready_line();
@@ -66,15 +66,15 @@ private:
 	int  m_DRQ, m_IRQ;
 
 	// Needed for triggering the motor monoflop
-	UINT8   m_lastval;
+	uint8_t   m_lastval;
 
-	// Signal DVENA. When TRUE, makes some drive turning.
+	// Signal DVENA. When true, makes some drive turning.
 	int  m_DVENA;
 
 	// Set when address is in card area
 	bool    m_inDsrArea;
 
-	// When TRUE the CPU is halted while DRQ/IRQ are true.
+	// When true the CPU is halted while DRQ/IRQ are true.
 	bool    m_WAITena;
 
 	// WD chip selected
@@ -97,7 +97,7 @@ private:
 	required_device<fd1771_t>   m_fd1771;
 
 	// DSR ROM
-	UINT8*  m_dsrrom;
+	uint8_t*  m_dsrrom;
 
 	// Link to the attached floppy drives
 	floppy_image_device*    m_floppy[3];

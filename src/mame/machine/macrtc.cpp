@@ -40,7 +40,7 @@ const device_type RTC3430042 = &device_creator<rtc3430042_device>;
 //  rtc4543_device - constructor
 //-------------------------------------------------
 
-rtc3430042_device::rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rtc3430042_device::rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RTC3430042, "Apple 343-0042 clock/PRAM", tag, owner, clock, "rtc3430042", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this)
@@ -91,7 +91,7 @@ void rtc3430042_device::device_timer(emu_timer &timer, device_timer_id id, int p
 void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
 	struct tm cur_time, mac_reference;
-	UINT32 seconds;
+	uint32_t seconds;
 
 	cur_time.tm_sec = second;
 	cur_time.tm_min = minute;
@@ -265,7 +265,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 			/* Write-protect register  */
 			if (LOG_RTC)
 				printf("RTC write to write-protect register, data = %X\n", (int) m_rtc_data_byte&0x80);
-			m_rtc_write_protect = (m_rtc_data_byte & 0x80) ? TRUE : FALSE;
+			m_rtc_write_protect = (m_rtc_data_byte & 0x80) ? true : false;
 			break;
 
 		case 16: case 17: case 18: case 19: /* RAM address $00-$0f */

@@ -18,7 +18,7 @@
 
 TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
 {
-	UINT8 attr = m_colorram[tile_index];
+	uint8_t attr = m_colorram[tile_index];
 
 	SET_TILE_INFO_MEMBER(1,
 			m_videoram[tile_index] + ((attr & 0x07) << 8) + (m_bg_tile_bank << 11),
@@ -215,7 +215,7 @@ void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			{0x0,0x1},
 			{0x2,0x3},
 		};
-		UINT8 *src = &m_spriteram[offs + (m_sprite_buffer << 7)];
+		uint8_t *src = &m_spriteram[offs + (m_sprite_buffer << 7)];
 		int attributes = src[0x800];
 		int size = (attributes & 0x10) >> 4;
 		int bank = (attributes & 0x01) + ((attributes & 0x02) ? m_sprite_bank : 0);
@@ -254,7 +254,7 @@ void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 
 
-UINT32 gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
@@ -272,7 +272,7 @@ UINT32 gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 
 			int x = sx;
 			int y = (sy + m_fg_scrolly) & 0x1ff;
 
-			UINT16 *dest = &bitmap.pix16(sy, sx);
+			uint16_t *dest = &bitmap.pix16(sy, sx);
 			while( x <= cliprect.max_x )
 			{
 				if( flagsbitmap.pix8(y, x)&TILEMAP_PIXEL_LAYER0 )
@@ -288,7 +288,7 @@ UINT32 gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 gladiatr_state::screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gladiatr_state::screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_video_attributes & 0x20)
 	{

@@ -32,7 +32,7 @@
 const device_type NES_ACTION53 = &device_creator<nes_action53_device>;
 
 
-nes_action53_device::nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_action53_device::nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_nrom_device(mconfig, NES_ACTION53, "NES Cart Action 53 PCB", tag, owner, clock, "nes_action53", __FILE__),
 	m_sel(0)
 				{
@@ -105,10 +105,10 @@ void nes_action53_device::pcb_reset()
 
 void nes_action53_device::update_prg()
 {
-	UINT8 prg_lo, prg_hi, helper;
-	UINT8 out = (m_reg[3] & 0x3f) << 1;     // Outer PRG reg
-	UINT8 size = (m_reg[2] & 0x30) >> 4;    // Game size
-	UINT8 mask = (1 << (size + 1)) - 1;     // Bits to be taken from PRG reg
+	uint8_t prg_lo, prg_hi, helper;
+	uint8_t out = (m_reg[3] & 0x3f) << 1;     // Outer PRG reg
+	uint8_t size = (m_reg[2] & 0x30) >> 4;    // Game size
+	uint8_t mask = (1 << (size + 1)) - 1;     // Bits to be taken from PRG reg
 
 	if (!BIT(m_reg[2], 3))
 	{

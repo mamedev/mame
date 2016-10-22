@@ -32,14 +32,14 @@ public:
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	optional_shared_ptr<UINT16> m_videostatus;
-	optional_shared_ptr<UINT16> m_protection_ram;
-	required_shared_ptr<UINT16> m_blitter_regs;
-	optional_shared_ptr<UINT16> m_pageram;
-	optional_shared_ptr<UINT16> m_txtram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_roadram;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_shared_ptr<uint16_t> m_videostatus;
+	optional_shared_ptr<uint16_t> m_protection_ram;
+	required_shared_ptr<uint16_t> m_blitter_regs;
+	optional_shared_ptr<uint16_t> m_pageram;
+	optional_shared_ptr<uint16_t> m_txtram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_roadram;
+	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 
 	int m_multiply_reg[2];
 	int m_spr_color_offs;
@@ -59,7 +59,7 @@ public:
 	int m_spr_offsx;
 	int m_spr_offsy;
 	int m_spr_count;
-	UINT16 *m_rgb_half;
+	uint16_t *m_rgb_half;
 	int m_cloud_blend;
 	int m_cloud_ds;
 	int m_cloud_visible;
@@ -101,14 +101,14 @@ public:
 	DECLARE_VIDEO_START(wecleman);
 	DECLARE_MACHINE_RESET(hotchase);
 	DECLARE_VIDEO_START(hotchase);
-	UINT32 screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hotchase_sound_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(wecleman_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(hotchase_scanline);
-	void draw_cloud(bitmap_rgb32 &bitmap,gfx_element *gfx,UINT16 *tm_base,int x0,int y0,int xcount,int ycount,int scrollx,int scrolly,int tmw_l2,int tmh_l2,int alpha,int pal_offset);
+	void draw_cloud(bitmap_rgb32 &bitmap,gfx_element *gfx,uint16_t *tm_base,int x0,int y0,int xcount,int ycount,int scrollx,int scrolly,int tmw_l2,int tmh_l2,int alpha,int pal_offset);
 	void wecleman_unpack_sprites();
-	void bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0);
+	void bitswap(uint8_t *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0);
 	void hotchase_sprite_decode( int num16_banks, int bank_size );
 	void get_sprite_info();
 	void sortsprite(int *idx_array, int *key_array, int size);

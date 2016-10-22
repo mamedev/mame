@@ -24,7 +24,7 @@ class xxx_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	xxx_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	xxx_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 protected:
 	// device-level overrides
@@ -32,9 +32,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 7; }
-	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 7; }
+	virtual uint32_t execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -45,15 +45,15 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
 
-	UINT8   m_pc;   /* registers */
-	UINT8   m_flags;  /* flags */
+	uint8_t   m_pc;   /* registers */
+	uint8_t   m_flags;  /* flags */
 	address_space *m_program;
 	address_space *m_data;
 	int m_icount;

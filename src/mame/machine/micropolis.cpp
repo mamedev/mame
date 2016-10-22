@@ -49,7 +49,7 @@ BE02 and BE03 - read data, write data
 #define TRKSIZE_SD      16*270
 
 #if 0
-static const UINT8 track_SD[][2] = {
+static const uint8_t track_SD[][2] = {
 	{ 1, 0xff},     /*  1 * FF (marker)                      */
 	{ 1, 0x00},     /*  1 byte, track number (00-4C)         */
 	{ 1, 0x01},     /*  1 byte, sector number (00-0F)        */
@@ -65,7 +65,7 @@ static const UINT8 track_SD[][2] = {
 
 const device_type MICROPOLIS = &device_creator<micropolis_device>;
 
-micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MICROPOLIS, "MICROPOLIS", tag, owner, clock, "micropolis", __FILE__),
 	m_read_dden(*this),
 	m_write_intrq(*this),
@@ -183,7 +183,7 @@ void micropolis_device::write_sector()
 ***************************************************************************/
 
 /* select a drive */
-void micropolis_device::set_drive(UINT8 drive)
+void micropolis_device::set_drive(uint8_t drive)
 {
 	if (VERBOSE)
 		logerror("micropolis_set_drive: $%02x\n", drive);
@@ -313,7 +313,7 @@ WRITE8_MEMBER( micropolis_device::data_w )
 
 READ8_MEMBER( micropolis_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x03)
 	{

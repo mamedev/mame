@@ -154,9 +154,9 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 
 struct IBUTTON_SUBKEY
 {
-	UINT8 identifier[8];
-	UINT8 password[8];
-	UINT8 data[0x30];
+	uint8_t identifier[8];
+	uint8_t password[8];
+	uint8_t data[0x30];
 };
 
 struct IBUTTON
@@ -190,7 +190,7 @@ public:
 
 	required_device<ppc4xx_device> m_maincpu;
 	optional_device<m68000_device> m_audiocpu;
-	required_shared_ptr<UINT32> m_work_ram;
+	required_shared_ptr<uint32_t> m_work_ram;
 	required_device<fujitsu_29f016a_device> m_flash_main;
 	required_device<fujitsu_29f016a_device> m_flash_snd1;
 	required_device<fujitsu_29f016a_device> m_flash_snd2;
@@ -203,19 +203,19 @@ public:
 	required_device<k057714_device> m_gcu1;
 	optional_device<ata_interface_device> m_spuata;
 
-	UINT8 m_extend_board_irq_enable;
-	UINT8 m_extend_board_irq_active;
+	uint8_t m_extend_board_irq_enable;
+	uint8_t m_extend_board_irq_active;
 //  emu_timer *m_keyboard_timer;
 	int m_tick;
 	int m_layer;
 	int m_cab_data_ptr;
 	const int * m_cur_cab_data;
 //  int m_keyboard_state[2];
-	UINT8 m_spu_shared_ram[0x400];
+	uint8_t m_spu_shared_ram[0x400];
 	IBUTTON m_ibutton;
 	int m_ibutton_state;
 	int m_ibutton_read_subkey_ptr;
-	UINT8 m_ibutton_subkey_data[0x40];
+	uint8_t m_ibutton_subkey_data[0x40];
 
 	DECLARE_READ8_MEMBER(soundram_r);
 	DECLARE_DRIVER_INIT(ppd);
@@ -224,8 +224,8 @@ public:
 	DECLARE_MACHINE_START(firebeat);
 	DECLARE_MACHINE_RESET(firebeat);
 	DECLARE_VIDEO_START(firebeat);
-	UINT32 screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
 	DECLARE_READ32_MEMBER(input_r);
 	DECLARE_READ32_MEMBER(sensor_r );
@@ -264,8 +264,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_interrupt);
 //  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(spu_timer_callback);
-	void set_ibutton(UINT8 *data);
-	int ibutton_w(UINT8 data);
+	void set_ibutton(uint8_t *data);
+	int ibutton_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(security_w);
 	void init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3);
 	void init_firebeat();
@@ -286,14 +286,14 @@ VIDEO_START_MEMBER(firebeat_state,firebeat)
 {
 }
 
-UINT32 firebeat_state::screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu0->draw(screen, bitmap, cliprect); }
-UINT32 firebeat_state::screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu1->draw(screen, bitmap, cliprect); }
+uint32_t firebeat_state::screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu0->draw(screen, bitmap, cliprect); }
+uint32_t firebeat_state::screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu1->draw(screen, bitmap, cliprect); }
 
 /*****************************************************************************/
 
 READ32_MEMBER(firebeat_state::input_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -325,7 +325,7 @@ READ32_MEMBER(firebeat_state::sensor_r )
 
 READ32_MEMBER(firebeat_state::flashram_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= (m_flash_main->read((offset*4)+0) & 0xff) << 24;
@@ -367,7 +367,7 @@ WRITE32_MEMBER(firebeat_state::flashram_w)
 
 READ32_MEMBER(firebeat_state::soundflash_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	fujitsu_29f016a_device *chip;
 	if (offset < 0x200000/4)
 	{
@@ -438,7 +438,7 @@ WRITE32_MEMBER(firebeat_state::soundflash_w)
 
 READ32_MEMBER(firebeat_state::ata_command_r )
 {
-	UINT16 r;
+	uint16_t r;
 //  printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
@@ -469,7 +469,7 @@ WRITE32_MEMBER(firebeat_state::ata_command_w )
 
 READ32_MEMBER(firebeat_state::ata_control_r )
 {
-	UINT16 r;
+	uint16_t r;
 //  printf("ata_control_r: %08X, %08X\n", offset, mem_mask);
 
 	if (ACCESSING_BITS_16_31)
@@ -501,7 +501,7 @@ WRITE32_MEMBER(firebeat_state::ata_control_w )
 /*
 READ32_MEMBER(firebeat_state::comm_uart_r )
 {
-    UINT32 r = 0;
+    uint32_t r = 0;
 
     if (ACCESSING_BITS_24_31)
     {
@@ -558,7 +558,7 @@ static const int ppd_cab_data[2] = { 0x1, 0x9 };
 
 READ32_MEMBER(firebeat_state::cabinet_r )
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 //  printf("cabinet_r: %08X, %08X\n", offset, mem_mask);
 
@@ -663,7 +663,7 @@ TIMER_CALLBACK_MEMBER(firebeat_state::keyboard_timer_callback)
 
     for (keyboard=0; keyboard < 2; keyboard++)
     {
-        UINT32 kbstate = ioport(keynames[keyboard])->read();
+        uint32_t kbstate = ioport(keynames[keyboard])->read();
         int uart_channel = kb_uart_channel[keyboard];
 
         if (kbstate != m_keyboard_state[keyboard])
@@ -708,7 +708,7 @@ TIMER_CALLBACK_MEMBER(firebeat_state::keyboard_timer_callback)
 
 READ32_MEMBER(firebeat_state::extend_board_irq_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -873,7 +873,7 @@ WRITE32_MEMBER(firebeat_state::lamp_output3_ppp_w )
 
 READ32_MEMBER(firebeat_state::ppc_spu_share_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 #if PRINT_SPU_MEM
 	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
@@ -928,7 +928,7 @@ WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
 
 			printf("SPU command %02X%02X\n", m_spu_shared_ram[0], m_spu_shared_ram[1]);
 
-			UINT16 cmd = ((UINT16)(m_spu_shared_ram[0]) << 8) | m_spu_shared_ram[1];
+			uint16_t cmd = ((uint16_t)(m_spu_shared_ram[0]) << 8) | m_spu_shared_ram[1];
 			if (cmd == 0x1110)
 			{
 				printf("   [%02X %02X %02X %02X %02X]\n", m_spu_shared_ram[0x10], m_spu_shared_ram[0x11], m_spu_shared_ram[0x12], m_spu_shared_ram[0x13], m_spu_shared_ram[0x14]);
@@ -958,7 +958,7 @@ READ16_MEMBER(firebeat_state::m68k_spu_share_r)
 #if PRINT_SPU_MEM
 	printf("m68k_spu_share_r: %08X, %08X\n", offset, mem_mask);
 #endif
-	UINT16 r = 0;
+	uint16_t r = 0;
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -992,7 +992,7 @@ READ16_MEMBER(firebeat_state::spu_unk_r)
 {
 	// dipswitches?
 
-	UINT16 r = 0;
+	uint16_t r = 0;
 	r |= 0x80;      // if set, uses ATA PIO mode, otherwise DMA
 	r |= 0x01;      // enable SDRAM test
 
@@ -1039,7 +1039,7 @@ MACHINE_START_MEMBER(firebeat_state,firebeat)
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, FALSE, m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, false, m_work_ram);
 }
 
 static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
@@ -1441,7 +1441,7 @@ enum
 
 
 
-void firebeat_state::set_ibutton(UINT8 *data)
+void firebeat_state::set_ibutton(uint8_t *data)
 {
 	int i, j;
 
@@ -1467,7 +1467,7 @@ void firebeat_state::set_ibutton(UINT8 *data)
 	}
 }
 
-int firebeat_state::ibutton_w(UINT8 data)
+int firebeat_state::ibutton_w(uint8_t data)
 {
 	int r = -1;
 
@@ -1579,7 +1579,7 @@ void firebeat_state::init_lights(write32_delegate out1, write32_delegate out2, w
 
 void firebeat_state::init_firebeat()
 {
-	UINT8 *rom = memregion("user2")->base();
+	uint8_t *rom = memregion("user2")->base();
 
 //  pc16552d_init(machine(), 0, 19660800, comm_uart_irq_callback, 0);     // Network UART
 //  pc16552d_init(machine(), 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART

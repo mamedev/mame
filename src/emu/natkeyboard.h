@@ -19,8 +19,8 @@
 //**************************************************************************
 
 // keyboard helper function delegates
-typedef delegate<int (const unicode_char *, size_t)> ioport_queue_chars_delegate;
-typedef delegate<bool (unicode_char)> ioport_accept_char_delegate;
+typedef delegate<int (const char32_t *, size_t)> ioport_queue_chars_delegate;
+typedef delegate<bool (char32_t)> ioport_accept_char_delegate;
 typedef delegate<bool ()> ioport_charqueue_empty_delegate;
 
 
@@ -41,13 +41,15 @@ public:
 	bool full() const { return ((m_bufend + 1) % m_buffer.size()) == m_bufbegin; }
 	bool can_post() const { return (!m_queue_chars.isnull() || !m_keycode_map.empty()); }
 	bool is_posting() const { return (!empty() || (!m_charqueue_empty.isnull() && !m_charqueue_empty())); }
+	bool in_use() const { return m_in_use; }
 
 	// configuration
 	void configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
+	void set_in_use(bool usage);
 
 	// posting
-	void post(unicode_char ch);
-	void post(const unicode_char *text, size_t length = 0, const attotime &rate = attotime::zero);
+	void post(char32_t ch);
+	void post(const char32_t *text, size_t length = 0, const attotime &rate = attotime::zero);
 	void post_utf8(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 
@@ -58,25 +60,26 @@ private:
 	// internal keyboard code information
 	struct keycode_map_entry
 	{
-		unicode_char    ch;
+		char32_t    ch;
 		ioport_field *  field[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN];
 	};
 
 	// internal helpers
 	void build_codes(ioport_manager &manager);
-	bool can_post_directly(unicode_char ch);
-	bool can_post_alternate(unicode_char ch);
-	attotime choose_delay(unicode_char ch);
-	void internal_post(unicode_char ch);
+	bool can_post_directly(char32_t ch);
+	bool can_post_alternate(char32_t ch);
+	attotime choose_delay(char32_t ch);
+	void internal_post(char32_t ch);
 	void timer(void *ptr, int param);
-	std::string unicode_to_string(unicode_char ch);
-	const keycode_map_entry *find_code(unicode_char ch) const;
+	std::string unicode_to_string(char32_t ch);
+	const keycode_map_entry *find_code(char32_t ch) const;
 
 	// internal state
 	running_machine &       m_machine;              // reference to our machine
-	UINT32                  m_bufbegin;             // index of starting character
-	UINT32                  m_bufend;               // index of ending character
-	std::vector<unicode_char> m_buffer;           // actual buffer
+	bool                    m_in_use;               // is natural keyboard in use?
+	uint32_t                  m_bufbegin;             // index of starting character
+	uint32_t                  m_bufend;               // index of ending character
+	std::vector<char32_t> m_buffer;           // actual buffer
 	bool                    m_status_keydown;       // current keydown status
 	bool                    m_last_cr;              // was the last char a CR?
 	emu_timer *             m_timer;                // timer for posting characters

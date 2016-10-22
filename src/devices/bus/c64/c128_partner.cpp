@@ -76,7 +76,7 @@ ioport_constructor partner128_t::device_input_ports() const
 //  partner128_t - constructor
 //-------------------------------------------------
 
-partner128_t::partner128_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+partner128_t::partner128_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C128_PARTNER, "PARTNER 128", tag, owner, clock, "c128_partner", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	//device_vcs_control_port_interface(mconfig, *this),
@@ -147,7 +147,7 @@ void partner128_t::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 partner128_t::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t partner128_t::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -185,7 +185,7 @@ UINT8 partner128_t::c64_cd_r(address_space &space, offs_t offset, UINT8 data, in
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void partner128_t::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void partner128_t::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -235,7 +235,7 @@ void partner128_t::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int
 //  vcs_joy_w - joystick write
 //-------------------------------------------------
 
-void partner128_t::vcs_joy_w(UINT8 data)
+void partner128_t::vcs_joy_w(uint8_t data)
 {
 	int joyb2 = BIT(data, 2);
 

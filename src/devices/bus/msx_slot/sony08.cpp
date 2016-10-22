@@ -13,7 +13,7 @@
 const device_type MSX_SLOT_SONY08 = &device_creator<msx_slot_sony08_device>;
 
 
-msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_SONY08, "MSX Internal SONY08", tag, owner, clock, "msx_slot_sony08", __FILE__)
 	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
@@ -41,7 +41,7 @@ machine_config_constructor msx_slot_sony08_device::device_mconfig_additions() co
 }
 
 
-void msx_slot_sony08_device::set_rom_start(device_t &device, const char *region, UINT32 offset)
+void msx_slot_sony08_device::set_rom_start(device_t &device, const char *region, uint32_t offset)
 {
 	msx_slot_sony08_device &dev = downcast<msx_slot_sony08_device &>(device);
 
@@ -122,7 +122,7 @@ READ8_MEMBER(msx_slot_sony08_device::read)
 		return m_bank_base[6 + ((offset >> 11) & 0x01)][offset & 0x7ff];
 	}
 
-	const UINT8 *mem = m_bank_base[offset >> 13];
+	const uint8_t *mem = m_bank_base[offset >> 13];
 
 	if (mem)
 	{

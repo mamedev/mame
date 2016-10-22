@@ -35,7 +35,7 @@ static char *WritePadding( char *pBuf, const char *pBuf0 )
 	return pBuf;
 }
 
-static char *DasmCoProc_RT( char *pBuf, UINT32 opcode, const char *pConditionCode, const char *pBuf0)
+static char *DasmCoProc_RT( char *pBuf, uint32_t opcode, const char *pConditionCode, const char *pBuf0)
 {
 	/* co processor register transfer */
 	/* xxxx 1110 oooL nnnn dddd cccc ppp1 mmmm */
@@ -55,7 +55,7 @@ static char *DasmCoProc_RT( char *pBuf, UINT32 opcode, const char *pConditionCod
 	return pBuf;
 }
 
-static char *DasmCoProc_DT( char *pBuf, UINT32 opcode, const char *pConditionCode, const char *pBuf0 )
+static char *DasmCoProc_DT( char *pBuf, uint32_t opcode, const char *pConditionCode, const char *pBuf0 )
 {
 	/* co processor data transfer */
 	/* xxxx 111P UNWL nnnn dddd pppp oooooooo */
@@ -80,7 +80,7 @@ static char *DasmCoProc_DT( char *pBuf, UINT32 opcode, const char *pConditionCod
 	return pBuf;
 }
 
-static char *DasmCoProc_DO( char *pBuf, UINT32 opcode, const char *pConditionCode, const char *pBuf0 )
+static char *DasmCoProc_DO( char *pBuf, uint32_t opcode, const char *pConditionCode, const char *pBuf0 )
 {
 	/* co processor data operation */
 	/* xxxx 1110 oooo nnnn dddd cccc ppp0 mmmm */
@@ -94,10 +94,10 @@ static char *DasmCoProc_DO( char *pBuf, UINT32 opcode, const char *pConditionCod
 	return pBuf;
 }
 
-static char *WriteImmediateOperand( char *pBuf, UINT32 opcode )
+static char *WriteImmediateOperand( char *pBuf, uint32_t opcode )
 {
 	/* rrrrbbbbbbbb */
-	UINT32 imm;
+	uint32_t imm;
 	int r;
 
 	imm = opcode&0xff;
@@ -107,7 +107,7 @@ static char *WriteImmediateOperand( char *pBuf, UINT32 opcode )
 	return pBuf;
 }
 
-static char *WriteDataProcessingOperand( char *pBuf, UINT32 opcode, int printOp0, int printOp1, int printOp2 )
+static char *WriteDataProcessingOperand( char *pBuf, uint32_t opcode, int printOp0, int printOp1, int printOp2 )
 {
 	/* ccccctttmmmm */
 	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
@@ -146,7 +146,7 @@ static char *WriteDataProcessingOperand( char *pBuf, UINT32 opcode, int printOp0
 	return pBuf;
 }
 
-static char *WriteRegisterOperand1( char *pBuf, UINT32 opcode )
+static char *WriteRegisterOperand1( char *pBuf, uint32_t opcode )
 {
 	/* ccccctttmmmm */
 	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
@@ -177,7 +177,7 @@ static char *WriteRegisterOperand1( char *pBuf, UINT32 opcode )
 } /* WriteRegisterOperand */
 
 
-static char *WriteBranchAddress( char *pBuf, UINT32 pc, UINT32 opcode )
+static char *WriteBranchAddress( char *pBuf, uint32_t pc, uint32_t opcode )
 {
 	opcode &= 0x00ffffff;
 	if( opcode&0x00800000 )
@@ -189,7 +189,7 @@ static char *WriteBranchAddress( char *pBuf, UINT32 pc, UINT32 opcode )
 	return pBuf;
 } /* WriteBranchAddress */
 
-static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
+static uint32_t arm7_disasm( char *pBuf, uint32_t pc, uint32_t opcode )
 {
 	const char *pBuf0;
 
@@ -208,7 +208,7 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 		"ORR","MOV","BIC","MVN"
 	};
 	const char *pConditionCode;
-	UINT32 dasmflags = 0;
+	uint32_t dasmflags = 0;
 
 	pConditionCode= pConditionCodeTable[opcode>>28];
 	pBuf0 = pBuf;
@@ -494,8 +494,8 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 	}
 	else if( (opcode&0x0c000000)==0x04000000 )      //bits 27-26 == 01
 	{
-		UINT32 rn;
-		UINT32 rnv = 0;
+		uint32_t rn;
+		uint32_t rnv = 0;
 
 		/* Data Transfer */
 
@@ -682,15 +682,15 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 	return dasmflags | DASMFLAG_SUPPORTED;
 }
 
-static UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
+static uint32_t thumb_disasm( char *pBuf, uint32_t pc, uint16_t opcode )
 {
 	const char *pBuf0;
-	UINT32 dasmflags = 0;
+	uint32_t dasmflags = 0;
 
-//      UINT32 readword;
-		UINT32 addr;
-		UINT32 rm, rn, rs, rd, op2, imm;//, rrs;
-		INT32 offs;
+//      uint32_t readword;
+		uint32_t addr;
+		uint32_t rm, rn, rs, rd, op2, imm;//, rrs;
+		int32_t offs;
 
 	pBuf0 = pBuf;
 	pBuf = WritePadding( pBuf, pBuf0 );
@@ -1100,13 +1100,13 @@ static UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 				if( opcode & THUMB_STACKOP_L )
 				{
 					rd = ( opcode & THUMB_STACKOP_RD ) >> THUMB_STACKOP_RD_SHIFT;
-					offs = (UINT8)( opcode & THUMB_INSN_IMM );
+					offs = (uint8_t)( opcode & THUMB_INSN_IMM );
 					pBuf += sprintf( pBuf, "LDR R%d, [SP, #%03x]", rd, offs << 2 );
 				}
 				else
 				{
 					rd = ( opcode & THUMB_STACKOP_RD ) >> THUMB_STACKOP_RD_SHIFT;
-					offs = (UINT8)( opcode & THUMB_INSN_IMM );
+					offs = (uint8_t)( opcode & THUMB_INSN_IMM );
 					pBuf += sprintf( pBuf, "STR R%d, [SP, #%03x]", rd, offs << 2 );
 				}
 				break;
@@ -1114,13 +1114,13 @@ static UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 				if( opcode & THUMB_RELADDR_SP ) /* ADD Rd, SP, #nn */
 				{
 					rd = ( opcode & THUMB_RELADDR_RD ) >> THUMB_RELADDR_RD_SHIFT;
-					offs = (UINT8)( opcode & THUMB_INSN_IMM ) << 2;
+					offs = (uint8_t)( opcode & THUMB_INSN_IMM ) << 2;
 					pBuf += sprintf( pBuf, "ADD R%d, SP, #%03x", rd, offs );
 				}
 				else /* ADD Rd, PC, #nn */
 				{
 					rd = ( opcode & THUMB_RELADDR_RD ) >> THUMB_RELADDR_RD_SHIFT;
-					offs = (UINT8)( opcode & THUMB_INSN_IMM ) << 2;
+					offs = (uint8_t)( opcode & THUMB_INSN_IMM ) << 2;
 					pBuf += sprintf( pBuf, "ADD R%d, PC, #%03x", rd, offs );
 				}
 				break;
@@ -1215,7 +1215,7 @@ static UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 				}
 				break;
 			case 0xd: /* Conditional Branch */
-				offs = (INT8)( opcode & THUMB_INSN_IMM );
+				offs = (int8_t)( opcode & THUMB_INSN_IMM );
 				switch( ( opcode & THUMB_COND_TYPE ) >> THUMB_COND_TYPE_SHIFT )
 				{
 					case COND_EQ:

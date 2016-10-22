@@ -49,10 +49,10 @@ public:
 	DECLARE_WRITE8_MEMBER(savia84_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portc_w);
-	UINT8 m_kbd;
-	UINT8 m_segment;
-	UINT8 m_digit;
-	UINT8 m_digit_last;
+	uint8_t m_kbd;
+	uint8_t m_segment;
+	uint8_t m_digit;
+	uint8_t m_digit_last;
 	virtual void machine_reset() override;
 };
 

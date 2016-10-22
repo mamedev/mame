@@ -40,7 +40,7 @@ class ef9365_device :   public device_t,
 {
 public:
 	// construction/destruction
-	ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -52,13 +52,13 @@ public:
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 
-	void update_scanline(UINT16 scanline);
-	void set_color_filler( UINT8 color );
-	void set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b );
+	void update_scanline(uint16_t scanline);
+	void set_color_filler( uint8_t color );
+	void set_color_entry( int index, uint8_t r, uint8_t g, uint8_t b );
 
-	UINT8 get_last_readback_word(int bitplane_number, int * pixel_offset);
+	uint8_t get_last_readback_word(int bitplane_number, int * pixel_offset);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -87,8 +87,8 @@ private:
 	void screen_scanning( int force_clear );
 	void set_busy_flag(int period);
 	void set_video_mode(void);
-	void draw_border(UINT16 line);
-	void ef9365_exec(UINT8 cmd);
+	void draw_border(uint16_t line);
+	void ef9365_exec(uint8_t cmd);
 	int  cycles_to_us(int cycles);
 	void dump_bitplanes_word();
 	void update_interrupts();
@@ -96,32 +96,32 @@ private:
 	// internal state
 	static const device_timer_id BUSY_TIMER = 0;
 
-	required_region_ptr<UINT8> m_charset;
+	required_region_ptr<uint8_t> m_charset;
 	address_space *m_videoram;
 
-	UINT8 m_irq_state;
-	UINT8 m_irq_vb;
-	UINT8 m_irq_lb;
-	UINT8 m_irq_rdy;
-	UINT8 m_current_color;
-	UINT8 m_bf;                             //busy flag
-	UINT8 m_registers[0x10];                //registers
-	UINT8 m_state;                          //status register
-	UINT8 m_border[80];                     //border color
+	uint8_t m_irq_state;
+	uint8_t m_irq_vb;
+	uint8_t m_irq_lb;
+	uint8_t m_irq_rdy;
+	uint8_t m_current_color;
+	uint8_t m_bf;                             //busy flag
+	uint8_t m_registers[0x10];                //registers
+	uint8_t m_state;                          //status register
+	uint8_t m_border[80];                     //border color
 
 	rgb_t palette[256];                     // 8 bitplanes max -> 256 colors max
 	int   nb_of_bitplanes;
 	int   nb_of_colors;
 	int   bitplane_xres;
 	int   bitplane_yres;
-	UINT16 overflow_mask_x;
-	UINT16 overflow_mask_y;
+	uint16_t overflow_mask_x;
+	uint16_t overflow_mask_y;
 	int   vsync_scanline_pos;
 
-	UINT8 m_readback_latch[EF936X_MAX_BITPLANES];   // Last DRAM Readback buffer (Filled after a Direct Memory Access Request command)
+	uint8_t m_readback_latch[EF936X_MAX_BITPLANES];   // Last DRAM Readback buffer (Filled after a Direct Memory Access Request command)
 	int m_readback_latch_pix_offset;
 
-	UINT32 clock_freq;
+	uint32_t clock_freq;
 	bitmap_rgb32 m_screen_out;
 
 	// timers

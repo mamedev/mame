@@ -28,7 +28,7 @@ class bml3bus_mp1802_device:
 {
 public:
 	// construction/destruction
-	bml3bus_mp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bml3bus_mp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -49,7 +49,7 @@ private:
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
 
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 };
 
 // device type definition

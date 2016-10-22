@@ -32,7 +32,7 @@
 #define ADDRESS_MASK_4K    0xFFF
 #define INCREMENT_PC_4K    (PC = (PC+1) & ADDRESS_MASK_4K)
 
-void patinho_feio_cpu_device::set_flag(UINT8 flag, bool state){
+void patinho_feio_cpu_device::set_flag(uint8_t flag, bool state){
 	if (state){
 		FLAGS |= flag;
 	} else {
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START(prog_8bit, AS_PROGRAM, 8, patinho_feio_cpu_device)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("internalram")
 ADDRESS_MAP_END
 
-patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, PATINHO_FEIO, "PATINHO FEIO", tag, owner, clock, "patinho_feio_cpu", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit)),
 		m_icount(0),
@@ -69,7 +69,7 @@ patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, 
 {
 }
 
-UINT16 patinho_feio_cpu_device::read_panel_keys_register(){
+uint16_t patinho_feio_cpu_device::read_panel_keys_register(){
 	if (!m_rc_read_cb.isnull())
 		m_rc = m_rc_read_cb(0);
 	else
@@ -78,7 +78,7 @@ UINT16 patinho_feio_cpu_device::read_panel_keys_register(){
 	return m_rc;
 }
 
-void patinho_feio_cpu_device::transfer_byte_from_external_device(UINT8 channel, UINT8 data){
+void patinho_feio_cpu_device::transfer_byte_from_external_device(uint8_t channel, uint8_t data){
 	m_iodev_incoming_byte[channel] = data;
 	m_iodev_status[channel] = IODEV_READY;
 	m_iodev_control[channel] = NO_REQUEST;
@@ -171,7 +171,7 @@ void patinho_feio_cpu_device::execute_run() {
 
 		if (!m_run){
 			if (!m_buttons_read_cb.isnull()){
-				UINT16 buttons = m_buttons_read_cb(0);
+				uint16_t buttons = m_buttons_read_cb(0);
 				if (buttons & BUTTON_PARTIDA){
 					/* "startup" button */
 					switch (m_mode){
@@ -230,8 +230,8 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0xD8:
 			//SOMI="Soma Imediato":
 			//     Add an immediate into the accumulator
-			set_flag(V, ((((INT16) ACC) + ((INT16) READ_BYTE_PATINHO(PC))) >> 8));
-			set_flag(T, ((((INT8) (ACC & 0x7F)) + ((INT8) (READ_BYTE_PATINHO(PC) & 0x7F))) >> 7) == V);
+			set_flag(V, ((((int16_t) ACC) + ((int16_t) READ_BYTE_PATINHO(PC))) >> 8));
+			set_flag(T, ((((int8_t) (ACC & 0x7F)) + ((int8_t) (READ_BYTE_PATINHO(PC) & 0x7F))) >> 7) == V);
 			ACC += READ_BYTE_PATINHO(PC);
 			INCREMENT_PC_4K;
 			return;
@@ -775,7 +775,7 @@ void patinho_feio_cpu_device::execute_instruction()
 	printf("unimplemented opcode: 0x%02X\n", m_opcode);
 }
 
-offs_t patinho_feio_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t patinho_feio_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( patinho_feio );
 	return CPU_DISASSEMBLE_NAME(patinho_feio)(this, buffer, pc, oprom, opram, options);

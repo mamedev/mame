@@ -167,7 +167,7 @@ inline void rp5c01_device::check_alarm()
 //  rp5c01_device - constructor
 //-------------------------------------------------
 
-rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RP5C01, "RP5C01", tag, owner, clock, "rp5c01", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -305,7 +305,7 @@ void rp5c01_device::nvram_write(emu_file &file)
 
 READ8_MEMBER( rp5c01_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	offset &= 0x0f;
 
 	switch (offset)

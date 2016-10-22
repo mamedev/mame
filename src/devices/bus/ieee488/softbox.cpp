@@ -128,7 +128,7 @@ READ8_MEMBER( softbox_device::ppi1_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= !m_bus->atn_r();
 	data |= !m_bus->dav_r() << 1;
@@ -186,8 +186,8 @@ READ8_MEMBER( softbox_device::ppi1_pc_r )
 
 	*/
 
-	UINT8 status = m_hdc->status_r(space, 0);
-	UINT8 data = 0;
+	uint8_t status = m_hdc->status_r(space, 0);
+	uint8_t data = 0;
 
 	data |= (status & CONTROLLER_BUSY) ? 0 : 0x10;
 	data |= (status & CONTROLLER_DIRECTION) ? 0 : 0x20;
@@ -326,7 +326,7 @@ ioport_constructor softbox_device::device_input_ports() const
 //  softbox_device - constructor
 //-------------------------------------------------
 
-softbox_device::softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+softbox_device::softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SOFTBOX, "PET SoftBox", tag, owner, clock, "pet_softbox", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),

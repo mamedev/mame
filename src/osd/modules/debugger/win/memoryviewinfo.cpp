@@ -22,13 +22,13 @@ memoryview_info::~memoryview_info()
 }
 
 
-UINT8 memoryview_info::data_format() const
+uint8_t memoryview_info::data_format() const
 {
 	return view<debug_view_memory>()->get_data_format();
 }
 
 
-UINT32 memoryview_info::chunks_per_row() const
+uint32_t memoryview_info::chunks_per_row() const
 {
 	return view<debug_view_memory>()->chunks_per_row();
 }
@@ -51,12 +51,12 @@ void memoryview_info::set_expression(char const *string)
 	view<debug_view_memory>()->set_expression(string);
 }
 
-void memoryview_info::set_data_format(UINT8 dataformat)
+void memoryview_info::set_data_format(uint8_t dataformat)
 {
 	view<debug_view_memory>()->set_data_format(dataformat);
 }
 
-void memoryview_info::set_chunks_per_row(UINT32 rowchunks)
+void memoryview_info::set_chunks_per_row(uint32_t rowchunks)
 {
 	view<debug_view_memory>()->set_chunks_per_row(rowchunks);
 }

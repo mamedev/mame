@@ -17,37 +17,37 @@
 
 static CX4 cx4;
 
-static UINT16 CX4_readw(UINT16 addr);
-static UINT32 CX4_readl(UINT16 addr);
+static uint16_t CX4_readw(uint16_t addr);
+static uint32_t CX4_readl(uint16_t addr);
 
-static void CX4_writew(running_machine &machine, UINT16 addr, UINT16 data);
-//static void CX4_writel(running_machine &machine, UINT16 addr, UINT32 data);
+static void CX4_writew(running_machine &machine, uint16_t addr, uint16_t data);
+//static void CX4_writel(running_machine &machine, uint16_t addr, uint32_t data);
 
-static void CX4_C4DrawLine(INT32 X1, INT32 Y1, INT16 Z1, INT32 X2, INT32 Y2, INT16 Z2, UINT8 Color);
+static void CX4_C4DrawLine(int32_t X1, int32_t Y1, int16_t Z1, int32_t X2, int32_t Y2, int16_t Z2, uint8_t Color);
 
 #include "machine/cx4data.hxx"
 #include "machine/cx4fn.hxx"
 
-static UINT32 CX4_ldr(UINT8 r)
+static uint32_t CX4_ldr(uint8_t r)
 {
-	UINT16 addr = 0x0080 + (r * 3);
+	uint16_t addr = 0x0080 + (r * 3);
 	return (cx4.reg[addr + 0] <<  0)
 			| (cx4.reg[addr + 1] <<  8)
 			| (cx4.reg[addr + 2] << 16);
 }
 
-static void CX4_str(UINT8 r, UINT32 data)
+static void CX4_str(uint8_t r, uint32_t data)
 {
-	UINT16 addr = 0x0080 + (r * 3);
+	uint16_t addr = 0x0080 + (r * 3);
 	cx4.reg[addr + 0] = (data >>  0);
 	cx4.reg[addr + 1] = (data >>  8);
 	cx4.reg[addr + 2] = (data >> 16);
 }
 
-static void CX4_mul(UINT32 x, UINT32 y, UINT32 *rl, UINT32 *rh)
+static void CX4_mul(uint32_t x, uint32_t y, uint32_t *rl, uint32_t *rh)
 {
-	INT64 rx = x & 0xffffff;
-	INT64 ry = y & 0xffffff;
+	int64_t rx = x & 0xffffff;
+	int64_t ry = y & 0xffffff;
 	if(rx & 0x800000)rx |= ~0x7fffff;
 	if(ry & 0x800000)ry |= ~0x7fffff;
 
@@ -57,7 +57,7 @@ static void CX4_mul(UINT32 x, UINT32 y, UINT32 *rl, UINT32 *rh)
 	*rh = (rx >> 24) & 0xffffff;
 }
 
-static UINT32 CX4_sin(UINT32 rx)
+static uint32_t CX4_sin(uint32_t rx)
 {
 	cx4.r0 = rx & 0x1ff;
 	if(cx4.r0 & 0x100)
@@ -78,14 +78,14 @@ static UINT32 CX4_sin(UINT32 rx)
 	}
 }
 
-static UINT32 CX4_cos(UINT32 rx)
+static uint32_t CX4_cos(uint32_t rx)
 {
 	return CX4_sin(rx + 0x080);
 }
 
-static void CX4_immediate_reg(UINT32 start)
+static void CX4_immediate_reg(uint32_t start)
 {
-	UINT32 i = 0;
+	uint32_t i = 0;
 	cx4.r0 = CX4_ldr(0);
 	for(i = start; i < 48; i++)
 	{
@@ -100,9 +100,9 @@ static void CX4_immediate_reg(UINT32 start)
 
 static void CX4_transfer_data(running_machine &machine)
 {
-	UINT32 src;
-	UINT16 dest, count;
-	UINT32 i;
+	uint32_t src;
+	uint16_t dest, count;
+	uint32_t i;
 
 	src   = (cx4.reg[0x40]) | (cx4.reg[0x41] << 8) | (cx4.reg[0x42] << 16);
 	count = (cx4.reg[0x43]) | (cx4.reg[0x44] << 8);
@@ -118,7 +118,7 @@ static void CX4_transfer_data(running_machine &machine)
 #include "machine/cx4oam.hxx"
 #include "machine/cx4ops.hxx"
 
-void CX4_write(running_machine &machine, UINT32 addr, UINT8 data)
+void CX4_write(running_machine &machine, uint32_t addr, uint8_t data)
 {
 	addr &= 0x1fff;
 
@@ -193,20 +193,20 @@ void CX4_write(running_machine &machine, UINT32 addr, UINT8 data)
 }
 
 #ifdef UNUSED_FUNCTION
-void CX4_writeb(running_machine &machine, UINT16 addr, UINT8 data)
+void CX4_writeb(running_machine &machine, uint16_t addr, uint8_t data)
 {
 	CX4_write(machine, addr,     data);
 }
 #endif
 
-static void CX4_writew(running_machine &machine, UINT16 addr, UINT16 data)
+static void CX4_writew(running_machine &machine, uint16_t addr, uint16_t data)
 {
 	CX4_write(machine, addr + 0, data >> 0);
 	CX4_write(machine, addr + 1, data >> 8);
 }
 
 #ifdef UNUSED_FUNCTION
-void CX4_writel(running_machine &machine, UINT16 addr, UINT32 data)
+void CX4_writel(running_machine &machine, uint16_t addr, uint32_t data)
 {
 	CX4_write(machine, addr + 0, data >>  0);
 	CX4_write(machine, addr + 1, data >>  8);
@@ -214,7 +214,7 @@ void CX4_writel(running_machine &machine, UINT16 addr, UINT32 data)
 }
 #endif
 
-UINT8 CX4_read(UINT32 addr)
+uint8_t CX4_read(uint32_t addr)
 {
 	addr &= 0x1fff;
 
@@ -232,18 +232,18 @@ UINT8 CX4_read(UINT32 addr)
 }
 
 #ifdef UNUSED_FUNCTION
-UINT8 CX4_readb(UINT16 addr)
+uint8_t CX4_readb(uint16_t addr)
 {
 	return CX4_read(addr);
 }
 #endif
 
-static UINT16 CX4_readw(UINT16 addr)
+static uint16_t CX4_readw(uint16_t addr)
 {
 	return CX4_read(addr) | (CX4_read(addr + 1) << 8);
 }
 
-static UINT32 CX4_readl(UINT16 addr)
+static uint32_t CX4_readl(uint16_t addr)
 {
 	return CX4_read(addr) | (CX4_read(addr + 1) << 8) | (CX4_read(addr + 2) << 16);
 }

@@ -27,8 +27,8 @@ class hp_taco_device : public device_t ,
 {
 public:
 	// construction/destruction
-	hp_taco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
-	hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hp_taco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
+	hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_irq_handler.set_callback(object); }
@@ -57,10 +57,10 @@ public:
 	virtual const char *file_extensions() const override;
 
 	// Tape position, 1 unit = 1 inch / (968 * 1024)
-	typedef INT32 tape_pos_t;
+	typedef int32_t tape_pos_t;
 
 	// Words stored on tape
-	typedef UINT16 tape_word_t;
+	typedef uint16_t tape_word_t;
 
 protected:
 		// device-level overrides
@@ -79,16 +79,16 @@ private:
 	devcb_write_line m_sts_handler;
 
 	// Registers
-	UINT16 m_data_reg;
+	uint16_t m_data_reg;
 	bool m_data_reg_full;
-	UINT16 m_cmd_reg;
-	UINT16 m_status_reg;
-	UINT16 m_tach_reg;
+	uint16_t m_cmd_reg;
+	uint16_t m_status_reg;
+	uint16_t m_tach_reg;
 	tape_pos_t m_tach_reg_ref;
 	bool m_tach_reg_frozen;
-	UINT16 m_checksum_reg;
+	uint16_t m_checksum_reg;
 	bool m_clear_checksum_reg;
-	UINT16 m_timing_reg;
+	uint16_t m_timing_reg;
 
 	// State
 	bool m_irq;
@@ -125,7 +125,7 @@ private:
 	// Reading & writing
 	bool m_tape_wr;
 	tape_pos_t m_rw_pos;
-	UINT16 m_next_word;
+	uint16_t m_next_word;
 	tape_track_t::iterator m_rd_it;
 	bool m_rd_it_valid;
 
@@ -153,7 +153,7 @@ private:
 	attotime time_to_distance(tape_pos_t distance) const;
 	attotime time_to_target(tape_pos_t target) const;
 	attotime time_to_stopping_pos(void) const;
-	bool start_tape_cmd(UINT16 cmd_reg , UINT16 must_be_1 , UINT16 must_be_0);
+	bool start_tape_cmd(uint16_t cmd_reg , uint16_t must_be_1 , uint16_t must_be_0);
 	void stop_tape(void);
 	tape_track_t& current_track(void);
 	static tape_pos_t word_length(tape_word_t w);
@@ -181,7 +181,7 @@ private:
 	void terminate_cmd_now(void);
 	void set_data_timeout(bool long_timeout);
 	void cmd_fsm(void);
-	void start_cmd_exec(UINT16 new_cmd_reg);
+	void start_cmd_exec(uint16_t new_cmd_reg);
 	image_init_result internal_load(bool is_create);
 };
 

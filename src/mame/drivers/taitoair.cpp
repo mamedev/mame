@@ -272,7 +272,7 @@ WRITE16_MEMBER(taitoair_state::airsys_paletteram16_w)/* xxBBBBxRRRRxGGGG */
 
 WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
 {
-	UINT32 pen;
+	uint32_t pen;
 	int r,g,b;
 	//int pal_r,pal_g,pal_b;
 
@@ -436,7 +436,7 @@ WRITE16_MEMBER(taitoair_state::dsp_test_z_w)
 
 READ16_MEMBER(taitoair_state::dsp_test_point_r)
 {
-	UINT16 r = 0;
+	uint16_t r = 0;
 	if(m_dsp_test_x < -m_dsp_test_z)
 		r |= 1;
 	if(m_dsp_test_x >  m_dsp_test_z)

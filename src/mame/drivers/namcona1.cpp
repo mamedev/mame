@@ -187,7 +187,7 @@ void namcona1_state::simulate_mcu()
  */
 void namcona1_state::write_version_info()
 {
-	static const UINT16 source[0x8] =
+	static const uint16_t source[0x8] =
 	{ /* "NSA-BIOS ver"... */
 		0x534e,0x2d41,0x4942,0x534f,0x7620,0x7265,0x2e31,0x3133
 	};
@@ -266,7 +266,7 @@ READ16_MEMBER(namcona1_state::custom_key_r)
 		if( offset==4 ) m_keyval = 0;
 		if( offset==3 )
 		{
-			UINT16 res;
+			uint16_t res;
 			res = BITSWAP16(m_keyval, 22,26,31,23,18,20,16,30,24,21,25,19,17,29,28,27);
 
 			m_keyval >>= 1;
@@ -295,9 +295,9 @@ WRITE16_MEMBER(namcona1_state::custom_key_w)
 
 /***************************************************************/
 
-int namcona1_state::transfer_dword( UINT32 dest, UINT32 source )
+int namcona1_state::transfer_dword( uint32_t dest, uint32_t source )
 {
-	UINT16 data;
+	uint16_t data;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if( source>=0x400000 && source<0xc00000 )
@@ -425,8 +425,8 @@ void namcona1_state::blit()
 	int gfxbank = m_vreg[0x6];
 
 	/* dest and source are provided as dword offsets */
-	UINT32 src_baseaddr = 2*(0xffffff&((m_vreg[0x7]<<16)|m_vreg[0x8]));
-	UINT32 dst_baseaddr = 2*(0xffffff&((m_vreg[0x9]<<16)|m_vreg[0xa]));
+	uint32_t src_baseaddr = 2*(0xffffff&((m_vreg[0x7]<<16)|m_vreg[0x8]));
+	uint32_t dst_baseaddr = 2*(0xffffff&((m_vreg[0x9]<<16)|m_vreg[0xa]));
 
 	int num_bytes = m_vreg[0xb];
 
@@ -570,7 +570,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 {
-	UINT16 data = flipendian_int16(m_workram[offset]);
+	uint16_t data = flipendian_int16(m_workram[offset]);
 
 #if 0
 	if (offset >= 0x70000/2)
@@ -688,8 +688,8 @@ WRITE8_MEMBER(namcona1_state::port8_w)
 
 void namcona1_state::machine_start()
 {
-	m_prgrom = (UINT16 *)memregion("maincpu")->base();
-	m_maskrom = (UINT16 *)memregion("maskrom")->base();
+	m_prgrom = (uint16_t *)memregion("maincpu")->base();
+	m_maskrom = (uint16_t *)memregion("maskrom")->base();
 	m_mEnableInterrupts = 0;
 	m_c140->set_base(m_workram);
 
@@ -721,8 +721,8 @@ void namcona1_state::machine_reset()
 // bit 7 => port 7
 READ8_MEMBER(namcona1_state::portana_r)
 {
-	static const UINT8 bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
-	UINT8 port = m_io_p3->read();
+	static const uint8_t bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
+	uint8_t port = m_io_p3->read();
 
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }

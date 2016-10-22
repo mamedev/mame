@@ -150,28 +150,28 @@ public:
 	tilemap_t *m_sc3_tilemap_0;
 	tilemap_t *m_sc3_tilemap_2;
 	tilemap_t *m_sc3_tilemap_3;
-	required_shared_ptr<UINT16> m_sc0_vram;
-	optional_shared_ptr<UINT16> m_sc1_vram;
-	optional_shared_ptr<UINT16> m_sc2_vram;
-	required_shared_ptr<UINT16> m_sc3_vram;
-	std::unique_ptr<UINT16[]>m_jm_scrollram;
-	std::unique_ptr<UINT16[]> m_jm_vregs;
-	UINT16 m_sc0bank;
-	UINT16 m_pri;
-	UINT8 m_sc0_prin;
-	UINT8 m_sc1_prin;
-	UINT8 m_sc2_prin;
-	UINT8 m_sc3_prin;
-	required_shared_ptr<UINT16> m_jm_shared_ram;
-	required_shared_ptr<UINT16> m_jm_mcu_code;
-	UINT8 m_mcu_prg;
+	required_shared_ptr<uint16_t> m_sc0_vram;
+	optional_shared_ptr<uint16_t> m_sc1_vram;
+	optional_shared_ptr<uint16_t> m_sc2_vram;
+	required_shared_ptr<uint16_t> m_sc3_vram;
+	std::unique_ptr<uint16_t[]>m_jm_scrollram;
+	std::unique_ptr<uint16_t[]> m_jm_vregs;
+	uint16_t m_sc0bank;
+	uint16_t m_pri;
+	uint8_t m_sc0_prin;
+	uint8_t m_sc1_prin;
+	uint8_t m_sc2_prin;
+	uint8_t m_sc3_prin;
+	required_shared_ptr<uint16_t> m_jm_shared_ram;
+	required_shared_ptr<uint16_t> m_jm_mcu_code;
+	uint8_t m_mcu_prg;
 	int m_respcount;
-	UINT8 m_test_mode;
-	UINT16 m_dma_old;
-	UINT16 m_prg_prot;
-	UINT8 m_oki_rom;
-	UINT8 m_oki_bank;
-	UINT8 m_oki_za;
+	uint8_t m_test_mode;
+	uint16_t m_dma_old;
+	uint16_t m_prg_prot;
+	uint8_t m_oki_rom;
+	uint8_t m_oki_bank;
+	uint8_t m_oki_za;
 	DECLARE_WRITE16_MEMBER(sc0_vram_w);
 	DECLARE_WRITE16_MEMBER(sc3_vram_w);
 	DECLARE_WRITE16_MEMBER(sc1_vram_w);
@@ -213,15 +213,15 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(urashima);
-	UINT32 screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(jalmah_mcu_sim);
 	void jalmah_priority_system();
 	void draw_sc0_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sc1_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sc2_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sc3_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void daireika_palette_dma(UINT16 val);
+	void daireika_palette_dma(uint16_t val);
 	void daireika_mcu_run();
 	void mjzoomin_mcu_run();
 	void urashima_mcu_run();
@@ -338,8 +338,8 @@ void jalmah_state::video_start()
 	m_sc3_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_8x8),this),8,8,128,64);
 	m_sc3_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range3_8x8),this),8,8,64,128);
 
-	m_jm_scrollram = std::make_unique<UINT16[]>(0x80/2);
-	m_jm_vregs = std::make_unique<UINT16[]>(0x40/2);
+	m_jm_scrollram = std::make_unique<uint16_t[]>(0x80/2);
+	m_jm_vregs = std::make_unique<uint16_t[]>(0x40/2);
 
 	m_sc0_tilemap_0->set_transparent_pen(15);
 	m_sc0_tilemap_1->set_transparent_pen(15);
@@ -367,8 +367,8 @@ VIDEO_START_MEMBER(jalmah_state,urashima)
 	m_sc0_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc0_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range0_16x16),this),16,16,256,32);
 	m_sc3_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_8x8),this),8,8,128,64);
 
-	m_jm_scrollram = std::make_unique<UINT16[]>(0x80/2);
-	m_jm_vregs = std::make_unique<UINT16[]>(0x40/2);
+	m_jm_scrollram = std::make_unique<uint16_t[]>(0x80/2);
+	m_jm_vregs = std::make_unique<uint16_t[]>(0x40/2);
 
 	m_sc0_tilemap_0->set_transparent_pen(15);
 	m_sc3_tilemap_0->set_transparent_pen(15);
@@ -386,9 +386,9 @@ priority = 8, then 4, 2 and finally 1).
 ***************************************************************************************/
 void jalmah_state::jalmah_priority_system()
 {
-	UINT8 *pri_rom = memregion("user1")->base();
-	UINT8 i;
-	UINT8 prinum[0x10];
+	uint8_t *pri_rom = memregion("user1")->base();
+	uint8_t i;
+	uint8_t prinum[0x10];
 
 	m_sc0_prin = 0;
 	m_sc1_prin = 0;
@@ -452,10 +452,10 @@ void jalmah_state::draw_sc3_layer(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
-UINT32 jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *jm_scrollram = m_jm_scrollram.get();
-	UINT8 cur_prin;
+	uint16_t *jm_scrollram = m_jm_scrollram.get();
+	uint8_t cur_prin;
 	jalmah_priority_system();
 
 	m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0] & 0xfff);
@@ -512,9 +512,9 @@ UINT32 jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 jalmah_state::screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jalmah_state::screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *jm_scrollram = m_jm_scrollram.get();
+	uint16_t *jm_scrollram = m_jm_scrollram.get();
 	/*this game doesn't use the RANGE register at all.*/
 	m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0]);
 	m_sc3_tilemap_0->set_scrollx(0, jm_scrollram[3]);
@@ -601,8 +601,8 @@ WRITE16_MEMBER(jalmah_state::jalmah_tilebank_w)
 
 WRITE16_MEMBER(jalmah_state::jalmah_scroll_w)
 {
-	UINT16 *jm_scrollram = m_jm_scrollram.get();
-	UINT16 *jm_vregs = m_jm_vregs.get();
+	uint16_t *jm_scrollram = m_jm_scrollram.get();
+	uint16_t *jm_vregs = m_jm_vregs.get();
 	//logerror("[%04x]<-%04x\n",(offset+0x10)*2,data);
 	switch(offset+(0x10))
 	{
@@ -657,8 +657,8 @@ WRITE16_MEMBER(jalmah_state::urashima_sc3_vram_w)
 /*Urashima Mahjong uses a bigger (and mostly unused/wasted) video register ram.*/
 WRITE16_MEMBER(jalmah_state::urashima_vregs_w)
 {
-	UINT16 *jm_scrollram = m_jm_scrollram.get();
-	UINT16 *jm_vregs = m_jm_vregs.get();
+	uint16_t *jm_scrollram = m_jm_scrollram.get();
+	uint16_t *jm_vregs = m_jm_vregs.get();
 	//logerror("[%04x]<-%04x\n",(offset)*2,data);
 	switch(offset)
 	{
@@ -734,17 +734,17 @@ WRITE16_MEMBER(jalmah_state::urashima_dma_w)
 {
 	if(data & 4)
 	{
-		UINT32 i;
+		uint32_t i;
 		for(i = 0; i < 0x200; i += 2)
 			space.write_word(0x88200 + i, space.read_word(0x88400 + i));
 	}
 }
 
 /*same as $f00c0 sub-routine,but with additional work-around,to remove from here...*/
-void jalmah_state::daireika_palette_dma(UINT16 val)
+void jalmah_state::daireika_palette_dma(uint16_t val)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT32 index_1, index_2, src_addr, tmp_addr;
+	uint32_t index_1, index_2, src_addr, tmp_addr;
 	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
 	/*a1=88000*/
 	src_addr = 0x301c0 + (val * 0x40);
@@ -764,7 +764,7 @@ void jalmah_state::daireika_palette_dma(UINT16 val)
 /*RAM-based protection handlings*/
 void jalmah_state::daireika_mcu_run()
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	uint16_t *jm_shared_ram = m_jm_shared_ram;
 
 	if(((jm_shared_ram[0x550/2] & 0xf00) == 0x700) && ((jm_shared_ram[0x540/2] & 0xf00) != m_dma_old))
 	{
@@ -813,7 +813,7 @@ void jalmah_state::daireika_mcu_run()
 
 void jalmah_state::mjzoomin_mcu_run()
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	uint16_t *jm_shared_ram = m_jm_shared_ram;
 
 	if(m_test_mode)  //service_mode
 	{
@@ -857,7 +857,7 @@ void jalmah_state::mjzoomin_mcu_run()
 
 void jalmah_state::urashima_mcu_run()
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	uint16_t *jm_shared_ram = m_jm_shared_ram;
 
 	if(m_test_mode)  //service_mode
 	{
@@ -901,7 +901,7 @@ void jalmah_state::urashima_mcu_run()
 
 void jalmah_state::second_mcu_run()
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	uint16_t *jm_shared_ram = m_jm_shared_ram;
 	if(m_test_mode)  //service_mode
 	{
 		jm_shared_ram[0x200/2] = ioport("KEY0")->read();
@@ -971,7 +971,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okirom_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memregion("oki")->base();
+		uint8_t *oki = memregion("oki")->base();
 
 		m_oki_rom = data & 1;
 
@@ -988,7 +988,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memregion("oki")->base();
+		uint8_t *oki = memregion("oki")->base();
 
 		m_oki_bank = data & 3;
 
@@ -1778,8 +1778,8 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram;
-	UINT16 *jm_mcu_code = m_jm_mcu_code;
+	uint16_t *jm_shared_ram = m_jm_shared_ram;
+	uint16_t *jm_mcu_code = m_jm_mcu_code;
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/*******************************************************
@@ -1994,14 +1994,14 @@ READ16_MEMBER(jalmah_state::daireika_mcu_r)
 /*
 data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
-static const UINT16 dai_mcu_code[0x11] = { 0x33c5, 0x0010, 0x07fe, 0x3a39,0x000f,0x000c,0xda86,0x0245,
+static const uint16_t dai_mcu_code[0x11] = { 0x33c5, 0x0010, 0x07fe, 0x3a39,0x000f,0x000c,0xda86,0x0245,
 											0x003f, 0x33c5, 0x000f, 0x000c,0x3a39,0x0010,0x07fe,0x4e75    };
 
 WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram;
-	UINT16 *jm_mcu_code = m_jm_mcu_code;
-	UINT16 i;
+	uint16_t *jm_shared_ram = m_jm_shared_ram;
+	uint16_t *jm_mcu_code = m_jm_mcu_code;
+	uint16_t i;
 
 	if(ACCESSING_BITS_0_7 && data)
 	{
@@ -2275,8 +2275,8 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram;
-	UINT16 *jm_mcu_code = m_jm_mcu_code;
+	uint16_t *jm_shared_ram = m_jm_shared_ram;
+	uint16_t *jm_mcu_code = m_jm_mcu_code;
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/******************************************************

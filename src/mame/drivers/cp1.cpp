@@ -58,16 +58,16 @@ public:
 	DECLARE_WRITE8_MEMBER(i8155_portc_w);
 
 private:
-	UINT8   m_7seg;
-	UINT8   m_port2;
-	UINT8   m_matrix;
+	uint8_t   m_7seg;
+	uint8_t   m_port2;
+	uint8_t   m_matrix;
 };
 
 READ8_MEMBER(cp1_state::port1_r)
 {
 	logerror("Read from expansion port 1\n");
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_io_config->read() & 0x01)
 		data |= (m_cassette->input() > 0.03) ? 0x80 : 0x00;
@@ -91,7 +91,7 @@ READ8_MEMBER(cp1_state::port2_r)
 	// ---x ----   I8155 CE
 	// ---- xxxx   keyboard input
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	for(int i=0; i<5; i++)
 		if (!(m_matrix & (1<<i)))
@@ -138,7 +138,7 @@ WRITE8_MEMBER(cp1_state::putbus)
 
 READ8_MEMBER(cp1_state::i8155_read)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!(m_port2 & 0x10))
 	{
@@ -263,7 +263,7 @@ void cp1_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 {
-	UINT8 *dest = (UINT8*)m_i8155->space().get_read_ptr(0);
+	uint8_t *dest = (uint8_t*)m_i8155->space().get_read_ptr(0);
 	char line[0x10];
 	int addr = 0;
 	while (image.fgets(line, 10) && addr < 0x100)

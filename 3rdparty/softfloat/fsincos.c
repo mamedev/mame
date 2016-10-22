@@ -95,7 +95,7 @@ INLINE floatx80 propagateFloatx80NaNOneArg(floatx80 a)
 | `zSigPtr', respectively.
 *----------------------------------------------------------------------------*/
 
-void normalizeFloatx80Subnormal(UINT64 aSig, INT32 *zExpPtr, UINT64 *zSigPtr)
+void normalizeFloatx80Subnormal(uint64_t aSig, int32_t *zExpPtr, uint64_t *zSigPtr)
 {
 	int shiftCount = countLeadingZeros64(aSig);
 	*zSigPtr = aSig<<shiftCount;
@@ -104,16 +104,16 @@ void normalizeFloatx80Subnormal(UINT64 aSig, INT32 *zExpPtr, UINT64 *zSigPtr)
 
 /* reduce trigonometric function argument using 128-bit precision
    M_PI approximation */
-static UINT64 argument_reduction_kernel(UINT64 aSig0, int Exp, UINT64 *zSig0, UINT64 *zSig1)
+static uint64_t argument_reduction_kernel(uint64_t aSig0, int Exp, uint64_t *zSig0, uint64_t *zSig1)
 {
-	UINT64 term0, term1, term2;
-	UINT64 aSig1 = 0;
+	uint64_t term0, term1, term2;
+	uint64_t aSig1 = 0;
 
 	shortShift128Left(aSig1, aSig0, Exp, &aSig1, &aSig0);
-	UINT64 q = estimateDiv128To64(aSig1, aSig0, FLOAT_PI_HI);
+	uint64_t q = estimateDiv128To64(aSig1, aSig0, FLOAT_PI_HI);
 	mul128By64To192(FLOAT_PI_HI, FLOAT_PI_LO, q, &term0, &term1, &term2);
 	sub128(aSig1, aSig0, term0, term1, zSig1, zSig0);
-	while ((INT64)(*zSig1) < 0) {
+	while ((int64_t)(*zSig1) < 0) {
 		--q;
 		add192(*zSig1, *zSig0, term2, 0, FLOAT_PI_HI, FLOAT_PI_LO, zSig1, zSig0, &term2);
 	}
@@ -121,9 +121,9 @@ static UINT64 argument_reduction_kernel(UINT64 aSig0, int Exp, UINT64 *zSig0, UI
 	return q;
 }
 
-static int reduce_trig_arg(int expDiff, int &zSign, UINT64 &aSig0, UINT64 &aSig1)
+static int reduce_trig_arg(int expDiff, int &zSign, uint64_t &aSig0, uint64_t &aSig1)
 {
-	UINT64 term0, term1, q = 0;
+	uint64_t term0, term1, q = 0;
 
 	if (expDiff < 0) {
 		shift128Right(aSig0, 0, 1, &aSig0, &aSig1);
@@ -251,7 +251,7 @@ INLINE void sincos_tiny_argument(floatx80 *sin_a, floatx80 *cos_a, floatx80 a)
 	if (cos_a) *cos_a = floatx80_one;
 }
 
-static floatx80 sincos_approximation(int neg, float128 r, UINT64 quotient)
+static floatx80 sincos_approximation(int neg, float128 r, uint64_t quotient)
 {
 	if (quotient & 0x1) {
 		r = poly_cos(r);
@@ -292,8 +292,8 @@ static floatx80 sincos_approximation(int neg, float128 r, UINT64 quotient)
 
 int sf_fsincos(floatx80 a, floatx80 *sin_a, floatx80 *cos_a)
 {
-	UINT64 aSig0, aSig1 = 0;
-	INT32 aExp, zExp, expDiff;
+	uint64_t aSig0, aSig1 = 0;
+	int32_t aExp, zExp, expDiff;
 	int aSign, zSign;
 	int q = 0;
 
@@ -303,7 +303,7 @@ int sf_fsincos(floatx80 a, floatx80 *sin_a, floatx80 *cos_a)
 
 	/* invalid argument */
 	if (aExp == 0x7FFF) {
-		if ((UINT64) (aSig0<<1)) {
+		if ((uint64_t) (aSig0<<1)) {
 			sincos_invalid(sin_a, cos_a, propagateFloatx80NaNOneArg(a));
 			return 0;
 		}
@@ -409,8 +409,8 @@ int floatx80_fcos(floatx80 &a)
 
 int floatx80_ftan(floatx80 &a)
 {
-	UINT64 aSig0, aSig1 = 0;
-	INT32 aExp, zExp, expDiff;
+	uint64_t aSig0, aSig1 = 0;
+	int32_t aExp, zExp, expDiff;
 	int aSign, zSign;
 	int q = 0;
 
@@ -420,7 +420,7 @@ int floatx80_ftan(floatx80 &a)
 
 	/* invalid argument */
 	if (aExp == 0x7FFF) {
-		if ((UINT64) (aSig0<<1))
+		if ((uint64_t) (aSig0<<1))
 		{
 			a = propagateFloatx80NaNOneArg(a);
 			return 0;

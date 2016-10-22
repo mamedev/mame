@@ -14,17 +14,17 @@ public:
 		m_bitmapram(*this, "bitmapram"),
 		m_maincpu(*this, "maincpu") { }
 
-	required_shared_ptr<UINT16> m_bitmapram;
+	required_shared_ptr<uint16_t> m_bitmapram;
 	struct
 	{
-		UINT8 index;
+		uint8_t index;
 	}m_ioboard;
 	DECLARE_READ8_MEMBER(ioboard_status_r);
 	DECLARE_READ8_MEMBER(ioboard_unk_r);
 	DECLARE_WRITE8_MEMBER(ioboard_data_w);
 	DECLARE_WRITE8_MEMBER(ioboard_reg_w);
 	virtual void video_start() override;
-	UINT32 screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -35,10 +35,10 @@ void hotstuff_state::video_start()
 
 /* the first 0x20 bytes in every 0x200 (each line) of video ram are the colour data, providing a palette of 16 RGB444 colours for that line */
 
-UINT32 hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count, y,yyy,x,xxx;
-	UINT16 row_palette_data[0x10];
+	uint16_t row_palette_data[0x10];
 	rgb_t row_palette_data_as_rgb32_pen_data[0x10];
 
 	yyy=512;xxx=512*2;
@@ -79,7 +79,7 @@ UINT32 hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rgb3
 /* TODO: identify this ... */
 READ8_MEMBER(hotstuff_state::ioboard_status_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	printf("STATUS R\n");
 

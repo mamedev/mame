@@ -35,38 +35,38 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	optional_device<i8275_device> m_crtc8275;
 	optional_device<mc6845_device> m_crtc6845;
 	required_device<pic8259_device> m_pic8259;
 	required_device<i8257_device> m_dma8257;
 
-	UINT8 m_rest55;
-	UINT8 m_rest65;
-	UINT8 m_trap;
-	UINT8 m_ar;
-	UINT8 m_av;
-	UINT8 m_prom[256];
-	UINT8 m_riga_sup;
-	UINT8 m_scudi;
-	UINT8 m_cannone;
-	UINT8 m_riga_inf;
+	uint8_t m_rest55;
+	uint8_t m_rest65;
+	uint8_t m_trap;
+	uint8_t m_ar;
+	uint8_t m_av;
+	uint8_t m_prom[256];
+	uint8_t m_riga_sup;
+	uint8_t m_scudi;
+	uint8_t m_cannone;
+	uint8_t m_riga_inf;
 
-	UINT8 m_irq0;
-	UINT8 m_irq1;
-	UINT8 m_irq2;
-	UINT8 m_irq3;
-	UINT8 m_irq4;
-	UINT8 m_irq5;
-	UINT8 m_irq6;
-	UINT8 m_irq7;
+	uint8_t m_irq0;
+	uint8_t m_irq1;
+	uint8_t m_irq2;
+	uint8_t m_irq3;
+	uint8_t m_irq4;
+	uint8_t m_irq5;
+	uint8_t m_irq6;
+	uint8_t m_irq7;
 
 
-	UINT8 m_start2_value;
-	UINT8 m_dma1;
-	UINT8 m_io_40;
-	UINT8 m_hsync;
+	uint8_t m_start2_value;
+	uint8_t m_dma1;
+	uint8_t m_io_40;
+	uint8_t m_hsync;
 
 	DECLARE_WRITE8_MEMBER(io_40_w);
 
@@ -106,7 +106,7 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_WRITE8_MEMBER(dark_1_clr);
 	DECLARE_WRITE8_MEMBER(dark_2_clr);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
 	DECLARE_DRIVER_INIT(fi6845);
@@ -205,7 +205,7 @@ void fastinvaders_state::video_start()
 {
 }
 
-UINT32 fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
@@ -217,7 +217,7 @@ UINT32 fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 	{
 		for (int x = 0;x < 40;x++)
 		{
-			UINT8 tile = m_videoram[count];
+			uint8_t tile = m_videoram[count];
 
 
 			gfx->transpen(
@@ -253,7 +253,7 @@ logerror("Audio write &02X\n",data);
 
 READ8_MEMBER(fastinvaders_state::io_60_r)
 {
-	UINT8 tmp=0;
+	uint8_t tmp=0;
 	//0x60 ds6 input bit 0 DX or SX
 	//               bit 1 DX or SX
 //               bit 2-7 dip switch
@@ -351,7 +351,7 @@ WRITE8_MEMBER(fastinvaders_state::io_f0_w)
 
 READ_LINE_MEMBER(fastinvaders_state::sid_read)
 {
-	UINT8 tmp= m_start2_value ? ASSERT_LINE : CLEAR_LINE;
+	uint8_t tmp= m_start2_value ? ASSERT_LINE : CLEAR_LINE;
 	m_start2_value=0;
 	return tmp;
 }
@@ -693,7 +693,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(fastinvaders_state, fi6845)
 {
-const UINT8 *prom = memregion("prom")->base();
+const uint8_t *prom = memregion("prom")->base();
 	int i;
 	for (i=0;i<256;i++){
 		m_prom[i]=prom[i];

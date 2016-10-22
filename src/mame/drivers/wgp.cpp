@@ -446,7 +446,7 @@ void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in wgp_state::device_timer");
+		assert_always(false, "Unknown id in wgp_state::device_timer");
 	}
 }
 
@@ -894,7 +894,7 @@ void wgp_state::machine_reset()
 		m_piv_scrolly[i] = 0;
 	}
 
-	memset(m_rotate_ctrl, 0, 8 * sizeof(UINT16));
+	memset(m_rotate_ctrl, 0, 8 * sizeof(uint16_t));
 }
 
 void wgp_state::machine_start()
@@ -1183,7 +1183,7 @@ DRIVER_INIT_MEMBER(wgp_state,wgp)
 #if 0
 	/* Patch for coding error that causes corrupt data in
 	   sprite tilemapping area from $4083c0-847f */
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0x25dc / 2] = 0x0602;   // faulty value is 0x0206
 #endif
 }
@@ -1191,7 +1191,7 @@ DRIVER_INIT_MEMBER(wgp_state,wgp)
 DRIVER_INIT_MEMBER(wgp_state,wgp2)
 {
 	/* Code patches to prevent failure in memory checks */
-	UINT16 *ROM = (UINT16 *)memregion("sub")->base();
+	uint16_t *ROM = (uint16_t *)memregion("sub")->base();
 	ROM[0x8008 / 2] = 0x0;
 	ROM[0x8010 / 2] = 0x0;
 }

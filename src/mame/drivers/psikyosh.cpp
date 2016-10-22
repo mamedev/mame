@@ -415,8 +415,8 @@ P1KEY11  29|30  P2KEY11
     GND  55|56  GND
 */
 
-	UINT32 controls = ioport("CONTROLLER")->read();
-	UINT32 value = ioport("INPUTS")->read();
+	uint32_t controls = ioport("CONTROLLER")->read();
+	uint32_t value = ioport("INPUTS")->read();
 
 	if(controls) {
 		// Clearly has ghosting, game will only recognise one key depressed at once, and keyboard can only represent keys with distinct rows and columns
@@ -438,7 +438,7 @@ P1KEY11  29|30  P2KEY11
 			KEY11 = 0x0800  // JAMMA P1 Button 1
 		}; // Mahjong->JAMMA mapping specific to this game pcb
 
-		UINT16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
+		uint16_t key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
 //          ROW (distinct pins for P1 or P2) | COLUMN (shared for P1+P2)
 			KEY4 | KEY3,  // A
 			KEY4 | KEY2,  // B
@@ -461,8 +461,8 @@ P1KEY11  29|30  P2KEY11
 			KEY11 | KEY6, // Ron
 			KEY1 | KEY3   // Start
 		}; // generic Mahjong keyboard encoder, corresponds to ordering in input port
-		UINT32 keys = ioport("MAHJONG")->read();
-		UINT32 which_key = 0x1;
+		uint32_t keys = ioport("MAHJONG")->read();
+		uint32_t which_key = 0x1;
 		int count = 0;
 
 		// HACK: read IPT_START1 from "INPUTS" to avoid listing it twice or having two independent STARTs listed
@@ -473,7 +473,7 @@ P1KEY11  29|30  P2KEY11
 		do {
 			// since we can't handle multiple keys, just return the first one depressed
 			if((keys & which_key) && (count < ARRAY_LENGTH(key_codes))) {
-				value &= ~((UINT32)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
+				value &= ~((uint32_t)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
 				break;
 			}
 			which_key <<= 1;

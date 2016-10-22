@@ -35,11 +35,11 @@ extern const device_type TICKET_DISPENSER;
 //  CONSTANTS
 //**************************************************************************
 
-const UINT8 TICKET_MOTOR_ACTIVE_LOW = 0;    /* Ticket motor is triggered by D7=0 */
-const UINT8 TICKET_MOTOR_ACTIVE_HIGH = 1;    /* Ticket motor is triggered by D7=1 */
+const uint8_t TICKET_MOTOR_ACTIVE_LOW = 0;    /* Ticket motor is triggered by D7=0 */
+const uint8_t TICKET_MOTOR_ACTIVE_HIGH = 1;    /* Ticket motor is triggered by D7=1 */
 
-const UINT8 TICKET_STATUS_ACTIVE_LOW = 0;    /* Ticket is done dispensing when D7=0 */
-const UINT8 TICKET_STATUS_ACTIVE_HIGH = 1;    /* Ticket is done dispensing when D7=1 */
+const uint8_t TICKET_STATUS_ACTIVE_LOW = 0;    /* Ticket is done dispensing when D7=0 */
+const uint8_t TICKET_STATUS_ACTIVE_HIGH = 1;    /* Ticket is done dispensing when D7=1 */
 
 
 
@@ -53,12 +53,12 @@ class ticket_dispenser_device : public device_t
 {
 public:
 	// construction/destruction
-	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ticket_dispenser_device();
 
 	// inline configuration helpers
 	static void static_set_period(device_t &device, const attotime &period);
-	static void static_set_senses(device_t &device, UINT8 motor_sense, UINT8 status_sense);
+	static void static_set_senses(device_t &device, uint8_t motor_sense, uint8_t status_sense);
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
@@ -73,17 +73,17 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// configuration state
-	UINT8 m_motor_sense;
-	UINT8 m_status_sense;
+	uint8_t m_motor_sense;
+	uint8_t m_status_sense;
 	attotime m_period;
 
 	// active state
-	UINT8 m_active_bit;
-	UINT8 m_motoron;
-	UINT8 m_ticketdispensed;
-	UINT8 m_ticketnotdispensed;
+	uint8_t m_active_bit;
+	uint8_t m_motoron;
+	uint8_t m_ticketdispensed;
+	uint8_t m_ticketnotdispensed;
 
-	UINT8 m_status;
-	UINT8 m_power;
+	uint8_t m_status;
+	uint8_t m_power;
 	emu_timer *m_timer;
 };

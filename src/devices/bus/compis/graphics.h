@@ -45,16 +45,16 @@ public:
 	// construction/destruction
 	device_compis_graphics_card_interface(const machine_config &mconfig, device_t &device);
 
-	virtual UINT8 mcs0_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void mcs0_w(address_space &space, offs_t offset, UINT8 data) { }
-	virtual UINT8 mcs1_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void mcs1_w(address_space &space, offs_t offset, UINT8 data) { }
-	virtual UINT16 pcs3_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void pcs3_w(address_space &space, offs_t offset, UINT16 data) { }
-	virtual UINT8 pcs6_6_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void pcs6_6_w(address_space &space, offs_t offset, UINT8 data) { }
-	virtual UINT8 dma_ack_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void dma_ack_w(address_space &space, offs_t offset, UINT8 data) { }
+	virtual uint8_t mcs0_r(address_space &space, offs_t offset) { return 0xff; }
+	virtual void mcs0_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t mcs1_r(address_space &space, offs_t offset) { return 0xff; }
+	virtual void mcs1_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint16_t pcs3_r(address_space &space, offs_t offset) { return 0xff; }
+	virtual void pcs3_w(address_space &space, offs_t offset, uint16_t data) { }
+	virtual uint8_t pcs6_6_r(address_space &space, offs_t offset) { return 0xff; }
+	virtual void pcs6_6_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t dma_ack_r(address_space &space, offs_t offset) { return 0xff; }
+	virtual void dma_ack_w(address_space &space, offs_t offset, uint8_t data) { }
 
 protected:
 	compis_graphics_slot_t *m_slot;
@@ -68,7 +68,7 @@ class compis_graphics_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	compis_graphics_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	compis_graphics_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _dma_request> void set_dma_request_callback(_dma_request dma_request) { m_write_dma_request.set_callback(dma_request); }
 

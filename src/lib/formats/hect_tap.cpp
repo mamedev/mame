@@ -40,7 +40,7 @@ enum
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-static inline int hector_tap_cycle(INT16 *buffer, int sample_pos, int high, int low)
+static inline int hector_tap_cycle(int16_t *buffer, int sample_pos, int high, int low)
 {
 	int i = 0;
 
@@ -62,7 +62,7 @@ static inline int hector_tap_cycle(INT16 *buffer, int sample_pos, int high, int 
 }
 
 
-static inline int hector_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
+static inline int hector_tap_byte(int16_t *buffer, int sample_pos, uint8_t data)
 {
 /* Writing an entire byte */
 	int i, samples;
@@ -81,7 +81,7 @@ static inline int hector_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
 }
 
 
-static inline int hector_tap_synchro(INT16 *buffer, int sample_pos, int nb_synchro)
+static inline int hector_tap_synchro(int16_t *buffer, int sample_pos, int nb_synchro)
 {
 /* Writing an entire byte */
 	int i, samples;
@@ -94,7 +94,7 @@ static inline int hector_tap_synchro(INT16 *buffer, int sample_pos, int nb_synch
 }
 
 
-static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
+static int hector_handle_tap(int16_t *buffer, const uint8_t *casdata)
 {
 	int data_pos, sample_count/*, block_count*/;
 	int previous_block=0;
@@ -110,7 +110,7 @@ static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
 	/* on the entire file*/
 	while( data_pos < cas_size )
 	{
-		UINT16  block_size;
+		uint16_t  block_size;
 
 		if (previous_block == 0xFE)
 				/* Starting a block with 150 cycle of synchro to let time to Hector to do the job ! */
@@ -152,7 +152,7 @@ static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
 *******************************************************************/
 
 
-static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
+static int hector_handle_forth_tap(int16_t *buffer, const uint8_t *casdata)
 {
 	int data_pos, sample_count/*, block_count*/;
 	/*int previous_block=0;*/
@@ -169,7 +169,7 @@ static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
 	/* on the entire file*/
 	while( data_pos < cas_size )
 	{
-		UINT16  block_size;
+		uint16_t  block_size;
 
 		/* Starting a block with 768 cycle of synchro*/
 		sample_count += hector_tap_synchro( buffer, sample_count, 768 );
@@ -204,7 +204,7 @@ static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int hector_tap_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int hector_tap_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	return hector_handle_tap( buffer, bytes );
 }
@@ -213,7 +213,7 @@ static int hector_tap_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 /*******************************************************************
    Calculate the number of samples needed for this tape image  FORTH
 ********************************************************************/
-static int hector_tap_forth_to_wav_size(const UINT8 *casdata, int caslen)
+static int hector_tap_forth_to_wav_size(const uint8_t *casdata, int caslen)
 {
 	cas_size = caslen ;
 
@@ -223,7 +223,7 @@ static int hector_tap_forth_to_wav_size(const UINT8 *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image FORTH
 ********************************************************************/
-static int hector_tap_forth_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int hector_tap_forth_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	return hector_handle_forth_tap( buffer, bytes ); //forth removed here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
@@ -232,7 +232,7 @@ static int hector_tap_forth_fill_wave(INT16 *buffer, int sample_count, UINT8 *by
 /*******************************************************************
    Calculate the number of samples needed for this tape image classical
 ********************************************************************/
-static int hector_tap_to_wav_size(const UINT8 *casdata, int caslen)
+static int hector_tap_to_wav_size(const uint8_t *casdata, int caslen)
 {
 	cas_size = caslen ;
 

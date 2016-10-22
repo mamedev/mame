@@ -88,8 +88,8 @@ enum
 #define IS_FLOAT(o)     (((o) & (1 << 23)) == 0)
 #define IS_INTEGRAL(o)  (((o) & (1 << 23)) != 0)
 
-#define SIMMVAL         ((INT16)op)
-#define UIMMVAL         ((UINT16)op)
+#define SIMMVAL         ((int16_t)op)
+#define UIMMVAL         ((uint16_t)op)
 #define LIMMVAL         (op & 0x03ffffff)
 
 #define RSP_STATUS_HALT          0x0001
@@ -137,7 +137,7 @@ class rsp_device : public cpu_device
 
 public:
 	// construction/destruction
-	rsp_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	rsp_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	void resolve_cb();
 	template<class _Object> static devcb_base &static_set_dp_reg_r_callback(device_t &device, _Object object) { return downcast<rsp_device &>(device).m_dp_reg_r_func.set_callback(object); }
@@ -147,9 +147,9 @@ public:
 	template<class _Object> static devcb_base &static_set_status_callback(device_t &device, _Object object) { return downcast<rsp_device &>(device).m_sp_set_status_func.set_callback(object); }
 
 	void rspdrc_flush_drc_cache();
-	void rspdrc_set_options(UINT32 options);
-	void rsp_add_dmem(UINT32 *base);
-	void rsp_add_imem(UINT32 *base);
+	void rspdrc_set_options(uint32_t options);
+	void rsp_add_dmem(uint32_t *base);
+	void rsp_add_imem(uint32_t *base);
 
 	void ccfunc_read8();
 	void ccfunc_read16();
@@ -162,7 +162,7 @@ public:
 	void ccfunc_sp_set_status_cb();
 	void ccfunc_unimplemented();
 
-	UINT8* get_dmem() { return m_dmem8; }
+	uint8_t* get_dmem() { return m_dmem8; }
 
 protected:
 	// device-level overrides
@@ -171,10 +171,10 @@ protected:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 1; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 1; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override { }
 
@@ -187,18 +187,18 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
-	void unimplemented_opcode(UINT32 op);
+	void unimplemented_opcode(uint32_t op);
 
 	/* internal compiler state */
 	struct compiler_state
 	{
-		UINT32              cycles;                   /* accumulated cycles */
-		UINT8               checkints;                /* need to check interrupts before next instruction */
-		UINT8               checksoftints;            /* need to check software interrupts before next instruction */
+		uint32_t              cycles;                   /* accumulated cycles */
+		uint8_t               checkints;                /* need to check interrupts before next instruction */
+		uint8_t               checksoftints;            /* need to check software interrupts before next instruction */
 		uml::code_label     labelnum;                 /* index for local labels */
 	};
 
@@ -210,7 +210,7 @@ private:
 	{
 		offs_t              start;                      /* start of the RAM block */
 		offs_t              end;                        /* end of the RAM block */
-		UINT8               readonly;                   /* TRUE if read-only */
+		bool                readonly;                   /* true if read-only */
 		void *              base;                       /* base in memory where the RAM lives */
 	};
 
@@ -218,16 +218,16 @@ private:
 	drc_cache           m_cache;                      /* pointer to the DRC code cache */
 	std::unique_ptr<drcuml_state>      m_drcuml;                     /* DRC UML generator state */
 	std::unique_ptr<rsp_frontend>      m_drcfe;                      /* pointer to the DRC front-end state */
-	UINT32              m_drcoptions;                 /* configurable DRC options */
+	uint32_t              m_drcoptions;                 /* configurable DRC options */
 
 	/* internal stuff */
-	UINT8               m_cache_dirty;                /* true if we need to flush the cache */
+	uint8_t               m_cache_dirty;                /* true if we need to flush the cache */
 
 	/* parameters for subroutines */
-	UINT64              m_numcycles;                  /* return value from gettotalcycles */
+	uint64_t              m_numcycles;                  /* return value from gettotalcycles */
 	const char *        m_format;                     /* format string for print_debug */
-	UINT32              m_arg2;                       /* print_debug argument 3 */
-	UINT32              m_arg3;                       /* print_debug argument 4 */
+	uint32_t              m_arg2;                       /* print_debug argument 3 */
+	uint32_t              m_arg3;                       /* print_debug argument 4 */
 
 	/* register mappings */
 	uml::parameter   m_regmap[34];                 /* parameter to register mappings for all 32 integer registers */
@@ -245,11 +245,11 @@ private:
 
 	struct internal_rsp_state
 	{
-		UINT32 pc;
-		UINT32 r[35];
-		UINT32 arg0;
-		UINT32 arg1;
-		UINT32 jmpdest;
+		uint32_t pc;
+		uint32_t r[35];
+		uint32_t arg0;
+		uint32_t arg1;
+		uint32_t jmpdest;
 		int icount;
 	};
 
@@ -257,11 +257,11 @@ private:
 
 	FILE *m_exec_output;
 
-	UINT32 m_sr;
-	UINT32 m_step_count;
+	uint32_t m_sr;
+	uint32_t m_step_count;
 
-	UINT32 m_ppc;
-	UINT32 m_nextpc;
+	uint32_t m_ppc;
+	uint32_t m_nextpc;
 
 	address_space *m_program;
 protected:
@@ -270,15 +270,15 @@ protected:
 private:
 	std::unique_ptr<rsp_cop2>    m_cop2;
 
-	UINT32 *m_dmem32;
-	UINT16 *m_dmem16;
-	UINT8 *m_dmem8;
+	uint32_t *m_dmem32;
+	uint16_t *m_dmem16;
+	uint8_t *m_dmem8;
 
-	UINT32 *m_imem32;
-	UINT16 *m_imem16;
-	UINT8 *m_imem8;
+	uint32_t *m_imem32;
+	uint16_t *m_imem16;
+	uint8_t *m_imem8;
 
-	UINT32 m_debugger_temp;
+	uint32_t m_debugger_temp;
 	bool m_isdrc;
 
 	devcb_read32 m_dp_reg_r_func;
@@ -287,22 +287,22 @@ private:
 	devcb_write32 m_sp_reg_w_func;
 	devcb_write32 m_sp_set_status_func;
 
-	UINT8 READ8(UINT32 address);
-	UINT16 READ16(UINT32 address);
-	UINT32 READ32(UINT32 address);
-	void WRITE8(UINT32 address, UINT8 data);
-	void WRITE16(UINT32 address, UINT16 data);
-	void WRITE32(UINT32 address, UINT32 data);
-	UINT32 get_cop0_reg(int reg);
-	void set_cop0_reg(int reg, UINT32 data);
+	uint8_t READ8(uint32_t address);
+	uint16_t READ16(uint32_t address);
+	uint32_t READ32(uint32_t address);
+	void WRITE8(uint32_t address, uint8_t data);
+	void WRITE16(uint32_t address, uint16_t data);
+	void WRITE32(uint32_t address, uint32_t data);
+	uint32_t get_cop0_reg(int reg);
+	void set_cop0_reg(int reg, uint32_t data);
 	void load_fast_iregs(drcuml_block *block);
 	void save_fast_iregs(drcuml_block *block);
-	UINT8 DM_READ8(UINT32 address);
-	UINT16 DM_READ16(UINT32 address);
-	UINT32 DM_READ32(UINT32 address);
-	void DM_WRITE8(UINT32 address, UINT8 data);
-	void DM_WRITE16(UINT32 address, UINT16 data);
-	void DM_WRITE32(UINT32 address, UINT32 data);
+	uint8_t DM_READ8(uint32_t address);
+	uint16_t DM_READ16(uint32_t address);
+	uint32_t DM_READ32(uint32_t address);
+	void DM_WRITE8(uint32_t address, uint8_t data);
+	void DM_WRITE16(uint32_t address, uint16_t data);
+	void DM_WRITE32(uint32_t address, uint32_t data);
 	void rspcom_init();
 	void execute_run_drc();
 	void code_flush_cache();
@@ -311,16 +311,16 @@ private:
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
 	void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle *&handleptr);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception);
+	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg);
+	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t linkreg);
 	void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op);
+	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
 };
 
 

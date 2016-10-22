@@ -30,7 +30,7 @@ class xxx_device : public device_t
 {
 public:
 	// construction/destruction
-	xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );

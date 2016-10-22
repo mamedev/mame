@@ -165,7 +165,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(pio_r, pio_w)
 ADDRESS_MAP_END
 
-aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_g1_device(mconfig, AW_ROM_BOARD, "Sammy Atomiswave ROM Board", tag, owner, clock, "aw_rom_board", __FILE__)
 	, m_region(*this, DEVICE_SELF)
 	, m_keyregion(*this, finder_base::DUMMY_TAG)
@@ -230,10 +230,10 @@ const aw_rom_board::sbox_set aw_rom_board::sboxes_table[4] =
 	},
 };
 
-UINT16 aw_rom_board::decrypt(UINT16 cipherText, UINT32 address, const UINT32 key)
+uint16_t aw_rom_board::decrypt(uint16_t cipherText, uint32_t address, const uint32_t key)
 {
-	UINT8 b0,b1,b2,b3;
-	UINT16 aux;
+	uint8_t b0,b1,b2,b3;
+	uint16_t aux;
 	const int* pbox = permutation_table[key>>18];
 	const sbox_set* ss = &sboxes_table[(key>>16)&3];
 
@@ -263,7 +263,7 @@ void aw_rom_board::set_key()
 	if (m_keyregion->bytes() != 4)
 		throw emu_fatalerror("AW-ROM-BOARD: key region %s has incorrect size (%d, expected 4)\n", m_keyregion.finder_tag(), m_keyregion->bytes());
 
-	const UINT8 *krp = m_keyregion->base();
+	const uint8_t *krp = m_keyregion->base();
 	rombd_key = (krp[0] << 24) | (krp[1] << 16) | (krp[2] << 8) | krp[3];
 }
 
@@ -298,10 +298,10 @@ void aw_rom_board::device_reset()
 
 READ16_MEMBER(aw_rom_board::pio_r)
 {
-	UINT32 roffset = epr_offset & 0x3ffffff;
+	uint32_t roffset = epr_offset & 0x3ffffff;
 	if (roffset >= (mpr_offset / 2))
 		roffset += mpr_bank * 0x4000000;
-	UINT16 retval = (m_region->bytes() > (roffset * 2)) ? m_region->u16(roffset) : 0; // not endian-safe?
+	uint16_t retval = (m_region->bytes() > (roffset * 2)) ? m_region->u16(roffset) : 0; // not endian-safe?
 	return retval;
 }
 
@@ -359,26 +359,26 @@ void aw_rom_board::recalc_dma_offset(int mode)
 
 	case MPR_RECORD:
 		dma_offset = mpr_offset + mpr_record_index * 0x40;
-		dma_limit = std::min((UINT32)0x8000000, m_region->bytes());
+		dma_limit = std::min((uint32_t)0x8000000, m_region->bytes());
 		break;
 
 	case MPR_FILE: {
-		UINT32 filedata_offs = (mpr_bank * 0x8000000 + mpr_offset + mpr_first_file_index * 0x40 + 8) / 2;
+		uint32_t filedata_offs = (mpr_bank * 0x8000000 + mpr_offset + mpr_first_file_index * 0x40 + 8) / 2;
 		dma_offset = decrypt16(filedata_offs) | (decrypt16(filedata_offs + 1) << 16);
 		dma_offset = (mpr_offset + dma_offset + mpr_file_offset * 2) & 0x7ffffff;
-		dma_limit  = std::min((UINT32)0x8000000, m_region->bytes());
+		dma_limit  = std::min((uint32_t)0x8000000, m_region->bytes());
 		break;
 	}
 	}
 
 	if (dma_offset >= mpr_offset) {
-		UINT32 bank_base = mpr_bank * 0x8000000;
+		uint32_t bank_base = mpr_bank * 0x8000000;
 		dma_offset += bank_base;
 		dma_limit = std::min(dma_limit + bank_base, m_region->bytes());
 	}
 }
 
-void aw_rom_board::dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram)
+void aw_rom_board::dma_get_position(uint8_t *&base, uint32_t &limit, bool to_mainram)
 {
 	if(!to_mainram) {
 		limit = 0;
@@ -386,14 +386,14 @@ void aw_rom_board::dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram
 		return;
 	}
 
-	UINT32 offset = dma_offset / 2;
+	uint32_t offset = dma_offset / 2;
 	for (int i = 0; i < 16; i++)
 		decrypted_buf[i] = decrypt16(offset + i);
-	base = (UINT8*)decrypted_buf;
+	base = (uint8_t*)decrypted_buf;
 	limit = 32;
 }
 
-void aw_rom_board::dma_advance(UINT32 size)
+void aw_rom_board::dma_advance(uint32_t size)
 {
 	dma_offset += size;
 }

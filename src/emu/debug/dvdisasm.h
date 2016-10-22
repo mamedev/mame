@@ -69,15 +69,15 @@ public:
 	// getters
 	const char *expression() const { return m_expression.string(); }
 	disasm_right_column right_column() const { return m_right_column; }
-	UINT32 backward_steps() const { return m_backwards_steps; }
-	UINT32 disasm_width() const { return m_dasm_width; }
+	uint32_t backward_steps() const { return m_backwards_steps; }
+	uint32_t disasm_width() const { return m_dasm_width; }
 	offs_t selected_address();
 
 	// setters
 	void set_expression(const char *expression);
 	void set_right_column(disasm_right_column contents);
-	void set_backward_steps(UINT32 steps);
-	void set_disasm_width(UINT32 width);
+	void set_backward_steps(uint32_t steps);
+	void set_disasm_width(uint32_t width);
 	void set_selected_address(offs_t address);
 
 protected:
@@ -96,11 +96,11 @@ private:
 
 	// internal state
 	disasm_right_column m_right_column;         // right column contents
-	UINT32              m_backwards_steps;      // number of backwards steps
-	UINT32              m_dasm_width;           // width of the disassembly area
-	UINT8 *             m_last_direct_raw;      // last direct raw value
-	UINT8 *             m_last_direct_decrypted;// last direct decrypted value
-	UINT32              m_last_change_count;    // last comment change count
+	uint32_t              m_backwards_steps;      // number of backwards steps
+	uint32_t              m_dasm_width;           // width of the disassembly area
+	uint8_t *             m_last_direct_raw;      // last direct raw value
+	uint8_t *             m_last_direct_decrypted;// last direct decrypted value
+	uint32_t              m_last_change_count;    // last comment change count
 	offs_t              m_last_pcbyte;          // last PC byte value
 	int                 m_divider1, m_divider2; // left and right divider columns
 	int                 m_divider3;             // comment divider column

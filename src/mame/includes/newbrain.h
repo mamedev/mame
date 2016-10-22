@@ -50,7 +50,7 @@ public:
 	{
 	}
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );
@@ -94,7 +94,7 @@ protected:
 	int get_pwrup_t();
 
 	void screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void tvl(UINT8 data, int a6);
+	void tvl(uint8_t data, int a6);
 
 	required_device<z80_device> m_maincpu;
 	required_device<cop400_cpu_device> m_cop;
@@ -124,14 +124,14 @@ protected:
 
 	int m_keylatch;
 	int m_keydata;
-	UINT16 m_segment_data;
+	uint16_t m_segment_data;
 
 	int m_rv;
 	int m_fs;
 	int m_32_40;
 	int m_ucr;
 	int m_80l;
-	UINT16 m_tvl;
+	uint16_t m_tvl;
 };
 
 

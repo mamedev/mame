@@ -202,20 +202,20 @@ void unif_mapr_setup( const char *board, int *pcb_id, int *battery, int *prgram,
 
 void nes_cart_slot_device::call_load_unif()
 {
-	UINT32 vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
+	uint32_t vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
 	// SETUP step 1: running through the file and getting PRG, VROM sizes
-	UINT32 unif_ver = 0, chunk_length = 0, read_length = 0x20;
-	UINT32 prg_start = 0, chr_start = 0;
-	UINT32 size = length(), prg_size = 0, vrom_size = 0;
-	UINT8 buffer[4], mirror = 0;
+	uint32_t unif_ver = 0, chunk_length = 0, read_length = 0x20;
+	uint32_t prg_start = 0, chr_start = 0;
+	uint32_t size = length(), prg_size = 0, vrom_size = 0;
+	uint8_t buffer[4], mirror = 0;
 	char magic2[4];
 	char unif_mapr[32]; // here we should store MAPR chunks
-	bool mapr_chunk_found = FALSE, small_prg = FALSE;
+	bool mapr_chunk_found = false, small_prg = false;
 
 	// allocate space to temporarily store PRG & CHR banks
-	dynamic_buffer temp_prg(256 * 0x4000);
-	dynamic_buffer temp_chr(256 * 0x2000);
-	UINT8 temp_byte = 0;
+	std::vector<uint8_t> temp_prg(256 * 0x4000);
+	std::vector<uint8_t> temp_chr(256 * 0x2000);
+	uint8_t temp_byte = 0;
 
 	fseek(4, SEEK_SET);
 	fread(&buffer, 4);
@@ -237,7 +237,7 @@ void nes_cart_slot_device::call_load_unif()
 		{
 			if ((magic2[0] == 'M') && (magic2[1] == 'A') && (magic2[2] == 'P') && (magic2[3] == 'R'))
 			{
-				mapr_chunk_found = TRUE;
+				mapr_chunk_found = true;
 				logerror("[MAPR] chunk found: ");
 				fread(&buffer, 4);
 				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
@@ -384,7 +384,7 @@ void nes_cart_slot_device::call_load_unif()
 					logerror("It consists of %d 16K-blocks.\n", chunk_length / 0x4000);
 				else
 				{
-					small_prg = TRUE;
+					small_prg = true;
 					logerror("This chunk is smaller than 16K: the emulation might have issues. Please report this file to the MESS forums.\n");
 				}
 
@@ -438,7 +438,7 @@ void nes_cart_slot_device::call_load_unif()
 	prgram_size = prgram * 0x2000;
 	vram_size = vram_chunks * 0x2000;
 
-	m_cart->set_four_screen_vram(FALSE);
+	m_cart->set_four_screen_vram(false);
 	switch (mirror)
 	{
 		case 0: // Horizontal Mirroring (Hard Wired)
@@ -454,7 +454,7 @@ void nes_cart_slot_device::call_load_unif()
 			m_cart->set_mirroring(PPU_MIRROR_HIGH);
 			break;
 		case 4: // Four Screens of VRAM (Hard Wired)
-			m_cart->set_four_screen_vram(TRUE);
+			m_cart->set_four_screen_vram(true);
 			m_cart->set_mirroring(PPU_MIRROR_4SCREEN);
 			break;
 		case 5: // Mirroring Controlled By Mapper Hardware
@@ -540,8 +540,8 @@ void nes_cart_slot_device::call_load_unif()
 	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
 	if (battery_size || mapper_sram_size)
 	{
-		UINT32 tot_size = battery_size + mapper_sram_size;
-		dynamic_buffer temp_nvram(tot_size);
+		uint32_t tot_size = battery_size + mapper_sram_size;
+		std::vector<uint8_t> temp_nvram(tot_size);
 		battery_load(&temp_nvram[0], tot_size, 0x00);
 		if (battery_size)
 		{
@@ -555,9 +555,9 @@ void nes_cart_slot_device::call_load_unif()
 	logerror("UNIF support is only very preliminary.\n");
 }
 
-const char * nes_cart_slot_device::get_default_card_unif(UINT8 *ROM, UINT32 len)
+const char * nes_cart_slot_device::get_default_card_unif(uint8_t *ROM, uint32_t len)
 {
-	UINT32 chunk_length = 0, read_length = 0x20;
+	uint32_t chunk_length = 0, read_length = 0x20;
 	int pcb_id = 0, battery = 0, prgram = 0, vram_chunks = 0;
 	char unif_mapr[32];
 

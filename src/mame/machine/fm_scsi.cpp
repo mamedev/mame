@@ -38,7 +38,7 @@ const device_type FMSCSI = &device_creator<fmscsi_device>;
  * Device
  */
 
-fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: legacy_scsi_host_adapter(mconfig, FMSCSI, "FM-SCSI", tag, owner, clock, "fmscsi", __FILE__),
 	m_irq_handler(*this),
 	m_drq_handler(*this)
@@ -81,7 +81,7 @@ void fmscsi_device::device_reset()
 }
 
 // get the length of a SCSI command based on it's command byte type
-int fmscsi_device::get_scsi_cmd_len(UINT8 cbyte)
+int fmscsi_device::get_scsi_cmd_len(uint8_t cbyte)
 {
 	int group;
 
@@ -126,7 +126,7 @@ void fmscsi_device::stop_transfer()
 	logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
 }
 
-UINT8 fmscsi_device::fmscsi_data_r(void)
+uint8_t fmscsi_device::fmscsi_data_r(void)
 {
 	// read from data bus
 	// ACK is automatic on accessing the data bus, so REQ will go low.
@@ -169,7 +169,7 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 	return m_data;
 }
 
-void fmscsi_device::fmscsi_data_w(UINT8 data)
+void fmscsi_device::fmscsi_data_w(uint8_t data)
 {
 	int phase;
 
@@ -304,7 +304,7 @@ int fmscsi_device::get_phase(void)
 	return m_phase;
 }
 
-void fmscsi_device::set_input_line(UINT8 line, UINT8 state)
+void fmscsi_device::set_input_line(uint8_t line, uint8_t state)
 {
 	if(line == FMSCSI_LINE_REQ)
 	{
@@ -334,12 +334,12 @@ void fmscsi_device::set_input_line(UINT8 line, UINT8 state)
 //  logerror("FMSCSI: input line %02x set to %i\n",line,state);
 }
 
-UINT8 fmscsi_device::get_input_line(UINT8 line)
+uint8_t fmscsi_device::get_input_line(uint8_t line)
 {
 	return m_input_lines & line;
 }
 
-void fmscsi_device::set_output_line(UINT8 line, UINT8 state)
+void fmscsi_device::set_output_line(uint8_t line, uint8_t state)
 {
 	if(line == FMSCSI_LINE_RST && state != 0)
 	{
@@ -372,18 +372,18 @@ void fmscsi_device::set_output_line(UINT8 line, UINT8 state)
 //  logerror("FMSCSI: output line %02x set to %i\n",line,state);
 }
 
-UINT8 fmscsi_device::get_output_line(UINT8 line)
+uint8_t fmscsi_device::get_output_line(uint8_t line)
 {
 	return m_output_lines & line;
 }
 
-UINT8 fmscsi_device::fmscsi_status_r(void)
+uint8_t fmscsi_device::fmscsi_status_r(void)
 {
 	// status inputs
 	return m_input_lines;
 }
 
-void fmscsi_device::fmscsi_control_w(UINT8 data)
+void fmscsi_device::fmscsi_control_w(uint8_t data)
 {
 	// control outputs
 	set_output_line(FMSCSI_LINE_RST,data & FMSCSI_LINE_RST);

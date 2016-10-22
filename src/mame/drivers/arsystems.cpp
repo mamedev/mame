@@ -95,7 +95,7 @@ protected:
 
 	optional_memory_region m_bios_region;
 
-	UINT8 m_coin_counter[2];
+	uint8_t m_coin_counter[2];
 };
 
 
@@ -154,7 +154,7 @@ WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_portb_w)
 
 CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 {
-	int coin = (FPTR)param;
+	int coin = (uintptr_t)param;
 
 	/* return coin counter values */
 	return m_coin_counter[coin] & 3;
@@ -163,7 +163,7 @@ CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 
 INPUT_CHANGED_MEMBER(arcadia_amiga_state::coin_changed_callback)
 {
-	int coin = (FPTR)param;
+	int coin = (uintptr_t)param;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval && m_coin_counter[coin] < 3)
@@ -887,7 +887,7 @@ ROM_END
 
 void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
 {
-	UINT16 *rom = (UINT16 *)memregion(tag)->base();
+	uint16_t *rom = (uint16_t *)memregion(tag)->base();
 	int i;
 
 	/* only the low byte of ROMs are encrypted in these games */
@@ -896,7 +896,7 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 
 	#if 0
 	{
-		UINT8 *ROM = memregion(tag)->base();
+		uint8_t *ROM = memregion(tag)->base();
 	//  int size = memregion(tag)->bytes();
 
 		FILE *fp;
@@ -930,7 +930,7 @@ DRIVER_INIT_MEMBER( arcadia_amiga_state, arcadia )
 	if (m_bios_region != nullptr)
 	{
 		/* OnePlay bios is encrypted, TenPlay is not */
-		UINT16 *rom = (UINT16 *)m_bios_region->base();
+		uint16_t *rom = (uint16_t *)m_bios_region->base();
 
 		if (rom[0] != 0x4afc)
 		{

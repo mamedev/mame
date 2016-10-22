@@ -84,7 +84,7 @@ static const char *const op_name_str[] = {
  * 2    invalid opcode for 1:6800/6802/6808, 2:6801/6803, 4:HD63701
  */
 
-static const UINT8 table[0x104][3] = {
+static const uint8_t table[0x104][3] = {
 	{ill, inh,7},{nop, inh,0},{ill, inh,7},{ill, inh,7},/* 00 */
 	{lsrd,inh,1},{asld,inh,1},{tap, inh,0},{tpa, inh,0},
 	{inx, inh,0},{dex, inh,0},{clv, inh,0},{sev, inh,0},
@@ -166,12 +166,12 @@ static const UINT8 table[0x104][3] = {
 #define ARG2    opram[2]
 #define ARGW    (opram[1]<<8) + opram[2]
 
-static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const UINT8 *oprom, const UINT8 *opram)
+static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const uint8_t *oprom, const uint8_t *opram)
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	int invalid_mask;
 	int code = OP;
-	UINT8 opcode, args, invalid;
+	uint8_t opcode, args, invalid;
 
 	switch( subtype )
 	{
@@ -218,7 +218,7 @@ static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const UINT8 *opro
 	switch( args )
 	{
 		case rel:  /* relative */
-			sprintf (buf, "$%04X", pc + (INT8)ARG1 + 2);
+			sprintf (buf, "$%04X", pc + (int8_t)ARG1 + 2);
 			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imb:  /* immediate (byte) */
 			sprintf (buf, "#$%02X", ARG1);

@@ -17,9 +17,9 @@ class wd177x_format : public floppy_image_format_t
 {
 public:
 	struct format {
-		UINT32 form_factor;      // See floppy_image for possible values
-		UINT32 variant;          // See floppy_image for possible values
-		UINT32 encoding;         // See floppy_image for possible values
+		uint32_t form_factor;      // See floppy_image for possible values
+		uint32_t variant;          // See floppy_image for possible values
+		uint32_t encoding;         // See floppy_image for possible values
 
 		int cell_size;           // See floppy_image_format_t for details
 		int sector_count;
@@ -37,8 +37,8 @@ public:
 	// End the array with {}
 	wd177x_format(const format *formats);
 
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
-	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
+	virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) override;
 	virtual bool save(io_generic *io, floppy_image *image) override;
 	virtual bool supports_save() const override;
 
@@ -49,13 +49,13 @@ protected:
 
 	virtual floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
 	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
-	virtual int find_size(io_generic *io, UINT32 form_factor);
+	virtual int find_size(io_generic *io, uint32_t form_factor);
 	virtual int get_image_offset(const format &f, int head, int track);
 	virtual int get_track_dam_fm(const format &f, int head, int track);
 	virtual int get_track_dam_mfm(const format &f, int head, int track);
 
 	int compute_track_size(const format &f) const;
-	void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors) const;
+	void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors) const;
 	void check_compatibility(floppy_image *image, std::vector<int> &candidates);
 	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head);
 };

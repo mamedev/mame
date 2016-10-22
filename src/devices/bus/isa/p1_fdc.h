@@ -26,7 +26,7 @@ class p1_fdc_device : public device_t,
 {
 public:
 	// construction/destruction
-	p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -46,8 +46,8 @@ private:
 
 public:
 	void p1_wd17xx_aux_w(int data);
-	UINT8 p1_wd17xx_aux_r();
-	UINT8 p1_wd17xx_motor_r();
+	uint8_t p1_wd17xx_aux_r();
+	uint8_t p1_wd17xx_motor_r();
 };
 
 

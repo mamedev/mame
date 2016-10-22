@@ -13,13 +13,13 @@ typedef device_delegate<void (void)> igs025_execute_external;
 class igs025_device : public device_t
 {
 public:
-	igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ16_MEMBER( killbld_igs025_prot_r );
 	// use setters instead of making public?
-	const UINT8 (*m_kb_source_data)[0xec];
-	UINT32 m_kb_game_id;
-	UINT32 m_kb_region;
+	const uint8_t (*m_kb_source_data)[0xec];
+	uint32_t m_kb_game_id;
+	uint32_t m_kb_region;
 
 
 	igs025_execute_external m_execute_external;
@@ -37,14 +37,14 @@ protected:
 	virtual void device_reset() override;
 
 
-	UINT16        m_kb_prot_hold;
-	UINT16        m_kb_prot_hilo;
-	UINT16        m_kb_prot_hilo_select;
+	uint16_t        m_kb_prot_hold;
+	uint16_t        m_kb_prot_hilo;
+	uint16_t        m_kb_prot_hilo_select;
 
 	int           m_kb_cmd;
 	int           m_kb_reg;
 	int           m_kb_ptr;
-	UINT8         m_kb_swap;
+	uint8_t         m_kb_swap;
 
 	void killbld_protection_calculate_hilo();
 	void killbld_protection_calculate_hold(int y, int z);
@@ -52,8 +52,8 @@ protected:
 	void no_callback_setup(void);
 
 
-	UINT16        m_olds_bs;
-	UINT16        m_kb_cmd3;
+	uint16_t        m_olds_bs;
+	uint16_t        m_kb_cmd3;
 
 };
 

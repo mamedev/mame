@@ -192,7 +192,7 @@ MACHINE_START_MEMBER(gb_state,sgb)
 	save_sgb_only();
 
 	if (m_cartslot && m_cartslot->get_sgb_hack()) {
-		dynamic_cast<sgb_ppu_device*>(m_ppu.target())->set_sgb_hack(TRUE);
+		dynamic_cast<sgb_ppu_device*>(m_ppu.target())->set_sgb_hack(true);
 	}
 }
 
@@ -230,7 +230,7 @@ MACHINE_RESET_MEMBER(gb_state,sgb)
 
 WRITE8_MEMBER(gb_state::gb_io_w)
 {
-	static const UINT8 timer_shifts[4] = {10, 4, 6, 8};
+	static const uint8_t timer_shifts[4] = {10, 4, 6, 8};
 
 	switch (offset)
 	{
@@ -360,7 +360,7 @@ static const char *const sgbcmds[32] =
 
 WRITE8_MEMBER(gb_state::sgb_io_w)
 {
-	UINT8 *sgb_data = m_sgb_data;
+	uint8_t *sgb_data = m_sgb_data;
 
 	switch (offset)
 	{
@@ -572,8 +572,8 @@ void gb_state::gb_timer_increment()
 // This gets called while the cpu is executing instructions to keep the timer state in sync
 WRITE8_MEMBER(gb_state::gb_timer_callback)
 {
-	UINT16 old_gb_divcount = m_divcount;
-	UINT16 old_internal_serial_clock = m_internal_serial_clock;
+	uint16_t old_gb_divcount = m_divcount;
+	uint16_t old_internal_serial_clock = m_internal_serial_clock;
 	m_divcount += data;
 	m_internal_serial_clock += data;
 
@@ -584,8 +584,8 @@ WRITE8_MEMBER(gb_state::gb_timer_callback)
 
 	if (TIMEFRQ & 0x04)
 	{
-		UINT16 old_count = old_gb_divcount >> m_shift;
-		UINT16 new_count = m_divcount >> m_shift;
+		uint16_t old_count = old_gb_divcount >> m_shift;
+		uint16_t new_count = m_divcount >> m_shift;
 		if (data > m_shift_cycles)
 		{
 			gb_timer_increment();
@@ -718,7 +718,7 @@ MACHINE_RESET_MEMBER(megaduck_state,megaduck)
 
 READ8_MEMBER(megaduck_state::megaduck_video_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if ((offset & 0x0C) && ((offset & 0x0C) ^ 0x0C))
 	{
@@ -746,7 +746,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 /* Map megaduck audio offset to game boy audio offsets */
 /* Envelope and LFSR register nibbles are reversed relative to the game boy */
 
-static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+static const uint8_t megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
 WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
 {
@@ -758,7 +758,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
 
 READ8_MEMBER(megaduck_state::megaduck_sound_r1)
 {
-	UINT8 data = m_apu->sound_r(space, megaduck_sound_offsets[offset]);
+	uint8_t data = m_apu->sound_r(space, megaduck_sound_offsets[offset]);
 	if ((offset == 0x01) || (offset == 0x07))
 		return ((data & 0x0f)<<4) | ((data & 0xf0)>>4);
 	else
@@ -775,7 +775,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
 
 READ8_MEMBER(megaduck_state::megaduck_sound_r2)
 {
-	UINT8 data = m_apu->sound_r(space, 0x10 + megaduck_sound_offsets[offset]);
+	uint8_t data = m_apu->sound_r(space, 0x10 + megaduck_sound_offsets[offset]);
 	if ((offset == 0x01) || (offset == 0x02))
 		return ((data & 0x0f)<<4) | ((data & 0xf0)>>4);
 	else

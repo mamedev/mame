@@ -65,7 +65,7 @@ WRITE8_MEMBER( coco3_state::ff20_write )
 
 READ8_MEMBER( coco3_state::ff40_read )
 {
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 	if (m_gime->spare_chip_select_enabled())
 		result = coco_state::ff40_read(space, offset, mem_mask);
 	return result;
@@ -111,7 +111,7 @@ bool coco3_state::irq_get_line(void)
 //  update_keyboard_input
 //-------------------------------------------------
 
-void coco3_state::update_keyboard_input(UINT8 value, UINT8 z)
+void coco3_state::update_keyboard_input(uint8_t value, uint8_t z)
 {
 	coco_state::update_keyboard_input(value, z);
 	m_gime->set_il1(value == 0xFF);
@@ -135,7 +135,7 @@ void coco3_state::cart_w(bool state)
 //  update_cart_base
 //-------------------------------------------------
 
-void coco3_state::update_cart_base(UINT8 *cart_base)
+void coco3_state::update_cart_base(uint8_t *cart_base)
 {
 	m_gime->update_cart_rom();
 }
@@ -146,7 +146,7 @@ void coco3_state::update_cart_base(UINT8 *cart_base)
 //  screen_update
 //-------------------------------------------------
 
-UINT32 coco3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t coco3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool result;
 	if (!strcmp(screen.tag(), ":" COMPOSITE_SCREEN_TAG))

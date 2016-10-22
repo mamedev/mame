@@ -11,8 +11,8 @@
 
 TILE_GET_INFO_MEMBER(ohmygod_state::get_tile_info)
 {
-	UINT16 code = m_videoram[2 * tile_index + 1];
-	UINT16 attr = m_videoram[2 * tile_index];
+	uint16_t code = m_videoram[2 * tile_index + 1];
+	uint16_t attr = m_videoram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			code,
 			(attr & 0x0f00) >> 8,
@@ -73,13 +73,13 @@ WRITE16_MEMBER(ohmygod_state::ohmygod_scrolly_w)
 
 void ohmygod_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes() / 4; offs += 4)
 	{
 		int sx, sy, code, color, flipx;
-		UINT16 *sr;
+		uint16_t *sr;
 
 		sr = m_spritebank ? (spriteram + m_spriteram.bytes() / 4) : spriteram;
 
@@ -99,7 +99,7 @@ void ohmygod_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 ohmygod_state::screen_update_ohmygod(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ohmygod_state::screen_update_ohmygod(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

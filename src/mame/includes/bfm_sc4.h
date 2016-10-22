@@ -59,7 +59,7 @@
 
 #define SC45_BUTTON_MATRIX_20_0 IPT_SERVICE1 // green / test
 
-static const UINT8 SEGMENT_34_ENCODING_LOOKUP[16] =
+static const uint8_t SEGMENT_34_ENCODING_LOOKUP[16] =
 {
 	63, // 0
 	6,  // 1
@@ -103,12 +103,12 @@ public:
 	int vfd_enabled;
 	bool vfd_old_clock;
 
-	UINT8 vfd_ser_value;
+	uint8_t vfd_ser_value;
 	int vfd_ser_count;
 
 	// 34 segment custom encoding used by some sc4/5 machines such as Box Clever, Break The Bank, The Big Deal, The Crazy Chair, The Perfect Game
 	bool m_segment_34_encoding;
-	UINT8 m_segment_34_cache[32];
+	uint8_t m_segment_34_cache[32];
 
 	DECLARE_WRITE8_MEMBER(mux_output_w);
 	DECLARE_WRITE8_MEMBER(mux_output2_w);
@@ -169,9 +169,9 @@ public:
 	int m_chk41addr;
 	bool m_dochk41;
 
-	UINT16 m_mainram[0x10000/2];
+	uint16_t m_mainram[0x10000/2];
 
-	UINT8 read_input_matrix(int row);
+	uint8_t read_input_matrix(int row);
 
 
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
@@ -608,14 +608,14 @@ public:
 	DECLARE_MACHINE_RESET(sc4);
 
 
-	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask);
+	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint8_t data, uint8_t line_mask);
 	DECLARE_WRITE8_MEMBER( bfm_sc4_reel3_w );
 	DECLARE_WRITE8_MEMBER( bfm_sc4_reel4_w );
-	void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask);
-	UINT8 bfm_sc4_68307_porta_r(address_space &space, bool dedicated, UINT8 line_mask);
-	UINT16 bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_mask);
+	void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint16_t data, uint16_t line_mask);
+	uint8_t bfm_sc4_68307_porta_r(address_space &space, bool dedicated, uint8_t line_mask);
+	uint16_t bfm_sc4_68307_portb_r(address_space &space, bool dedicated, uint16_t line_mask);
 
-	void find_mbus(UINT16* rom);
+	void find_mbus(uint16_t* rom);
 
 
 protected:
@@ -630,8 +630,8 @@ public:
 			m_adder4cpu(*this, "adder4")
 	{ }
 
-	UINT32* m_adder4cpuregion;
-	std::unique_ptr<UINT32[]> m_adder4ram;
+	uint32_t* m_adder4cpuregion;
+	std::unique_ptr<uint32_t[]> m_adder4ram;
 
 	DECLARE_READ32_MEMBER(adder4_mem_r);
 	DECLARE_WRITE32_MEMBER(adder4_mem_w);

@@ -76,16 +76,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_fbram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_fbram;
 
-	UINT8 m_char_pen;
-	UINT8 m_char_pen_vreg;
-	std::unique_ptr<UINT8[]> m_fg_fb;
-	UINT8 m_scrollx_hi;
-	UINT8 m_scrollx_lo;
-	UINT8 m_gfx_switch;
-	UINT8 m_sound_cmd;
+	uint8_t m_char_pen;
+	uint8_t m_char_pen_vreg;
+	std::unique_ptr<uint8_t[]> m_fg_fb;
+	uint8_t m_scrollx_hi;
+	uint8_t m_scrollx_lo;
+	uint8_t m_gfx_switch;
+	uint8_t m_sound_cmd;
 
 	DECLARE_WRITE8_MEMBER(charram_w);
 	DECLARE_WRITE8_MEMBER(char_vregs_w);
@@ -103,7 +103,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(progolf);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -117,7 +117,7 @@ void progolf_state::video_start()
 	m_scrollx_hi = 0;
 	m_scrollx_lo = 0;
 
-	m_fg_fb = std::make_unique<UINT8[]>(0x2000*8);
+	m_fg_fb = std::make_unique<uint8_t[]>(0x2000*8);
 
 	save_item(NAME(m_char_pen));
 	save_item(NAME(m_char_pen_vreg));
@@ -128,7 +128,7 @@ void progolf_state::video_start()
 }
 
 
-UINT32 progolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t progolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count,color,x,y,xi,yi;
 
@@ -239,7 +239,7 @@ READ8_MEMBER(progolf_state::audio_command_r)
 
 READ8_MEMBER(progolf_state::videoram_r)
 {
-	UINT8 *gfx_rom = memregion("gfx1")->base();
+	uint8_t *gfx_rom = memregion("gfx1")->base();
 
 	if (offset >= 0x0800)
 	{
@@ -394,7 +394,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(progolf_state, progolf)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < m_palette->entries();i++)

@@ -5545,6 +5545,12 @@ wildfangs:
 
 ;@s:galaga.cpp
 
+battles2:
+@:maincpu,program,8510,4d,00,50
+@:maincpu,program,8024,3,00,00
+@:maincpu,program,8025,1,40,40
+
+
 ;digdugat1:******dig dug (atari, rev1)
 digdug:
 digdug1:
@@ -10103,6 +10109,17 @@ paclandm:
 
 ;@s:pacman.cpp
 
+mspacmab2:
+@:maincpu,program,4E88,04,00,00
+@:maincpu,program,43ED,06,40,40
+@:maincpu,program,43D1,01,48,48
+
+
+pinguinos:
+@:maincpu,program,8840,1e,d0,41
+@:maincpu,program,880c,2,d0,07
+
+
 ;*** puckman/pacman (and clones) for pacmame & regular mame builds **
 ;abscam:******Abscam 
 ;mspacmbe:******Ms. Pac-Man (bootleg, (encrypted))
@@ -10579,6 +10596,18 @@ dw2v100x:
 
 ;@s:phoenix.cpp
 
+;** after you get a hiscore, you must start a new game then exit **
+;** for save to work (i.e make sure the new top score is displaying in top score spot) **
+condorn:
+@:maincpu,program,4389,3,00,00
+@:maincpu,program,41e0,1,20,20
+@:maincpu,program,41c0,1,20,20
+@:maincpu,program,41a0,1,20,20
+@:maincpu,program,4180,1,20,20
+@:maincpu,program,4160,1,20,20
+@:maincpu,program,4140,1,20,20
+
+
 falconz:
 vautourz:
 @:maincpu,program,4389,03,00,00
@@ -10623,6 +10652,7 @@ condor:
 falcon:
 nextfase:
 phoenix:
+phoenix2:
 phoenix3:
 phoenixa:
 phoenixb:
@@ -10794,6 +10824,12 @@ pooyans:
 
 
 ;@s:popeye.cpp
+
+popeyej:
+@:maincpu,program,8200,24,00,02
+@:maincpu,program,8fed,3,00,03
+@:maincpu,program,8f32,6,00,00
+
 
 popeyef:
 @:maincpu,program,8a00,24,00,01
@@ -11322,6 +11358,11 @@ rollace:
 
 
 ;@s:route16.cpp
+
+stratvoxa:
+@:cpu1,program,4001,3,00,00
+@:cpu1,program,4010,3,00,00
+
 
 route16:
 route16a:
@@ -12416,6 +12457,10 @@ glocu:
 
 ;@s:seibuspi.cpp
 
+rdftgb:
+@:maincpu,program,29bc1,aa,40,4f
+
+
 rdft2jb:
 @:maincpu,program,285dc,1ab,01,2e
 
@@ -12740,6 +12785,11 @@ penbros:
 
 
 ;@s:sf.cpp
+
+sfjan:
+@:maincpu,program,ff94f2,9C,00,12
+@:maincpu,program,ff8732,8,00,00
+
 
 sf:
 sfj:
@@ -13108,6 +13158,12 @@ slapfighb3:
 
 ;@s:snk.cpp
 
+jcross:
+jcrossa:
+@:maincpu,program,f5ab,1e,00,49
+@:maincpu,program,da1c,3,00,54
+
+
 dogosokb:
 dogosoke:
 victroad:
@@ -13212,11 +13268,6 @@ tdfeverj:
 @:maincpu,program,df28,28,c5,00
 
 
-;********jumping cross
-jcross:
-@:maincpu,program,f5ab,1e,00,49
-
-
 ;(marvins maze)
 marvins:
 @:maincpu,program,c290,46,00,4b
@@ -13248,6 +13299,11 @@ sgladiat:
 
 
 ;@s:snk6502.cpp
+
+nibblera:
+@:maincpu,program,0290,28,00,00
+@:maincpu,program,02d0,1e,13,14
+
 
 ;nibblero:******Nibbler (Olympia)
 nibbler:
@@ -13930,6 +13986,10 @@ superchsu:
 
 
 ;@s:superqix.cpp
+
+sqixr0:
+@:maincpu,program,f4c0,28,00,03
+
 
 ;** this only saves the hiscore table, the top score will stay at default **
 sqix:
@@ -15024,6 +15084,10 @@ landgear:
 
 ;@s:taitosj.cpp
 
+elevator4:
+@:maincpu,program,8350,3,00,01
+
+
 ;(water ski) (by GeoMan)
 waterski:
 @:maincpu,program,835b,3,0,0
@@ -15162,6 +15226,18 @@ tbowlp:
 
 
 ;@s:tecmo.cpp
+
+geminib:
+@:maincpu,program,cf41,45,00,46
+@:maincpu,program,c026,3,00,00
+@:maincpu,program,d241,1,40,40
+@:maincpu,program,d221,1,40,40
+@:maincpu,program,d201,1,35,35
+@:maincpu,program,d1e1,1,30,30
+@:maincpu,program,d1c1,1,30,30
+@:maincpu,program,d1a1,1,30,30
+@:maincpu,program,d181,1,30,30
+
 
 gemini:
 @:maincpu,program,cf41,45,00,46
@@ -16675,6 +16751,27 @@ volfieduo:
 
 ;@s:vsnes.cpp
 
+nvs_machridera:
+@:maincpu,program,700,50,00,4b
+@:maincpu,program,701,1,05,05
+
+
+;mightybj:******vs. mighty bomb jack (japan)
+nvs_mightybj:
+@:maincpu,program,3a8,4,00,00
+@:maincpu,program,3aa,1,10,10
+
+
+;(mach rider) (by GeoMan)
+nvs_machrider:
+@:maincpu,program,0714,50,00,4b
+
+
+;(platoon)
+nvs_platoon:
+@:maincpu,program,700,e9,10,60
+
+
 ;bnglngby:******vs. raid on bungeling bay (japan)
 bnglngby:
 @:maincpu,program,6400,5a,00,01
@@ -16699,11 +16796,6 @@ excitebko:
 @:maincpu,program,630,14f,00,0e
 
 
-machridra:
-@:maincpu,program,700,50,00,4b
-@:maincpu,program,701,1,05,05
-
-
 iceclimb:
 iceclimba:
 @:maincpu,program,750,3c,00,23
@@ -16719,12 +16811,6 @@ iceclmrd:
 ;vsgshoe:******vs. gumshoe
 vsgshoe:
 @:maincpu,program,560,1d,12,a0
-
-
-;mightybj:******vs. mighty bomb jack (japan)
-mightybj:
-@:maincpu,program,3a8,4,00,00
-@:maincpu,program,3aa,1,10,10
 
 
 ;vsfdf:******vs. freedom force
@@ -16776,11 +16862,6 @@ wrecking:
 @:maincpu,program,6000,1e,06,16
 
 
-;(mach rider) (by GeoMan)
-machridr:
-@:maincpu,program,0714,50,00,4b
-
-
 ;(clu clu land)
 cluclu:
 @:maincpu,program,751,4f,1d,70
@@ -16796,11 +16877,6 @@ drmario:
 balonfgt:
 @:maincpu,program,6100,1e,00,00
 @:maincpu,program,6124,0f,0a,10
-
-
-;(platoon)
-platoon:
-@:maincpu,program,700,e9,10,60
 
 
 ;(duck hunt)

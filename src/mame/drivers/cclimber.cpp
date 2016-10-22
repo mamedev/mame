@@ -1140,7 +1140,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cclimber, root )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
 MACHINE_CONFIG_END
@@ -1192,13 +1192,13 @@ static MACHINE_CONFIG_DERIVED( yamato, root )
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_yamato)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1254,15 +1254,15 @@ static MACHINE_CONFIG_START( swimmer, cclimber_state )
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,swimmer)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_4MHz/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_4MHz/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( guzzler, swimmer )
@@ -2584,7 +2584,7 @@ DRIVER_INIT_MEMBER(cclimber_state,yamato)
 
 DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 {
-	m_opcodes = std::make_unique<UINT8[]>(0x6000*3);
+	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
 	segacrpt_z80_device* cpu = (segacrpt_z80_device*)machine().device(":maincpu");
 
@@ -2610,7 +2610,7 @@ DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 
 DRIVER_INIT_MEMBER(cclimber_state,dking)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 	int i;
 	int j;
 
@@ -2624,7 +2624,7 @@ DRIVER_INIT_MEMBER(cclimber_state,dking)
 
 DRIVER_INIT_MEMBER(cclimber_state,rpatrol)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 
 	/* Bits are inverted */
 	for (int i = 0x0000; i < 0x5000; i++)

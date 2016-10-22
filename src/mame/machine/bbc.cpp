@@ -157,7 +157,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp1_w)
 
 DIRECT_UPDATE_MEMBER(bbc_state::bbcbp_direct_handler)
 {
-	UINT8 *RAM = m_region_maincpu->base();
+	uint8_t *RAM = m_region_maincpu->base();
 	if (m_vdusel == 0)
 	{
 		// not in shadow ram mode so just read normal ram
@@ -182,7 +182,7 @@ DIRECT_UPDATE_MEMBER(bbc_state::bbcbp_direct_handler)
 
 WRITE8_MEMBER(bbc_state::bbc_memorybp2_w)
 {
-	UINT8 *RAM = m_region_maincpu->base();
+	uint8_t *RAM = m_region_maincpu->base();
 	if (m_vdusel==0)
 	{
 		// not in shadow ram mode so just write to normal ram
@@ -426,7 +426,7 @@ DIRECT_UPDATE_MEMBER(bbc_state::bbcm_direct_handler)
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
 {
-	UINT8 *RAM = m_region_maincpu->base();
+	uint8_t *RAM = m_region_maincpu->base();
 	if (m_ACCCON_X)
 	{
 		RAM[offset + 0xb000] = data;
@@ -886,8 +886,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b1_speech_read = 1;
-					//logerror("Speech read select TRUE\n");
-					if (m_tms) m_tms->rsq_w(TRUE);
+					//logerror("Speech read select true\n");
+					if (m_tms) m_tms->rsq_w(true);
 				}
 			}
 			break;
@@ -904,8 +904,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b2_speech_write = 1;
-					//logerror("Speech write select TRUE\n");
-					if (m_tms) m_tms->wsq_w(TRUE);
+					//logerror("Speech write select true\n");
+					if (m_tms) m_tms->wsq_w(true);
 				}
 			}
 			break;
@@ -969,8 +969,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b1_speech_read = 0;
-					//logerror("Speech read select FALSE\n");
-					if (m_tms) m_tms->rsq_w(FALSE);
+					//logerror("Speech read select false\n");
+					if (m_tms) m_tms->rsq_w(false);
 				}
 			}
 			break;
@@ -987,8 +987,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b2_speech_write = 0;
-					//logerror("Speech write select FALSE\n");
-					if (m_tms) m_tms->wsq_w(FALSE);
+					//logerror("Speech write select false\n");
+					if (m_tms) m_tms->wsq_w(false);
 				}
 			}
 			break;
@@ -1574,7 +1574,7 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1772l_write)
 
 image_init_result bbc_state::bbc_load_rom(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32 size = slot->common_get_size("rom");
+	uint32_t size = slot->common_get_size("rom");
 
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
@@ -1597,7 +1597,7 @@ image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, gener
 {
 	if (image.software_entry() == nullptr)
 	{
-		UINT32 filesize = image.length();
+		uint32_t filesize = image.length();
 
 		if (filesize != 0x8000)
 		{
@@ -1611,8 +1611,8 @@ image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, gener
 	}
 	else
 	{
-		UINT32 size_lo = image.get_software_region_length("lorom");
-		UINT32 size_hi = image.get_software_region_length("uprom");
+		uint32_t size_lo = image.get_software_region_length("lorom");
+		uint32_t size_hi = image.get_software_region_length("uprom");
 
 		if (size_lo + size_hi != 0x8000)
 		{
@@ -1652,11 +1652,11 @@ DRIVER_INIT_MEMBER(bbc_state,bbc)
 
 
 // setup pointers for optional EPROMs
-void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
+void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, uint32_t shift, uint32_t size)
 {
 	std::string region_tag;
 	memory_region *tmp_reg;
-	UINT8 *eprom[4];
+	uint8_t *eprom[4];
 	if (m_exp1 && (tmp_reg = memregion(region_tag.assign(m_exp1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[0] = tmp_reg->base() + shift;
 	else
@@ -1686,11 +1686,11 @@ void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, U
 	}
 }
 
-void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
+void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, uint32_t shift, uint32_t size)
 {
 	std::string region_tag;
 	memory_region *tmp_reg;
-	UINT8 *eprom[2];
+	uint8_t *eprom[2];
 	if (m_exp1 && (tmp_reg = memregion(region_tag.assign(m_exp1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[0] = tmp_reg->base() + shift;
 	else
@@ -1725,7 +1725,7 @@ MACHINE_RESET_MEMBER(bbc_state, bbca)
 	m_Speech      = m_bbcconfig.read_safe(0) & 0x04;
 	m_SWRAMtype   = m_bbcconfig.read_safe(0) & 0x18;
 
-	UINT8 *RAM = m_region_maincpu->base();
+	uint8_t *RAM = m_region_maincpu->base();
 
 	m_bank1->set_base(RAM);
 	if (m_ram->size() == 32*1024)
@@ -1760,7 +1760,7 @@ MACHINE_RESET_MEMBER(bbc_state, bbcb)
 	m_Speech      = m_bbcconfig.read_safe(1) & 0x04;
 	m_SWRAMtype   = m_bbcconfig.read_safe(0) & 0x18;
 
-	UINT8 *RAM = m_region_maincpu->base();
+	uint8_t *RAM = m_region_maincpu->base();
 
 	m_bank1->set_base(RAM);
 	m_bank3->set_base(RAM + 0x4000);

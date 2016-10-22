@@ -17,24 +17,24 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	UINT8 m_prot0;
-	UINT8 m_prot1;
-	UINT8 m_prot_shift;
-	UINT8 m_dswbit;
-	required_shared_ptr<UINT8> m_background_pos;
-	required_shared_ptr<UINT8> m_palettebank;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_region_ptr<UINT8> m_color_prom;
-	required_region_ptr<UINT8> m_color_prom_spr;
+	uint8_t m_prot0;
+	uint8_t m_prot1;
+	uint8_t m_prot_shift;
+	uint8_t m_dswbit;
+	required_shared_ptr<uint8_t> m_background_pos;
+	required_shared_ptr<uint8_t> m_palettebank;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_region_ptr<uint8_t> m_color_prom;
+	required_region_ptr<uint8_t> m_color_prom_spr;
 
-	std::unique_ptr<UINT8[]> m_bitmapram;
+	std::unique_ptr<uint8_t[]> m_bitmapram;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
-	UINT8 m_invertmask;
-	UINT8 m_bitmap_type;
+	uint8_t m_invertmask;
+	uint8_t m_bitmap_type;
 	tilemap_t *m_fg_tilemap;
-	UINT8 m_lastflip;
+	uint8_t m_lastflip;
 	int   m_field;
 
 	DECLARE_READ8_MEMBER(protection_r);
@@ -53,10 +53,10 @@ public:
 	DECLARE_VIDEO_START(popeye);
 	DECLARE_PALETTE_INIT(popeyebl);
 	DECLARE_PALETTE_INIT(skyskipr);
-	UINT32 screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(popeye_interrupt);
 	DECLARE_CUSTOM_INPUT_MEMBER( pop_field_r );
-	void convert_color_prom(const UINT8 *color_prom);
+	void convert_color_prom(const uint8_t *color_prom);
 	void set_background_palette(int bank);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

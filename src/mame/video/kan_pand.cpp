@@ -54,7 +54,7 @@
 
 const device_type KANEKO_PANDORA = &device_creator<kaneko_pandora_device>;
 
-kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KANEKO_PANDORA, "Kaneko PANDORA GFX", tag, owner, clock, "kaneko_pandora", __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_gfx_region(0)
@@ -82,7 +82,7 @@ void kaneko_pandora_device::device_start()
 {
 	m_bg_pen = 0;
 
-	m_spriteram = std::make_unique<UINT8[]>(0x1000);
+	m_spriteram = std::make_unique<uint8_t[]>(0x1000);
 
 	m_sprites_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 

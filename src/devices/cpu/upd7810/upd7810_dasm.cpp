@@ -24,7 +24,7 @@ public:
 	bool is_call() const { return (m_token == CALB) || (m_token == CALF) || (m_token == CALL) || (m_token == CALT); }
 	bool is_return() const { return (m_token == RET) || (m_token == RETI); }
 
-	const dasm_s &prefix_get(UINT8 op) const { assert(m_token == prefix); return reinterpret_cast<const dasm_s *>(m_args)[op]; }
+	const dasm_s &prefix_get(uint8_t op) const { assert(m_token == prefix); return reinterpret_cast<const dasm_s *>(m_args)[op]; }
 
 	static const dasm_s XX_7810[256];
 	static const dasm_s XX_7807[256];
@@ -214,10 +214,10 @@ protected:
 	};
 
 	dasm_s() : m_token(illegal), m_args(nullptr) { }
-	dasm_s(UINT8 t, const char *a) : m_token(t), m_args(a) { }
+	dasm_s(uint8_t t, const char *a) : m_token(t), m_args(a) { }
 	dasm_s(const dasm_s (&a)[256]) : m_token(prefix), m_args(a) { }
 
-	UINT8 m_token;
+	uint8_t m_token;
 	const void *m_args;
 
 	static const char *const token_names[];
@@ -5416,20 +5416,20 @@ const char *const regname[32] =
 	"illegal", "TMM",     "PT",      "illegal"
 };
 
-offs_t Dasm( char *buffer, offs_t pc, const dasm_s (&dasmXX)[256], const UINT8 *oprom, const UINT8 *opram, int is_7810 )
+offs_t Dasm( char *buffer, offs_t pc, const dasm_s (&dasmXX)[256], const uint8_t *oprom, const uint8_t *opram, int is_7810 )
 {
 	unsigned idx = 0;
-	const UINT8 op = oprom[idx++];
+	const uint8_t op = oprom[idx++];
 	const dasm_s *desc = &dasmXX[op];
 	if (desc->is_prefix())
 		desc = &desc->prefix_get(oprom[idx++]);
 
 	buffer += sprintf(buffer, "%-8.8s", desc->name());
 
-	UINT32 flags = desc->is_call() ? DASMFLAG_STEP_OVER : desc->is_return() ? DASMFLAG_STEP_OUT : 0;
-	UINT8 op2;
+	uint32_t flags = desc->is_call() ? DASMFLAG_STEP_OVER : desc->is_return() ? DASMFLAG_STEP_OUT : 0;
+	uint8_t op2;
 	int offset;
-	UINT16 ea;
+	uint16_t ea;
 
 	for (const char *a = desc->args(); a && *a; a++)
 	{

@@ -146,7 +146,7 @@ WRITE8_MEMBER(galaxold_state::_4in1_bank_w)
 CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
 {
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	return (ioport(portnames[m__4in1_bank])->read() & bit_mask) ? 0x01 : 0x00;
 }
@@ -155,7 +155,7 @@ DRIVER_INIT_MEMBER(galaxold_state,4in1)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	offs_t i, len = memregion("maincpu")->bytes();
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	/* Decrypt Program Roms */
 	for (i = 0; i < len; i++)
@@ -185,7 +185,7 @@ DRIVER_INIT_MEMBER(galaxold_state,bullsdrtg)
 	int i;
 
 	// patch char supposed to be space
-	UINT8 *gfxrom = memregion("gfx1")->base();
+	uint8_t *gfxrom = memregion("gfx1")->base();
 	for (i = 0; i < 8; i++)
 	{
 		gfxrom[i] = 0;

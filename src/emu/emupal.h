@@ -112,8 +112,8 @@
 #define PALETTE_INIT_MEMBER(_Class, _Name) void _Class::PALETTE_INIT_NAME(_Name)(palette_device &palette)
 
 #define PALETTE_DECODER_NAME(_Name) _Name##_decoder
-#define DECLARE_PALETTE_DECODER(_Name) static rgb_t PALETTE_DECODER_NAME(_Name)(UINT32 raw)
-#define PALETTE_DECODER_MEMBER(_Class, _Name) rgb_t _Class::PALETTE_DECODER_NAME(_Name)(UINT32 raw)
+#define DECLARE_PALETTE_DECODER(_Name) static rgb_t PALETTE_DECODER_NAME(_Name)(uint32_t raw)
+#define PALETTE_DECODER_MEMBER(_Class, _Name) rgb_t _Class::PALETTE_DECODER_NAME(_Name)(uint32_t raw)
 
 // standard 3-3-2 formats
 #define PALETTE_FORMAT_BBGGGRRR raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 0,3,6>)
@@ -290,7 +290,7 @@
 
 typedef device_delegate<void (palette_device &)> palette_init_delegate;
 
-typedef UINT16 indirect_pen_t;
+typedef uint16_t indirect_pen_t;
 
 
 // ======================> raw_to_rgb_converter
@@ -298,7 +298,7 @@ typedef UINT16 indirect_pen_t;
 class raw_to_rgb_converter
 {
 	// helper function
-	typedef rgb_t (*raw_to_rgb_func)(UINT32 raw);
+	typedef rgb_t (*raw_to_rgb_func)(uint32_t raw);
 
 public:
 	// constructor
@@ -310,43 +310,43 @@ public:
 	int bytes_per_entry() const { return m_bytes_per_entry; }
 
 	// helpers
-	rgb_t operator()(UINT32 raw) const { return (*m_func)(raw); }
+	rgb_t operator()(uint32_t raw) const { return (*m_func)(raw); }
 
 	// generic raw-to-RGB conversion helpers
 	template<int _RedBits, int _GreenBits, int _BlueBits, int _RedShift, int _GreenShift, int _BlueShift>
-	static rgb_t standard_rgb_decoder(UINT32 raw)
+	static rgb_t standard_rgb_decoder(uint32_t raw)
 	{
-		UINT8 r = palexpand<_RedBits>(raw >> _RedShift);
-		UINT8 g = palexpand<_GreenBits>(raw >> _GreenShift);
-		UINT8 b = palexpand<_BlueBits>(raw >> _BlueShift);
+		uint8_t r = palexpand<_RedBits>(raw >> _RedShift);
+		uint8_t g = palexpand<_GreenBits>(raw >> _GreenShift);
+		uint8_t b = palexpand<_BlueBits>(raw >> _BlueShift);
 		return rgb_t(r, g, b);
 	}
 
 	// data-inverted generic raw-to-RGB conversion helpers
 	template<int _RedBits, int _GreenBits, int _BlueBits, int _RedShift, int _GreenShift, int _BlueShift>
-	static rgb_t inverted_rgb_decoder(UINT32 raw)
+	static rgb_t inverted_rgb_decoder(uint32_t raw)
 	{
-		UINT8 r = palexpand<_RedBits>(~raw >> _RedShift);
-		UINT8 g = palexpand<_GreenBits>(~raw >> _GreenShift);
-		UINT8 b = palexpand<_BlueBits>(~raw >> _BlueShift);
+		uint8_t r = palexpand<_RedBits>(~raw >> _RedShift);
+		uint8_t g = palexpand<_GreenBits>(~raw >> _GreenShift);
+		uint8_t b = palexpand<_BlueBits>(~raw >> _BlueShift);
 		return rgb_t(r, g, b);
 	}
 
 	template<int _IntBits, int _RedBits, int _GreenBits, int _BlueBits, int _IntShift, int _RedShift, int _GreenShift, int _BlueShift>
-	static rgb_t standard_irgb_decoder(UINT32 raw)
+	static rgb_t standard_irgb_decoder(uint32_t raw)
 	{
-		UINT8 i = palexpand<_IntBits>(raw >> _IntShift);
-		UINT8 r = (i * palexpand<_RedBits>(raw >> _RedShift)) >> 8;
-		UINT8 g = (i * palexpand<_GreenBits>(raw >> _GreenShift)) >> 8;
-		UINT8 b = (i * palexpand<_BlueBits>(raw >> _BlueShift)) >> 8;
+		uint8_t i = palexpand<_IntBits>(raw >> _IntShift);
+		uint8_t r = (i * palexpand<_RedBits>(raw >> _RedShift)) >> 8;
+		uint8_t g = (i * palexpand<_GreenBits>(raw >> _GreenShift)) >> 8;
+		uint8_t b = (i * palexpand<_BlueBits>(raw >> _BlueShift)) >> 8;
 		return rgb_t(r, g, b);
 	}
 
 	// other standard decoders
-	static rgb_t IRRRRRGGGGGBBBBB_decoder(UINT32 raw);
-	static rgb_t RRRRGGGGBBBBRGBx_decoder(UINT32 raw);  // bits 3/2/1 are LSb
-	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(UINT32 raw);  // bits 14/13/12 are LSb
-	static rgb_t xRGBRRRRGGGGBBBB_bit4_decoder(UINT32 raw);  // bits 14/13/12 are MSb
+	static rgb_t IRRRRRGGGGGBBBBB_decoder(uint32_t raw);
+	static rgb_t RRRRGGGGBBBBRGBx_decoder(uint32_t raw);  // bits 3/2/1 are LSb
+	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(uint32_t raw);  // bits 14/13/12 are LSb
+	static rgb_t xRGBRRRRGGGGBBBB_bit4_decoder(uint32_t raw);  // bits 14/13/12 are MSb
 
 private:
 	// internal data
@@ -366,7 +366,7 @@ class palette_device :  public device_t
 
 public:
 	// construction/destruction
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_init(device_t &device, palette_init_delegate init);
@@ -395,9 +395,9 @@ public:
 	bool hilights_enabled() { return m_enable_hilights; }
 
 	// raw entry reading
-	UINT32 read_entry(pen_t pen) const
+	uint32_t read_entry(pen_t pen) const
 	{
-		UINT32 data = m_paletteram.read(pen);
+		uint32_t data = m_paletteram.read(pen);
 		if (m_paletteram_ext.base() != nullptr)
 			data |= m_paletteram_ext.read(pen) << (8 * m_paletteram.bytes_per_entry());
 		return data;
@@ -405,10 +405,10 @@ public:
 
 	// setters
 	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
-	void set_pen_red_level(pen_t pen, UINT8 level) { m_palette->entry_set_red_level(pen, level); }
-	void set_pen_green_level(pen_t pen, UINT8 level) { m_palette->entry_set_green_level(pen, level); }
-	void set_pen_blue_level(pen_t pen, UINT8 level) { m_palette->entry_set_blue_level(pen, level); }
-	void set_pen_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b) { m_palette->entry_set_color(pen, rgb_t(r, g, b)); }
+	void set_pen_red_level(pen_t pen, uint8_t level) { m_palette->entry_set_red_level(pen, level); }
+	void set_pen_green_level(pen_t pen, uint8_t level) { m_palette->entry_set_green_level(pen, level); }
+	void set_pen_blue_level(pen_t pen, uint8_t level) { m_palette->entry_set_blue_level(pen, level); }
+	void set_pen_color(pen_t pen, uint8_t r, uint8_t g, uint8_t b) { m_palette->entry_set_color(pen, rgb_t(r, g, b)); }
 	void set_pen_colors(pen_t color_base, const rgb_t *colors, int color_count) { while (color_count--) set_pen_color(color_base++, *colors++); }
 	void set_pen_colors(pen_t color_base, const std::vector<rgb_t> &colors) { for(unsigned int i=0; i != colors.size(); i++) set_pen_color(color_base+i, colors[i]); }
 	void set_pen_contrast(pen_t pen, double bright) { m_palette->entry_set_contrast(pen, bright); }
@@ -418,7 +418,7 @@ public:
 	rgb_t indirect_color(int index) const { return m_indirect_colors[index]; }
 	void set_indirect_color(int index, rgb_t rgb);
 	void set_pen_indirect(pen_t pen, indirect_pen_t index);
-	UINT32 transpen_mask(gfx_element &gfx, UINT32 color, indirect_pen_t transcolor);
+	uint32_t transpen_mask(gfx_element &gfx, uint32_t color, indirect_pen_t transcolor);
 
 	// shadow config
 	void set_shadow_factor(double factor) { assert(m_shadow_group != 0); m_palette->group_set_contrast(m_shadow_group, factor); }
@@ -494,8 +494,8 @@ private:
 	const pen_t *       m_pens;                 // remapped palette pen numbers
 	bitmap_format       m_format;               // format assumed for palette data
 	pen_t *             m_shadow_table;         // table for looking up a shadowed pen
-	UINT32              m_shadow_group;         // index of the shadow group, or 0 if none
-	UINT32              m_hilight_group;        // index of the hilight group, or 0 if none
+	uint32_t              m_shadow_group;         // index of the shadow group, or 0 if none
+	uint32_t              m_hilight_group;        // index of the hilight group, or 0 if none
 	pen_t               m_white_pen;            // precomputed white pen value
 	pen_t               m_black_pen;            // precomputed black pen value
 
@@ -506,9 +506,9 @@ private:
 	struct shadow_table_data
 	{
 		pen_t *            base;               // pointer to the base of the table
-		INT16              dr;                 // delta red value
-		INT16              dg;                 // delta green value
-		INT16              db;                 // delta blue value
+		int16_t              dr;                 // delta red value
+		int16_t              dg;                 // delta green value
+		int16_t              db;                 // delta blue value
 		bool               noclip;             // clip?
 	};
 	shadow_table_data   m_shadow_tables[MAX_SHADOW_PRESETS]; // array of shadow table data

@@ -29,7 +29,7 @@ class newbrain_fdc_t :  public device_t,
 {
 public:
 	// construction/destruction
-	newbrain_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	newbrain_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -46,10 +46,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_newbrain_expansion_slot_interface overrides
-	virtual UINT8 mreq_r(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh) override;
-	virtual void mreq_w(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh) override;
-	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data, bool &prtov) override;
-	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data, bool &prtov) override;
+	virtual uint8_t mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
+	virtual void mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
+	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov) override;
+	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov) override;
 
 private:
 	required_device<z80_device> m_maincpu;

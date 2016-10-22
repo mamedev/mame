@@ -17,7 +17,7 @@
 
 const device_type TECMO_SPRITE = &device_creator<tecmo_spr_device>;
 
-tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TECMO_SPRITE, "Tecmo Chained Sprites", tag, owner, clock, "tecmo_spr", __FILE__),
 m_gfxregion(0),
 m_bootleg(0),
@@ -54,7 +54,7 @@ void tecmo_spr_device::set_yoffset(device_t &device, int yoffset)
 }
 
 
-static const UINT8 layout[8][8] =
+static const uint8_t layout[8][8] =
 {
 	{ 0, 1, 4, 5, 16, 17, 20, 21 },
 	{ 2, 3, 6, 7, 18, 19, 22, 23 },
@@ -88,10 +88,10 @@ static const UINT8 layout[8][8] =
 
 #define NUM_SPRITES 256
 
-void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap)
+void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap)
 {
 	gfx_element *gfx = gfxdecode->gfx(m_gfxregion);
-	UINT16 *source;
+	uint16_t *source;
 	int sourceinc;
 
 
@@ -118,7 +118,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
 	/* draw all sprites from front to back */
 	while (count--)
 	{
-		UINT32 attributes = source[attributes_word];
+		uint32_t attributes = source[attributes_word];
 		int col, row;
 
 		int enabled = source[attributes_word] & 0x04;
@@ -141,15 +141,15 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
 
 		if (enabled)
 		{
-			UINT32 flipx = (attributes & 1);
-			UINT32 flipy = (attributes & 2);
+			uint32_t flipx = (attributes & 1);
+			uint32_t flipy = (attributes & 2);
 
-			UINT32 color = source[colour_word];
-			UINT32 sizex = 1 << ((color >> 0) & 3);                     /* 1,2,4,8 */
-			UINT32 sizey = 1 << ((color >> sprite_sizey) & 3); /* 1,2,4,8 */
+			uint32_t color = source[colour_word];
+			uint32_t sizex = 1 << ((color >> 0) & 3);                     /* 1,2,4,8 */
+			uint32_t sizey = 1 << ((color >> sprite_sizey) & 3); /* 1,2,4,8 */
 
 			/* raiga & fstarfrc need something like this */
-			UINT32 number = (source[tilenumber_word]);
+			uint32_t number = (source[tilenumber_word]);
 
 			if (sizex >= 2) number &= ~0x01;
 			if (sizey >= 2) number &= ~0x02;
@@ -241,7 +241,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
 
 
 
-void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bitmap, gfxdecode_device *gfxdecode, const rectangle &cliprect, UINT8* spriteram, int size, int video_type, int flip_screen)
+void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bitmap, gfxdecode_device *gfxdecode, const rectangle &cliprect, uint8_t* spriteram, int size, int video_type, int flip_screen)
 {
 	int offs;
 
@@ -317,7 +317,7 @@ void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bi
 */
 
 
-void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, UINT8* spriteram, int size, int priority )
+void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, uint8_t* spriteram, int size, int priority )
 {
 	int offs, flags, code;
 
@@ -368,7 +368,7 @@ void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &
 
 
 
-void tecmo_spr_device::tbowl_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, gfxdecode_device *gfxdecode, int xscroll, UINT8* spriteram)
+void tecmo_spr_device::tbowl_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, gfxdecode_device *gfxdecode, int xscroll, uint8_t* spriteram)
 {
 	int offs;
 

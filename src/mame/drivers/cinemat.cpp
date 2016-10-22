@@ -88,7 +88,7 @@ READ8_MEMBER(cinemat_state::inputs_r)
 
 READ8_MEMBER(cinemat_state::switches_r)
 {
-	static const UINT8 switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
+	static const uint8_t switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
 	return (ioport("SWITCHES")->read() >> switch_shuffle[offset]) & 1;
 }
 
@@ -150,7 +150,7 @@ READ8_MEMBER(cinemat_state::joystick_read)
 		return 0;
 	else
 	{
-		int const xval = INT16(m_maincpu->state_int(CCPU_X) << 4) >> 4;
+		int const xval = int16_t(m_maincpu->state_int(CCPU_X) << 4) >> 4;
 		return ((m_mux_select ? m_analog_x : m_analog_y).read_safe(0) - xval) < 0x800;
 	}
 }
@@ -165,11 +165,11 @@ READ8_MEMBER(cinemat_state::joystick_read)
 
 READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 {
-	static const UINT8 speedfrk_steer[] = {0xe, 0x6, 0x2, 0x0, 0x3, 0x7, 0xf};
+	static const uint8_t speedfrk_steer[] = {0xe, 0x6, 0x2, 0x0, 0x3, 0x7, 0xf};
 	int delta_wheel;
 
 	/* the shift register is cleared once per 'frame' */
-	delta_wheel = INT8(ioport("WHEEL")->read()) / 8;
+	delta_wheel = int8_t(ioport("WHEEL")->read()) / 8;
 	if (delta_wheel > 3)
 		delta_wheel = 3;
 	else if (delta_wheel < -3)
@@ -205,7 +205,7 @@ READ8_MEMBER(cinemat_state::speedfrk_gear_r)
 static const struct
 {
 	const char *portname;
-	UINT16 bitmask;
+	uint16_t bitmask;
 } sundance_port_map[16] =
 {
 	{ "PAD1", 0x155 },  /* bit  0 is set if P1 1,3,5,7,9 is pressed */

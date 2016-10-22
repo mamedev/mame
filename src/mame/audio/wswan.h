@@ -28,13 +28,13 @@ struct CHAN
 	on(0),
 	signal(0) { }
 
-	UINT16  freq;           /* frequency */
-	UINT32  period;         /* period */
-	UINT32  pos;            /* position */
-	UINT8   vol_left;       /* volume left */
-	UINT8   vol_right;      /* volume right */
-	UINT8   on;         /* on/off */
-	INT8    signal;         /* signal */
+	uint16_t  freq;           /* frequency */
+	uint32_t  period;         /* period */
+	uint32_t  pos;            /* position */
+	uint8_t   vol_left;       /* volume left */
+	uint8_t   vol_right;      /* volume right */
+	uint8_t   on;         /* on/off */
+	int8_t    signal;         /* signal */
 };
 
 
@@ -44,7 +44,7 @@ class wswan_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~wswan_sound_device() { }
 
 protected:
@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER( port_w );
 
 private:
-	void wswan_ch_set_freq( CHAN *ch, UINT16 freq );
+	void wswan_ch_set_freq( CHAN *ch, uint16_t freq );
 
 private:
 	sound_stream *m_channel;
@@ -67,23 +67,23 @@ private:
 	CHAN m_audio2;     /* Audio channel 2 */
 	CHAN m_audio3;     /* Audio channel 3 */
 	CHAN m_audio4;     /* Audio channel 4 */
-	INT8    m_sweep_step;     /* Sweep step */
-	UINT32  m_sweep_time;     /* Sweep time */
-	UINT32  m_sweep_count;        /* Sweep counter */
-	UINT8   m_noise_type;     /* Noise generator type */
-	UINT8   m_noise_reset;        /* Noise reset */
-	UINT8   m_noise_enable;       /* Noise enable */
-	UINT16  m_sample_address;     /* Sample address */
-	UINT8   m_audio2_voice;       /* Audio 2 voice */
-	UINT8   m_audio3_sweep;       /* Audio 3 sweep */
-	UINT8   m_audio4_noise;       /* Audio 4 noise */
-	UINT8   m_mono;           /* mono */
-	UINT8   m_voice_data;     /* voice data */
-	UINT8   m_output_volume;      /* output volume */
-	UINT8   m_external_stereo;    /* external stereo */
-	UINT8   m_external_speaker;   /* external speaker */
-	UINT16  m_noise_shift;        /* Noise counter shift register */
-	UINT8   m_master_volume;      /* Master volume */
+	int8_t    m_sweep_step;     /* Sweep step */
+	uint32_t  m_sweep_time;     /* Sweep time */
+	uint32_t  m_sweep_count;        /* Sweep counter */
+	uint8_t   m_noise_type;     /* Noise generator type */
+	uint8_t   m_noise_reset;        /* Noise reset */
+	uint8_t   m_noise_enable;       /* Noise enable */
+	uint16_t  m_sample_address;     /* Sample address */
+	uint8_t   m_audio2_voice;       /* Audio 2 voice */
+	uint8_t   m_audio3_sweep;       /* Audio 3 sweep */
+	uint8_t   m_audio4_noise;       /* Audio 4 noise */
+	uint8_t   m_mono;           /* mono */
+	uint8_t   m_voice_data;     /* voice data */
+	uint8_t   m_output_volume;      /* output volume */
+	uint8_t   m_external_stereo;    /* external stereo */
+	uint8_t   m_external_speaker;   /* external speaker */
+	uint16_t  m_noise_shift;        /* Noise counter shift register */
+	uint8_t   m_master_volume;      /* Master volume */
 };
 
 extern const device_type WSWAN_SND;

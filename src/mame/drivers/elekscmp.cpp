@@ -42,7 +42,7 @@ public:
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(hex_display_w);
-	UINT8 convert_key(UINT8 data);
+	uint8_t convert_key(uint8_t data);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -58,9 +58,9 @@ WRITE8_MEMBER(elekscmp_state::hex_display_w)
 	output().set_digit_value(offset, data);
 }
 
-UINT8 elekscmp_state::convert_key(UINT8 data)
+uint8_t elekscmp_state::convert_key(uint8_t data)
 {
-	UINT8 i;
+	uint8_t i;
 	for (i = 0; i < 8; i++)
 		if (BIT(data, i))
 			return i;
@@ -70,7 +70,7 @@ UINT8 elekscmp_state::convert_key(UINT8 data)
 
 READ8_MEMBER(elekscmp_state::keyboard_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = m_x0->read();
 

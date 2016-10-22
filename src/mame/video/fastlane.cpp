@@ -6,7 +6,7 @@
 
 PALETTE_INIT_MEMBER(fastlane_state, fastlane)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int pal;
 
 	for (pal = 0; pal < 0x10; pal++)
@@ -15,7 +15,7 @@ PALETTE_INIT_MEMBER(fastlane_state, fastlane)
 
 		for (i = 0; i < 0x400; i++)
 		{
-			UINT8 ctabentry = (i & 0x3f0) | color_prom[(pal << 4) | (i & 0x0f)];
+			uint8_t ctabentry = (i & 0x3f0) | color_prom[(pal << 4) | (i & 0x0f)];
 			palette.set_pen_indirect((pal << 10) | i, ctabentry);
 		}
 	}
@@ -31,9 +31,9 @@ PALETTE_INIT_MEMBER(fastlane_state, fastlane)
 
 TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 {
-	UINT8 ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
-	UINT8 ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
-	UINT8 ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
+	uint8_t ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
+	uint8_t ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
+	uint8_t ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
 	int attr = m_videoram1[tile_index];
 	int code = m_videoram1[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -58,9 +58,9 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 
 TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 {
-	UINT8 ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
-	UINT8 ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
-	UINT8 ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
+	uint8_t ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
+	uint8_t ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
+	uint8_t ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
 	int attr = m_videoram2[tile_index];
 	int code = m_videoram2[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -130,7 +130,7 @@ WRITE8_MEMBER(fastlane_state::fastlane_vram2_w)
 
 ***************************************************************************/
 
-UINT32 fastlane_state::screen_update_fastlane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fastlane_state::screen_update_fastlane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle finalclip0 = m_clip0, finalclip1 = m_clip1;
 	int i, xoffs;
@@ -147,7 +147,7 @@ UINT32 fastlane_state::screen_update_fastlane(screen_device &screen, bitmap_ind1
 	m_layer0->set_scrolly(0, m_k007121->ctrlram_r(space, 2));
 
 	m_layer0->draw(screen, bitmap, finalclip0, 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), *m_palette, m_spriteram, 0, 40, 0, screen.priority(), (UINT32)-1);
+	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), *m_palette, m_spriteram, 0, 40, 0, screen.priority(), (uint32_t)-1);
 	m_layer1->draw(screen, bitmap, finalclip1, 0, 0);
 	return 0;
 }

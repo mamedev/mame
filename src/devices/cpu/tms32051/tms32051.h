@@ -21,35 +21,35 @@ enum
 
 struct TMS32051_PMST
 {
-	UINT16 iptr;
-	UINT16 avis;
-	UINT16 ovly;
-	UINT16 ram;
-	UINT16 mpmc;
-	UINT16 ndx;
-	UINT16 trm;
-	UINT16 braf;
+	uint16_t iptr;
+	uint16_t avis;
+	uint16_t ovly;
+	uint16_t ram;
+	uint16_t mpmc;
+	uint16_t ndx;
+	uint16_t trm;
+	uint16_t braf;
 };
 
 struct TMS32051_ST0
 {
-	UINT16 dp;
-	UINT16 intm;
-	UINT16 ovm;
-	UINT16 ov;
-	UINT16 arp;
+	uint16_t dp;
+	uint16_t intm;
+	uint16_t ovm;
+	uint16_t ov;
+	uint16_t arp;
 };
 
 struct TMS32051_ST1
 {
-	UINT16 arb;
-	UINT16 cnf;
-	UINT16 tc;
-	UINT16 sxm;
-	UINT16 c;
-	UINT16 hm;
-	UINT16 xf;
-	UINT16 pm;
+	uint16_t arb;
+	uint16_t cnf;
+	uint16_t tc;
+	uint16_t sxm;
+	uint16_t c;
+	uint16_t hm;
+	uint16_t xf;
+	uint16_t pm;
 };
 
 
@@ -57,8 +57,8 @@ class tms32051_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_READ16_MEMBER( cpuregs_r );
 	DECLARE_WRITE16_MEMBER( cpuregs_w );
@@ -69,20 +69,20 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 5; }
-	virtual UINT32 execute_input_lines() const override { return 6; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 5; }
+	virtual uint32_t execute_input_lines() const override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) ); }
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value) override;
+	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -93,71 +93,71 @@ protected:
 	static const opcode_func s_opcode_table_be[256];
 	static const opcode_func s_opcode_table_bf[256];
 
-	UINT16 m_pc;
-	UINT16 m_op;
-	INT32 m_acc;
-	INT32 m_accb;
-	INT32 m_preg;
-	UINT16 m_treg0;
-	UINT16 m_treg1;
-	UINT16 m_treg2;
-	UINT16 m_ar[8];
-	INT32 m_rptc;
+	uint16_t m_pc;
+	uint16_t m_op;
+	int32_t m_acc;
+	int32_t m_accb;
+	int32_t m_preg;
+	uint16_t m_treg0;
+	uint16_t m_treg1;
+	uint16_t m_treg2;
+	uint16_t m_ar[8];
+	int32_t m_rptc;
 
-	UINT16 m_bmar;
-	INT32 m_brcr;
-	UINT16 m_paer;
-	UINT16 m_pasr;
-	UINT16 m_indx;
-	UINT16 m_dbmr;
-	UINT16 m_arcr;
+	uint16_t m_bmar;
+	int32_t m_brcr;
+	uint16_t m_paer;
+	uint16_t m_pasr;
+	uint16_t m_indx;
+	uint16_t m_dbmr;
+	uint16_t m_arcr;
 
 	TMS32051_ST0 m_st0;
 	TMS32051_ST1 m_st1;
 	TMS32051_PMST m_pmst;
 
-	UINT16 m_ifr;
-	UINT16 m_imr;
+	uint16_t m_ifr;
+	uint16_t m_imr;
 
-	UINT16 m_pcstack[8];
+	uint16_t m_pcstack[8];
 	int m_pcstack_ptr;
 
-	UINT16 m_rpt_start, m_rpt_end;
+	uint16_t m_rpt_start, m_rpt_end;
 
-	UINT16 m_cbcr;
-	UINT16 m_cbsr1;
-	UINT16 m_cber1;
-	UINT16 m_cbsr2;
-	UINT16 m_cber2;
+	uint16_t m_cbcr;
+	uint16_t m_cbsr1;
+	uint16_t m_cber1;
+	uint16_t m_cbsr2;
+	uint16_t m_cber2;
 
 	struct
 	{
 		int tddr;
 		int psc;
-		UINT16 tim;
-		UINT16 prd;
+		uint16_t tim;
+		uint16_t prd;
 	} m_timer;
 
 	struct
 	{
-		UINT16 drr;
-		UINT16 dxr;
-		UINT16 spc;
+		uint16_t drr;
+		uint16_t dxr;
+		uint16_t spc;
 	} m_serial;
 
 	struct
 	{
-		INT32 acc;
-		INT32 accb;
-		UINT16 arcr;
-		UINT16 indx;
+		int32_t acc;
+		int32_t accb;
+		uint16_t arcr;
+		uint16_t indx;
 		TMS32051_PMST pmst;
-		INT32 preg;
+		int32_t preg;
 		TMS32051_ST0 st0;
 		TMS32051_ST1 st1;
-		INT32 treg0;
-		INT32 treg1;
-		INT32 treg2;
+		int32_t treg0;
+		int32_t treg1;
+		int32_t treg2;
 	} m_shadow;
 
 	address_space *m_program;
@@ -168,21 +168,21 @@ protected:
 
 	bool m_idle;
 
-	inline void CHANGE_PC(UINT16 new_pc);
-	inline UINT16 PM_READ16(UINT16 address);
-	inline void PM_WRITE16(UINT16 address, UINT16 data);
-	inline UINT16 DM_READ16(UINT16 address);
-	inline void DM_WRITE16(UINT16 address, UINT16 data);
-	inline void PUSH_STACK(UINT16 pc);
-	inline UINT16 POP_STACK();
-	inline INT32 SUB(UINT32 a, UINT32 b, bool shift16);
-	inline INT32 ADD(UINT32 a, UINT32 b, bool shift16);
+	inline void CHANGE_PC(uint16_t new_pc);
+	inline uint16_t PM_READ16(uint16_t address);
+	inline void PM_WRITE16(uint16_t address, uint16_t data);
+	inline uint16_t DM_READ16(uint16_t address);
+	inline void DM_WRITE16(uint16_t address, uint16_t data);
+	inline void PUSH_STACK(uint16_t pc);
+	inline uint16_t POP_STACK();
+	inline int32_t SUB(uint32_t a, uint32_t b, bool shift16);
+	inline int32_t ADD(uint32_t a, uint32_t b, bool shift16);
 	inline void UPDATE_AR(int ar, int step);
 	inline void UPDATE_ARP(int nar);
-	UINT16 GET_ADDRESS();
+	uint16_t GET_ADDRESS();
 	inline bool GET_ZLVC_CONDITION(int zlvc, int zlvc_mask);
 	inline bool GET_TP_CONDITION(int tp);
-	inline INT32 PREG_PSCALER(INT32 preg);
+	inline int32_t PREG_PSCALER(int32_t preg);
 	void op_invalid();
 	void op_abs();
 	void op_adcb();
@@ -362,7 +362,7 @@ protected:
 	void op_sst_st1();
 	void op_group_be();
 	void op_group_bf();
-	void delay_slot(UINT16 startpc);
+	void delay_slot(uint16_t startpc);
 	void check_interrupts();
 	void save_interrupt_context();
 	void restore_interrupt_context();
@@ -373,7 +373,7 @@ class tms32053_device : public tms32051_device
 {
 public:
 	// construction/destruction
-	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_config_complete() override;

@@ -20,7 +20,7 @@ enum
 {
 	SEQ_PRESSED_FALSE = 0,      /* not pressed */
 	SEQ_PRESSED_TRUE,           /* pressed */
-	SEQ_PRESSED_RESET           /* reset -- converted to FALSE once detected as not pressed */
+	SEQ_PRESSED_RESET           /* reset -- converted to false once detected as not pressed */
 };
 
 
@@ -183,7 +183,7 @@ void ui_input_manager::reset()
     location of the mouse
 -------------------------------------------------*/
 
-render_target *ui_input_manager::find_mouse(INT32 *x, INT32 *y, bool *button) const
+render_target *ui_input_manager::find_mouse(int32_t *x, int32_t *y, bool *button) const
 {
 	if (x != nullptr)
 		*x = m_current_mouse_x;
@@ -224,7 +224,7 @@ ioport_field *ui_input_manager::find_mouse_field() const
 ***************************************************************************/
 
 /*-------------------------------------------------
-    pressed - return TRUE if a key down
+    pressed - return true if a key down
     for the given user interface sequence is
     detected
 -------------------------------------------------*/
@@ -236,7 +236,7 @@ bool ui_input_manager::pressed(int code)
 
 
 /*-------------------------------------------------
-    pressed_repeat - return TRUE if a key
+    pressed_repeat - return true if a key
     down for the given user interface sequence is
     detected, or if autorepeat at the given speed
     is triggered
@@ -244,7 +244,7 @@ bool ui_input_manager::pressed(int code)
 
 bool ui_input_manager::pressed_repeat(int code, int speed)
 {
-	int pressed;
+	bool pressed;
 
 g_profiler.start(PROFILER_INPUT);
 
@@ -284,7 +284,7 @@ g_profiler.stop();
     move event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_move_event(render_target* target, INT32 x, INT32 y)
+void ui_input_manager::push_mouse_move_event(render_target* target, int32_t x, int32_t y)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_MOVE;
@@ -312,7 +312,7 @@ void ui_input_manager::push_mouse_leave_event(render_target* target)
     down event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_down_event(render_target* target, INT32 x, INT32 y)
+void ui_input_manager::push_mouse_down_event(render_target* target, int32_t x, int32_t y)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_DOWN;
@@ -327,7 +327,7 @@ void ui_input_manager::push_mouse_down_event(render_target* target, INT32 x, INT
     down event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_up_event(render_target* target, INT32 x, INT32 y)
+void ui_input_manager::push_mouse_up_event(render_target* target, int32_t x, int32_t y)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_UP;
@@ -342,7 +342,7 @@ push_mouse_down_event - pushes a mouse
 down event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_rdown_event(render_target* target, INT32 x, INT32 y)
+void ui_input_manager::push_mouse_rdown_event(render_target* target, int32_t x, int32_t y)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_RDOWN;
@@ -357,7 +357,7 @@ push_mouse_down_event - pushes a mouse
 down event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_rup_event(render_target* target, INT32 x, INT32 y)
+void ui_input_manager::push_mouse_rup_event(render_target* target, int32_t x, int32_t y)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_RUP;
@@ -372,7 +372,7 @@ void ui_input_manager::push_mouse_rup_event(render_target* target, INT32 x, INT3
     a mouse double-click event to the specified
     render_target
 -------------------------------------------------*/
-void ui_input_manager::push_mouse_double_click_event(render_target* target, INT32 x, INT32 y)
+void ui_input_manager::push_mouse_double_click_event(render_target* target, int32_t x, int32_t y)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_DOUBLE_CLICK;
@@ -386,7 +386,7 @@ void ui_input_manager::push_mouse_double_click_event(render_target* target, INT3
     push_char_event - pushes a char event
     to the specified render_target
 -------------------------------------------------*/
-void ui_input_manager::push_char_event(render_target* target, unicode_char ch)
+void ui_input_manager::push_char_event(render_target* target, char32_t ch)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_CHAR;
@@ -400,7 +400,7 @@ void ui_input_manager::push_char_event(render_target* target, unicode_char ch)
     wheel event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_wheel_event(render_target *target, INT32 x, INT32 y, short delta, int ucNumLines)
+void ui_input_manager::push_mouse_wheel_event(render_target *target, int32_t x, int32_t y, short delta, int ucNumLines)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_WHEEL;

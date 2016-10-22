@@ -21,7 +21,7 @@ void convert_command_glyph(std::string &str)
 	for (int i = j = 0; i < len;)
 	{
 		fix_command_t *fixcmd = nullptr;
-		unicode_char uchar;
+		char32_t uchar;
 		int ucharcount = uchar_from_utf8(&uchar, str.substr(i).c_str(), len - i);
 		if (ucharcount == -1)
 			break;
@@ -90,22 +90,22 @@ void render_font::render_font_command_glyph()
 		load_cached_cmd(ramfile, 0);
 }
 
-bool render_font::load_cached_cmd(emu_file &file, UINT32 hash)
+bool render_font::load_cached_cmd(emu_file &file, uint32_t hash)
 {
-	UINT64 filesize = file.size();
-	UINT8 header[CACHED_HEADER_SIZE];
-	UINT32 bytes_read = file.read(header, CACHED_HEADER_SIZE);
+	uint64_t filesize = file.size();
+	uint8_t header[CACHED_HEADER_SIZE];
+	uint32_t bytes_read = file.read(header, CACHED_HEADER_SIZE);
 
 	if (bytes_read != CACHED_HEADER_SIZE)
 		return false;
 
 	if (header[0] != 'f' || header[1] != 'o' || header[2] != 'n' || header[3] != 't')
 		return false;
-	if (header[4] != (UINT8)(hash >> 24) || header[5] != (UINT8)(hash >> 16) || header[6] != (UINT8)(hash >> 8) || header[7] != (UINT8)hash)
+	if (header[4] != (uint8_t)(hash >> 24) || header[5] != (uint8_t)(hash >> 16) || header[6] != (uint8_t)(hash >> 8) || header[7] != (uint8_t)hash)
 		return false;
 	m_height_cmd = (header[8] << 8) | header[9];
-	m_yoffs_cmd = (INT16)((header[10] << 8) | header[11]);
-	UINT32 numchars = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | header[15];
+	m_yoffs_cmd = (int16_t)((header[10] << 8) | header[11]);
+	uint32_t numchars = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | header[15];
 	if (filesize - CACHED_HEADER_SIZE < numchars * CACHED_CHAR_SIZE)
 		return false;
 
@@ -117,10 +117,10 @@ bool render_font::load_cached_cmd(emu_file &file, UINT32 hash)
 		return false;
 	}
 
-	UINT64 offset = numchars * CACHED_CHAR_SIZE;
+	uint64_t offset = numchars * CACHED_CHAR_SIZE;
 	for (int chindex = 0; chindex < numchars; chindex++)
 	{
-		const UINT8 *info = reinterpret_cast<UINT8 *>(&m_rawdata_cmd[chindex * CACHED_CHAR_SIZE]);
+		const uint8_t *info = reinterpret_cast<uint8_t *>(&m_rawdata_cmd[chindex * CACHED_CHAR_SIZE]);
 		int chnum = (info[0] << 8) | info[1];
 
 		if (!m_glyphs_cmd[chnum / 256])
@@ -132,8 +132,8 @@ bool render_font::load_cached_cmd(emu_file &file, UINT32 hash)
 			gl.color = color_table[chnum - COMMAND_UNICODE];
 
 		gl.width = (info[2] << 8) | info[3];
-		gl.xoffs = (INT16)((info[4] << 8) | info[5]);
-		gl.yoffs = (INT16)((info[6] << 8) | info[7]);
+		gl.xoffs = (int16_t)((info[4] << 8) | info[5]);
+		gl.yoffs = (int16_t)((info[6] << 8) | info[7]);
 		gl.bmwidth = (info[8] << 8) | info[9];
 		gl.bmheight = (info[10] << 8) | info[11];
 		gl.rawdata = &m_rawdata_cmd[offset];

@@ -271,7 +271,7 @@ public:
 	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(apple2);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram0000_r);
 	DECLARE_WRITE8_MEMBER(ram0000_w);
@@ -342,8 +342,8 @@ private:
 	double m_joystick_x2_time;
 	double m_joystick_y2_time;
 
-	UINT16 m_lastchar, m_strobe;
-	UINT8 m_transchar;
+	uint16_t m_lastchar, m_strobe;
+	uint8_t m_transchar;
 	bool m_anykeydown;
 	int m_repeatdelay;
 
@@ -371,12 +371,12 @@ private:
 	bool m_mockingboard4c;
 
 	bool m_isiic, m_isiicplus;
-	UINT8 m_iicplus_ce00[0x200];
+	uint8_t m_iicplus_ce00[0x200];
 
-	UINT8 *m_ram_ptr, *m_rom_ptr;
+	uint8_t *m_ram_ptr, *m_rom_ptr;
 	int m_ram_size;
 
-	UINT8 *m_aux_ptr, *m_aux_bank_ptr;
+	uint8_t *m_aux_ptr, *m_aux_bank_ptr;
 
 	int m_inh_bank;
 
@@ -387,19 +387,19 @@ private:
 
 	int m_irqmask;
 
-	UINT8 m_exp_bankhior;
+	uint8_t m_exp_bankhior;
 	int m_exp_addrmask;
-	UINT8 m_exp_regs[0x10];
-	UINT8 *m_exp_ram;
+	uint8_t m_exp_regs[0x10];
+	uint8_t *m_exp_ram;
 	int m_exp_wptr, m_exp_liveptr;
 
 	void do_io(address_space &space, int offset, bool is_iic);
-	UINT8 read_floatingbus();
+	uint8_t read_floatingbus();
 	void update_slotrom_banks();
 	void lc_update(int offset);
-	UINT8 read_slot_rom(address_space &space, int slotbias, int offset);
-	void write_slot_rom(address_space &space, int slotbias, int offset, UINT8 data);
-	UINT8 read_int_rom(address_space &space, int slotbias, int offset);
+	uint8_t read_slot_rom(address_space &space, int slotbias, int offset);
+	void write_slot_rom(address_space &space, int slotbias, int offset, uint8_t data);
+	uint8_t read_int_rom(address_space &space, int slotbias, int offset);
 	void auxbank_update();
 	void raise_irq(int irq);
 	void lower_irq(int irq);
@@ -482,7 +482,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 
 READ8_MEMBER(apple2e_state::memexp_r)
 {
-	UINT8 retval = m_exp_regs[offset];
+	uint8_t retval = m_exp_regs[offset];
 
 	if (!m_exp_ram)
 	{
@@ -819,7 +819,7 @@ PALETTE_INIT_MEMBER(apple2e_state, apple2)
 	m_video->palette_init_apple2(palette);
 }
 
-UINT32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool old_page2 = m_video->m_page2;
 
@@ -1267,7 +1267,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
-				UINT8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 				m_strobe = 0;
 				return rv;
 			}
@@ -1516,7 +1516,7 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
-				UINT8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 				m_strobe = 0;
 				return rv;
 			}
@@ -1872,7 +1872,7 @@ WRITE8_MEMBER(apple2e_state::c080_w)
 	}
 }
 
-UINT8 apple2e_state::read_slot_rom(address_space &space, int slotbias, int offset)
+uint8_t apple2e_state::read_slot_rom(address_space &space, int slotbias, int offset)
 {
 	int slotnum = ((offset>>8) & 0xf) + slotbias;
 
@@ -1890,7 +1890,7 @@ UINT8 apple2e_state::read_slot_rom(address_space &space, int slotbias, int offse
 	return read_floatingbus();
 }
 
-void apple2e_state::write_slot_rom(address_space &space, int slotbias, int offset, UINT8 data)
+void apple2e_state::write_slot_rom(address_space &space, int slotbias, int offset, uint8_t data)
 {
 	int slotnum = ((offset>>8) & 0xf) + slotbias;
 
@@ -1906,7 +1906,7 @@ void apple2e_state::write_slot_rom(address_space &space, int slotbias, int offse
 	}
 }
 
-UINT8 apple2e_state::read_int_rom(address_space &space, int slotbias, int offset)
+uint8_t apple2e_state::read_int_rom(address_space &space, int slotbias, int offset)
 {
 	if ((m_cnxx_slot == CNXX_UNCLAIMED) && (!space.debugger_access()))
 	{
@@ -2148,7 +2148,7 @@ WRITE8_MEMBER(apple2e_state::lc_w)
 }
 
 // floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
-UINT8 apple2e_state::read_floatingbus()
+uint8_t apple2e_state::read_floatingbus()
 {
 	enum
 	{
@@ -2489,8 +2489,8 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
 {
 	if (state == ASSERT_LINE)
 	{
-		UINT8 *decode = m_kbdrom->base();
-		UINT16 trans;
+		uint8_t *decode = m_kbdrom->base();
+		uint16_t trans;
 
 		m_lastchar = m_ay3600->b_r();
 

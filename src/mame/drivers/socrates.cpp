@@ -118,23 +118,23 @@ public:
 	required_memory_region m_vram_reg;
 	memory_region *m_cart_reg;
 
-	UINT8 m_data[8];
-	UINT8 m_rom_bank;
-	UINT8 m_ram_bank;
-	UINT16 m_scroll_offset;
-	UINT8 m_kb_latch_low[2];
-	UINT8 m_kb_latch_high[2];
-	UINT8 m_kb_latch_mouse;
-	UINT8 m_kbmcu_rscount; // how many pokes the kbmcu has taken in the last frame
-	UINT8 m_io40_latch; // what was last written to speech reg (for open bus)?
-	UINT8 m_hblankstate; // are we in hblank?
-	UINT8 m_vblankstate; // are we in vblank?
-	UINT8 m_speech_running; // is speech synth talking?
-	UINT32 m_speech_address; // address in speech space
-	UINT8 m_speech_settings; // speech settings (nybble 0: ? externrom ? ?; nybble 1: ? ? ? ?)
-	UINT8 m_speech_dummy_read; // have we done a dummy read yet?
-	UINT8 m_speech_load_address_count; // number of times load address has happened
-	UINT8 m_speech_load_settings_count; // number of times load settings has happened
+	uint8_t m_data[8];
+	uint8_t m_rom_bank;
+	uint8_t m_ram_bank;
+	uint16_t m_scroll_offset;
+	uint8_t m_kb_latch_low[2];
+	uint8_t m_kb_latch_high[2];
+	uint8_t m_kb_latch_mouse;
+	uint8_t m_kbmcu_rscount; // how many pokes the kbmcu has taken in the last frame
+	uint8_t m_io40_latch; // what was last written to speech reg (for open bus)?
+	uint8_t m_hblankstate; // are we in hblank?
+	uint8_t m_vblankstate; // are we in vblank?
+	uint8_t m_speech_running; // is speech synth talking?
+	uint32_t m_speech_address; // address in speech space
+	uint8_t m_speech_settings; // speech settings (nybble 0: ? externrom ? ?; nybble 1: ? ? ? ?)
+	uint8_t m_speech_dummy_read; // have we done a dummy read yet?
+	uint8_t m_speech_load_address_count; // number of times load address has happened
+	uint8_t m_speech_load_settings_count; // number of times load settings has happened
 	DECLARE_READ8_MEMBER(socrates_rom_bank_r);
 	DECLARE_WRITE8_MEMBER(socrates_rom_bank_w);
 	DECLARE_READ8_MEMBER(socrates_ram_bank_r);
@@ -153,7 +153,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(socrates);
-	UINT32 screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(assert_irq);
 	TIMER_CALLBACK_MEMBER(clear_speech_cb);
 	TIMER_CALLBACK_MEMBER(clear_irq_cb);
@@ -161,7 +161,7 @@ public:
 	void socrates_set_ram_bank();
 	void socrates_update_kb();
 	void socrates_check_kb_latch();
-	rgb_t socrates_create_color(UINT8 color);
+	rgb_t socrates_create_color(uint8_t color);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -184,7 +184,7 @@ public:
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER( colors_w );
 	DECLARE_READ8_MEMBER( rombank_r );
 	DECLARE_WRITE8_MEMBER( rombank_w );
@@ -203,14 +203,14 @@ protected:
 	int get_color(int index, int y);
 
 private:
-	UINT8   m_rombank[2];
-	UINT8   m_rambank;
-	UINT8   m_colors[8];
-	UINT8   m_video_regs[4];
+	uint8_t   m_rombank[2];
+	uint8_t   m_rambank;
+	uint8_t   m_colors[8];
+	uint8_t   m_video_regs[4];
 
 	struct
 	{
-		UINT8   buffer[8];
+		uint8_t   buffer[8];
 		int     head;
 		int     tail;
 	} m_kb_queue;
@@ -332,13 +332,13 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		clear_irq_cb(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in socrates_state::device_timer");
+		assert_always(false, "Unknown id in socrates_state::device_timer");
 	}
 }
 
 DRIVER_INIT_MEMBER(socrates_state,socrates)
 {
-	UINT8 *gfx = memregion("vram")->base();
+	uint8_t *gfx = memregion("vram")->base();
 
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
@@ -399,8 +399,8 @@ READ8_MEMBER(socrates_state::status_and_speech)// read 0x4x, some sort of status
 // bit 2 - speech chip bit 2
 // bit 1 - speech chip bit 1
 // bit 0 - speech chip bit 0
-UINT8 *speechromint = memregion("speechint")->base();
-UINT8 *speechromext = memregion("speechext")->base();
+uint8_t *speechromint = memregion("speechint")->base();
+uint8_t *speechromext = memregion("speechext")->base();
 	int temp = 0;
 	temp |= (m_speech_running)?0x80:0;
 	temp |= 0x40; // unknown, possibly IR mcu busy
@@ -613,7 +613,7 @@ WRITE8_MEMBER(socrates_state::socrates_scroll_w)
 // gamma: this needs to be messed with... may differ on different systems... attach to slider somehow?
 #define GAMMA 1.5
 
-rgb_t socrates_state::socrates_create_color(UINT8 color)
+rgb_t socrates_state::socrates_create_color(uint8_t color)
 {
 	rgb_t composedcolor;
 	static const double lumatable[256] = {
@@ -713,13 +713,13 @@ void socrates_state::video_start()
 	m_scroll_offset = 0;
 }
 
-UINT32 socrates_state::screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t socrates_state::screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const UINT8 fixedcolors[8] =
+	static const uint8_t fixedcolors[8] =
 	{
 	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7
 	};
-	UINT8 *videoram = m_vram_reg->base();
+	uint8_t *videoram = m_vram_reg->base();
 	int x, y, colidx, color;
 	int lineoffset = 0; // if display ever tries to display data at 0xfxxx, offset line displayed by 0x1000
 	for (y = 0; y < 228; y++)
@@ -790,9 +790,9 @@ int iqunlim_state::get_color(int index, int y)
 		return m_vram_reg->u8(0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff));
 }
 
-UINT32 iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_vram_reg->base();
+	uint8_t *videoram = m_vram_reg->base();
 
 	// bitmap layer
 	for (int y=0; y<224; y++)
@@ -800,7 +800,7 @@ UINT32 iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		if (y >= m_video_regs[0x03])    break;
 		for (int x=0; x<128; x++)
 		{
-			UINT8 data = videoram[(m_scroll_offset + y) * 0x80 + x];
+			uint8_t data = videoram[(m_scroll_offset + y) * 0x80 + x];
 
 			for(int b=0; b<2; b++)
 			{
@@ -817,17 +817,17 @@ UINT32 iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for (int x=0; x<line_len; x++)
 		{
-			UINT8 c = videoram[0x8400 + (y - 1) * (mode_80 ? 0x80 : 0x40) + x];
-			UINT8 *gfx = &videoram[0x8000 + (c & 0x7f) * 8];
+			uint8_t c = videoram[0x8400 + (y - 1) * (mode_80 ? 0x80 : 0x40) + x];
+			uint8_t *gfx = &videoram[0x8000 + (c & 0x7f) * 8];
 
 			for (int cy=0; cy<8; cy++)
 			{
 				int py = y * 8 + cy;
 				if ((m_video_regs[0x02] & 0x01) || py >= m_video_regs[0x03])
 				{
-					UINT8 col0 = get_color(0x0e, py);
-					UINT8 col1 = get_color(0x0f, py);
-					UINT8 data = 0;
+					uint8_t col0 = get_color(0x0e, py);
+					uint8_t col1 = get_color(0x0f, py);
+					uint8_t data = 0;
 
 					if (BIT(m_video_regs[0x02],4) && m_video_regs[0x00] == x && m_video_regs[0x01] == ((y - 1) + (0x400 / (mode_80 ? 0x80 : 0x40)))) // cursor position start at 0x8000
 						data = 0xff;
@@ -879,9 +879,9 @@ void iqunlim_state::machine_start()
 	std::string region_tag;
 	m_cart_reg = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
-	UINT8 *bios = m_bios_reg->base();
-	UINT8 *cart = m_cart_reg ? m_cart_reg->base() : m_bios_reg->base();
-	UINT8 *ram  = m_vram_reg->base();
+	uint8_t *bios = m_bios_reg->base();
+	uint8_t *cart = m_cart_reg ? m_cart_reg->base() : m_bios_reg->base();
+	uint8_t *ram  = m_vram_reg->base();
 
 	m_bank1->configure_entries(0x00, 0x10, bios, 0x4000);
 	m_bank1->configure_entries(0x10, 0x10, cart , 0x4000);
@@ -947,7 +947,7 @@ WRITE8_MEMBER( iqunlim_state::colors_w )
 
 INPUT_CHANGED_MEMBER( iqunlim_state::send_input )
 {
-	UINT8 data = (UINT8)(FPTR)param;
+	uint8_t data = (uint8_t)(uintptr_t)param;
 
 	if (newval)
 	{
@@ -964,7 +964,7 @@ WRITE8_MEMBER( iqunlim_state::keyboard_clear )
 
 READ8_MEMBER( iqunlim_state::keyboard_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch(offset)
 	{

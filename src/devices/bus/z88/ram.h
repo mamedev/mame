@@ -19,8 +19,8 @@ class z88_32k_ram_device : public device_t,
 {
 public:
 	// construction/destruction
-	z88_32k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	z88_32k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
@@ -29,12 +29,12 @@ protected:
 	// z88cart_interface overrides
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
-	virtual UINT8* get_cart_base() override;
-	virtual UINT32 get_cart_size() override { return 0x8000; }
+	virtual uint8_t* get_cart_base() override;
+	virtual uint32_t get_cart_size() override { return 0x8000; }
 
 protected:
 	// internal state
-	UINT8 *     m_ram;
+	uint8_t *     m_ram;
 };
 
 // ======================> z88_128k_ram_device
@@ -43,11 +43,11 @@ class z88_128k_ram_device : public z88_32k_ram_device
 {
 public:
 	// construction/destruction
-	z88_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z88_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// z88cart_interface overrides
-	virtual UINT32 get_cart_size() override { return 0x20000; }
+	virtual uint32_t get_cart_size() override { return 0x20000; }
 };
 
 // ======================> z88_512k_ram_device
@@ -56,11 +56,11 @@ class z88_512k_ram_device : public z88_32k_ram_device
 {
 public:
 	// construction/destruction
-	z88_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z88_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// z88cart_interface overrides
-	virtual UINT32 get_cart_size() override { return 0x80000; }
+	virtual uint32_t get_cart_size() override { return 0x80000; }
 };
 
 // ======================> z88_1024k_ram_device
@@ -69,11 +69,11 @@ class z88_1024k_ram_device : public z88_32k_ram_device
 {
 public:
 	// construction/destruction
-	z88_1024k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z88_1024k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// z88cart_interface overrides
-	virtual UINT32 get_cart_size() override { return 0x100000; }
+	virtual uint32_t get_cart_size() override { return 0x100000; }
 };
 
 // device type definition

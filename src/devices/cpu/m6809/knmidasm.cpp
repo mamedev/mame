@@ -4,11 +4,6 @@
 #include "debugger.h"
 #include "konami.h"
 
-#ifndef TRUE
-#define TRUE    -1
-#define FALSE   0
-#endif
-
 /*
 
 0x08 leax indexed

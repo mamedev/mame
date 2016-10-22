@@ -175,7 +175,7 @@
 
 
 // Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
-typedef device_delegate<void (int x, UINT32 priority, UINT16 &lineptr)> md_32x_scanline_delegate;
+typedef device_delegate<void (int x, uint32_t priority, uint16_t &lineptr)> md_32x_scanline_delegate;
 typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
 typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
 
@@ -192,7 +192,7 @@ typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
 class sega315_5313_device : public sega315_5124_device
 {
 public:
-	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_sndirqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_sndirqline_callback.set_callback(object); }
 	template<class _Object> static devcb_base &set_lv6irqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_lv6irqline_callback.set_callback(object); }
@@ -241,14 +241,14 @@ public:
 	}
 
 	std::unique_ptr<bitmap_ind16> m_render_bitmap;
-	std::unique_ptr<UINT16[]> m_render_line;
-	std::unique_ptr<UINT16[]> m_render_line_raw;
+	std::unique_ptr<uint16_t[]> m_render_line;
+	std::unique_ptr<uint16_t[]> m_render_line_raw;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback_alt_timing );
 	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback );
 	timer_device* m_megadriv_scanline_timer;
 
-	inline UINT16 vdp_get_word_from_68k_mem(UINT32 source);
+	inline uint16_t vdp_get_word_from_68k_mem(uint32_t source);
 
 protected:
 	virtual void device_start() override;
@@ -267,12 +267,12 @@ protected:
 private:
 
 	int m_command_pending; // 2nd half of command pending..
-	UINT16 m_command_part1;
-	UINT16 m_command_part2;
-	UINT8  m_vdp_code;
-	UINT16 m_vdp_address;
-	UINT8 m_vram_fill_pending;
-	UINT16 m_vram_fill_length;
+	uint16_t m_command_part1;
+	uint16_t m_command_part2;
+	uint8_t  m_vdp_code;
+	uint16_t m_vdp_address;
+	uint8_t m_vram_fill_pending;
+	uint16_t m_vram_fill_length;
 	int m_irq4counter;
 	int m_imode_odd_frame;
 	int m_sprite_collision;
@@ -295,13 +295,13 @@ private:
 	int m_use_cram; // c2 uses it's own palette ram, so it sets this to 0
 	int m_dma_delay;    // SVP and SegaCD have some 'lag' in DMA transfers
 
-	std::unique_ptr<UINT16[]> m_regs;
-	std::unique_ptr<UINT16[]> m_vram;
-	std::unique_ptr<UINT16[]> m_cram;
-	std::unique_ptr<UINT16[]> m_vsram;
+	std::unique_ptr<uint16_t[]> m_regs;
+	std::unique_ptr<uint16_t[]> m_vram;
+	std::unique_ptr<uint16_t[]> m_cram;
+	std::unique_ptr<uint16_t[]> m_vsram;
 	/* The VDP keeps a 0x400 byte on-chip cache of the Sprite Attribute Table
 	   to speed up processing, Castlevania Bloodlines abuses this on the upside down level */
-	std::unique_ptr<UINT16[]> m_internal_sprite_attribute_table;
+	std::unique_ptr<uint16_t[]> m_internal_sprite_attribute_table;
 
 	// these are used internally by the VDP to schedule when after the start of a scanline
 	// to trigger the various interrupts / rendering to our bitmap, bit of a hack really
@@ -309,29 +309,29 @@ private:
 	emu_timer* m_irq4_on_timer;
 	emu_timer* m_render_timer;
 
-	UINT16 vdp_vram_r(void);
-	UINT16 vdp_vsram_r(void);
-	UINT16 vdp_cram_r(void);
+	uint16_t vdp_vram_r(void);
+	uint16_t vdp_vsram_r(void);
+	uint16_t vdp_cram_r(void);
 
-	void insta_68k_to_cram_dma(UINT32 source,UINT16 length);
-	void insta_68k_to_vsram_dma(UINT32 source,UINT16 length);
-	void insta_68k_to_vram_dma(UINT32 source,int length);
-	void insta_vram_copy(UINT32 source, UINT16 length);
+	void insta_68k_to_cram_dma(uint32_t source,uint16_t length);
+	void insta_68k_to_vsram_dma(uint32_t source,uint16_t length);
+	void insta_68k_to_vram_dma(uint32_t source,int length);
+	void insta_vram_copy(uint32_t source, uint16_t length);
 
-	void vdp_vram_write(UINT16 data);
-	void vdp_cram_write(UINT16 data);
+	void vdp_vram_write(uint16_t data);
+	void vdp_cram_write(uint16_t data);
 	void write_cram_value(int offset, int data);
-	void vdp_vsram_write(UINT16 data);
+	void vdp_vsram_write(uint16_t data);
 
-	void vdp_set_register(int regnum, UINT8 value);
+	void vdp_set_register(int regnum, uint8_t value);
 
 	void handle_dma_bits();
 
-	UINT16 get_hposition();
-	UINT16 megadriv_read_hv_counters();
+	uint16_t get_hposition();
+	uint16_t megadriv_read_hv_counters();
 
-	UINT16 ctrl_port_r();
-	UINT16 data_port_r();
+	uint16_t ctrl_port_r();
+	uint16_t data_port_r();
 	void data_port_w(int data);
 	void ctrl_port_w(int data);
 	void update_code_and_address(void);
@@ -342,13 +342,13 @@ private:
 	void render_videobuffer_to_screenbuffer(int scanline);
 
 	/* variables used during emulation - not saved */
-	std::unique_ptr<UINT8[]> m_sprite_renderline;
-	std::unique_ptr<UINT8[]> m_highpri_renderline;
-	std::unique_ptr<UINT32[]> m_video_renderline;
-	std::unique_ptr<UINT16[]> m_palette_lookup;
-	std::unique_ptr<UINT16[]> m_palette_lookup_sprite; // for C2
-	std::unique_ptr<UINT16[]> m_palette_lookup_shadow;
-	std::unique_ptr<UINT16[]> m_palette_lookup_highlight;
+	std::unique_ptr<uint8_t[]> m_sprite_renderline;
+	std::unique_ptr<uint8_t[]> m_highpri_renderline;
+	std::unique_ptr<uint32_t[]> m_video_renderline;
+	std::unique_ptr<uint16_t[]> m_palette_lookup;
+	std::unique_ptr<uint16_t[]> m_palette_lookup_sprite; // for C2
+	std::unique_ptr<uint16_t[]> m_palette_lookup_shadow;
+	std::unique_ptr<uint16_t[]> m_palette_lookup_highlight;
 
 	address_space *m_space68k;
 	m68000_base_device* m_cpu68k;

@@ -19,7 +19,7 @@
 #define MAX_CUST_FILTER          8
 
 // GLOBAL ENUMERATORS
-enum : UINT16
+enum : uint16_t
 {
 	FILTER_FIRST = 0,
 	FILTER_ALL = FILTER_FIRST,
@@ -84,7 +84,7 @@ enum
 	HIDE_BOTH
 };
 
-enum : UINT16
+enum : uint16_t
 {
 	UI_SW_FIRST = 0,
 	UI_SW_ALL = UI_SW_FIRST,
@@ -130,7 +130,7 @@ struct ui_software_info
 {
 	ui_software_info() {}
 	ui_software_info(std::string sname, std::string lname, std::string pname, std::string y, std::string pub,
-		UINT8 s, std::string pa, const game_driver *d, std::string li, std::string i, std::string is, UINT8 em,
+		uint8_t s, std::string pa, const game_driver *d, std::string li, std::string i, std::string is, uint8_t em,
 		std::string plong, std::string u, std::string de, bool av)
 	{
 		shortname = sname; longname = lname; parentname = pname; year = y; publisher = pub;
@@ -142,13 +142,13 @@ struct ui_software_info
 	std::string parentname;
 	std::string year;
 	std::string publisher;
-	UINT8 supported = 0;
+	uint8_t supported = 0;
 	std::string part;
 	const game_driver *driver = nullptr;
 	std::string listname;
 	std::string interface;
 	std::string instance;
-	UINT8 startempty = 0;
+	uint8_t startempty = 0;
 	std::string parentlongname;
 	std::string usage;
 	std::string devicetype;
@@ -174,7 +174,7 @@ struct c_mnfct
 	static std::string getname(const char *str);
 	static std::vector<std::string> ui;
 	static std::unordered_map<std::string, int> uimap;
-	static UINT16 actual;
+	static uint16_t actual;
 };
 
 // Years
@@ -182,23 +182,23 @@ struct c_year
 {
 	static void set(const char *str);
 	static std::vector<std::string> ui;
-	static UINT16 actual;
+	static uint16_t actual;
 };
 
 // GLOBAL CLASS
 struct ui_globals
 {
-	static UINT8        curimage_view, curdats_view, curdats_total, cur_sw_dats_view, cur_sw_dats_total, rpanel;
+	static uint8_t        curimage_view, curdats_view, curdats_total, cur_sw_dats_view, cur_sw_dats_total, rpanel;
 	static bool         switch_image, redraw_icon, default_image, reset;
 	static int          visible_main_lines, visible_sw_lines;
-	static UINT16       panels_status;
+	static uint16_t       panels_status;
 	static bool         has_icons;
 };
 
 #define main_struct(name) \
 struct name##_filters \
 { \
-	static UINT16 actual; \
+	static uint16_t actual; \
 	static const char *text[]; \
 	static size_t length; \
 };
@@ -209,25 +209,25 @@ main_struct(sw);
 // Custom filter
 struct custfltr
 {
-	static UINT16  main;
-	static UINT16  numother;
-	static UINT16  other[MAX_CUST_FILTER];
-	static UINT16  mnfct[MAX_CUST_FILTER];
-	static UINT16  screen[MAX_CUST_FILTER];
-	static UINT16  year[MAX_CUST_FILTER];
+	static uint16_t  main;
+	static uint16_t  numother;
+	static uint16_t  other[MAX_CUST_FILTER];
+	static uint16_t  mnfct[MAX_CUST_FILTER];
+	static uint16_t  screen[MAX_CUST_FILTER];
+	static uint16_t  year[MAX_CUST_FILTER];
 };
 
 // Software custom filter
 struct sw_custfltr
 {
-	static UINT16  main;
-	static UINT16  numother;
-	static UINT16  other[MAX_CUST_FILTER];
-	static UINT16  mnfct[MAX_CUST_FILTER];
-	static UINT16  year[MAX_CUST_FILTER];
-	static UINT16  region[MAX_CUST_FILTER];
-	static UINT16  type[MAX_CUST_FILTER];
-	static UINT16  list[MAX_CUST_FILTER];
+	static uint16_t  main;
+	static uint16_t  numother;
+	static uint16_t  other[MAX_CUST_FILTER];
+	static uint16_t  mnfct[MAX_CUST_FILTER];
+	static uint16_t  year[MAX_CUST_FILTER];
+	static uint16_t  region[MAX_CUST_FILTER];
+	static uint16_t  type[MAX_CUST_FILTER];
+	static uint16_t  list[MAX_CUST_FILTER];
 };
 
 // GLOBAL FUNCTIONS
@@ -244,7 +244,7 @@ std::vector<std::string> tokenize(const std::string &text, char sep);
 //-------------------------------------------------
 
 template <typename F>
-bool input_character(std::string &buffer, std::string::size_type size, unicode_char unichar, F &&filter)
+bool input_character(std::string &buffer, std::string::size_type size, char32_t unichar, F &&filter)
 {
 	bool result = false;
 	auto buflen = buffer.size();
@@ -280,7 +280,7 @@ bool input_character(std::string &buffer, std::string::size_type size, unicode_c
 //-------------------------------------------------
 
 template <typename F>
-bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
+bool input_character(std::string &buffer, char32_t unichar, F &&filter)
 {
 	auto size = std::numeric_limits<std::string::size_type>::max();
 	return input_character(buffer, size, unichar, filter);

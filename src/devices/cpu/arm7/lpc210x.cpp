@@ -39,7 +39,7 @@ static ADDRESS_MAP_START( lpc2103_map, AS_PROGRAM, 32, lpc210x_device )
 ADDRESS_MAP_END
 
 
-lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, LPC2103, "LPC2103", tag, owner, clock, "lpc2103", __FILE__, 4, eARM_ARCHFLAGS_T, ENDIANNESS_LITTLE),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME(lpc2103_map))
 {
@@ -52,7 +52,7 @@ READ32_MEMBER(lpc210x_device::arm_E01FC088_r)
 
 READ32_MEMBER(lpc210x_device::flash_r)
 {
-	UINT32 ret = (m_flash[offset * 4 + 3] << 24) |
+	uint32_t ret = (m_flash[offset * 4 + 3] << 24) |
 					(m_flash[offset * 4 + 2] << 16) |
 					(m_flash[offset * 4 + 1] << 8) |
 					(m_flash[offset * 4 + 0] << 0);
@@ -245,7 +245,7 @@ WRITE32_MEMBER( lpc210x_device::pll_w )
 
 /* Timers */
 
-UINT32 lpc210x_device::read_timer(address_space &space, int timer, int offset, UINT32 mem_mask)
+uint32_t lpc210x_device::read_timer(address_space &space, int timer, int offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -260,7 +260,7 @@ UINT32 lpc210x_device::read_timer(address_space &space, int timer, int offset, U
 }
 
 
-void lpc210x_device::write_timer(address_space &space, int timer, int offset, UINT32 data, UINT32 mem_mask)
+void lpc210x_device::write_timer(address_space &space, int timer, int offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset * 4)
 	{

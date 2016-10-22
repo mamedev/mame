@@ -36,12 +36,12 @@ public:
 
 	/* Misc related */
 
-	UINT8 m_rambk;
+	uint8_t m_rambk;
 
-	UINT8 m_hopper_motor;
-	UINT8 m_hopper;
+	uint8_t m_hopper_motor;
+	uint8_t m_hopper;
 
-	UINT8 m_vid[igrosoft_gamble_VIDRAM_SIZE];
+	uint8_t m_vid[igrosoft_gamble_VIDRAM_SIZE];
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_bank_w);
 	DECLARE_READ8_MEMBER(bankedram_r);
@@ -86,7 +86,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<timekeeper_device> m_m48t35;
 	required_device<gfxdecode_device> m_gfxdecode;

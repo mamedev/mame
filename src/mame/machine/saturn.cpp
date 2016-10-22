@@ -181,7 +181,7 @@ DMA TODO:
 #define WORK_RAM_H(var) (var & 0x07000000) == 0x06000000
 #define SOUND_RAM(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05afffff)
 
-void saturn_state::scu_do_transfer(UINT8 event)
+void saturn_state::scu_do_transfer(uint8_t event)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
@@ -225,7 +225,7 @@ void saturn_state::scu_test_pending_irq()
 
 READ32_MEMBER(saturn_state::saturn_scu_r)
 {
-	UINT32 res;
+	uint32_t res;
 
 	/*TODO: write only registers must return 0 or open bus */
 	switch(offset)
@@ -382,9 +382,9 @@ TIMER_CALLBACK_MEMBER(saturn_state::dma_lv2_ended)
 	DnMV_0(2);
 }
 
-void saturn_state::scu_single_transfer(address_space &space, UINT32 src, UINT32 dst,UINT8 *src_shift)
+void saturn_state::scu_single_transfer(address_space &space, uint32_t src, uint32_t dst,uint8_t *src_shift)
 {
-	UINT32 src_data;
+	uint32_t src_data;
 
 	if(src & 1)
 	{
@@ -401,10 +401,10 @@ void saturn_state::scu_single_transfer(address_space &space, UINT32 src, UINT32 
 	*src_shift ^= 1;
 }
 
-void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
+void saturn_state::scu_dma_direct(address_space &space, uint8_t dma_ch)
 {
-	UINT32 tmp_src,tmp_dst,total_size;
-	UINT8 cd_transfer_flag;
+	uint32_t tmp_src,tmp_dst,total_size;
+	uint8_t cd_transfer_flag;
 
 	if(m_scu.src_add[dma_ch] == 0 || (m_scu.dst_add[dma_ch] != 2 && m_scu.dst_add[dma_ch] != 4))
 	{
@@ -459,7 +459,7 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 	else
 	{
 		int i;
-		UINT8  src_shift;
+		uint8_t  src_shift;
 
 		src_shift = ((m_scu.src[dma_ch] & 2) >> 1) ^ 1;
 
@@ -491,15 +491,15 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 	}
 }
 
-void saturn_state::scu_dma_indirect(address_space &space,UINT8 dma_ch)
+void saturn_state::scu_dma_indirect(address_space &space,uint8_t dma_ch)
 {
 	/*Helper to get out of the cycle*/
-	UINT8 job_done = 0;
+	uint8_t job_done = 0;
 	/*temporary storage for the transfer data*/
-	UINT32 tmp_src;
-	UINT32 indirect_src,indirect_dst;
-	INT32 indirect_size;
-	UINT32 total_size = 0;
+	uint32_t tmp_src;
+	uint32_t indirect_src,indirect_dst;
+	int32_t indirect_size;
+	uint32_t total_size = 0;
 
 	DnMV_1(dma_ch);
 
@@ -531,7 +531,7 @@ void saturn_state::scu_dma_indirect(address_space &space,UINT8 dma_ch)
 
 		{
 			int i;
-			UINT8  src_shift;
+			uint8_t  src_shift;
 
 			src_shift = ((indirect_src & 2) >> 1) ^ 1;
 
@@ -675,7 +675,7 @@ void saturn_state::scu_reset(void)
 
 TIMER_CALLBACK_MEMBER(saturn_state::stv_rtc_increment)
 {
-	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	static int year_num, year_count;
 
 	/*

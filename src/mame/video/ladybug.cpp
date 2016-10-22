@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-void ladybug_state::palette_init_common( palette_device &palette, const UINT8 *color_prom,
+void ladybug_state::palette_init_common( palette_device &palette, const uint8_t *color_prom,
 								int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1 )
 {
 	static const int resistances[2] = { 470, 220 };
@@ -74,14 +74,14 @@ void ladybug_state::palette_init_common( palette_device &palette, const UINT8 *c
 	/* characters */
 	for (i = 0; i < 0x20; i++)
 	{
-		UINT8 ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
+		uint8_t ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites */
 	for (i = 0x20; i < 0x40; i++)
 	{
-		UINT8 ctabentry = color_prom[(i - 0x20) >> 1];
+		uint8_t ctabentry = color_prom[(i - 0x20) >> 1];
 
 		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
 		palette.set_pen_indirect(i + 0x00, ctabentry);
@@ -94,7 +94,7 @@ void ladybug_state::palette_init_common( palette_device &palette, const UINT8 *c
 
 PALETTE_INIT_MEMBER(ladybug_state,ladybug)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, 0, 5, 2, 6, 4, 7);
 }
 
@@ -148,7 +148,7 @@ VIDEO_START_MEMBER(ladybug_state,ladybug)
 
 void ladybug_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = m_spriteram.bytes() - 2 * 0x40; offs >= 2 * 0x40; offs -= 0x40)
@@ -196,7 +196,7 @@ void ladybug_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 

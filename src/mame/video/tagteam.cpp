@@ -36,7 +36,7 @@ static const res_net_decode_info tagteam_decode_info =
 
 PALETTE_INIT_MEMBER(tagteam_state, tagteam)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, tagteam_decode_info, tagteam_net_info);
@@ -187,7 +187,7 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-UINT32 tagteam_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tagteam_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

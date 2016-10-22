@@ -132,7 +132,7 @@ READ8_MEMBER( c2031_device::via0_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// not ready for data
 	data |= m_bus->nrfd_r() << 1;
@@ -224,7 +224,7 @@ READ8_MEMBER( c2031_device::via1_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// write protect sense
 	data |= !m_floppy->wpt_r() << 4;
@@ -397,7 +397,7 @@ inline int c2031_device::get_device_number()
 //  c2031_device - constructor
 //-------------------------------------------------
 
-c2031_device::c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c2031_device::c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C2031, "C2031", tag, owner, clock, "c2031", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),

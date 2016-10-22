@@ -194,12 +194,12 @@ class esq1_filters : public device_t,
 {
 public:
 	// construction/destruction
-	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_vca(int channel, UINT8 value);
-	void set_vpan(int channel, UINT8 value);
-	void set_vq(int channel, UINT8 value);
-	void set_vfc(int channel, UINT8 value);
+	void set_vca(int channel, uint8_t value);
+	void set_vpan(int channel, uint8_t value);
+	void set_vq(int channel, uint8_t value);
+	void set_vfc(int channel, uint8_t value);
 
 protected:
 	// device-level overrides
@@ -210,7 +210,7 @@ protected:
 
 private:
 	struct filter {
-		UINT8 vca, vpan, vq, vfc;
+		uint8_t vca, vpan, vq, vfc;
 		double amp, lamp, ramp;
 		double a[5], b[5];
 		double x[4], y[4];
@@ -225,13 +225,13 @@ private:
 
 static const device_type ESQ1_FILTERS = &device_creator<esq1_filters>;
 
-esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ESQ1_FILTERS, "ESQ1 Filters stage", tag, owner, clock, "esq1-filters", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }
 
-void esq1_filters::set_vca(int channel, UINT8 value)
+void esq1_filters::set_vca(int channel, uint8_t value)
 {
 	if(filters[channel].vca != value) {
 		stream->update();
@@ -240,7 +240,7 @@ void esq1_filters::set_vca(int channel, UINT8 value)
 	}
 }
 
-void esq1_filters::set_vpan(int channel, UINT8 value)
+void esq1_filters::set_vpan(int channel, uint8_t value)
 {
 	if(filters[channel].vpan != value) {
 		stream->update();
@@ -249,7 +249,7 @@ void esq1_filters::set_vpan(int channel, UINT8 value)
 	}
 }
 
-void esq1_filters::set_vq(int channel, UINT8 value)
+void esq1_filters::set_vq(int channel, uint8_t value)
 {
 	if(filters[channel].vq != value) {
 		stream->update();
@@ -258,7 +258,7 @@ void esq1_filters::set_vq(int channel, UINT8 value)
 	}
 }
 
-void esq1_filters::set_vfc(int channel, UINT8 value)
+void esq1_filters::set_vfc(int channel, uint8_t value)
 {
 	if(filters[channel].vfc != value) {
 		stream->update();
@@ -416,12 +416,12 @@ public:
 
 	int m_mapper_state;
 	int m_seq_bank;
-	UINT8 m_seqram[0x10000];
-	UINT8 m_dosram[0x2000];
+	uint8_t m_seqram[0x10000];
+	uint8_t m_dosram[0x2000];
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
-	void send_through_panel(UINT8 data);
+	void send_through_panel(uint8_t data);
 };
 
 
@@ -562,7 +562,7 @@ WRITE_LINE_MEMBER(esq1_state::duart_tx_b)
 	m_panel->rx_w(state);
 }
 
-void esq1_state::send_through_panel(UINT8 data)
+void esq1_state::send_through_panel(uint8_t data)
 {
 	m_panel->xmit_char(data);
 }
@@ -571,13 +571,13 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
 	if (oldval == 0 && newval == 1)
 	{
-		send_through_panel((UINT8)(FPTR)param);
-		send_through_panel((UINT8)(FPTR)0x00);
+		send_through_panel((uint8_t)(uintptr_t)param);
+		send_through_panel((uint8_t)(uintptr_t)0x00);
 	}
 	else if (oldval == 1 && newval == 0)
 	{
-		send_through_panel((UINT8)(FPTR)param&0x7f);
-		send_through_panel((UINT8)(FPTR)0x00);
+		send_through_panel((uint8_t)(uintptr_t)param&0x7f);
+		send_through_panel((uint8_t)(uintptr_t)0x00);
 	}
 }
 

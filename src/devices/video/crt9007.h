@@ -99,7 +99,7 @@ class crt9007_t :  public device_t,
 {
 public:
 	// construction/destruction
-	crt9007_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	crt9007_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_character_width(device_t &device, int value) { downcast<crt9007_t &>(device).m_hpixels_per_column = value; }
 
@@ -143,7 +143,7 @@ private:
 		TIMER_DMA
 	};
 
-	inline UINT8 readbyte(offs_t address);
+	inline uint8_t readbyte(offs_t address);
 
 	inline void trigger_interrupt(int line);
 	inline void update_cblank_line();
@@ -172,8 +172,8 @@ private:
 	devcb_write_line   m_write_sld;
 
 	// registers
-	UINT8 m_reg[0x3d];
-	UINT8 m_status;
+	uint8_t m_reg[0x3d];
+	uint8_t m_status;
 
 	int m_disp;
 	int m_hpixels_per_column;

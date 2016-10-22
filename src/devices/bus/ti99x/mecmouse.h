@@ -22,10 +22,10 @@ extern const device_type MECMOUSE;
 class mecmouse_device : public joyport_attached_device
 {
 public:
-	mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	UINT8 read_dev() override;
-	void  write_dev(UINT8 data) override;
+	uint8_t read_dev() override;
+	void  write_dev(uint8_t data) override;
 
 protected:
 	virtual void device_start(void) override;

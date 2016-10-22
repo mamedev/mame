@@ -54,7 +54,7 @@ enum
 	FEEPROM_WRITE_ENABLE = 0x10
 };
 
-nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ti_expansion_card_device(mconfig, TI99_USBSM, "Nouspikel USB/Smartmedia card", tag, owner, clock, "ti99_usbsm", __FILE__),
 	  m_feeprom_page(0),
 	  m_sram_page(0),
@@ -80,7 +80,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::crureadz)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		UINT8 reply = 0;
+		uint8_t reply = 0;
 		offset &= 3;
 
 		if (offset == 0)

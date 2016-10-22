@@ -19,7 +19,7 @@
 const device_type NEOGEO_FATFURY2_CART = &device_creator<neogeo_fatfury2_cart>;
 
 
-neogeo_fatfury2_cart::neogeo_fatfury2_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
+neogeo_fatfury2_cart::neogeo_fatfury2_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
 	neogeo_rom_device(mconfig, NEOGEO_FATFURY2_CART, "Neo Geo Fatal Fury 2 Cart", tag, owner, clock, "neocart_fatfury2", __FILE__),
 	m_prot(*this, "fatfury2_prot")
 {}

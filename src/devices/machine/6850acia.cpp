@@ -64,7 +64,7 @@ const device_type ACIA6850 = &device_creator<acia6850_device>;
 //  acia6850_device - constructor
 //-------------------------------------------------
 
-acia6850_device::acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+acia6850_device::acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ACIA6850, "6850 ACIA", tag, owner, clock, "acia6850", __FILE__),
 	m_txd_handler(*this),
 	m_rts_handler(*this),
@@ -88,7 +88,7 @@ acia6850_device::acia6850_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-acia6850_device::acia6850_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+acia6850_device::acia6850_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_txd_handler(*this),
 	m_rts_handler(*this),
@@ -169,7 +169,7 @@ void acia6850_device::device_reset()
 
 READ8_MEMBER( acia6850_device::status_r )
 {
-	UINT8 status = m_status;
+	uint8_t status = m_status;
 
 	if (status & SR_CTS)
 	{
@@ -362,7 +362,7 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 					{
 						if (m_rx_counter != 1)
 						{
-							if (LOG) logerror("MC6850 '%s': RX FALSE START BIT\n", tag());
+							if (LOG) logerror("MC6850 '%s': RX false START BIT\n", tag());
 						}
 
 						m_rx_counter = 0;

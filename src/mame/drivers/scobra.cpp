@@ -50,7 +50,7 @@ public:
 		: scramble_state(mconfig, type, tag),
 			m_soundram(*this, "soundram") { }
 
-	optional_shared_ptr<UINT8> m_soundram;
+	optional_shared_ptr<uint8_t> m_soundram;
 	DECLARE_READ8_MEMBER(scobra_soundram_r);
 	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
 	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
@@ -324,7 +324,7 @@ ADDRESS_MAP_END
 /* stratgyx coinage DIPs are spread across two input ports */
 CUSTOM_INPUT_MEMBER(scobra_state::stratgyx_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("IN4")->read() & bit_mask) ? 0x01 : 0x00;
 }
 

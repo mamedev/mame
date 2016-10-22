@@ -53,13 +53,13 @@ static const double tx1_engine_gains[16] =
 
 const device_type TX1 = &device_creator<tx1_sound_device>;
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TX1, "TX-1 Audio Custom", tag, owner, clock, "tx1_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -251,7 +251,7 @@ static inline void update_engine(int eng[4])
 
 void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	UINT32 step_0, step_1, step_2;
+	uint32_t step_0, step_1, step_2;
 	double /*gain_0, gain_1,*/ gain_2, gain_3;
 
 	stream_sample_t *fl = &outputs[0][0];
@@ -346,7 +346,7 @@ static const double bb_engine_gains[16] =
 
 const device_type BUGGYBOY = &device_creator<buggyboy_sound_device>;
 
-buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tx1_sound_device(mconfig, BUGGYBOY, "Buggy Boy Audio Custom", tag, owner, clock, "buggyboy_sound", __FILE__)
 {
 }
@@ -499,7 +499,7 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 {
 	/* This is admittedly a bit of a hack job... */
 
-	UINT32 step_0, step_1;
+	uint32_t step_0, step_1;
 	int n1_en, n2_en;
 	double gain0, gain1_l, gain1_r;
 

@@ -9278,6 +9278,12 @@ quizard4                        // (c) TAB Austria 1998
 quizard4_40                     // (c) TAB Austria 1997
 quizard4_41                     // (c) TAB Austria 1998
 
+@source:cedar_magnet.cpp
+cedmag
+mag_time
+mag_exzi
+mag_xain
+
 @source:centiped.cpp
 bullsdrt                        // (c) 1985 Shinkai
 caterplr                        // (bootleg)
@@ -11899,7 +11905,10 @@ equitess                        // (c) 1984 Alpha Denshi Co./Sega
 gekisou                         // (c) 1985 Eastern
 hvoltage                        // (c) 1985 Alpha Denshi Co.
 kouyakyu                        // (c) 1985 Alpha Denshi Co.
+splendorblast2                  // (c) 1985 Alpha Denshi Co.
 splndrbt                        // (c) 1985 Alpha Denshi Co.
+splndrbta                       // (c) 1985 Alpha Denshi Co.
+splndrbtb                       // (c) 1985 Alpha Denshi Co.
 
 @source:ertictac.cpp
 ertictac                        // (c) 1992 Sisteme
@@ -27668,6 +27677,7 @@ viostormub                      // GX168 (c) 1993 (US)
 myvision                        //
 
 @source:mz2000.cpp
+mz80b                           // 1981 Sharp MZ80B
 mz2000                          // 1981 Sharp MZ2000
 mz2200                          // 1981 Sharp MZ2200
 
@@ -27689,7 +27699,6 @@ mz800                           // 1984 Sharp MZ800
 
 @source:mz80.cpp
 mz80a                           // 1982 Sharp MZ80A
-mz80b                           // 1981 Sharp MZ80B
 mz80k                           // 1979 Sharp MZ80K
 mz80kj                          // 1979 Sharp MZ80K
 
@@ -28308,7 +28317,7 @@ sl2007                          // 2007.07 Shooting Love
 slasho                          // 2000.07 Slashout
 slashout                        // 2000.?? Slashout
 smarinef                        // 2000.03 Sega Marine Fishing
-smlg99                          // 1999.09 Super Major League 99
+smlg99                          // 1999.09 World Series 99 / Super Major League 99
 soulsurf                        // 2002.07 Soul Surfer
 spawn                           // 1999.?? Spawn In the Demon's Hand
 spkrbtl                         // 2001.07 Spikers Battle
@@ -28378,7 +28387,7 @@ wldkicksj                       // 2000.03 World Kicks PCB (Japan, WKC1 Ver.A)
 wldrider                        // 2001.05 Wild Riders
 wrungp                          // 2001.08 Wave Runner GP
 wrungpo                         // 2001.?? Wave Runner GP (USA, Rev A)
-wsbbgd                          // 2001.06 Super Major League / World Series Baseball
+wsbbgd                          // 2001.06 World Series Baseball / Super Major League
 wwfroyal                        // 2000.11 WWF Royal Rumble
 xtrmhnt2                        // 2006.09 Extreme Hunting 2 Tournament Edition
 xtrmhunt                        // 2004.09 Extreme Hunting
@@ -34135,6 +34144,7 @@ stuntair                        // (c) 1983 Nuova Videotron
 astrass                         // 1998.06 Astra Super Stars (Sunsoft)
 bakubaku                        // 1995.04 Bakubaku Animal
 batmanfr                        // 1996.02 Batman Forever (Acclaim)
+choroqhr						// 1998.12 Choro Q Hyper Racing Five (Takara)
 colmns97                        // 1997.01 Columns 97
 cotton2                         // 1997.11 Cotton 2 (Success)
 cottonbm                        // 1998.09 Cotton Boomerang (Success)
@@ -35381,6 +35391,7 @@ gorodki                         // (c) 1988 Terminal
 kot                             // (c) 1988 Terminal
 
 @source:ticalc1x.cpp
+cmulti8                         // Canon
 dataman                         //
 lilprof                         //
 lilprof78                       //

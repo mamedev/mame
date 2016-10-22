@@ -734,9 +734,6 @@ static MACHINE_CONFIG_START( pocketc,  pocketc_state)
 	MCFG_PALETTE_ADD("palette", 8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(6)
 	MCFG_PALETTE_INIT_OWNER( pocketc_state, pocketc )
-
-	/* sound hardware */
-	/*MCFG_SOUND_ADD("dac", DAC, pocketc_sound_interface)*/
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( pc1401, pocketc, pc1401_state )

@@ -32,7 +32,7 @@ class huc6272_device :  public device_t,
 {
 public:
 	// construction/destruction
-	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );
@@ -47,19 +47,19 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 private:
-	inline UINT32 read_dword(offs_t address);
-	inline void write_dword(offs_t address, UINT32 data);
-	UINT8 m_register;
-	UINT32 m_kram_addr_r, m_kram_addr_w;
-	UINT16 m_kram_inc_r,m_kram_inc_w;
-	UINT8 m_kram_page_r,m_kram_page_w;
-	UINT32 m_page_setting;
-	UINT8 m_bgmode[4];
+	inline uint32_t read_dword(offs_t address);
+	inline void write_dword(offs_t address, uint32_t data);
+	uint8_t m_register;
+	uint32_t m_kram_addr_r, m_kram_addr_w;
+	uint16_t m_kram_inc_r,m_kram_inc_w;
+	uint8_t m_kram_page_r,m_kram_page_w;
+	uint32_t m_page_setting;
+	uint8_t m_bgmode[4];
 
 	struct{
-		UINT8 addr;
-		UINT8 ctrl;
-		UINT16 data[16];
+		uint8_t addr;
+		uint8_t ctrl;
+		uint16_t data[16];
 	}m_micro_prg;
 
 	const address_space_config      m_space_config;

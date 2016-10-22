@@ -248,7 +248,7 @@ ioport_constructor ibm_pc_83_keyboard_device::device_input_ports() const
 //  ibm_pc_83_keyboard_device - constructor
 //-------------------------------------------------
 
-ibm_pc_83_keyboard_device::ibm_pc_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ibm_pc_83_keyboard_device::ibm_pc_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC_KBD_IBM_PC_83, "IBM PC Keyboard", tag, owner, clock, "kb_pc83", __FILE__),
 	device_pc_kbd_interface(mconfig, *this),
 	m_maincpu(*this, I8048_TAG),
@@ -325,7 +325,7 @@ READ8_MEMBER( ibm_pc_83_keyboard_device::p1_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= clock_signal();
 	data |= data_signal() << 1;
@@ -366,7 +366,7 @@ WRITE8_MEMBER( ibm_pc_83_keyboard_device::p2_w )
 
 READ8_MEMBER( ibm_pc_83_keyboard_device::t1_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	int keylatch = m_cnt >> 2;
 

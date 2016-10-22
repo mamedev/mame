@@ -45,7 +45,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_scrolly_w)
 
 void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram;
+	uint8_t *spriteram;
 	int offs;
 
 	// these sprites are from the ET-P103A board (himesiki only)
@@ -120,7 +120,7 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 	}
 }
 
-UINT32 himesiki_state::screen_update_himesiki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t himesiki_state::screen_update_himesiki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x = -(m_scrollx[0] << 8 | m_scrollx[1]) & 0x1ff;
 	m_bg_tilemap->set_scrolldx(x, x);

@@ -161,8 +161,8 @@ WRITE8_MEMBER(_4enraya_state::sound_control_w)
 
 READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 {
-	UINT8 prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
-	UINT8 res = 0;
+	uint8_t prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
+	uint8_t res = 0;
 
 	if (prom_routing & 1) // ROM5
 	{
@@ -189,7 +189,7 @@ READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 
 WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 {
-	UINT8 prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
+	uint8_t prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
 
 	if (prom_routing & 1) // ROM5
 	{
@@ -516,7 +516,7 @@ ROM_END
 DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 {
 	// descramble rom
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	for (int i = 0x8000; i < 0xa000; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
 }

@@ -15,7 +15,7 @@
 class neogeo_sbp_cart : public neogeo_rom_device
 {
 public:
-	neogeo_sbp_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_sbp_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -26,7 +26,7 @@ public:
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 
-	void patch(UINT8* cpurom, UINT32 cpurom_size);
+	void patch(uint8_t* cpurom, uint32_t cpurom_size);
 };
 
 extern const device_type NEOGEO_SBP_CART;

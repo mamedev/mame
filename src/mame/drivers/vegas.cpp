@@ -472,29 +472,29 @@ public:
 	required_device<m48t37_device> m_timekeeper;
 	required_device<bus_master_ide_controller_device> m_ide;
 	required_device<smc91c94_device> m_ethernet;
-	required_shared_ptr<UINT32> m_rambase;
-	required_shared_ptr<UINT32> m_nile_regs;
-	required_shared_ptr<UINT32> m_rombase;
+	required_shared_ptr<uint32_t> m_rambase;
+	required_shared_ptr<uint32_t> m_nile_regs;
+	required_shared_ptr<uint32_t> m_rombase;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
 
-	UINT16 m_nile_irq_state;
-	UINT16 m_ide_irq_state;
-	UINT32 m_pci_bridge_regs[0x40];
-	UINT32 m_pci_ide_regs[0x40];
-	UINT32 m_pci_3dfx_regs[0x40];
+	uint16_t m_nile_irq_state;
+	uint16_t m_ide_irq_state;
+	uint32_t m_pci_bridge_regs[0x40];
+	uint32_t m_pci_ide_regs[0x40];
+	uint32_t m_pci_3dfx_regs[0x40];
 	emu_timer *m_timer[4];
-	UINT8 m_vblank_state;
-	UINT8 m_sio_data[4];
-	UINT8 m_sio_irq_clear;
-	UINT8 m_sio_irq_enable;
-	UINT8 m_sio_irq_state;
-	UINT8 m_sio_led_state;
-	UINT8 m_pending_analog_read;
-	UINT8 m_cmos_unlocked;
+	uint8_t m_vblank_state;
+	uint8_t m_sio_data[4];
+	uint8_t m_sio_irq_clear;
+	uint8_t m_sio_irq_enable;
+	uint8_t m_sio_irq_state;
+	uint8_t m_sio_led_state;
+	uint8_t m_pending_analog_read;
+	uint8_t m_cmos_unlocked;
 	voodoo_device *m_voodoo;
-	UINT8 m_dcs_idma_cs;
+	uint8_t m_dcs_idma_cs;
 	int m_count;
 	int m_dynamic_count;
 	dynamic_address m_dynamic[MAX_DYNAMIC_ADDRESSES];
@@ -513,7 +513,7 @@ public:
 	DECLARE_DRIVER_INIT(sf2049se);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nile_timer_callback);
 	void remap_dynamic_addresses();
 	void update_nile_irqs();
@@ -565,7 +565,7 @@ public:
  *
  *************************************/
 
-UINT32 vegas_state::screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vegas_state::screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
@@ -608,8 +608,8 @@ void vegas_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions */
-	m_maincpu->add_fastram(0x00000000, m_rambase.bytes() - 1, FALSE, m_rambase);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
+	m_maincpu->add_fastram(0x00000000, m_rambase.bytes() - 1, false, m_rambase);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true, m_rombase);
 
 	/* register for save states */
 	save_item(NAME(m_nile_irq_state));
@@ -685,7 +685,7 @@ WRITE32_MEMBER( vegas_state::timekeeper_w )
 
 READ32_MEMBER( vegas_state::timekeeper_r )
 {
-	UINT32 result = 0xffffffff;
+	uint32_t result = 0xffffffff;
 	if (ACCESSING_BITS_0_7)
 		result = (result & ~0x000000ff) | (m_timekeeper->read(space, offset * 4 + 0, 0xff) << 0);
 	if (ACCESSING_BITS_8_15)
@@ -709,7 +709,7 @@ READ32_MEMBER( vegas_state::timekeeper_r )
 
 READ32_MEMBER( vegas_state::pci_bridge_r )
 {
-	UINT32 result = m_pci_bridge_regs[offset];
+	uint32_t result = m_pci_bridge_regs[offset];
 
 	switch (offset)
 	{
@@ -745,7 +745,7 @@ WRITE32_MEMBER( vegas_state::pci_bridge_w )
 
 READ32_MEMBER( vegas_state::pci_ide_r )
 {
-	UINT32 result = m_pci_ide_regs[offset];
+	uint32_t result = m_pci_ide_regs[offset];
 
 	switch (offset)
 	{
@@ -807,7 +807,7 @@ WRITE32_MEMBER( vegas_state::pci_ide_w )
 READ32_MEMBER( vegas_state::pci_3dfx_r )
 {
 	int voodoo_type = m_voodoo->voodoo_get_type();
-	UINT32 result = m_pci_3dfx_regs[offset];
+	uint32_t result = m_pci_3dfx_regs[offset];
 
 	switch (offset)
 	{
@@ -896,9 +896,9 @@ WRITE32_MEMBER( vegas_state::pci_3dfx_w )
 
 void vegas_state::update_nile_irqs()
 {
-	UINT32 intctll = m_nile_regs[NREG_INTCTRL+0];
-	UINT32 intctlh = m_nile_regs[NREG_INTCTRL+1];
-	UINT8 irq[6];
+	uint32_t intctll = m_nile_regs[NREG_INTCTRL+0];
+	uint32_t intctlh = m_nile_regs[NREG_INTCTRL+1];
+	uint8_t irq[6];
 	int i;
 
 	/* check for UART transmit IRQ enable and synthsize one */
@@ -961,15 +961,15 @@ void vegas_state::update_nile_irqs()
 TIMER_CALLBACK_MEMBER(vegas_state::nile_timer_callback)
 {
 	int which = param;
-	UINT32 *regs = &m_nile_regs[NREG_T0CTRL + which * 4];
+	uint32_t *regs = &m_nile_regs[NREG_T0CTRL + which * 4];
 	if (LOG_TIMERS) logerror("timer %d fired\n", which);
 
 	/* adjust the timer to fire again */
 	{
-		UINT32 scale = regs[0];
+		uint32_t scale = regs[0];
 		if (regs[1] & 2) {
-			UINT32 scaleSrc = (regs[1] >> 2) & 0x3;
-			UINT32 *scaleReg = &m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+			uint32_t scaleSrc = (regs[1] >> 2) & 0x3;
+			uint32_t *scaleReg = &m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 			scale *= scaleReg[0];
 			//logerror("Unexpected value: timer %d is prescaled\n", which);
 			logerror("Timer Scaling value: timer %d is prescaled from %08X to %08X\n", which, regs[0], scale);
@@ -997,8 +997,9 @@ TIMER_CALLBACK_MEMBER(vegas_state::nile_timer_callback)
 
 READ32_MEMBER( vegas_state::nile_r )
 {
-	UINT32 result = m_nile_regs[offset];
-	int logit = 1, which;
+	uint32_t result = m_nile_regs[offset];
+	bool logit = true;
+	int which;
 
 	switch (offset)
 	{
@@ -1058,9 +1059,9 @@ READ32_MEMBER( vegas_state::nile_r )
 			{
 				//if (m_nile_regs[offset - 1] & 2)
 				//  logerror("Unexpected value: timer %d is prescaled\n", which);
-				UINT32 scale = 1;
+				uint32_t scale = 1;
 				if (m_nile_regs[offset - 1] & 2) {
-					UINT32 scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
+					uint32_t scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
 					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 					logerror("Timer value: timer %d is prescaled by \n", which, scale);
 				}
@@ -1115,8 +1116,9 @@ READ32_MEMBER( vegas_state::nile_r )
 
 WRITE32_MEMBER( vegas_state::nile_w )
 {
-	UINT32 olddata = m_nile_regs[offset];
-	int logit = 1, which;
+	uint32_t olddata = m_nile_regs[offset];
+	bool logit = true;
+	int which;
 
 	COMBINE_DATA(&m_nile_regs[offset]);
 
@@ -1190,11 +1192,11 @@ WRITE32_MEMBER( vegas_state::nile_w )
 			/* timer just enabled? */
 			if (!(olddata & 1) && (m_nile_regs[offset] & 1))
 			{
-				UINT32 scale = m_nile_regs[offset - 1];
+				uint32_t scale = m_nile_regs[offset - 1];
 				//if (m_nile_regs[offset] & 2)
 				//  logerror("Unexpected value: timer %d is prescaled\n", which);
 				if (m_nile_regs[offset] & 2) {
-					UINT32 scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
+					uint32_t scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
 					scale *= m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 					logerror("Timer scale: timer %d is scaled by %08X\n", which, m_nile_regs[NREG_T0CTRL + which * 4]);
 				}
@@ -1208,9 +1210,9 @@ WRITE32_MEMBER( vegas_state::nile_w )
 			{
 				//if (m_nile_regs[offset] & 2)
 				//  logerror("Unexpected value: timer %d is prescaled\n", which);
-				UINT32 scale = 1;
+				uint32_t scale = 1;
 				if (m_nile_regs[offset] & 2) {
-					UINT32 scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
+					uint32_t scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
 					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 					logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
 				}
@@ -1231,9 +1233,9 @@ WRITE32_MEMBER( vegas_state::nile_w )
 			{
 				//if (m_nile_regs[offset - 1] & 2)
 				//  logerror("Unexpected value: timer %d is prescaled\n", which);
-				UINT32 scale = 1;
+				uint32_t scale = 1;
 				if (m_nile_regs[offset - 1] & 2) {
-					UINT32 scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
+					uint32_t scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
 					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 					logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
 				}
@@ -1454,7 +1456,7 @@ WRITE32_MEMBER( vegas_state::sio_w )
 
 READ32_MEMBER( vegas_state::sio_r )
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (ACCESSING_BITS_0_7) offset += 0;
 	if (ACCESSING_BITS_8_15) offset += 1;
 	if (ACCESSING_BITS_16_23) offset += 2;
@@ -1545,7 +1547,7 @@ WRITE32_MEMBER( vegas_state::ide_bus_master32_w )
 
 READ32_MEMBER( vegas_state::ethernet_r )
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (ACCESSING_BITS_0_15)
 		result |= m_ethernet->read(space, offset * 2 + 0, mem_mask);
 	if (ACCESSING_BITS_16_31)

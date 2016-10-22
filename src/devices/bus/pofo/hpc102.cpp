@@ -67,7 +67,7 @@ machine_config_constructor hpc102_t::device_mconfig_additions() const
 //  hpc102_t - constructor
 //-------------------------------------------------
 
-hpc102_t::hpc102_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+hpc102_t::hpc102_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HPC102, "Atari Portfolio HPC-102", tag, owner, clock, "hpc102", __FILE__),
 	device_portfolio_expansion_slot_interface(mconfig, *this),
 	m_uart(*this, M82C50A_TAG)
@@ -98,7 +98,7 @@ void hpc102_t::device_reset()
 //  eack_r - external interrupt acknowledge
 //-------------------------------------------------
 
-UINT8 hpc102_t::eack_r()
+uint8_t hpc102_t::eack_r()
 {
 	return m_vector;
 }
@@ -108,7 +108,7 @@ UINT8 hpc102_t::eack_r()
 //  nrdi_r - read
 //-------------------------------------------------
 
-UINT8 hpc102_t::nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1)
+uint8_t hpc102_t::nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
 	if (!bcom)
 	{
@@ -131,7 +131,7 @@ UINT8 hpc102_t::nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom
 //  nwri_w - write
 //-------------------------------------------------
 
-void hpc102_t::nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1)
+void hpc102_t::nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
 	if (!bcom)
 	{

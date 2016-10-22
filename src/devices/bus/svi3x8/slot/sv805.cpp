@@ -48,7 +48,7 @@ machine_config_constructor sv805_device::device_mconfig_additions() const
 //  sv805_device - constructor
 //-------------------------------------------------
 
-sv805_device::sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sv805_device::sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SV805, "SV-805 RS-232 Interface", tag, owner, clock, "sv805", __FILE__),
 	device_svi_slot_interface(mconfig, *this),
 	m_uart(*this, "uart"),

@@ -13,7 +13,7 @@
 
 PALETTE_INIT_MEMBER(compgolf_state, compgolf)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -115,7 +115,7 @@ void compgolf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 compgolf_state::screen_update_compgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t compgolf_state::screen_update_compgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int scrollx = m_scrollx_hi + m_scrollx_lo;
 	int scrolly = m_scrolly_hi + m_scrolly_lo;

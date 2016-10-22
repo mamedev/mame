@@ -113,7 +113,7 @@ static const res_net_info popeye_7052_obj_net_info =
 };
 
 
-void popeye_state::convert_color_prom(const UINT8 *color_prom)
+void popeye_state::convert_color_prom(const uint8_t *color_prom)
 {
 	int i;
 
@@ -163,7 +163,7 @@ void popeye_state::convert_color_prom(const UINT8 *color_prom)
 #if USE_NEW_COLOR
 	/* sprites */
 	std::vector<rgb_t> rgb;
-	UINT8 cpi[512];
+	uint8_t cpi[512];
 
 	for (i=0; i<512; i++)
 		cpi[i] = m_color_prom_spr[i] ^ m_invertmask;
@@ -234,10 +234,10 @@ PALETTE_INIT_MEMBER(popeye_state, skyskipr)
 void popeye_state::set_background_palette(int bank)
 {
 	int i;
-	UINT8 *color_prom = m_color_prom + 16 * bank;
+	uint8_t *color_prom = m_color_prom + 16 * bank;
 
 #if USE_NEW_COLOR
-	UINT8 cpi[16];
+	uint8_t cpi[16];
 	std::vector<rgb_t> rgb;
 	for (i=0; i<16; i++)
 		cpi[i] = color_prom[i] ^ m_invertmask;
@@ -353,7 +353,7 @@ TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
 
 void popeye_state::video_start()
 {
-	m_bitmapram = std::make_unique<UINT8[]>(popeye_bitmapram_size);
+	m_bitmapram = std::make_unique<uint8_t[]>(popeye_bitmapram_size);
 	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(1024,1024);    /* actually 1024x512 but not rolling over vertically? */
 
 	m_bitmap_type = TYPE_SKYSKIPR;
@@ -372,7 +372,7 @@ void popeye_state::video_start()
 
 VIDEO_START_MEMBER(popeye_state,popeye)
 {
-	m_bitmapram = std::make_unique<UINT8[]>(popeye_bitmapram_size);
+	m_bitmapram = std::make_unique<uint8_t[]>(popeye_bitmapram_size);
 	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(512,512);
 
 	m_bitmap_type = TYPE_POPEYE;
@@ -428,7 +428,7 @@ void popeye_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 
 void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0;offs < m_spriteram.bytes();offs += 4)
@@ -488,7 +488,7 @@ void popeye_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			bitmap.pix(y, x) = 0;
 }
 
-UINT32 popeye_state::screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t popeye_state::screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_background(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);

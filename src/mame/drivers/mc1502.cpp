@@ -40,7 +40,7 @@
 
 TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 {
-	UINT8 key = 0;
+	uint8_t key = 0;
 
 	key |= ioport("Y1")->read();
 	key |= ioport("Y2")->read();
@@ -114,7 +114,7 @@ READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 
 READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
 {
-	UINT8 key = 0;
+	uint8_t key = 0;
 
 	if (m_kbd.mask & 0x0001) { key |= ioport("Y1")->read(); }
 	if (m_kbd.mask & 0x0002) { key |= ioport("Y2")->read(); }

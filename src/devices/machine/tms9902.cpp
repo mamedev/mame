@@ -64,7 +64,7 @@ enum
 /*
     Constructor
 */
-tms9902_device::tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9902_device::tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMS9902, "TMS9902 ACC", tag, owner, clock, "tms9902", __FILE__),
 		m_int_cb(*this),
 		m_rcv_cb(*this),
@@ -174,7 +174,7 @@ void tms9902_device::rcv_dsr(line_state state)
     the device that contains the UART. Unlike the real thing, we deliver
     complete bytes in one go.
 */
-void tms9902_device::rcv_data(UINT8 data)
+void tms9902_device::rcv_data(uint8_t data)
 {
 	// Put the received byte into the 1-byte receive buffer
 	m_RBR = data;
@@ -463,7 +463,7 @@ void tms9902_device::initiate_transmit()
 */
 READ8_MEMBER( tms9902_device::cruread )
 {
-	UINT8 answer = 0;
+	uint8_t answer = 0;
 
 	offset &= 0x0003;
 
@@ -509,7 +509,7 @@ READ8_MEMBER( tms9902_device::cruread )
 	return answer;
 }
 
-static inline void set_bits8(UINT8 *reg, UINT8 bits, bool set)
+static inline void set_bits8(uint8_t *reg, uint8_t bits, bool set)
 {
 	if (set)
 		*reg |= bits;
@@ -517,7 +517,7 @@ static inline void set_bits8(UINT8 *reg, UINT8 bits, bool set)
 		*reg &= ~bits;
 }
 
-static inline void set_bits16(UINT16 *reg, UINT16 bits, bool set)
+static inline void set_bits16(uint16_t *reg, uint16_t bits, bool set)
 {
 	if (set)
 		*reg |= bits;
@@ -589,7 +589,7 @@ WRITE8_MEMBER( tms9902_device::cruwrite )
 
 	if (offset <= 10)
 	{
-		UINT16 mask = (1 << offset);
+		uint16_t mask = (1 << offset);
 
 		if (m_LDCTRL)
 		{   // Control Register mode. Values written to bits 0-7 are copied

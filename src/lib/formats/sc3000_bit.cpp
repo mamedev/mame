@@ -56,11 +56,11 @@ static cassette_image::error sc3000_bit_identify(cassette_image *cassette, struc
 static cassette_image::error sc3000_bit_load(cassette_image *cassette)
 {
 	cassette_image::error err;
-	UINT64 image_size = cassette_image_size(cassette);
-	UINT64 image_pos = 0;
+	uint64_t image_size = cassette_image_size(cassette);
+	uint64_t image_pos = 0;
 	double time_index = 0.0;
 	double time_displacement;
-	UINT8 data;
+	uint8_t data;
 
 	while (image_pos < image_size)
 	{

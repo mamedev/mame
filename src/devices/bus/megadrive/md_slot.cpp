@@ -87,7 +87,7 @@ void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = (UINT16 *)device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_BIG)->base();
+		m_rom = (uint16_t *)device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_BIG)->base();
 		m_rom_size = size;
 	}
 }
@@ -99,7 +99,7 @@ void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
 
 void device_md_cart_interface::nvram_alloc(size_t size)
 {
-	m_nvram.resize(size/sizeof(UINT16));
+	m_nvram.resize(size/sizeof(uint16_t));
 }
 
 //-------------------------------------------------
@@ -107,7 +107,7 @@ void device_md_cart_interface::nvram_alloc(size_t size)
 //  blocks, so to simplify ROM mirroring
 //-------------------------------------------------
 
-void device_md_cart_interface::rom_map_setup(UINT32 size)
+void device_md_cart_interface::rom_map_setup(uint32_t size)
 {
 	int i;
 	// setup the rom_bank_map array to faster ROM read
@@ -139,9 +139,9 @@ void device_md_cart_interface::rom_map_setup(UINT32 size)
 // get_padded_size
 //-------------------------------------------------
 
-UINT32 device_md_cart_interface::get_padded_size(UINT32 size)
+uint32_t device_md_cart_interface::get_padded_size(uint32_t size)
 {
-	UINT32 pad_size = 0x10000;
+	uint32_t pad_size = 0x10000;
 	while (size > pad_size)
 		pad_size <<= 1;
 
@@ -160,7 +160,7 @@ UINT32 device_md_cart_interface::get_padded_size(UINT32 size)
 //-------------------------------------------------
 //  base_md_cart_slot_device - constructor
 //-------------------------------------------------
-base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -169,17 +169,17 @@ base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig
 {
 }
 
-md_cart_slot_device::md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+md_cart_slot_device::md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						base_md_cart_slot_device(mconfig, MD_CART_SLOT, "MD Cartridge Slot", tag, owner, clock, "md_cart_slot", __FILE__)
 {
 }
 
-pico_cart_slot_device::pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pico_cart_slot_device::pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						base_md_cart_slot_device(mconfig, PICO_CART_SLOT, "Pico Cartridge Slot", tag, owner, clock, "pico_cart_slot", __FILE__)
 {
 }
 
-copera_cart_slot_device::copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+copera_cart_slot_device::copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						base_md_cart_slot_device(mconfig, COPERA_CART_SLOT, "Copera Cartridge Slot", tag, owner, clock, "copera_cart_slot", __FILE__)
 {
 }
@@ -354,7 +354,7 @@ image_init_result base_md_cart_slot_device::call_load()
 			if (m_cart->get_nvram_size())
 				battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0xff);
 
-			file_logging((UINT8 *)m_cart->get_rom_base(), m_cart->get_rom_size(), m_cart->get_nvram_size());
+			file_logging((uint8_t *)m_cart->get_rom_base(), m_cart->get_rom_size(), m_cart->get_nvram_size());
 		}
 
 		return res;
@@ -366,8 +366,8 @@ image_init_result base_md_cart_slot_device::call_load()
 
 image_init_result base_md_cart_slot_device::load_list()
 {
-	UINT16 *ROM;
-	UINT32 length = get_software_region_length("rom");
+	uint16_t *ROM;
+	uint32_t length = get_software_region_length("rom");
 	const char  *slot_name;
 
 	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
@@ -375,7 +375,7 @@ image_init_result base_md_cart_slot_device::load_list()
 
 	m_cart->rom_alloc(length, tag());
 	ROM = m_cart->get_rom_base();
-	memcpy((UINT8 *)ROM, get_software_region("rom"), get_software_region_length("rom"));
+	memcpy((uint8_t *)ROM, get_software_region("rom"), get_software_region_length("rom"));
 
 	// if we allocated a ROM larger that the file (e.g. due to uneven cart size), set remaining space to 0xff
 	if (length > get_software_region_length("rom"))
@@ -470,8 +470,8 @@ image_init_result base_md_cart_slot_device::load_nonlist()
 {
 	unsigned char *ROM;
 	bool is_smd, is_md;
-	UINT32 tmplen = length(), offset, len;
-	dynamic_buffer tmpROM(tmplen);
+	uint32_t tmplen = length(), offset, len;
+	std::vector<uint8_t> tmpROM(tmplen);
 
 	// STEP 1: store a (possibly headered) copy of the file and determine its type (SMD? MD? BIN?)
 	fread(&tmpROM[0], tmplen);
@@ -562,7 +562,7 @@ void base_md_cart_slot_device::call_unload()
 
 void base_md_cart_slot_device::setup_custom_mappers()
 {
-	UINT16 *ROM16 = m_cart->get_rom_base();
+	uint16_t *ROM16 = m_cart->get_rom_base();
 
 	switch (m_type)
 	{
@@ -583,7 +583,7 @@ void base_md_cart_slot_device::setup_custom_mappers()
 
 void base_md_cart_slot_device::setup_nvram()
 {
-	UINT8 *ROM = (UINT8 *)m_cart->get_rom_base();
+	uint8_t *ROM = (uint8_t *)m_cart->get_rom_base();
 	m_cart->m_nvram_readonly = 0;
 	m_cart->m_nvram_active = 0;
 	m_cart->m_nvram_handlers_installed = 0;
@@ -683,7 +683,7 @@ void base_md_cart_slot_device::setup_nvram()
 
 
 
-int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
+int base_md_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
 {
 	int type = SEGA_STD;
 
@@ -889,8 +889,8 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		// If the cart is not of a special type, we check the header for SRAM.
 		if (ROM[0x1b1] == 'A' && ROM[0x1b0] == 'R')
 		{
-			UINT32 start = (ROM[0x1b4] << 24 | ROM[0x1b5] << 16 | ROM[0x1b6] << 8 | ROM[0x1b7]);
-			UINT32 end = (ROM[0x1b8] << 24 | ROM[0x1b9] << 16 | ROM[0x1ba] << 8 | ROM[0x1bb]);
+			uint32_t start = (ROM[0x1b4] << 24 | ROM[0x1b5] << 16 | ROM[0x1b6] << 8 | ROM[0x1b7]);
+			uint32_t end = (ROM[0x1b8] << 24 | ROM[0x1b9] << 16 | ROM[0x1ba] << 8 | ROM[0x1bb]);
 			// For some games using serial EEPROM, difference between SRAM end to start is 0 or 1.
 			// Carts with EEPROM should have been already detected above, but better safe than sorry
 			if (end - start < 2)
@@ -918,8 +918,8 @@ std::string base_md_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 len = m_file->size(), offset = 0;
-		dynamic_buffer rom(len);
+		uint32_t len = m_file->size(), offset = 0;
+		std::vector<uint8_t> rom(len);
 		int type;
 
 		m_file->read(&rom[0], len);
@@ -995,13 +995,13 @@ WRITE16_MEMBER(base_md_cart_slot_device::write_a15)
  Image loading logging
  -------------------------------------------------*/
 
-void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 nvram_len)
+void base_md_cart_slot_device::file_logging(uint8_t *ROM8, uint32_t rom_len, uint32_t nvram_len)
 {
 	char console[16], copyright[16], domestic_name[48], overseas_name[48];
 	char serial[14], io[16], modem[12], memo[40], country[16];
-	UINT32 rom_start, rom_end, ram_start, ram_end, sram_start = 0, sram_end = 0;
-	UINT16 checksum, csum = 0;
-	bool valid_sram = FALSE, is_pico = FALSE;
+	uint32_t rom_start, rom_end, ram_start, ram_end, sram_start = 0, sram_end = 0;
+	uint16_t checksum, csum = 0;
+	bool valid_sram = false, is_pico = false;
 	std::string ctrl(""), reg("");
 
 	// LOG FILE DETAILS
@@ -1024,7 +1024,7 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	for (int i = 0; i < 16; i++)
 		console[i] = ROM8[0x100 + (i ^ 1)];
 	if (!strncmp("SEGA PICO", console, 9))
-		is_pico = TRUE;
+		is_pico = true;
 	for (int i = 0; i < 16; i++)
 		copyright[i] = ROM8[0x110 + (i ^ 1)];
 	for (int i = 0; i < 48; i++)
@@ -1051,7 +1051,7 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	ram_end = (ROM8[0x1ad] << 24 | ROM8[0x1ac] << 16 | ROM8[0x1af] << 8 | ROM8[0x1ae]);;
 	if (ROM8[0x1b1] == 'R' && ROM8[0x1b0] == 'A')
 	{
-		valid_sram = TRUE;
+		valid_sram = true;
 		sram_start = (ROM8[0x1b5] << 24 | ROM8[0x1b4] << 16 | ROM8[0x1b7] << 8 | ROM8[0x1b6]);
 		sram_end = (ROM8[0x1b9] << 24 | ROM8[0x1b8] << 16 | ROM8[0x1bb] << 8 | ROM8[0x1ba]);
 	}

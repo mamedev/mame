@@ -16,7 +16,7 @@ struct sprite_cave
 {
 	int priority, flags;
 
-	const UINT8 *pen_data;  /* points to top left corner of tile data */
+	const uint8_t *pen_data;  /* points to top left corner of tile data */
 	int line_offset;
 
 	pen_t base_pen;
@@ -53,12 +53,12 @@ public:
 		, m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	optional_shared_ptr_array<UINT16, 4> m_videoregs;
-	optional_shared_ptr_array<UINT16, 4> m_vram;
-	optional_shared_ptr_array<UINT16, 4> m_vctrl;
-	optional_shared_ptr_array<UINT16, 4> m_spriteram;
-	optional_shared_ptr_array<UINT16, 4> m_spriteram_2;
-	optional_shared_ptr_array<UINT16, 4> m_paletteram;
+	optional_shared_ptr_array<uint16_t, 4> m_videoregs;
+	optional_shared_ptr_array<uint16_t, 4> m_vram;
+	optional_shared_ptr_array<uint16_t, 4> m_vctrl;
+	optional_shared_ptr_array<uint16_t, 4> m_spriteram;
+	optional_shared_ptr_array<uint16_t, 4> m_spriteram_2;
+	optional_shared_ptr_array<uint16_t, 4> m_paletteram;
 
 	/* video-related */
 	struct sprite_cave *m_sprite[4];
@@ -67,9 +67,9 @@ public:
 	struct
 	{
 		int    clip_left, clip_right, clip_top, clip_bottom;
-		UINT8  *baseaddr;
+		uint8_t  *baseaddr;
 		int    line_offset;
-		UINT8  *baseaddr_zbuf;
+		uint8_t  *baseaddr_zbuf;
 		int    line_offset_zbuf;
 	} m_blit;
 
@@ -82,14 +82,14 @@ public:
 	int          m_old_tiledim[4];
 
 	bitmap_ind16 m_sprite_zbuf;
-	UINT16       m_sprite_zbuf_baseval;
+	uint16_t       m_sprite_zbuf_baseval;
 
 	int          m_num_sprites[4];
 
 	int          m_spriteram_bank[4];
 	int          m_spriteram_bank_delay[4];
 
-	std::unique_ptr<UINT16[]>      m_palette_map[4];
+	std::unique_ptr<uint16_t[]>      m_palette_map[4];
 
 	int          m_layers_offs_x;
 	int          m_layers_offs_y;
@@ -103,26 +103,26 @@ public:
 
 	/* misc */
 	int          m_time_vblank_irq;
-	UINT8        m_irq_level;
-	UINT8        m_vblank_irq;
-	UINT8        m_sound_irq;
-	UINT8        m_unknown_irq;
-	UINT8        m_agallet_vblank_irq;
+	uint8_t        m_irq_level;
+	uint8_t        m_vblank_irq;
+	uint8_t        m_sound_irq;
+	uint8_t        m_unknown_irq;
+	uint8_t        m_agallet_vblank_irq;
 
 	/* sound related */
 	int          m_soundbuf_len;
-	UINT8        m_soundbuf_data[32];
-	//UINT8        m_sound_flag1;
-	//UINT8        m_sound_flag2;
+	uint8_t        m_soundbuf_data[32];
+	//uint8_t        m_sound_flag1;
+	//uint8_t        m_sound_flag2;
 
 	/* game specific */
 	// sailormn
 	int          m_sailormn_tilebank;
 	// korokoro
-	UINT16       m_leds[2];
+	uint16_t       m_leds[2];
 	int          m_hopper;
 	// ppsatan
-	UINT16       m_ppsatan_io_mux;
+	uint16_t       m_ppsatan_io_mux;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -190,7 +190,7 @@ public:
 	DECLARE_READ16_MEMBER(ppsatan_touch1_r);
 	DECLARE_READ16_MEMBER(ppsatan_touch2_r);
 	DECLARE_WRITE16_MEMBER(ppsatan_out_w);
-	UINT16 ppsatan_touch_r(int player);
+	uint16_t ppsatan_touch_r(int player);
 	DECLARE_DRIVER_INIT(uopoko);
 	DECLARE_DRIVER_INIT(donpachi);
 	DECLARE_DRIVER_INIT(mazinger);
@@ -230,11 +230,11 @@ public:
 	DECLARE_VIDEO_START(sailormn_3_layers);
 	DECLARE_PALETTE_INIT(sailormn);
 	DECLARE_PALETTE_INIT(ppsatan);
-	UINT32 screen_update_cave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ppsatan_core (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip);
-	UINT32 screen_update_ppsatan_top  (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ppsatan_left (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ppsatan_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ppsatan_core (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip);
+	uint32_t screen_update_ppsatan_top  (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ppsatan_left (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ppsatan_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cave_interrupt);
 	INTERRUPT_GEN_MEMBER(cave_interrupt_ppsatan);
 	TIMER_CALLBACK_MEMBER(cave_vblank_end);
@@ -255,10 +255,10 @@ public:
 
 private:
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int GFX );
-	inline void tilemap_draw( int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 priority, UINT32 priority2, int GFX );
-	inline void vram_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX );
-	inline void vram_8x8_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX );
-	inline void vctrl_w( address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int GFX );
+	inline void tilemap_draw( int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t priority, uint32_t priority2, int GFX );
+	inline void vram_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t data, ATTR_UNUSED uint16_t mem_mask, int GFX );
+	inline void vram_8x8_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t data, ATTR_UNUSED uint16_t mem_mask, int GFX );
+	inline void vctrl_w( address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask, int GFX );
 	void set_pens(int chip);
 	void cave_vh_start( int num );
 	void get_sprite_info_cave(int chip);

@@ -132,7 +132,7 @@ protected:
 	virtual void execute_command(int command) override;
 
 	// internal helpers
-	inline void add_command(UINT8 command);
+	inline void add_command(uint8_t command);
 
 	// timer IDs
 	enum
@@ -145,9 +145,9 @@ protected:
 
 	// internal state
 	emu_timer *m_bit_timer;
-	UINT32 m_command_buffer_in;
-	UINT32 m_command_buffer_out;
-	UINT8 m_command_buffer[10];
+	uint32_t m_command_buffer_in;
+	uint32_t m_command_buffer_out;
+	uint8_t m_command_buffer[10];
 };
 
 
@@ -176,7 +176,7 @@ protected:
 
 chd_file *ldplayer_state::get_disc()
 {
-	bool found = FALSE;
+	bool found = false;
 	// open a path to the ROMs and find the first CHD file
 	file_enumerator path(machine().options().media_path());
 
@@ -206,7 +206,7 @@ chd_file *ldplayer_state::get_disc()
 				if (machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()) == CHDERR_NONE)
 				{
 					m_filename.assign(dir->name);
-					found = TRUE;
+					found = true;
 					break;
 				}
 			}
@@ -214,7 +214,7 @@ chd_file *ldplayer_state::get_disc()
 	}
 
 	// if we failed, pop a message and exit
-	if (found == FALSE)
+	if (found == false)
 		throw emu_fatalerror("No valid image file found!\n");
 
 	return machine().rom_load().get_disk_handle("laserdisc");
@@ -351,7 +351,7 @@ void ldplayer_state::machine_reset()
  *
  *************************************/
 
-void pr8210_state::add_command(UINT8 command)
+void pr8210_state::add_command(uint8_t command)
 {
 	m_command_buffer[m_command_buffer_in++ % ARRAY_LENGTH(m_command_buffer)] = (command & 0x1f) | 0x20;
 	m_command_buffer[m_command_buffer_in++ % ARRAY_LENGTH(m_command_buffer)] = 0x00 | 0x20;
@@ -365,8 +365,8 @@ void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		case TIMER_ID_BIT:
 		{
 			attotime duration = attotime::from_msec(30);
-			UINT8 bitsleft = param >> 16;
-			UINT8 data = param;
+			uint8_t bitsleft = param >> 16;
+			uint8_t data = param;
 
 			// if we have bits, process
 			if (bitsleft != 0)
@@ -418,7 +418,7 @@ void pr8210_state::machine_reset()
 
 void pr8210_state::execute_command(int command)
 {
-	static const UINT8 digits[10] = { 0x01, 0x11, 0x09, 0x19, 0x05, 0x15, 0x0d, 0x1d, 0x03, 0x13 };
+	static const uint8_t digits[10] = { 0x01, 0x11, 0x09, 0x19, 0x05, 0x15, 0x0d, 0x1d, 0x03, 0x13 };
 
 	switch (command)
 	{
@@ -534,7 +534,7 @@ void pr8210_state::execute_command(int command)
 
 void ldv1000_state::execute_command(int command)
 {
-	static const UINT8 digits[10] = { 0x3f, 0x0f, 0x8f, 0x4f, 0x2f, 0xaf, 0x6f, 0x1f, 0x9f, 0x5f };
+	static const uint8_t digits[10] = { 0x3f, 0x0f, 0x8f, 0x4f, 0x2f, 0xaf, 0x6f, 0x1f, 0x9f, 0x5f };
 	switch (command)
 	{
 		case CMD_SCAN_REVERSE:

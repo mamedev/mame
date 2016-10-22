@@ -167,27 +167,27 @@ public:
 	device_abcbus_card_interface(const machine_config &mconfig, device_t &device);
 
 	// required operation overrides
-	virtual void abcbus_cs(UINT8 data) = 0;
+	virtual void abcbus_cs(uint8_t data) = 0;
 
 	// optional operation overrides
-	virtual UINT8 abcbus_inp() { return 0xff; };
-	virtual void abcbus_out(UINT8 data) { };
-	virtual UINT8 abcbus_stat() { return 0xff; };
-	virtual void abcbus_c1(UINT8 data) { };
-	virtual void abcbus_c2(UINT8 data) { };
-	virtual void abcbus_c3(UINT8 data) { };
-	virtual void abcbus_c4(UINT8 data) { };
+	virtual uint8_t abcbus_inp() { return 0xff; };
+	virtual void abcbus_out(uint8_t data) { };
+	virtual uint8_t abcbus_stat() { return 0xff; };
+	virtual void abcbus_c1(uint8_t data) { };
+	virtual void abcbus_c2(uint8_t data) { };
+	virtual void abcbus_c3(uint8_t data) { };
+	virtual void abcbus_c4(uint8_t data) { };
 
 	// optional operation overrides for ABC 80
-	virtual UINT8 abcbus_xmemfl(offs_t offset) { return 0xff; };
-	virtual void abcbus_xmemw(offs_t offset, UINT8 data) { };
+	virtual uint8_t abcbus_xmemfl(offs_t offset) { return 0xff; };
+	virtual void abcbus_xmemw(offs_t offset, uint8_t data) { };
 
 	// optional operation overrides for ABC 1600
 	virtual int abcbus_csb() { return 1; }
-	virtual UINT8 abcbus_ops() { return 0xff; };
+	virtual uint8_t abcbus_ops() { return 0xff; };
 	virtual void abcbus_tren(int state) { };
 	virtual void abcbus_prac(int state) { };
-	virtual UINT8 abcbus_exp() { return 0xff; };
+	virtual uint8_t abcbus_exp() { return 0xff; };
 	virtual int abcbus_xcsb2() { return 1; };
 	virtual int abcbus_xcsb3() { return 1; };
 	virtual int abcbus_xcsb4() { return 1; };
@@ -205,7 +205,7 @@ class abcbus_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	abcbus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abcbus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
 	template<class _nmi> void set_nmi_callback(_nmi nmi) { m_write_nmi.set_callback(nmi); }
@@ -219,20 +219,20 @@ public:
 	template<class _xint5> void set_xint5_callback(_xint5 xint5) { m_write_xint5.set_callback(xint5); }
 
 	// computer interface
-	void cs_w(UINT8 data) { if (m_card) m_card->abcbus_cs(data); }
-	UINT8 rst_r() { device_reset(); return 0xff; }
-	UINT8 inp_r() { return m_card ? m_card->abcbus_inp() : 0xff; }
-	void out_w(UINT8 data) { if (m_card) m_card->abcbus_out(data); }
-	UINT8 stat_r() { return m_card ? m_card->abcbus_stat() : 0xff; }
-	void c1_w(UINT8 data) { if (m_card) m_card->abcbus_c1(data); }
-	void c2_w(UINT8 data) { if (m_card) m_card->abcbus_c2(data); }
-	void c3_w(UINT8 data) { if (m_card) m_card->abcbus_c3(data); }
-	void c4_w(UINT8 data) { if (m_card) m_card->abcbus_c4(data); }
-	UINT8 xmemfl_r(offs_t offset) { return m_card ? m_card->abcbus_xmemfl(offset) : 0xff; }
-	void xmemw_w(offs_t offset, UINT8 data) { if (m_card) m_card->abcbus_xmemw(offset, data); }
+	void cs_w(uint8_t data) { if (m_card) m_card->abcbus_cs(data); }
+	uint8_t rst_r() { device_reset(); return 0xff; }
+	uint8_t inp_r() { return m_card ? m_card->abcbus_inp() : 0xff; }
+	void out_w(uint8_t data) { if (m_card) m_card->abcbus_out(data); }
+	uint8_t stat_r() { return m_card ? m_card->abcbus_stat() : 0xff; }
+	void c1_w(uint8_t data) { if (m_card) m_card->abcbus_c1(data); }
+	void c2_w(uint8_t data) { if (m_card) m_card->abcbus_c2(data); }
+	void c3_w(uint8_t data) { if (m_card) m_card->abcbus_c3(data); }
+	void c4_w(uint8_t data) { if (m_card) m_card->abcbus_c4(data); }
+	uint8_t xmemfl_r(offs_t offset) { return m_card ? m_card->abcbus_xmemfl(offset) : 0xff; }
+	void xmemw_w(offs_t offset, uint8_t data) { if (m_card) m_card->abcbus_xmemw(offset, data); }
 	DECLARE_READ_LINE_MEMBER( csb_r ) { return m_card ? m_card->abcbus_csb() : 1; }
-	UINT8 ops_r() { return m_card ? m_card->abcbus_ops() : 0xff; }
-	UINT8 exp_r() { return m_card ? m_card->abcbus_exp() : 0xff; }
+	uint8_t ops_r() { return m_card ? m_card->abcbus_ops() : 0xff; }
+	uint8_t exp_r() { return m_card ? m_card->abcbus_exp() : 0xff; }
 	DECLARE_READ_LINE_MEMBER( xcsb2_r ) { return m_card ? m_card->abcbus_xcsb2() : 1; }
 	DECLARE_READ_LINE_MEMBER( xcsb3_r ) { return m_card ? m_card->abcbus_xcsb3() : 1; }
 	DECLARE_READ_LINE_MEMBER( xcsb4_r ) { return m_card ? m_card->abcbus_xcsb4() : 1; }

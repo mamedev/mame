@@ -18,7 +18,7 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<uint8_t> m_paletteram;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -29,7 +29,7 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory */
-	UINT8      m_banked_vram[0x2000];
+	uint8_t      m_banked_vram[0x2000];
 	DECLARE_WRITE8_MEMBER(funybubl_vidram_bank_w);
 	DECLARE_WRITE8_MEMBER(funybubl_cpurombank_w);
 	DECLARE_WRITE8_MEMBER(funybubl_soundcommand_w);
@@ -37,6 +37,6 @@ public:
 	DECLARE_WRITE8_MEMBER(funybubl_oki_bank_sw);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_funybubl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_funybubl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

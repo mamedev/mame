@@ -140,12 +140,12 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
 		}
 }
 
-UINT8 hp_hybrid_cpu_device::pa_r(void) const
+uint8_t hp_hybrid_cpu_device::pa_r(void) const
 {
 		return CURRENT_PA;
 }
 
-hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth)
+hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname , uint8_t addrwidth)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 			m_pa_changed_func(*this),
 			m_program_config("program", ENDIANNESS_BIG, 16, addrwidth, -1),
@@ -261,14 +261,14 @@ void hp_hybrid_cpu_device::execute_set_input(int inputnum, int state)
  *
  * @return Next opcode to be executed
  */
-UINT16 hp_hybrid_cpu_device::execute_one(UINT16 opcode)
+uint16_t hp_hybrid_cpu_device::execute_one(uint16_t opcode)
 {
 	if ((opcode & 0x7fe0) == 0x7000) {
 		// EXE
 		m_icount -= 8;
 		// Indirect addressing in EXE instruction seems to use AEC case A instead of case C
 		// (because it's an opcode fetch)
-		UINT16 reg = RM(opcode & 0x1f);
+		uint16_t reg = RM(opcode & 0x1f);
 		if (BIT(opcode , 15)) {
 			m_icount -= 6;
 			return RM(add_mae(AEC_CASE_A , reg));
@@ -288,10 +288,10 @@ UINT16 hp_hybrid_cpu_device::execute_one(UINT16 opcode)
  *
  * @return new value of P register
  */
-UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
+uint16_t hp_hybrid_cpu_device::execute_one_sub(uint16_t opcode)
 {
-				UINT32 ea;
-				UINT16 tmp;
+				uint32_t ea;
+				uint16_t tmp;
 
 				switch (opcode & 0x7800) {
 				case 0x0000:
@@ -551,11 +551,11 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 																												if (BIT(m_flags , HPHYBRID_IRH_SVC_BIT)) {
 																																BIT_CLR(m_flags , HPHYBRID_IRH_SVC_BIT);
 																																memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
-																																																																m_pa_changed_func((UINT8)CURRENT_PA);
+																																																																m_pa_changed_func((uint8_t)CURRENT_PA);
 																												} else if (BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
 																																BIT_CLR(m_flags , HPHYBRID_IRL_SVC_BIT);
 																																memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
-																																																																m_pa_changed_func((UINT8)CURRENT_PA);
+																																																																m_pa_changed_func((uint8_t)CURRENT_PA);
 																												}
 																												tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
 																												BIT_CLR(m_flags, HPHYBRID_IM_BIT);
@@ -675,26 +675,26 @@ void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
-offs_t hp_hybrid_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t hp_hybrid_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 				extern CPU_DISASSEMBLE(hp_hybrid);
 				return CPU_DISASSEMBLE_NAME(hp_hybrid)(this, buffer, pc, oprom, opram, options);
 }
 
-UINT16 hp_hybrid_cpu_device::remove_mae(UINT32 addr)
+uint16_t hp_hybrid_cpu_device::remove_mae(uint32_t addr)
 {
-		return (UINT16)(addr & 0xffff);
+		return (uint16_t)(addr & 0xffff);
 }
 
-UINT16 hp_hybrid_cpu_device::RM(aec_cases_t aec_case , UINT16 addr)
+uint16_t hp_hybrid_cpu_device::RM(aec_cases_t aec_case , uint16_t addr)
 {
 		return RM(add_mae(aec_case , addr));
 }
 
-UINT16 hp_hybrid_cpu_device::RM(UINT32 addr)
+uint16_t hp_hybrid_cpu_device::RM(uint32_t addr)
 {
-		UINT16 tmp;
-		UINT16 addr_wo_bsc = remove_mae(addr);
+		uint16_t tmp;
+		uint16_t addr_wo_bsc = remove_mae(addr);
 
 		if (addr_wo_bsc <= HP_REG_LAST_ADDR) {
 				// Any access to internal registers removes forcing of BSC 2x
@@ -759,14 +759,14 @@ UINT16 hp_hybrid_cpu_device::RM(UINT32 addr)
 		}
 }
 
-void hp_hybrid_cpu_device::WM(aec_cases_t aec_case , UINT16 addr , UINT16 v)
+void hp_hybrid_cpu_device::WM(aec_cases_t aec_case , uint16_t addr , uint16_t v)
 {
 		WM(add_mae(aec_case , addr) , v);
 }
 
-void hp_hybrid_cpu_device::WM(UINT32 addr , UINT16 v)
+void hp_hybrid_cpu_device::WM(uint32_t addr , uint16_t v)
 {
-		UINT16 addr_wo_bsc = remove_mae(addr);
+		uint16_t addr_wo_bsc = remove_mae(addr);
 
 		if (addr_wo_bsc <= HP_REG_LAST_ADDR) {
 				// Any access to internal registers removes forcing of BSC 2x
@@ -803,7 +803,7 @@ void hp_hybrid_cpu_device::WM(UINT32 addr , UINT16 v)
 
 				case HP_REG_PA_ADDR:
 						CURRENT_PA = v & HP_REG_PA_MASK;
-						m_pa_changed_func((UINT8)CURRENT_PA);
+						m_pa_changed_func((uint8_t)CURRENT_PA);
 						break;
 
 				case HP_REG_W_ADDR:
@@ -839,16 +839,16 @@ void hp_hybrid_cpu_device::WM(UINT32 addr , UINT16 v)
 		}
 }
 
-UINT16 hp_hybrid_cpu_device::fetch(void)
+uint16_t hp_hybrid_cpu_device::fetch(void)
 {
 		m_genpc = add_mae(AEC_CASE_A , m_reg_P);
 		return RM(m_genpc);
 }
 
-UINT32 hp_hybrid_cpu_device::get_ea(UINT16 opcode)
+uint32_t hp_hybrid_cpu_device::get_ea(uint16_t opcode)
 {
-		UINT16 base;
-		UINT16 off;
+		uint16_t base;
+		uint16_t off;
 		aec_cases_t aec;
 
 		if (BIT(opcode , 10)) {
@@ -878,9 +878,9 @@ UINT32 hp_hybrid_cpu_device::get_ea(UINT16 opcode)
 		}
 }
 
-void hp_hybrid_cpu_device::do_add(UINT16& addend1 , UINT16 addend2)
+void hp_hybrid_cpu_device::do_add(uint16_t& addend1 , uint16_t addend2)
 {
-				UINT32 tmp = addend1 + addend2;
+				uint32_t tmp = addend1 + addend2;
 
 				if (BIT(tmp , 16)) {
 								// Carry
@@ -892,15 +892,15 @@ void hp_hybrid_cpu_device::do_add(UINT16& addend1 , UINT16 addend2)
 								BIT_SET(m_flags , HPHYBRID_O_BIT);
 				}
 
-				addend1 = (UINT16)tmp;
+				addend1 = (uint16_t)tmp;
 }
 
-UINT16 hp_hybrid_cpu_device::get_skip_addr(UINT16 opcode , bool condition) const
+uint16_t hp_hybrid_cpu_device::get_skip_addr(uint16_t opcode , bool condition) const
 {
 				bool skip_val = BIT(opcode , 8) != 0;
 
 				if (condition == skip_val) {
-								UINT16 off = opcode & 0x1f;
+								uint16_t off = opcode & 0x1f;
 
 								if (BIT(opcode , 5)) {
 												off -= 0x20;
@@ -911,7 +911,7 @@ UINT16 hp_hybrid_cpu_device::get_skip_addr(UINT16 opcode , bool condition) const
 				}
 }
 
-UINT16 hp_hybrid_cpu_device::get_skip_addr_sc(UINT16 opcode , UINT16& v , unsigned n)
+uint16_t hp_hybrid_cpu_device::get_skip_addr_sc(uint16_t opcode , uint16_t& v , unsigned n)
 {
 				bool val = BIT(v , n);
 
@@ -926,7 +926,7 @@ UINT16 hp_hybrid_cpu_device::get_skip_addr_sc(UINT16 opcode , UINT16& v , unsign
 				return get_skip_addr(opcode , val);
 }
 
-UINT16 hp_hybrid_cpu_device::get_skip_addr_sc(UINT16 opcode , UINT32& v , unsigned n)
+uint16_t hp_hybrid_cpu_device::get_skip_addr_sc(uint16_t opcode , uint32_t& v , unsigned n)
 {
 		bool val = BIT(v , n);
 
@@ -941,12 +941,12 @@ UINT16 hp_hybrid_cpu_device::get_skip_addr_sc(UINT16 opcode , UINT32& v , unsign
 		return get_skip_addr(opcode , val);
 }
 
-void hp_hybrid_cpu_device::do_pw(UINT16 opcode)
+void hp_hybrid_cpu_device::do_pw(uint16_t opcode)
 {
-				UINT16 tmp;
-				UINT16 reg_addr = opcode & 7;
-				UINT16 *ptr_reg;
-				UINT16 b_mask;
+				uint16_t tmp;
+				uint16_t reg_addr = opcode & 7;
+				uint16_t *ptr_reg;
+				uint16_t b_mask;
 
 				if (BIT(opcode , 3)) {
 								ptr_reg = &m_reg_D;
@@ -960,11 +960,11 @@ void hp_hybrid_cpu_device::do_pw(UINT16 opcode)
 								// Withdraw
 								if (BIT(opcode , 11)) {
 												// Byte
-												UINT32 tmp_addr = (UINT32)(*ptr_reg);
+												uint32_t tmp_addr = (uint32_t)(*ptr_reg);
 												if (m_flags & b_mask) {
 																tmp_addr |= 0x10000;
 												}
-												tmp = RM(AEC_CASE_C , (UINT16)(tmp_addr >> 1));
+												tmp = RM(AEC_CASE_C , (uint16_t)(tmp_addr >> 1));
 												if (BIT(tmp_addr , 0)) {
 																tmp &= 0xff;
 												} else {
@@ -1003,7 +1003,7 @@ void hp_hybrid_cpu_device::do_pw(UINT16 opcode)
 								tmp = RM(reg_addr);
 								if (BIT(opcode , 11)) {
 												// Byte
-												UINT32 tmp_addr = (UINT32)(*ptr_reg);
+												uint32_t tmp_addr = (uint32_t)(*ptr_reg);
 												if (m_flags & b_mask) {
 																tmp_addr |= 0x10000;
 												}
@@ -1021,7 +1021,7 @@ void hp_hybrid_cpu_device::do_pw(UINT16 opcode)
 																								} else {
 																										// Extend address, preserve LSB & form byte address
 																										tmp_addr = (add_mae(AEC_CASE_C , tmp_addr >> 1) << 1) | (tmp_addr & 1);
-																										m_program->write_byte(tmp_addr , (UINT8)tmp);
+																										m_program->write_byte(tmp_addr , (uint8_t)tmp);
 																								}
 								} else {
 												// Word
@@ -1054,8 +1054,8 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 				}
 
 				// Get interrupt vector in low byte
-				UINT8 vector = (UINT8)standard_irq_callback(irqline);
-				UINT8 new_PA;
+				uint8_t vector = (uint8_t)standard_irq_callback(irqline);
+				uint8_t new_PA;
 
 				// Get highest numbered 1
 				// Don't know what happens if vector is 0, here we assume bit 7 = 1
@@ -1074,7 +1074,7 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 
 				CURRENT_PA = new_PA;
 
-								m_pa_changed_func((UINT8)CURRENT_PA);
+								m_pa_changed_func((uint8_t)CURRENT_PA);
 
 				// Is this correct? Patent @ pg 210 suggests that the whole interrupt recognition sequence
 				// lasts for 32 cycles
@@ -1098,7 +1098,7 @@ void hp_hybrid_cpu_device::handle_dma(void)
 {
 				// Patent hints at the fact that terminal count is detected by bit 15 of dmac being 1 after decrementing
 				bool tc = BIT(--m_dmac , 15) != 0;
-				UINT16 tmp;
+				uint16_t tmp;
 
 				if (BIT(m_flags , HPHYBRID_DMADIR_BIT)) {
 								// "Outward" DMA: memory -> peripheral
@@ -1115,17 +1115,17 @@ void hp_hybrid_cpu_device::handle_dma(void)
 								// Mystery solved: DMA is not automatically disabled at TC (test of 9845's graphic memory relies on this to work)
 }
 
-UINT16 hp_hybrid_cpu_device::RIO(UINT8 pa , UINT8 ic)
+uint16_t hp_hybrid_cpu_device::RIO(uint8_t pa , uint8_t ic)
 {
 				return m_io->read_word(HP_MAKE_IOADDR(pa, ic) << 1);
 }
 
-void hp_hybrid_cpu_device::WIO(UINT8 pa , UINT8 ic , UINT16 v)
+void hp_hybrid_cpu_device::WIO(uint8_t pa , uint8_t ic , uint16_t v)
 {
 				m_io->write_word(HP_MAKE_IOADDR(pa, ic) << 1 , v);
 }
 
-hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: hp_hybrid_cpu_device(mconfig, HP_5061_3001, "HP-5061-3001", tag, owner, clock, "5061-3001", 22),
 			m_boot_mode(false)
 {
@@ -1187,77 +1187,77 @@ void hp_5061_3001_cpu_device::device_reset()
 		hp_hybrid_cpu_device::device_reset();
 }
 
-UINT8 hp_5061_3001_cpu_device::do_dec_shift_r(UINT8 d1 , UINT64& mantissa)
+uint8_t hp_5061_3001_cpu_device::do_dec_shift_r(uint8_t d1 , uint64_t& mantissa)
 {
-		UINT8 d12 = (UINT8)(mantissa & 0xf);
+		uint8_t d12 = (uint8_t)(mantissa & 0xf);
 
-		mantissa = (mantissa >> 4) | ((UINT64)d1 << 44);
+		mantissa = (mantissa >> 4) | ((uint64_t)d1 << 44);
 
 		return d12;
 }
 
-UINT8 hp_5061_3001_cpu_device::do_dec_shift_l(UINT8 d12 , UINT64& mantissa)
+uint8_t hp_5061_3001_cpu_device::do_dec_shift_l(uint8_t d12 , uint64_t& mantissa)
 {
-		UINT8 d1 = (UINT8)((mantissa >> 44) & 0xf);
+		uint8_t d1 = (uint8_t)((mantissa >> 44) & 0xf);
 
-		mantissa = (mantissa << 4) | ((UINT64)d12);
+		mantissa = (mantissa << 4) | ((uint64_t)d12);
 		mantissa &= 0xffffffffffffULL;
 
 		return d1;
 }
 
-UINT64 hp_5061_3001_cpu_device::get_ar1(void)
+uint64_t hp_5061_3001_cpu_device::get_ar1(void)
 {
-		UINT32 addr;
-		UINT64 tmp;
+		uint32_t addr;
+		uint64_t tmp;
 
 		addr = add_mae(AEC_CASE_B , HP_REG_AR1_ADDR + 1);
-		tmp = (UINT64)RM(addr++);
+		tmp = (uint64_t)RM(addr++);
 		tmp <<= 16;
-		tmp |= (UINT64)RM(addr++);
+		tmp |= (uint64_t)RM(addr++);
 		tmp <<= 16;
-		tmp |= (UINT64)RM(addr);
+		tmp |= (uint64_t)RM(addr);
 
 		return tmp;
 }
 
-void hp_5061_3001_cpu_device::set_ar1(UINT64 v)
+void hp_5061_3001_cpu_device::set_ar1(uint64_t v)
 {
-		UINT32 addr;
+		uint32_t addr;
 
 		addr = add_mae(AEC_CASE_B , HP_REG_AR1_ADDR + 3);
-		WM(addr-- , (UINT16)(v & 0xffff));
+		WM(addr-- , (uint16_t)(v & 0xffff));
 		v >>= 16;
-		WM(addr-- , (UINT16)(v & 0xffff));
+		WM(addr-- , (uint16_t)(v & 0xffff));
 		v >>= 16;
-		WM(addr , (UINT16)(v & 0xffff));
+		WM(addr , (uint16_t)(v & 0xffff));
 }
 
-UINT64 hp_5061_3001_cpu_device::get_ar2(void) const
+uint64_t hp_5061_3001_cpu_device::get_ar2(void) const
 {
-		UINT64 tmp;
+		uint64_t tmp;
 
-		tmp = (UINT64)m_reg_ar2[ 1 ];
+		tmp = (uint64_t)m_reg_ar2[ 1 ];
 		tmp <<= 16;
-		tmp |= (UINT64)m_reg_ar2[ 2 ];
+		tmp |= (uint64_t)m_reg_ar2[ 2 ];
 		tmp <<= 16;
-		tmp |= (UINT64)m_reg_ar2[ 3 ];
+		tmp |= (uint64_t)m_reg_ar2[ 3 ];
 
 		return tmp;
 }
 
-void hp_5061_3001_cpu_device::set_ar2(UINT64 v)
+void hp_5061_3001_cpu_device::set_ar2(uint64_t v)
 {
-		m_reg_ar2[ 3 ] = (UINT16)(v & 0xffff);
+		m_reg_ar2[ 3 ] = (uint16_t)(v & 0xffff);
 		v >>= 16;
-		m_reg_ar2[ 2 ] = (UINT16)(v & 0xffff);
+		m_reg_ar2[ 2 ] = (uint16_t)(v & 0xffff);
 		v >>= 16;
-		m_reg_ar2[ 1 ] = (UINT16)(v & 0xffff);
+		m_reg_ar2[ 1 ] = (uint16_t)(v & 0xffff);
 }
 
-UINT64 hp_5061_3001_cpu_device::do_mrxy(UINT64 ar)
+uint64_t hp_5061_3001_cpu_device::do_mrxy(uint64_t ar)
 {
-		UINT8 n;
+		uint8_t n;
 
 		n = m_reg_B & 0xf;
 		m_reg_A &= 0xf;
@@ -1273,15 +1273,15 @@ UINT64 hp_5061_3001_cpu_device::do_mrxy(UINT64 ar)
 		return ar;
 }
 
-bool hp_5061_3001_cpu_device::do_dec_add(bool carry_in , UINT64& a , UINT64 b)
+bool hp_5061_3001_cpu_device::do_dec_add(bool carry_in , uint64_t& a , uint64_t b)
 {
-	UINT64 tmp = 0;
+	uint64_t tmp = 0;
 	unsigned i;
-	UINT8 digit_a , digit_b;
+	uint8_t digit_a , digit_b;
 
 	for (i = 0; i < 12; i++) {
-		digit_a = (UINT8)(a & 0xf);
-		digit_b = (UINT8)(b & 0xf);
+		digit_a = (uint8_t)(a & 0xf);
+		digit_b = (uint8_t)(b & 0xf);
 
 		if (carry_in) {
 			digit_a++;
@@ -1295,7 +1295,7 @@ bool hp_5061_3001_cpu_device::do_dec_add(bool carry_in , UINT64& a , UINT64 b)
 			digit_a = (digit_a - 10) & 0xf;
 		}
 
-		tmp |= (UINT64)digit_a << (4 * i);
+		tmp |= (uint64_t)digit_a << (4 * i);
 
 		a >>= 4;
 		b >>= 4;
@@ -1308,25 +1308,25 @@ bool hp_5061_3001_cpu_device::do_dec_add(bool carry_in , UINT64& a , UINT64 b)
 
 void hp_5061_3001_cpu_device::do_mpy(void)
 {
-		INT32 a = (INT16)m_reg_A;
-		INT32 b = (INT16)m_reg_B;
-		INT32 p = a * b;
+		int32_t a = (int16_t)m_reg_A;
+		int32_t b = (int16_t)m_reg_B;
+		int32_t p = a * b;
 
-		m_reg_A = (UINT16)(p & 0xffff);
-		m_reg_B = (UINT16)((p >> 16) & 0xffff);
+		m_reg_A = (uint16_t)(p & 0xffff);
+		m_reg_B = (uint16_t)((p >> 16) & 0xffff);
 
 		// Not entirely correct, timing depends on initial content of A register
 		m_icount -= 65;
 }
 
-UINT16 hp_5061_3001_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
+uint16_t hp_5061_3001_cpu_device::execute_no_bpc_ioc(uint16_t opcode)
 {
 		// EMC instructions
-		UINT8 n;
-		UINT16 tmp1;
-		UINT16 tmp2;
-		UINT64 tmp_ar;
-		UINT64 tmp_ar2;
+		uint8_t n;
+		uint16_t tmp1;
+		uint16_t tmp2;
+		uint64_t tmp_ar;
+		uint64_t tmp_ar2;
 		bool carry;
 
 		switch (opcode & 0xfff0) {
@@ -1536,15 +1536,15 @@ UINT16 hp_5061_3001_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
 		return m_reg_P + 1;
 }
 
-offs_t hp_5061_3001_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t hp_5061_3001_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 		extern CPU_DISASSEMBLE(hp_5061_3001);
 		return CPU_DISASSEMBLE_NAME(hp_5061_3001)(this, buffer, pc, oprom, opram, options);
 }
 
-UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
+uint32_t hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , uint16_t addr)
 {
-	UINT16 bsc_reg;
+	uint16_t bsc_reg;
 	bool top_half = BIT(addr , 15) != 0;
 
 	// Detect accesses to top half of base page
@@ -1603,16 +1603,16 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 		return 0;
 	}
 
-	UINT16 aec_reg = bsc_reg & BSC_REG_MASK;
+	uint16_t aec_reg = bsc_reg & BSC_REG_MASK;
 
 	if (m_forced_bsc_25) {
 		aec_reg = (aec_reg & 0xf) | 0x20;
 	}
 
-	return (UINT32)addr | ((UINT32)aec_reg << 16);
+	return (uint32_t)addr | ((uint32_t)aec_reg << 16);
 }
 
-UINT16 hp_5061_3001_cpu_device::read_non_common_reg(UINT16 addr)
+uint16_t hp_5061_3001_cpu_device::read_non_common_reg(uint16_t addr)
 {
 		switch (addr) {
 		case HP_REG_AR2_ADDR:
@@ -1646,7 +1646,7 @@ UINT16 hp_5061_3001_cpu_device::read_non_common_reg(UINT16 addr)
 		}
 }
 
-void hp_5061_3001_cpu_device::write_non_common_reg(UINT16 addr , UINT16 v)
+void hp_5061_3001_cpu_device::write_non_common_reg(uint16_t addr , uint16_t v)
 {
 		switch (addr) {
 		case HP_REG_AR2_ADDR:
@@ -1692,12 +1692,12 @@ void hp_5061_3001_cpu_device::enter_isr(void)
 	BIT_SET(m_flags, HPHYBRID_IM_BIT);
 }
 
-hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: hp_hybrid_cpu_device(mconfig, HP_5061_3011, "HP-5061-3011", tag, owner, clock, "5061-3011", 16)
 {
 }
 
-UINT16 hp_5061_3011_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
+uint16_t hp_5061_3011_cpu_device::execute_no_bpc_ioc(uint16_t opcode)
 {
 		// Unrecognized instructions: NOP
 		// Execution time is fictional
@@ -1706,19 +1706,19 @@ UINT16 hp_5061_3011_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
 		return m_reg_P + 1;
 }
 
-UINT32 hp_5061_3011_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
+uint32_t hp_5061_3011_cpu_device::add_mae(aec_cases_t aec_case , uint16_t addr)
 {
 		// No MAE on 3011
 		return addr;
 }
 
-UINT16 hp_5061_3011_cpu_device::read_non_common_reg(UINT16 addr)
+uint16_t hp_5061_3011_cpu_device::read_non_common_reg(uint16_t addr)
 {
 		// Non-existing registers are returned as 0
 		return 0;
 }
 
-void hp_5061_3011_cpu_device::write_non_common_reg(UINT16 addr , UINT16 v)
+void hp_5061_3011_cpu_device::write_non_common_reg(uint16_t addr , uint16_t v)
 {
 		// Non-existing registers are silently discarded
 }

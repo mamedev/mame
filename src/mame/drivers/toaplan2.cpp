@@ -429,7 +429,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,fixeight)
 
 DRIVER_INIT_MEMBER(toaplan2_state,fixeightbl)
 {
-	UINT8 *ROM = memregion("oki")->base();
+	uint8_t *ROM = memregion("oki")->base();
 
 	membank("bank1")->configure_entries(0, 5, &ROM[0x30000], 0x10000);
 }
@@ -443,7 +443,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,vfive)
 
 DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 {
-	UINT16 *ROM = (UINT16 *)(memregion("maincpu")->base());
+	uint16_t *ROM = (uint16_t *)(memregion("maincpu")->base());
 
 	for (int i = 0; i < (0x040000/2); i += 4)
 	{
@@ -457,7 +457,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 
 DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
 {
-	UINT8 *Z80 = memregion("audiocpu")->base();
+	uint8_t *Z80 = memregion("audiocpu")->base();
 
 	// seems to only use banks 0x0a to 0x0f
 	membank("bank1")->configure_entries(8, 8, Z80, 0x4000);
@@ -466,7 +466,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
 
 DRIVER_INIT_MEMBER(toaplan2_state,batrider)
 {
-	UINT8 *Z80 = memregion("audiocpu")->base();
+	uint8_t *Z80 = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, Z80, 0x4000);
 	m_sndirq_line = 4;
@@ -491,7 +491,7 @@ void toaplan2_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(param, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in toaplan2_state::device_timer");
+		assert_always(false, "Unknown id in toaplan2_state::device_timer");
 	}
 }
 
@@ -667,7 +667,7 @@ CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
 
 READ16_MEMBER(toaplan2_state::ghox_p1_h_analog_r)
 {
-	INT8 value, new_value;
+	int8_t value, new_value;
 
 	new_value = ioport("PAD1")->read();
 	if (new_value == m_old_p1_paddle_h) return 0;
@@ -679,7 +679,7 @@ READ16_MEMBER(toaplan2_state::ghox_p1_h_analog_r)
 
 READ16_MEMBER(toaplan2_state::ghox_p2_h_analog_r)
 {
-	INT8 value, new_value;
+	int8_t value, new_value;
 
 	new_value = ioport("PAD2")->read();
 	if (new_value == m_old_p2_paddle_h) return 0;
@@ -896,7 +896,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_z80_busreq_w)
 
 READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
 {
-	UINT8 *Z80 = memregion("audiocpu")->base();
+	uint8_t *Z80 = memregion("audiocpu")->base();
 
 	return Z80[offset];
 }
@@ -3097,7 +3097,7 @@ MACHINE_CONFIG_END
 those 3 games have been seen with the NITRO905 chip, other alias are
 ts002mach for dogyuun, ts004dash for kbash and ts007spy for vfive */
 
-static const UINT8 nitro_decryption_table[256] = {
+static const uint8_t nitro_decryption_table[256] = {
 	0x1b,0x56,0x75,0x88,0x8c,0x06,0x58,0x72, 0x83,0x86,0x36,0x1a,0x5f,0xd3,0x8c,0xe9, /* 00 */
 	/* *//* *//* *//* *//* *//* *//* *//* */ /* *//* *//* *//* *//* *//* *//* *//* */
 	0x22,0x0f,0x03,0x2a,0xeb,0x2a,0xf9,0x0f, 0xa4,0xbd,0x75,0xf3,0x4f,0x53,0x8e,0xfe, /* 10 */
@@ -3413,7 +3413,7 @@ MACHINE_CONFIG_END
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them */
 /* this one seems more different to the other tables */
-static const UINT8 ts001turbo_decryption_table[256] = {
+static const uint8_t ts001turbo_decryption_table[256] = {
 	0x90,0x05,0x57,0x5f,0xfe,0x4f,0xbd,0x36, 0x80,0x8b,0x8a,0x0a,0x89,0x90,0x47,0x80, /* 00 */
 			/*r*//*r*//*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*//*r*//*r*/     /*r*//*r*/
 	0x22,0x90,0x90,0x5d,0x81,0x3c,0xb5,0x83, 0x68,0xff,0x75,0x75,0x8d,0x5b,0x8a,0x38, /* 10 */

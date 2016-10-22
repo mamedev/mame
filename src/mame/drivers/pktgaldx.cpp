@@ -73,15 +73,15 @@ WRITE16_MEMBER(pktgaldx_state::pktgaldx_oki_bank_w)
 READ16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_r )
 {
 	int real_address = 0 + (offset *2);
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( real_address&0x7fff, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( real_address&0x7fff, mem_mask, cs );
 	return data;
 }
 
 WRITE16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_w )
 {
 	int real_address = 0 + (offset *2);
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, real_address&0x7fff, data, mem_mask, cs );
 }
 
@@ -478,7 +478,7 @@ ROM_END
 DRIVER_INIT_MEMBER(pktgaldx_state,pktgaldx)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
-	deco102_decrypt_cpu((UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x42ba, 0x00, 0x00);
+	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x42ba, 0x00, 0x00);
 }
 
 GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", MACHINE_SUPPORTS_SAVE )

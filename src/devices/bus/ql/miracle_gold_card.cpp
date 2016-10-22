@@ -50,7 +50,7 @@ const tiny_rom_entry *miracle_gold_card_t::device_rom_region() const
 //  miracle_gold_card_t - constructor
 //-------------------------------------------------
 
-miracle_gold_card_t::miracle_gold_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+miracle_gold_card_t::miracle_gold_card_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MIRACLE_GOLD_CARD, "Miracle Gold Card", tag, owner, clock, "ql_gold", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this)
 {
@@ -70,7 +70,7 @@ void miracle_gold_card_t::device_start()
 //  read -
 //-------------------------------------------------
 
-UINT8 miracle_gold_card_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t miracle_gold_card_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -80,6 +80,6 @@ UINT8 miracle_gold_card_t::read(address_space &space, offs_t offset, UINT8 data)
 //  write -
 //-------------------------------------------------
 
-void miracle_gold_card_t::write(address_space &space, offs_t offset, UINT8 data)
+void miracle_gold_card_t::write(address_space &space, offs_t offset, uint8_t data)
 {
 }

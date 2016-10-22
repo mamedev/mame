@@ -205,7 +205,7 @@ ioport_constructor mm1_keyboard_t::device_input_ports() const
 //  mm1_keyboard_t - constructor
 //-------------------------------------------------
 
-mm1_keyboard_t::mm1_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mm1_keyboard_t::mm1_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MM1_KEYBOARD, "MikroMikko 1 keyboard", tag, owner, clock, "mm1kb", __FILE__),
 	m_write_kbst(*this),
 	m_samples(*this, "keyboard_and_chassis_sounds"),
@@ -257,17 +257,17 @@ void mm1_keyboard_t::shut_down_mm1()
 void mm1_keyboard_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	// handle scan timer
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_drive < 10)
 	{
 		data = m_y[m_drive]->read();
 	}
 
-	UINT8 special = m_special->read();
+	uint8_t special = m_special->read();
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);
-	UINT8 keydata = 0xff;
+	uint8_t keydata = 0xff;
 
 	if (!BIT(data, m_sense))
 	{

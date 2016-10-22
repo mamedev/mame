@@ -24,14 +24,14 @@ class a2bus_memexp_device:
 {
 public:
 	// construction/destruction
-	a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	bool m_isramfactor;
-	UINT8 m_bankhior;
+	uint8_t m_bankhior;
 	int m_addrmask;
 
 protected:
@@ -39,28 +39,28 @@ protected:
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
-	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) override;
-	virtual UINT8 read_c800(address_space &space, UINT16 offset) override;
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
+	virtual uint8_t read_c800(address_space &space, uint16_t offset) override;
 
 private:
-	UINT8 *m_rom;
-	UINT8 m_regs[0x10];
-	UINT8 m_ram[8*1024*1024];
+	uint8_t *m_rom;
+	uint8_t m_regs[0x10];
+	uint8_t m_ram[8*1024*1024];
 	int m_wptr, m_liveptr;
 };
 
 class a2bus_memexpapple_device : public a2bus_memexp_device
 {
 public:
-	a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class a2bus_ramfactor_device : public a2bus_memexp_device
 {
 public:
-	a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };

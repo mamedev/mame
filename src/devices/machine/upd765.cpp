@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 
 int upd765_family_device::rates[4] = { 500000, 300000, 250000, 1000000 };
 
-upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source),
 	intrq_cb(*this),
 	drq_cb(*this),
@@ -273,7 +273,7 @@ void upd765_family_device::set_floppy(floppy_image_device *flop)
 
 READ8_MEMBER(upd765_family_device::sra_r)
 {
-	UINT8 sra = 0;
+	uint8_t sra = 0;
 	int fid = dor & 3;
 	floppy_info &fi = flopi[fid];
 	if(fi.dir)
@@ -307,7 +307,7 @@ READ8_MEMBER(upd765_family_device::dor_r)
 WRITE8_MEMBER(upd765_family_device::dor_w)
 {
 	if (LOG) logerror("dor = %02x\n", data);
-	UINT8 diff = dor ^ data;
+	uint8_t diff = dor ^ data;
 	dor = data;
 	if(diff & 4)
 		soft_reset();
@@ -331,7 +331,7 @@ WRITE8_MEMBER(upd765_family_device::tdr_w)
 
 READ8_MEMBER(upd765_family_device::msr_r)
 {
-	UINT32 msr = 0;
+	uint32_t msr = 0;
 	switch(main_phase) {
 	case PHASE_CMD:
 		msr |= MSR_RQM;
@@ -383,7 +383,7 @@ void upd765_family_device::set_rate(int rate)
 
 READ8_MEMBER(upd765_family_device::fifo_r)
 {
-	UINT8 r = 0xff;
+	uint8_t r = 0xff;
 	switch(main_phase) {
 	case PHASE_EXEC:
 		if(internal_drq)
@@ -441,7 +441,7 @@ WRITE8_MEMBER(upd765_family_device::fifo_w)
 	}
 }
 
-UINT8 upd765_family_device::do_dir_r()
+uint8_t upd765_family_device::do_dir_r()
 {
 	floppy_info &fi = flopi[dor & 3];
 	if(fi.dev)
@@ -498,7 +498,7 @@ void upd765_family_device::disable_transfer()
 		set_drq(false);
 }
 
-void upd765_family_device::fifo_push(UINT8 data, bool internal)
+void upd765_family_device::fifo_push(uint8_t data, bool internal)
 {
 	if(fifo_pos == 16) {
 		if(internal) {
@@ -519,7 +519,7 @@ void upd765_family_device::fifo_push(UINT8 data, bool internal)
 }
 
 
-UINT8 upd765_family_device::fifo_pop(bool internal)
+uint8_t upd765_family_device::fifo_pop(bool internal)
 {
 	if(!fifo_pos) {
 		if(internal) {
@@ -529,7 +529,7 @@ UINT8 upd765_family_device::fifo_pop(bool internal)
 		}
 		return 0;
 	}
-	UINT8 r = fifo[0];
+	uint8_t r = fifo[0];
 	fifo_pos--;
 	memmove(fifo, fifo+1, fifo_pos);
 	if(!fifo_write && !fifo_pos)
@@ -558,12 +558,12 @@ WRITE8_MEMBER(upd765_family_device::mdma_w)
 	dma_w(data);
 }
 
-UINT8 upd765_family_device::dma_r()
+uint8_t upd765_family_device::dma_r()
 {
 	return fifo_pop(false);
 }
 
-void upd765_family_device::dma_w(UINT8 data)
+void upd765_family_device::dma_w(uint8_t data)
 {
 	fifo_push(data, false);
 }
@@ -884,7 +884,7 @@ void upd765_family_device::live_run(attotime limit)
 			if(!scan_done) // TODO: handle stp, x68000 sets it to 0xff (as it would dtl)?
 			{
 				int slot = (cur_live.bit_counter >> 4)-1;
-				UINT8 data = fifo_pop(true);
+				uint8_t data = fifo_pop(true);
 				if(!slot)
 					st2 = (st2 & ~(ST2_SN)) | ST2_SH;
 
@@ -1029,7 +1029,7 @@ void upd765_family_device::live_run(attotime limit)
 					cur_live.crc = 0xcdb4;
 					live_write_mfm(0xfe);
 				} else if(cur_live.byte_counter < 20) {
-					UINT8 byte = fifo_pop(true);
+					uint8_t byte = fifo_pop(true);
 					command[12+cur_live.byte_counter-16] = byte;
 					live_write_mfm(byte);
 					if(cur_live.byte_counter == 19)
@@ -1065,7 +1065,7 @@ void upd765_family_device::live_run(attotime limit)
 					cur_live.crc = 0xffff;
 					live_write_raw(0xf57e);
 				} else if(cur_live.byte_counter < 11) {
-					UINT8 byte = fifo_pop(true);
+					uint8_t byte = fifo_pop(true);
 					command[12+cur_live.byte_counter-7] = byte;
 					live_write_fm(byte);
 					if(cur_live.byte_counter == 10)
@@ -2010,7 +2010,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 	}
 }
 
-int upd765_family_device::calc_sector_size(UINT8 size)
+int upd765_family_device::calc_sector_size(uint8_t size)
 {
 	return size > 7 ? 16384 : 128 << size;
 }
@@ -2368,17 +2368,17 @@ bool upd765_family_device::write_one_bit(const attotime &limit)
 	return false;
 }
 
-void upd765_family_device::live_write_raw(UINT16 raw)
+void upd765_family_device::live_write_raw(uint16_t raw)
 {
 	//  if (LOG) logerror("write %04x %04x\n", raw, cur_live.crc);
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = raw & 1;
 }
 
-void upd765_family_device::live_write_mfm(UINT8 mfm)
+void upd765_family_device::live_write_mfm(uint8_t mfm)
 {
 	bool context = cur_live.data_bit_context;
-	UINT16 raw = 0;
+	uint16_t raw = 0;
 	for(int i=0; i<8; i++) {
 		bool bit = mfm & (0x80 >> i);
 		if(!(bit || context))
@@ -2393,9 +2393,9 @@ void upd765_family_device::live_write_mfm(UINT8 mfm)
 	//  if (LOG) logerror("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
 }
 
-void upd765_family_device::live_write_fm(UINT8 fm)
+void upd765_family_device::live_write_fm(uint8_t fm)
 {
-	UINT16 raw = 0xaaaa;
+	uint16_t raw = 0xaaaa;
 	for(int i=0; i<8; i++)
 		if(fm & (0x80 >> i))
 			raw |= 0x4000 >> (2*i);
@@ -2418,67 +2418,67 @@ bool upd765_family_device::sector_matches() const
 		cur_live.idbuf[3] == command[5];
 }
 
-upd765a_device::upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, UPD765A, "UPD765A", tag, owner, clock, "upd765a", __FILE__)
+upd765a_device::upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, UPD765A, "UPD765A", tag, owner, clock, "upd765a", __FILE__)
 {
 	dor_reset = 0x0c;
 }
 
-upd765b_device::upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, UPD765B, "UPD765B", tag, owner, clock, "upd765b", __FILE__)
+upd765b_device::upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, UPD765B, "UPD765B", tag, owner, clock, "upd765b", __FILE__)
 {
 	dor_reset = 0x0c;
 }
 
-i8272a_device::i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, I8272A, "I8272A", tag, owner, clock, "i8272a", __FILE__)
+i8272a_device::i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, I8272A, "I8272A", tag, owner, clock, "i8272a", __FILE__)
 {
 	dor_reset = 0x0c;
 }
 
-upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, UPD72065, "UPD72065", tag, owner, clock, "upd72065", __FILE__)
+upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, UPD72065, "UPD72065", tag, owner, clock, "upd72065", __FILE__)
 {
 	dor_reset = 0x0c;
 }
 
-smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, SMC37C78, "SMC37C78", tag, owner, clock, "smc37c78", __FILE__)
+smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, SMC37C78, "SMC37C78", tag, owner, clock, "smc37c78", __FILE__)
 {
 	ready_connected = false;
 	select_connected = true;
 }
 
-n82077aa_device::n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, N82077AA, "N82077AA", tag, owner, clock, "n82077aa", __FILE__)
+n82077aa_device::n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, N82077AA, "N82077AA", tag, owner, clock, "n82077aa", __FILE__)
 {
 	ready_connected = false;
 	select_connected = true;
 }
 
-pc_fdc_superio_device::pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC FDC SUPERIO", tag, owner, clock, "pc_fdc_superio", __FILE__)
+pc_fdc_superio_device::pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC FDC SUPERIO", tag, owner, clock, "pc_fdc_superio", __FILE__)
 {
 	ready_polled = false;
 	ready_connected = false;
 	select_connected = true;
 }
 
-dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "DP8473", tag, owner, clock, "dp8473", __FILE__)
+dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "DP8473", tag, owner, clock, "dp8473", __FILE__)
 {
 	ready_polled = false;
 	ready_connected = false;
 	select_connected = true;
 }
 
-pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC8477A", tag, owner, clock, "pc8477a", __FILE__)
+pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC8477A", tag, owner, clock, "pc8477a", __FILE__)
 {
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
 }
 
-wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "WD37C65C", tag, owner, clock, "wd37c65c", __FILE__)
+wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "WD37C65C", tag, owner, clock, "wd37c65c", __FILE__)
 {
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
 }
 
-mcs3201_device::mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mcs3201_device::mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	upd765_family_device(mconfig, MCS3201, "Motorola MCS3201", tag, owner, clock, "mcs3201", __FILE__),
 	m_input_handler(*this)
 {
@@ -2499,7 +2499,7 @@ READ8_MEMBER( mcs3201_device::input_r )
 	return m_input_handler();
 }
 
-tc8566af_device::tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc8566af_device::tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd765_family_device(mconfig, TC8566AF, "TC8566AF", tag, owner, clock, "tc8566af", __FILE__)
 	, m_cr1(0)
 {

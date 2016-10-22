@@ -339,9 +339,9 @@ osd_file::error osd_file::remove(std::string const &filename)
 //  osd_get_physical_drive_geometry
 //============================================================
 
-int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UINT32 *heads, UINT32 *sectors, UINT32 *bps)
+bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
 {
-	return FALSE; // no, no way, huh-uh, forget it
+	return false; // no, no way, huh-uh, forget it
 }
 
 
@@ -474,7 +474,7 @@ const char *osd_get_volume_name(int idx)
 //  osd_is_valid_filename_char
 //============================================================
 
-bool osd_is_valid_filename_char(unicode_char uchar)
+bool osd_is_valid_filename_char(char32_t uchar)
 {
 	// The only one that's actually invalid is the slash
 	// The other two are just problematic because they're the escape character and path separator
@@ -494,7 +494,7 @@ bool osd_is_valid_filename_char(unicode_char uchar)
 //  osd_is_valid_filepath_char
 //============================================================
 
-bool osd_is_valid_filepath_char(unicode_char uchar)
+bool osd_is_valid_filepath_char(char32_t uchar)
 {
 	// One could argue that colon should be in here too because it functions as path separator
 	return uchar >= 0x20

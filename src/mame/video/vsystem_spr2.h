@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, David Haywood
 // Video System Sprites
 
-typedef device_delegate<UINT32 (UINT32)> vsystem_tile2_indirection_delegate;
+typedef device_delegate<uint32_t (uint32_t)> vsystem_tile2_indirection_delegate;
 
 #define MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( _class, _method) \
 	vsystem_spr2_device::set_tile_indirect_cb(*device, vsystem_tile2_indirection_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
@@ -18,7 +18,7 @@ typedef device_delegate<UINT32 (UINT32)> vsystem_tile2_indirection_delegate;
 class vsystem_spr2_device : public device_t
 {
 public:
-	vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 		// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -39,22 +39,22 @@ public:
 		int flipy;
 		int color;
 		int pri;
-		UINT32 map;
+		uint32_t map;
 	} curr_sprite;
 
-	int get_sprite_attributes(UINT16* ram);
+	int get_sprite_attributes(uint16_t* ram);
 	void handle_xsize_map_inc(void);
 	vsystem_tile2_indirection_delegate m_newtilecb;
-	UINT32 tile_callback_noindirect(UINT32 tile);
+	uint32_t tile_callback_noindirect(uint32_t tile);
 	int m_pritype;
 	int m_gfx_region;
 	int m_xoffs, m_yoffs;
 
 	template<class _BitmapClass>
-	void turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, _BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param );
+	void turbofrc_draw_sprites_common( uint16_t* spriteram3,  int spriteram3_bytes, int spritepalettebank, _BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param );
 
-	void turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes,  int spritepalettebank, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param );
-	void turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes,  int spritepalettebank, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param );
+	void turbofrc_draw_sprites( uint16_t* spriteram3,  int spriteram3_bytes,  int spritepalettebank, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param );
+	void turbofrc_draw_sprites( uint16_t* spriteram3,  int spriteram3_bytes,  int spritepalettebank, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param );
 
 
 

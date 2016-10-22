@@ -181,17 +181,18 @@ MAIN BOARD:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6800/m6800.h"
-#include "machine/konami1.h"
-#include "cpu/m6809/m6809.h"
-#include "sound/dac.h"
-#include "audio/trackfld.h"
-#include "audio/hyprolyb.h"
 #include "includes/trackfld.h"
 #include "includes/konamipt.h"
+#include "audio/trackfld.h"
+#include "audio/hyprolyb.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6800/m6800.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/konami1.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 #define SOUND_CLOCK           XTAL_14_31818MHz
@@ -406,7 +407,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_DEVREAD("trackfld_audio", trackfld_audio_device, trackfld_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(konami_SN76496_latch_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_WRITE(konami_SN76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP           /* watch dog ?; reaktor reads here */
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD("trackfld_audio", trackfld_audio_device, trackfld_speech_r)
 	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1c78) AM_SELECT(0x0380) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, trackfld_sound_w)
@@ -420,7 +421,7 @@ static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_DEVREAD("trackfld_audio", trackfld_audio_device, trackfld_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(konami_SN76496_latch_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_WRITE(konami_SN76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP           /* watch dog ?; reaktor reads here */
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, busy_r)
 	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_WRITENOP
@@ -927,21 +928,22 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("snsnd", SN76496, SOUND_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -985,21 +987,22 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/6/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 /* same as the original, but uses ADPCM instead of VLM5030 */
@@ -1543,7 +1546,7 @@ DRIVER_INIT_MEMBER(trackfld_state,trackfld)
 
 DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt program rom */
@@ -1554,7 +1557,7 @@ DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
 DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	machine().device<konami1_device>("maincpu")->set_encryption_boundary(0x6000);
 
@@ -1574,7 +1577,7 @@ DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 
 DRIVER_INIT_MEMBER(trackfld_state,mastkin)
 {
-	UINT8 *prom = memregion("proms")->base();
+	uint8_t *prom = memregion("proms")->base();
 	int i;
 
 	/* build a fake palette so the screen won't be all black */
@@ -1596,7 +1599,7 @@ DRIVER_INIT_MEMBER(trackfld_state,mastkin)
 
 DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
 {
-	UINT8 *ROM = memregion("maincpu")->base() + 0xe000;
+	uint8_t *ROM = memregion("maincpu")->base() + 0xe000;
 	int i;
 
 	/* decrypt program rom */

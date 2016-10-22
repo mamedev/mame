@@ -64,13 +64,13 @@ public:
 	{
 	}
 
-	std::unique_ptr<UINT32[]> m_bios_f0000_ram;
-	std::unique_ptr<UINT32[]> m_bios_e0000_ram;
-	std::unique_ptr<UINT32[]> m_bios_e4000_ram;
-	std::unique_ptr<UINT32[]> m_bios_e8000_ram;
-	std::unique_ptr<UINT32[]> m_bios_ec000_ram;
+	std::unique_ptr<uint32_t[]> m_bios_f0000_ram;
+	std::unique_ptr<uint32_t[]> m_bios_e0000_ram;
+	std::unique_ptr<uint32_t[]> m_bios_e4000_ram;
+	std::unique_ptr<uint32_t[]> m_bios_e8000_ram;
+	std::unique_ptr<uint32_t[]> m_bios_ec000_ram;
 
-	std::unique_ptr<UINT8[]> m_smram;
+	std::unique_ptr<uint8_t[]> m_smram;
 
 	required_device<s3_vga_device> m_vga;
 	required_device<voodoo_2_device> m_voodoo;
@@ -85,14 +85,14 @@ public:
 		HASPSTATE_READ
 	};
 	int m_hasp_passind;
-	UINT8 m_hasp_tmppass[0x29];
-	UINT8 m_port379;
+	uint8_t m_hasp_tmppass[0x29];
+	uint8_t m_port379;
 	int m_hasp_passmode;
 	int m_hasp_prodind;
 
-	UINT8 m_mtxc_config_reg[256];
-	UINT8 m_piix4_config_reg[8][256];
-	UINT32 m_pci_3dfx_regs[0x40];
+	uint8_t m_mtxc_config_reg[256];
+	uint8_t m_piix4_config_reg[8][256];
+	uint32_t m_pci_3dfx_regs[0x40];
 
 	DECLARE_WRITE32_MEMBER( bios_f0000_ram_w );
 	DECLARE_WRITE32_MEMBER( bios_e0000_ram_w );
@@ -122,7 +122,7 @@ public:
 
 // Intel 82439TX System Controller (MTXC)
 
-static UINT8 mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
+static uint8_t mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
 //  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
@@ -136,7 +136,7 @@ static UINT8 mtxc_config_r(device_t *busdevice, device_t *device, int function, 
 	return state->m_mtxc_config_reg[reg];
 }
 
-static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
+static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
 //  osd_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
@@ -214,12 +214,12 @@ void savquest_state::intel82439tx_init()
 	m_mtxc_config_reg[0x63] = 0x02;
 	m_mtxc_config_reg[0x64] = 0x02;
 	m_mtxc_config_reg[0x65] = 0x02;
-	m_smram = std::make_unique<UINT8[]>(0x20000);
+	m_smram = std::make_unique<uint8_t[]>(0x20000);
 }
 
-static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= mtxc_config_r(busdevice, device, function, reg + 3) << 24;
@@ -239,7 +239,7 @@ static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int func
 	return r;
 }
 
-static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -261,7 +261,7 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
 
-static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
+static uint8_t piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
 //  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
@@ -281,16 +281,16 @@ static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function,
 	return state->m_piix4_config_reg[function][reg];
 }
 
-static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
+static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
 //  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
 	state->m_piix4_config_reg[function][reg] = data;
 }
 
-static UINT32 intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
@@ -310,7 +310,7 @@ static UINT32 intel82371ab_pci_r(device_t *busdevice, device_t *device, int func
 	return r;
 }
 
-static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -339,14 +339,14 @@ void savquest_state::vid_3dfx_init()
 	m_voodoo->voodoo_set_init_enable(0x4000); //INITEN_SECONDARY_REV_ID
 }
 
-static UINT32 pci_3dfx_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t pci_3dfx_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 //osd_printf_warning("PCI read: %x\n", reg);
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
 	return state->m_pci_3dfx_regs[reg / 4];
 }
 
-static void pci_3dfx_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void pci_3dfx_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 osd_printf_warning("PCI write: %x %x\n", reg, data);
 
@@ -423,8 +423,8 @@ WRITE32_MEMBER(savquest_state::bios_ec000_ram_w)
 	#endif
 }
 
-static const UINT8 m_hasp_cmppass[] = {0xc3, 0xd9, 0xd3, 0xfb, 0x9d, 0x89, 0xb9, 0xa1, 0xb3, 0xc1, 0xf1, 0xcd, 0xdf, 0x9d}; /* 0x9d or 0x9e */
-static const UINT8 m_hasp_prodinfo[] = {0x51, 0x4c, 0x52, 0x4d, 0x53, 0x4e, 0x53, 0x4e, 0x53, 0x49, 0x53, 0x48, 0x53, 0x4b, 0x53, 0x4a,
+static const uint8_t m_hasp_cmppass[] = {0xc3, 0xd9, 0xd3, 0xfb, 0x9d, 0x89, 0xb9, 0xa1, 0xb3, 0xc1, 0xf1, 0xcd, 0xdf, 0x9d}; /* 0x9d or 0x9e */
+static const uint8_t m_hasp_prodinfo[] = {0x51, 0x4c, 0x52, 0x4d, 0x53, 0x4e, 0x53, 0x4e, 0x53, 0x49, 0x53, 0x48, 0x53, 0x4b, 0x53, 0x4a,
 										0x53, 0x43, 0x53, 0x45, 0x52, 0x46, 0x53, 0x43, 0x53, 0x41, 0xac, 0x40, 0x53, 0xbc, 0x53, 0x42,
 										0x53, 0x57, 0x53, 0x5d, 0x52, 0x5e, 0x53, 0x5b, 0x53, 0x59, 0xac, 0x58, 0x53, 0xa4
 										};
@@ -489,7 +489,7 @@ WRITE8_MEMBER(savquest_state::parallel_port_w)
 {
 	if (!offset)
 	{
-		UINT8 data8 = (UINT8) (data & 0xff);
+		uint8_t data8 = (uint8_t) (data & 0xff);
 
 		/* state machine to determine when password is about to be entered */
 
@@ -769,11 +769,11 @@ INPUT_PORTS_END
 
 void savquest_state::machine_start()
 {
-	m_bios_f0000_ram = std::make_unique<UINT32[]>(0x10000/4);
-	m_bios_e0000_ram = std::make_unique<UINT32[]>(0x4000/4);
-	m_bios_e4000_ram = std::make_unique<UINT32[]>(0x4000/4);
-	m_bios_e8000_ram = std::make_unique<UINT32[]>(0x4000/4);
-	m_bios_ec000_ram = std::make_unique<UINT32[]>(0x4000/4);
+	m_bios_f0000_ram = std::make_unique<uint32_t[]>(0x10000/4);
+	m_bios_e0000_ram = std::make_unique<uint32_t[]>(0x4000/4);
+	m_bios_e4000_ram = std::make_unique<uint32_t[]>(0x4000/4);
+	m_bios_e8000_ram = std::make_unique<uint32_t[]>(0x4000/4);
+	m_bios_ec000_ram = std::make_unique<uint32_t[]>(0x4000/4);
 
 	intel82439tx_init();
 	vid_3dfx_init();

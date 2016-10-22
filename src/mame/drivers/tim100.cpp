@@ -43,9 +43,9 @@ public:
 
 private:
 	virtual void machine_start() override;
-	UINT8 *m_charmap;
-	UINT16 m_dma_adr;
-	required_shared_ptr<UINT8> m_p_videoram;
+	uint8_t *m_charmap;
+	uint16_t m_dma_adr;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
@@ -116,8 +116,8 @@ GFXDECODE_END
 I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 pixels;
-	for (UINT8 i = 0; i < 2; i++)
+	uint8_t pixels;
+	for (uint8_t i = 0; i < 2; i++)
 	{
 		pixels = m_charmap[(i * 0x1000) | (linecount & 15) | (charcode << 4)];
 		if (vsp)

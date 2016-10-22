@@ -29,7 +29,7 @@
 **  1 - fuse blown: disconnected from input (equal to 1)
 **  0 - fuse not blown: connected to input (ie. x, not x, q, not q accordingly)
 */
-static const UINT8 fusemap[64*32]=
+static const uint8_t fusemap[64*32]=
 {
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,1,1,0,1,1,0,1,1,1,0,1,1,1,1,1,
@@ -100,8 +100,8 @@ static const UINT8 fusemap[64*32]=
 
 void bagman_state::update_pal()
 {
-UINT16 rowoffs;
-UINT8 row, column, val;
+uint16_t rowoffs;
+uint8_t row, column, val;
 
 /*calculate all rows ANDs*/
 	for (row = 0; row < 64; row++)
@@ -203,7 +203,7 @@ UINT8 row, column, val;
 
 WRITE8_MEMBER(bagman_state::pal16r6_w)
 {
-UINT8 line;
+uint8_t line;
 
 	line = offset * 4;
 	m_columnvalue[line    ] = data & 1;

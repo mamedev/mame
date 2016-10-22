@@ -47,9 +47,9 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_alpha_num_ram;
-	required_shared_ptr<UINT8> m_major_obj_ram;
-	required_shared_ptr<UINT8> m_minor_obj_ram;
+	required_shared_ptr<uint8_t> m_alpha_num_ram;
+	required_shared_ptr<uint8_t> m_major_obj_ram;
+	required_shared_ptr<uint8_t> m_minor_obj_ram;
 
 	/* video-related */
 	int            m_cursor;
@@ -75,7 +75,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(destroyr);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(dial_callback);
 	TIMER_CALLBACK_MEMBER(frame_callback);
@@ -85,7 +85,7 @@ protected:
 };
 
 
-UINT32 destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
 
@@ -163,7 +163,7 @@ void destroyr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		frame_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in destroyr_state::device_timer");
+		assert_always(false, "Unknown id in destroyr_state::device_timer");
 	}
 }
 
@@ -286,7 +286,7 @@ READ8_MEMBER(destroyr_state::input_r)
 
 	else
 	{
-		UINT8 ret = ioport("IN0")->read();
+		uint8_t ret = ioport("IN0")->read();
 
 		if (m_potsense[0] && m_potmask[0])
 			ret |= 4;
@@ -400,7 +400,7 @@ static const gfx_layout destroyr_minor_object_layout =
 	0x200     /* increment */
 };
 
-static const UINT32 destroyr_major_object_layout_xoffset[64] =
+static const uint32_t destroyr_major_object_layout_xoffset[64] =
 {
 	0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E,
 	0x10, 0x12, 0x14, 0x16, 0x18, 0x1A, 0x1C, 0x1E,
@@ -428,7 +428,7 @@ static const gfx_layout destroyr_major_object_layout =
 	nullptr
 };
 
-static const UINT32 destroyr_waves_layout_xoffset[64] =
+static const uint32_t destroyr_waves_layout_xoffset[64] =
 {
 	0x00, 0x01, 0x02, 0x03, 0x08, 0x09, 0x0A, 0x0B,
 	0x10, 0x11, 0x12, 0x13, 0x18, 0x19, 0x1A, 0x1B,

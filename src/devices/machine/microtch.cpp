@@ -17,7 +17,7 @@
 
 const device_type MICROTOUCH = &device_creator<microtouch_device>;
 
-microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MICROTOUCH, "Microtouch Touchscreen", tag, owner, clock, "microtouch", __FILE__),
 	device_serial_interface(mconfig, *this), m_rx_buffer_ptr(0), m_tx_buffer_num(0), m_tx_buffer_ptr(0), m_reset_done(0), m_format(0), m_mode(0), m_last_touch_state(0),
 	m_last_x(0), m_last_y(0),
@@ -28,7 +28,7 @@ microtouch_device::microtouch_device(const machine_config &mconfig, const char *
 {
 }
 
-int microtouch_device::check_command( const char* commandtocheck, int command_len, UINT8* command_data )
+int microtouch_device::check_command( const char* commandtocheck, int command_len, uint8_t* command_data )
 {
 	if ( (command_len == (strlen(commandtocheck) + 2)) &&
 			(command_data[0] == 0x01) &&
@@ -43,7 +43,7 @@ int microtouch_device::check_command( const char* commandtocheck, int command_le
 	}
 }
 
-void microtouch_device::send_format_table_packet(UINT8 flag, int x, int y)
+void microtouch_device::send_format_table_packet(uint8_t flag, int x, int y)
 {
 	m_tx_buffer[m_tx_buffer_num++] = flag;
 	// lower byte (7bits) of x coordinate

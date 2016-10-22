@@ -81,7 +81,7 @@ void legacy_floppy_image_device::flopimg_get_id_callback(chrn_id *id, int id_ind
 {
 	int cylinder, sector, N;
 	unsigned long flags;
-	UINT32 sector_length;
+	uint32_t sector_length;
 
 	if (!m_floppy)
 		return;
@@ -103,7 +103,7 @@ void legacy_floppy_image_device::log_readwrite(const char *name, int head, int t
 	char membuf[1024];
 	int i;
 	for (i = 0; i < length; i++)
-		sprintf(membuf + i*2, "%02x", (int) (UINT8) buf[i]);
+		sprintf(membuf + i*2, "%02x", (int) (uint8_t) buf[i]);
 	logerror("%s:  head=%i track=%i sector=%i buffer='%s'\n", name, head, track, sector, membuf);
 }
 
@@ -396,7 +396,7 @@ int legacy_floppy_image_device::floppy_drive_get_current_track()
 	return m_current_track;
 }
 
-UINT64 legacy_floppy_image_device::floppy_drive_get_current_track_size(int head)
+uint64_t legacy_floppy_image_device::floppy_drive_get_current_track_size(int head)
 {
 	int size = 0;
 	if (exists())
@@ -696,7 +696,7 @@ const device_type LEGACY_FLOPPY = &device_creator<legacy_floppy_image_device>;
 //  legacy_floppy_image_device - constructor
 //-------------------------------------------------
 
-legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LEGACY_FLOPPY, "Floppy Disk", tag, owner, clock, "legacy_floppy_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_out_idx_func(*this),
@@ -730,7 +730,7 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 	memset(&m_extension_list,0,sizeof(m_extension_list));
 }
 
-legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
 		m_out_idx_func(*this),
@@ -781,7 +781,7 @@ void legacy_floppy_image_device::device_start()
 	floppy_drive_init();
 
 	m_drive_id = floppy_get_drive(this);
-	m_active = FALSE;
+	m_active = false;
 
 	/* resolve callbacks */
 	m_out_idx_func.resolve_safe();

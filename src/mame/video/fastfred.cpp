@@ -27,7 +27,7 @@
 
 PALETTE_INIT_MEMBER(fastfred_state,fastfred)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 1000, 470, 220, 100 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -81,10 +81,10 @@ PALETTE_INIT_MEMBER(fastfred_state,fastfred)
 
 TILE_GET_INFO_MEMBER(fastfred_state::get_tile_info)
 {
-	UINT8 x = tile_index & 0x1f;
+	uint8_t x = tile_index & 0x1f;
 
-	UINT16 code = m_charbank | m_videoram[tile_index];
-	UINT8 color = m_colorbank | (m_attributesram[2 * x + 1] & 0x07);
+	uint16_t code = m_charbank | m_videoram[tile_index];
+	uint8_t color = m_colorbank | (m_attributesram[2 * x + 1] & 0x07);
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -144,7 +144,7 @@ WRITE8_MEMBER(fastfred_state::fastfred_attributes_w )
 
 WRITE8_MEMBER(fastfred_state::fastfred_charbank1_w )
 {
-	UINT16 new_data = (m_charbank & 0x0200) | ((data & 0x01) << 8);
+	uint16_t new_data = (m_charbank & 0x0200) | ((data & 0x01) << 8);
 
 	if (new_data != m_charbank)
 	{
@@ -156,7 +156,7 @@ WRITE8_MEMBER(fastfred_state::fastfred_charbank1_w )
 
 WRITE8_MEMBER(fastfred_state::fastfred_charbank2_w )
 {
-	UINT16 new_data = (m_charbank & 0x0100) | ((data & 0x01) << 9);
+	uint16_t new_data = (m_charbank & 0x0100) | ((data & 0x01) << 9);
 
 	if (new_data != m_charbank)
 	{
@@ -169,7 +169,7 @@ WRITE8_MEMBER(fastfred_state::fastfred_charbank2_w )
 
 WRITE8_MEMBER(fastfred_state::fastfred_colorbank1_w )
 {
-	UINT8 new_data = (m_colorbank & 0x10) | ((data & 0x01) << 3);
+	uint8_t new_data = (m_colorbank & 0x10) | ((data & 0x01) << 3);
 
 	if (new_data != m_colorbank)
 	{
@@ -181,7 +181,7 @@ WRITE8_MEMBER(fastfred_state::fastfred_colorbank1_w )
 
 WRITE8_MEMBER(fastfred_state::fastfred_colorbank2_w )
 {
-	UINT8 new_data = (m_colorbank & 0x08) | ((data & 0x01) << 4);
+	uint8_t new_data = (m_colorbank & 0x08) | ((data & 0x01) << 4);
 
 	if (new_data != m_colorbank)
 	{
@@ -229,7 +229,7 @@ void fastfred_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		UINT8 code,sx,sy;
+		uint8_t code,sx,sy;
 		int flipx,flipy;
 
 		sx = m_spriteram[offs + 3];
@@ -285,7 +285,7 @@ void fastfred_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 fastfred_state::screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fastfred_state::screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(*m_background_color, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
@@ -297,10 +297,10 @@ UINT32 fastfred_state::screen_update_fastfred(screen_device &screen, bitmap_ind1
 
 TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_bg)
 {
-	UINT8 x = tile_index & 0x1f;
+	uint8_t x = tile_index & 0x1f;
 
-	UINT16 code = m_charbank * 0x100 + m_videoram[tile_index];
-	UINT8 color = m_colorbank | (m_attributesram[2 * x + 1] & 0x07);
+	uint16_t code = m_charbank * 0x100 + m_videoram[tile_index];
+	uint8_t color = m_colorbank | (m_attributesram[2 * x + 1] & 0x07);
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -367,7 +367,7 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 	}
 }
 
-UINT32 fastfred_state::screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fastfred_state::screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_web_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	galaxold_draw_stars(bitmap, cliprect);

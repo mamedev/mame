@@ -197,7 +197,7 @@ WRITE32_MEMBER(ms32_state::ms32_gfxctrl_w)
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder)
+void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, uint16_t *sprram_top, size_t sprram_size, int gfxnum, int reverseorder)
 {
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
@@ -206,8 +206,8 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 	int xzoom, yzoom;
 	gfx_element *gfx = m_gfxdecode->gfx(gfxnum);
 
-	UINT16      *source =   sprram_top;
-	UINT16  *finish =   sprram_top + (sprram_size - 0x10) / 2;
+	uint16_t      *source =   sprram_top;
+	uint16_t  *finish =   sprram_top + (sprram_size - 0x10) / 2;
 
 	if (reverseorder == 1)
 	{
@@ -284,7 +284,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 
 		while (y <= maxy)
 		{
-			UINT16 *lineaddr = m_lineram + 8 * (y & 0xff);
+			uint16_t *lineaddr = m_lineram + 8 * (y & 0xff);
 
 			int start2x = (lineaddr[0x00/4] & 0xffff) | ((lineaddr[0x04/4] & 3) << 16);
 			int start2y = (lineaddr[0x08/4] & 0xffff) | ((lineaddr[0x0c/4] & 3) << 16);
@@ -349,7 +349,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 
 
 
-UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int scrollx,scrolly;
 	int asc_pri;
@@ -468,12 +468,12 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		int height = screen.height();
 		const pen_t *paldata = m_palette->pens();
 
-		UINT16* srcptr_tile;
-		UINT8* srcptr_tilepri;
-		UINT16* srcptr_spri;
-		//UINT8* srcptr_spripri;
+		uint16_t* srcptr_tile;
+		uint8_t* srcptr_tilepri;
+		uint16_t* srcptr_spri;
+		//uint8_t* srcptr_spripri;
 
-		UINT32* dstptr_bitmap;
+		uint32_t* dstptr_bitmap;
 
 		bitmap.fill(0, cliprect);
 
@@ -486,12 +486,12 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 			dstptr_bitmap  =  &bitmap.pix32(yy);
 			for (xx=0;xx<width;xx++)
 			{
-				UINT16 src_tile  = srcptr_tile[xx];
-				UINT8 src_tilepri = srcptr_tilepri[xx];
-				UINT16 src_spri = srcptr_spri[xx];
-				//UINT8 src_spripri;// = srcptr_spripri[xx];
-				UINT16 spridat = ((src_spri&0x0fff));
-				UINT8  spritepri =     ((src_spri&0xf000) >> 8);
+				uint16_t src_tile  = srcptr_tile[xx];
+				uint8_t src_tilepri = srcptr_tilepri[xx];
+				uint16_t src_spri = srcptr_spri[xx];
+				//uint8_t src_spripri;// = srcptr_spripri[xx];
+				uint16_t spridat = ((src_spri&0x0fff));
+				uint8_t  spritepri =     ((src_spri&0xf000) >> 8);
 				int primask = 0;
 
 				// get sprite priority value back out of bitmap/colour data (this is done in draw_sprite for standalone hw)

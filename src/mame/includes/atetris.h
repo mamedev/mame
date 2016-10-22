@@ -26,13 +26,13 @@ public:
 	required_device<screen_device> m_screen;
 	optional_device<atari_slapstic_device> m_slapstic_device;
 
-	required_shared_ptr<UINT8>  m_nvram;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t>  m_nvram;
+	required_shared_ptr<uint8_t> m_videoram;
 
-	UINT8 *m_slapstic_source;
-	UINT8 *m_slapstic_base;
-	UINT8 m_current_bank;
-	UINT8 m_nvram_write_enable;
+	uint8_t *m_slapstic_source;
+	uint8_t *m_slapstic_base;
+	uint8_t m_current_bank;
+	uint8_t m_nvram_write_enable;
 	emu_timer *m_interrupt_timer;
 	tilemap_t *m_bg_tilemap;
 
@@ -47,7 +47,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_gen);
 	void reset_bank();
 };

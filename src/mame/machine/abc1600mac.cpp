@@ -108,7 +108,7 @@ const tiny_rom_entry *abc1600_mac_device::device_rom_region() const
 //  abc1600_mac_device - constructor
 //-------------------------------------------------
 
-abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC1600_MAC, "ABC 1600 MAC", tag, owner, clock, "abc1600mac", __FILE__),
 	device_memory_interface(mconfig, *this),
 	m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),
@@ -202,7 +202,7 @@ offs_t abc1600_mac_device::get_segment_address(offs_t offset)
 //  get_page_address -
 //-------------------------------------------------
 
-offs_t abc1600_mac_device::get_page_address(offs_t offset, UINT8 segd)
+offs_t abc1600_mac_device::get_page_address(offs_t offset, uint8_t segd)
 {
 	return ((segd & 0x3f) << 4) | ((offset >> 11) & 0x0f);
 }
@@ -216,11 +216,11 @@ offs_t abc1600_mac_device::translate_address(offs_t offset, int *nonx, int *wp)
 {
 	// segment
 	offs_t sega = get_segment_address(offset);
-	UINT8 segd = m_segment_ram[sega];
+	uint8_t segd = m_segment_ram[sega];
 
 	// page
 	offs_t pga = get_page_address(offset, segd);
-	UINT16 page_data = m_page_ram[pga];
+	uint16_t page_data = m_page_ram[pga];
 
 	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
 
@@ -244,7 +244,7 @@ offs_t abc1600_mac_device::translate_address(offs_t offset, int *nonx, int *wp)
 //  read_user_memory -
 //-------------------------------------------------
 
-UINT8 abc1600_mac_device::read_user_memory(offs_t offset)
+uint8_t abc1600_mac_device::read_user_memory(offs_t offset)
 {
 	int nonx = 0, wp = 0;
 	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
@@ -257,7 +257,7 @@ UINT8 abc1600_mac_device::read_user_memory(offs_t offset)
 //  write_user_memory -
 //-------------------------------------------------
 
-void abc1600_mac_device::write_user_memory(offs_t offset, UINT8 data)
+void abc1600_mac_device::write_user_memory(offs_t offset, uint8_t data)
 {
 	int nonx = 0, wp = 0;
 	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
@@ -272,9 +272,9 @@ void abc1600_mac_device::write_user_memory(offs_t offset, UINT8 data)
 //  read_supervisor_memory -
 //-------------------------------------------------
 
-UINT8 abc1600_mac_device::read_supervisor_memory(address_space &space, offs_t offset)
+uint8_t abc1600_mac_device::read_supervisor_memory(address_space &space, offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!A2 && !A1)
 	{
@@ -300,7 +300,7 @@ UINT8 abc1600_mac_device::read_supervisor_memory(address_space &space, offs_t of
 //  write_supervisor_memory -
 //-------------------------------------------------
 
-void abc1600_mac_device::write_supervisor_memory(address_space &space, offs_t offset, UINT8 data)
+void abc1600_mac_device::write_supervisor_memory(address_space &space, offs_t offset, uint8_t data)
 {
 	if (!A2 && !A1)
 	{
@@ -326,7 +326,7 @@ void abc1600_mac_device::write_supervisor_memory(address_space &space, offs_t of
 
 int abc1600_mac_device::get_fc()
 {
-	UINT16 fc = m_cpu->get_fc();
+	uint16_t fc = m_cpu->get_fc();
 
 	m_ifc2 = !(!(MAGIC || FC0) || FC2);
 
@@ -342,7 +342,7 @@ READ8_MEMBER( abc1600_mac_device::read )
 {
 	int fc = get_fc();
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!BOOTE && !A19 && !A18 && !A17)
 	{
@@ -402,7 +402,7 @@ READ8_MEMBER( abc1600_mac_device::cause_r )
 
 	*/
 
-	UINT8 data = 0x02;
+	uint8_t data = 0x02;
 
 	// DMA status
 	data |= m_cause;
@@ -462,7 +462,7 @@ READ8_MEMBER( abc1600_mac_device::segment_r )
 	*/
 
 	offs_t sega = get_segment_address(offset);
-	UINT8 segd = m_segment_ram[sega];
+	uint8_t segd = m_segment_ram[sega];
 
 	return (READ_MAGIC << 7) | (segd & 0x7f);
 }
@@ -529,13 +529,13 @@ READ8_MEMBER( abc1600_mac_device::page_r )
 
 	// segment
 	offs_t sega = get_segment_address(offset);
-	UINT8 segd = m_segment_ram[sega];
+	uint8_t segd = m_segment_ram[sega];
 
 	// page
 	offs_t pga = get_page_address(offset, segd);
-	UINT16 pgd = m_page_ram[pga];
+	uint16_t pgd = m_page_ram[pga];
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (A0)
 	{
@@ -584,7 +584,7 @@ WRITE8_MEMBER( abc1600_mac_device::page_w )
 
 	// segment
 	offs_t sega = get_segment_address(offset);
-	UINT8 segd = m_segment_ram[sega];
+	uint8_t segd = m_segment_ram[sega];
 
 	// page
 	offs_t pga = get_page_address(offset, segd);
@@ -606,11 +606,11 @@ WRITE8_MEMBER( abc1600_mac_device::page_w )
 //  get_dma_address -
 //-------------------------------------------------
 
-offs_t abc1600_mac_device::get_dma_address(int index, UINT16 offset)
+offs_t abc1600_mac_device::get_dma_address(int index, uint16_t offset)
 {
 	// A0 = DMA15, A1 = BA1, A2 = BA2
-	UINT8 dmamap_addr = index | BIT(offset, 15);
-	UINT8 dmamap = m_dmamap[dmamap_addr];
+	uint8_t dmamap_addr = index | BIT(offset, 15);
+	uint8_t dmamap = m_dmamap[dmamap_addr];
 
 	m_cause = (dmamap & 0x1f) << 3;
 
@@ -622,7 +622,7 @@ offs_t abc1600_mac_device::get_dma_address(int index, UINT16 offset)
 //  dma_mreq_r - DMA memory read
 //-------------------------------------------------
 
-UINT8 abc1600_mac_device::dma_mreq_r(int index, UINT16 offset)
+uint8_t abc1600_mac_device::dma_mreq_r(int index, uint16_t offset)
 {
 	offs_t virtual_offset = get_dma_address(index, offset);
 
@@ -636,7 +636,7 @@ UINT8 abc1600_mac_device::dma_mreq_r(int index, UINT16 offset)
 //  dma_mreq_w - DMA memory write
 //-------------------------------------------------
 
-void abc1600_mac_device::dma_mreq_w(int index, UINT16 offset, UINT8 data)
+void abc1600_mac_device::dma_mreq_w(int index, uint16_t offset, uint8_t data)
 {
 	offs_t virtual_offset = get_dma_address(index, offset);
 
@@ -650,7 +650,7 @@ void abc1600_mac_device::dma_mreq_w(int index, UINT16 offset, UINT8 data)
 //  dma_iorq_r - DMA I/O read
 //-------------------------------------------------
 
-UINT8 abc1600_mac_device::dma_iorq_r(int index, UINT16 offset)
+uint8_t abc1600_mac_device::dma_iorq_r(int index, uint16_t offset)
 {
 	offs_t virtual_offset = 0x1fe000 | get_dma_address(index, offset);
 
@@ -664,7 +664,7 @@ UINT8 abc1600_mac_device::dma_iorq_r(int index, UINT16 offset)
 //  dma_iorq_w - DMA I/O write
 //-------------------------------------------------
 
-void abc1600_mac_device::dma_iorq_w(int index, UINT16 offset, UINT8 data)
+void abc1600_mac_device::dma_iorq_w(int index, uint16_t offset, uint8_t data)
 {
 	offs_t virtual_offset = 0x1fe000 | get_dma_address(index, offset);
 

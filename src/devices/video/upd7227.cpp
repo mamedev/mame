@@ -41,7 +41,7 @@ ADDRESS_MAP_END
 //  upd7227_device - constructor
 //-------------------------------------------------
 
-upd7227_device::upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7227_device::upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, UPD7227, "uPD7227", tag, owner, clock, "upd7227", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_BIG, 8, 7, 0, *ADDRESS_MAP_NAME(upd7227_map)),
@@ -106,7 +106,7 @@ const address_space_config *upd7227_device::memory_space_config(address_spacenum
 //  update_screen - update screen
 //-------------------------------------------------
 
-UINT32 upd7227_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t upd7227_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

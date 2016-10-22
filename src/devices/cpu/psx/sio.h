@@ -52,7 +52,7 @@ extern const device_type PSX_SIO1;
 class psxsio_device : public device_t
 {
 public:
-	psxsio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	psxsio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_irq_handler.set_callback(object); }
@@ -77,17 +77,17 @@ private:
 	void sio_interrupt();
 	void sio_timer_adjust();
 
-	UINT32 m_status;
-	UINT32 m_mode;
-	UINT32 m_control;
-	UINT32 m_baud;
+	uint32_t m_status;
+	uint32_t m_mode;
+	uint32_t m_control;
+	uint32_t m_baud;
 	int m_rxd;
-	UINT32 m_tx_data;
-	UINT32 m_rx_data;
-	UINT32 m_tx_shift;
-	UINT32 m_rx_shift;
-	UINT32 m_tx_bits;
-	UINT32 m_rx_bits;
+	uint32_t m_tx_data;
+	uint32_t m_rx_data;
+	uint32_t m_tx_shift;
+	uint32_t m_rx_shift;
+	uint32_t m_tx_bits;
+	uint32_t m_rx_bits;
 
 	emu_timer *m_timer;
 
@@ -101,13 +101,13 @@ private:
 class psxsio0_device : public psxsio_device
 {
 public:
-	psxsio0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psxsio0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class psxsio1_device : public psxsio_device
 {
 public:
-	psxsio1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psxsio1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 #endif

@@ -17,8 +17,8 @@
 //-------------------------------------------------
 //  GLOBAL VARIABLES
 //-------------------------------------------------
-UINT16 inifile_manager::c_cat = 0;
-UINT16 inifile_manager::c_file = 0;
+uint16_t inifile_manager::c_cat = 0;
+uint16_t inifile_manager::c_file = 0;
 
 //-------------------------------------------------
 //  ctor

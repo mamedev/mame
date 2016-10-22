@@ -30,9 +30,9 @@ TILE_GET_INFO_MEMBER(terracre_state::get_fg_tile_info)
 
 void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT8 *spritepalettebank = memregion("user1")->base();
+	const uint8_t *spritepalettebank = memregion("user1")->base();
 	gfx_element *pGfx = m_gfxdecode->gfx(2);
-	const UINT16 *pSource = m_spriteram->buffer();
+	const uint16_t *pSource = m_spriteram->buffer();
 	int flip = flip_screen();
 	int transparent_pen;
 
@@ -91,7 +91,7 @@ void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 PALETTE_INIT_MEMBER(terracre_state, terracre)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -116,7 +116,7 @@ PALETTE_INIT_MEMBER(terracre_state, terracre)
 	/* pens 0-7; the top two bits for pens 8-0x0f. */
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry;
+		uint8_t ctabentry;
 
 		if (i & 0x08)
 			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0xc0) >> 2);
@@ -133,7 +133,7 @@ PALETTE_INIT_MEMBER(terracre_state, terracre)
 	/* 8-15 (like for tiles). */
 	for (i = 0; i < 0x1000; i++)
 	{
-		UINT8 ctabentry;
+		uint8_t ctabentry;
 		int i_swapped = ((i & 0x0f) << 8) | ((i & 0xff0) >> 4);
 
 		if (i & 0x80)
@@ -190,7 +190,7 @@ void terracre_state::video_start()
 	save_item(NAME(m_yscroll));
 }
 
-UINT32 terracre_state::screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t terracre_state::screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if( m_xscroll&0x2000 )
 		bitmap.fill(m_palette->black_pen(), cliprect );

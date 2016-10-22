@@ -134,7 +134,7 @@ VIDEO_START_MEMBER(m90_state,dynablsb)
 
 void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram = m_video_data + 0xee00/2;;
+	uint16_t *spriteram = m_video_data + 0xee00/2;;
 	int offs;
 
 	for (offs = 0x1f2/2; offs >= 0; offs -= 3)
@@ -187,7 +187,7 @@ void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const r
 
 void m90_state::bomblord_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *spriteram16 = m_spriteram;
 	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
@@ -226,7 +226,7 @@ void m90_state::bomblord_draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 
 void m90_state::dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *spriteram16 = m_spriteram;
 	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
@@ -285,10 +285,10 @@ WRITE16_MEMBER(m90_state::m90_video_w)
 	markdirty(m_pf2_wide_layer,m_video_control_data[6] & 0x2,offset);
 }
 
-UINT32 m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 pf1_base = m_video_control_data[5] & 0x3;
-	UINT8 pf2_base = m_video_control_data[6] & 0x3;
+	uint8_t pf1_base = m_video_control_data[5] & 0x3;
+	uint8_t pf2_base = m_video_control_data[6] & 0x3;
 	int i,pf1_enable,pf2_enable, video_enable;
 
 	if (m_video_control_data[7]&0x04) video_enable=0; else video_enable=1;
@@ -449,7 +449,7 @@ UINT32 m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-UINT32 m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	screen.priority().fill(0, cliprect);
@@ -501,7 +501,7 @@ UINT32 m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-UINT32 m90_state::screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m90_state::screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);

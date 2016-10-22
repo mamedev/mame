@@ -346,7 +346,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	int wddone = m_dsk.wddone;      // get previous state of word-done
 	int i;
-	UINT8 s0, s1;
+	uint8_t s0, s1;
 
 	LOG((this,LOG_DISK,9,"   *** KWD timing bitclk:%d datin:%d block:%d\n", bitclk, datin, block));
 	if (0 == m_dsk.seclate)
@@ -794,7 +794,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
  * @param ptr some unused pointer
  * @param arg contains the seclate value
  */
-void alto2_cpu_device::disk_seclate(void* ptr, INT32 arg)
+void alto2_cpu_device::disk_seclate(void* ptr, int32_t arg)
 {
 	(void)ptr;
 	LOG((this,LOG_DISK,2,"   SECLATE -> %d\n", arg));
@@ -807,7 +807,7 @@ void alto2_cpu_device::disk_seclate(void* ptr, INT32 arg)
  * @param ptr some unused pointer
  * @param arg contains the ok_to_run value
  */
-void alto2_cpu_device::disk_ok_to_run(void* ptr, INT32 arg)
+void alto2_cpu_device::disk_ok_to_run(void* ptr, int32_t arg)
 {
 	(void)ptr;
 	LOG((this,LOG_DISK,2,"   OK TO RUN -> %d\n", arg));
@@ -835,7 +835,7 @@ void alto2_cpu_device::disk_ok_to_run(void* ptr, INT32 arg)
  * @param ptr some unused pointer
  * @param arg contains the drive, cylinder, and restore flag
  */
-void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
+void alto2_cpu_device::disk_strobon(void* ptr, int32_t arg)
 {
 	(void)ptr;
 	int unit = arg % 2;
@@ -849,7 +849,7 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 	dhd->set_restore(restore);
 	// This is really monoflop 52a generating a very short 0 pulse
 	for (int strobe = 0; strobe < 2; strobe++) {
-		UINT8 s0, s1;
+		uint8_t s0, s1;
 		dhd->set_strobe(strobe);    // pulse the strobe signal to the unit
 
 		int lai = dhd->get_log_addx_interlock_0();
@@ -903,7 +903,7 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 }
 
 /** @brief timer callback to change the READY monoflop 31a */
-void alto2_cpu_device::disk_ready_mf31a(void* ptr, INT32 arg)
+void alto2_cpu_device::disk_ready_mf31a(void* ptr, int32_t arg)
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	m_dsk.ready_mf31a = arg & dhd->get_ready_0();
@@ -938,7 +938,7 @@ void alto2_cpu_device::disk_block(int task)
 void alto2_cpu_device::bs_early_read_kstat()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-	UINT16 r;
+	uint16_t r;
 
 	/* KSTAT[4-7] bus is open */
 	PUT_KSTAT_DONE(m_dsk.kstat, 017);
@@ -984,7 +984,7 @@ void alto2_cpu_device::bs_early_read_kstat()
  */
 void alto2_cpu_device::bs_early_read_kdata()
 {
-	UINT16 r;
+	uint16_t r;
 	/* get the current word from the drive */
 	r = m_dsk.datain;
 	LOG((this,LOG_DISK,1,"   <-KDATA (%#o)\n", r));
@@ -1045,7 +1045,7 @@ void alto2_cpu_device::f1_late_load_kstat()
 	 * Q    Q' inverted to BUS[13] on <-KSTAT
 	 */
 	for (int i = 0; i < 2; i++) {
-		UINT8 s0, s1;
+		uint8_t s0, s1;
 		s0 = m_dsk.ff_44b;
 		s1 = i ? JKFF_CLK : JKFF_0;
 		if (!GET_KSTAT_CKSUM(m_bus))
@@ -1173,7 +1173,7 @@ void alto2_cpu_device::f1_late_increcno()
 void alto2_cpu_device::f1_late_clrstat()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-	UINT8 s0, s1;
+	uint8_t s0, s1;
 
 	/* clears the LAI clocked flip-flop 44a
 	 * JK flip-flop 44a (LAI' clocked)
@@ -1274,7 +1274,7 @@ void alto2_cpu_device::f1_late_clrstat()
  */
 void alto2_cpu_device::f1_late_load_kcom()
 {
-	UINT16 change = m_dsk.kcom ^ m_bus;
+	uint16_t change = m_dsk.kcom ^ m_bus;
 	m_dsk.kcom = m_bus;
 	LOG((this,LOG_DISK,2,"   KCOM<-; BUS %06o\n", m_dsk.kcom));
 	LOG((this,LOG_DISK,2,"       XFEROFF    : %d\n", GET_KCOM_XFEROFF(m_dsk.kcom)));
@@ -1285,7 +1285,7 @@ void alto2_cpu_device::f1_late_load_kcom()
 	if (GET_KCOM_WDINHIB(change)) {
 		// WDALLOW going 0: should asynchronously reset 43a and 53a and set 53b
 		if (m_task == task_kwd) {
-			UINT8 s0, s1;
+			uint8_t s0, s1;
 			/**
 			 * JK flip-flop 53b (word task)
 			 * <PRE>
@@ -1402,7 +1402,7 @@ void alto2_cpu_device::f1_late_load_kadr()
 void alto2_cpu_device::f2_late_init()
 {
 	// INIT = current task == KWD and WDINIT
-	UINT16 r = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
+	uint16_t r = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 	LOG((this,LOG_DISK,1,"   INIT; %sbranch (%#o | %#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 	m_dsk.wdinit0 = 0;
@@ -1432,8 +1432,8 @@ void alto2_cpu_device::f2_late_init()
  */
 void alto2_cpu_device::f2_late_rwc()
 {
-	UINT16 r;
-	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
+	uint16_t r;
+	uint16_t init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	switch (m_dsk.krwc & 3) {
 	case 0:     // read
@@ -1485,8 +1485,8 @@ void alto2_cpu_device::f2_late_rwc()
  */
 void alto2_cpu_device::f2_late_recno()
 {
-	UINT16 r = m_dsk.krecno;
-	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
+	uint16_t r = m_dsk.krecno;
+	uint16_t init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 	LOG((this,LOG_DISK,1,"   RECNO; %sbranch recno:%d (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_dsk.krecno, m_next2, r, init));
 	m_next2 |= r | init;
 	m_dsk.wdinit0 = 0;
@@ -1499,8 +1499,8 @@ void alto2_cpu_device::f2_late_recno()
  */
 void alto2_cpu_device::f2_late_xfrdat()
 {
-	UINT16 r = GET_KADR_NOXFER(m_dsk.kadr) ? 0 : 1;
-	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
+	uint16_t r = GET_KADR_NOXFER(m_dsk.kadr) ? 0 : 1;
+	uint16_t init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 	LOG((this,LOG_DISK,1,"   XFRDAT; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
 	m_dsk.wdinit0 = 0;
@@ -1514,8 +1514,8 @@ void alto2_cpu_device::f2_late_xfrdat()
 void alto2_cpu_device::f2_late_swrnrdy()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-	UINT16 r = dhd->get_seek_read_write_0();
-	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
+	uint16_t r = dhd->get_seek_read_write_0();
+	uint16_t init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	LOG((this,LOG_DISK,1,"   SWRNRDY; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
@@ -1529,8 +1529,8 @@ void alto2_cpu_device::f2_late_swrnrdy()
  */
 void alto2_cpu_device::f2_late_nfer()
 {
-	UINT16 r = m_dsk.kfer ? 0 : 1;
-	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
+	uint16_t r = m_dsk.kfer ? 0 : 1;
+	uint16_t init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	LOG((this,LOG_DISK,1,"   NFER; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
@@ -1558,8 +1558,8 @@ void alto2_cpu_device::f2_late_nfer()
  */
 void alto2_cpu_device::f2_late_strobon()
 {
-	UINT16 r = m_dsk.strobe;
-	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
+	uint16_t r = m_dsk.strobe;
+	uint16_t init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	LOG((this,LOG_DISK,2,"   STROBON; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
@@ -1572,7 +1572,7 @@ void alto2_cpu_device::f2_late_strobon()
  * @param id timer id
  * @param arg bit number
  */
-void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
+void alto2_cpu_device::disk_bitclk(void* ptr, int32_t arg)
 {
 	(void)ptr;
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];

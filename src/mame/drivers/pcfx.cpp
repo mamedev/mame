@@ -17,9 +17,9 @@
 
 struct pcfx_pad_t
 {
-	UINT8 ctrl[2];
-	UINT8 status[2];
-	UINT32 latch[2];
+	uint8_t ctrl[2];
+	uint8_t status[2];
+	uint32_t latch[2];
 };
 
 class pcfx_state : public driver_device
@@ -40,12 +40,12 @@ public:
 
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Interrupt controller (component unknown)
-	UINT16 m_irq_mask;
-	UINT16 m_irq_pending;
-	UINT8 m_irq_priority[8];
+	uint16_t m_irq_mask;
+	uint16_t m_irq_pending;
+	uint8_t m_irq_priority[8];
 
 	pcfx_pad_t m_pad;
 
@@ -98,8 +98,8 @@ ADDRESS_MAP_END
 
 READ16_MEMBER( pcfx_state::pad_r )
 {
-	UINT16 res;
-	UINT8 port_type = ((offset<<1) & 0x80) >> 7;
+	uint16_t res;
+	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
 
 	if(((offset<<1) & 0x40) == 0)
 	{
@@ -135,7 +135,7 @@ void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		pad_func(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pcfx_state::device_timer");
+		assert_always(false, "Unknown id in pcfx_state::device_timer");
 	}
 }
 
@@ -152,7 +152,7 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 
 WRITE16_MEMBER( pcfx_state::pad_w )
 {
-	UINT8 port_type = ((offset<<1) & 0x80) >> 7;
+	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
 
 	if(((offset<<1) & 0x40) == 0)
 	{
@@ -292,7 +292,7 @@ INPUT_PORTS_END
 
 READ16_MEMBER( pcfx_state::irq_read )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	switch( offset )
 	{
@@ -377,7 +377,7 @@ WRITE16_MEMBER( pcfx_state::irq_write )
 
 inline void pcfx_state::check_irqs()
 {
-	UINT16 active_irqs = m_irq_pending & ~m_irq_mask;
+	uint16_t active_irqs = m_irq_pending & ~m_irq_mask;
 	int highest_prio = -1;
 
 	for (auto & elem : m_irq_priority)
@@ -468,7 +468,7 @@ void pcfx_state::machine_reset()
 }
 
 
-UINT32 pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_huc6261->video_update( bitmap, cliprect );
 	return 0;

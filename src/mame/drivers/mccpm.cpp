@@ -75,8 +75,8 @@ public:
 	DECLARE_READ8_MEMBER(mccpm_f0_r);
 	DECLARE_READ8_MEMBER(mccpm_f1_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	required_shared_ptr<UINT8> m_p_ram;
-	UINT8 m_term_data;
+	required_shared_ptr<uint8_t> m_p_ram;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
@@ -84,7 +84,7 @@ public:
 
 READ8_MEMBER( mccpm_state::mccpm_f0_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -115,7 +115,7 @@ INPUT_PORTS_END
 
 void mccpm_state::machine_reset()
 {
-	UINT8* bios = memregion("maincpu")->base();
+	uint8_t* bios = memregion("maincpu")->base();
 	memcpy(m_p_ram, bios, 0x1000);
 }
 

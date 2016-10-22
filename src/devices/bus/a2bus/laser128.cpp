@@ -42,14 +42,14 @@ machine_config_constructor a2bus_laser128_device::device_mconfig_additions() con
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_slot7_bank(0), m_slot7_ram_bank(0)
 
 {
 }
 
-a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_LASER128, "VTech Laser 128 Internal Device", tag, owner, clock, "a2laser128", __FILE__),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_slot7_bank(0), m_slot7_ram_bank(0)
 {
@@ -75,21 +75,21 @@ void a2bus_laser128_device::device_reset()
 	m_slot7_ram_bank = 0;
 }
 
-UINT8 a2bus_laser128_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_laser128_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	return 0x00;
 }
 
-void a2bus_laser128_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_laser128_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 }
 
-UINT8 a2bus_laser128_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_laser128_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	return m_rom[offset + (m_slot * 0x100) + 0x4000];
 }
 
-UINT8 a2bus_laser128_device::read_c800(address_space &space, UINT16 offset)
+uint8_t a2bus_laser128_device::read_c800(address_space &space, uint16_t offset)
 {
 	switch (m_slot)
 	{
@@ -116,7 +116,7 @@ UINT8 a2bus_laser128_device::read_c800(address_space &space, UINT16 offset)
 	return 0xff;
 }
 
-void a2bus_laser128_device::write_c800(address_space &space, UINT16 offset, UINT8 data)
+void a2bus_laser128_device::write_c800(address_space &space, uint16_t offset, uint8_t data)
 {
 	if ((m_slot == 7) && (offset < 0x400))
 	{

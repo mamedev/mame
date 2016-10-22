@@ -16,9 +16,9 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_scrollram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_scrollram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* misc */
 	int m_sound_pending;
@@ -28,16 +28,16 @@ public:
 	int m_sound_result;
 
 	/* mcu */
-	UINT8 m_from_main;
-	UINT8 m_from_mcu;
+	uint8_t m_from_main;
+	uint8_t m_from_mcu;
 	int m_mcu_sent;
 	int m_main_sent;
-	UINT8 m_port_a_in;
-	UINT8 m_port_a_out;
-	UINT8 m_ddr_a;
-	UINT8 m_port_b_in;
-	UINT8 m_port_b_out;
-	UINT8 m_ddr_b;
+	uint8_t m_port_a_in;
+	uint8_t m_port_a_out;
+	uint8_t m_ddr_a;
+	uint8_t m_port_b_in;
+	uint8_t m_port_b_out;
+	uint8_t m_ddr_b;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -69,10 +69,10 @@ public:
 	DECLARE_WRITE8_MEMBER(unk);
 	DECLARE_MACHINE_START(lsasquad);
 	DECLARE_MACHINE_RESET(lsasquad);
-	UINT32 screen_update_lsasquad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_daikaiju(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lsasquad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_daikaiju(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
-	void draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *scrollram );
+	void draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *scrollram );
 	int draw_layer_daikaiju( bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int  * previd, int type );
 	void drawbg( bitmap_ind16 &bitmap, const rectangle &cliprect, int type );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

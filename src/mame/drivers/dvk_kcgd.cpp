@@ -66,7 +66,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	DECLARE_PALETTE_INIT(kcgd);
 
@@ -96,17 +96,17 @@ public:
 	emu_timer *m_500hz_timer;
 
 private:
-	void draw_scanline(UINT16 *p, UINT16 offset);
+	void draw_scanline(uint16_t *p, uint16_t offset);
 	rectangle m_tmpclip;
 	bitmap_ind16 m_tmpbmp;
 
 	struct {
-		UINT16 status;  // 167770
-		UINT8 control;  // 167772
+		uint16_t status;  // 167770
+		uint8_t control;  // 167772
 		int palette_index, vram_addr;
-		UINT8 palette[16];
+		uint8_t palette[16];
 	} m_video;
-	std::unique_ptr<UINT32[]> m_videoram;
+	std::unique_ptr<uint32_t[]> m_videoram;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -157,7 +157,7 @@ void kcgd_state::video_start()
 //  screen_device *screen = machine().device<screen_device>("screen");
 
 	// 64 kwords, word size is 17 bits
-	m_videoram = std::make_unique<UINT32[]>(65536);
+	m_videoram = std::make_unique<uint32_t[]>(65536);
 
 	m_tmpclip = rectangle(0, KCGD_DISP_HORZ-1, 0, KCGD_DISP_VERT-1);
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);
@@ -206,7 +206,7 @@ READ16_MEMBER(kcgd_state::vram_data_r)
 {
 	DBG_LOG(2,"VRAM R2", ("%06o\n", m_video.vram_addr));
 	m_video.status = (m_video.status & 0xff7f) | (BIT(m_videoram[m_video.vram_addr], 16) << 7);
-	return (UINT16) (m_videoram[m_video.vram_addr] & 0xffff);
+	return (uint16_t) (m_videoram[m_video.vram_addr] & 0xffff);
 }
 
 WRITE16_MEMBER(kcgd_state::vram_mmap_w)
@@ -218,7 +218,7 @@ WRITE16_MEMBER(kcgd_state::vram_mmap_w)
 READ16_MEMBER(kcgd_state::vram_mmap_r)
 {
 	DBG_LOG(3,"VRAM R1", ("%06o\n", offset));
-	return (UINT16) (m_videoram[offset] & 0xffff);
+	return (uint16_t) (m_videoram[offset] & 0xffff);
 }
 
 WRITE16_MEMBER(kcgd_state::status_w)
@@ -230,7 +230,7 @@ WRITE16_MEMBER(kcgd_state::status_w)
 
 READ16_MEMBER(kcgd_state::status_r)
 {
-	UINT16 data = m_video.status ^ (BIT(m_video.control, 6) << 7);
+	uint16_t data = m_video.status ^ (BIT(m_video.control, 6) << 7);
 	DBG_LOG(1,"Status R", ("data %04X index %d\n", data, m_video.palette_index));
 	return data;
 }
@@ -270,13 +270,13 @@ READ8_MEMBER(kcgd_state::palette_data_r)
     host writes it separately (via bit 7 in 167772).
 */
 
-void kcgd_state::draw_scanline(UINT16 *p, UINT16 offset)
+void kcgd_state::draw_scanline(uint16_t *p, uint16_t offset)
 {
 	int i;
 
 	for ( i = 0; i < 100; i++ )
 	{
-		UINT32 data = m_videoram[ offset++ ];
+		uint32_t data = m_videoram[ offset++ ];
 		if (BIT(data, 16)) {
 			*p = ( data >> 12) & 0x0F; p++;
 			*p = ( data >> 12) & 0x0F; p++;
@@ -301,7 +301,7 @@ void kcgd_state::draw_scanline(UINT16 *p, UINT16 offset)
 
 TIMER_DEVICE_CALLBACK_MEMBER(kcgd_state::scanline_callback)
 {
-	UINT16 y = m_screen->vpos(), offset;
+	uint16_t y = m_screen->vpos(), offset;
 
 	if (y < KCGD_VERT_START) return;
 	y -= KCGD_VERT_START;
@@ -316,7 +316,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kcgd_state::scanline_callback)
 	draw_scanline(&m_tmpbmp.pix16(y), m_videoram[offset + (KCGD_DISP_VERT-1) - y]);
 }
 
-UINT32 kcgd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kcgd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_tmpbmp, 0, 0, KCGD_HORZ_START, KCGD_VERT_START, cliprect);
 	return 0;

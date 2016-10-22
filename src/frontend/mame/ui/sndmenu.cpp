@@ -78,7 +78,7 @@ void menu_sound_options::handle()
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((FPTR)menu_event->itemref)
+		switch ((uintptr_t)menu_event->itemref)
 		{
 		case ENABLE_SOUND:
 			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
@@ -126,13 +126,13 @@ void menu_sound_options::handle()
 
 void menu_sound_options::populate()
 {
-	UINT32 arrow_flags = get_arrow_flags(UINT16(0), UINT16(ARRAY_LENGTH(m_sound_rate) - 1), m_cur_rates);
+	uint32_t arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(ARRAY_LENGTH(m_sound_rate) - 1), m_cur_rates);
 	m_sample_rate = m_sound_rate[m_cur_rates];
 
 	// add options items
-	item_append(_("Sound"), m_sound ? _("On") : _("Off"), m_sound ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SOUND);
-	item_append(_("Sample Rate"), string_format("%d", m_sample_rate), arrow_flags, (void *)(FPTR)SAMPLE_RATE);
-	item_append(_("Use External Samples"), m_samples ? _("On") : _("Off"), m_samples ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SAMPLES);
+	item_append(_("Sound"), m_sound ? _("On") : _("Off"), m_sound ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)ENABLE_SOUND);
+	item_append(_("Sample Rate"), string_format("%d", m_sample_rate), arrow_flags, (void *)(uintptr_t)SAMPLE_RATE);
+	item_append(_("Use External Samples"), m_samples ? _("On") : _("Off"), m_samples ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)ENABLE_SAMPLES);
 	item_append(menu_item_type::SEPARATOR);
 
 	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);

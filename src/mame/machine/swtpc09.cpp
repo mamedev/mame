@@ -150,8 +150,8 @@ WRITE8_MEMBER ( swtpc09_state::dmf2_control_reg_w )
 /* FDC controller dma transfer */
 void swtpc09_state::swtpc09_fdc_dma_transfer()
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	UINT32 offset;
+	uint8_t *RAM = memregion("maincpu")->base();
+	uint32_t offset;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	offset = (m_fdc_dma_address_reg & 0x0f)<<16;
@@ -160,14 +160,14 @@ void swtpc09_state::swtpc09_fdc_dma_transfer()
 	{
 		if (!(m_m6844_channel[0].control & 0x01))  // dma write to memory
 		{
-			UINT8 data = m_fdc->data_r(space, 0);
+			uint8_t data = m_fdc->data_r(space, 0);
 
 			LOG(("swtpc09_dma_write_mem %05X %02X\n", m_m6844_channel[0].address + offset, data));
 			RAM[m_m6844_channel[0].address + offset] = data;
 		}
 		else
 		{
-			UINT8 data = RAM[m_m6844_channel[0].address + offset];
+			uint8_t data = RAM[m_m6844_channel[0].address + offset];
 
 			m_fdc->data_w(space, 0, data);
 			//LOG(("swtpc09_dma_read_mem %04X %02X\n", m_m6844_channel[0].address, data));
@@ -190,7 +190,7 @@ void swtpc09_state::swtpc09_fdc_dma_transfer()
 }
 
 /* common interrupt handler */
-void swtpc09_state::swtpc09_irq_handler(UINT8 peripheral, UINT8 state)
+void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 {
 	LOG(("swtpc09_irq_handler peripheral:%02X state:%02X\n", peripheral, state));
 
@@ -208,14 +208,14 @@ void swtpc09_state::swtpc09_irq_handler(UINT8 peripheral, UINT8 state)
 	if (!m_active_interrupt && m_interrupt)    //no active interrupt and it needs to be asserted
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_active_interrupt=TRUE;
+		m_active_interrupt=true;
 		LOG(("swtpc09_irq_assert %02X\n", peripheral));
 	}
 	else if (m_active_interrupt && !m_interrupt)  //active interrupt and it needs to be cleared
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 		LOG(("swtpc09_irq_clear %02X\n", peripheral));
-		m_active_interrupt=FALSE;
+		m_active_interrupt=false;
 	}
 }
 
@@ -455,9 +455,9 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 
 WRITE8_MEMBER(swtpc09_state::dat_w)
 {
-	UINT8 a16_to_a19, a12_to_a15;
-	UINT8 *RAM = memregion("maincpu")->base();
-	UINT32 physical_address, logical_address;
+	uint8_t a16_to_a19, a12_to_a15;
+	uint8_t *RAM = memregion("maincpu")->base();
+	uint32_t physical_address, logical_address;
 
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
@@ -581,7 +581,7 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 
 READ8_MEMBER( swtpc09_state::m6844_r )
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 
 	/* switch off the offset we were given */
@@ -779,7 +779,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
 	m_fdc_status = 0;    // for floppy controller
 	m_system_type = FLEX_DMF2;
 	m_interrupt = 0;
-	m_active_interrupt = FALSE;
+	m_active_interrupt = false;
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
@@ -801,7 +801,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09i )
 	m_fdc_status = 0;    // for floppy controller
 	m_system_type = FLEX_DC4_PIAIDE;
 	m_interrupt = 0;
-	m_active_interrupt = FALSE;
+	m_active_interrupt = false;
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
@@ -823,7 +823,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09u )
 	m_fdc_status = 0;    // for floppy controller
 	m_system_type = UNIFLEX_DMF2;
 	m_interrupt = 0;
-	m_active_interrupt = FALSE;
+	m_active_interrupt = false;
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
@@ -846,7 +846,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09d3 )
 	m_via_ca1_input = 0;
 	m_system_type = UNIFLEX_DMF3;
 	m_interrupt = 0;
-	m_active_interrupt = FALSE;
+	m_active_interrupt = false;
 
 
 	/* reset the 6844 */

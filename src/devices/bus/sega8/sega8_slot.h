@@ -55,8 +55,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
-	void ram_alloc(UINT32 size);
+	void rom_alloc(uint32_t size, const char *tag);
+	void ram_alloc(uint32_t size);
 
 	virtual void late_bank_setup() {}
 
@@ -69,18 +69,18 @@ public:
 	int get_sms_mode() { return m_sms_mode; }
 
 //protected:
-	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_ram_base() { return &m_ram[0]; }
-	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_ram_size() { return m_ram.size(); }
+	uint8_t* get_rom_base() { return m_rom; }
+	uint8_t* get_ram_base() { return &m_ram[0]; }
+	uint32_t get_rom_size() { return m_rom_size; }
+	uint32_t get_ram_size() { return m_ram.size(); }
 
 	void save_ram() { device().save_item(NAME(m_ram)); }
 
 //private:
 	// internal state
-	UINT8 *m_rom;
-	UINT32 m_rom_size;
-	dynamic_buffer m_ram;
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
+	std::vector<uint8_t> m_ram;
 	int m_rom_page_count;
 
 	bool has_battery;
@@ -102,8 +102,8 @@ class sega8_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_card, const char *shortname, const char *source);
-	sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, bool is_card, const char *shortname, const char *source);
+	sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~sega8_cart_slot_device();
 
 	// device-level overrides
@@ -116,12 +116,12 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
-	int get_cart_type(UINT8 *ROM, UINT32 len);
+	int get_cart_type(uint8_t *ROM, uint32_t len);
 
 	void setup_ram();
-	void internal_header_logging(UINT8 *ROM, UINT32 len, UINT32 nvram_len);
-	image_verify_result verify_cart(UINT8 *magic, int size);
-	void set_lphaser_xoffset(UINT8 *rom, int size);
+	void internal_header_logging(uint8_t *ROM, uint32_t len, uint32_t nvram_len);
+	image_verify_result verify_cart(uint8_t *magic, int size);
+	void set_lphaser_xoffset(uint8_t *rom, int size);
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
@@ -163,7 +163,7 @@ class sega8_card_slot_device : public sega8_cart_slot_device
 {
 public:
 	// construction/destruction
-	sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_config_complete() override { update_names(SEGA8_CARD_SLOT, "card", "card"); }
 };
@@ -179,42 +179,42 @@ public:
 #define MCFG_SG1000_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(TRUE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(true); \
 	static_cast<sega8_cart_slot_device *>(device)->set_intf("sg1000_cart"); \
 	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sg");
 
 #define MCFG_OMV_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(FALSE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(false); \
 	static_cast<sega8_cart_slot_device *>(device)->set_intf("sg1000_cart"); \
 	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sg");
 
 #define MCFG_SC3000_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(TRUE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(true); \
 	static_cast<sega8_cart_slot_device *>(device)->set_intf("sg1000_cart"); \
 	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sg,sc");
 
 #define MCFG_SG1000MK3_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(FALSE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(false); \
 	static_cast<sega8_cart_slot_device *>(device)->set_intf("sms_cart,sg1000_cart"); \
 	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sms,sg");
 
 #define MCFG_SMS_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(FALSE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(false); \
 	static_cast<sega8_cart_slot_device *>(device)->set_intf("sms_cart"); \
 	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sms");
 
 #define MCFG_GG_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(TRUE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(true); \
 	static_cast<sega8_cart_slot_device *>(device)->set_intf("gamegear_cart"); \
 	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,gg");
 
@@ -223,7 +223,7 @@ public:
 #define MCFG_SMS_CARD_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CARD_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_card_slot_device *>(device)->set_mandatory(FALSE); \
+	static_cast<sega8_card_slot_device *>(device)->set_mandatory(false); \
 	static_cast<sega8_card_slot_device *>(device)->set_intf("sms_card"); \
 	static_cast<sega8_card_slot_device *>(device)->set_ext("bin");
 #define MCFG_SG1000_CARD_ADD(_tag,_slot_intf,_def_slot) \

@@ -92,7 +92,7 @@ Notes:
   a bug. The service mode functionality is very limited anyway. To get past the
   failed ROM test and see the service mode, use this ROM patch:
 
-    UINT8 *mem = machine.root_device().memregion("maincpu")->base();
+    uint8_t *mem = machine.root_device().memregion("maincpu")->base();
     mem[0x3a5d] = mem[0x3a5e] = mem[0x3a5f] = 0;
 
 - The "SNK Wave" custom sound circuitry is only actually used by marvins and
@@ -567,7 +567,7 @@ WRITE8_MEMBER(snk_state::hardflags_scroll_msb_w)
 
 int snk_state::hardflags_check(int num)
 {
-	const UINT8 *sr = &m_spriteram[0x800 + 4*num];
+	const uint8_t *sr = &m_spriteram[0x800 + 4*num];
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
@@ -659,7 +659,7 @@ WRITE8_MEMBER(snk_state::turbocheck_msb_w)
 
 int snk_state::turbofront_check(int small, int num)
 {
-	const UINT8 *sr = &m_spriteram[0x800*small + 4*num];
+	const uint8_t *sr = &m_spriteram[0x800*small + 4*num];
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
@@ -719,7 +719,7 @@ hand, always returning 0xf inbetween valid values confuses the game.
 CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 {
 	static const char *const ports[] = { "P1ROT", "P2ROT" };
-	int which = (int)(FPTR)param;
+	int which = (int)(uintptr_t)param;
 	int value = ioport(ports[which])->read();
 
 	if ((m_last_value[which] == 0x5 && value == 0x6) || (m_last_value[which] == 0x6 && value == 0x5))
@@ -795,7 +795,7 @@ CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 
 CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{

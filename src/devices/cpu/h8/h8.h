@@ -61,7 +61,7 @@ public:
 		STATE_DTC_WRITEBACK      = 0x10006
 	};
 
-	h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate);
+	h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate);
 
 	void internal_update();
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
@@ -74,8 +74,8 @@ public:
 protected:
 	struct disasm_entry {
 		int slot;
-		UINT32 val, mask;
-		UINT16 val0, mask0;
+		uint32_t val, mask;
+		uint16_t val0, mask0;
 		const char *opcode;
 		int am1, am2;
 		offs_t flags;
@@ -159,9 +159,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -173,9 +173,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	address_space_config program_config, io_config;
 	address_space *program, *io;
@@ -185,18 +185,18 @@ protected:
 	h8_dma_state *current_dma;
 	h8_dtc_state *current_dtc;
 
-	UINT32  PPC;                    /* previous program counter */
-	UINT32  NPC;                    /* next start-of-instruction program counter */
-	UINT32  PC;                     /* program counter */
-	UINT16  PIR;                    /* Prefetched word */
-	UINT16  IR[5];                  /* Fetched instruction */
-	UINT16  R[16];                  /* Rn (0-7), En (8-15, h8-300h+) */
-	UINT8   EXR;                    /* Interrupt/trace register (h8s/2000+) */
-	UINT8   CCR;                    /* Condition-code register */
-	INT64   MAC;                    /* Multiply accumulator (h8s/2600+) */
-	UINT8   MACF;                   /* MAC flags (h8s/2600+) */
-	UINT32  TMP1, TMP2;
-	UINT32  TMPR;                   /* For debugger ER register import */
+	uint32_t  PPC;                    /* previous program counter */
+	uint32_t  NPC;                    /* next start-of-instruction program counter */
+	uint32_t  PC;                     /* program counter */
+	uint16_t  PIR;                    /* Prefetched word */
+	uint16_t  IR[5];                  /* Fetched instruction */
+	uint16_t  R[16];                  /* Rn (0-7), En (8-15, h8-300h+) */
+	uint8_t   EXR;                    /* Interrupt/trace register (h8s/2000+) */
+	uint8_t   CCR;                    /* Condition-code register */
+	int64_t   MAC;                    /* Multiply accumulator (h8s/2600+) */
+	uint8_t   MACF;                   /* MAC flags (h8s/2600+) */
+	uint32_t  TMP1, TMP2;
+	uint32_t  TMPR;                   /* For debugger ER register import */
 
 	bool has_exr, has_trace, supports_advanced, mode_advanced, mac_saturating;
 
@@ -208,137 +208,137 @@ protected:
 
 	static const disasm_entry disasm_entries[];
 
-	offs_t disassemble_generic(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options, const disasm_entry *table);
-	void disassemble_am(char *&buffer, int am, offs_t pc, const UINT8 *oprom, UINT32 opcode, int slot, int offset);
+	offs_t disassemble_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table);
+	void disassemble_am(char *&buffer, int am, offs_t pc, const uint8_t *oprom, uint32_t opcode, int slot, int offset);
 
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
-	static void add_event(UINT64 &event_time, UINT64 new_event);
+	static void add_event(uint64_t &event_time, uint64_t new_event);
 	virtual bool exr_in_stack() const;
 	virtual void update_irq_filter() = 0;
 	virtual void interrupt_taken() = 0;
-	virtual void internal_update(UINT64 current_time) = 0;
-	void recompute_bcount(UINT64 event_time);
+	virtual void internal_update(uint64_t current_time) = 0;
+	void recompute_bcount(uint64_t event_time);
 	virtual int trace_setup();
 	virtual int trapa_setup();
 	virtual void irq_setup() = 0;
 
-	UINT16 read16i(UINT32 adr);
-	UINT16 fetch();
+	uint16_t read16i(uint32_t adr);
+	uint16_t fetch();
 	inline void fetch(int slot) { IR[slot] = fetch(); }
-	UINT8 read8(UINT32 adr);
-	void write8(UINT32 adr, UINT8 data);
-	UINT16 read16(UINT32 adr);
-	void write16(UINT32 adr, UINT16 data);
+	uint8_t read8(uint32_t adr);
+	void write8(uint32_t adr, uint8_t data);
+	uint16_t read16(uint32_t adr);
+	void write16(uint32_t adr, uint16_t data);
 	void internal(int cycles);
 	inline void prefetch() { prefetch_start(); prefetch_done(); }
 	inline void prefetch_noirq() { prefetch_start(); prefetch_done_noirq(); }
 	inline void prefetch_noirq_notrace() { prefetch_start(); prefetch_done_noirq_notrace(); }
 	void prefetch_start() { NPC = PC; PIR = fetch(); }
-	void prefetch_switch(UINT32 pc, UINT16 ir) { NPC = pc; PC = pc+2; PIR = ir; }
+	void prefetch_switch(uint32_t pc, uint16_t ir) { NPC = pc; PC = pc+2; PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();
 	void prefetch_done_noirq_notrace();
 	void illegal();
 
-	UINT8 do_addx8(UINT8 a, UINT8 b);
-	UINT8 do_subx8(UINT8 a, UINT8 b);
+	uint8_t do_addx8(uint8_t a, uint8_t b);
+	uint8_t do_subx8(uint8_t a, uint8_t b);
 
-	UINT8 do_inc8(UINT8 a, UINT8 b);
-	UINT16 do_inc16(UINT16 a, UINT16 b);
-	UINT32 do_inc32(UINT32 a, UINT32 b);
+	uint8_t do_inc8(uint8_t a, uint8_t b);
+	uint16_t do_inc16(uint16_t a, uint16_t b);
+	uint32_t do_inc32(uint32_t a, uint32_t b);
 
-	UINT8 do_add8(UINT8 a, UINT8 b);
-	UINT16 do_add16(UINT16 a, UINT16 b);
-	UINT32 do_add32(UINT32 a, UINT32 b);
+	uint8_t do_add8(uint8_t a, uint8_t b);
+	uint16_t do_add16(uint16_t a, uint16_t b);
+	uint32_t do_add32(uint32_t a, uint32_t b);
 
-	UINT8 do_dec8(UINT8 a, UINT8 b);
-	UINT16 do_dec16(UINT16 a, UINT16 b);
-	UINT32 do_dec32(UINT32 a, UINT32 b);
+	uint8_t do_dec8(uint8_t a, uint8_t b);
+	uint16_t do_dec16(uint16_t a, uint16_t b);
+	uint32_t do_dec32(uint32_t a, uint32_t b);
 
-	UINT8 do_sub8(UINT8 a, UINT8 b);
-	UINT16 do_sub16(UINT16 a, UINT16 b);
-	UINT32 do_sub32(UINT32 a, UINT32 b);
+	uint8_t do_sub8(uint8_t a, uint8_t b);
+	uint16_t do_sub16(uint16_t a, uint16_t b);
+	uint32_t do_sub32(uint32_t a, uint32_t b);
 
-	UINT8 do_shal8(UINT8 v);
-	UINT16 do_shal16(UINT16 v);
-	UINT32 do_shal32(UINT32 v);
+	uint8_t do_shal8(uint8_t v);
+	uint16_t do_shal16(uint16_t v);
+	uint32_t do_shal32(uint32_t v);
 
-	UINT8 do_shar8(UINT8 v);
-	UINT16 do_shar16(UINT16 v);
-	UINT32 do_shar32(UINT32 v);
+	uint8_t do_shar8(uint8_t v);
+	uint16_t do_shar16(uint16_t v);
+	uint32_t do_shar32(uint32_t v);
 
-	UINT8 do_shll8(UINT8 v);
-	UINT16 do_shll16(UINT16 v);
-	UINT32 do_shll32(UINT32 v);
+	uint8_t do_shll8(uint8_t v);
+	uint16_t do_shll16(uint16_t v);
+	uint32_t do_shll32(uint32_t v);
 
-	UINT8 do_shlr8(UINT8 v);
-	UINT16 do_shlr16(UINT16 v);
-	UINT32 do_shlr32(UINT32 v);
+	uint8_t do_shlr8(uint8_t v);
+	uint16_t do_shlr16(uint16_t v);
+	uint32_t do_shlr32(uint32_t v);
 
-	UINT8 do_rotl8(UINT8 v);
-	UINT16 do_rotl16(UINT16 v);
-	UINT32 do_rotl32(UINT32 v);
+	uint8_t do_rotl8(uint8_t v);
+	uint16_t do_rotl16(uint16_t v);
+	uint32_t do_rotl32(uint32_t v);
 
-	UINT8 do_rotr8(UINT8 v);
-	UINT16 do_rotr16(UINT16 v);
-	UINT32 do_rotr32(UINT32 v);
+	uint8_t do_rotr8(uint8_t v);
+	uint16_t do_rotr16(uint16_t v);
+	uint32_t do_rotr32(uint32_t v);
 
-	UINT8 do_rotxl8(UINT8 v);
-	UINT16 do_rotxl16(UINT16 v);
-	UINT32 do_rotxl32(UINT32 v);
+	uint8_t do_rotxl8(uint8_t v);
+	uint16_t do_rotxl16(uint16_t v);
+	uint32_t do_rotxl32(uint32_t v);
 
-	UINT8 do_rotxr8(UINT8 v);
-	UINT16 do_rotxr16(UINT16 v);
-	UINT32 do_rotxr32(UINT32 v);
+	uint8_t do_rotxr8(uint8_t v);
+	uint16_t do_rotxr16(uint16_t v);
+	uint32_t do_rotxr32(uint32_t v);
 
-	UINT8 do_shal2_8(UINT8 v);
-	UINT16 do_shal2_16(UINT16 v);
-	UINT32 do_shal2_32(UINT32 v);
+	uint8_t do_shal2_8(uint8_t v);
+	uint16_t do_shal2_16(uint16_t v);
+	uint32_t do_shal2_32(uint32_t v);
 
-	UINT8 do_shar2_8(UINT8 v);
-	UINT16 do_shar2_16(UINT16 v);
-	UINT32 do_shar2_32(UINT32 v);
+	uint8_t do_shar2_8(uint8_t v);
+	uint16_t do_shar2_16(uint16_t v);
+	uint32_t do_shar2_32(uint32_t v);
 
-	UINT8 do_shll2_8(UINT8 v);
-	UINT16 do_shll2_16(UINT16 v);
-	UINT32 do_shll2_32(UINT32 v);
+	uint8_t do_shll2_8(uint8_t v);
+	uint16_t do_shll2_16(uint16_t v);
+	uint32_t do_shll2_32(uint32_t v);
 
-	UINT8 do_shlr2_8(UINT8 v);
-	UINT16 do_shlr2_16(UINT16 v);
-	UINT32 do_shlr2_32(UINT32 v);
+	uint8_t do_shlr2_8(uint8_t v);
+	uint16_t do_shlr2_16(uint16_t v);
+	uint32_t do_shlr2_32(uint32_t v);
 
-	UINT8 do_rotl2_8(UINT8 v);
-	UINT16 do_rotl2_16(UINT16 v);
-	UINT32 do_rotl2_32(UINT32 v);
+	uint8_t do_rotl2_8(uint8_t v);
+	uint16_t do_rotl2_16(uint16_t v);
+	uint32_t do_rotl2_32(uint32_t v);
 
-	UINT8 do_rotr2_8(UINT8 v);
-	UINT16 do_rotr2_16(UINT16 v);
-	UINT32 do_rotr2_32(UINT32 v);
+	uint8_t do_rotr2_8(uint8_t v);
+	uint16_t do_rotr2_16(uint16_t v);
+	uint32_t do_rotr2_32(uint32_t v);
 
-	UINT8 do_rotxl2_8(UINT8 v);
-	UINT16 do_rotxl2_16(UINT16 v);
-	UINT32 do_rotxl2_32(UINT32 v);
+	uint8_t do_rotxl2_8(uint8_t v);
+	uint16_t do_rotxl2_16(uint16_t v);
+	uint32_t do_rotxl2_32(uint32_t v);
 
-	UINT8 do_rotxr2_8(UINT8 v);
-	UINT16 do_rotxr2_16(UINT16 v);
-	UINT32 do_rotxr2_32(UINT32 v);
+	uint8_t do_rotxr2_8(uint8_t v);
+	uint16_t do_rotxr2_16(uint16_t v);
+	uint32_t do_rotxr2_32(uint32_t v);
 
-	void set_nzv8(UINT8 v);
-	void set_nzv16(UINT16 v);
-	void set_nzv32(UINT32 v);
+	void set_nzv8(uint8_t v);
+	void set_nzv16(uint16_t v);
+	void set_nzv32(uint32_t v);
 
-	void set_nz16(UINT16 v);
-	void set_nz32(UINT32 v);
+	void set_nz16(uint16_t v);
+	void set_nz32(uint32_t v);
 
-	inline void r8_w(int reg, UINT8 val) {
+	inline void r8_w(int reg, uint8_t val) {
 		if(reg & 8)
 			R[reg & 7] = (R[reg & 7] & 0xff00) | val;
 		else
 			R[reg & 7] = (R[reg & 7] & 0xff) | (val << 8);
 	}
 
-	inline UINT8 r8_r(int reg) {
+	inline uint8_t r8_r(int reg) {
 		if(reg & 8)
 			return R[reg & 7];
 		else
@@ -353,8 +353,8 @@ protected:
 	// and the h8-300h is r32 of course, we have to be careful to mask
 	// in h8.lst there if the top bit is 1.
 
-	inline void r16_w(int reg, UINT16 val) { R[reg & 0xf] = val; }
-	inline UINT16 r16_r(int reg) { return R[reg & 0xf]; }
+	inline void r16_w(int reg, uint16_t val) { R[reg & 0xf] = val; }
+	inline uint16_t r16_r(int reg) { return R[reg & 0xf]; }
 
 #define O(o) void o ## _full(); void o ## _partial()
 	O(add_b_imm8_r8u); O(add_b_r8h_r8l); O(add_w_imm16_r16l); O(add_w_r16h_r16l);

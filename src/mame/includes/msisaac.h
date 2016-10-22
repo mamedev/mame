@@ -26,10 +26,10 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_videoram3;
-	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram3;
+	required_shared_ptr<uint8_t> m_videoram2;
 
 	/* video-related */
 	bitmap_ind16    *m_tmp_bitmap1;
@@ -45,15 +45,15 @@ public:
 
 	/* fake mcu (in msisaac.c) */
 #ifndef USE_MCU
-	UINT8       m_mcu_val;
-	UINT8       m_direction;
+	uint8_t       m_mcu_val;
+	uint8_t       m_direction;
 #endif
 
 	int         m_vol_ctrl[16];
-	UINT8       m_snd_ctrl0;
-	UINT8       m_snd_ctrl1;
-	UINT8       m_snd_ctrl2;
-	UINT8       m_snd_ctrl3;
+	uint8_t       m_snd_ctrl0;
+	uint8_t       m_snd_ctrl1;
+	uint8_t       m_snd_ctrl2;
+	uint8_t       m_snd_ctrl3;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -90,7 +90,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(ta7630);
-	UINT32 screen_update_msisaac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_msisaac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

@@ -133,12 +133,12 @@ void wrally_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 					sx - 0x0f,sy,0);
 		} else {
 			/* get a pointer to the current sprite's gfx data */
-			const UINT8 *gfx_src = gfx->get_data(number % gfx->elements());
+			const uint8_t *gfx_src = gfx->get_data(number % gfx->elements());
 
 			for (py = 0; py < gfx->height(); py++){
 				/* get a pointer to the current line in the screen bitmap */
 				int ypos = ((sy + py) & 0x1ff);
-				UINT16 *srcy = &bitmap.pix16(ypos);
+				uint16_t *srcy = &bitmap.pix16(ypos);
 
 				int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
 
@@ -147,7 +147,7 @@ void wrally_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 				for (px = 0; px < gfx->width(); px++){
 					/* get current pixel */
 					int xpos = (((sx + px) & 0x3ff) - 0x0f) & 0x3ff;
-					UINT16 *pixel = srcy + xpos;
+					uint16_t *pixel = srcy + xpos;
 					int src_color = *pixel;
 
 					int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
@@ -174,7 +174,7 @@ void wrally_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 ***************************************************************************/
 
-UINT32 wrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* set scroll registers */
 	if (!flip_screen()) {

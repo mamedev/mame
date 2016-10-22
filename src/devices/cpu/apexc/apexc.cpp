@@ -337,7 +337,7 @@ const device_type APEXC = &device_creator<apexc_cpu_device>;
 #define DELAY(n)    {m_icount -= (n); m_current_word = (m_current_word + (n)) & 0x1f;}
 
 
-apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, APEXC, "APEXC", tag, owner, clock, "apexc_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 15, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 1, 0)
@@ -369,7 +369,7 @@ apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *ta
 
 /* compute complete word address (i.e. translate a logical track address (expressed
 in current working store) to an absolute track address) */
-UINT32 apexc_cpu_device::effective_address(UINT32 address)
+uint32_t apexc_cpu_device::effective_address(uint32_t address)
 {
 	if (address & 0x200)
 	{
@@ -380,9 +380,9 @@ UINT32 apexc_cpu_device::effective_address(UINT32 address)
 }
 
 /* read word */
-UINT32 apexc_cpu_device::word_read(UINT32 address, UINT32 special)
+uint32_t apexc_cpu_device::word_read(uint32_t address, uint32_t special)
 {
-	UINT32 result;
+	uint32_t result;
 
 	/* compute absolute track address */
 	address = effective_address(address);
@@ -408,7 +408,7 @@ UINT32 apexc_cpu_device::word_read(UINT32 address, UINT32 special)
 }
 
 /* write word (or part of a word, according to mask) */
-void apexc_cpu_device::word_write(UINT32 address, UINT32 data, UINT32 mask)
+void apexc_cpu_device::word_write(uint32_t address, uint32_t data, uint32_t mask)
 {
 	/* compute absolute track address */
 	address = effective_address(address);
@@ -430,12 +430,12 @@ void apexc_cpu_device::word_write(UINT32 address, UINT32 data, UINT32 mask)
     no address is used, these functions just punch or read 5 bits
 */
 
-UINT8 apexc_cpu_device::papertape_read()
+uint8_t apexc_cpu_device::papertape_read()
 {
 	return m_io->read_byte(0) & 0x1f;
 }
 
-void apexc_cpu_device::papertape_punch(UINT8 data)
+void apexc_cpu_device::papertape_punch(uint8_t data)
 {
 	m_io->write_byte(0, data);
 }
@@ -447,7 +447,7 @@ void apexc_cpu_device::papertape_punch(UINT8 data)
 /*
     set the memory location (i.e. address) register, and compute the associated delay
 */
-UINT32 apexc_cpu_device::load_ml(UINT32 address, UINT32 vector)
+uint32_t apexc_cpu_device::load_ml(uint32_t address, uint32_t vector)
 {
 	int delay;
 
@@ -524,7 +524,7 @@ void apexc_cpu_device::execute()
 		case 0:
 			/* stop */
 
-			m_running = FALSE;
+			m_running = false;
 
 			/* BTW, I don't know whether stop loads y into ml or not, and whether
 			subsequent fetch is done */
@@ -599,7 +599,7 @@ void apexc_cpu_device::execute()
 				m_r >>= 1;
 				if (m_a & 1)
 					m_r |= 0x80000000UL;
-				m_a = ((INT32) m_a) >> 1;
+				m_a = ((int32_t) m_a) >> 1;
 
 				c6 = (c6+1) & 0x3f;
 			}
@@ -648,7 +648,7 @@ void apexc_cpu_device::execute()
 					m_r >>= 1;
 					if (m_a & 1)
 						m_r |= 0x80000000UL;
-					m_a = ((INT32) m_a) >> 1;
+					m_a = ((int32_t) m_a) >> 1;
 				}
 			}
 
@@ -687,7 +687,7 @@ void apexc_cpu_device::execute()
 			/* R_(1-n)(x) & R_(n-32)(x) */
 
 			{
-				UINT32 mask;
+				uint32_t mask;
 
 				if (c6 & 0x20)
 					mask = 0xFFFFFFFFUL << (64 - c6);
@@ -706,7 +706,7 @@ void apexc_cpu_device::execute()
 			/* A_(1-n)(x) & A_(n-32)(x) */
 
 			{
-				UINT32 mask;
+				uint32_t mask;
 
 				if (c6 & 0x20)
 					mask = 0xFFFFFFFFUL << (64 - c6);
@@ -776,6 +776,7 @@ void apexc_cpu_device::device_start()
 	state_add( APEXC_STATE, "CPU state", m_running ).mask(0x01);
 	state_add( APEXC_PC, "PC", m_pc ).callimport().callexport().formatstr("%03X");
 	state_add( APEXC_ML_FULL, "ML_FULL", m_ml_full ).callimport().callexport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	m_icountptr = &m_icount;
 }
@@ -834,7 +835,7 @@ void apexc_cpu_device::device_reset()
 
 	/* next two lines are just the product of my bold fantasy */
 	m_cr = 0;               /* first instruction executed will be a stop */
-	m_running = TRUE;       /* this causes the CPU to load the instruction at 0/0,
+	m_running = true;       /* this causes the CPU to load the instruction at 0/0,
 	                           which enables easy booting (just press run on the panel) */
 	m_a = 0;
 	m_r = 0;
@@ -859,7 +860,7 @@ void apexc_cpu_device::execute_run()
 }
 
 
-offs_t apexc_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t apexc_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( apexc );
 	return CPU_DISASSEMBLE_NAME(apexc)(this, buffer, pc, oprom, opram, options);

@@ -436,10 +436,10 @@ static int nes_cart_get_line( const char *feature )
 
 void nes_cart_slot_device::call_load_pcb()
 {
-	UINT32 vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
+	uint32_t vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
 	// SETUP step 1: getting PRG, VROM, VRAM sizes
-	UINT32 prg_size = get_software_region_length("prg");
-	UINT32 vrom_size = get_software_region_length("chr");
+	uint32_t prg_size = get_software_region_length("prg");
+	uint32_t vrom_size = get_software_region_length("chr");
 	vram_size = get_software_region_length("vram");
 	vram_size += get_software_region_length("vram2");
 
@@ -477,7 +477,7 @@ void nes_cart_slot_device::call_load_pcb()
 		{
 			// A few boards uses 4-screen mirroring: Gauntlet (DDROM or TRR1ROM or Tengen 800004),
 			// Rad Racer II (TVROM), and Napoleon Senki (IREM LROG017 with 74*161/161/21/138)
-			m_cart->set_four_screen_vram(TRUE);
+			m_cart->set_four_screen_vram(true);
 			m_cart->set_mirroring(PPU_MIRROR_4SCREEN);
 		}
 		if (!strcmp(mirroring, "pcb_controlled"))
@@ -487,7 +487,7 @@ void nes_cart_slot_device::call_load_pcb()
 			// See e.g. HES 6-in-1 vs other HES games, Irem Major League vs other G-101 games,
 			// Sunsoft-2 Shanghai vs Mito Koumon, Camerica BF9093 games vs BF9097 games, etc.
 			// Boards where all games control mirroring do not make real use of this.
-			m_cart->set_pcb_ctrl_mirror(TRUE);
+			m_cart->set_pcb_ctrl_mirror(true);
 		}
 	}
 
@@ -513,7 +513,7 @@ void nes_cart_slot_device::call_load_pcb()
 	if (m_pcb_id == TAITO_X1_005 && get_feature("x1-pin17") != nullptr && get_feature("x1-pin31") != nullptr)
 	{
 		if (!strcmp(get_feature("x1-pin17"), "CIRAM A10") && !strcmp(get_feature("x1-pin31"), "NC"))
-			m_cart->set_x1_005_alt(TRUE);
+			m_cart->set_x1_005_alt(true);
 	}
 
 	if (m_pcb_id == KONAMI_VRC2)
@@ -554,7 +554,7 @@ void nes_cart_slot_device::call_load_pcb()
 	// pirate variants of boards with bus conflict are often not suffering from it
 	// and actually games glitch if bus conflict is emulated...
 	if (get_feature("bus_conflict") && !strcmp(get_feature("bus_conflict"), "no"))
-		m_cart->set_bus_conflict(FALSE);
+		m_cart->set_bus_conflict(false);
 
 
 	// SETUP step 4: logging what we have found
@@ -595,13 +595,13 @@ void nes_cart_slot_device::call_load_pcb()
 	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
 	if (battery_size || mapper_sram_size)
 	{
-		UINT32 tot_size = battery_size + mapper_sram_size;
-		dynamic_buffer temp_nvram(tot_size);
+		uint32_t tot_size = battery_size + mapper_sram_size;
+		std::vector<uint8_t> temp_nvram(tot_size);
 
 		// some games relies on specific battery patterns to work
 		// (e.g. Silva Saga does not work with SRAM fully initialized to 0x00)
 		// and we use the info from xml here to prepare a default NVRAM
-		dynamic_buffer default_nvram(tot_size);
+		std::vector<uint8_t> default_nvram(tot_size);
 		if (battery_size)
 			memcpy(&default_nvram[0], get_software_region("bwram"), battery_size);
 		if (mapper_sram_size)

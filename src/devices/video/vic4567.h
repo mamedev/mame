@@ -32,7 +32,7 @@ struct vic3_sprite
 
 	/* buffer for currently painted line */
 	int paintedline[8];
-	UINT8 bitmap[8][SPRITE_BASE_X_SIZE * 2 / 8 + 1  /*for simplier sprite collision detection*/];
+	uint8_t bitmap[8][SPRITE_BASE_X_SIZE * 2 / 8 + 1  /*for simplier sprite collision detection*/];
 };
 
 
@@ -124,7 +124,7 @@ class vic3_device : public device_t,
 					public device_video_interface
 {
 public:
-	vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~vic3_device() {}
 
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<vic3_device &>(device).m_cpu.set_tag(tag); }
@@ -143,7 +143,7 @@ public:
 	DECLARE_READ8_MEMBER(port_r);
 
 	void raster_interrupt_gen();
-	UINT32 video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -157,7 +157,7 @@ private:
 	inline int getforeground16(int y, int x);
 	void set_interrupt(int mask);
 	void clear_interrupt(int mask);
-	void draw_character(int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color, int start_x, int end_x);
+	void draw_character(int ybegin, int yend, int ch, int yoff, int xoff, uint16_t *color, int start_x, int end_x);
 	void draw_character_multi(int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x);
 	void draw_bitmap(int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x);
 	void draw_bitmap_multi(int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x);
@@ -178,18 +178,18 @@ private:
 
 	required_device<cpu_device> m_cpu;
 
-	UINT8 m_reg[0x80];
+	uint8_t m_reg[0x80];
 	int m_on;                             /* rastering of the screen */
 
 	int m_lines;
 
-	UINT16 m_chargenaddr, m_videoaddr, m_bitmapaddr;
+	uint16_t m_chargenaddr, m_videoaddr, m_bitmapaddr;
 
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 	int m_x_begin, m_x_end;
 	int m_y_begin, m_y_end;
 
-	UINT16 m_c64_bitmap[2], m_bitmapmulti[4], m_mono[2], m_multi[4], m_ecmcolor[2], m_colors[4], m_spritemulti[4];
+	uint16_t m_c64_bitmap[2], m_bitmapmulti[4], m_mono[2], m_multi[4], m_ecmcolor[2], m_colors[4], m_spritemulti[4];
 
 	int m_lastline, m_rasterline;
 
@@ -197,15 +197,15 @@ private:
 	int m_columns, m_rows;
 
 	/* background/foreground for sprite collision */
-	UINT8 *m_screenptr[216], m_shift[216];
+	uint8_t *m_screenptr[216], m_shift[216];
 
 	/* convert multicolor byte to background/foreground for sprite collision */
-	UINT8 m_foreground[256];
-	UINT16 m_expandx[256];
-	UINT16 m_expandx_multi[256];
+	uint8_t m_foreground[256];
+	uint16_t m_expandx[256];
+	uint16_t m_expandx_multi[256];
 
 	/* converts sprite multicolor info to info for background collision checking */
-	UINT8 m_multi_collision[256];
+	uint8_t m_multi_collision[256];
 
 	vic3_sprite m_sprites[8];
 
@@ -228,9 +228,9 @@ private:
 	devcb_read8      m_c64_mem_r_cb;
 
 	/* palette - vic3 specific items (the ones above are used for VIC II as well) */
-	UINT8 m_palette_red[0x100];
-	UINT8 m_palette_green[0x100];
-	UINT8 m_palette_blue[0x100];
+	uint8_t m_palette_red[0x100];
+	uint8_t m_palette_green[0x100];
+	uint8_t m_palette_blue[0x100];
 	int m_palette_dirty;
 
 	required_device<palette_device> m_palette;

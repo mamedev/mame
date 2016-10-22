@@ -60,7 +60,7 @@ const device_type PSION_DATAPACK = &device_creator<datapack_device>;
 //  datapack_device - constructor
 //-------------------------------------------------
 
-datapack_device::datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+datapack_device::datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PSION_DATAPACK, "Psion Datapack", tag, owner, clock, "datapack", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -117,7 +117,7 @@ const util::option_guide &datapack_device::create_option_guide() const
 
 void datapack_device::update()
 {
-	UINT32 pack_addr = m_counter + ((m_id & DP_ID_PAGED) ? (m_page << 8) : 0);
+	uint32_t pack_addr = m_counter + ((m_id & DP_ID_PAGED) ? (m_page << 8) : 0);
 
 	// if the datapack is 128k or more is treated as segmented
 	if (m_size >= 0x10)
@@ -177,7 +177,7 @@ void datapack_device::update()
     read datapack data lines
 -------------------------------------------------*/
 
-UINT8 datapack_device::data_r()
+uint8_t datapack_device::data_r()
 {
 	return (!(m_control & DP_LINE_SLOT_SELECT)) ? m_data : 0;
 }
@@ -187,7 +187,7 @@ UINT8 datapack_device::data_r()
     write datapack data lines
 -------------------------------------------------*/
 
-void  datapack_device::data_w(UINT8 data)
+void  datapack_device::data_w(uint8_t data)
 {
 	if (is_loaded())
 	{
@@ -204,7 +204,7 @@ void  datapack_device::data_w(UINT8 data)
     read datapack control lines
 -------------------------------------------------*/
 
-UINT8 datapack_device::control_r()
+uint8_t datapack_device::control_r()
 {
 	return m_control;
 }
@@ -214,7 +214,7 @@ UINT8 datapack_device::control_r()
     write datapack control lines
 -------------------------------------------------*/
 
-void datapack_device::control_w(UINT8 data)
+void datapack_device::control_w(uint8_t data)
 {
 	if (is_loaded())
 	{
@@ -258,7 +258,7 @@ void datapack_device::control_w(UINT8 data)
 
 image_init_result datapack_device::call_load()
 {
-	UINT8 data[0x10];
+	uint8_t data[0x10];
 
 	fread(data, 0x10);
 
@@ -280,7 +280,7 @@ image_init_result datapack_device::call_load()
 
 image_init_result datapack_device::call_create(int format_type, util::option_resolution *create_args)
 {
-	static const UINT8 opk_head[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
+	static const uint8_t opk_head[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
 
 	if (create_args != nullptr)
 	{

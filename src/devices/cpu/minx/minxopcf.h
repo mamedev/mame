@@ -3,7 +3,7 @@
 
 void minx_cpu_device::execute_one_cf()
 {
-	const UINT8 opcode = rdop();
+	const uint8_t opcode = rdop();
 
 	switch (opcode)
 	{
@@ -238,21 +238,21 @@ void minx_cpu_device::execute_one_cf()
 		case 0x6F: { /* illegal instruction? */ }
 			break;
 
-		case 0x70: { UINT8 ofs8 = rdop(); m_BA = rd16( m_SP + ofs8 ); }
+		case 0x70: { uint8_t ofs8 = rdop(); m_BA = rd16( m_SP + ofs8 ); }
 			break;
-		case 0x71: { UINT8 ofs8 = rdop(); m_HL = rd16( m_SP + ofs8 ); }
+		case 0x71: { uint8_t ofs8 = rdop(); m_HL = rd16( m_SP + ofs8 ); }
 			break;
-		case 0x72: { UINT8 ofs8 = rdop(); m_X = rd16( m_SP + ofs8 ); }
+		case 0x72: { uint8_t ofs8 = rdop(); m_X = rd16( m_SP + ofs8 ); }
 			break;
-		case 0x73: { UINT8 ofs8 = rdop(); m_Y = rd16( m_SP + ofs8 ); }
+		case 0x73: { uint8_t ofs8 = rdop(); m_Y = rd16( m_SP + ofs8 ); }
 			break;
-		case 0x74: { UINT8 ofs8 = rdop(); wr16( m_SP + ofs8, m_BA ); }
+		case 0x74: { uint8_t ofs8 = rdop(); wr16( m_SP + ofs8, m_BA ); }
 			break;
-		case 0x75: { UINT8 ofs8 = rdop(); wr16( m_SP + ofs8, m_HL ); }
+		case 0x75: { uint8_t ofs8 = rdop(); wr16( m_SP + ofs8, m_HL ); }
 			break;
-		case 0x76: { UINT8 ofs8 = rdop(); wr16( m_SP + ofs8, m_X ); }
+		case 0x76: { uint8_t ofs8 = rdop(); wr16( m_SP + ofs8, m_X ); }
 			break;
-		case 0x77: { UINT8 ofs8 = rdop(); wr16( m_SP + ofs8, m_Y ); }
+		case 0x77: { uint8_t ofs8 = rdop(); wr16( m_SP + ofs8, m_Y ); }
 			break;
 		case 0x78: { AD2_I16; m_SP = rd16( addr2 ); }
 			break;

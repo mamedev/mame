@@ -95,7 +95,7 @@
 
 struct res_net_channel_info {
 	// per channel options
-	UINT32  options;
+	uint32_t  options;
 	// Pullup resistor value in Ohms
 	double  rBias;
 	// Pulldown resistor value in Ohms
@@ -121,7 +121,7 @@ struct res_net_channel_info {
 
 struct res_net_info {
 	// global options
-	UINT32  options;
+	uint32_t  options;
 	// The three color channels
 	res_net_channel_info rgb[3];
 	// Supply Voltage
@@ -136,7 +136,7 @@ struct res_net_info {
 	// - CMOS: 0.05V (@5v vcc)
 	double  vOH;
 	// Open Collector flag
-	UINT8   OpenCol;
+	uint8_t   OpenCol;
 };
 
 #define RES_NET_MAX_COMP    3
@@ -145,9 +145,9 @@ struct res_net_decode_info {
 	int numcomp;
 	int start;
 	int end;
-	UINT16  offset[3 * RES_NET_MAX_COMP];
-	INT16   shift[3 * RES_NET_MAX_COMP];
-	UINT16  mask[3 * RES_NET_MAX_COMP];
+	uint16_t  offset[3 * RES_NET_MAX_COMP];
+	int16_t   shift[3 * RES_NET_MAX_COMP];
+	uint16_t  mask[3 * RES_NET_MAX_COMP];
 };
 
 /* return a single value for one channel */
@@ -156,7 +156,7 @@ int compute_res_net(int inputs, int channel, const res_net_info &di);
 
 /* compute all values */
 
-void compute_res_net_all(std::vector<rgb_t> &rgb, const UINT8 *prom, const res_net_decode_info &rdi, const res_net_info &di);
+void compute_res_net_all(std::vector<rgb_t> &rgb, const uint8_t *prom, const res_net_decode_info &rdi, const res_net_info &di);
 
 
 /* legacy interface */

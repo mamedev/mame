@@ -98,7 +98,7 @@ const tiny_rom_entry *a2bus_pic_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, A2BUS_PIC, "Apple Parallel Interface Card", tag, owner, clock, "a2pic", __FILE__),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
@@ -109,7 +109,7 @@ a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *ta
 {
 }
 
-a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
@@ -163,7 +163,7 @@ void a2bus_pic_device::device_timer(emu_timer &timer, device_timer_id tid, int p
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_pic_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_pic_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	m_autostrobe = true;
 
@@ -179,9 +179,9 @@ UINT8 a2bus_pic_device::read_cnxx(address_space &space, UINT8 offset)
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_pic_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_pic_device::read_c0nx(address_space &space, uint8_t offset)
 {
-	UINT8 rv = 0;
+	uint8_t rv = 0;
 
 	switch (offset)
 	{
@@ -222,7 +222,7 @@ UINT8 a2bus_pic_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_pic_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_pic_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER( a2bus_pic_device::ack_w )
 {
 	if (m_started)
 	{
-		UINT8 dsw1 = m_dsw1->read();
+		uint8_t dsw1 = m_dsw1->read();
 
 		if (dsw1 & 0x10)    // negative polarity
 		{

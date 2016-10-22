@@ -3,7 +3,7 @@
 
 #include "machine/i8255.h"
 
-typedef device_delegate<UINT16 (UINT16)> igs017_igs031_palette_scramble_delegate;
+typedef device_delegate<uint16_t (uint16_t)> igs017_igs031_palette_scramble_delegate;
 
 #define MCFG_PALETTE_SCRAMBLE_CB( _class, _method) \
 	igs017_igs031_device::set_palette_scramble_cb(*device, igs017_igs031_palette_scramble_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
@@ -20,7 +20,7 @@ class igs017_igs031_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 public:
-	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
 	static void set_palette_scramble_cb(device_t &device,igs017_igs031_palette_scramble_delegate newtilecb);
@@ -31,7 +31,7 @@ public:
 		dev.m_revbits = 1;
 	}
 
-	UINT16 palette_callback_straight(UINT16 bgr);
+	uint16_t palette_callback_straight(uint16_t bgr);
 
 	igs017_igs031_palette_scramble_delegate m_palette_scramble_cb;
 
@@ -46,10 +46,10 @@ public:
 	int m_toggle;
 	int m_debug_addr;
 	int m_debug_width;
-	UINT8 m_video_disable;
+	uint8_t m_video_disable;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	std::unique_ptr<UINT8[]> m_sprites_gfx;
+	std::unique_ptr<uint8_t[]> m_sprites_gfx;
 	int m_sprites_gfx_size;
 
 	int get_nmi_enable() { return m_nmi_enable; }
@@ -72,14 +72,14 @@ public:
 	DECLARE_WRITE8_MEMBER(fg_w);
 	DECLARE_WRITE8_MEMBER(bg_w);
 
-	void space_w(int offset, UINT8 data);
-	UINT8 space_r(int offset);
+	void space_w(int offset, uint8_t data);
+	uint8_t space_r(int offset);
 
 	void expand_sprites();
 	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	virtual void video_start();
@@ -93,10 +93,10 @@ protected:
 	address_space_config        m_space_config;
 
 public:
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_palram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_palram;
 	optional_device<i8255_device> m_i8255;
 	required_device<palette_device> m_palette;
 

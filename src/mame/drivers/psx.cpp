@@ -33,21 +33,21 @@ public:
 	{
 	}
 
-	UINT8 *m_exe_buffer;
+	uint8_t *m_exe_buffer;
 	int m_exe_size;
 	int m_cd_param_p;
 	int m_cd_result_p;
 	int m_cd_result_c;
 	int m_cd_result_ready;
 	int m_cd_reset;
-	UINT8 m_cd_stat;
-	UINT8 m_cd_io_status;
-	UINT8 m_cd_param[8];
-	UINT8 m_cd_result[8];
+	uint8_t m_cd_stat;
+	uint8_t m_cd_io_status;
+	uint8_t m_cd_param[8];
+	uint8_t m_cd_result[8];
 	DECLARE_MACHINE_RESET(psx);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	void cd_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
-	void cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
@@ -69,14 +69,14 @@ inline void ATTR_PRINTF(3,4)  psx1_state::verboselog( int n_level, const char *s
 }
 
 
-void psx1_state::cd_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void psx1_state::cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
-	UINT8 *psxram = (UINT8 *) p_n_psxram;
+	uint8_t *psxram = (uint8_t *) p_n_psxram;
 	psxcd_device *psxcd = machine().device<psxcd_device>(PSXCD_TAG);
 	psxcd->start_dma(psxram + n_address, n_size*4);
 }
 
-void psx1_state::cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }

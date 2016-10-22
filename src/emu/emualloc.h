@@ -49,7 +49,7 @@ public:
 			m_ordered_prev(nullptr),
 			m_ptr(ptr),
 			m_size(size),
-			m_id(~(UINT64)0) { }
+			m_id(~(uint64_t)0) { }
 	virtual ~resource_pool_item() { }
 
 	resource_pool_item *    m_next;
@@ -57,7 +57,7 @@ public:
 	resource_pool_item *    m_ordered_prev;
 	void *                  m_ptr;
 	size_t                  m_size;
-	UINT64                  m_id;
+	uint64_t                  m_id;
 };
 
 
@@ -129,7 +129,7 @@ private:
 	std::vector<resource_pool_item *> m_hash;
 	resource_pool_item *    m_ordered_head;
 	resource_pool_item *    m_ordered_tail;
-	static UINT64           s_id;
+	static uint64_t           s_id;
 };
 
 

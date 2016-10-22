@@ -59,7 +59,7 @@ const device_type TTL74145 = &device_creator<ttl74145_device>;
 //  ttl74145_device - constructor
 //-------------------------------------------------
 
-ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TTL74145, "TTL74145", tag, owner, clock, "ttl74145", __FILE__)
 	, m_output_line_0_cb(*this)
 	, m_output_line_1_cb(*this)
@@ -111,10 +111,10 @@ void ttl74145_device::device_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
-void ttl74145_device::write(UINT8 data)
+void ttl74145_device::write(uint8_t data)
 {
 	/* decode number */
-	UINT16 new_number = bcd_2_dec(data & 0x0f);
+	uint16_t new_number = bcd_2_dec(data & 0x0f);
 
 	/* call output callbacks if the number changed */
 	if (new_number != m_number)
@@ -136,7 +136,7 @@ void ttl74145_device::write(UINT8 data)
 }
 
 
-UINT16 ttl74145_device::read()
+uint16_t ttl74145_device::read()
 {
 	return (1 << m_number) & 0x3ff;
 }

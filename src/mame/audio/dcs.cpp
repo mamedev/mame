@@ -605,10 +605,10 @@ void dcs_audio_device::dcs_boot()
 		{
 			/* determine the base */
 			// max_banks = m_bootrom_words / 0x1000;
-			UINT16* base = m_bootrom + ((m_sounddata_bank * 0x1000) % m_bootrom_words);
+			uint16_t* base = m_bootrom + ((m_sounddata_bank * 0x1000) % m_bootrom_words);
 
 			/* convert from 16-bit data to 8-bit data and boot */
-			UINT8 buffer[0x1000];
+			uint8_t buffer[0x1000];
 			for (int i = 0; i < 0x1000; i++)
 			{
 				buffer[i] = base[i];
@@ -622,7 +622,7 @@ void dcs_audio_device::dcs_boot()
 		case 2:
 		{
 			/* determine the base */
-			UINT16* base;
+			uint16_t* base;
 			if (m_bootrom == m_sounddata)
 			{
 				/* EPROM case: page is selected from the page register */
@@ -635,7 +635,7 @@ void dcs_audio_device::dcs_boot()
 			}
 
 			/* convert from 16-bit data to 8-bit data and boot */
-			UINT8 buffer[0x1000];
+			uint8_t buffer[0x1000];
 			for (int i = 0; i < 0x1000; i++)
 			{
 				buffer[i] = base[i];
@@ -800,7 +800,7 @@ void dcs_audio_device::dcs_register_state()
 //  dcs_audio_device - constructor
 //-------------------------------------------------
 
-dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int rev) :
+dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int rev) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_cpu(nullptr),
 	m_program(nullptr),
@@ -867,12 +867,12 @@ void dcs_audio_device::device_start()
 	memory_share *internal_ram = memshare("dcsint");
 	if (internal_ram != nullptr)
 	{
-		m_internal_program_ram = (UINT32 *)internal_ram->ptr();
+		m_internal_program_ram = (uint32_t *)internal_ram->ptr();
 	}
 	memory_share *external_ram = memshare("dcsext");
 	if (external_ram != nullptr)
 	{
-		m_external_program_ram = (UINT32 *)external_ram->ptr();
+		m_external_program_ram = (uint32_t *)external_ram->ptr();
 	}
 
 	/* find the DCS CPU and the sound ROMs */
@@ -886,7 +886,7 @@ void dcs_audio_device::device_start()
 	m_dmadac[0] = subdevice<dmadac_sound_device>("dac");
 
 	/* configure boot and sound ROMs */
-	m_bootrom = (UINT16 *)machine().root_device().memregion("dcs")->base();
+	m_bootrom = (uint16_t *)machine().root_device().memregion("dcs")->base();
 	m_bootrom_words = machine().root_device().memregion("dcs")->bytes() / 2;
 	m_sounddata = m_bootrom;
 	m_sounddata_words = m_bootrom_words;
@@ -906,7 +906,7 @@ void dcs_audio_device::device_start()
 	m_reg_timer = subdevice<timer_device>("dcs_reg_timer");
 
 	/* non-RAM based automatically acks */
-	m_auto_ack = TRUE;
+	m_auto_ack = true;
 	/* register for save states */
 	dcs_register_state();
 	/* reset the system */
@@ -921,12 +921,12 @@ void dcs2_audio_device::device_start()
 	memory_share *internal_ram = memshare("dcsint");
 	if (internal_ram != nullptr)
 	{
-		m_internal_program_ram = (UINT32 *)internal_ram->ptr();
+		m_internal_program_ram = (uint32_t *)internal_ram->ptr();
 	}
 	memory_share *external_ram = memshare("dcsext");
 	if (external_ram != nullptr)
 	{
-		m_external_program_ram = (UINT32 *)external_ram->ptr();
+		m_external_program_ram = (uint32_t *)external_ram->ptr();
 	}
 
 	/* find the DCS CPU and the sound ROMs */
@@ -958,18 +958,18 @@ void dcs2_audio_device::device_start()
 	memory_region *bootrom_region = machine().root_device().memregion("dcs");
 	if (bootrom_region != nullptr)
 	{
-		m_bootrom = (UINT16 *)bootrom_region->base();
+		m_bootrom = (uint16_t *)bootrom_region->base();
 		m_bootrom_words = bootrom_region->bytes() / 2;
 	}
 
 	/* supports both RAM and ROM variants */
 	if (m_dram_in_mb != 0)
 	{
-		UINT32 ramSize = m_dram_in_mb << (20 - 1);
+		uint32_t ramSize = m_dram_in_mb << (20 - 1);
 		// Add one extra bank for internal ram in ADSP 2181
 		if (m_rev == 4)
 			ramSize += soundbank_words;
-		m_sounddata = auto_alloc_array(machine(), UINT16, ramSize);
+		m_sounddata = auto_alloc_array(machine(), uint16_t, ramSize);
 		save_pointer(NAME(m_sounddata), ramSize);
 		m_sounddata_words = (m_dram_in_mb << 20) / 2;
 	}
@@ -986,7 +986,7 @@ void dcs2_audio_device::device_start()
 
 
 	/* allocate memory for the SRAM */
-	m_sram = auto_alloc_array(machine(), UINT16, 0x8000*4/2);
+	m_sram = auto_alloc_array(machine(), uint16_t, 0x8000*4/2);
 
 	/* create the timers */
 	m_internal_timer = subdevice<timer_device>("dcs_int_timer");
@@ -994,7 +994,7 @@ void dcs2_audio_device::device_start()
 	m_sport_timer = subdevice<timer_device>("dcs_sport_timer");
 
 	/* we don't do auto-ack by default */
-	m_auto_ack = FALSE;
+	m_auto_ack = false;
 
 	/* install the speedup handler */
 	if (m_polling_offset) {
@@ -1037,7 +1037,7 @@ READ16_MEMBER( dcs_audio_device::dcs_dataram_r )
 WRITE16_MEMBER( dcs_audio_device::dcs_dataram_w )
 {
 	assert(m_external_program_ram != nullptr);
-	UINT16 val = m_external_program_ram[offset] >> 8;
+	uint16_t val = m_external_program_ram[offset] >> 8;
 	COMBINE_DATA(&val);
 	m_external_program_ram[offset] = (val << 8) | (m_external_program_ram[offset] & 0x0000ff);
 }
@@ -1179,7 +1179,7 @@ void dcs_audio_device::sdrc_reset()
 READ16_MEMBER( dcs_audio_device::sdrc_r )
 {
 	sdrc_state &sdrc = m_sdrc;
-	UINT16 result = sdrc.reg[offset];
+	uint16_t result = sdrc.reg[offset];
 
 	/* offset 3 is for security */
 	if (offset == 3)
@@ -1228,7 +1228,7 @@ READ16_MEMBER( dcs_audio_device::sdrc_r )
 WRITE16_MEMBER( dcs_audio_device::sdrc_w )
 {
 	sdrc_state &sdrc = m_sdrc;
-	UINT16 diff = sdrc.reg[offset] ^ data;
+	uint16_t diff = sdrc.reg[offset] ^ data;
 
 	switch (offset)
 	{
@@ -1309,7 +1309,7 @@ void dcs_audio_device::dsio_reset()
 READ16_MEMBER( dcs_audio_device::dsio_r )
 {
 	dsio_state &dsio = m_dsio;
-	UINT16 result = dsio.reg[offset];
+	uint16_t result = dsio.reg[offset];
 
 	if (offset == 1)
 	{
@@ -1363,7 +1363,7 @@ void dcs_audio_device::denver_reset()
 
 READ16_MEMBER( dcs_audio_device::denver_r )
 {
-	UINT16 result = m_dsio.reg[offset];
+	uint16_t result = m_dsio.reg[offset];
 
 	if (offset == 3)
 	{
@@ -1401,7 +1401,7 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 				}
 				dmadac_enable(&m_dmadac[0], m_channels, enable);
 				if (m_channels <= 6)
-					dmadac_enable(&m_dmadac[m_channels], 6 - m_channels, FALSE);
+					dmadac_enable(&m_dmadac[m_channels], 6 - m_channels, false);
 				recompute_sample_rate();
 			}
 			break;
@@ -1441,7 +1441,7 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_addr_w )
 WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 {
 	dsio_state &dsio = m_dsio;
-	UINT32 pc = space.device().safe_pc();
+	uint32_t pc = space.device().safe_pc();
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS)
@@ -1464,7 +1464,7 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 
 READ32_MEMBER( dcs_audio_device::dsio_idma_data_r )
 {
-	UINT32 result;
+	uint32_t result;
 	result = downcast<adsp2181_device *>(m_cpu)->idma_data_r();
 	if (LOG_DCS_TRANSFERS)
 		logerror("%08X:IDMA_data_r(%04X) = %04X\n", space.device().safe_pc(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), result);
@@ -1576,7 +1576,7 @@ READ16_MEMBER( dcs_audio_device::fifo_input_r )
     INPUT LATCH (data from host to DCS)
 ****************************************************************************/
 
-void dcs_audio_device::dcs_delayed_data_w(UINT16 data)
+void dcs_audio_device::dcs_delayed_data_w(uint16_t data)
 {
 	if (LOG_DCS_IO)
 		logerror("%s:dcs_data_w(%04X)\n", machine().describe_context(), data);
@@ -1603,7 +1603,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_delayed_data_w_callback )
 }
 
 
-void dcs_audio_device::data_w(UINT16 data)
+void dcs_audio_device::data_w(uint16_t data)
 {
 	/* preprocess the write */
 	if (preprocess_write(data))
@@ -1694,7 +1694,7 @@ void dcs_audio_device::ack_w()
 }
 
 
-UINT16 dcs_audio_device::data_r()
+uint16_t dcs_audio_device::data_r()
 {
 	/* data is actually only 8 bit (read from d8-d15, which is d0-d7 from the data access instructions POV) on early dcs, but goes 16 on later (seattle) */
 	if (m_last_output_full && !m_output_full_cb.isnull())
@@ -1752,9 +1752,9 @@ int dcs_audio_device::data2_r()
 
 void dcs_audio_device::update_timer_count()
 {
-	UINT64 periods_since_start;
-	UINT64 elapsed_cycles;
-	UINT64 elapsed_clocks;
+	uint64_t periods_since_start;
+	uint64_t elapsed_cycles;
+	uint64_t elapsed_clocks;
 
 	/* if not enabled, skip */
 	if (!m_timer_enable)
@@ -1781,12 +1781,12 @@ void dcs_audio_device::update_timer_count()
 
 TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::internal_timer_callback )
 {
-	INT64 target_cycles;
+	int64_t target_cycles;
 
 	/* compute the absolute cycle when the next one should fire */
 	/* we do this to avoid drifting */
 	m_timers_fired++;
-	target_cycles = m_timer_start_cycles + m_timer_scale * (m_timer_start_count + 1 + m_timers_fired * (UINT64)(m_timer_period + 1));
+	target_cycles = m_timer_start_cycles + m_timer_scale * (m_timer_start_count + 1 + m_timers_fired * (uint64_t)(m_timer_period + 1));
 	target_cycles -= m_cpu->total_cycles();
 
 	/* set the next timer, but only if it's for a reasonable number */
@@ -1821,7 +1821,7 @@ void dcs_audio_device::reset_timer()
 			m_program->read_dword(0x1b*4) == 0x0C0020 &&      /* DIS SEC_REG */
 			m_program->read_dword(0x1c*4) == 0x0A001F)            /* RTI */
 		{
-			m_timer_ignore = TRUE;
+			m_timer_ignore = true;
 		}
 	}
 
@@ -1874,7 +1874,7 @@ WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
 
 READ16_MEMBER( dcs_audio_device::adsp_control_r )
 {
-	UINT16 result = 0xffff;
+	uint16_t result = 0xffff;
 
 	switch (offset)
 	{
@@ -1987,7 +1987,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 	{
 		int count = m_size / (2*(m_incs ? m_incs : 1));
 		// sf2049se was having overflow issues with fixed size of 0x400 buffer (m_size==0xb40, count=0x5a0).
-		INT16 buffer[0x800];
+		int16_t buffer[0x800];
 		int i;
 
 		for (i = 0; i < count; i++)
@@ -2063,7 +2063,7 @@ WRITE32_MEMBER(dcs_audio_device::sound_tx_callback)
 		{
 			/* get the autobuffer registers */
 			int     mreg, lreg;
-			UINT16  source;
+			uint16_t  source;
 
 			m_ireg = (m_control_regs[S1_AUTOBUF_REG] >> 9) & 7;
 			mreg = (m_control_regs[S1_AUTOBUF_REG] >> 7) & 3;
@@ -2189,7 +2189,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback1 )
 }
 
 
-int dcs_audio_device::preprocess_stage_1(UINT16 data)
+int dcs_audio_device::preprocess_stage_1(uint16_t data)
 {
 	hle_transfer_state &transfer = m_transfer;
 
@@ -2327,7 +2327,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s2_ack_callback )
 }
 
 
-int dcs_audio_device::preprocess_stage_2(UINT16 data)
+int dcs_audio_device::preprocess_stage_2(uint16_t data)
 {
 	hle_transfer_state &transfer = m_transfer;
 
@@ -2429,7 +2429,7 @@ int dcs_audio_device::preprocess_stage_2(UINT16 data)
 }
 
 
-int dcs_audio_device::preprocess_write(UINT16 data)
+int dcs_audio_device::preprocess_write(uint16_t data)
 {
 	hle_transfer_state &transfer = m_transfer;
 	int result;
@@ -2461,7 +2461,7 @@ const device_type DCS_AUDIO_2K = &device_creator<dcs_audio_2k_device>;
 //  dcs_audio_2k_device - constructor
 //-------------------------------------------------
 
-dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dcs_audio_device(mconfig, DCS_AUDIO_2K, "DCS Audio 2K", tag, owner, clock, "dcs_audio_2k", __FILE__)
 {
 }
@@ -2477,7 +2477,7 @@ const device_type DCS_AUDIO_2K_UART = &device_creator<dcs_audio_2k_uart_device>;
 //  dcs_audio_2k_uart_device - constructor
 //-------------------------------------------------
 
-dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dcs_audio_device(mconfig, DCS_AUDIO_2K_UART, "DCS Audio 2K UART", tag, owner, clock, "dcs_audio_2k_uart", __FILE__)
 {
 }
@@ -2493,7 +2493,7 @@ const device_type DCS_AUDIO_8K = &device_creator<dcs_audio_8k_device>;
 //  dcs_audio_8k_device - constructor
 //-------------------------------------------------
 
-dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dcs_audio_device(mconfig, DCS_AUDIO_8K, "DCS Audio 8K", tag, owner, clock, "dcs_audio_8k", __FILE__)
 {
 }
@@ -2509,7 +2509,7 @@ const device_type DCS_AUDIO_WPC = &device_creator<dcs_audio_wpc_device>;
 //  dcs_audio_wpc_device - constructor
 //-------------------------------------------------
 
-dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dcs_audio_device(mconfig, DCS_AUDIO_WPC, "DCS Audio WPC", tag, owner, clock, "dcs_audio_wpc", __FILE__, 15)
 {
 }
@@ -2525,7 +2525,7 @@ machine_config_constructor dcs_audio_wpc_device::device_mconfig_additions() cons
 //  dcs2_audio_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	dcs_audio_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -2537,7 +2537,7 @@ const device_type DCS2_AUDIO_2115 = &device_creator<dcs2_audio_2115_device>;
 //  dcs2_audio_2115_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_2115_device::dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dcs2_audio_2115_device::dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dcs2_audio_device(mconfig, DCS2_AUDIO_2115, "DCS2 Audio 2115", tag, owner, clock, "dcs2_audio_2115", __FILE__)
 {
 }
@@ -2553,7 +2553,7 @@ const device_type DCS2_AUDIO_2104 = &device_creator<dcs2_audio_2104_device>;
 //  dcs2_audio_2104_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_2104_device::dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dcs2_audio_2104_device::dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dcs2_audio_device(mconfig, DCS2_AUDIO_2104, "DCS2 Audio 2104", tag, owner, clock, "dcs2_audio_2104", __FILE__)
 {
 }
@@ -2570,7 +2570,7 @@ const device_type DCS2_AUDIO_DSIO = &device_creator<dcs2_audio_dsio_device>;
 //  dcs2_audio_dsio_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dcs2_audio_device(mconfig, DCS2_AUDIO_DSIO, "DCS2 Audio DSIO", tag, owner, clock, "dcs2_audio_dsio", __FILE__)
 {
 }
@@ -2586,7 +2586,7 @@ const device_type DCS2_AUDIO_DENVER = &device_creator<dcs2_audio_denver_device>;
 //  dcs2_audio_denver_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dcs2_audio_device(mconfig, DCS2_AUDIO_DENVER, "DCS2 Audio Denver", tag, owner, clock, "dcs2_audio_denver", __FILE__)
 {
 }

@@ -44,7 +44,7 @@ device_pc1512_mouse_port_interface::device_pc1512_mouse_port_interface(const mac
 //  pc1512_mouse_port_t - constructor
 //-------------------------------------------------
 
-pc1512_mouse_port_t::pc1512_mouse_port_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pc1512_mouse_port_t::pc1512_mouse_port_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC1512_MOUSE_PORT, "Amstrad PC1512 mouse port", tag, owner, clock, "pc1512_mouse_port", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_write_x(*this),
@@ -55,7 +55,7 @@ pc1512_mouse_port_t::pc1512_mouse_port_t(const machine_config &mconfig, const ch
 {
 }
 
-pc1512_mouse_t::pc1512_mouse_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pc1512_mouse_t::pc1512_mouse_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC1512_MOUSE, "Amstrad PC1512 mouse", tag, owner, clock, "pc1512_mouse", __FILE__),
 	device_pc1512_mouse_port_interface(mconfig, *this)
 {

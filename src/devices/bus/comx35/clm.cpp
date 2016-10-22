@@ -101,9 +101,9 @@ MC6845_UPDATE_ROW( comx_clm_device::crtc_update_row )
 {
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[((ma + column) & 0x7ff)];
-		UINT16 addr = (code << 3) | (ra & 0x07);
-		UINT8 data = m_char_rom->base()[addr & 0x7ff];
+		uint8_t code = m_video_ram[((ma + column) & 0x7ff)];
+		uint16_t addr = (code << 3) | (ra & 0x07);
+		uint8_t data = m_char_rom->base()[addr & 0x7ff];
 
 		if (BIT(ra, 3) && column == cursor_x)
 		{
@@ -172,7 +172,7 @@ machine_config_constructor comx_clm_device::device_mconfig_additions() const
 //  comx_clm_device - constructor
 //-------------------------------------------------
 
-comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COMX_CLM, "COMX 80 Column Card", tag, owner, clock, "comx_clm", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	device_gfx_interface(mconfig, *this, nullptr, "palette"),
@@ -222,9 +222,9 @@ int comx_clm_device::comx_ef4_r()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (offset >= 0xc000 && offset < 0xc800)
 	{
@@ -247,7 +247,7 @@ UINT8 comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *extr
 //  comx_mwr_w - memory write
 //-------------------------------------------------
 
-void comx_clm_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data)
+void comx_clm_device::comx_mwr_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset >= 0xd000 && offset < 0xd800)
 	{

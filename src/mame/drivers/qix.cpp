@@ -1167,7 +1167,7 @@ ROM_END
  *************************************/
 
 // 99 means the value is unknown
-static const UINT8 xor1_table[] =
+static const uint8_t xor1_table[] =
 {
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
@@ -1235,7 +1235,7 @@ static const UINT8 xor1_table[] =
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 };
 
-static const UINT8 xor2_table[] =
+static const uint8_t xor2_table[] =
 {
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,
@@ -1315,7 +1315,7 @@ int qix_state::kram3_permut1(int idx, int value)
 	}
 }
 
-int qix_state::kram3_permut2(int tbl_index, int idx, const UINT8 *xor_table)
+int qix_state::kram3_permut2(int tbl_index, int idx, const uint8_t *xor_table)
 {
 	int xorval = 0;
 
@@ -1364,8 +1364,8 @@ int qix_state::kram3_decrypt(int address, int value)
 
 DRIVER_INIT_MEMBER(qix_state,kram3)
 {
-	//const UINT8 *patch;
-	UINT8 *rom, *decrypted;
+	//const uint8_t *patch;
+	uint8_t *rom, *decrypted;
 	int i;
 
 	assert(m_bank0);
@@ -1388,7 +1388,7 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 	i = 0;
 	//patch = memregion("user1")->base();
 	rom = memregion("maincpu")->base();
-	decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
+	decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
 	for (i = 0xa000; i < 0x10000; ++i)
@@ -1403,7 +1403,7 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 	i = 0;
 	//patch = memregion("user2")->base();
 	rom = memregion("videocpu")->base();
-	decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
+	decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
 	for (i = 0xa000; i < 0x10000; ++i)

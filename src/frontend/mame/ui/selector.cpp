@@ -21,7 +21,7 @@ namespace ui {
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> const &s_sel, UINT16 &s_actual, int category, int _hover)
+menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> const &s_sel, uint16_t &s_actual, int category, int _hover)
 	: menu(mui, container)
 	, m_selector(s_actual)
 	, m_category(category)
@@ -33,7 +33,7 @@ menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, 
 	m_searchlist[0] = nullptr;
 }
 
-menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> &&s_sel, UINT16 &s_actual, int category, int _hover)
+menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> &&s_sel, uint16_t &s_actual, int category, int _hover)
 	: menu(mui, container)
 	, m_selector(s_actual)
 	, m_category(category)

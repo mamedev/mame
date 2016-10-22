@@ -95,7 +95,7 @@ void wd7600_device::static_set_keybctag(device_t &device, const char *tag)
 	chip.m_keybctag = tag;
 }
 
-wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WD7600, "WD 7600 chipset", tag, owner, clock, "wd7600", __FILE__),
 	m_read_ior(*this),
 	m_write_iow(*this),
@@ -153,7 +153,7 @@ void wd7600_device::device_start()
 	m_keybc = downcast<at_keyboard_controller_device *>(machine().device(m_keybctag));
 
 	m_ram = ram_dev->pointer();
-	UINT32 ram_size = ram_dev->size();
+	uint32_t ram_size = ram_dev->size();
 
 	// install base memory
 	m_space->install_ram(0x000000, 0x09ffff, m_ram);
@@ -295,7 +295,7 @@ WRITE8_MEMBER( wd7600_device::keyb_data_w )
 
 READ8_MEMBER( wd7600_device::keyb_data_r )
 {
-	UINT8 ret = m_keybc->data_r(space,0);
+	uint8_t ret = m_keybc->data_r(space,0);
 //  if(LOG) logerror("WD7600 '%s': keyboard data read %02x\n", tag(), ret);
 		return ret;
 }
@@ -372,7 +372,7 @@ READ8_MEMBER( wd7600_device::dma_read_word )
 	if (m_dma_channel == -1)
 		return 0xff;
 
-	UINT16 result = m_space->read_word((page_offset() & 0xfe0000) | (offset << 1));
+	uint16_t result = m_space->read_word((page_offset() & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result >> 8;
 
 	return result;
@@ -452,7 +452,7 @@ WRITE8_MEMBER( wd7600_device::a20_reset_w )
 
 READ8_MEMBER( wd7600_device::a20_reset_r )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if(m_alt_a20)
 		ret |= 0x02;
 	return ret;

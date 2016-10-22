@@ -75,7 +75,7 @@ GFXDECODE_END
 
 const device_type IGS017_IGS031 = &device_creator<igs017_igs031_device>;
 
-igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IGS017_IGS031, "IGS017_IGS031", tag, owner, clock, "igs017_igs031", __FILE__),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		device_video_interface(mconfig, *this),
@@ -97,7 +97,7 @@ const address_space_config *igs017_igs031_device::memory_space_config(address_sp
 	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
-UINT16 igs017_igs031_device::palette_callback_straight(UINT16 bgr)
+uint16_t igs017_igs031_device::palette_callback_straight(uint16_t bgr)
 {
 	return bgr;
 }
@@ -137,7 +137,7 @@ void igs017_igs031_device::video_start()
 
 	if (m_revbits)
 	{
-		UINT8 *rom  =   memregion("^tilemaps")->base();
+		uint8_t *rom  =   memregion("^tilemaps")->base();
 		int size    =   memregion("^tilemaps")->bytes();
 		int i;
 
@@ -168,12 +168,12 @@ WRITE8_MEMBER(igs017_igs031_device::write)
 }
 
 
-void igs017_igs031_device::space_w(int offset, UINT8 data)
+void igs017_igs031_device::space_w(int offset, uint8_t data)
 {
 	space().write_byte(offset, data);
 }
 
-UINT8 igs017_igs031_device::space_r(int offset)
+uint8_t igs017_igs031_device::space_r(int offset)
 {
 	return space().read_byte(offset);
 }
@@ -237,16 +237,16 @@ WRITE8_MEMBER(igs017_igs031_device::bg_w)
 // This routine expands each word into three bytes.
 void igs017_igs031_device::expand_sprites()
 {
-	UINT8 *rom  =   memregion("^sprites")->base();
+	uint8_t *rom  =   memregion("^sprites")->base();
 	int size    =   memregion("^sprites")->bytes();
 	int i;
 
 	m_sprites_gfx_size   =   size / 2 * 3;
-	m_sprites_gfx        =   std::make_unique<UINT8[]>(m_sprites_gfx_size);
+	m_sprites_gfx        =   std::make_unique<uint8_t[]>(m_sprites_gfx_size);
 
 	for (i = 0; i < size / 2 ; i++)
 	{
-		UINT16 pens = (rom[i*2+1] << 8) | rom[i*2];
+		uint16_t pens = (rom[i*2+1] << 8) | rom[i*2];
 
 		m_sprites_gfx[i * 3 + 0] = (pens >>  0) & 0x1f;
 		m_sprites_gfx[i * 3 + 1] = (pens >>  5) & 0x1f;
@@ -306,8 +306,8 @@ void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cli
 
 void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8 *s    =   m_spriteram;
-	UINT8 *end  =   m_spriteram + 0x800;
+	uint8_t *s    =   m_spriteram;
+	uint8_t *end  =   m_spriteram + 0x800;
 
 	for ( ; s < end; s += 8 )
 	{
@@ -381,7 +381,7 @@ int igs017_igs031_device::debug_viewer(bitmap_ind16 &bitmap,const rectangle &cli
 	return 0;
 }
 
-UINT32 igs017_igs031_device::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs017_igs031_device::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 

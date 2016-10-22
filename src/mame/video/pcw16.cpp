@@ -52,9 +52,9 @@ static const rgb_t pcw16_palette[PCW16_NUM_COLOURS] =
 };
 
 
-inline void pcw16_state::pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void pcw16_state::pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (uint16_t)color;
 }
 
 /* Initialise the palette */
@@ -158,9 +158,9 @@ void pcw16_state::pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, unsi
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-UINT32 pcw16_state::screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pcw16_state::screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	unsigned char *pScanLine = (unsigned char *)ram + 0x0fc00;  //0x03c00;  //0x020FC00;
 
 	int y;

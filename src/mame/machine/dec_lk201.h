@@ -48,7 +48,7 @@ class lk201_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(ddr_r);
 	DECLARE_WRITE8_MEMBER(ddr_w);
@@ -78,36 +78,36 @@ protected:
 	virtual void tra_callback() override;    // Tx send bit
 
 private:
-	UINT8 ddrs[3];
-	UINT8 ports[3];
-	UINT8 led_data;
-	UINT8 kbd_data;
+	uint8_t ddrs[3];
+	uint8_t ports[3];
+	uint8_t led_data;
+	uint8_t kbd_data;
 
 	union {
 		struct {
-			UINT8 tcr;
-			UINT8 tsr;
-			UINT8 icrh;
-			UINT8 icrl;
-			UINT8 ocrh;
-			UINT8 ocrl;
-			UINT8 crh;
-			UINT8 crl;
-			UINT8 acrh;
-			UINT8 acrl;
+			uint8_t tcr;
+			uint8_t tsr;
+			uint8_t icrh;
+			uint8_t icrl;
+			uint8_t ocrh;
+			uint8_t ocrl;
+			uint8_t crh;
+			uint8_t crl;
+			uint8_t acrh;
+			uint8_t acrl;
 		};
-		UINT8 regs[10];
+		uint8_t regs[10];
 	} m_timer;
 
 	emu_timer *m_count;
 	emu_timer *m_beeper;
 
-	UINT8 sci_ctl2;
-	UINT8 sci_status;
-	//UINT8 sci_data;
+	uint8_t sci_ctl2;
+	uint8_t sci_status;
+	//uint8_t sci_data;
 
-	UINT8 spi_status;
-	UINT8 spi_data;
+	uint8_t spi_status;
+	uint8_t spi_data;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_speaker;
@@ -131,7 +131,7 @@ private:
 	required_ioport m_kbd16;
 	required_ioport m_kbd17;
 
-	void send_port(address_space &space, UINT8 offset, UINT8 data);
+	void send_port(address_space &space, uint8_t offset, uint8_t data);
 	void update_interrupts();
 
 	int m_kbd_state;

@@ -29,28 +29,28 @@ public:
 		{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_paletteram;
 
 	/* ROM banking */
-	UINT8       m_bankxor;
+	uint8_t       m_bankxor;
 
 	/* video-related */
 	tilemap_t   *m_background;
-	UINT8       m_videoreg;
-	UINT8       m_scrollx;
-	UINT8       m_scrolly;
+	uint8_t       m_videoreg;
+	uint8_t       m_scrollx;
+	uint8_t       m_scrolly;
 
 	/* Kaneko BEAST state */
-	UINT8       m_data_to_beast;
-	UINT8       m_data_to_z80;
-	UINT8       m_beast_to_z80_full;
-	UINT8       m_z80_to_beast_full;
-	UINT8       m_beast_int0_l;
-	UINT8       m_beast_p0;
-	UINT8       m_beast_p1;
-	UINT8       m_beast_p2;
-	UINT8       m_beast_p3;
+	uint8_t       m_data_to_beast;
+	uint8_t       m_data_to_z80;
+	uint8_t       m_beast_to_z80_full;
+	uint8_t       m_z80_to_beast_full;
+	uint8_t       m_beast_int0_l;
+	uint8_t       m_beast_p0;
+	uint8_t       m_beast_p1;
+	uint8_t       m_beast_p2;
+	uint8_t       m_beast_p3;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -89,7 +89,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_djboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_djboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_djboy(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(djboy_scanline);
 };

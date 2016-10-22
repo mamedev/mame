@@ -43,7 +43,7 @@ class microdrive_image_device : public device_t,
 {
 public:
 	// construction/destruction
-	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~microdrive_image_device();
 
 	template<class _Object> static devcb_base &set_comms_out_wr_callback(device_t &device, _Object object) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(object); }
@@ -86,8 +86,8 @@ private:
 	int m_erase;
 	int m_read_write;
 
-	std::unique_ptr<UINT8[]> m_left;
-	std::unique_ptr<UINT8[]> m_right;
+	std::unique_ptr<uint8_t[]> m_left;
+	std::unique_ptr<uint8_t[]> m_right;
 
 	int m_bit_offset;
 	int m_byte_offset;

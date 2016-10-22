@@ -50,7 +50,7 @@ READ8_MEMBER( cosmicos_state::read )
 {
 	if (m_boot) offset |= 0xc0c0;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset < 0xc000)
 	{
@@ -84,7 +84,7 @@ WRITE8_MEMBER( cosmicos_state::write )
 
 READ8_MEMBER( cosmicos_state::video_off_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!m_q)
 	{
@@ -96,7 +96,7 @@ READ8_MEMBER( cosmicos_state::video_off_r )
 
 READ8_MEMBER( cosmicos_state::video_on_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!m_q)
 	{
@@ -116,14 +116,14 @@ WRITE8_MEMBER( cosmicos_state::audio_latch_w )
 
 READ8_MEMBER( cosmicos_state::hex_keyboard_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
 		if (BIT(m_keylatch, i))
 		{
-			UINT8 keydata = m_key_row[i]->read();
+			uint8_t keydata = m_key_row[i]->read();
 
 			if (BIT(keydata, 0)) data |= 0x01;
 			if (BIT(keydata, 1)) data |= 0x02;
@@ -193,7 +193,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER( cosmicos_state::data )
 {
-	UINT8 data = m_io_data->read();
+	uint8_t data = m_io_data->read();
 	int i;
 
 	for (i = 0; i < 8; i++)
@@ -385,14 +385,14 @@ READ_LINE_MEMBER( cosmicos_state::clear_r )
 
 READ_LINE_MEMBER( cosmicos_state::ef1_r )
 {
-	UINT8 special = m_special->read();
+	uint8_t special = m_special->read();
 
 	return BIT(special, 0);
 }
 
 READ_LINE_MEMBER( cosmicos_state::ef2_r )
 {
-	UINT8 special = m_special->read();
+	uint8_t special = m_special->read();
 	int casin = (m_cassette)->input() < 0.0;
 
 	output().set_led_value(LED_CASSETTE, casin);
@@ -402,7 +402,7 @@ READ_LINE_MEMBER( cosmicos_state::ef2_r )
 
 READ_LINE_MEMBER( cosmicos_state::ef3_r )
 {
-	UINT8 special = m_special->read();
+	uint8_t special = m_special->read();
 
 	return BIT(special, 2) | BIT(special, 3);
 }
@@ -483,7 +483,7 @@ void cosmicos_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 {
-	UINT8 *ptr = m_rom->base();
+	uint8_t *ptr = m_rom->base();
 	int size = image.length();
 
 	/* load image to RAM */

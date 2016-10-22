@@ -24,8 +24,8 @@ class a2bus_pic_device:
 {
 public:
 	// construction/destruction
-	a2bus_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2bus_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2bus_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -41,9 +41,9 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
-	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) override;
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
 
 	required_device<centronics_device> m_ctx;
 	required_device<input_buffer_device> m_ctx_data_in;
@@ -53,9 +53,9 @@ protected:
 	void clear_strobe();
 
 private:
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 	bool m_started;
-	UINT8 m_ack;
+	uint8_t m_ack;
 	bool m_irqenable;
 	bool m_autostrobe;
 	emu_timer *m_timer;

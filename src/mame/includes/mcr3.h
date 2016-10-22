@@ -15,21 +15,21 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	optional_shared_ptr<UINT8> m_spyhunt_alpharam;
+	optional_shared_ptr<uint8_t> m_spyhunt_alpharam;
 	required_device<screen_device> m_screen;
 
-	UINT8 m_input_mux;
-	UINT8 m_latched_input;
-	UINT8 m_last_op4;
-	UINT8 m_maxrpm_adc_control;
-	UINT8 m_maxrpm_adc_select;
-	UINT8 m_maxrpm_last_shift;
-	INT8 m_maxrpm_p1_shift;
-	INT8 m_maxrpm_p2_shift;
-	UINT8 m_spyhunt_sprite_color_mask;
-	INT16 m_spyhunt_scroll_offset;
-	INT16 m_spyhunt_scrollx;
-	INT16 m_spyhunt_scrolly;
+	uint8_t m_input_mux;
+	uint8_t m_latched_input;
+	uint8_t m_last_op4;
+	uint8_t m_maxrpm_adc_control;
+	uint8_t m_maxrpm_adc_select;
+	uint8_t m_maxrpm_last_shift;
+	int8_t m_maxrpm_p1_shift;
+	int8_t m_maxrpm_p2_shift;
+	uint8_t m_spyhunt_sprite_color_mask;
+	int16_t m_spyhunt_scroll_offset;
+	int16_t m_spyhunt_scrollx;
+	int16_t m_spyhunt_scrolly;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_alpha_tilemap;
 
@@ -74,8 +74,8 @@ public:
 	DECLARE_VIDEO_START(mcrmono);
 	DECLARE_VIDEO_START(spyhunt);
 	DECLARE_PALETTE_INIT(spyhunt);
-	UINT32 screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced);
 	void mcr_common_init();
 

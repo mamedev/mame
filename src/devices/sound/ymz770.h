@@ -38,32 +38,32 @@ class ymz770_device : public device_t, public device_sound_interface
 {
 	struct ymz_channel
 	{
-		UINT8 phrase;
-		UINT8 pan;
-		UINT8 volume;
-		UINT8 control;
+		uint8_t phrase;
+		uint8_t pan;
+		uint8_t volume;
+		uint8_t control;
 
 		bool is_playing, last_block;
 
 		mpeg_audio *decoder;
 
-		INT16 output_data[0x1000];
+		int16_t output_data[0x1000];
 		int output_remaining;
 		int output_ptr;
 		int atbl;
 		int pptr;
 
-		UINT8 sequence;
-		UINT8 seqcontrol;
-		UINT8 seqdelay;
-		UINT8 *seqdata;
+		uint8_t sequence;
+		uint8_t seqcontrol;
+		uint8_t seqdelay;
+		uint8_t *seqdata;
 		bool is_seq_playing;
 	};
 
 
 public:
 	// construction/destruction
-	ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER(write);
 
@@ -77,16 +77,16 @@ protected:
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	void internal_reg_write(UINT8 reg, UINT8 data);
+	void internal_reg_write(uint8_t reg, uint8_t data);
 
 	// data
-	UINT8 m_cur_reg;
-	UINT8 m_mute;         // mute chip
-	UINT8 m_doen;         // digital output enable
-	UINT8 m_vlma;         // overall AAM volume
-	UINT8 m_bsl;          // boost level
-	UINT8 m_cpl;          // clip limiter
-	required_region_ptr<UINT8> m_rom;
+	uint8_t m_cur_reg;
+	uint8_t m_mute;         // mute chip
+	uint8_t m_doen;         // digital output enable
+	uint8_t m_vlma;         // overall AAM volume
+	uint8_t m_bsl;          // boost level
+	uint8_t m_cpl;          // clip limiter
+	required_region_ptr<uint8_t> m_rom;
 
 	ymz_channel m_channels[8];
 };

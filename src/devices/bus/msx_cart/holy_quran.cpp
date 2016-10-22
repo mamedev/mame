@@ -7,7 +7,7 @@
 const device_type MSX_CART_HOLY_QURAN = &device_creator<msx_cart_holy_quran>;
 
 
-msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_HOLY_QURAN, "MSX Cartridge - Holy Quran", tag, owner, clock, "msx_cart_holy_quran", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_decrypt(false)
@@ -72,7 +72,7 @@ READ8_MEMBER(msx_cart_holy_quran::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
-		UINT8 data = m_bank_base[(offset - 0x4000) >> 13][offset & 0x1fff];
+		uint8_t data = m_bank_base[(offset - 0x4000) >> 13][offset & 0x1fff];
 
 		if (m_decrypt)
 		{

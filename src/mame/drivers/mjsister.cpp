@@ -10,8 +10,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/dac.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #define MCLK 12000000
 
@@ -46,20 +47,20 @@ public:
 	int  m_rombank0;
 	int  m_rombank1;
 
-	UINT32 m_dac_adr;
-	UINT32 m_dac_bank;
-	UINT32 m_dac_adr_s;
-	UINT32 m_dac_adr_e;
-	UINT32 m_dac_busy;
+	uint32_t m_dac_adr;
+	uint32_t m_dac_bank;
+	uint32_t m_dac_adr_s;
+	uint32_t m_dac_adr_e;
+	uint32_t m_dac_busy;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 
 	/* memory */
-	UINT8 m_videoram0[0x8000];
-	UINT8 m_videoram1[0x8000];
+	uint8_t m_videoram0[0x8000];
+	uint8_t m_videoram1[0x8000];
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(dac_adr_s_w);
 	DECLARE_WRITE8_MEMBER(dac_adr_e_w);
@@ -72,10 +73,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redraw();
-	void plot0( int offset, UINT8 data );
-	void plot1( int offset, UINT8 data );
+	void plot0( int offset, uint8_t data );
+	void plot1( int offset, uint8_t data );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -97,7 +98,7 @@ void mjsister_state::video_start()
 	save_item(NAME(m_videoram1));
 }
 
-void mjsister_state::plot0( int offset, UINT8 data )
+void mjsister_state::plot0( int offset, uint8_t data )
 {
 	int x, y, c1, c2;
 
@@ -111,7 +112,7 @@ void mjsister_state::plot0( int offset, UINT8 data )
 	m_tmpbitmap0->pix16(y, x * 2 + 1) = c2;
 }
 
-void mjsister_state::plot1( int offset, UINT8 data )
+void mjsister_state::plot1( int offset, uint8_t data )
 {
 	int x, y, c1, c2;
 
@@ -144,7 +145,7 @@ WRITE8_MEMBER(mjsister_state::videoram_w)
 	}
 }
 
-UINT32 mjsister_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mjsister_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flip = m_flip_screen;
 	int i, j;
@@ -189,15 +190,15 @@ void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		dac_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in mjsister_state::device_timer");
+		assert_always(false, "Unknown id in mjsister_state::device_timer");
 	}
 }
 
 TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 {
-	UINT8 *DACROM = memregion("samples")->base();
+	uint8_t *DACROM = memregion("samples")->base();
 
-	m_dac->write_unsigned8(DACROM[(m_dac_bank * 0x10000 + m_dac_adr++) & 0x1ffff]);
+	m_dac->write(DACROM[(m_dac_bank * 0x10000 + m_dac_adr++) & 0x1ffff]);
 
 	if (((m_dac_adr & 0xff00 ) >> 8) !=  m_dac_adr_e)
 		timer_set(attotime::from_hz(MCLK) * 1024, TIMER_DAC);
@@ -436,7 +437,7 @@ void mjsister_state::redraw()
 
 void mjsister_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 
@@ -497,15 +498,16 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, MCLK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /*************************************

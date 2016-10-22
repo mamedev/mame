@@ -28,7 +28,7 @@ const device_type WSWAN_SND = &device_creator<wswan_sound_device>;
 //  wswan_sound_device - constructor
 //-------------------------------------------------
 
-wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WSWAN_SND, "WonderSwan Audio Custom", tag, owner, clock, "wswan_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
@@ -214,7 +214,7 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 
 				if (m_noise_enable)
 				{
-					UINT16 new_bit = 0;
+					uint16_t new_bit = 0;
 
 					if (m_noise_type == 0)
 					{
@@ -254,7 +254,7 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 }
 
 
-void wswan_sound_device::wswan_ch_set_freq( CHAN *ch, UINT16 freq )
+void wswan_sound_device::wswan_ch_set_freq( CHAN *ch, uint16_t freq )
 {
 	freq &= 0x7ff;  // docs say freq is 11bits and a few games (Morita Shougi, World Stadium + others) write 0x800 causing a divide by 0 crash
 	ch->freq = freq;
@@ -321,7 +321,7 @@ WRITE8_MEMBER( wswan_sound_device::port_w )
 			break;
 
 		case 0x8C:              /* Sweep step */
-			m_sweep_step = (INT8)data;
+			m_sweep_step = (int8_t)data;
 			break;
 
 		case 0x8D:              /* Sweep time */

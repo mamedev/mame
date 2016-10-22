@@ -362,9 +362,9 @@ public:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
 
-	required_shared_ptr<UINT32> m_workram;
-	required_shared_ptr<UINT32> m_sharc_dataram0;
-	optional_shared_ptr<UINT32> m_sharc_dataram1;
+	required_shared_ptr<uint32_t> m_workram;
+	required_shared_ptr<uint32_t> m_sharc_dataram0;
+	optional_shared_ptr<uint32_t> m_sharc_dataram1;
 	required_device<ppc4xx_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k056800_device> m_k056800;
@@ -378,19 +378,19 @@ public:
 	optional_device<eeprom_serial_93cxx_device> m_lan_eeprom;
 	required_ioport m_in0, m_in1, m_in2, m_dsw;
 	optional_ioport m_eepromout, m_analog1, m_analog2;
-	optional_region_ptr<UINT8> m_user3_ptr;
-	optional_region_ptr<UINT8> m_user5_ptr;
+	optional_region_ptr<uint8_t> m_user3_ptr;
+	optional_region_ptr<uint8_t> m_user5_ptr;
 	optional_device<ds2401_device> m_lan_ds2401;
 	required_device<watchdog_timer_device> m_watchdog;
 
 	emu_timer *m_sound_irq_timer;
-	UINT8 m_led_reg0;
-	UINT8 m_led_reg1;
-	std::unique_ptr<UINT8[]> m_jvs_sdata;
-	UINT32 m_jvs_sdata_ptr;
-	UINT16 m_gn680_latch;
-	UINT16 m_gn680_ret0;
-	UINT16 m_gn680_ret1;
+	uint8_t m_led_reg0;
+	uint8_t m_led_reg1;
+	std::unique_ptr<uint8_t[]> m_jvs_sdata;
+	uint32_t m_jvs_sdata_ptr;
+	uint16_t m_gn680_latch;
+	uint16_t m_gn680_ret0;
+	uint16_t m_gn680_ret1;
 
 	DECLARE_READ32_MEMBER(hornet_k037122_sram_r);
 	DECLARE_WRITE32_MEMBER(hornet_k037122_sram_w);
@@ -429,11 +429,11 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(hornet_2board);
-	UINT32 screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	int jvs_encode_data(UINT8 *in, int length);
-	int jvs_decode_data(UINT8 *in, UINT8 *out, int length);
+	int jvs_encode_data(uint8_t *in, int length);
+	int jvs_decode_data(uint8_t *in, uint8_t *out, int length);
 	void jamma_jvs_cmd_exec();
 };
 
@@ -486,7 +486,7 @@ WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_1)
 {
 }
 
-UINT32 hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	voodoo_device* voodoo = (voodoo_device*)machine().device("voodoo0");
 
@@ -499,7 +499,7 @@ UINT32 hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
@@ -527,7 +527,7 @@ UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_r
 
 READ8_MEMBER(hornet_state::sysreg_r)
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 
 	switch (offset)
 	{
@@ -655,7 +655,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 
 READ8_MEMBER(hornet_state::comm_eeprom_r)
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 	r |= (m_lan_eeprom->do_read() & 1) << 1;
 	r |= m_lan_ds2401->read() & 1;
 	return r;
@@ -675,7 +675,7 @@ WRITE32_MEMBER(hornet_state::comm1_w)
 WRITE32_MEMBER(hornet_state::comm_rombank_w)
 {
 	int bank = data >> 24;
-	UINT8 *usr3 = memregion("user3")->base();
+	uint8_t *usr3 = memregion("user3")->base();
 	if (usr3 != nullptr)
 		membank("bank1")->set_entry(bank & 0x7f);
 }
@@ -953,13 +953,13 @@ INPUT_PORTS_END
 void hornet_state::machine_start()
 {
 	m_jvs_sdata_ptr = 0;
-	m_jvs_sdata = make_unique_clear<UINT8[]>(1024);
+	m_jvs_sdata = make_unique_clear<uint8_t[]>(1024);
 
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_workram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_workram);
 
 	save_item(NAME(m_led_reg0));
 	save_item(NAME(m_led_reg1));
@@ -974,7 +974,7 @@ void hornet_state::machine_reset()
 	memory_region* comm_region = memregion("user3");
 	if (comm_region != nullptr)
 	{
-		UINT8* comm_rom = comm_region->base();
+		uint8_t* comm_rom = comm_region->base();
 		membank("bank1")->configure_entries(0, comm_region->bytes() / 0x10000, comm_rom, 0x10000);
 		membank("bank1")->set_entry(0);
 	}
@@ -1165,14 +1165,14 @@ WRITE8_MEMBER(hornet_state::jamma_jvs_w)
 		jamma_jvs_cmd_exec();
 }
 
-int hornet_state::jvs_encode_data(UINT8 *in, int length)
+int hornet_state::jvs_encode_data(uint8_t *in, int length)
 {
 	int inptr = 0;
 	int sum = 0;
 
 	while (inptr < length)
 	{
-		UINT8 b = in[inptr++];
+		uint8_t b = in[inptr++];
 		if (b == 0xe0)
 		{
 			sum += 0xd0 + 0xdf;
@@ -1194,17 +1194,17 @@ int hornet_state::jvs_encode_data(UINT8 *in, int length)
 	return sum;
 }
 
-int hornet_state::jvs_decode_data(UINT8 *in, UINT8 *out, int length)
+int hornet_state::jvs_decode_data(uint8_t *in, uint8_t *out, int length)
 {
 	int outptr = 0;
 	int inptr = 0;
 
 	while (inptr < length)
 	{
-		UINT8 b = in[inptr++];
+		uint8_t b = in[inptr++];
 		if (b == 0xd0)
 		{
-			UINT8 b2 = in[inptr++];
+			uint8_t b2 = in[inptr++];
 			out[outptr++] = b2 + 1;
 		}
 		else
@@ -1218,8 +1218,8 @@ int hornet_state::jvs_decode_data(UINT8 *in, UINT8 *out, int length)
 
 void hornet_state::jamma_jvs_cmd_exec()
 {
-	UINT8 byte_num;
-	UINT8 data[1024], rdata[1024];
+	uint8_t byte_num;
+	uint8_t data[1024], rdata[1024];
 #if 0
 	int length;
 #endif

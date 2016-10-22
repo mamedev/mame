@@ -67,7 +67,7 @@ const tiny_rom_entry *isa8_pc1640_iga_device::device_rom_region() const
 //  isa8_pc1640_iga_device - constructor
 //-------------------------------------------------
 
-isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: isa8_ega_device(mconfig, ISA8_PC1640_IGA, "Amstrad PC1640 IGA", tag, owner, clock, "pc1640_iga", __FILE__)
 {
 }
@@ -86,9 +86,9 @@ void isa8_pc1640_iga_device::device_start()
 
 	for (int i = 0; i < 64; i++ )
 	{
-		UINT8 r = ( ( i & 0x04 ) ? 0xAA : 0x00 ) + ( ( i & 0x20 ) ? 0x55 : 0x00 );
-		UINT8 g = ( ( i & 0x02 ) ? 0xAA : 0x00 ) + ( ( i & 0x10 ) ? 0x55 : 0x00 );
-		UINT8 b = ( ( i & 0x01 ) ? 0xAA : 0x00 ) + ( ( i & 0x08 ) ? 0x55 : 0x00 );
+		uint8_t r = ( ( i & 0x04 ) ? 0xAA : 0x00 ) + ( ( i & 0x20 ) ? 0x55 : 0x00 );
+		uint8_t g = ( ( i & 0x02 ) ? 0xAA : 0x00 ) + ( ( i & 0x10 ) ? 0x55 : 0x00 );
+		uint8_t b = ( ( i & 0x01 ) ? 0xAA : 0x00 ) + ( ( i & 0x08 ) ? 0x55 : 0x00 );
 
 		m_palette->set_pen_color( i, r, g, b );
 	}
@@ -98,13 +98,13 @@ void isa8_pc1640_iga_device::device_start()
 
 	m_videoram = m_vram->base();
 	m_plane[0] = m_videoram + 0x00000;
-	memset(m_plane[0], 0, sizeof(UINT8) * 0x10000);
+	memset(m_plane[0], 0, sizeof(uint8_t) * 0x10000);
 	m_plane[1] = m_videoram + 0x10000;
-	memset(m_plane[1], 0, sizeof(UINT8) * 0x10000);
+	memset(m_plane[1], 0, sizeof(uint8_t) * 0x10000);
 	m_plane[2] = m_videoram + 0x20000;
-	memset(m_plane[2], 0, sizeof(UINT8) * 0x10000);
+	memset(m_plane[2], 0, sizeof(uint8_t) * 0x10000);
 	m_plane[3] = m_videoram + 0x30000;
-	memset(m_plane[3], 0, sizeof(UINT8) * 0x10000);
+	memset(m_plane[3], 0, sizeof(uint8_t) * 0x10000);
 
 	m_crtc_ega = subdevice<crtc_ega_device>(EGA_CRTC_NAME);
 

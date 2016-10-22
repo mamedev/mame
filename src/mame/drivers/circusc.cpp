@@ -52,14 +52,14 @@ This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/circusc.h"
 #include "cpu/z80/z80.h"
-#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
+#include "machine/konami1.h"
 #include "machine/watchdog.h"
-#include "sound/dac.h"
 #include "sound/discrete.h"
-#include "includes/circusc.h"
+#include "sound/volt_reg.h"
 
 
 void circusc_state::machine_start()
@@ -123,7 +123,7 @@ WRITE8_MEMBER(circusc_state::circusc_sound_w)
 
 		/* CS5 */
 		case 3:
-			m_dac->write_unsigned8(data);
+			m_dac->write(data);
 			break;
 
 		/* CS6 */
@@ -372,8 +372,9 @@ static MACHINE_CONFIG_START( circusc, circusc_state )
 	MCFG_SOUND_ADD("sn2", SN76496, XTAL_14_31818MHz/8)
 	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 1)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 2)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 2) // ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_ADD("fltdisc", DISCRETE, 0)
 

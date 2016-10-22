@@ -51,14 +51,14 @@ public:
 		m_soundlatch2(*this, "soundlatch2"),
 		m_hopper(*this, "hopper") { }
 
-	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-	optional_shared_ptr<UINT16> m_shared_ram16;     // Really 8 bit RAM connected to Z180
-	optional_shared_ptr<UINT16> m_paletteram;
-	optional_shared_ptr<UINT16> m_tx_videoram;
-	optional_shared_ptr<UINT16> m_tx_lineselect;
-	optional_shared_ptr<UINT16> m_tx_linescroll;
-	optional_shared_ptr<UINT16> m_tx_gfxram16;
-	optional_shared_ptr<UINT16> m_mainram16;
+	optional_shared_ptr<uint8_t> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
+	optional_shared_ptr<uint16_t> m_shared_ram16;     // Really 8 bit RAM connected to Z180
+	optional_shared_ptr<uint16_t> m_paletteram;
+	optional_shared_ptr<uint16_t> m_tx_videoram;
+	optional_shared_ptr<uint16_t> m_tx_lineselect;
+	optional_shared_ptr<uint16_t> m_tx_linescroll;
+	optional_shared_ptr<uint16_t> m_tx_gfxram16;
+	optional_shared_ptr<uint16_t> m_mainram16;
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -76,12 +76,12 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_device<ticket_dispenser_device> m_hopper;
 
-	UINT16 m_mcu_data;
-	INT8 m_old_p1_paddle_h; /* For Ghox */
-	INT8 m_old_p2_paddle_h;
-	UINT8 m_v25_reset_line; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
-	UINT8 m_sndirq_line;        /* IRQ4 for batrider, IRQ2 for bbakraid */
-	UINT8 m_z80_busreq;
+	uint16_t m_mcu_data;
+	int8_t m_old_p1_paddle_h; /* For Ghox */
+	int8_t m_old_p2_paddle_h;
+	uint8_t m_v25_reset_line; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
+	uint8_t m_sndirq_line;        /* IRQ4 for batrider, IRQ2 for bbakraid */
+	uint8_t m_z80_busreq;
 
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
@@ -147,11 +147,11 @@ public:
 	DECLARE_VIDEO_START(bgaregga);
 	DECLARE_VIDEO_START(bgareggabl);
 	DECLARE_VIDEO_START(batrider);
-	UINT32 screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_toaplan2(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq1);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);

@@ -58,7 +58,7 @@ static const char *const register_names[] =
 //  cs8221_device - constructor
 //-------------------------------------------------
 
-cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CS8221, "CS8221", tag, owner, clock, "cs8221", __FILE__),
 		m_address(0),
 		m_address_valid(false)
@@ -118,7 +118,7 @@ WRITE8_MEMBER( cs8221_device::address_w )
 
 READ8_MEMBER( cs8221_device::data_r )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	if (m_address_valid)
 	{

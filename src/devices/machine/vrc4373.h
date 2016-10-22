@@ -66,11 +66,11 @@
 
 class vrc4373_device : public pci_host_device {
 public:
-	vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void reset_all_mappings() override;
-	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	void set_cpu_tag(const char *tag);
 
@@ -117,14 +117,14 @@ private:
 
 	void map_cpu_space();
 
-	std::vector<UINT32> m_ram;
+	std::vector<uint32_t> m_ram;
 
-	std::vector<UINT32> m_simm[4];
+	std::vector<uint32_t> m_simm[4];
 
-	UINT32 m_cpu_regs[0x7c];
+	uint32_t m_cpu_regs[0x7c];
 
-	UINT32 m_pci1_laddr, m_pci2_laddr, m_pci_io_laddr;
-	UINT32 m_target1_laddr, m_target2_laddr;
+	uint32_t m_pci1_laddr, m_pci2_laddr, m_pci_io_laddr;
+	uint32_t m_target1_laddr, m_target2_laddr;
 
 	required_memory_region m_romRegion;
 

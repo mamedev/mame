@@ -58,8 +58,8 @@ public:
 	optional_ioport_array<8> m_inp_pa2;
 	optional_ioport_array<8> m_inp_pa3;
 
-	UINT8 m_keylatch;
-	UINT8 read_keyboard(int pa);
+	uint8_t m_keylatch;
+	uint8_t read_keyboard(int pa);
 
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_READ8_MEMBER( pia_pa_r );
@@ -92,7 +92,7 @@ public:
 	required_ioport_array<8> m_inp_y;
 	required_ioport_array<4> m_inp_joy;
 
-	UINT8 m_joylatch;
+	uint8_t m_joylatch;
 	int m_centronics_busy;
 	int m_psg_ready;
 

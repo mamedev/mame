@@ -7,15 +7,15 @@ class fuukivid_device : public device_t,
 						public device_video_interface
 {
 public:
-	fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip_screen, UINT32* tilebank);
-	std::unique_ptr<UINT16[]> m_sprram;
-	std::unique_ptr<UINT16[]> m_sprram_old;
-	std::unique_ptr<UINT16[]> m_sprram_old2;
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip_screen, uint32_t* tilebank);
+	std::unique_ptr<uint16_t[]> m_sprram;
+	std::unique_ptr<uint16_t[]> m_sprram_old;
+	std::unique_ptr<uint16_t[]> m_sprram_old2;
 
 
 	DECLARE_WRITE16_MEMBER(fuuki_sprram_w)

@@ -116,22 +116,22 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT32> m_viewregs0;
-	required_shared_ptr<UINT32> m_viewregs6;
-	required_shared_ptr<UINT32> m_viewregs7;
-	required_shared_ptr<UINT32> m_viewregs9;
-	required_shared_ptr<UINT32> m_viewregs10;
-	required_shared_ptr_array<UINT32, 4> m_tilemap_regs;
-	required_shared_ptr<UINT32> m_spriteregs;
-	required_shared_ptr<UINT32> m_blitterregs;
-	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<uint32_t> m_viewregs0;
+	required_shared_ptr<uint32_t> m_viewregs6;
+	required_shared_ptr<uint32_t> m_viewregs7;
+	required_shared_ptr<uint32_t> m_viewregs9;
+	required_shared_ptr<uint32_t> m_viewregs10;
+	required_shared_ptr_array<uint32_t, 4> m_tilemap_regs;
+	required_shared_ptr<uint32_t> m_spriteregs;
+	required_shared_ptr<uint32_t> m_blitterregs;
+	required_shared_ptr<uint32_t> m_spriteram;
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 	rectangle m_sprite_clip;
 	int m_vblirqlevel;
 	int m_bltirqlevel;
 	int m_banking;
-	std::unique_ptr<UINT32[]> m_tilemap_ram[4];
+	std::unique_ptr<uint32_t[]> m_tilemap_ram[4];
 	tilemap_t *m_tilemap[4];
 
 	DECLARE_WRITE32_MEMBER(tilemap0_w);
@@ -158,7 +158,7 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tilemap_info(tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -302,8 +302,8 @@ void rabbit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int todraw = (m_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
-	UINT32 *source = (m_spriteram+ (todraw*2))-2;
-	UINT32 *finish = m_spriteram;
+	uint32_t *source = (m_spriteram+ (todraw*2))-2;
+	uint32_t *finish = m_spriteram;
 
 //  m_sprite_bitmap->fill(0x0, m_sprite_clip); // sloooow
 
@@ -336,7 +336,7 @@ void rabbit_state::clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cli
 	int startx, starty;
 	int y;
 	int amountx,amounty;
-	UINT16 *dstline;
+	uint16_t *dstline;
 
 	/* clears a *sensible* amount of the sprite bitmap */
 	startx = (m_spriteregs[0]&0x00000fff);
@@ -360,13 +360,13 @@ void rabbit_state::clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cli
 /* todo: fix zoom, its inaccurate and this code is ugly */
 void rabbit_state::draw_sprite_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT32 x,y;
-	UINT16 *srcline;
-	UINT16 *dstline;
-	UINT16 pixdata;
-	UINT32 xsize, ysize;
-	UINT32 xdrawpos, ydrawpos;
-	UINT32 xstep,ystep;
+	uint32_t x,y;
+	uint16_t *srcline;
+	uint16_t *dstline;
+	uint16_t pixdata;
+	uint32_t xsize, ysize;
+	uint32_t xdrawpos, ydrawpos;
+	uint32_t xstep,ystep;
 
 	int startx, starty;
 	startx = ((m_spriteregs[0]&0x00000fff));
@@ -414,10 +414,10 @@ void rabbit_state::video_start()
 {
 	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
 	/* or maybe not for this game/hw .... */
-	m_tilemap_ram[0] = make_unique_clear<UINT32[]>(0x20000/4);
-	m_tilemap_ram[1] = make_unique_clear<UINT32[]>(0x20000/4);
-	m_tilemap_ram[2] = make_unique_clear<UINT32[]>(0x20000/4);
-	m_tilemap_ram[3] = make_unique_clear<UINT32[]>(0x20000/4);
+	m_tilemap_ram[0] = make_unique_clear<uint32_t[]>(0x20000/4);
+	m_tilemap_ram[1] = make_unique_clear<uint32_t[]>(0x20000/4);
+	m_tilemap_ram[2] = make_unique_clear<uint32_t[]>(0x20000/4);
+	m_tilemap_ram[3] = make_unique_clear<uint32_t[]>(0x20000/4);
 
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rabbit_state::get_tilemap0_tile_info),this),TILEMAP_SCAN_ROWS,16, 16, 128,32);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rabbit_state::get_tilemap1_tile_info),this),TILEMAP_SCAN_ROWS,16, 16, 128,32);
@@ -467,7 +467,7 @@ each line represents the differences on each tilemap for unknown variables
 
 void rabbit_state::drawtilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap )
 {
-	INT32 startx, starty, incxx, incxy, incyx, incyy, tran;
+	int32_t startx, starty, incxx, incxy, incyx, incyy, tran;
 
 	startx=((m_tilemap_regs[whichtilemap][1]&0x0000ffff));  // >>4 for nonzoomed pixel scroll value
 	starty=((m_tilemap_regs[whichtilemap][1]&0xffff0000)>>16); // >> 20 for nonzoomed pixel scroll value
@@ -488,7 +488,7 @@ void rabbit_state::drawtilemap( screen_device &screen, bitmap_ind16 &bitmap, con
 			tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
 }
 
-UINT32 rabbit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rabbit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int prilevel;
 
@@ -556,7 +556,7 @@ READ32_MEMBER(rabbit_state::randomrabbits)
 /* rom bank is used when testing roms, not currently hooked up */
 WRITE32_MEMBER(rabbit_state::rombank_w)
 {
-	UINT8 *dataroms = memregion("gfx1")->base();
+	uint8_t *dataroms = memregion("gfx1")->base();
 #if 0
 	int bank;
 	printf("rabbit rombank %08x\n",data);
@@ -581,13 +581,13 @@ void rabbit_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_maincpu->set_input_line(m_bltirqlevel, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in rabbit_state::device_timer");
+		assert_always(false, "Unknown id in rabbit_state::device_timer");
 	}
 }
 
 void rabbit_state::do_blit()
 {
-	UINT8 *blt_data = memregion("gfx1")->base();
+	uint8_t *blt_data = memregion("gfx1")->base();
 	int blt_source = (m_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (m_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (m_blitterregs[1]&0x000000ff);

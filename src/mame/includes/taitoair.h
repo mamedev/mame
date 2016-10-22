@@ -12,13 +12,13 @@
 enum { TAITOAIR_FRAC_SHIFT = 16, TAITOAIR_POLY_MAX_PT = 16 };
 
 struct taitoair_spoint {
-	INT32 x, y;
+	int32_t x, y;
 };
 
 struct taitoair_poly {
 	struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT];
 	int pcount;
-	UINT16 header;
+	uint16_t header;
 };
 
 
@@ -44,12 +44,12 @@ public:
 			{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_m68000_mainram;
-	required_shared_ptr<UINT16> m_line_ram;
-	required_shared_ptr<UINT16> m_dsp_ram;          // Shared 68000/TMS32025 RAM
-	required_shared_ptr<UINT16> m_paletteram;
-	required_shared_ptr<UINT16> m_gradram;
-	required_shared_ptr<UINT16> m_tc0430grw;
+	required_shared_ptr<uint16_t> m_m68000_mainram;
+	required_shared_ptr<uint16_t> m_line_ram;
+	required_shared_ptr<uint16_t> m_dsp_ram;          // Shared 68000/TMS32025 RAM
+	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<uint16_t> m_gradram;
+	required_shared_ptr<uint16_t> m_tc0430grw;
 
 	/* video-related */
 	taitoair_poly  m_q;
@@ -70,15 +70,15 @@ public:
 	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
 
 	/* 3d info */
-	INT16 m_frustumLeft;
-	INT16 m_frustumBottom;
-	INT16 m_eyecoordBuffer[4];  /* homogeneous */
+	int16_t m_frustumLeft;
+	int16_t m_frustumBottom;
+	int16_t m_eyecoordBuffer[4];  /* homogeneous */
 
 	bool m_gradbank;
 
-	UINT16 m_dsp_test_object_type;
-	INT16 m_dsp_test_or_clip, m_dsp_test_and_clip;
-	INT16 m_dsp_test_x, m_dsp_test_y, m_dsp_test_z;
+	uint16_t m_dsp_test_object_type;
+	int16_t m_dsp_test_or_clip, m_dsp_test_and_clip;
+	int16_t m_dsp_test_x, m_dsp_test_y, m_dsp_test_z;
 
 	DECLARE_WRITE16_MEMBER(dsp_test_start_w);
 	DECLARE_WRITE16_MEMBER(dsp_test_x_w);
@@ -88,14 +88,14 @@ public:
 	DECLARE_READ16_MEMBER(dsp_test_or_clip_r);
 	DECLARE_READ16_MEMBER(dsp_test_and_clip_r);
 
-	INT16 m_dsp_muldiv_a_1, m_dsp_muldiv_b_1, m_dsp_muldiv_c_1;
+	int16_t m_dsp_muldiv_a_1, m_dsp_muldiv_b_1, m_dsp_muldiv_c_1;
 
 	DECLARE_WRITE16_MEMBER(dsp_muldiv_a_1_w);
 	DECLARE_WRITE16_MEMBER(dsp_muldiv_b_1_w);
 	DECLARE_WRITE16_MEMBER(dsp_muldiv_c_1_w);
 	DECLARE_READ16_MEMBER(dsp_muldiv_1_r);
 
-	INT16 m_dsp_muldiv_a_2, m_dsp_muldiv_b_2, m_dsp_muldiv_c_2;
+	int16_t m_dsp_muldiv_a_2, m_dsp_muldiv_b_2, m_dsp_muldiv_c_2;
 
 	DECLARE_WRITE16_MEMBER(dsp_muldiv_a_2_w);
 	DECLARE_WRITE16_MEMBER(dsp_muldiv_b_2_w);
@@ -121,13 +121,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset );
 	void fb_copy_op(void);
 	void fb_fill_op(void);
 	void fb_erase_op(void);
 
-	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 header, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 );
+	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t header, int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t y1, int32_t y2, int32_t *nx1, int32_t *nx2 );
 	void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q );
 };

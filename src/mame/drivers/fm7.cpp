@@ -58,7 +58,7 @@
  * when kana is active.
  */
 	// TODO: fill in shift,ctrl,graph and kana code
-static const UINT16 fm7_key_list[0x60][7] =
+static const uint16_t fm7_key_list[0x60][7] =
 { // norm  shift ctrl  graph kana  sh.kana scan
 	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 	{0x1b, 0x1b, 0x1b, 0x1b, 0x1b, 0x1b, 0x01},  // ESC
@@ -161,7 +161,7 @@ static const UINT16 fm7_key_list[0x60][7] =
 };
 
 
-void fm7_state::main_irq_set_flag(UINT8 flag)
+void fm7_state::main_irq_set_flag(uint8_t flag)
 {
 	m_irq_flags |= flag;
 
@@ -169,7 +169,7 @@ void fm7_state::main_irq_set_flag(UINT8 flag)
 		m_maincpu->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
 }
 
-void fm7_state::main_irq_clear_flag(UINT8 flag)
+void fm7_state::main_irq_clear_flag(uint8_t flag)
 {
 	m_irq_flags &= ~flag;
 
@@ -204,7 +204,7 @@ void fm7_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		fm77av_vsync(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in fm7_state::device_timer");
+		assert_always(false, "Unknown id in fm7_state::device_timer");
 	}
 }
 
@@ -245,7 +245,7 @@ WRITE8_MEMBER(fm7_state::fm7_irq_mask_w)
  */
 READ8_MEMBER(fm7_state::fm7_irq_cause_r)
 {
-	UINT8 ret = ~m_irq_flags;
+	uint8_t ret = ~m_irq_flags;
 
 	// Timer and Printer IRQ flags are cleared when this port is read
 	// Keyboard IRQ flag is cleared when the scancode is read from
@@ -313,7 +313,7 @@ READ8_MEMBER(fm7_state::fm7_sub_beeper_r)
 
 READ8_MEMBER(fm7_state::vector_r)
 {
-	UINT32 init_size = m_rom_ptr.bytes();
+	uint32_t init_size = m_rom_ptr.bytes();
 
 	if (m_init_rom_en)
 	{
@@ -344,7 +344,7 @@ WRITE8_MEMBER(fm7_state::vector_w)
  */
 READ8_MEMBER(fm7_state::fm7_fd04_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	if(m_video.attn_irq != 0)
 	{
@@ -368,7 +368,7 @@ READ8_MEMBER(fm7_state::fm7_rom_en_r)
 {
 	if(!space.debugger_access())
 	{
-		UINT8* RAM = memregion("maincpu")->base();
+		uint8_t* RAM = memregion("maincpu")->base();
 
 		m_basic_rom_en = 1;
 		if(m_type == SYS_FM7)
@@ -384,7 +384,7 @@ READ8_MEMBER(fm7_state::fm7_rom_en_r)
 
 WRITE8_MEMBER(fm7_state::fm7_rom_en_w)
 {
-	UINT8* RAM = memregion("maincpu")->base();
+	uint8_t* RAM = memregion("maincpu")->base();
 
 	m_basic_rom_en = 0;
 	if(m_type == SYS_FM7)
@@ -432,7 +432,7 @@ WRITE_LINE_MEMBER(fm7_state::fm7_fdc_drq_w)
 
 READ8_MEMBER(fm7_state::fm7_fdc_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch(offset)
 	{
@@ -529,7 +529,7 @@ WRITE8_MEMBER(fm7_state::fm7_fdc_w)
  */
 READ8_MEMBER(fm7_state::fm7_keyboard_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 	switch(offset)
 	{
 		case 0:
@@ -546,7 +546,7 @@ READ8_MEMBER(fm7_state::fm7_keyboard_r)
 
 READ8_MEMBER(fm7_state::fm7_sub_keyboard_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 	switch(offset)
 	{
 		case 0:
@@ -587,7 +587,7 @@ READ8_MEMBER(fm7_state::fm7_sub_keyboard_r)
  */
 READ8_MEMBER(fm7_state::fm77av_key_encoder_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 	switch(offset)
 	{
 		case 0x00:  // data register
@@ -779,7 +779,7 @@ READ8_MEMBER(fm7_state::fm7_cassette_printer_r)
 	// bit 2: printer acknowledge
 	// bit 1: printer error
 	// bit 0: printer busy
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if(m_cassette->input() > 0.03)
 		ret |= 0x80;
@@ -827,7 +827,7 @@ WRITE8_MEMBER(fm7_state::fm7_cassette_printer_w)
  */
 READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	if(m_dsw->read() & 0x02)
 		ret &= ~0x01;
@@ -953,7 +953,7 @@ WRITE8_MEMBER(fm7_state::fm7_main_shared_w)
 
 READ8_MEMBER(fm7_state::fm7_fmirq_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	if(m_fm77av_ym_irq != 0)
 		ret &= ~0x08;
@@ -1005,14 +1005,14 @@ READ8_MEMBER(fm7_state::fm7_mmr_r)
 	return 0xff;
 }
 
-void fm7_state::fm7_update_bank(address_space & space, int bank, UINT8 physical)
+void fm7_state::fm7_update_bank(address_space & space, int bank, uint8_t physical)
 {
 	address_map_bank_device* avbank[16] = { m_avbank1, m_avbank2, m_avbank3, m_avbank4, m_avbank5, m_avbank6, m_avbank7
 			, m_avbank8, m_avbank9, m_avbank10, m_avbank11, m_avbank12, m_avbank13, m_avbank14, m_avbank15, m_avbank16 };
 
 	avbank[bank]->set_bank(physical);
-/*  UINT8* RAM = memregion("maincpu")->base();
-    UINT16 size = 0xfff;
+/*  uint8_t* RAM = memregion("maincpu")->base();
+    uint16_t size = 0xfff;
     char bank_name[10];
 
     if(bank == 15)
@@ -1115,8 +1115,8 @@ void fm7_state::fm7_update_bank(address_space & space, int bank, UINT8 physical)
 void fm7_state::fm7_mmr_refresh(address_space& space)
 {
 	int x;
-	UINT16 window_addr;
-	UINT8* RAM = memregion("maincpu")->base();
+	uint16_t window_addr;
+	uint8_t* RAM = memregion("maincpu")->base();
 
 	if(m_mmr.enabled)
 	{
@@ -1211,8 +1211,8 @@ WRITE8_MEMBER(fm7_state::fm7_mmr_w)
  */
 READ8_MEMBER(fm7_state::fm7_kanji_r)
 {
-	UINT8* KROM = m_kanji->base();
-	UINT32 addr = m_kanji_address << 1;
+	uint8_t* KROM = m_kanji->base();
+	uint32_t addr = m_kanji_address << 1;
 
 	switch(offset)
 	{
@@ -1232,7 +1232,7 @@ READ8_MEMBER(fm7_state::fm7_kanji_r)
 
 WRITE8_MEMBER(fm7_state::fm7_kanji_w)
 {
-	UINT16 addr;
+	uint16_t addr;
 
 	switch(offset)
 	{
@@ -1268,7 +1268,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_subtimer_irq)
 // When a key is pressed or released (in scan mode only), an IRQ is generated on the main CPU,
 // or an FIRQ on the sub CPU, if masked.  Both CPUs have ports to read keyboard data.
 // Scancodes are 9 bits in FM-7 mode, 8 bits in scan mode.
-void fm7_state::key_press(UINT16 scancode)
+void fm7_state::key_press(uint16_t scancode)
 {
 	m_current_scancode = scancode;
 
@@ -1290,9 +1290,9 @@ void fm7_state::fm7_keyboard_poll_scan()
 {
 	int bit = 0;
 	int x,y;
-	UINT32 keys;
-	UINT32 modifiers = m_keymod->read();
-	static const UINT16 modscancodes[6] = { 0x52, 0x53, 0x54, 0x55, 0x56, 0x5a };
+	uint32_t keys;
+	uint32_t modifiers = m_keymod->read();
+	static const uint16_t modscancodes[6] = { 0x52, 0x53, 0x54, 0x55, 0x56, 0x5a };
 
 	for(x=0;x<3;x++)
 	{
@@ -1335,8 +1335,8 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 	int x,y;
 	int bit = 0;
 	int mod = 0;
-	UINT32 keys;
-	UINT32 modifiers = m_keymod->read();
+	uint32_t keys;
+	uint32_t modifiers = m_keymod->read();
 
 	if (m_kb_ports[2]->read() & 0x40000)
 	{
@@ -1889,8 +1889,8 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(fm7_state,fm7)
 {
-//  m_shared_ram = std::make_unique<UINT8[]>(0x80);
-	m_video_ram = std::make_unique<UINT8[]>(0x18000);  // 2 pages on some systems
+//  m_shared_ram = std::make_unique<uint8_t[]>(0x80);
+	m_video_ram = std::make_unique<uint8_t[]>(0x18000);  // 2 pages on some systems
 	m_timer = timer_alloc(TIMER_FM7_IRQ);
 	m_subtimer = timer_alloc(TIMER_FM7_SUBTIMER_IRQ);
 	m_keyboard_timer = timer_alloc(TIMER_FM7_KEYBOARD_POLL);
@@ -1901,7 +1901,7 @@ MACHINE_START_MEMBER(fm7_state,fm7)
 {
 	// The FM-7 has no initialisation ROM, and no other obvious
 	// way to set the reset vector, so for now this will have to do.
-	UINT8* RAM = memregion("maincpu")->base();
+	uint8_t* RAM = memregion("maincpu")->base();
 
 	RAM[0xfffe] = 0xfe;
 	RAM[0xffff] = 0x00;
@@ -1914,8 +1914,8 @@ MACHINE_START_MEMBER(fm7_state,fm7)
 
 MACHINE_START_MEMBER(fm7_state,fm77av)
 {
-	UINT8* RAM = memregion("maincpu")->base();
-	UINT8* ROM = memregion("init")->base();
+	uint8_t* RAM = memregion("maincpu")->base();
+	uint8_t* ROM = memregion("init")->base();
 
 	memset(m_shared_ram,0xff,0x80);
 
@@ -1934,8 +1934,8 @@ MACHINE_START_MEMBER(fm7_state,fm77av)
 
 MACHINE_START_MEMBER(fm7_state,fm11)
 {
-	UINT8* RAM = memregion("maincpu")->base();
-	UINT8* ROM = memregion("init")->base();
+	uint8_t* RAM = memregion("maincpu")->base();
+	uint8_t* ROM = memregion("init")->base();
 
 	memset(m_shared_ram,0xff,0x80);
 	m_type = SYS_FM11;
@@ -2030,7 +2030,7 @@ void fm7_state::machine_reset()
 		m_x86->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
 	}
 
-	memset(m_video_ram.get(), 0, sizeof(UINT8) * 0x18000);
+	memset(m_video_ram.get(), 0, sizeof(uint8_t) * 0x18000);
 }
 
 

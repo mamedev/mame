@@ -125,7 +125,7 @@ CUSTOM_INPUT_MEMBER(astrof_state::astrof_p1_controls_r)
 
 CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	/* on an upright cabinet, a single set of controls
 	   is connected to both sets of pins on the edge
@@ -141,7 +141,7 @@ CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 
 CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	/* on a cocktail cabinet, two sets of controls are
 	   multiplexed on a single set of inputs
@@ -170,25 +170,25 @@ CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
 void astrof_state::video_start()
 {
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
-	m_colorram = std::make_unique<UINT8[]>(m_videoram.bytes() / 2);
+	m_colorram = std::make_unique<uint8_t[]>(m_videoram.bytes() / 2);
 	save_pointer(NAME(m_colorram.get()), m_videoram.bytes() / 2);
 }
 
 
-rgb_t astrof_state::make_pen( UINT8 data )
+rgb_t astrof_state::make_pen( uint8_t data )
 {
-	UINT8 r1_bit = m_red_on ? 0x01 : (data >> 0) & 0x01;
-	UINT8 r2_bit = m_red_on ? 0x01 : (data >> 1) & 0x01;
-	UINT8 g1_bit = (data >> 2) & 0x01;
-	UINT8 g2_bit = (data >> 3) & 0x01;
-	UINT8 b1_bit = (data >> 4) & 0x01;
-	UINT8 b2_bit = (data >> 5) & 0x01;
+	uint8_t r1_bit = m_red_on ? 0x01 : (data >> 0) & 0x01;
+	uint8_t r2_bit = m_red_on ? 0x01 : (data >> 1) & 0x01;
+	uint8_t g1_bit = (data >> 2) & 0x01;
+	uint8_t g2_bit = (data >> 3) & 0x01;
+	uint8_t b1_bit = (data >> 4) & 0x01;
+	uint8_t b2_bit = (data >> 5) & 0x01;
 
 	/* this is probably not quite right, but I don't have the
 	   knowledge to figure out the actual weights - ZV */
-	UINT8 r = (0xc0 * r1_bit) + (0x3f * r2_bit);
-	UINT8 g = (0xc0 * g1_bit) + (0x3f * g2_bit);
-	UINT8 b = (0xc0 * b1_bit) + (0x3f * b2_bit);
+	uint8_t r = (0xc0 * r1_bit) + (0x3f * r2_bit);
+	uint8_t g = (0xc0 * g1_bit) + (0x3f * g2_bit);
+	uint8_t b = (0xc0 * b1_bit) + (0x3f * b2_bit);
 
 	return rgb_t(r, g, b);
 }
@@ -197,9 +197,9 @@ rgb_t astrof_state::make_pen( UINT8 data )
 void astrof_state::astrof_get_pens( pen_t *pens )
 {
 	offs_t i;
-	UINT8 bank = (m_astrof_palette_bank ? 0x10 : 0x00);
-	UINT8 config = m_fake_port.read_safe(0x00);
-	UINT8 *prom = memregion("proms")->base();
+	uint8_t bank = (m_astrof_palette_bank ? 0x10 : 0x00);
+	uint8_t config = m_fake_port.read_safe(0x00);
+	uint8_t *prom = memregion("proms")->base();
 
 	/* a common wire hack to the pcb causes the prom halves to be inverted */
 	/* this results in e.g. astrof background being black */
@@ -224,7 +224,7 @@ void astrof_state::astrof_get_pens( pen_t *pens )
 
 	for (i = 0; i < ASTROF_NUM_PENS; i++)
 	{
-		UINT8 data = prom[bank | i];
+		uint8_t data = prom[bank | i];
 		pens[i] = make_pen(data);
 	}
 }
@@ -233,13 +233,13 @@ void astrof_state::astrof_get_pens( pen_t *pens )
 void astrof_state::tomahawk_get_pens( pen_t *pens )
 {
 	offs_t i;
-	UINT8 *prom = memregion("proms")->base();
-	UINT8 config = m_fake_port.read_safe(0x00);
+	uint8_t *prom = memregion("proms")->base();
+	uint8_t config = m_fake_port.read_safe(0x00);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
 	{
-		UINT8 data;
-		UINT8 pen;
+		uint8_t data;
+		uint8_t pen;
 
 		/* a common wire hack to the pcb causes the prom halves to be inverted */
 		/* this results in e.g. astrof background being black */
@@ -289,7 +289,7 @@ WRITE8_MEMBER(astrof_state::video_control_1_w)
 	m_flipscreen = ((data >> 0) & 0x01) & ioport("CAB")->read();
 
 	/* this ties to the CLR pin of the shift registers */
-	m_screen_off = (data & 0x02) ? TRUE : FALSE;
+	m_screen_off = (data & 0x02) ? true : false;
 
 	/* D2 - not connected in the schematics, but at one point Astro Fighter sets it to 1 */
 	/* D3-D7 - not connected */
@@ -298,16 +298,16 @@ WRITE8_MEMBER(astrof_state::video_control_1_w)
 }
 
 
-void astrof_state::astrof_set_video_control_2( UINT8 data )
+void astrof_state::astrof_set_video_control_2( uint8_t data )
 {
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 
 	/* D2 - selects one of the two palette banks */
-	m_astrof_palette_bank = (data & 0x04) ? TRUE : FALSE;
+	m_astrof_palette_bank = (data & 0x04) ? true : false;
 
 	/* D3 - turns on the red color gun regardless of the value in the color PROM */
-	m_red_on = (data & 0x08) ? TRUE : FALSE;
+	m_red_on = (data & 0x08) ? true : false;
 
 	/* D4-D7 - not connected */
 }
@@ -319,13 +319,13 @@ WRITE8_MEMBER(astrof_state::astrof_video_control_2_w)
 }
 
 
-void astrof_state::spfghmk2_set_video_control_2( UINT8 data )
+void astrof_state::spfghmk2_set_video_control_2( uint8_t data )
 {
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 
 	/* D2 - selects one of the two palette banks */
-	m_astrof_palette_bank = (data & 0x04) ? TRUE : FALSE;
+	m_astrof_palette_bank = (data & 0x04) ? true : false;
 
 	/* D3-D7 - not connected */
 }
@@ -337,14 +337,14 @@ WRITE8_MEMBER(astrof_state::spfghmk2_video_control_2_w)
 }
 
 
-void astrof_state::tomahawk_set_video_control_2( UINT8 data )
+void astrof_state::tomahawk_set_video_control_2( uint8_t data )
 {
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 	/* D2 - not connected */
 
 	/* D3 - turns on the red color gun regardless of the value in the color PROM */
-	m_red_on = (data & 0x08) ? TRUE : FALSE;
+	m_red_on = (data & 0x08) ? true : false;
 }
 
 WRITE8_MEMBER(astrof_state::tomahawk_video_control_2_w)
@@ -360,16 +360,16 @@ void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &c
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		UINT8 data;
+		uint8_t data;
 		int i;
 
-		UINT8 color = m_colorram[offs >> 1];
+		uint8_t color = m_colorram[offs >> 1];
 
 		pen_t back_pen = pens[(color & (num_pens-1)) | 0x00];
 		pen_t fore_pen = pens[(color & (num_pens-1)) | 0x01];
 
-		UINT8 y = offs;
-		UINT8 x = offs >> 8 << 3;
+		uint8_t y = offs;
+		uint8_t x = offs >> 8 << 3;
 
 		if (!m_flipscreen)
 			y = ~y;
@@ -398,7 +398,7 @@ void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &c
 }
 
 
-UINT32 astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[ASTROF_NUM_PENS];
 
@@ -410,7 +410,7 @@ UINT32 astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &b
 }
 
 
-UINT32 astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[TOMAHAWK_NUM_PENS];
 
@@ -498,7 +498,7 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 
 
 	/* the red background circuit is disabled */
-	m_red_on = FALSE;
+	m_red_on = false;
 
 	/* register for state saving */
 	save_item(NAME(m_flipscreen));
@@ -1293,8 +1293,8 @@ ROM_END
 DRIVER_INIT_MEMBER(astrof_state,abattle)
 {
 	/* use the protection PROM to decrypt the ROMs */
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *prom = memregion("user1")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *prom = memregion("user1")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1308,7 +1308,7 @@ DRIVER_INIT_MEMBER(astrof_state,abattle)
 
 DRIVER_INIT_MEMBER(astrof_state,afire)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1322,7 +1322,7 @@ DRIVER_INIT_MEMBER(astrof_state,afire)
 
 DRIVER_INIT_MEMBER(astrof_state,sstarbtl)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)

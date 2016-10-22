@@ -208,7 +208,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_1_timer_event)
 READ16_MEMBER(jpmimpct_state::duart_1_r)
 {
 	struct duart_t &duart_1 = m_duart_1;
-	UINT16 val = 0xffff;
+	uint16_t val = 0xffff;
 	switch (offset)
 	{
 		case 0x1:
@@ -382,7 +382,7 @@ READ16_MEMBER(jpmimpct_state::duart_2_r)
 		}
 		case 0xb:
 		{
-			UINT16 val = m_touch_data[m_touch_cnt];
+			uint16_t val = m_touch_data[m_touch_cnt];
 
 			if (m_touch_cnt++ == 3)
 				m_touch_cnt = 0;
@@ -426,7 +426,7 @@ WRITE16_MEMBER(jpmimpct_state::duart_2_w)
 
 READ16_MEMBER(jpmimpct_state::inputs1_r)
 {
-	UINT16 val = 0x00ff;
+	uint16_t val = 0x00ff;
 
 	switch (offset)
 	{
@@ -838,7 +838,7 @@ static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
 
 	MCFG_CPU_ADD("dsp", TMS34010, 40000000)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(40000000/16) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(jpmimpct_state, scanline_update)   /* scanline updater (rgb32) */
@@ -1000,7 +1000,7 @@ MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
  */
 READ16_MEMBER(jpmimpct_state::inputs1awp_r)
 {
-	UINT16 val = 0x00;
+	uint16_t val = 0x00;
 
 	{
 		switch (offset)

@@ -23,15 +23,15 @@ class isa8_pgc_device :
 {
 public:
 	// construction/destruction
-	isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	isa8_pgc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_pgc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -54,11 +54,11 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_commarea;
-	std::unique_ptr<UINT8[]> m_vram;
-	std::unique_ptr<UINT8[]> m_eram;
-	UINT8 m_stateparam[16];
-	UINT8 m_lut[256*3];
+	uint8_t *m_commarea;
+	std::unique_ptr<uint8_t[]> m_vram;
+	std::unique_ptr<uint8_t[]> m_eram;
+	uint8_t m_stateparam[16];
+	uint8_t m_lut[256*3];
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 };
 

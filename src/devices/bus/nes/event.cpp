@@ -35,7 +35,7 @@
 const device_type NES_EVENT = &device_creator<nes_event_device>;
 
 
-nes_event_device::nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_event_device::nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_sxrom_device(mconfig, NES_EVENT, "NES Cart Event PCB", tag, owner, clock, "nes_event", __FILE__),
 						m_dsw(*this, "DIPSW"),
 	m_nwc_init(0),
@@ -113,7 +113,7 @@ void nes_event_device::set_prg()
 //  printf("enter with %d and reg1 0x%x - reg3 0x%x\n", m_nwc_init, m_reg[1], m_reg[3]);
 	// reg[1] is different from base MMC-1!
 	// bit 0 is ignored, bit1/bit3 are used for PRG switch, bit4 is used for the timer
-	UINT8 temp = (m_reg[1] >> 1) & 7;
+	uint8_t temp = (m_reg[1] >> 1) & 7;
 
 	// initially PRG is fixed, until bit4 of reg1 is set to 1 and then to 0
 	switch (m_nwc_init)

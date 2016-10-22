@@ -48,7 +48,7 @@ easier to manage.
 //  pia1_pa_changed - called when PIA1 PA changes
 //-------------------------------------------------
 
-void dragon_state::pia1_pa_changed(UINT8 data)
+void dragon_state::pia1_pa_changed(uint8_t data)
 {
 	/* call inherited function */
 	coco12_state::pia1_pa_changed(data);
@@ -56,7 +56,7 @@ void dragon_state::pia1_pa_changed(UINT8 data)
 	/* if strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
 	{
-		UINT8 output = m_pia_1->b_output();
+		uint8_t output = m_pia_1->b_output();
 		m_printer->output(output);
 	}
 }
@@ -72,7 +72,7 @@ void dragon_state::pia1_pa_changed(UINT8 data)
 
 READ8_MEMBER( dragon64_state::ff00_read )
 {
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 
 	switch(offset & 0x07)
 	{
@@ -113,11 +113,11 @@ WRITE8_MEMBER( dragon64_state::ff00_write )
 //  pia1_pb_changed
 //-------------------------------------------------
 
-void dragon64_state::pia1_pb_changed(UINT8 data)
+void dragon64_state::pia1_pb_changed(uint8_t data)
 {
 	dragon_state::pia1_pb_changed(data);
 
-	UINT8 ddr = ~m_pia_1->port_b_z_mask();
+	uint8_t ddr = ~m_pia_1->port_b_z_mask();
 
 	/* If bit 2 of the pia1 ddrb is 1 then this pin is an output so use it */
 	/* to control the paging of the 32k and 64k basic roms */

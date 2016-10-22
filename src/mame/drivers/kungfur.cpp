@@ -74,12 +74,12 @@ public:
 		m_adpcm2(*this, "adpcm2")
 	{ }
 
-	UINT8 m_latch[3];
-	UINT8 m_control;
+	uint8_t m_latch[3];
+	uint8_t m_control;
 
-	UINT32 m_adpcm_pos[2];
-	UINT8 m_adpcm_data[2];
-	UINT8 m_adpcm_sel[2];
+	uint32_t m_adpcm_pos[2];
+	uint8_t m_adpcm_data[2];
+	uint8_t m_adpcm_sel[2];
 	DECLARE_WRITE8_MEMBER(kungfur_output_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch1_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch2_w);
@@ -201,8 +201,8 @@ WRITE8_MEMBER(kungfur_state::kungfur_adpcm2_w)
 // adpcm callbacks
 WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
 {
-	UINT8 *ROM = memregion("adpcm1")->base();
-	UINT8 data = ROM[m_adpcm_pos[0] & 0x1ffff];
+	uint8_t *ROM = memregion("adpcm1")->base();
+	uint8_t data = ROM[m_adpcm_pos[0] & 0x1ffff];
 
 	m_adpcm1->data_w(m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[0] += m_adpcm_sel[0];
@@ -211,8 +211,8 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
 
 WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
 {
-	UINT8 *ROM = memregion("adpcm2")->base();
-	UINT8 data = ROM[m_adpcm_pos[1] & 0x3ffff];
+	uint8_t *ROM = memregion("adpcm2")->base();
+	uint8_t data = ROM[m_adpcm_pos[1] & 0x3ffff];
 
 	m_adpcm2->data_w(m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[1] += m_adpcm_sel[1];

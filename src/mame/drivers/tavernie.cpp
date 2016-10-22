@@ -94,12 +94,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	const UINT8 *m_p_chargen;
-	optional_shared_ptr<UINT8> m_p_videoram;
+	const uint8_t *m_p_chargen;
+	optional_shared_ptr<uint8_t> m_p_videoram;
 
 private:
-	UINT8 m_term_data;
-	UINT8 m_pa;
+	uint8_t m_term_data;
+	uint8_t m_pa;
 	required_device<cassette_image_device> m_cass;
 	optional_device<pia6821_device> m_pia_ivg;
 	optional_device<fd1795_t> m_fdc;
@@ -209,13 +209,13 @@ WRITE8_MEMBER( tavernie_state::ds_w )
 MC6845_UPDATE_ROW( tavernie_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx=0;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx=0;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
-		UINT8 inv=0;
+		uint8_t inv=0;
 		if (x == cursor_x) inv=0xff;
 		mem = (ma + x) & 0xfff;
 		if (ra > 7)
@@ -272,7 +272,7 @@ READ_LINE_MEMBER( tavernie_state::ca1_r )
 
 READ8_MEMBER( tavernie_state::pb_ivg_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

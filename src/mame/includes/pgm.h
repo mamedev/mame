@@ -36,21 +36,21 @@ public:
 		}
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoregs;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT8> m_z80_mainram;
-	required_shared_ptr<UINT16> m_mainram;
-	UINT16 *      m_bg_videoram;
-	UINT16 *      m_tx_videoram;
-	UINT16 *      m_rowscrollram;
-	std::unique_ptr<UINT8[]>      m_sprite_a_region;
+	required_shared_ptr<uint16_t> m_videoregs;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint8_t> m_z80_mainram;
+	required_shared_ptr<uint16_t> m_mainram;
+	uint16_t *      m_bg_videoram;
+	uint16_t *      m_tx_videoram;
+	uint16_t *      m_rowscrollram;
+	std::unique_ptr<uint8_t[]>      m_sprite_a_region;
 	size_t        m_sprite_a_region_size;
-	std::unique_ptr<UINT16[]>     m_spritebufferram; // buffered spriteram
+	std::unique_ptr<uint16_t[]>     m_spritebufferram; // buffered spriteram
 
 	/* video-related */
 	tilemap_t       *m_bg_tilemap;
 	tilemap_t     *m_tx_tilemap;
-	UINT16        *m_sprite_temp_render;
+	uint16_t        *m_sprite_temp_render;
 	bitmap_rgb32      m_tmppgmbitmap;
 
 	/* devices */
@@ -63,7 +63,7 @@ public:
 	device_t *m_ics;
 
 	/* used by rendering */
-	UINT8 *m_bdata;
+	uint8_t *m_bdata;
 	size_t  m_bdatasize;
 	int m_aoffset;
 	int m_boffset;
@@ -72,10 +72,10 @@ public:
 	int m_irq4_disabled;
 
 	/* calendar */
-	UINT8        m_cal_val;
-	UINT8        m_cal_mask;
-	UINT8        m_cal_com;
-	UINT8        m_cal_cnt;
+	uint8_t        m_cal_val;
+	uint8_t        m_cal_mask;
+	uint8_t        m_cal_com;
+	uint8_t        m_cal_cnt;
 	system_time  m_systime;
 
 	DECLARE_READ16_MEMBER(pgm_videoram_r);
@@ -97,18 +97,18 @@ public:
 	DECLARE_VIDEO_START(pgm);
 	DECLARE_MACHINE_START(pgm);
 	DECLARE_MACHINE_RESET(pgm);
-	UINT32 screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pgm(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(pgm_interrupt);
 
-	inline void pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8* destpri, UINT16 srcdat);
-	inline void pgm_draw_pix_nopri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat);
-	inline void pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat);
-	void draw_sprite_line( int wide, UINT16* dest, UINT8* destpri, int xzoom, int xgrow, int flip, int xpos, int pri, int realxsize, int palt, int draw );
-	void draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri );
-	void draw_sprite_line_basic( int wide, UINT16* dest, UINT8* destpri, int flip, int xpos, int pri, int realxsize, int palt, int draw );
+	inline void pgm_draw_pix( int xdrawpos, int pri, uint16_t* dest, uint8_t* destpri, uint16_t srcdat);
+	inline void pgm_draw_pix_nopri( int xdrawpos, uint16_t* dest, uint8_t* destpri, uint16_t srcdat);
+	inline void pgm_draw_pix_pri( int xdrawpos, uint16_t* dest, uint8_t* destpri, uint16_t srcdat);
+	void draw_sprite_line( int wide, uint16_t* dest, uint8_t* destpri, int xzoom, int xgrow, int flip, int xpos, int pri, int realxsize, int palt, int draw );
+	void draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, uint32_t xzoom, int xgrow, uint32_t yzoom, int ygrow, int pri );
+	void draw_sprite_line_basic( int wide, uint16_t* dest, uint8_t* destpri, int flip, int xpos, int pri, int realxsize, int palt, int draw );
 	void draw_sprite_new_basic( int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, int pri );
-	void draw_sprites( bitmap_ind16& spritebitmap, UINT16 *sprite_source, bitmap_ind8& priority_bitmap );
+	void draw_sprites( bitmap_ind16& spritebitmap, uint16_t *sprite_source, bitmap_ind8& priority_bitmap );
 	void expand_colourdata();
 	void pgm_basic_init( bool set_bank = true);
 };

@@ -45,7 +45,7 @@ INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
 {
 	if (newval)
 	{
-		m_gear = (FPTR)param;
+		m_gear = (uintptr_t)param;
 		output().set_value("P1gear", m_gear+1);
 	}
 }
@@ -155,8 +155,8 @@ void firetrk_state::machine_reset()
 
 READ8_MEMBER(firetrk_state::firetrk_dip_r)
 {
-	UINT8 val0 = m_dips[0]->read();
-	UINT8 val1 = m_dips[1]->read();
+	uint8_t val0 = m_dips[0]->read();
+	uint8_t val1 = m_dips[1]->read();
 
 	if (val1 & (1 << (2 * offset + 0))) val0 |= 1;
 	if (val1 & (1 << (2 * offset + 1))) val0 |= 2;
@@ -167,8 +167,8 @@ READ8_MEMBER(firetrk_state::firetrk_dip_r)
 
 READ8_MEMBER(firetrk_state::montecar_dip_r)
 {
-	UINT8 val0 = m_dips[0]->read();
-	UINT8 val1 = m_dips[1]->read();
+	uint8_t val0 = m_dips[0]->read();
+	uint8_t val1 = m_dips[1]->read();
 
 	if (val1 & (1 << (3 - offset))) val0 |= 1;
 	if (val1 & (1 << (7 - offset))) val0 |= 2;
@@ -179,20 +179,20 @@ READ8_MEMBER(firetrk_state::montecar_dip_r)
 
 CUSTOM_INPUT_MEMBER(firetrk_state::steer_dir_r)
 {
-	return m_steer_dir[(FPTR)param];
+	return m_steer_dir[(uintptr_t)param];
 }
 
 
 CUSTOM_INPUT_MEMBER(firetrk_state::steer_flag_r)
 {
-	return m_steer_flag[(FPTR)param];
+	return m_steer_flag[(uintptr_t)param];
 }
 
 
 CUSTOM_INPUT_MEMBER(firetrk_state::skid_r)
 {
-	UINT32 ret;
-	int which = (FPTR)param;
+	uint32_t ret;
+	int which = (uintptr_t)param;
 
 	if (which != 2)
 		ret = m_skid[which];
@@ -205,8 +205,8 @@ CUSTOM_INPUT_MEMBER(firetrk_state::skid_r)
 
 CUSTOM_INPUT_MEMBER(firetrk_state::crash_r)
 {
-	UINT32 ret;
-	int which = (FPTR)param;
+	uint32_t ret;
+	int which = (uintptr_t)param;
 
 	if (which != 2)
 		ret = m_crash[which];
@@ -219,7 +219,7 @@ CUSTOM_INPUT_MEMBER(firetrk_state::crash_r)
 
 CUSTOM_INPUT_MEMBER(firetrk_state::gear_r)
 {
-	return (m_gear == (FPTR)param) ? 1 : 0;
+	return (m_gear == (uintptr_t)param) ? 1 : 0;
 }
 
 
@@ -230,8 +230,8 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 	/* update steering wheels */
 	for (i = 0; i < 2; i++)
 	{
-		UINT32 const new_dial = m_steer[i].read_safe(0);
-		INT32 const delta = new_dial - m_dial[i];
+		uint32_t const new_dial = m_steer[i].read_safe(0);
+		int32_t const delta = new_dial - m_dial[i];
 
 		if (delta != 0)
 		{
@@ -250,7 +250,7 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 
 READ8_MEMBER(firetrk_state::montecar_input_r)
 {
-	UINT8 ret = firetrk_input_r(space, offset);
+	uint8_t ret = firetrk_input_r(space, offset);
 
 	if (m_crash[0])
 		ret |= 0x02;
@@ -265,7 +265,7 @@ READ8_MEMBER(firetrk_state::montecar_input_r)
 
 WRITE8_MEMBER(firetrk_state::blink_on_w)
 {
-	*m_blink = TRUE;
+	*m_blink = true;
 }
 
 
@@ -788,7 +788,7 @@ static const gfx_layout superbug_car_layout2 =
 	0x001
 };
 
-static const UINT32 firetrk_trailer_layout_xoffset[64] =
+static const uint32_t firetrk_trailer_layout_xoffset[64] =
 {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -800,7 +800,7 @@ static const UINT32 firetrk_trailer_layout_xoffset[64] =
 	0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f
 };
 
-static const UINT32 firetrk_trailer_layout_yoffset[64] =
+static const uint32_t firetrk_trailer_layout_yoffset[64] =
 {
 	0x000, 0x040, 0x080, 0x0c0, 0x100, 0x140, 0x180, 0x1c0,
 	0x200, 0x240, 0x280, 0x2c0, 0x300, 0x340, 0x380, 0x3c0,

@@ -79,13 +79,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	required_shared_ptr<UINT8> m_p_videoram;
-	UINT8 *m_p_chargen;
-	UINT8 m_flashcnt;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	uint8_t *m_p_chargen;
+	uint8_t m_flashcnt;
 
 private:
-	UINT8 m_timer_bit;
-	UINT8 m_cass_data[4];
+	uint8_t m_timer_bit;
+	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
 	emu_timer* m_sys_timer;
@@ -98,7 +98,7 @@ private:
 	required_device<i8251_device> m_usart;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 public:
 	required_device<palette_device> m_palette;
 };
@@ -136,7 +136,7 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_timer_bit ^= 0x80;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in alphatro_state::device_timer");
+		assert_always(false, "Unknown id in alphatro_state::device_timer");
 	}
 }
 
@@ -162,9 +162,9 @@ MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 	bool palette = BIT(ioport("CONFIG")->read(), 5);
 	if (y==0) m_flashcnt++;
 	bool inv;
-	UINT8 chr,gfx,attr,bg,fg;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx,attr,bg,fg;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -191,7 +191,7 @@ MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 
 		if (inv)
 		{
-			UINT8 t = bg;
+			uint8_t t = bg;
 			bg = fg;
 			fg = t;
 		}
@@ -381,7 +381,7 @@ void alphatro_state::machine_start()
 void alphatro_state::machine_reset()
 {
 	// do what the IPL does
-	UINT8* ROM = memregion("roms")->base();
+	uint8_t* ROM = memregion("roms")->base();
 	m_maincpu->set_pc(0xe000);
 	// If BASIC is missing then it boots into the Monitor
 	memcpy(m_p_ram, ROM, 0x6000); // Copy BASIC to RAM
@@ -434,7 +434,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{

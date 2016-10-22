@@ -90,13 +90,13 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_colorram(*this, "colorram") { }
 
-	UINT16 m_io_offset;
-	UINT16 m_io_reg[IO_SIZE];
-	UINT16 m_fifo[FIFO_SIZE];
-	UINT16 m_fptr;
+	uint16_t m_io_offset;
+	uint16_t m_io_reg[IO_SIZE];
+	uint16_t m_fifo[FIFO_SIZE];
+	uint16_t m_fptr;
 
-	UINT16 m_jpeg1;
-	UINT16 m_jpeg2;
+	uint16_t m_jpeg1;
+	uint16_t m_jpeg2;
 	int m_jpeg_x;
 	int m_jpeg_y;
 	int m_tmp_counter;
@@ -105,11 +105,11 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_colorram;
 	bitmap_rgb32 m_bitmap_fg;
 	bitmap_rgb32 m_bitmap_bg;
 
-	UINT16 m_tempbuf[8];
+	uint16_t m_tempbuf[8];
 
 	DECLARE_WRITE16_MEMBER(fifo_data_w);
 	DECLARE_WRITE16_MEMBER(fifo_clear_w);
@@ -126,8 +126,8 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t b);
 	void plot_pixel_pal(int x, int y, int addr);
 	void blit_gfx();
 	void render_jpeg();
@@ -147,7 +147,7 @@ void sliver_state::machine_start()
 	save_item(NAME(m_tmp_counter));
 }
 
-void sliver_state::plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b)
+void sliver_state::plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t b)
 {
 //  printf("plot %d %d %d\n", r,g,b);
 
@@ -159,7 +159,7 @@ void sliver_state::plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b)
 
 void sliver_state::plot_pixel_pal(int x, int y, int addr)
 {
-	UINT32 r,g,b;
+	uint32_t r,g,b;
 
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
@@ -195,7 +195,7 @@ WRITE16_MEMBER(sliver_state::fifo_data_w)
 void sliver_state::blit_gfx()
 {
 	int tmpptr=0;
-	const UINT8 *rom = memregion("user1")->base();
+	const uint8_t *rom = memregion("user1")->base();
 
 	while (tmpptr < m_fptr)
 	{
@@ -267,7 +267,7 @@ void sliver_state::render_jpeg()
 
 		jpeg_mem_src(&cinfo, memregion("user2")->base()+addr, memregion("user2")->bytes()-addr);
 
-		jpeg_read_header(&cinfo, TRUE);
+		jpeg_read_header(&cinfo, true);
 		jpeg_start_decompress(&cinfo);
 
 		int row_stride = cinfo.output_width * cinfo.output_components;
@@ -281,9 +281,9 @@ void sliver_state::render_jpeg()
 
 			for (x = 0; x < row_stride/3; x++)
 			{
-				UINT8 b = buffer[0][(x*3)];
-				UINT8 g = buffer[0][(x*3)+1];
-				UINT8 r = buffer[0][(x*3)+2];
+				uint8_t b = buffer[0][(x*3)];
+				uint8_t g = buffer[0][(x*3)+1];
+				uint8_t r = buffer[0][(x*3)+2];
 				plot_pixel_rgb(x - x_offset + m_jpeg_x, y - y_offset - m_jpeg_y, r, g, b);
 
 			}
@@ -410,7 +410,7 @@ void sliver_state::postload()
 	render_jpeg();
 }
 
-UINT32 sliver_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sliver_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap      (bitmap, m_bitmap_bg, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, m_bitmap_fg, 0, 0, 0, 0, cliprect, 0);

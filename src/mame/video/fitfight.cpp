@@ -9,8 +9,8 @@
 void fitfight_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(3);
-	UINT16 *source = m_spriteram;
-	UINT16 *finish = source + 0x800 / 2;
+	uint16_t *source = m_spriteram;
+	uint16_t *finish = source + 0x800 / 2;
 
 	while (source < finish)
 	{
@@ -105,7 +105,7 @@ void fitfight_state::video_start()
 	m_fof_txt_tilemap->set_transparent_pen(0);
 }
 
-UINT32 fitfight_state::screen_update_fitfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fitfight_state::screen_update_fitfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* scroll isn't right */
 

@@ -101,9 +101,9 @@ public:
 	};
 
 	// construction/destruction
-	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner,
-					UINT32 clock, psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source);
+					uint32_t clock, psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_flags(device_t &device, int flags) { downcast<ay8910_device &>(device).m_flags = flags; }
@@ -161,7 +161,7 @@ protected:
 private:
 	// internal helpers
 	void set_type(psg_type_t psg_type);
-	inline UINT16 mix_3D();
+	inline uint16_t mix_3D();
 	void ay8910_write_reg(int r, int v);
 	void build_mixer_table();
 	void ay8910_statesave();
@@ -173,28 +173,28 @@ private:
 	int m_ready;
 	sound_stream *m_channel;
 	bool m_active;
-	INT32 m_register_latch;
-	UINT8 m_regs[16];
-	INT32 m_last_enable;
-	INT32 m_count[AY8910_NUM_CHANNELS];
-	UINT8 m_output[AY8910_NUM_CHANNELS];
-	UINT8 m_prescale_noise;
-	INT32 m_count_noise;
-	INT32 m_count_env;
-	INT8 m_env_step;
-	UINT32 m_env_volume;
-	UINT8 m_hold,m_alternate,m_attack,m_holding;
-	INT32 m_rng;
-	UINT8 m_env_step_mask;
+	int32_t m_register_latch;
+	uint8_t m_regs[16];
+	int32_t m_last_enable;
+	int32_t m_count[AY8910_NUM_CHANNELS];
+	uint8_t m_output[AY8910_NUM_CHANNELS];
+	uint8_t m_prescale_noise;
+	int32_t m_count_noise;
+	int32_t m_count_env;
+	int8_t m_env_step;
+	uint32_t m_env_volume;
+	uint8_t m_hold,m_alternate,m_attack,m_holding;
+	int32_t m_rng;
+	uint8_t m_env_step_mask;
 	/* init parameters ... */
 	int m_step;
 	int m_zero_is_off;
-	UINT8 m_vol_enabled[AY8910_NUM_CHANNELS];
+	uint8_t m_vol_enabled[AY8910_NUM_CHANNELS];
 	const ay_ym_param *m_par;
 	const ay_ym_param *m_par_env;
-	INT32 m_vol_table[AY8910_NUM_CHANNELS][16];
-	INT32 m_env_table[AY8910_NUM_CHANNELS][32];
-	INT32 m_vol3d_table[8*32*32*32];
+	int32_t m_vol_table[AY8910_NUM_CHANNELS][16];
+	int32_t m_env_table[AY8910_NUM_CHANNELS][32];
+	int32_t m_vol3d_table[8*32*32*32];
 	int m_flags;          /* Flags */
 	int m_res_load[3];    /* Load on channel in ohms */
 	devcb_read8 m_port_a_read_cb;
@@ -208,7 +208,7 @@ extern const device_type AY8910;
 class ay8912_device : public ay8910_device
 {
 public:
-	ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type AY8912;
@@ -216,7 +216,7 @@ extern const device_type AY8912;
 class ay8913_device : public ay8910_device
 {
 public:
-	ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type AY8913;
@@ -224,7 +224,7 @@ extern const device_type AY8913;
 class ay8914_device : public ay8910_device
 {
 public:
-	ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* AY8914 handlers needed due to different register map */
 	DECLARE_READ8_MEMBER( read );
@@ -236,7 +236,7 @@ extern const device_type AY8914;
 class ay8930_device : public ay8910_device
 {
 public:
-	ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type AY8930;
@@ -244,7 +244,7 @@ extern const device_type AY8930;
 class ym2149_device : public ay8910_device
 {
 public:
-	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type YM2149;
@@ -252,7 +252,7 @@ extern const device_type YM2149;
 class ym3439_device : public ay8910_device
 {
 public:
-	ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type YM3439;
@@ -260,7 +260,7 @@ extern const device_type YM3439;
 class ymz284_device : public ay8910_device
 {
 public:
-	ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type YMZ284;
@@ -268,7 +268,7 @@ extern const device_type YMZ284;
 class ymz294_device : public ay8910_device
 {
 public:
-	ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type YMZ294;

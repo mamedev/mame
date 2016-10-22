@@ -582,7 +582,7 @@ GFXDECODE_END
 
 void esd16_state::machine_start()
 {
-	UINT8 *AUDIO = memregion("audiocpu")->base();
+	uint8_t *AUDIO = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, &AUDIO[0x0000], 0x4000);
 

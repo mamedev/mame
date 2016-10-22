@@ -94,16 +94,16 @@ public:
 	DECLARE_MACHINE_START(exeltel);
 
 	/* tms7020 i/o ports */
-	UINT8   m_tms7020_portb;
+	uint8_t   m_tms7020_portb;
 
 	/* tms7041 i/o ports */
-	UINT8   m_tms7041_portb;
-	UINT8   m_tms7041_portc;
-	UINT8   m_tms7041_portd;
+	uint8_t   m_tms7041_portb;
+	uint8_t   m_tms7041_portc;
+	uint8_t   m_tms7041_portd;
 
 	/* mailbox data */
-	UINT8   m_wx318;    /* data of 74ls374 labeled wx318 */
-	UINT8   m_wx319;    /* data of 74sl374 labeled wx319 */
+	uint8_t   m_wx318;    /* data of 74ls374 labeled wx318 */
+	uint8_t   m_wx319;    /* data of 74sl374 labeled wx319 */
 
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 
@@ -255,8 +255,8 @@ WRITE8_MEMBER(exelv_state::tms7020_portb_w)
 */
 READ8_MEMBER(exelv_state::tms7041_porta_r)
 {
-	UINT8 data = 0x00;
-	static UINT8 data_last=0;
+	uint8_t data = 0x00;
+	static uint8_t data_last=0;
 
 	// TMS5220 OK
 	data |= m_tms5220c->intq_r() ? 0x08 : 0x00; // A3
@@ -314,7 +314,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portb_w)
 */
 READ8_MEMBER(exelv_state::tms7041_portc_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	logerror("tms7041_portc_r\n");
 
 	/* Check if wx318 output is enabled */
@@ -345,7 +345,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portc_w)
 */
 READ8_MEMBER(exelv_state::tms7041_portd_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	data=m_tms5220c->status_r(space, 0, data);
 	logerror("tms7041_portd_r\n");
 	return data;
@@ -464,7 +464,7 @@ MACHINE_START_MEMBER( exelv_state, exl100)
 
 MACHINE_START_MEMBER( exelv_state, exeltel)
 {
-	UINT8 *rom = memregion("user1")->base() + 0x0200;
+	uint8_t *rom = memregion("user1")->base() + 0x0200;
 	membank("bank1")->configure_entry(0, rom);
 	membank("bank1")->set_entry(0);
 

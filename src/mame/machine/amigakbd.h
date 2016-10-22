@@ -42,7 +42,7 @@ class amigakbd_device : public device_t
 {
 public:
 	// construction/destruction
-	amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_kclk_wr_callback(device_t &device, _Object object)
 		{ return downcast<amigakbd_device &>(device).m_write_kclk.set_callback(object); }
@@ -130,11 +130,11 @@ private:
 	int m_kdat;
 	int m_kclk;
 
-	UINT8 m_port_c;
-	UINT8 m_port_d;
-	UINT16 m_latch;
-	UINT16 m_counter;
-	UINT8 m_control;
+	uint8_t m_port_c;
+	uint8_t m_port_d;
+	uint16_t m_latch;
+	uint16_t m_counter;
+	uint8_t m_control;
 };
 
 // device type definition

@@ -14,7 +14,6 @@
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/hc55516.h"
-#include "sound/dac.h"
 
 
 
@@ -29,18 +28,6 @@ extern const device_type WILLIAMS_ADPCM_SOUND;
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_WILLIAMS_NARC_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WILLIAMS_NARC_SOUND, 0)
-#define MCFG_WILLIAMS_CVSD_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WILLIAMS_CVSD_SOUND, 0)
-#define MCFG_WILLIAMS_ADPCM_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WILLIAMS_ADPCM_SOUND, 0)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -51,7 +38,7 @@ class williams_cvsd_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
 	DECLARE_WRITE16_MEMBER(write);
@@ -80,7 +67,7 @@ private:
 	required_device<hc55516_device> m_hc55516;
 
 	// internal state
-	UINT8 m_talkback;
+	uint8_t m_talkback;
 };
 
 
@@ -91,7 +78,7 @@ class williams_narc_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
 	DECLARE_READ16_MEMBER(read);
@@ -134,11 +121,11 @@ private:
 	required_device<hc55516_device> m_hc55516;
 
 	// internal state
-	UINT8 m_latch;
-	UINT8 m_latch2;
-	UINT8 m_talkback;
-	UINT8 m_audio_sync;
-	UINT8 m_sound_int_state;
+	uint8_t m_latch;
+	uint8_t m_latch2;
+	uint8_t m_talkback;
+	uint8_t m_audio_sync;
+	uint8_t m_sound_int_state;
 };
 
 
@@ -149,7 +136,7 @@ class williams_adpcm_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
 	DECLARE_WRITE16_MEMBER(write);
@@ -182,7 +169,7 @@ private:
 	required_device<m6809e_device> m_cpu;
 
 	// internal state
-	UINT8 m_latch;
-	UINT8 m_talkback;
-	UINT8 m_sound_int_state;
+	uint8_t m_latch;
+	uint8_t m_talkback;
+	uint8_t m_sound_int_state;
 };

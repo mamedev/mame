@@ -10,8 +10,8 @@
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
-static inline UINT16
-nth_word32( const UINT32 *source, int which )
+static inline uint16_t
+nth_word32( const uint32_t *source, int which )
 {
 	source += which/2;
 	if( which&1 )
@@ -27,10 +27,10 @@ nth_word32( const UINT32 *source, int which )
 /* nth_byte32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of bytes.
  */
-static inline UINT8
-nth_byte32( const UINT32 *pSource, int which )
+static inline uint8_t
+nth_byte32( const uint32_t *pSource, int which )
 {
-	UINT32 data = pSource[which/4];
+	uint32_t data = pSource[which/4];
 	switch( which&3 )
 	{
 	case 0: return data>>24;
@@ -41,14 +41,14 @@ nth_byte32( const UINT32 *pSource, int which )
 } /* nth_byte32 */
 
 static void
-NB1TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
+NB1TilemapCB(running_machine &machine, uint16_t code, int *tile, int *mask )
 {
 	*tile = code;
 	*mask = code;
 } /* NB1TilemapCB */
 
 static void
-NB2TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
+NB2TilemapCB(running_machine &machine, uint16_t code, int *tile, int *mask )
 {
 	namconb1_state *state = machine.driver_data<namconb1_state>();
 	int mangle;
@@ -101,7 +101,7 @@ void namconb1_state::video_update_common(screen_device &screen, bitmap_ind16 &bi
 
 /************************************************************************************************/
 
-UINT32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* compute window for custom screen blanking */
 	rectangle clip;
@@ -136,7 +136,7 @@ VIDEO_START_MEMBER(namconb1_state,namconb1)
 
 /****************************************************************************************************/
 
-UINT32 namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* compute window for custom screen blanking */
 	rectangle clip;

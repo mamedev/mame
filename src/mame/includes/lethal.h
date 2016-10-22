@@ -31,7 +31,7 @@ public:
 	int        m_back_colorbase;
 
 	/* misc */
-	UINT8      m_cur_control2;
+	uint8_t      m_cur_control2;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -51,7 +51,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);

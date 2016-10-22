@@ -21,7 +21,7 @@ struct tms7000_opcodeinfo {
 	int opcode;
 	char name[8];
 	int operand;
-	UINT32 s_flag;
+	uint32_t s_flag;
 };
 
 static const oprandinfo of[] = {
@@ -382,10 +382,10 @@ CPU_DISASSEMBLE( tms7000 )
 			/* We found a match */
 
 			int j,k,vector;
-			UINT8   a;
-			INT8    b;
-			UINT16  c;
-			INT16   d;
+			uint8_t   a;
+			int8_t    b;
+			uint16_t  c;
+			int16_t   d;
 
 			buffer += sprintf (buffer, "%s", opcodes[i].name);
 
@@ -401,32 +401,32 @@ CPU_DISASSEMBLE( tms7000 )
 						buffer += sprintf (buffer, "%s", of[j].opstr[k]);
 						break;
 					case UI8:
-						a = (UINT8)opram[pos++];
+						a = (uint8_t)opram[pos++];
 						buffer += sprintf(buffer, of[j].opstr[k], (unsigned int)a);
 						break;
 					case I8:
-						b = (INT8)opram[pos++];
-						buffer += sprintf (buffer, of[j].opstr[k], (INT8)b);
+						b = (int8_t)opram[pos++];
+						buffer += sprintf (buffer, of[j].opstr[k], (int8_t)b);
 						break;
 					case UI16:
-						c = (UINT16)opram[pos++];
+						c = (uint16_t)opram[pos++];
 						c <<= 8;
 						c += opram[pos++];
 						buffer += sprintf (buffer, of[j].opstr[k], (unsigned int)c);
 						break;
 					case I16:
-						d = (INT16)opram[pos++];
+						d = (int16_t)opram[pos++];
 						d <<= 8;
 						d += opram[pos++];
 						buffer += sprintf (buffer, of[j].opstr[k], (signed int)d);
 						break;
 					case PCREL:
-						b = (INT8)opram[pos++];
+						b = (int8_t)opram[pos++];
 						sprintf(tmpbuf, "$%04X", pc+2+k+b);
 						buffer += sprintf (buffer, of[j].opstr[k], tmpbuf);
 						break;
 					case PCABS:
-						c = (UINT16)opram[pos++];
+						c = (uint16_t)opram[pos++];
 						c <<= 8;
 						c += opram[pos++];
 						sprintf(tmpbuf, "$%04X", c);

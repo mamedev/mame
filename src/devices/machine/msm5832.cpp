@@ -87,7 +87,7 @@ inline void msm5832_device::write_counter(int counter, int value)
 //  msm5832_device - constructor
 //-------------------------------------------------
 
-msm5832_device::msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msm5832_device::msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSM5832, "MSM5832", tag, owner, clock, "msm5832", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_hold(0),
@@ -145,6 +145,8 @@ void msm5832_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void msm5832_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
+	if (LOG) logerror("MSM5832 Clock Update: %d.%d.%d %d %d:%d:%d\n", year, month, day, day_of_week, hour, minute, second);
+
 	write_counter(REGISTER_Y1, year);
 	write_counter(REGISTER_MO1, month);
 	write_counter(REGISTER_D1, day);
@@ -161,7 +163,7 @@ void msm5832_device::rtc_clock_updated(int year, int month, int day, int day_of_
 
 READ8_MEMBER( msm5832_device::data_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_cs && m_read)
 	{
@@ -180,7 +182,7 @@ READ8_MEMBER( msm5832_device::data_r )
 		}
 	}
 
-	if (LOG) logerror("MSM5832 '%s' Register Read %01x: %01x\n", tag(), m_address, data & 0x0f);
+	if (LOG) logerror("MSM5832 Register Read %01x: %01x\n", m_address, data & 0x0f);
 
 	return data & 0x0f;
 }
@@ -192,7 +194,7 @@ READ8_MEMBER( msm5832_device::data_r )
 
 WRITE8_MEMBER( msm5832_device::data_w )
 {
-	if (LOG) logerror("MSM5832 '%s' Register Write %01x: %01x\n", tag(), m_address, data & 0x0f);
+	if (LOG) logerror("MSM5832 Register Write %01x: %01x\n", m_address, data & 0x0f);
 
 	if (m_cs && m_write)
 	{
@@ -215,9 +217,9 @@ WRITE8_MEMBER( msm5832_device::data_w )
 //  address_w -
 //-------------------------------------------------
 
-void msm5832_device::address_w(UINT8 data)
+void msm5832_device::address_w(uint8_t data)
 {
-	if (LOG) logerror("MSM5832 '%s' Address: %01x\n", tag(), data & 0x0f);
+	if (LOG) logerror("MSM5832 Address: %01x\n", data & 0x0f);
 
 	m_address = data & 0x0f;
 }
@@ -229,7 +231,7 @@ void msm5832_device::address_w(UINT8 data)
 
 WRITE_LINE_MEMBER( msm5832_device::adj_w )
 {
-	if (LOG) logerror("MSM5832 '%s' 30 ADJ: %u\n", tag(), state);
+	if (LOG) logerror("MSM5832 30 ADJ: %u\n", state);
 
 	if (state)
 	{
@@ -244,7 +246,7 @@ WRITE_LINE_MEMBER( msm5832_device::adj_w )
 
 WRITE_LINE_MEMBER( msm5832_device::test_w )
 {
-	if (LOG) logerror("MSM5832 '%s' TEST: %u\n", tag(), state);
+	if (LOG) logerror("MSM5832 TEST: %u\n", state);
 }
 
 
@@ -254,7 +256,7 @@ WRITE_LINE_MEMBER( msm5832_device::test_w )
 
 WRITE_LINE_MEMBER( msm5832_device::hold_w )
 {
-	if (LOG) logerror("MSM5832 '%s' HOLD: %u\n", tag(), state);
+	if (LOG) logerror("MSM5832 HOLD: %u\n", state);
 
 	m_hold = state;
 }
@@ -266,7 +268,7 @@ WRITE_LINE_MEMBER( msm5832_device::hold_w )
 
 WRITE_LINE_MEMBER( msm5832_device::read_w )
 {
-	if (LOG) logerror("MSM5832 '%s' READ: %u\n", tag(), state);
+	if (LOG) logerror("MSM5832 READ: %u\n", state);
 
 	m_read = state;
 }
@@ -278,7 +280,7 @@ WRITE_LINE_MEMBER( msm5832_device::read_w )
 
 WRITE_LINE_MEMBER( msm5832_device::write_w )
 {
-	if (LOG) logerror("MSM5832 '%s' WR: %u\n", tag(), state);
+	if (LOG) logerror("MSM5832 WR: %u\n", state);
 
 	m_write = state;
 }
@@ -290,7 +292,7 @@ WRITE_LINE_MEMBER( msm5832_device::write_w )
 
 WRITE_LINE_MEMBER( msm5832_device::cs_w )
 {
-	if (LOG) logerror("MSM5832 '%s' CS: %u\n", tag(), state);
+	if (LOG) logerror("MSM5832 CS: %u\n", state);
 
 	m_cs = state;
 }

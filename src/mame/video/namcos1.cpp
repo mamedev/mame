@@ -52,7 +52,7 @@ Namco System 1 Video Hardware
 
 ***************************************************************************/
 
-inline void namcos1_state::get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram)
+inline void namcos1_state::get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *info_vram)
 {
 	int code;
 
@@ -104,7 +104,7 @@ void namcos1_state::video_start()
 {
 	int i;
 
-	m_tilemap_maskdata = (UINT8 *)memregion("gfx1")->base();
+	m_tilemap_maskdata = (uint8_t *)memregion("gfx1")->base();
 
 	/* initialize playfields */
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -213,9 +213,9 @@ sprite format:
 
 void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram + 0x800;
-	const UINT8 *source = &spriteram[0x800-0x20];   /* the last is NOT a sprite */
-	const UINT8 *finish = &spriteram[0];
+	uint8_t *spriteram = m_spriteram + 0x800;
+	const uint8_t *source = &spriteram[0x800-0x20];   /* the last is NOT a sprite */
+	const uint8_t *finish = &spriteram[0];
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
 	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
@@ -282,7 +282,7 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 
 
-UINT32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, j, scrollx, scrolly, priority;
 	rectangle new_clip = cliprect;
@@ -353,7 +353,7 @@ void namcos1_state::screen_eof(screen_device &screen, bool state)
 	{
 		if (m_copy_sprites)
 		{
-			UINT8 *spriteram = m_spriteram + 0x800;
+			uint8_t *spriteram = m_spriteram + 0x800;
 			int i,j;
 
 			for (i = 0;i < 0x800;i += 16)

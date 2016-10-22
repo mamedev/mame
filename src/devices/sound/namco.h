@@ -21,22 +21,22 @@
 /* this structure defines the parameters for a channel */
 struct sound_channel
 {
-	UINT32 frequency;
-	UINT32 counter;
-	INT32 volume[2];
-	INT32 noise_sw;
-	INT32 noise_state;
-	INT32 noise_seed;
-	UINT32 noise_counter;
-	INT32 noise_hold;
-	INT32 waveform_select;
+	uint32_t frequency;
+	uint32_t counter;
+	int32_t volume[2];
+	int32_t noise_sw;
+	int32_t noise_state;
+	int32_t noise_seed;
+	uint32_t noise_counter;
+	int32_t noise_hold;
+	int32_t waveform_select;
 };
 
 class namco_audio_device : public device_t,
 							public device_sound_interface
 {
 public:
-	namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~namco_audio_device() {}
 
 	// static configuration
@@ -49,22 +49,22 @@ protected:
 
 	// internal state
 
-	void build_decoded_waveform( UINT8 *rgnbase );
-	void update_namco_waveform(int offset, UINT8 data);
-	UINT32 namco_update_one(stream_sample_t *buffer, int length, const INT16 *wave, UINT32 counter, UINT32 freq);
+	void build_decoded_waveform( uint8_t *rgnbase );
+	void update_namco_waveform(int offset, uint8_t data);
+	uint32_t namco_update_one(stream_sample_t *buffer, int length, const int16_t *wave, uint32_t counter, uint32_t freq);
 
 	/* waveform region */
-	optional_region_ptr<UINT8> m_wave_ptr;
+	optional_region_ptr<uint8_t> m_wave_ptr;
 
 	/* data about the sound system */
 	sound_channel m_channel_list[MAX_VOICES];
 	sound_channel *m_last_channel;
-	UINT8 *m_soundregs;
-	UINT8 *m_wavedata;
+	uint8_t *m_soundregs;
+	uint8_t *m_wavedata;
 
 	/* global sound parameters */
 	int m_wave_size;
-	INT32 m_sound_enable;
+	int32_t m_sound_enable;
 	sound_stream *m_stream;
 	int m_namco_clock;
 	int m_sample_rate;
@@ -74,7 +74,7 @@ protected:
 	int m_stereo;     /* set to 1 to indicate stereo (e.g., System 1) */
 
 	/* decoded waveform table */
-	INT16 *m_waveform[MAX_VOLUME];
+	int16_t *m_waveform[MAX_VOLUME];
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
@@ -82,7 +82,7 @@ protected:
 class namco_device : public namco_audio_device
 {
 public:
-	namco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( pacman_sound_enable_w );
 	DECLARE_WRITE8_MEMBER( pacman_sound_w );
@@ -101,7 +101,7 @@ extern const device_type NAMCO;
 class namco_15xx_device : public namco_audio_device
 {
 public:
-	namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( namco_15xx_w );
 	DECLARE_READ8_MEMBER( sharedram_r );
@@ -118,7 +118,7 @@ extern const device_type NAMCO_15XX;
 class namco_cus30_device : public namco_audio_device
 {
 public:
-	namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( namcos1_cus30_w );   /* wavedata + sound registers + RAM */
 	DECLARE_READ8_MEMBER( namcos1_cus30_r );

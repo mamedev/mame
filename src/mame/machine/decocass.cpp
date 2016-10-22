@@ -14,14 +14,14 @@
 
 /* dongle type #1: jumpers C and D assignments */
 #define MAKE_MAP(m0,m1,m2,m3,m4,m5,m6,m7)   \
-	((UINT32)(m0)) | \
-	((UINT32)(m1) << 3) | \
-	((UINT32)(m2) << 6) | \
-	((UINT32)(m3) << 9) | \
-	((UINT32)(m4) << 12) | \
-	((UINT32)(m5) << 15) | \
-	((UINT32)(m6) << 18) | \
-	((UINT32)(m7) << 21)
+	((uint32_t)(m0)) | \
+	((uint32_t)(m1) << 3) | \
+	((uint32_t)(m2) << 6) | \
+	((uint32_t)(m3) << 9) | \
+	((uint32_t)(m4) << 12) | \
+	((uint32_t)(m5) << 15) | \
+	((uint32_t)(m6) << 18) | \
+	((uint32_t)(m7) << 21)
 
 
 #define T1MAP(x, m) (((m)>>(x*3))&7)
@@ -66,14 +66,14 @@ WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 
 READ8_MEMBER(decocass_state::decocass_sound_data_r)
 {
-	UINT8 data = m_soundlatch2->read(space, 0);
+	uint8_t data = m_soundlatch2->read(space, 0);
 	LOG(2,("CPU %s sound data    <- $%02x\n", space.device().tag(), data));
 	return data;
 }
 
 READ8_MEMBER(decocass_state::decocass_sound_ack_r)
 {
-	UINT8 data = m_sound_ack;   /* D6+D7 */
+	uint8_t data = m_sound_ack;   /* D6+D7 */
 	LOG(4,("CPU %s sound ack     <- $%02x\n", space.device().tag(), data));
 	return data;
 }
@@ -87,7 +87,7 @@ WRITE8_MEMBER(decocass_state::decocass_sound_data_w)
 
 READ8_MEMBER(decocass_state::decocass_sound_command_r)
 {
-	UINT8 data = m_soundlatch->read(space, 0);
+	uint8_t data = m_soundlatch->read(space, 0);
 	LOG(4,("CPU %s sound command <- $%02x\n", space.device().tag(), data));
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	m_sound_ack &= ~0x80;
@@ -116,7 +116,7 @@ READ8_MEMBER(decocass_state::decocass_sound_nmi_enable_r)
 
 READ8_MEMBER(decocass_state::decocass_sound_data_ack_reset_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	LOG(2,("CPU %s sound ack rst <- $%02x\n", space.device().tag(), data));
 	m_sound_ack &= ~0x40;
 	return data;
@@ -158,7 +158,7 @@ WRITE8_MEMBER(decocass_state::decocass_adc_w)
  */
 READ8_MEMBER(decocass_state::decocass_input_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
 	switch (offset & 7)
@@ -211,7 +211,7 @@ WRITE8_MEMBER(decocass_state::decocass_reset_w)
 
 
 #ifdef MAME_DEBUG
-void decocass_state::decocass_fno( offs_t offset, UINT8 data )
+void decocass_state::decocass_fno( offs_t offset, uint8_t data )
 {
 	/* 8041ENA/ and is this a FNO write (function number)? */
 	if (0 == (m_i8041_p2 & 0x01))
@@ -246,7 +246,7 @@ READ8_MEMBER(decocass_state::decocass_type1_r)
 	if (!m_type1_map)
 		return 0x00;
 
-	UINT8 data;
+	uint8_t data;
 
 	if (1 == (offset & 1))
 	{
@@ -264,8 +264,8 @@ READ8_MEMBER(decocass_state::decocass_type1_r)
 	else
 	{
 		offs_t promaddr;
-		UINT8 save;
-		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
+		uint8_t save;
+		uint8_t *prom = space.machine().root_device().memregion("dongle")->base();
 
 		if (m_firsttime)
 		{
@@ -333,7 +333,7 @@ READ8_MEMBER(decocass_state::decocass_type1_r)
  *
  ***************************************************************************/
 
-static UINT8 type1_latch_26_pass_3_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T1DIRECT,T1PROM, T1PROM,T1LATCH,T1PROM };
+static uint8_t type1_latch_26_pass_3_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T1DIRECT,T1PROM, T1PROM,T1LATCH,T1PROM };
 
 /***************************************************************************
  *
@@ -345,7 +345,7 @@ static UINT8 type1_latch_26_pass_3_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T
  *
  ***************************************************************************/
 
-static UINT8 type1_pass_136_table[8] ={ T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM,T1PROM,T1DIRECT,T1PROM };
+static uint8_t type1_pass_136_table[8] ={ T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM,T1PROM,T1DIRECT,T1PROM };
 
 /***************************************************************************
  *
@@ -358,7 +358,7 @@ static UINT8 type1_pass_136_table[8] ={ T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM,T
  *
  ***************************************************************************/
 
-static UINT8 type1_latch_xab_pass_x54_table[8] = { T1PROM,T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM };
+static uint8_t type1_latch_xab_pass_x54_table[8] = { T1PROM,T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM };
 
 /***************************************************************************
  *
@@ -371,7 +371,7 @@ static UINT8 type1_latch_xab_pass_x54_table[8] = { T1PROM,T1PROM,T1DIRECT,T1PROM
  *
  ***************************************************************************/
 
-static UINT8 type1_latch_27_pass_3_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T1DIRECT,T1PROM,T1PROM,T1PROM,T1LATCH };
+static uint8_t type1_latch_27_pass_3_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T1DIRECT,T1PROM,T1PROM,T1PROM,T1LATCH };
 
 /***************************************************************************
  *
@@ -384,7 +384,7 @@ static UINT8 type1_latch_27_pass_3_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T
  *
  ***************************************************************************/
 
-static UINT8 type1_latch_26_pass_5_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T1PROM,T1PROM,T1DIRECT,T1LATCH,T1PROM };
+static uint8_t type1_latch_26_pass_5_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T1PROM,T1PROM,T1DIRECT,T1LATCH,T1PROM };
 
 /***************************************************************************
  *
@@ -397,7 +397,7 @@ static UINT8 type1_latch_26_pass_5_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T
  *
  ***************************************************************************/
 
-static UINT8 type1_latch_16_pass_3_inv_1_table[8] = { T1PROM,T1LATCHINV,T1PROM,T1DIRECT,T1PROM,T1PROM,T1LATCH,T1PROM };
+static uint8_t type1_latch_16_pass_3_inv_1_table[8] = { T1PROM,T1LATCHINV,T1PROM,T1DIRECT,T1PROM,T1PROM,T1LATCH,T1PROM };
 
 /***************************************************************************
  *
@@ -418,7 +418,7 @@ static UINT8 type1_latch_16_pass_3_inv_1_table[8] = { T1PROM,T1LATCHINV,T1PROM,T
  *
  ***************************************************************************/
 
-static UINT8 type1_map1100[8] = { T1PROM,T1PROM,T1LATCHINV,T1PROM,T1DIRECT,T1PROM,T1LATCH,T1PROM };
+static uint8_t type1_map1100[8] = { T1PROM,T1PROM,T1LATCHINV,T1PROM,T1DIRECT,T1PROM,T1LATCH,T1PROM };
 
 MACHINE_RESET_MEMBER(decocass_state,cocean1a) /* 10 */
 {
@@ -442,13 +442,13 @@ MACHINE_RESET_MEMBER(decocass_state,cocean1a) /* 10 */
  ***************************************************************************/
 READ8_MEMBER(decocass_state::decocass_type2_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (1 == m_type2_xx_latch)
 	{
 		if (1 == (offset & 1))
 		{
-			UINT8 *prom = memregion("dongle")->base();
+			uint8_t *prom = memregion("dongle")->base();
 			data = prom[256 * m_type2_d2_latch + m_type2_promaddr];
 			LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, 256 * m_type2_d2_latch + m_type2_promaddr));
 		}
@@ -524,13 +524,13 @@ WRITE8_MEMBER(decocass_state::decocass_type2_w)
  ***************************************************************************/
 READ8_MEMBER(decocass_state::decocass_type3_r)
 {
-	UINT8 data, save;
+	uint8_t data, save;
 
 	if (1 == (offset & 1))
 	{
 		if (1 == m_type3_pal_19)
 		{
-			UINT8 *prom = memregion("dongle")->base();
+			uint8_t *prom = memregion("dongle")->base();
 			data = prom[m_type3_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, m_type3_ctrs));
 			if (++m_type3_ctrs == 4096)
@@ -762,7 +762,7 @@ WRITE8_MEMBER(decocass_state::decocass_type3_w)
 
 READ8_MEMBER(decocass_state::decocass_type4_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (1 == (offset & 1))
 	{
@@ -781,7 +781,7 @@ READ8_MEMBER(decocass_state::decocass_type4_r)
 	{
 		if (m_type4_latch)
 		{
-			UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
+			uint8_t *prom = space.machine().root_device().memregion("dongle")->base();
 
 			data = prom[m_type4_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.', m_type4_ctrs));
@@ -845,7 +845,7 @@ WRITE8_MEMBER(decocass_state::decocass_type4_w)
 
 READ8_MEMBER(decocass_state::decocass_type5_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (1 == (offset & 1))
 	{
@@ -921,7 +921,7 @@ WRITE8_MEMBER(decocass_state::decocass_type5_w)
 
 READ8_MEMBER(decocass_state::decocass_nodong_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (1 == (offset & 1))
 	{
@@ -961,12 +961,12 @@ READ8_MEMBER(decocass_state::decocass_nodong_r)
 
 READ8_MEMBER(decocass_state::decocass_e5xx_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	/* E5x2-E5x3 and mirrors */
 	if (2 == (offset & E5XX_MASK))
 	{
-		UINT8 bot_eot = (m_cassette->get_status_bits() >> 5) & 1;
+		uint8_t bot_eot = (m_cassette->get_status_bits() >> 5) & 1;
 
 		data =
 			(BIT(m_i8041_p1, 7)   << 0) |   /* D0 = P17 - REQ/ */
@@ -1406,7 +1406,7 @@ MACHINE_RESET_MEMBER(decocass_state,csdtenis)
 
 MACHINE_RESET_MEMBER(decocass_state,czeroize)
 {
-	UINT8 *mem = memregion("dongle")->base();
+	uint8_t *mem = memregion("dongle")->base();
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type3_r),this);
@@ -1510,7 +1510,7 @@ WRITE8_MEMBER(decocass_state::i8041_p1_w)
 
 READ8_MEMBER(decocass_state::i8041_p1_r)
 {
-	UINT8 data = m_i8041_p1;
+	uint8_t data = m_i8041_p1;
 
 	if (data != m_i8041_p1_read_latch)
 	{
@@ -1554,7 +1554,7 @@ WRITE8_MEMBER(decocass_state::i8041_p2_w)
 
 READ8_MEMBER(decocass_state::i8041_p2_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = (m_i8041_p2 & ~0xe0) | m_cassette->get_status_bits();
 

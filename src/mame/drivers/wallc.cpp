@@ -67,7 +67,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	tilemap_t *m_bg_tilemap;
 
@@ -79,7 +79,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wallc);
-	UINT32 screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -110,7 +110,7 @@ public:
 
 PALETTE_INIT_MEMBER(wallc_state, wallc)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	static const int resistances_rg[2] = { 330, 220 };
@@ -162,7 +162,7 @@ void wallc_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y,   8, 8, 32, 32);
 }
 
-UINT32 wallc_state::screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wallc_state::screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -267,10 +267,10 @@ GFXDECODE_END
 
 DRIVER_INIT_MEMBER(wallc_state,wallc)
 {
-	UINT8 c;
-	UINT32 i;
+	uint8_t c;
+	uint32_t i;
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	for (i=0; i<0x2000*2; i++)
 	{
@@ -282,10 +282,10 @@ DRIVER_INIT_MEMBER(wallc_state,wallc)
 
 DRIVER_INIT_MEMBER(wallc_state,wallca)
 {
-	UINT8 c;
-	UINT32 i;
+	uint8_t c;
+	uint32_t i;
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	for (i=0; i<0x4000; i++)
 	{
@@ -445,10 +445,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wallc_state,sidam)
 {
-	UINT8 c;
-	UINT32 i;
+	uint8_t c;
+	uint32_t i;
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int count = 0;
 
 	for (i=0; i<0x2000; i++)

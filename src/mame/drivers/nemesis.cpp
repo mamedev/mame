@@ -1415,9 +1415,9 @@ static const gfx_layout spritelayout168 =
 	4*16*8
 };
 
-static const UINT32 spritelayout6464_xoffset[64] = { STEP64(0, 4) };
+static const uint32_t spritelayout6464_xoffset[64] = { STEP64(0, 4) };
 
-static const UINT32 spritelayout6464_yoffset[64] = { STEP64(0, 4*64) };
+static const uint32_t spritelayout6464_yoffset[64] = { STEP64(0, 4*64) };
 
 static const gfx_layout spritelayout6464 =
 {

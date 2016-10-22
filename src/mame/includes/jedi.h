@@ -35,30 +35,30 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen") { }
 
-	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<uint8_t> m_nvram;
 
 	/* machine state */
-	UINT8  m_a2d_select;
-	UINT8  m_nvram_enabled;
+	uint8_t  m_a2d_select;
+	uint8_t  m_nvram_enabled;
 	emu_timer *m_interrupt_timer;
 
 	/* video state */
-	required_shared_ptr<UINT8> m_foreground_bank;
-	required_shared_ptr<UINT8> m_video_off;
-	required_shared_ptr<UINT8> m_backgroundram;
-	required_shared_ptr<UINT8> m_paletteram;
-	required_shared_ptr<UINT8> m_foregroundram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_smoothing_table;
-	UINT32 m_vscroll;
-	UINT32 m_hscroll;
+	required_shared_ptr<uint8_t> m_foreground_bank;
+	required_shared_ptr<uint8_t> m_video_off;
+	required_shared_ptr<uint8_t> m_backgroundram;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_foregroundram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_smoothing_table;
+	uint32_t m_vscroll;
+	uint32_t m_hscroll;
 
 	/* audio state */
-	UINT8  m_audio_latch;
-	UINT8  m_audio_ack_latch;
-	required_shared_ptr<UINT8> m_audio_comm_stat;
-	required_shared_ptr<UINT8> m_speech_data;
-	UINT8  m_speech_strobe_state;
+	uint8_t  m_audio_latch;
+	uint8_t  m_audio_ack_latch;
+	required_shared_ptr<uint8_t> m_audio_comm_stat;
+	required_shared_ptr<uint8_t> m_speech_data;
+	uint8_t  m_speech_strobe_state;
 	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(rom_banksel_w);
 	DECLARE_READ8_MEMBER(a2d_data_r);
@@ -83,7 +83,7 @@ public:
 	virtual void sound_start() override;
 	virtual void sound_reset() override;
 	DECLARE_VIDEO_START(jedi);
-	UINT32 screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(generate_interrupt);
 	TIMER_CALLBACK_MEMBER(delayed_audio_latch_w);
 	void get_pens(pen_t *pens);

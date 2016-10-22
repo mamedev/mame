@@ -19,24 +19,24 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
-	required_shared_ptr<UINT8> m_m62_tileram;
-	optional_shared_ptr<UINT8> m_m62_textram;
-	optional_shared_ptr<UINT8> m_scrollram;
+	required_shared_ptr<uint8_t> m_m62_tileram;
+	optional_shared_ptr<uint8_t> m_m62_textram;
+	optional_shared_ptr<uint8_t> m_scrollram;
 
 	/* video-related */
 	tilemap_t*             m_bg_tilemap;
 	tilemap_t*             m_fg_tilemap;
 	int                  m_flipscreen;
 
-	const UINT8          *m_sprite_height_prom;
-	INT32                m_m62_background_hscroll;
-	INT32                m_m62_background_vscroll;
-	UINT8                m_kidniki_background_bank;
-	INT32                m_kidniki_text_vscroll;
+	const uint8_t          *m_sprite_height_prom;
+	int32_t                m_m62_background_hscroll;
+	int32_t                m_m62_background_vscroll;
+	uint8_t                m_kidniki_background_bank;
+	int32_t                m_kidniki_text_vscroll;
 	int                  m_ldrun3_topbottom_mask;
-	INT32                m_spelunkr_palbank;
+	int32_t                m_spelunkr_palbank;
 
 	/* misc */
 	int                 m_ldrun2_bankswap;  //ldrun2
@@ -105,18 +105,18 @@ public:
 	DECLARE_PALETTE_INIT(spelunk2);
 	DECLARE_VIDEO_START(youjyudn);
 	DECLARE_VIDEO_START(horizon);
-	UINT32 screen_update_ldrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kungfum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_battroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ldrun3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ldrun4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_lotlot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kidniki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spelunkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spelunk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_youjyudn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_horizon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void m62_amplify_contrast(palette_t *palette, UINT32 numcolors);
+	uint32_t screen_update_ldrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kungfum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_battroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ldrun3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ldrun4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lotlot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kidniki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spelunkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spelunk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_youjyudn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_horizon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void m62_amplify_contrast(palette_t *palette, uint32_t numcolors);
 	void register_savestate(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority );
 	void m62_start( tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 );

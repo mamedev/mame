@@ -111,7 +111,7 @@
  *
  *************************************/
 
-static void bebox_mbreg32_w(UINT32 *target, UINT64 data, UINT64 mem_mask)
+static void bebox_mbreg32_w(uint32_t *target, uint64_t data, uint64_t mem_mask)
 {
 	int i;
 
@@ -130,22 +130,22 @@ static void bebox_mbreg32_w(UINT32 *target, UINT64 data, UINT64 mem_mask)
 
 READ64_MEMBER(bebox_state::bebox_cpu0_imask_r )
 {
-	return ((UINT64) m_cpu_imask[0]) << 32;
+	return ((uint64_t) m_cpu_imask[0]) << 32;
 }
 
 READ64_MEMBER(bebox_state::bebox_cpu1_imask_r )
 {
-	return ((UINT64) m_cpu_imask[1]) << 32;
+	return ((uint64_t) m_cpu_imask[1]) << 32;
 }
 
 READ64_MEMBER(bebox_state::bebox_interrupt_sources_r )
 {
-	return ((UINT64) m_interrupts) << 32;
+	return ((uint64_t) m_interrupts) << 32;
 }
 
 WRITE64_MEMBER(bebox_state::bebox_cpu0_imask_w )
 {
-	UINT32 old_imask = m_cpu_imask[0];
+	uint32_t old_imask = m_cpu_imask[0];
 
 	bebox_mbreg32_w(&m_cpu_imask[0], data, mem_mask);
 
@@ -162,7 +162,7 @@ WRITE64_MEMBER(bebox_state::bebox_cpu0_imask_w )
 
 WRITE64_MEMBER(bebox_state::bebox_cpu1_imask_w )
 {
-	UINT32 old_imask = m_cpu_imask[1];
+	uint32_t old_imask = m_cpu_imask[1];
 
 	bebox_mbreg32_w(&m_cpu_imask[1], data, mem_mask);
 
@@ -179,7 +179,7 @@ WRITE64_MEMBER(bebox_state::bebox_cpu1_imask_w )
 
 READ64_MEMBER(bebox_state::bebox_crossproc_interrupts_r )
 {
-	UINT32 result;
+	uint32_t result;
 	result = m_crossproc_interrupts;
 
 	/* return a different result depending on which CPU is accessing this handler */
@@ -188,14 +188,14 @@ READ64_MEMBER(bebox_state::bebox_crossproc_interrupts_r )
 	else
 		result &= ~0x02000000;
 
-	return ((UINT64) result) << 32;
+	return ((uint64_t) result) << 32;
 }
 
 WRITE64_MEMBER(bebox_state::bebox_crossproc_interrupts_w )
 {
 	static const struct
 	{
-		UINT32 mask;
+		uint32_t mask;
 		int cpunum;
 		int active_high;
 		int inputline;
@@ -207,7 +207,7 @@ WRITE64_MEMBER(bebox_state::bebox_crossproc_interrupts_w )
 		{ 0x04000000, 1, 0, 0/*PPC_INPUT_LINE_TLBISYNC*/ }
 	};
 	int i, line;
-	UINT32 old_crossproc_interrupts = m_crossproc_interrupts;
+	uint32_t old_crossproc_interrupts = m_crossproc_interrupts;
 	cpu_device *cpus[] = { m_ppc1, m_ppc2 };
 
 	bebox_mbreg32_w(&m_crossproc_interrupts, data, mem_mask);
@@ -237,7 +237,7 @@ WRITE64_MEMBER(bebox_state::bebox_crossproc_interrupts_w )
 
 WRITE64_MEMBER(bebox_state::bebox_processor_resets_w )
 {
-	UINT8 b = (UINT8) (data >> 56);
+	uint8_t b = (uint8_t) (data >> 56);
 
 	if (b & 0x20)
 	{
@@ -248,7 +248,7 @@ WRITE64_MEMBER(bebox_state::bebox_processor_resets_w )
 
 void bebox_state::bebox_update_interrupts()
 {
-	UINT32 interrupt;
+	uint32_t interrupt;
 	cpu_device *cpus[] = { m_ppc1, m_ppc2 };
 
 	for (int cpunum = 0; cpunum < 2; cpunum++)
@@ -303,7 +303,7 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 		"SMI0",
 		nullptr
 	};
-	UINT32 old_interrupts;
+	uint32_t old_interrupts;
 
 	if (LOG_INTERRUPTS)
 	{
@@ -348,10 +348,10 @@ WRITE_LINE_MEMBER( bebox_state::fdc_interrupt )
 
 READ64_MEMBER(bebox_state::bebox_interrupt_ack_r )
 {
-	UINT32 result;
+	uint32_t result;
 	result = m_pic8259_1->acknowledge();
 	bebox_set_irq_bit(5, 0);   /* HACK */
-	return ((UINT64) result) << 56;
+	return ((uint64_t) result) << 56;
 }
 
 
@@ -398,24 +398,24 @@ WRITE_LINE_MEMBER(bebox_state::bebox_ide_interrupt)
 /*
 static READ64_MEMBER(bebox_state::bebox_video_r )
 {
-    UINT64 result = 0;
+    uint64_t result = 0;
     mem_mask = FLIPENDIAN_INT64(mem_mask);
     if (ACCESSING_BITS_0_7)
-        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 0, mem_mask >> 0) << 0;
+        result |= (uint64_t)vga_mem_linear_r(space, offset * 8 + 0, mem_mask >> 0) << 0;
     if (ACCESSING_BITS_8_15)
-        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 1, mem_mask >> 8) << 8;
+        result |= (uint64_t)vga_mem_linear_r(space, offset * 8 + 1, mem_mask >> 8) << 8;
     if (ACCESSING_BITS_16_23)
-        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 2, mem_mask >> 16) << 16;
+        result |= (uint64_t)vga_mem_linear_r(space, offset * 8 + 2, mem_mask >> 16) << 16;
     if (ACCESSING_BITS_24_31)
-        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 3, mem_mask >> 24) << 24;
+        result |= (uint64_t)vga_mem_linear_r(space, offset * 8 + 3, mem_mask >> 24) << 24;
     if (ACCESSING_BITS_32_39)
-        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 4, mem_mask >> 32) << 32;
+        result |= (uint64_t)vga_mem_linear_r(space, offset * 8 + 4, mem_mask >> 32) << 32;
     if (ACCESSING_BITS_40_47)
-        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 5, mem_mask >> 40) << 40;
+        result |= (uint64_t)vga_mem_linear_r(space, offset * 8 + 5, mem_mask >> 40) << 40;
     if (ACCESSING_BITS_48_55)
-        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 6, mem_mask >> 48) << 48;
+        result |= (uint64_t)vga_mem_linear_r(space, offset * 8 + 6, mem_mask >> 48) << 48;
     if (ACCESSING_BITS_56_63)
-        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 7, mem_mask >> 56) << 56;
+        result |= (uint64_t)vga_mem_linear_r(space, offset * 8 + 7, mem_mask >> 56) << 56;
     return FLIPENDIAN_INT64(result);
 }
 
@@ -451,7 +451,7 @@ static WRITE64_MEMBER(bebox_state::bebox_video_w )
 
 READ8_MEMBER(bebox_state::bebox_page_r)
 {
-	UINT8 data = m_at_pages[offset % 0x10];
+	uint8_t data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
@@ -480,19 +480,19 @@ WRITE8_MEMBER(bebox_state::bebox_page_w)
 	{
 		case 1:
 			m_dma_offset[(offset / 8) & 1][2] &= 0xFF00;
-			m_dma_offset[(offset / 8) & 1][2] |= ((UINT16 ) data) << 0;
+			m_dma_offset[(offset / 8) & 1][2] |= ((uint16_t ) data) << 0;
 			break;
 		case 2:
 			m_dma_offset[(offset / 8) & 1][3] &= 0xFF00;
-			m_dma_offset[(offset / 8) & 1][3] |= ((UINT16 ) data) << 0;
+			m_dma_offset[(offset / 8) & 1][3] |= ((uint16_t ) data) << 0;
 			break;
 		case 3:
 			m_dma_offset[(offset / 8) & 1][1] &= 0xFF00;
-			m_dma_offset[(offset / 8) & 1][1] |= ((UINT16 ) data) << 0;
+			m_dma_offset[(offset / 8) & 1][1] |= ((uint16_t ) data) << 0;
 			break;
 		case 7:
 			m_dma_offset[(offset / 8) & 1][0] &= 0xFF00;
-			m_dma_offset[(offset / 8) & 1][0] |= ((UINT16 ) data) << 0;
+			m_dma_offset[(offset / 8) & 1][0] |= ((uint16_t ) data) << 0;
 			break;
 	}
 }
@@ -504,19 +504,19 @@ WRITE8_MEMBER(bebox_state::bebox_80000480_w)
 	{
 		case 1:
 			m_dma_offset[(offset / 8) & 1][2] &= 0x00FF;
-			m_dma_offset[(offset / 8) & 1][2] |= ((UINT16 ) data) << 8;
+			m_dma_offset[(offset / 8) & 1][2] |= ((uint16_t ) data) << 8;
 			break;
 		case 2:
 			m_dma_offset[(offset / 8) & 1][3] &= 0x00FF;
-			m_dma_offset[(offset / 8) & 1][3] |= ((UINT16 ) data) << 8;
+			m_dma_offset[(offset / 8) & 1][3] |= ((uint16_t ) data) << 8;
 			break;
 		case 3:
 			m_dma_offset[(offset / 8) & 1][1] &= 0x00FF;
-			m_dma_offset[(offset / 8) & 1][1] |= ((UINT16 ) data) << 8;
+			m_dma_offset[(offset / 8) & 1][1] |= ((uint16_t ) data) << 8;
 			break;
 		case 7:
 			m_dma_offset[(offset / 8) & 1][0] &= 0x00FF;
-			m_dma_offset[(offset / 8) & 1][0] |= ((UINT16 ) data) << 8;
+			m_dma_offset[(offset / 8) & 1][0] |= ((uint16_t ) data) << 8;
 			break;
 	}
 }
@@ -621,30 +621,30 @@ WRITE8_MEMBER(bebox_state::bebox_flash_w )
 READ64_MEMBER(bebox_state::scsi53c810_r )
 {
 	int reg = offset*8;
-	UINT64 r = 0;
+	uint64_t r = 0;
 	if (!ACCESSING_BITS_56_63) {
-		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+0) << 56;
+		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+0) << 56;
 	}
 	if (!ACCESSING_BITS_48_55) {
-		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+1) << 48;
+		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+1) << 48;
 	}
 	if (!ACCESSING_BITS_40_47) {
-		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+2) << 40;
+		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+2) << 40;
 	}
 	if (!ACCESSING_BITS_32_39) {
-		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+3) << 32;
+		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+3) << 32;
 	}
 	if (!ACCESSING_BITS_24_31) {
-		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+4) << 24;
+		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+4) << 24;
 	}
 	if (!ACCESSING_BITS_16_23) {
-		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+5) << 16;
+		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+5) << 16;
 	}
 	if (!ACCESSING_BITS_8_15) {
-		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+6) << 8;
+		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+6) << 8;
 	}
 	if (!ACCESSING_BITS_0_7) {
-		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+7) << 0;
+		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+7) << 0;
 	}
 
 	return r;
@@ -681,10 +681,10 @@ WRITE64_MEMBER(bebox_state::scsi53c810_w )
 }
 
 
-UINT32 scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask)
+uint32_t scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, uint32_t mem_mask)
 {
 	bebox_state *state = device->machine().driver_data<bebox_state>();
-	UINT32 result = 0;
+	uint32_t result = 0;
 
 	if (function == 0)
 	{
@@ -707,7 +707,7 @@ UINT32 scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, 
 }
 
 
-void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, uint32_t data, uint32_t mem_mask)
 {
 	bebox_state *state = device->machine().driver_data<bebox_state>();
 	offs_t addr;
@@ -752,7 +752,7 @@ void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_GET_DEVICES:
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in bebox_state::device_timer");
+		assert_always(false, "Unknown id in bebox_state::device_timer");
 	}
 }
 
@@ -800,7 +800,7 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 	 * the crash
 	 */
 	{
-		static UINT64 ops[2] =
+		static uint64_t ops[2] =
 		{
 			/* li r0, 0x0700 */
 			/* mtspr ctr, r0 */

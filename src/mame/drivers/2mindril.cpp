@@ -48,12 +48,12 @@ public:
 		m_iodata(*this, "iodata") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_iodata;
+	required_shared_ptr<uint16_t> m_iodata;
 
 	/* input-related */
-	UINT16        m_defender_sensor;
-	UINT16        m_shutter_sensor;
-	UINT16        m_irq_reg;
+	uint16_t        m_defender_sensor;
+	uint16_t        m_shutter_sensor;
+	uint16_t        m_irq_reg;
 
 	/* devices */
 	DECLARE_READ16_MEMBER(drill_io_r);
@@ -153,7 +153,7 @@ void _2mindril_state::device_timer(emu_timer &timer, device_timer_id id, int par
 			m_defender_sensor = param;
 			break;
 	default:
-			assert_always(FALSE, "Unknown id in _2mindril_state::device_timer");
+			assert_always(false, "Unknown id in _2mindril_state::device_timer");
 	}
 }
 #endif
@@ -497,9 +497,9 @@ ROM_END
 
 void _2mindril_state::tile_decode()
 {
-	UINT8 lsb,msb;
-	UINT32 offset,i;
-	UINT8 *gfx = memregion("gfx2")->base();
+	uint8_t lsb,msb;
+	uint32_t offset,i;
+	uint8_t *gfx = memregion("gfx2")->base();
 	int size=memregion("gfx2")->bytes();
 	int data;
 

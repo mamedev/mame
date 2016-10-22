@@ -81,7 +81,7 @@ ioport_constructor bbc_voltmace3b_device::device_input_ports() const
 //  bbc_joystick_device - constructor
 //-------------------------------------------------
 
-bbc_joystick_device::bbc_joystick_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+bbc_joystick_device::bbc_joystick_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_bbc_analogue_interface(mconfig, *this),
 	m_joy(*this, "JOY%u", 0),
@@ -89,12 +89,12 @@ bbc_joystick_device::bbc_joystick_device(const machine_config &mconfig, device_t
 {
 }
 
-bbc_acornjoy_device::bbc_acornjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bbc_acornjoy_device::bbc_acornjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bbc_joystick_device(mconfig, BBC_ACORNJOY, "Acorn Analogue Joysticks", tag, owner, clock, "bbc_acornjoy", __FILE__)
 {
 }
 
-bbc_voltmace3b_device::bbc_voltmace3b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bbc_voltmace3b_device::bbc_voltmace3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bbc_joystick_device(mconfig, BBC_VOLTMACE3B, "Voltmace Delta 3b Twin Joysticks", tag, owner, clock, "bbc_voltmace3b", __FILE__)
 {
 }
@@ -122,12 +122,12 @@ void bbc_joystick_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-UINT8 bbc_joystick_device::ch_r(int channel)
+uint8_t bbc_joystick_device::ch_r(int channel)
 {
 	return m_joy[channel]->read();
 }
 
-UINT8 bbc_joystick_device::pb_r()
+uint8_t bbc_joystick_device::pb_r()
 {
 	return m_buttons->read();
 }

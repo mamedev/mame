@@ -690,13 +690,13 @@ static const gfx_layout tilelayout =
 	2*16*16
 };
 
-static const UINT32 objlayout_xoffset[64] =
+static const uint32_t objlayout_xoffset[64] =
 {
 	STEP8(7*8,1), STEP8(6*8,1), STEP8(5*8,1), STEP8(4*8,1),
 	STEP8(3*8,1), STEP8(2*8,1), STEP8(1*8,1), STEP8(0*8,1)
 };
 
-static const UINT32 objlayout_yoffset[64] =
+static const uint32_t objlayout_yoffset[64] =
 {
 	STEP32(63*2*64, -1*2*64),
 	STEP32(31*2*64, -1*2*64)
@@ -1742,7 +1742,7 @@ DRIVER_INIT_MEMBER(decocass_state,decocrom)
 
 READ8_MEMBER(decocass_state::cdsteljn_input_r )
 {
-	UINT8 res;
+	uint8_t res;
 	static const char *const portnames[2][4] = {
 		{"P1_MP0", "P1_MP1", "P1_MP2", "P1_MP3"},
 		{"P2_MP0", "P2_MP1", "P2_MP2", "P2_MP3"}         };

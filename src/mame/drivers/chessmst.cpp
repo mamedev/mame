@@ -41,12 +41,12 @@ public:
 	optional_device<beep_device> m_beeper;
 	required_ioport m_extra;
 
-	UINT16 m_matrix;
-	UINT16 m_led_sel;
-	UINT8 m_sensor[64];
-	UINT8 m_digit_matrix;
+	uint16_t m_matrix;
+	uint16_t m_led_sel;
+	uint8_t m_sensor[64];
+	uint8_t m_digit_matrix;
 	int m_digit_dot;
-	UINT16 m_digit;
+	uint16_t m_digit;
 
 	virtual void machine_reset() override;
 
@@ -117,7 +117,7 @@ INPUT_CHANGED_MEMBER(chessmst_state::view_monitor_button)
 
 INPUT_CHANGED_MEMBER(chessmst_state::chessmst_sensor)
 {
-	UINT8 pos = (UINT8)(FPTR)param;
+	uint8_t pos = (uint8_t)(uintptr_t)param;
 
 	if (newval)
 	{
@@ -314,7 +314,7 @@ WRITE8_MEMBER( chessmst_state::pio1_port_b_dm_w )
 
 READ8_MEMBER( chessmst_state::pio2_port_a_r )
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	// The pieces position on the chessboard is identified by 64 Hall
 	// sensors, which are in a 8x8 matrix with the corresponding LEDs.

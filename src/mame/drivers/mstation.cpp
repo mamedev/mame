@@ -53,21 +53,21 @@ public:
 	required_device<address_map_bank_device> m_bankdev1;
 	required_device<address_map_bank_device> m_bankdev2;
 	required_ioport_array<10> m_keyboard;
-	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<uint8_t> m_nvram;
 
-	UINT8 m_bank1[2];
-	UINT8 m_bank2[2];
-	UINT8 *m_vram;
-	UINT8 m_screen_column;
-	UINT8 m_port2;
-	UINT8 m_irq;
-	UINT16 m_kb_matrix;
+	uint8_t m_bank1[2];
+	uint8_t m_bank2[2];
+	uint8_t *m_vram;
+	uint8_t m_screen_column;
+	uint8_t m_port2;
+	uint8_t m_irq;
+	uint16_t m_kb_matrix;
 
 	DECLARE_READ8_MEMBER( modem_r );
 	DECLARE_WRITE8_MEMBER( modem_w );
 
-	void lcd_w(UINT16 offset, int column, UINT8 data);
-	UINT8 lcd_r(UINT16 offset, int column);
+	void lcd_w(uint16_t offset, int column, uint8_t data);
+	uint8_t lcd_r(uint16_t offset, int column);
 	DECLARE_READ8_MEMBER( lcd_right_r );
 	DECLARE_WRITE8_MEMBER( lcd_right_w );
 	DECLARE_READ8_MEMBER( lcd_left_r );
@@ -90,7 +90,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(mstation);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
@@ -111,7 +111,7 @@ WRITE8_MEMBER( mstation_state::modem_w )
 //  video hardware emulation
 //***************************************************************************/
 
-void mstation_state::lcd_w(UINT16 offset, int column, UINT8 data)
+void mstation_state::lcd_w(uint16_t offset, int column, uint8_t data)
 {
 	if (m_port2 & 0x08)
 		m_vram[(column * 240) + (offset % 240)] = data;
@@ -119,7 +119,7 @@ void mstation_state::lcd_w(UINT16 offset, int column, UINT8 data)
 		m_screen_column = data % 20;
 }
 
-UINT8 mstation_state::lcd_r(UINT16 offset, int column)
+uint8_t mstation_state::lcd_r(uint16_t offset, int column)
 {
 	if (m_port2 & 0x08)
 		return m_vram[(column * 240) + (offset % 240)];
@@ -132,12 +132,12 @@ WRITE8_MEMBER( mstation_state::lcd_left_w )  {  lcd_w(offset, m_screen_column, d
 READ8_MEMBER ( mstation_state::lcd_right_r ) {  return lcd_r(offset, m_screen_column + 20); }
 WRITE8_MEMBER( mstation_state::lcd_right_w ) {  lcd_w(offset, m_screen_column + 20, data);  }
 
-UINT32 mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int x=0; x<40; x++)
 		for (int y=0; y<128; y++)
 		{
-			UINT8 data = m_vram[56 + y + x * 240];
+			uint8_t data = m_vram[56 + y + x * 240];
 
 			for (int b=0; b<8; b++)
 			{
@@ -237,7 +237,7 @@ WRITE8_MEMBER( mstation_state::kb_w )
 
 READ8_MEMBER( mstation_state::kb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i=0; i<10; i++)
 	{
@@ -384,7 +384,7 @@ INPUT_PORTS_END
 void mstation_state::machine_start()
 {
 	// allocate the videoram
-	m_vram = (UINT8*)machine().memory().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
+	m_vram = (uint8_t*)machine().memory().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
 
 	// map firsh RAM bank at 0xc000-0xffff
 	membank("sysram")->set_base(m_nvram);

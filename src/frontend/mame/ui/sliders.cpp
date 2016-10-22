@@ -42,8 +42,8 @@ void menu_sliders::handle()
 		if (menu_event->itemref != nullptr && menu_event->type == menu_item_type::SLIDER)
 		{
 			const slider_state *slider = (const slider_state *)menu_event->itemref;
-			INT32 curvalue = slider->update(machine(), slider->arg, slider->id, nullptr, SLIDER_NOCHANGE);
-			INT32 increment = 0;
+			int32_t curvalue = slider->update(machine(), slider->arg, slider->id, nullptr, SLIDER_NOCHANGE);
+			int32_t increment = 0;
 			bool alt_pressed = machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT);
 			bool ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
 			bool shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
@@ -95,7 +95,7 @@ void menu_sliders::handle()
 			// handle any changes
 			if (increment != 0)
 			{
-				INT32 newvalue = curvalue + increment;
+				int32_t newvalue = curvalue + increment;
 
 				// clamp within bounds
 				if (newvalue < slider->minval)
@@ -140,8 +140,8 @@ void menu_sliders::populate()
 		if (item.type == menu_item_type::SLIDER)
 		{
 			slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
-			INT32 curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
-			UINT32 flags = 0;
+			int32_t curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
+			uint32_t flags = 0;
 			if (curval > slider->minval)
 				flags |= FLAG_LEFT_ARROW;
 			if (curval < slider->maxval)
@@ -163,8 +163,8 @@ void menu_sliders::populate()
 		if (item.type == menu_item_type::SLIDER)
 		{
 			slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
-			INT32 curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
-			UINT32 flags = 0;
+			int32_t curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
+			uint32_t flags = 0;
 			if (curval > slider->minval)
 				flags |= FLAG_LEFT_ARROW;
 			if (curval < slider->maxval)
@@ -195,7 +195,7 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		float percentage, default_percentage;
 		std::string tempstring;
 		float text_height;
-		INT32 curval;
+		int32_t curval;
 
 		// determine the current value and text
 		curval = curslider->update(machine(), curslider->arg, curslider->id, &tempstring, SLIDER_NOCHANGE);
@@ -257,9 +257,9 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 //  standard menu handler
 //-------------------------------------------------
 
-UINT32 menu_sliders::ui_handler(render_container &container, mame_ui_manager &mui)
+uint32_t menu_sliders::ui_handler(render_container &container, mame_ui_manager &mui)
 {
-	UINT32 result;
+	uint32_t result;
 
 	// if this is the first call, push the sliders menu
 	if (topmost_menu<menu_sliders>(mui.machine()) == nullptr)

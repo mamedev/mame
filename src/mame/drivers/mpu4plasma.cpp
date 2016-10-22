@@ -20,7 +20,7 @@ public:
 	{
 	}
 
-	required_shared_ptr<UINT16> m_plasmaram;
+	required_shared_ptr<uint16_t> m_plasmaram;
 
 	DECLARE_READ16_MEMBER( mpu4plasma_unk_r )
 	{
@@ -30,7 +30,7 @@ public:
 	DECLARE_WRITE16_MEMBER( mpu4plasma_unk_w )
 	{
 	}
-	UINT32 screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -49,13 +49,13 @@ static ADDRESS_MAP_START( mpu4plasma_map, AS_PROGRAM, 16, mpu4plasma_state )
 	AM_RANGE(0xffff04, 0xffff05) AM_WRITE( mpu4plasma_unk_w )
 ADDRESS_MAP_END
 
-UINT32 mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// don't know if this really gets drawn straight from ram..
 	int base = 0x1600 / 2;
 
-	UINT16* rambase = m_plasmaram;
-	UINT16* dst_bitmap;
+	uint16_t* rambase = m_plasmaram;
+	uint16_t* dst_bitmap;
 
 	int i,y,x,p;
 	i = 0;
@@ -66,11 +66,11 @@ UINT32 mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitmap_
 
 		for (x=0;x<128/16;x++)
 		{
-			UINT16 pix = rambase[base+i];
+			uint16_t pix = rambase[base+i];
 
 			for (p=0;p<16;p++)
 			{
-				UINT16 bit = (pix << p)&0x8000;
+				uint16_t bit = (pix << p)&0x8000;
 				if (bit) dst_bitmap[x*16 + p] = 1;
 				else dst_bitmap[x*16 + p] = 0;
 			}

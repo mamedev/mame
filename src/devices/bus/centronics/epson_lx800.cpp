@@ -199,7 +199,7 @@ ioport_constructor epson_lx800_t::device_input_ports() const
 //  epson_lx800_t - constructor
 //-------------------------------------------------
 
-epson_lx800_t::epson_lx800_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+epson_lx800_t::epson_lx800_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EPSON_LX800, "Epson LX-800", tag, owner, clock, "lx800", __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -207,7 +207,7 @@ epson_lx800_t::epson_lx800_t(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-epson_lx800_t::epson_lx800_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+epson_lx800_t::epson_lx800_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -250,7 +250,7 @@ void epson_lx800_t::device_reset()
  */
 READ8_MEMBER( epson_lx800_t::porta_r )
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	logerror("%s: lx800_porta_r(%02x)\n", machine().describe_context(), offset);
 
@@ -280,7 +280,7 @@ WRITE8_MEMBER( epson_lx800_t::porta_w )
  */
 READ8_MEMBER( epson_lx800_t::portc_r )
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	logerror("%s: lx800_portc_r(%02x)\n", machine().describe_context(), offset);
 

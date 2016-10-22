@@ -137,7 +137,7 @@
 #define SRCID_ER                    0x80
 
 /* convernience functions */
-UINT8 wd33c93_device::getunit( void )
+uint8_t wd33c93_device::getunit( void )
 {
 	/* return the destination unit id */
 	return regs[WD_DESTINATION_ID] & SRCID_MASK;
@@ -215,7 +215,7 @@ void wd33c93_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 	}
 }
 
-void wd33c93_device::complete_cmd( UINT8 status )
+void wd33c93_device::complete_cmd( uint8_t status )
 {
 	/* fire off a timer to complete the command */
 	cmd_timer->adjust( attotime::from_usec(1), status );
@@ -269,8 +269,8 @@ void wd33c93_device::disconnect_cmd()
 
 void wd33c93_device::select_cmd()
 {
-	UINT8 unit = getunit();
-	UINT8 newstatus;
+	uint8_t unit = getunit();
+	uint8_t newstatus;
 
 	/* see if we can select that device */
 	if (select(unit))
@@ -305,8 +305,8 @@ void wd33c93_device::select_cmd()
 
 void wd33c93_device::selectxfer_cmd()
 {
-	UINT8 unit = getunit();
-	UINT8 newstatus;
+	uint8_t unit = getunit();
+	uint8_t newstatus;
 
 	/* see if we can select that device */
 	if (select(unit))
@@ -398,7 +398,7 @@ void wd33c93_device::xferinfo_cmd()
 void wd33c93_device::dispatch_command()
 {
 	/* get the command */
-	UINT8 cmd = regs[WD_COMMAND] & 0x7f;
+	uint8_t cmd = regs[WD_COMMAND] & 0x7f;
 
 	switch(cmd)
 	{
@@ -618,7 +618,7 @@ READ8_MEMBER(wd33c93_device::read)
 
 		case 1:
 		{
-			UINT8 ret;
+			uint8_t ret;
 
 			/* if reading status, clear irq flag */
 			if ( sasr == WD_SCSI_STATUS )
@@ -723,7 +723,7 @@ READ8_MEMBER(wd33c93_device::read)
 	return 0;
 }
 
-wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	legacy_scsi_host_adapter(mconfig, WD33C93, "33C93 SCSI", tag, owner, clock, "wd33c93", __FILE__),
 	m_irq_cb(*this)
 {
@@ -762,7 +762,7 @@ void wd33c93_device::device_start()
 	save_item( NAME( read_pending ) );
 }
 
-void wd33c93_device::dma_read_data( int bytes, UINT8 *pData )
+void wd33c93_device::dma_read_data( int bytes, uint8_t *pData )
 {
 	int len = bytes;
 
@@ -787,7 +787,7 @@ void wd33c93_device::dma_read_data( int bytes, UINT8 *pData )
 	set_xfer_count(len);
 }
 
-void wd33c93_device::dma_write_data(int bytes, UINT8 *pData)
+void wd33c93_device::dma_write_data(int bytes, uint8_t *pData)
 {
 	write_data(pData, bytes);
 }

@@ -285,13 +285,13 @@ public:
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
 private:
-	UINT8 *m_p_ram;
-	UINT8 m_ipl;
-	UINT8 m_palet[3];
-	UINT8 m_paltbl[8];
-	UINT16 m_page;
-	UINT8 m_pcg_char, m_pcg_attr, m_char_change, m_pcg_char0;
-	UINT16 m_pcg_offset[3];
+	uint8_t *m_p_ram;
+	uint8_t m_ipl;
+	uint8_t m_palet[3];
+	uint8_t m_paltbl[8];
+	uint16_t m_page;
+	uint8_t m_pcg_char, m_pcg_attr, m_char_change, m_pcg_char0;
+	uint16_t m_pcg_offset[3];
 	int m_char_count;
 	attotime m_time;
 	bool m_romsel;
@@ -299,7 +299,7 @@ private:
 	bool m_p5bit;
 	bool m_motor;
 	bool m_motor_toggle;
-	UINT8 m_crtc_vreg[0x100];
+	uint8_t m_crtc_vreg[0x100];
 	bool m_centronics_busy;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -307,8 +307,8 @@ private:
 	required_device<mc6845_device> m_vdg;
 	required_device<cassette_image_device> m_cass;
 	required_device<ram_device> m_ram;
-	required_shared_ptr<UINT8> m_p_videoram;
-	required_shared_ptr<UINT8> m_pcgram;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_pcgram;
 	required_ioport_array<10> m_io_kb;
 	required_ioport m_io_joy;
 	required_ioport m_dipsw;
@@ -316,8 +316,8 @@ private:
 	required_device<i8255_device> m_pio;
 	required_device<ay8910_device> m_sound;
 	required_device<palette_device> m_palette;
-	UINT8 *m_font;
-	UINT8 m_priority;
+	uint8_t *m_font;
+	uint8_t m_priority;
 	emu_timer *m_timer;
 	void get_pcg_addr();
 };
@@ -380,7 +380,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 
 READ8_MEMBER( spc1500_state::portb_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED || ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED));
 	data |= (m_dipsw->read() & 1) << 4;
 	data |= (m_cass->input() > 0.0038)<<1;
@@ -424,7 +424,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(spc1500_state::timer)
 
 void spc1500_state::get_pcg_addr()
 {
-	UINT16 vaddr = 0;
+	uint16_t vaddr = 0;
 	if(m_p_videoram[0x7ff] & 0x20) {
 		vaddr = 0x7ff;
 	} else if(m_p_videoram[0x3ff] & 0x20) {
@@ -462,7 +462,7 @@ WRITE8_MEMBER( spc1500_state::pcg_w)
 READ8_MEMBER( spc1500_state::pcg_r)
 {
 	int reg = (offset>>8)-0x15;
-	UINT8 data = 0;
+	uint8_t data = 0;
 	get_pcg_addr();
 	if (reg < 0) reg = 2;
 	if (BIT(m_pcg_attr,5)) // PCG font
@@ -516,13 +516,13 @@ MC6845_RECONFIGURE(spc1500_state::crtc_reconfig)
 
 MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 {
-	UINT8 han2;
-	UINT8 *pf;
-	UINT16 hfnt;
+	uint8_t han2;
+	uint8_t *pf;
+	uint16_t hfnt;
 	int i;
 	int j;
 	int h1, h2, h3;
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
@@ -530,27 +530,27 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	char hs = (m_crtc_vreg[0x9] < 15 ? 3 : 4);
 	int n = y & (m_crtc_vreg[0x9]);
 	bool ln400 = (hs == 4 && m_crtc_vreg[0x4] > 20);
-	UINT8 *vram = &m_p_videoram[0] + (m_crtc_vreg[12] << 8) + m_crtc_vreg[13];
+	uint8_t *vram = &m_p_videoram[0] + (m_crtc_vreg[12] << 8) + m_crtc_vreg[13];
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 *pp = &vram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
-		UINT8 *pv = &vram[(y>>hs)*x_count + i];
-		UINT8 ascii = *(pv+0x1000);
-		UINT8 attr = *pv;
+		uint8_t *pp = &vram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
+		uint8_t *pv = &vram[(y>>hs)*x_count + i];
+		uint8_t ascii = *(pv+0x1000);
+		uint8_t attr = *pv;
 		inv = (attr & 0x8 ? true : false);
-		UINT8 color = attr & 0x7;
-		UINT8 pixelb = *(pp+0);
-		UINT8 pixelr = *(pp+0x4000);
-		UINT8 pixelg = *(pp+0x8000);
+		uint8_t color = attr & 0x7;
+		uint8_t pixelb = *(pp+0);
+		uint8_t pixelr = *(pp+0x4000);
+		uint8_t pixelg = *(pp+0x8000);
 		bool nopalet = ((m_palet[0] | m_palet[1] | m_palet[2])==0 || ln400);
-		UINT8 pen = (nopalet ? color : m_paltbl[color]);
-		UINT8 pixelpen = 0;
-		UINT8 pixel = 0;
+		uint8_t pen = (nopalet ? color : m_paltbl[color]);
+		uint8_t pixelpen = 0;
+		uint8_t pixel = 0;
 		if (hs == 4 && (ascii & 0x80))
 		{
-			UINT16 wpixelb = (pixelb << 8) + (*(pp+1));
-			UINT16 wpixelr = (pixelr << 8) + (*(pp+0x4001));
-			UINT16 wpixelg = (pixelg << 8) + (*(pp+0x8001));
+			uint16_t wpixelb = (pixelb << 8) + (*(pp+1));
+			uint16_t wpixelr = (pixelr << 8) + (*(pp+0x4001));
+			uint16_t wpixelg = (pixelg << 8) + (*(pp+0x8001));
 			if (ascii != 0xfa)
 			{
 				han2 = *(pv+0x1001);
@@ -581,10 +581,10 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		}
 		else if (attr & 0x20)
 		{
-			UINT8 *pa = &m_pcgram[(ascii*(m_crtc_vreg[0x9]+1))+n];
-			UINT8 b = *pa;
-			UINT8 r = *(pa+0x800);
-			UINT8 g = *(pa+0x1000);
+			uint8_t *pa = &m_pcgram[(ascii*(m_crtc_vreg[0x9]+1))+n];
+			uint8_t b = *pa;
+			uint8_t r = *(pa+0x800);
+			uint8_t g = *(pa+0x1000);
 			for (j = 0x80; j > 0; j>>=1)
 			{
 				pixel = ((g & j)?4:0)|((r & j)?2:0)|((b & j)?1:0);
@@ -596,7 +596,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		}
 		else
 		{
-			UINT8 fnt = m_font[(hs == 4 ? 0x1000 : (attr & (1<<6) ? 0x80<<4 : 0)) + (ascii<<4) + n];
+			uint8_t fnt = m_font[(hs == 4 ? 0x1000 : (attr & (1<<6) ? 0x80<<4 : 0)) + (ascii<<4) + n];
 			if (ascii == 0 && (attr & 0x08) && inv)
 			{
 				fnt = 0xff;
@@ -844,8 +844,8 @@ ADDRESS_MAP_END
 
 void spc1500_state::machine_start()
 {
-	UINT8 *mem_basic = memregion("basic")->base();
-	UINT8 *mem_ipl = memregion("ipl")->base();
+	uint8_t *mem_basic = memregion("basic")->base();
+	uint8_t *mem_ipl = memregion("ipl")->base();
 	m_p_ram = m_ram->pointer();
 	m_font = memregion("font1")->base();
 	// configure and intialize banks 1 (read banks)
@@ -879,7 +879,7 @@ READ8_MEMBER(spc1500_state::mc6845_videoram_r)
 
 READ8_MEMBER( spc1500_state::psga_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	data |= (BIT(m_dipsw->read(),1)<<4) | (BIT(m_dipsw->read(),2)<<7);
 	data |= (m_io_joy->read() & 0x6f);
 	return data;
@@ -887,7 +887,7 @@ READ8_MEMBER( spc1500_state::psga_r )
 
 READ8_MEMBER( spc1500_state::porta_r )
 {
-	UINT8 data = 0x3f;
+	uint8_t data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x00 : 0x40;
 	data &= ~((m_centronics_busy == 0)<< 5);

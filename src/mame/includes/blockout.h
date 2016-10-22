@@ -24,13 +24,13 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_frontvideoram;
-	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_frontvideoram;
+	required_shared_ptr<uint16_t> m_paletteram;
 
 	/* video-related */
 	bitmap_ind16 m_tmpbitmap;
-	UINT16   m_color;
+	uint16_t   m_color;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -49,7 +49,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_blockout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_blockout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(blockout_scanline);
 	void setcolor( int color, int rgb );
 	void update_pixels( int x, int y );

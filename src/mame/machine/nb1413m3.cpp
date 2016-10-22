@@ -23,7 +23,7 @@ Memo:
 
 const device_type NB1413M3 = &device_creator<nb1413m3_device>;
 
-nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NB1413M3, "NB1413M3 Mahjong Custom", tag, owner, clock, "nb1413m3", __FILE__),
 	m_sndromrgntag("voice"),
 	m_sndrombank1(0),
@@ -107,7 +107,7 @@ void nb1413m3_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			timer_callback(ptr, param);
 			break;
 		default:
-			assert_always(FALSE, "Unknown id in nb1413m3_device::device_timer");
+			assert_always(false, "Unknown id in nb1413m3_device::device_timer");
 	}
 }
 
@@ -312,7 +312,7 @@ WRITE8_MEMBER( nb1413m3_device::sndrombank2_w )
 
 READ8_MEMBER( nb1413m3_device::gfxrom_r )
 {
-	UINT8 *GFXROM = space.machine().root_device().memregion("gfx1")->base();
+	uint8_t *GFXROM = space.machine().root_device().memregion("gfx1")->base();
 
 	return GFXROM[(0x20000 * (m_gfxrombank | ((m_sndrombank1 & 0x02) << 3))) + ((0x0200 * m_gfxradr_h) + (0x0002 * m_gfxradr_l)) + (offset & 0x01)];
 }

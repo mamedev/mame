@@ -25,11 +25,11 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT32> m_nvram;
-	required_shared_ptr<UINT32> m_ram_base;
-	optional_shared_ptr<UINT32> m_linkram;
-	required_shared_ptr<UINT32> m_tms32031_control;
-	optional_shared_ptr<UINT32> m_zeusbase;
+	required_shared_ptr<uint32_t> m_nvram;
+	required_shared_ptr<uint32_t> m_ram_base;
+	optional_shared_ptr<uint32_t> m_linkram;
+	required_shared_ptr<uint32_t> m_tms32031_control;
+	optional_shared_ptr<uint32_t> m_zeusbase;
 	optional_device<timekeeper_device> m_m48t35;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -67,20 +67,20 @@ public:
 	DECLARE_MACHINE_START(midzeus);
 	DECLARE_MACHINE_RESET(midzeus);
 	DECLARE_VIDEO_START(midzeus);
-	UINT32 screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(display_irq);
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
 private:
 	void exit_handler();
-	void zeus_pointer_w(UINT32 which, UINT32 data, int logit);
-	void zeus_register16_w(offs_t offset, UINT16 data, int logit);
-	void zeus_register32_w(offs_t offset, UINT32 data, int logit);
+	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);
+	void zeus_register16_w(offs_t offset, uint16_t data, bool logit);
+	void zeus_register32_w(offs_t offset, uint32_t data, bool logit);
 	void zeus_register_update(offs_t offset);
-	int zeus_fifo_process(const UINT32 *data, int numwords);
-	void zeus_draw_model(UINT32 texdata, int logit);
+	int zeus_fifo_process(const uint32_t *data, int numwords);
+	void zeus_draw_model(uint32_t texdata, bool logit);
 
-	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
-	void log_waveram(UINT32 length_and_base);
+	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
+	void log_waveram(uint32_t length_and_base);
 	void update_gun_irq();
 };

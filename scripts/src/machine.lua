@@ -1275,18 +1275,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/matsucd.h,MACHINES["MATSUCD"] = true
----------------------------------------------------
-
-if (MACHINES["MATSUCD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/matsucd.cpp",
-		MAME_DIR .. "src/devices/machine/matsucd.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/mb14241.h,MACHINES["MB14241"] = true
 ---------------------------------------------------
 

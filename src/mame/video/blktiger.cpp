@@ -30,14 +30,14 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 {
 	/* the tile priority table is a guess compiled by looking at the game. It
 	   was not derived from a PROM so it could be wrong. */
-	static const UINT8 split_table[16] =
+	static const uint8_t split_table[16] =
 	{
 		3,3,2,2,
 		1,1,0,0,
 		0,0,0,0,
 		0,0,0,0
 	};
-	UINT8 attr = m_scroll_ram[2 * tile_index + 1];
+	uint8_t attr = m_scroll_ram[2 * tile_index + 1];
 	int color = (attr & 0x78) >> 3;
 	SET_TILE_INFO_MEMBER(1,
 			m_scroll_ram[2 * tile_index] + ((attr & 0x07) << 8),
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(blktiger_state::get_tx_tile_info)
 {
-	UINT8 attr = m_txvideoram[tile_index + 0x400];
+	uint8_t attr = m_txvideoram[tile_index + 0x400];
 	SET_TILE_INFO_MEMBER(0,
 			m_txvideoram[tile_index] + ((attr & 0xe0) << 3),
 			attr & 0x1f,
@@ -69,7 +69,7 @@ void blktiger_state::video_start()
 	m_objon = 1;
 	m_screen_layout = 0;
 
-	m_scroll_ram = std::make_unique<UINT8[]>(BGRAM_BANK_SIZE * BGRAM_BANKS);
+	m_scroll_ram = std::make_unique<uint8_t[]>(BGRAM_BANK_SIZE * BGRAM_BANKS);
 
 	m_tx_tilemap =    &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap8x4 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg8x4_scan),this), 16, 16, 128, 64);
@@ -187,7 +187,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_screen_layout_w)
 
 void blktiger_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
 	/* Draw the sprites. */
@@ -215,7 +215,7 @@ void blktiger_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 blktiger_state::screen_update_blktiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t blktiger_state::screen_update_blktiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(1023, cliprect);
 

@@ -34,8 +34,8 @@
 void turrett_state::machine_start()
 {
 	// Allocate memory for the two 256kx16 banks of video RAM
-	m_video_ram[0] = std::make_unique<UINT16[]>(VRAM_BANK_WORDS);
-	m_video_ram[1] = std::make_unique<UINT16[]>(VRAM_BANK_WORDS);
+	m_video_ram[0] = std::make_unique<uint16_t[]>(VRAM_BANK_WORDS);
+	m_video_ram[1] = std::make_unique<uint16_t[]>(VRAM_BANK_WORDS);
 
 	// Register our state for saving
 	save_pointer(NAME(m_video_ram[0].get()), VRAM_BANK_WORDS);
@@ -181,9 +181,9 @@ WRITE32_MEMBER( turrett_state::int_w )
 }
 
 
-UINT32 turrett_state::update_inputs(void)
+uint32_t turrett_state::update_inputs(void)
 {
-	UINT32 val = 0;
+	uint32_t val = 0;
 
 	// TODO: Prioritise?
 	if (m_inputs_active)
@@ -200,8 +200,8 @@ UINT32 turrett_state::update_inputs(void)
 		}
 		else if (m_inputs_active & 0x0000ff00)
 		{
-			UINT32 data = ioport("PORT CX")->read();
-			UINT32 bits = m_inputs_active >> 8;
+			uint32_t data = ioport("PORT CX")->read();
+			uint32_t bits = m_inputs_active >> 8;
 
 			val = 0xc0;
 
@@ -218,8 +218,8 @@ UINT32 turrett_state::update_inputs(void)
 		}
 		else if (m_inputs_active & 0x00ff0000)
 		{
-			UINT32 data = ioport("PORT DX")->read();
-			UINT32 bits = m_inputs_active >> 16;
+			uint32_t data = ioport("PORT DX")->read();
+			uint32_t bits = m_inputs_active >> 16;
 
 			val = 0xd0;
 
@@ -254,7 +254,7 @@ UINT32 turrett_state::update_inputs(void)
 
 INPUT_CHANGED_MEMBER( turrett_state::ipt_change )
 {
-	int p = (FPTR)param;
+	int p = (uintptr_t)param;
 
 	if (newval != oldval)
 	{
@@ -322,12 +322,12 @@ extern const device_type TURRETT_HARDDISK;
 class turrett_hdd : public ide_hdd_device
 {
 public:
-	turrett_hdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	turrett_hdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: ide_hdd_device(mconfig, TURRETT_HARDDISK, "HDD Turrett Tower", tag, owner, clock, "turrett_hdd", __FILE__)
 	{
 	}
 
-	virtual UINT32 lba_address() override
+	virtual uint32_t lba_address() override
 	{
 		if (m_device_head & IDE_DEVICE_HEAD_L)
 			return (((m_device_head & IDE_DEVICE_HEAD_HS) << 24) | (m_cylinder_high << 16) | (m_cylinder_low << 8) | m_sector_number) - 63;

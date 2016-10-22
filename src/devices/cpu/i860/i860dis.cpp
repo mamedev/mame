@@ -33,9 +33,9 @@ static const char *const cr2str[] =
 
 
 /* Sign extend N-bit number.  */
-static INT32 sign_ext(UINT32 x, int n)
+static int32_t sign_ext(uint32_t x, int n)
 {
-	INT32 t;
+	int32_t t;
 	t = x >> (n - 1);
 	t = ((-t) << n) | x;
 	return t;
@@ -44,7 +44,7 @@ static INT32 sign_ext(UINT32 x, int n)
 
 /* Basic integer 3-address register format:
  *   mnemonic %rs1,%rs2,%rd  */
-static void int_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_12d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Possibly prefix shrd with 'd.' */
 	if (((insn & 0xfc000000) == 0xb0000000) && (insn & 0x200))
@@ -58,14 +58,14 @@ static void int_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 /* Basic integer 3-address imm16 format:
  *   mnemonic #imm16,%rs2,%rd  */
-static void int_i2d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_i2d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Sign extend the 16-bit immediate.
 	   Print as hex for the bitwise operations.  */
 	int upper_6bits = (insn >> 26) & 0x3f;
 	if (upper_6bits >= 0x30 && upper_6bits <= 0x3f)
 		sprintf(buf, "%s\t0x%04x,%%r%d,%%r%d", mnemonic,
-			(UINT32)(get_imm16 (insn)), get_isrc2 (insn), get_idest (insn));
+			(uint32_t)(get_imm16 (insn)), get_isrc2 (insn), get_idest (insn));
 	else
 		sprintf(buf, "%s\t%d,%%r%d,%%r%d", mnemonic,
 			sign_ext(get_imm16 (insn), 16), get_isrc2 (insn), get_idest (insn));
@@ -73,21 +73,21 @@ static void int_i2d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 
 /* Integer (mixed) 2-address  isrc1ni,fdest.  */
-static void int_1d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_1d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	sprintf(buf, "%s\t%%r%d,%%f%d", mnemonic, get_isrc1 (insn), get_fdest (insn));
 }
 
 
 /* Integer (mixed) 2-address  csrc2,idest.  */
-static void int_cd(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_cd(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	sprintf(buf, "%s\t%%%s,%%r%d", mnemonic, cr2str[get_creg (insn)], get_idest (insn));
 }
 
 
 /* Integer (mixed) 2-address  isrc1,csrc2.  */
-static void int_1c(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_1c(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	sprintf(buf, "%s\t%%r%d,%%%s", mnemonic, get_isrc1(insn), cr2str[get_creg (insn)]);
 }
@@ -95,7 +95,7 @@ static void int_1c(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 /* Integer 1-address register format:
  *   mnemonic %rs1  */
-static void int_1(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_1(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	sprintf(buf, "%s\t%%r%d", mnemonic, get_isrc1 (insn));
 }
@@ -103,7 +103,7 @@ static void int_1(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 /* Integer no-address register format:
  *   mnemonic  */
-static void int_0(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_0(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	sprintf(buf, "%s", mnemonic);
 }
@@ -111,7 +111,7 @@ static void int_0(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 /* Basic floating-point 3-address register format:
  *   mnemonic %fs1,%fs2,%fd  */
-static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void flop_12d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d, *prefix_p;
@@ -165,7 +165,7 @@ static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 /* Floating-point 2-address register format:
  *   mnemonic %fs1,%fd  */
-static void flop_1d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void flop_1d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d, *prefix_p;
@@ -179,7 +179,7 @@ static void flop_1d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 /* Floating-point 2-address register format:
  *   mnemonic %fs2,%fd  */
-static void flop_2d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void flop_2d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d;
@@ -192,7 +192,7 @@ static void flop_2d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 /* Floating-point (mixed) 2-address register format:
  *  fxfr fsrc1,idest.  */
-static void flop_fxfr(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void flop_fxfr(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *prefix_d = (insn & 0x200) ? "d." : "";
 	sprintf(buf, "%s%s\t%%f%d,%%r%d", prefix_d, mnemonic, get_fsrc1 (insn),
@@ -202,48 +202,48 @@ static void flop_fxfr(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 /* Branch with reg,reg,sbroff format:
  *   mnemonic %rs1,%rs2,sbroff  */
-static void int_12S(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_12S(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
-	INT32 sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	INT32 rel = (INT32)pc + (sbroff << 2) + 4;
+	int32_t sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
+	int32_t rel = (int32_t)pc + (sbroff << 2) + 4;
 
 	sprintf(buf, "%s\t%%r%d,%%r%d,0x%08x", mnemonic, get_isrc1 (insn),
-		get_isrc2 (insn), (UINT32)rel);
+		get_isrc2 (insn), (uint32_t)rel);
 }
 
 
 /* Branch with #const5,reg,sbroff format:
  *   mnemonic #const5,%rs2,sbroff  */
-static void int_i2S(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_i2S(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
-	INT32 sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	INT32 rel = (INT32)pc + (sbroff << 2) + 4;
+	int32_t sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
+	int32_t rel = (int32_t)pc + (sbroff << 2) + 4;
 
 	sprintf(buf, "%s\t%d,%%r%d,0x%08x", mnemonic, ((insn >> 11) & 0x1f),
-		get_isrc2 (insn), (UINT32)rel);
+		get_isrc2 (insn), (uint32_t)rel);
 }
 
 
 /* Branch with lbroff format:
  *   mnemonic lbroff  */
-static void int_L(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_L(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
-	INT32 lbroff =  sign_ext ((insn & 0x03ffffff), 26);
-	INT32 rel = (INT32)pc + (lbroff << 2) + 4;
+	int32_t lbroff =  sign_ext ((insn & 0x03ffffff), 26);
+	int32_t rel = (int32_t)pc + (lbroff << 2) + 4;
 
-	sprintf(buf, "%s\t0x%08x", mnemonic, (UINT32)rel);
+	sprintf(buf, "%s\t0x%08x", mnemonic, (uint32_t)rel);
 }
 
 
 /* Integer load.
  *  ld.{b,s,l} isrc1(isrc2),idest
  *  ld.{b,s,l} #const(isrc2),idest  */
-static void int_ldx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_ldx(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4 };
 	const char *const suffix[4] = { "b", "b", "s", "l" };
-	UINT32 idx;
+	uint32_t idx;
 
 	/* Bits 28 and 0 determine the operand size.  */
 	idx = ((insn >> 27) & 2) | (insn & 1);
@@ -252,7 +252,7 @@ static void int_ldx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	if (insn & 0x04000000)
 	{
 		/* Chop off lower bits of displacement.  */
-		INT32 immsrc1 = sign_ext (get_imm16 (insn), 16);
+		int32_t immsrc1 = sign_ext (get_imm16 (insn), 16);
 		int size = sizes[idx];
 		immsrc1 &= ~(size - 1);
 		sprintf(buf, "%s%s\t%d(%%r%d),%%r%d", mnemonic, suffix[idx],
@@ -265,14 +265,14 @@ static void int_ldx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 
 /* Integer store: st.b isrc1ni,#const(isrc2)  */
-static void int_stx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_stx(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4 };
 	const char *const suffix[4] = { "b", "b", "s", "l" };
 	int idx;
 	int size;
-	INT32 immsrc = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
+	int32_t immsrc = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
 
 	/* Bits 28 and 0 determine the operand size.  */
 	idx = ((insn >> 27) & 2) | (insn & 1);
@@ -291,9 +291,9 @@ static void int_stx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
  *  "fst.y fdest,isrc1(isrc2)", "fst.y fdest,isrc1(isrc2)++",
  *  "fst.y fdest,#const(isrc2)" or "fst.y fdest,#const(isrc2)++"
  *  Where y = {l,d,q}.  Note, there is no pfld.q, though.  */
-static void int_fldst(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_fldst(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
-	INT32 immsrc1 = sign_ext (get_imm16 (insn), 16);
+	int32_t immsrc1 = sign_ext (get_imm16 (insn), 16);
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 8, 4, 16, 4 };
 	const char *const suffix[4] = { "d", "l", "q", "l" };
@@ -353,10 +353,10 @@ static void int_fldst(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 
 /* flush #const(isrc2)[++].  */
-static void int_flush(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
+static void int_flush(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *const auto_suff[2] = { "", "++" };
-	INT32 immsrc = sign_ext (get_imm16 (insn), 16);
+	int32_t immsrc = sign_ext (get_imm16 (insn), 16);
 	immsrc &= ~(16-1);
 	sprintf(buf, "%s\t%d(%%r%d)%s", mnemonic, immsrc, get_isrc2 (insn),
 		auto_suff[(insn & 1)]);
@@ -375,7 +375,7 @@ struct decode_tbl_t
 {
 	/* Disassembly function for this opcode.
 	   Call with buffer, mnemonic, pc, insn.  */
-	void (*insn_dis)(char *, char *, UINT32, UINT32);
+	void (*insn_dis)(char *, char *, uint32_t, uint32_t);
 
 	/* Flags for this opcode.  */
 	char flags;
@@ -645,7 +645,7 @@ static void i860_dasm_tab_replacer(char* buf, int tab_size)
 
 CPU_DISASSEMBLE( i860 )
 {
-	UINT32 insn = (oprom[0] << 0) |
+	uint32_t insn = (oprom[0] << 0) |
 		(oprom[1] << 8)  |
 		(oprom[2] << 16) |
 		(oprom[3] << 24);

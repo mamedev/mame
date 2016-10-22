@@ -76,8 +76,8 @@ Heavy use is made of sprite zooming.
 
 void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 {
-	UINT32 *spriteram32 = m_spriteram;
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
+	uint32_t *spriteram32 = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -206,14 +206,14 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
                 POLYGON RENDERER
 **************************************************************/
 
-void galastrm_renderer::tc0610_draw_scanline(INT32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid)
+void galastrm_renderer::tc0610_draw_scanline(int32_t scanline, const extent_t& extent, const gs_poly_data& object, int threadid)
 {
-	UINT16 *framebuffer = &m_screenbits.pix16(scanline);
-	const INT32 dudx = extent.param[0].dpdx;
-	const INT32 dvdx = extent.param[1].dpdx;
+	uint16_t *framebuffer = &m_screenbits.pix16(scanline);
+	const int32_t dudx = extent.param[0].dpdx;
+	const int32_t dvdx = extent.param[1].dpdx;
 
-	INT32 u = extent.param[0].start;
-	INT32 v = extent.param[1].start;
+	int32_t u = extent.param[0].start;
+	int32_t v = extent.param[1].start;
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		framebuffer[x] = object.texbase->pix16(v >> 16, u >> 16);
@@ -416,11 +416,11 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
                 SCREEN REFRESH
 **************************************************************/
 
-UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[5];
-	UINT8 pivlayer[3];
-	UINT16 priority;
+	uint8_t layer[5];
+	uint8_t pivlayer[3];
+	uint16_t priority;
 	static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
 	bitmap_ind8 &priority_bitmap = screen.priority();
 
@@ -466,7 +466,7 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 	if (layer[0]==3 && layer[1]==0 && layer[2]==1 && layer[3]==2)
 	{
 		int x,y;
-		UINT8 *pri;
+		uint8_t *pri;
 
 		for (y=0; y < priority_bitmap.height; y++)
 		{
@@ -513,7 +513,7 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 	if (layer[0]==3 && layer[1]==0 && layer[2]==1 && layer[3]==2)
 	{
 		int x,y;
-		UINT8 *pri;
+		uint8_t *pri;
 
 		for (y=0; y < priority_bitmap.height(); y++)
 		{

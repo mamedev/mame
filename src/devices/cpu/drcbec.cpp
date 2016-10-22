@@ -179,24 +179,24 @@ enum
 #define FDPARAM3                    (*inst[3].pdouble)
 
 // compute C and V flags for 32-bit add/subtract
-#define FLAGS32_C_ADD(a,b)          ((UINT32)~(a) < (UINT32)(b))
-#define FLAGS32_C_SUB(a,b)          ((UINT32)(b) > (UINT32)(a))
+#define FLAGS32_C_ADD(a,b)          ((uint32_t)~(a) < (uint32_t)(b))
+#define FLAGS32_C_SUB(a,b)          ((uint32_t)(b) > (uint32_t)(a))
 #define FLAGS32_V_SUB(r,a,b)        (((((a) ^ (b)) & ((a) ^ (r))) >> 30) & FLAG_V)
 #define FLAGS32_V_ADD(r,a,b)        (((~((a) ^ (b)) & ((a) ^ (r))) >> 30) & FLAG_V)
 
 // compute N and Z flags for 32-bit operations
-#define FLAGS32_NZ(v)               ((((v) >> 28) & FLAG_S) | (((UINT32)(v) == 0) << 2))
+#define FLAGS32_NZ(v)               ((((v) >> 28) & FLAG_S) | (((uint32_t)(v) == 0) << 2))
 #define FLAGS32_NZCV_ADD(r,a,b)     (FLAGS32_NZ(r) | FLAGS32_C_ADD(a,b) | FLAGS32_V_ADD(r,a,b))
 #define FLAGS32_NZCV_SUB(r,a,b)     (FLAGS32_NZ(r) | FLAGS32_C_SUB(a,b) | FLAGS32_V_SUB(r,a,b))
 
 // compute C and V flags for 64-bit add/subtract
-#define FLAGS64_C_ADD(a,b)          ((UINT64)~(a) < (UINT64)(b))
-#define FLAGS64_C_SUB(a,b)          ((UINT64)(b) > (UINT64)(a))
+#define FLAGS64_C_ADD(a,b)          ((uint64_t)~(a) < (uint64_t)(b))
+#define FLAGS64_C_SUB(a,b)          ((uint64_t)(b) > (uint64_t)(a))
 #define FLAGS64_V_SUB(r,a,b)        (((((a) ^ (b)) & ((a) ^ (r))) >> 62) & FLAG_V)
 #define FLAGS64_V_ADD(r,a,b)        (((~((a) ^ (b)) & ((a) ^ (r))) >> 62) & FLAG_V)
 
 // compute N and Z flags for 64-bit operations
-#define FLAGS64_NZ(v)               ((((v) >> 60) & FLAG_S) | (((UINT64)(v) == 0) << 2))
+#define FLAGS64_NZ(v)               ((((v) >> 60) & FLAG_S) | (((uint64_t)(v) == 0) << 2))
 #define FLAGS64_NZCV_ADD(r,a,b)     (FLAGS64_NZ(r) | FLAGS64_C_ADD(a,b) | FLAGS64_V_ADD(r,a,b))
 #define FLAGS64_NZCV_SUB(r,a,b)     (FLAGS64_NZ(r) | FLAGS64_C_SUB(a,b) | FLAGS64_V_SUB(r,a,b))
 
@@ -209,17 +209,17 @@ enum
 // union to simplify accessing data via the instruction stream
 union drcbec_instruction
 {
-	UINT32              i;
+	uint32_t              i;
 	void *              v;
 	char *              c;
-	UINT8 *             puint8;
-	INT8 *              pint8;
-	UINT16 *            puint16;
-	INT16 *             pint16;
-	UINT32 *            puint32;
-	INT32 *             pint32;
-	UINT64 *            puint64;
-	INT64 *             pint64;
+	uint8_t *             puint8;
+	int8_t *              pint8;
+	uint16_t *            puint16;
+	int16_t *             pint16;
+	uint32_t *            puint32;
+	int32_t *             pint32;
+	uint64_t *            puint64;
+	int64_t *             pint64;
 	float *             pfloat;
 	double *            pdouble;
 	void                (*cfunc)(void *);
@@ -235,9 +235,9 @@ union drcbec_instruction
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-UINT64 drcbe_c::s_immediate_zero = 0;
+uint64_t drcbe_c::s_immediate_zero = 0;
 
-const UINT32 drcbe_c::s_condition_map[] =
+const uint32_t drcbe_c::s_condition_map[] =
 {
 	/* ..... */     NCBIT | NVBIT | NZBIT | NSBIT | NUBIT | ABIT  | GBIT  | GEBIT,
 	/* ....C */     CBIT  | NVBIT | NZBIT | NSBIT | NUBIT | BEBIT | GBIT  | GEBIT,
@@ -283,7 +283,7 @@ const UINT32 drcbe_c::s_condition_map[] =
 //  drcbe_c - constructor
 //-------------------------------------------------
 
-drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits)
+drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device),
 		m_hash(cache, modes, addrbits, ignorebits),
 		m_map(cache, 0),
@@ -318,7 +318,7 @@ void drcbe_c::reset()
 //  drcbec_generate - generate code
 //-------------------------------------------------
 
-void drcbe_c::generate(drcuml_block &block, const instruction *instlist, UINT32 numinst)
+void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
 	// tell all of our utility objects that a block is beginning
 	m_hash.block_begin(block, instlist, numinst);
@@ -331,14 +331,14 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, UINT32 
 		block.abort();
 
 	// compute the base by aligning the cache top to an even multiple of drcbec_instruction
-	drcbec_instruction *base = (drcbec_instruction *)(((FPTR)*cachetop + sizeof(drcbec_instruction) - 1) & ~(sizeof(drcbec_instruction) - 1));
+	drcbec_instruction *base = (drcbec_instruction *)(((uintptr_t)*cachetop + sizeof(drcbec_instruction) - 1) & ~(sizeof(drcbec_instruction) - 1));
 	drcbec_instruction *dst = base;
 
 	// generate code by copying the instructions and extracting immediates
 	for (int inum = 0; inum < numinst; inum++)
 	{
 		const instruction &inst = instlist[inum];
-		UINT8 psize[instruction::MAX_PARAMS];
+		uint8_t psize[instruction::MAX_PARAMS];
 
 		// handle most instructions generally, but a few special cases
 		opcode_t opcode = inst.opcode();
@@ -464,7 +464,7 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, UINT32 
 //  exists in the hash table
 //-------------------------------------------------
 
-bool drcbe_c::hash_exists(UINT32 mode, UINT32 pc)
+bool drcbe_c::hash_exists(uint32_t mode, uint32_t pc)
 {
 	return m_hash.code_exists(mode, pc);
 }
@@ -496,14 +496,14 @@ int drcbe_c::execute(code_handle &entry)
 	// loop while we have cycles
 	const drcbec_instruction *callstack[32];
 	const drcbec_instruction *newinst;
-	UINT32 temp32;
-	UINT64 temp64;
+	uint32_t temp32;
+	uint64_t temp64;
 	int shift;
-	UINT8 flags = 0;
-	UINT8 sp = 0;
+	uint8_t flags = 0;
+	uint8_t sp = 0;
 	while (true)
 	{
-		UINT32 opcode = (inst++)->i;
+		uint32_t opcode = (inst++)->i;
 
 		switch (OPCODE_GET_SHORT(opcode))
 		{
@@ -646,19 +646,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD1x2, 4, 0):   // LOAD    dst,base,index,BYTE_x2
-				PARAM0 = *(UINT8 *)&inst[1].puint16[PARAM2];
+				PARAM0 = *(uint8_t *)&inst[1].puint16[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD1x4, 4, 0):   // LOAD    dst,base,index,BYTE_x4
-				PARAM0 = *(UINT8 *)&inst[1].puint32[PARAM2];
+				PARAM0 = *(uint8_t *)&inst[1].puint32[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD1x8, 4, 0):   // LOAD    dst,base,index,BYTE_x8
-				PARAM0 = *(UINT8 *)&inst[1].puint64[PARAM2];
+				PARAM0 = *(uint8_t *)&inst[1].puint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD2x1, 4, 0):   // LOAD    dst,base,index,WORD_x1
-				PARAM0 = *(UINT16 *)&inst[1].puint8[PARAM2];
+				PARAM0 = *(uint16_t *)&inst[1].puint8[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD2, 4, 0):     // LOAD    dst,base,index,WORD
@@ -666,19 +666,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD2x4, 4, 0):   // LOAD    dst,base,index,WORD_x4
-				PARAM0 = *(UINT16 *)&inst[1].puint32[PARAM2];
+				PARAM0 = *(uint16_t *)&inst[1].puint32[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD2x8, 4, 0):   // LOAD    dst,base,index,WORD_x8
-				PARAM0 = *(UINT16 *)&inst[1].puint64[PARAM2];
+				PARAM0 = *(uint16_t *)&inst[1].puint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD4x1, 4, 0):   // LOAD    dst,base,index,DWORD_x1
-				PARAM0 = *(UINT32 *)&inst[1].puint8[PARAM2];
+				PARAM0 = *(uint32_t *)&inst[1].puint8[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD4x2, 4, 0):   // LOAD    dst,base,index,DWORD_x2
-				PARAM0 = *(UINT32 *)&inst[1].puint16[PARAM2];
+				PARAM0 = *(uint32_t *)&inst[1].puint16[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD4, 4, 0):     // LOAD    dst,base,index,DWORD
@@ -686,7 +686,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD4x8, 4, 0):   // LOAD    dst,base,index,DWORD_x8
-				PARAM0 = *(UINT32 *)&inst[1].puint64[PARAM2];
+				PARAM0 = *(uint32_t *)&inst[1].puint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS1, 4, 0):    // LOADS   dst,base,index,BYTE
@@ -694,19 +694,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS1x2, 4, 0):  // LOADS   dst,base,index,BYTE_x2
-				PARAM0 = *(INT8 *)&inst[1].pint16[PARAM2];
+				PARAM0 = *(int8_t *)&inst[1].pint16[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS1x4, 4, 0):  // LOADS   dst,base,index,BYTE_x4
-				PARAM0 = *(INT8 *)&inst[1].pint32[PARAM2];
+				PARAM0 = *(int8_t *)&inst[1].pint32[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS1x8, 4, 0):  // LOADS   dst,base,index,BYTE_x8
-				PARAM0 = *(INT8 *)&inst[1].pint64[PARAM2];
+				PARAM0 = *(int8_t *)&inst[1].pint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS2x1, 4, 0):  // LOADS   dst,base,index,WORD_x1
-				PARAM0 = *(INT16 *)&inst[1].pint8[PARAM2];
+				PARAM0 = *(int16_t *)&inst[1].pint8[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS2, 4, 0):    // LOADS   dst,base,index,WORD
@@ -714,19 +714,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS2x4, 4, 0):  // LOADS   dst,base,index,WORD_x4
-				PARAM0 = *(INT16 *)&inst[1].pint32[PARAM2];
+				PARAM0 = *(int16_t *)&inst[1].pint32[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS2x8, 4, 0):  // LOADS   dst,base,index,WORD_x8
-				PARAM0 = *(INT16 *)&inst[1].pint64[PARAM2];
+				PARAM0 = *(int16_t *)&inst[1].pint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS4x1, 4, 0):  // LOADS   dst,base,index,DWORD_x1
-				PARAM0 = *(INT32 *)&inst[1].pint8[PARAM2];
+				PARAM0 = *(int32_t *)&inst[1].pint8[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS4x2, 4, 0):  // LOADS   dst,base,index,DWORD_x2
-				PARAM0 = *(INT32 *)&inst[1].pint16[PARAM2];
+				PARAM0 = *(int32_t *)&inst[1].pint16[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS4, 4, 0):    // LOADS   dst,base,index,DWORD
@@ -734,7 +734,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS4x8, 4, 0):  // LOADS   dst,base,index,DWORD_x8
-				PARAM0 = *(INT32 *)&inst[1].pint64[PARAM2];
+				PARAM0 = *(int32_t *)&inst[1].pint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE1, 4, 0):    // STORE   dst,base,index,BYTE
@@ -742,19 +742,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE1x2, 4, 0):  // STORE   dst,base,index,BYTE_x2
-				*(UINT8 *)&inst[0].puint16[PARAM1] = PARAM2;
+				*(uint8_t *)&inst[0].puint16[PARAM1] = PARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE1x4, 4, 0):  // STORE   dst,base,index,BYTE_x4
-				*(UINT8 *)&inst[0].puint32[PARAM1] = PARAM2;
+				*(uint8_t *)&inst[0].puint32[PARAM1] = PARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE1x8, 4, 0):  // STORE   dst,base,index,BYTE_x8
-				*(UINT8 *)&inst[0].puint64[PARAM1] = PARAM2;
+				*(uint8_t *)&inst[0].puint64[PARAM1] = PARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE2x1, 4, 0):  // STORE   dst,base,index,WORD_x1
-				*(UINT16 *)&inst[0].puint8[PARAM1] = PARAM2;
+				*(uint16_t *)&inst[0].puint8[PARAM1] = PARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE2, 4, 0):    // STORE   dst,base,index,WORD
@@ -762,19 +762,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE2x4, 4, 0):  // STORE   dst,base,index,WORD_x4
-				*(UINT16 *)&inst[0].puint32[PARAM1] = PARAM2;
+				*(uint16_t *)&inst[0].puint32[PARAM1] = PARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE2x8, 4, 0):  // STORE   dst,base,index,WORD_x8
-				*(UINT16 *)&inst[0].puint64[PARAM1] = PARAM2;
+				*(uint16_t *)&inst[0].puint64[PARAM1] = PARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE4x1, 4, 0):  // STORE   dst,base,index,DWORD_x1
-				*(UINT32 *)&inst[0].puint8[PARAM1] = PARAM2;
+				*(uint32_t *)&inst[0].puint8[PARAM1] = PARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE4x2, 4, 0):  // STORE   dst,base,index,DWORD_x2
-				*(UINT32 *)&inst[0].puint16[PARAM1] = PARAM2;
+				*(uint32_t *)&inst[0].puint16[PARAM1] = PARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE4, 4, 0):    // STORE   dst,base,index,DWORD
@@ -782,7 +782,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE4x8, 4, 0):  // STORE   dst,base,index,DWORD_x8
-				*(UINT32 *)&inst[0].puint64[PARAM1] = PARAM2;
+				*(uint32_t *)&inst[0].puint64[PARAM1] = PARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_READ1, 4, 0):     // READ    dst,src1,space_BYTE
@@ -843,21 +843,21 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT1, 4, 0):     // SEXT1   dst,src
-				PARAM0 = (INT8)PARAM1;
+				PARAM0 = (int8_t)PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT1, 4, 1):
-				temp32 = (INT8)PARAM1;
+				temp32 = (int8_t)PARAM1;
 				flags = FLAGS32_NZ(temp32);
 				PARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT2, 4, 0):     // SEXT2   dst,src
-				PARAM0 = (INT16)PARAM1;
+				PARAM0 = (int16_t)PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT2, 4, 1):
-				temp32 = (INT16)PARAM1;
+				temp32 = (int16_t)PARAM1;
 				flags = FLAGS32_NZ(temp32);
 				PARAM0 = temp32;
 				break;
@@ -933,7 +933,7 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_SUBB, 4, 1):
 				temp32 = PARAM1 - PARAM2 - (flags & FLAG_C);
-				temp64 = (UINT64)PARAM1 - (UINT64)PARAM2 - (UINT64)(flags & FLAG_C);
+				temp64 = (uint64_t)PARAM1 - (uint64_t)PARAM2 - (uint64_t)(flags & FLAG_C);
 				if (PARAM2 + 1 != 0)
 					flags = FLAGS32_NZCV_SUB(temp32, PARAM1, PARAM2 + (flags & FLAG_C));
 				else
@@ -953,41 +953,41 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 4, 0):      // MULU    dst,edst,src1,src2[,f]
-				temp64 = (UINT64)(UINT32)PARAM2 * (UINT64)(UINT32)PARAM3;
+				temp64 = (uint64_t)(uint32_t)PARAM2 * (uint64_t)(uint32_t)PARAM3;
 				PARAM1 = temp64 >> 32;
-				PARAM0 = (UINT32)temp64;
+				PARAM0 = (uint32_t)temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 4, 1):
-				temp64 = (UINT64)(UINT32)PARAM2 * (UINT64)(UINT32)PARAM3;
+				temp64 = (uint64_t)(uint32_t)PARAM2 * (uint64_t)(uint32_t)PARAM3;
 				flags = FLAGS64_NZ(temp64);
 				PARAM1 = temp64 >> 32;
-				PARAM0 = (UINT32)temp64;
-				if (temp64 != (UINT32)temp64)
+				PARAM0 = (uint32_t)temp64;
+				if (temp64 != (uint32_t)temp64)
 					flags |= FLAG_V;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 0):      // MULS    dst,edst,src1,src2[,f]
-				temp64 = (INT64)(INT32)PARAM2 * (INT64)(INT32)PARAM3;
+				temp64 = (int64_t)(int32_t)PARAM2 * (int64_t)(int32_t)PARAM3;
 				PARAM1 = temp64 >> 32;
-				PARAM0 = (UINT32)temp64;
+				PARAM0 = (uint32_t)temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 1):
-				temp64 = (INT64)(INT32)PARAM2 * (INT64)(INT32)PARAM3;
-				temp32 = (INT32)temp64;
+				temp64 = (int64_t)(int32_t)PARAM2 * (int64_t)(int32_t)PARAM3;
+				temp32 = (int32_t)temp64;
 				flags = FLAGS32_NZ(temp32);
 				PARAM1 = temp64 >> 32;
-				PARAM0 = (UINT32)temp64;
-				if (temp64 != (INT32)temp64)
+				PARAM0 = (uint32_t)temp64;
+				if (temp64 != (int32_t)temp64)
 					flags |= FLAG_V;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_DIVU, 4, 0):      // DIVU    dst,edst,src1,src2[,f]
 				if (PARAM3 != 0)
 				{
-					temp32 = (UINT32)PARAM2 / (UINT32)PARAM3;
-					PARAM1 = (UINT32)PARAM2 % (UINT32)PARAM3;
+					temp32 = (uint32_t)PARAM2 / (uint32_t)PARAM3;
+					PARAM1 = (uint32_t)PARAM2 % (uint32_t)PARAM3;
 					PARAM0 = temp32;
 				}
 				break;
@@ -995,8 +995,8 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_DIVU, 4, 1):
 				if (PARAM3 != 0)
 				{
-					temp32 = (UINT32)PARAM2 / (UINT32)PARAM3;
-					PARAM1 = (UINT32)PARAM2 % (UINT32)PARAM3;
+					temp32 = (uint32_t)PARAM2 / (uint32_t)PARAM3;
+					PARAM1 = (uint32_t)PARAM2 % (uint32_t)PARAM3;
 					flags = FLAGS32_NZ(temp32);
 					PARAM0 = temp32;
 				}
@@ -1007,8 +1007,8 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_DIVS, 4, 0):      // DIVS    dst,edst,src1,src2[,f]
 				if (PARAM3 != 0)
 				{
-					temp32 = (INT32)PARAM2 / (INT32)PARAM3;
-					PARAM1 = (INT32)PARAM2 % (INT32)PARAM3;
+					temp32 = (int32_t)PARAM2 / (int32_t)PARAM3;
+					PARAM1 = (int32_t)PARAM2 % (int32_t)PARAM3;
 					PARAM0 = temp32;
 				}
 				break;
@@ -1016,8 +1016,8 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_DIVS, 4, 1):
 				if (PARAM3 != 0)
 				{
-					temp32 = (INT32)PARAM2 / (INT32)PARAM3;
-					PARAM1 = (INT32)PARAM2 % (INT32)PARAM3;
+					temp32 = (int32_t)PARAM2 / (int32_t)PARAM3;
+					PARAM1 = (int32_t)PARAM2 % (int32_t)PARAM3;
 					flags = FLAGS32_NZ(temp32);
 					PARAM0 = temp32;
 				}
@@ -1122,12 +1122,12 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SAR, 4, 0):       // SAR     dst,src,count[,f]
-				PARAM0 = (INT32)PARAM1 >> (PARAM2 & 31);
+				PARAM0 = (int32_t)PARAM1 >> (PARAM2 & 31);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SAR, 4, 1):
 				shift = PARAM2 & 31;
-				temp32 = (INT32)PARAM1 >> shift;
+				temp32 = (int32_t)PARAM1 >> shift;
 				if (shift != 0)
 				{
 					flags = FLAGS32_NZ(temp32);
@@ -1215,19 +1215,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD1x2, 8, 0):   // DLOAD   dst,base,index,BYTE_x2
-				DPARAM0 = *(UINT8 *)&inst[1].puint16[PARAM2];
+				DPARAM0 = *(uint8_t *)&inst[1].puint16[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD1x4, 8, 0):   // DLOAD   dst,base,index,BYTE_x4
-				DPARAM0 = *(UINT8 *)&inst[1].puint32[PARAM2];
+				DPARAM0 = *(uint8_t *)&inst[1].puint32[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD1x8, 8, 0):   // DLOAD   dst,base,index,BYTE_x8
-				DPARAM0 = *(UINT8 *)&inst[1].puint64[PARAM2];
+				DPARAM0 = *(uint8_t *)&inst[1].puint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD2x1, 8, 0):   // DLOAD   dst,base,index,WORD_x1
-				DPARAM0 = *(UINT16 *)&inst[1].puint8[PARAM2];
+				DPARAM0 = *(uint16_t *)&inst[1].puint8[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD2, 8, 0):     // DLOAD   dst,base,index,WORD
@@ -1235,19 +1235,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD2x4, 8, 0):   // DLOAD   dst,base,index,WORD_x4
-				DPARAM0 = *(UINT16 *)&inst[1].puint32[PARAM2];
+				DPARAM0 = *(uint16_t *)&inst[1].puint32[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD2x8, 8, 0):   // DLOAD   dst,base,index,WORD_x8
-				DPARAM0 = *(UINT16 *)&inst[1].puint64[PARAM2];
+				DPARAM0 = *(uint16_t *)&inst[1].puint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD4x1, 8, 0):   // DLOAD   dst,base,index,DWORD_x1
-				DPARAM0 = *(UINT32 *)&inst[1].puint8[PARAM2];
+				DPARAM0 = *(uint32_t *)&inst[1].puint8[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD4x2, 8, 0):   // DLOAD   dst,base,index,DWORD_x2
-				DPARAM0 = *(UINT32 *)&inst[1].puint16[PARAM2];
+				DPARAM0 = *(uint32_t *)&inst[1].puint16[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD4, 8, 0):     // DLOAD   dst,base,index,DWORD
@@ -1255,19 +1255,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD4x8, 8, 0):   // DLOAD   dst,base,index,DWORD_x8
-				DPARAM0 = *(UINT32 *)&inst[1].puint64[PARAM2];
+				DPARAM0 = *(uint32_t *)&inst[1].puint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD8x1, 8, 0):   // DLOAD   dst,base,index,QWORD_x1
-				DPARAM0 = *(UINT64 *)&inst[1].puint8[PARAM2];
+				DPARAM0 = *(uint64_t *)&inst[1].puint8[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD8x2, 8, 0):   // DLOAD   dst,base,index,QWORD_x2
-				DPARAM0 = *(UINT64 *)&inst[1].puint16[PARAM2];
+				DPARAM0 = *(uint64_t *)&inst[1].puint16[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD8x4, 8, 0):   // DLOAD   dst,base,index,QWORD_x4
-				DPARAM0 = *(UINT64 *)&inst[1].puint32[PARAM2];
+				DPARAM0 = *(uint64_t *)&inst[1].puint32[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOAD8, 8, 0):     // DLOAD   dst,base,index,QWORD
@@ -1279,19 +1279,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS1x2, 8, 0):  // DLOADS  dst,base,index,BYTE_x2
-				DPARAM0 = *(INT8 *)&inst[1].pint16[PARAM2];
+				DPARAM0 = *(int8_t *)&inst[1].pint16[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS1x4, 8, 0):  // DLOADS  dst,base,index,BYTE_x4
-				DPARAM0 = *(INT8 *)&inst[1].pint32[PARAM2];
+				DPARAM0 = *(int8_t *)&inst[1].pint32[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS1x8, 8, 0):  // DLOADS  dst,base,index,BYTE_x8
-				DPARAM0 = *(INT8 *)&inst[1].pint64[PARAM2];
+				DPARAM0 = *(int8_t *)&inst[1].pint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS2x1, 8, 0):  // DLOADS  dst,base,index,WORD_x1
-				DPARAM0 = *(INT16 *)&inst[1].pint8[PARAM2];
+				DPARAM0 = *(int16_t *)&inst[1].pint8[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS2, 8, 0):    // DLOADS  dst,base,index,WORD
@@ -1299,19 +1299,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS2x4, 8, 0):  // DLOADS  dst,base,index,WORD_x4
-				DPARAM0 = *(INT16 *)&inst[1].pint32[PARAM2];
+				DPARAM0 = *(int16_t *)&inst[1].pint32[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS2x8, 8, 0):  // DLOADS  dst,base,index,WORD_x8
-				DPARAM0 = *(INT16 *)&inst[1].pint64[PARAM2];
+				DPARAM0 = *(int16_t *)&inst[1].pint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS4x1, 8, 0):  // DLOADS  dst,base,index,DWORD_x1
-				DPARAM0 = *(INT32 *)&inst[1].pint8[PARAM2];
+				DPARAM0 = *(int32_t *)&inst[1].pint8[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS4x2, 8, 0):  // DLOADS  dst,base,index,DWORD_x2
-				DPARAM0 = *(INT32 *)&inst[1].pint16[PARAM2];
+				DPARAM0 = *(int32_t *)&inst[1].pint16[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS4, 8, 0):    // DLOADS  dst,base,index,DWORD
@@ -1319,19 +1319,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS4x8, 8, 0):  // DLOADS  dst,base,index,DWORD_x8
-				DPARAM0 = *(INT32 *)&inst[1].pint64[PARAM2];
+				DPARAM0 = *(int32_t *)&inst[1].pint64[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS8x1, 8, 0):  // DLOADS  dst,base,index,QWORD_x1
-				DPARAM0 = *(INT64 *)&inst[1].pint8[PARAM2];
+				DPARAM0 = *(int64_t *)&inst[1].pint8[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS8x2, 8, 0):  // DLOADS  dst,base,index,QWORD_x2
-				DPARAM0 = *(INT64 *)&inst[1].pint16[PARAM2];
+				DPARAM0 = *(int64_t *)&inst[1].pint16[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS8x4, 8, 0):  // DLOADS  dst,base,index,QWORD_x4
-				DPARAM0 = *(INT64 *)&inst[1].pint32[PARAM2];
+				DPARAM0 = *(int64_t *)&inst[1].pint32[PARAM2];
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LOADS8, 8, 0):    // DLOADS  dst,base,index,QWORD
@@ -1343,19 +1343,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE1x2, 8, 0):  // DSTORE  dst,base,index,BYTE_x2
-				*(UINT8 *)&inst[0].puint16[PARAM1] = DPARAM2;
+				*(uint8_t *)&inst[0].puint16[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE1x4, 8, 0):  // DSTORE  dst,base,index,BYTE_x4
-				*(UINT8 *)&inst[0].puint32[PARAM1] = DPARAM2;
+				*(uint8_t *)&inst[0].puint32[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE1x8, 8, 0):  // DSTORE  dst,base,index,BYTE_x8
-				*(UINT8 *)&inst[0].puint64[PARAM1] = DPARAM2;
+				*(uint8_t *)&inst[0].puint64[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE2x1, 8, 0):  // DSTORE  dst,base,index,WORD_x1
-				*(UINT16 *)&inst[0].puint8[PARAM1] = DPARAM2;
+				*(uint16_t *)&inst[0].puint8[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE2, 8, 0):    // DSTORE  dst,base,index,WORD
@@ -1363,19 +1363,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE2x4, 8, 0):  // DSTORE  dst,base,index,WORD_x4
-				*(UINT16 *)&inst[0].puint32[PARAM1] = DPARAM2;
+				*(uint16_t *)&inst[0].puint32[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE2x8, 8, 0):  // DSTORE  dst,base,index,WORD_x8
-				*(UINT16 *)&inst[0].puint64[PARAM1] = DPARAM2;
+				*(uint16_t *)&inst[0].puint64[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE4x1, 8, 0):  // DSTORE  dst,base,index,DWORD_x1
-				*(UINT32 *)&inst[0].puint8[PARAM1] = DPARAM2;
+				*(uint32_t *)&inst[0].puint8[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE4x2, 8, 0):  // DSTORE  dst,base,index,DWORD_x2
-				*(UINT32 *)&inst[0].puint16[PARAM1] = DPARAM2;
+				*(uint32_t *)&inst[0].puint16[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE4, 8, 0):    // DSTORE  dst,base,index,DWORD
@@ -1383,19 +1383,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE4x8, 8, 0):  // DSTORE  dst,base,index,DWORD_x8
-				*(UINT32 *)&inst[0].puint64[PARAM1] = DPARAM2;
+				*(uint32_t *)&inst[0].puint64[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE8x1, 8, 0):  // DSTORE  dst,base,index,QWORD_x1
-				*(UINT64 *)&inst[0].puint8[PARAM1] = DPARAM2;
+				*(uint64_t *)&inst[0].puint8[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE8x2, 8, 0):  // DSTORE  dst,base,index,QWORD_x2
-				*(UINT64 *)&inst[0].puint16[PARAM1] = DPARAM2;
+				*(uint64_t *)&inst[0].puint16[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE8x4, 8, 0):  // DSTORE  dst,base,index,QWORD_x4
-				*(UINT64 *)&inst[0].puint32[PARAM1] = DPARAM2;
+				*(uint64_t *)&inst[0].puint32[PARAM1] = DPARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_STORE8, 8, 0):    // DSTORE  dst,base,index,QWORD
@@ -1476,31 +1476,31 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT1, 8, 0):     // DSEXT   dst,src,BYTE
-				DPARAM0 = (INT8)PARAM1;
+				DPARAM0 = (int8_t)PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT1, 8, 1):
-				temp64 = (INT8)PARAM1;
+				temp64 = (int8_t)PARAM1;
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT2, 8, 0):     // DSEXT   dst,src,WORD
-				DPARAM0 = (INT16)PARAM1;
+				DPARAM0 = (int16_t)PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT2, 8, 1):
-				temp64 = (INT16)PARAM1;
+				temp64 = (int16_t)PARAM1;
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT4, 8, 0):     // DSEXT   dst,src,DWORD
-				DPARAM0 = (INT32)PARAM1;
+				DPARAM0 = (int32_t)PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT4, 8, 1):
-				temp64 = (INT32)PARAM1;
+				temp64 = (int32_t)PARAM1;
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
@@ -1581,26 +1581,26 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 8, 0):      // DMULU   dst,edst,src1,src2[,f]
-				dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, FALSE);
+				dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, false);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 8, 1):
-				flags = dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, TRUE);
+				flags = dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, true);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 8, 0):      // DMULS   dst,edst,src1,src2[,f]
-				dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, FALSE);
+				dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, false);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 8, 1):
-				flags = dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, TRUE);
+				flags = dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, true);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_DIVU, 8, 0):      // DDIVU   dst,edst,src1,src2[,f]
 				if (DPARAM3 != 0)
 				{
-					temp64 = (UINT64)DPARAM2 / (UINT64)DPARAM3;
-					DPARAM1 = (UINT64)DPARAM2 % (UINT64)DPARAM3;
+					temp64 = (uint64_t)DPARAM2 / (uint64_t)DPARAM3;
+					DPARAM1 = (uint64_t)DPARAM2 % (uint64_t)DPARAM3;
 					DPARAM0 = temp64;
 				}
 				break;
@@ -1608,8 +1608,8 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_DIVU, 8, 1):
 				if (DPARAM3 != 0)
 				{
-					temp64 = (UINT64)DPARAM2 / (UINT64)DPARAM3;
-					DPARAM1 = (UINT64)DPARAM2 % (UINT64)DPARAM3;
+					temp64 = (uint64_t)DPARAM2 / (uint64_t)DPARAM3;
+					DPARAM1 = (uint64_t)DPARAM2 % (uint64_t)DPARAM3;
 					flags = FLAGS64_NZ(temp64);
 					DPARAM0 = temp64;
 				}
@@ -1620,8 +1620,8 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_DIVS, 8, 0):      // DDIVS   dst,edst,src1,src2[,f]
 				if (DPARAM3 != 0)
 				{
-					temp64 = (INT64)DPARAM2 / (INT64)DPARAM3;
-					DPARAM1 = (INT64)DPARAM2 % (INT64)DPARAM3;
+					temp64 = (int64_t)DPARAM2 / (int64_t)DPARAM3;
+					DPARAM1 = (int64_t)DPARAM2 % (int64_t)DPARAM3;
 					DPARAM0 = temp64;
 				}
 				break;
@@ -1629,8 +1629,8 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_DIVS, 8, 1):
 				if (DPARAM3 != 0)
 				{
-					temp64 = (INT64)DPARAM2 / (INT64)DPARAM3;
-					DPARAM1 = (INT64)DPARAM2 % (INT64)DPARAM3;
+					temp64 = (int64_t)DPARAM2 / (int64_t)DPARAM3;
+					DPARAM1 = (int64_t)DPARAM2 % (int64_t)DPARAM3;
 					flags = FLAGS64_NZ(temp64);
 					DPARAM0 = temp64;
 				}
@@ -1674,14 +1674,14 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LZCNT, 8, 0):     // DLZCNT  dst,src
-				if ((UINT32)(DPARAM1 >> 32) != 0)
+				if ((uint32_t)(DPARAM1 >> 32) != 0)
 					DPARAM0 = count_leading_zeros(DPARAM1 >> 32);
 				else
 					DPARAM0 = 32 + count_leading_zeros(DPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LZCNT, 8, 1):
-				if ((UINT32)(DPARAM1 >> 32) != 0)
+				if ((uint32_t)(DPARAM1 >> 32) != 0)
 					temp64 = count_leading_zeros(DPARAM1 >> 32);
 				else
 					temp64 = 32 + count_leading_zeros(DPARAM1);
@@ -1735,12 +1735,12 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SAR, 8, 0):       // DSAR    dst,src,count[,f]
-				DPARAM0 = (INT64)DPARAM1 >> (DPARAM2 & 63);
+				DPARAM0 = (int64_t)DPARAM1 >> (DPARAM2 & 63);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SAR, 8, 1):
 				shift = DPARAM2 & 63;
-				temp64 = (INT32)DPARAM1 >> shift;
+				temp64 = (int32_t)DPARAM1 >> shift;
 				flags = FLAGS64_NZ(temp64);
 				if (shift != 0) flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
 				DPARAM0 = temp64;
@@ -1796,17 +1796,17 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RORC, 8, 0):      // DRORC   dst,src,count[,f]
 				shift = DPARAM2 & 63;
 				if (shift > 1)
-					DPARAM0 = (DPARAM1 >> shift) | ((((UINT64)flags & FLAG_C) << 63) >> (shift - 1)) | (DPARAM1 << (65 - shift));
+					DPARAM0 = (DPARAM1 >> shift) | ((((uint64_t)flags & FLAG_C) << 63) >> (shift - 1)) | (DPARAM1 << (65 - shift));
 				else if (shift == 1)
-					DPARAM0 = (DPARAM1 >> shift) | (((UINT64)flags & FLAG_C) << 63);
+					DPARAM0 = (DPARAM1 >> shift) | (((uint64_t)flags & FLAG_C) << 63);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_RORC, 8, 1):
 				shift = DPARAM2 & 63;
 				if (shift > 1)
-					temp64 = (DPARAM1 >> shift) | ((((UINT64)flags & FLAG_C) << 63) >> (shift - 1)) | (DPARAM1 << (65 - shift));
+					temp64 = (DPARAM1 >> shift) | ((((uint64_t)flags & FLAG_C) << 63) >> (shift - 1)) | (DPARAM1 << (65 - shift));
 				else if (shift == 1)
-					temp64 = (DPARAM1 >> shift) | (((UINT64)flags & FLAG_C) << 63);
+					temp64 = (DPARAM1 >> shift) | (((uint64_t)flags & FLAG_C) << 63);
 				else
 					temp64 = DPARAM1;
 				flags = FLAGS64_NZ(temp64);
@@ -2137,10 +2137,10 @@ void drcbe_c::output_parameter(drcbec_instruction **dstptr, void **immedptr, int
 			{
 				(dst++)->v = immed;
 				if (size == 4)
-					*(UINT32 *)immed = (UINT32)param.immediate();
+					*(uint32_t *)immed = (uint32_t)param.immediate();
 				else
-					*(UINT64 *)immed = (UINT64)param.immediate();
-				immed = (UINT8 *)immed + size;
+					*(uint64_t *)immed = (uint64_t)param.immediate();
+				immed = (uint8_t *)immed + size;
 			}
 			break;
 
@@ -2188,7 +2188,7 @@ void drcbe_c::output_parameter(drcbec_instruction **dstptr, void **immedptr, int
 
 		// code label just contains the label value
 		case parameter::PTYPE_CODE_LABEL:
-			return output_parameter(dstptr, immedptr, size, UINT32(param.label()));
+			return output_parameter(dstptr, immedptr, size, uint32_t(param.label()));
 
 		// c_function just points to the C function
 		case parameter::PTYPE_C_FUNCTION:
@@ -2220,18 +2220,18 @@ void drcbe_c::fixup_label(void *parameter, drccodeptr labelcodeptr)
 //  dmulu - perform a double-wide unsigned multiply
 //-------------------------------------------------
 
-int drcbe_c::dmulu(UINT64 &dstlo, UINT64 &dsthi, UINT64 src1, UINT64 src2, int flags)
+int drcbe_c::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags)
 {
 	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == 0)
+	if (&dstlo == &dsthi && flags == false)
 	{
 		dstlo = src1 * src2;
 		return 0;
 	}
 
 	// fetch source values
-	UINT64 a = src1;
-	UINT64 b = src2;
+	uint64_t a = src1;
+	uint64_t b = src2;
 	if (a == 0 || b == 0)
 	{
 		dsthi = dstlo = 0;
@@ -2239,17 +2239,17 @@ int drcbe_c::dmulu(UINT64 &dstlo, UINT64 &dsthi, UINT64 src1, UINT64 src2, int f
 	}
 
 	// compute high and low parts first
-	UINT64 lo = (UINT64)(UINT32)(a >> 0)  * (UINT64)(UINT32)(b >> 0);
-	UINT64 hi = (UINT64)(UINT32)(a >> 32) * (UINT64)(UINT32)(b >> 32);
+	uint64_t lo = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 0);
+	uint64_t hi = (uint64_t)(uint32_t)(a >> 32) * (uint64_t)(uint32_t)(b >> 32);
 
 	// compute middle parts
-	UINT64 prevlo = lo;
-	UINT64 temp = (UINT64)(UINT32)(a >> 32)  * (UINT64)(UINT32)(b >> 0);
+	uint64_t prevlo = lo;
+	uint64_t temp = (uint64_t)(uint32_t)(a >> 32)  * (uint64_t)(uint32_t)(b >> 0);
 	lo += temp << 32;
 	hi += (temp >> 32) + (lo < prevlo);
 
 	prevlo = lo;
-	temp = (UINT64)(UINT32)(a >> 0)  * (UINT64)(UINT32)(b >> 32);
+	temp = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 32);
 	lo += temp << 32;
 	hi += (temp >> 32) + (lo < prevlo);
 
@@ -2264,18 +2264,18 @@ int drcbe_c::dmulu(UINT64 &dstlo, UINT64 &dsthi, UINT64 src1, UINT64 src2, int f
 //  dmuls - perform a double-wide signed multiply
 //-------------------------------------------------
 
-int drcbe_c::dmuls(UINT64 &dstlo, UINT64 &dsthi, INT64 src1, INT64 src2, int flags)
+int drcbe_c::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags)
 {
 	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == 0)
+	if (&dstlo == &dsthi && flags == false)
 	{
 		dstlo = src1 * src2;
 		return 0;
 	}
 
 	// fetch absolute source values
-	UINT64 a = src1; if ((INT64)a < 0) a = -a;
-	UINT64 b = src2; if ((INT64)b < 0) b = -b;
+	uint64_t a = src1; if ((int64_t)a < 0) a = -a;
+	uint64_t b = src2; if ((int64_t)b < 0) b = -b;
 	if (a == 0 || b == 0)
 	{
 		dsthi = dstlo = 0;
@@ -2283,22 +2283,22 @@ int drcbe_c::dmuls(UINT64 &dstlo, UINT64 &dsthi, INT64 src1, INT64 src2, int fla
 	}
 
 	// compute high and low parts first
-	UINT64 lo = (UINT64)(UINT32)(a >> 0)  * (UINT64)(UINT32)(b >> 0);
-	UINT64 hi = (UINT64)(UINT32)(a >> 32) * (UINT64)(UINT32)(b >> 32);
+	uint64_t lo = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 0);
+	uint64_t hi = (uint64_t)(uint32_t)(a >> 32) * (uint64_t)(uint32_t)(b >> 32);
 
 	// compute middle parts
-	UINT64 prevlo = lo;
-	UINT64 temp = (UINT64)(UINT32)(a >> 32)  * (UINT64)(UINT32)(b >> 0);
+	uint64_t prevlo = lo;
+	uint64_t temp = (uint64_t)(uint32_t)(a >> 32)  * (uint64_t)(uint32_t)(b >> 0);
 	lo += temp << 32;
 	hi += (temp >> 32) + (lo < prevlo);
 
 	prevlo = lo;
-	temp = (UINT64)(UINT32)(a >> 0)  * (UINT64)(UINT32)(b >> 32);
+	temp = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 32);
 	lo += temp << 32;
 	hi += (temp >> 32) + (lo < prevlo);
 
 	// adjust for signage
-	if ((INT64)(src1 ^ src2) < 0)
+	if ((int64_t)(src1 ^ src2) < 0)
 	{
 		hi = ~hi + (lo == 0);
 		lo = ~lo + 1;
@@ -2307,10 +2307,10 @@ int drcbe_c::dmuls(UINT64 &dstlo, UINT64 &dsthi, INT64 src1, INT64 src2, int fla
 	// store the results
 	dsthi = hi;
 	dstlo = lo;
-	return ((hi >> 60) & FLAG_S) | ((dsthi != ((INT64)lo >> 63)) << 1);
+	return ((hi >> 60) & FLAG_S) | ((dsthi != ((int64_t)lo >> 63)) << 1);
 }
 
-UINT32 drcbe_c::tzcount32(UINT32 value)
+uint32_t drcbe_c::tzcount32(uint32_t value)
 {
 	for (int i = 0; i < 32; i++)
 	{
@@ -2320,11 +2320,11 @@ UINT32 drcbe_c::tzcount32(UINT32 value)
 	return 32;
 }
 
-UINT64 drcbe_c::tzcount64(UINT64 value)
+uint64_t drcbe_c::tzcount64(uint64_t value)
 {
 	for (int i = 0; i < 64; i++)
 	{
-		if (value & ((UINT64)(1) << i))
+		if (value & ((uint64_t)(1) << i))
 			return i;
 	}
 	return 64;

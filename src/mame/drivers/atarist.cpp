@@ -65,7 +65,7 @@ void st_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 		blitter_tick();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in st_state::device_timer");
+		assert_always(false, "Unknown id in st_state::device_timer");
 	}
 }
 
@@ -98,7 +98,7 @@ void st_state::flush_dma_fifo()
 	if (m_fdc_dmabytes) {
 		address_space &program = m_maincpu->space(AS_PROGRAM);
 		for (int i = 0; i < 8; i++) {
-			UINT16 data = m_fdc_fifo[m_fdc_fifo_sel][i];
+			uint16_t data = m_fdc_fifo[m_fdc_fifo_sel][i];
 
 			if (LOG) logerror("Flushing DMA FIFO %u data %04x to address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
@@ -129,7 +129,7 @@ void st_state::fill_dma_fifo()
 	if (m_fdc_dmabytes) {
 		address_space &program = m_maincpu->space(AS_PROGRAM);
 		for (int i = 0; i < 8; i++) {
-			UINT16 data = program.read_word(m_dma_base);
+			uint16_t data = program.read_word(m_dma_base);
 
 			if (LOG) logerror("Filling DMA FIFO %u with data %04x from memory address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
@@ -158,7 +158,7 @@ void st_state::fdc_dma_transfer()
 {
 	if (m_fdc_mode & DMA_MODE_READ_WRITE)
 	{
-		UINT16 data = m_fdc_fifo[m_fdc_fifo_sel][m_fdc_fifo_index];
+		uint16_t data = m_fdc_fifo[m_fdc_fifo_sel][m_fdc_fifo_index];
 
 		if (m_fdc_fifo_msb)
 		{
@@ -196,7 +196,7 @@ void st_state::fdc_dma_transfer()
 	else
 	{
 		// read from controller to FIFO
-		UINT8 data = m_fdc->data_r();
+		uint8_t data = m_fdc->data_r();
 
 		m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
 
@@ -232,7 +232,7 @@ void st_state::fdc_dma_transfer()
 
 READ16_MEMBER( st_state::fdc_data_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_fdc_mode & DMA_MODE_SECTOR_COUNT)
 	{
@@ -306,7 +306,7 @@ WRITE16_MEMBER( st_state::fdc_data_w )
 
 READ16_MEMBER( st_state::dma_status_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	// DMA error
 	data |= m_dma_error;
@@ -350,7 +350,7 @@ WRITE16_MEMBER( st_state::dma_mode_w )
 
 READ8_MEMBER( st_state::dma_counter_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -457,8 +457,8 @@ void st_state::mouse_tick()
 
 	*/
 
-	UINT8 x = m_mousex->read();
-	UINT8 y = m_mousey->read();
+	uint8_t x = m_mousex->read();
+	uint8_t y = m_mousey->read();
 
 	if (m_ikbd_mouse_pc == 0)
 	{
@@ -525,7 +525,7 @@ READ8_MEMBER( st_state::ikbd_port1_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	// keyboard data
 	if (!BIT(m_ikbd_keylatch, 1)) data &= m_p31->read();
@@ -566,7 +566,7 @@ READ8_MEMBER( st_state::ikbd_port2_r )
 
 	*/
 
-	UINT8 data = m_joy1.read_safe(0x06) & 0x06;
+	uint8_t data = m_joy1.read_safe(0x06) & 0x06;
 
 	// serial receive
 	data |= m_ikbd_tx << 3;
@@ -653,7 +653,7 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
 	if (m_ikbd_joy) return 0xff;
 
-	UINT8 data = m_joy0.read_safe(0xff);
+	uint8_t data = m_joy0.read_safe(0xff);
 
 	if ((m_config->read() & 0x01) == 0)
 	{
@@ -758,7 +758,7 @@ void ste_state::dmasound_tick()
 {
 	if (m_dmasnd_samples == 0)
 	{
-		UINT8 *RAM = m_ram->pointer();
+		uint8_t *RAM = m_ram->pointer();
 
 		for (auto & elem : m_dmasnd_fifo)
 		{
@@ -834,7 +834,7 @@ READ8_MEMBER( ste_state::sound_dma_control_r )
 
 READ8_MEMBER( ste_state::sound_dma_base_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -861,7 +861,7 @@ READ8_MEMBER( ste_state::sound_dma_base_r )
 
 READ8_MEMBER( ste_state::sound_dma_counter_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -888,7 +888,7 @@ READ8_MEMBER( ste_state::sound_dma_counter_r )
 
 READ8_MEMBER( ste_state::sound_dma_end_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{

@@ -225,7 +225,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
 	DECLARE_DRIVER_INIT(leapster);
 
@@ -254,14 +254,14 @@ INPUT_PORTS_END
 
 
 
-UINT32 leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");

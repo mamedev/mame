@@ -49,7 +49,7 @@ private:
 	virtual void populate() override;
 	virtual void handle() override;
 
-	UINT16 m_main;
+	uint16_t m_main;
 };
 
 } // namespace ui

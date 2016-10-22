@@ -30,19 +30,19 @@ public:
 
 	bool            m_is_pitfight;
 
-	UINT8           m_which_input;
-	required_shared_ptr<UINT16> m_mo_command;
+	uint8_t           m_which_input;
+	required_shared_ptr<uint16_t> m_mo_command;
 
-	UINT16 *        m_bslapstic_base;
-	std::unique_ptr<UINT8[]>          m_bslapstic_bank0;
-	UINT8           m_bslapstic_bank;
+	uint16_t *        m_bslapstic_base;
+	std::unique_ptr<uint8_t[]>          m_bslapstic_bank0;
+	uint8_t           m_bslapstic_bank;
 	bool            m_bslapstic_primed;
 
 	int             m_pfscroll_xoffset;
-	UINT16          m_current_control;
-	UINT8           m_playfield_tile_bank;
-	UINT16          m_playfield_xscroll;
-	UINT16          m_playfield_yscroll;
+	uint16_t          m_current_control;
+	uint8_t           m_playfield_tile_bank;
+	uint16_t          m_playfield_xscroll;
+	uint16_t          m_playfield_yscroll;
 
 	virtual void device_post_load() override;
 	virtual void update_interrupts() override;
@@ -62,7 +62,7 @@ public:
 	DECLARE_MACHINE_START(atarig1);
 	DECLARE_MACHINE_RESET(atarig1);
 	DECLARE_VIDEO_START(atarig1);
-	UINT32 screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	void pitfightb_cheap_slapstic_init();
 };

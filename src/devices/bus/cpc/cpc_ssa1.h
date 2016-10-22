@@ -53,16 +53,16 @@ class cpc_ssa1_device : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	void set_lrq(UINT8 state) { m_lrq = state; }
-	UINT8 get_lrq() { return m_lrq; }
-	void set_sby(UINT8 state) { m_sby = state; }
-	UINT8 get_sby() { return m_sby; }
+	void set_lrq(uint8_t state) { m_lrq = state; }
+	uint8_t get_lrq() { return m_lrq; }
+	void set_sby(uint8_t state) { m_sby = state; }
+	uint8_t get_sby() { return m_sby; }
 
 	DECLARE_READ8_MEMBER(ssa1_r);
 	DECLARE_WRITE8_MEMBER(ssa1_w);
@@ -77,9 +77,9 @@ protected:
 private:
 	cpc_expansion_slot_device *m_slot;
 
-	UINT8 *m_rom;
-	UINT8 m_lrq;
-	UINT8 m_sby;
+	uint8_t *m_rom;
+	uint8_t m_lrq;
+	uint8_t m_sby;
 
 	required_device<sp0256_device> m_sp0256_device;
 };
@@ -89,16 +89,16 @@ class cpc_dkspeech_device : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	void set_lrq(UINT8 state) { m_lrq = state; }
-	UINT8 get_lrq() { return m_lrq; }
-	void set_sby(UINT8 state) { m_sby = state; }
-	UINT8 get_sby() { return m_sby; }
+	void set_lrq(uint8_t state) { m_lrq = state; }
+	uint8_t get_lrq() { return m_lrq; }
+	void set_sby(uint8_t state) { m_sby = state; }
+	uint8_t get_sby() { return m_sby; }
 
 	DECLARE_READ8_MEMBER(dkspeech_r);
 	DECLARE_WRITE8_MEMBER(dkspeech_w);
@@ -113,9 +113,9 @@ protected:
 private:
 	cpc_expansion_slot_device *m_slot;
 
-	UINT8 *m_rom;
-	UINT8 m_lrq;
-	UINT8 m_sby;
+	uint8_t *m_rom;
+	uint8_t m_lrq;
+	uint8_t m_sby;
 
 	required_device<sp0256_device> m_sp0256_device;
 };

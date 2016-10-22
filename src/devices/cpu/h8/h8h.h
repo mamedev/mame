@@ -18,18 +18,18 @@
 
 class h8h_device : public h8_device {
 public:
-	h8h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_delegate map_delegate);
+	h8h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_delegate map_delegate);
 
 protected:
 	static const disasm_entry disasm_entries[];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
-	inline void r32_w(int reg, UINT32 val) { R[reg & 7] = val; R[(reg & 7) | 8] = val >> 16; }
-	inline UINT32 r32_r(int reg) const { return R[reg & 7] | (R[(reg & 7) | 8] << 16); }
+	inline void r32_w(int reg, uint32_t val) { R[reg & 7] = val; R[(reg & 7) | 8] = val >> 16; }
+	inline uint32_t r32_r(int reg) const { return R[reg & 7] | (R[(reg & 7) | 8] << 16); }
 
 #define O(o) void o ## _full(); void o ## _partial()
 

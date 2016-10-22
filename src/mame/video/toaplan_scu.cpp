@@ -28,7 +28,7 @@ GFXDECODE_MEMBER( toaplan_scu_device::gfxinfo )
 GFXDECODE_END
 
 
-toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TOAPLAN_SCU, "Toaplan SCU", tag, owner, clock, "toaplan_scu", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo )
 {
@@ -58,7 +58,7 @@ void toaplan_scu_device::alloc_sprite_bitmap(screen_device &screen)
     Sprite Handlers
 ***************************************************************************/
 
-void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, UINT16* spriteram, UINT32 bytes )
+void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, uint16_t* spriteram, uint32_t bytes )
 {
 	int offs;
 	m_temp_spritebitmap.fill(0,cliprect);
@@ -107,12 +107,12 @@ void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_ind16 &bitmap, cons
 
 	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		UINT16* srcline = &m_temp_spritebitmap.pix16(y);
-		UINT16* dstline = &bitmap.pix16(y);
+		uint16_t* srcline = &m_temp_spritebitmap.pix16(y);
+		uint16_t* dstline = &bitmap.pix16(y);
 
 		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
-			UINT16 pix = srcline[x];
+			uint16_t pix = srcline[x];
 
 			if ( (pix>>(4+6)) == priority )
 			{

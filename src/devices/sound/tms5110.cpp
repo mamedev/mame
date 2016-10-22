@@ -65,7 +65,7 @@
 #include "emu.h"
 #include "tms5110.h"
 
-static INT16 clip_analog(INT16 cliptemp);
+static int16_t clip_analog(int16_t cliptemp);
 
 /* *****optional defines***** */
 
@@ -176,7 +176,7 @@ void tms5110_device::set_variant(int variant)
 	m_variant = variant;
 }
 
-void tms5110_device::new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
+void tms5110_device::new_int_write(uint8_t rc, uint8_t m0, uint8_t m1, uint8_t addr)
 {
 	if (!m_m0_cb.isnull())
 		m_m0_cb(m0);
@@ -191,7 +191,7 @@ void tms5110_device::new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
 	}
 }
 
-void tms5110_device::new_int_write_addr(UINT8 addr)
+void tms5110_device::new_int_write_addr(uint8_t addr)
 {
 	new_int_write(1, 0, 1, addr); // romclk 1, m0 0, m1 1, addr bus nybble = xxxx
 	new_int_write(0, 0, 1, addr); // romclk 0, m0 0, m1 1, addr bus nybble = xxxx
@@ -199,7 +199,7 @@ void tms5110_device::new_int_write_addr(UINT8 addr)
 	new_int_write(0, 0, 0, addr); // romclk 0, m0 0, m1 0, addr bus nybble = xxxx
 }
 
-UINT8 tms5110_device::new_int_read()
+uint8_t tms5110_device::new_int_read()
 {
 	new_int_write(1, 1, 0, 0); // romclk 1, m0 1, m1 0, addr bus nybble = 0/open bus
 	new_int_write(0, 1, 0, 0); // romclk 0, m0 1, m1 0, addr bus nybble = 0/open bus
@@ -335,7 +335,7 @@ void tms5110_device::perform_dummy_read()
 	{
 		int data = new_int_read();
 		if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data & 1);
-		m_schedule_dummy_read = FALSE;
+		m_schedule_dummy_read = false;
 	}
 }
 
@@ -348,11 +348,11 @@ void tms5110_device::perform_dummy_read()
 
 ***********************************************************************************************/
 
-void tms5110_device::process(INT16 *buffer, unsigned int size)
+void tms5110_device::process(int16_t *buffer, unsigned int size)
 {
 	int buf_count=0;
 	int i, bitout;
-	INT32 this_sample;
+	int32_t this_sample;
 
 	/* loop until the buffer is full or we've stopped speaking */
 	while (size > 0)
@@ -501,9 +501,9 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 				 * disabled, forcing all samples beyond 51d to be == 51d
 				 */
 				if (m_pitch_count >= 51)
-					m_excitation_data = (INT8)m_coeff->chirptable[51];
+					m_excitation_data = (int8_t)m_coeff->chirptable[51];
 				else /*m_pitch_count < 51*/
-					m_excitation_data = (INT8)m_coeff->chirptable[m_pitch_count];
+					m_excitation_data = (int8_t)m_coeff->chirptable[m_pitch_count];
 			}
 
 			// Update LFSR *20* times every sample (once per T cycle), like patent shows
@@ -627,7 +627,7 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 
 ***********************************************************************************************/
 
-static INT16 clip_analog(INT16 cliptemp)
+static int16_t clip_analog(int16_t cliptemp)
 {
 	/* clipping, just like the patent shows:
 	 * the top 10 bits of this result are visible on the digital output IO pin.
@@ -669,9 +669,9 @@ static INT16 clip_analog(INT16 cliptemp)
      output, this makes almost no difference in the computation.
 
 **********************************************************************************************/
-static INT32 matrix_multiply(INT32 a, INT32 b)
+static int32_t matrix_multiply(int32_t a, int32_t b)
 {
-	INT32 result;
+	int32_t result;
 	while (a>511) { a-=1024; }
 	while (a<-512) { a+=1024; }
 	while (b>16383) { b-=32768; }
@@ -692,7 +692,7 @@ static INT32 matrix_multiply(INT32 a, INT32 b)
 
 ***********************************************************************************************/
 
-INT32 tms5110_device::lattice_filter()
+int32_t tms5110_device::lattice_filter()
 {
 	// Lattice filter here
 	// Aug/05/07: redone as unrolled loop, for clarity - LN
@@ -727,7 +727,7 @@ INT32 tms5110_device::lattice_filter()
 		m_u[1] = m_u[2] - matrix_multiply(m_current_k[1], m_x[1]);
 		m_u[0] = m_u[1] - matrix_multiply(m_current_k[0], m_x[0]);
 #ifdef DEBUG_LATTICE
-		INT32 err = m_x[9] + matrix_multiply(m_current_k[9], m_u[9]); //x_10, real chip doesn't use or calculate this
+		int32_t err = m_x[9] + matrix_multiply(m_current_k[9], m_u[9]); //x_10, real chip doesn't use or calculate this
 #endif
 		m_x[9] = m_x[8] + matrix_multiply(m_current_k[8], m_u[8]);
 		m_x[8] = m_x[7] + matrix_multiply(m_current_k[7], m_u[7]);
@@ -814,10 +814,10 @@ void tms5110_device::PDC_set(int data)
 #ifdef DEBUG_COMMAND_DUMP
 				fprintf(stderr,"Loading address nybble %02x to VSMs\n", m_CTL_pins);
 #endif
-				m_next_is_address = FALSE;
+				m_next_is_address = false;
 				m_address = m_address | ((m_CTL_pins & 0x0F)<<m_addr_bit);
 				m_addr_bit = (m_addr_bit + 4) % 12;
-				m_schedule_dummy_read = TRUE;
+				m_schedule_dummy_read = true;
 				new_int_write_addr(m_CTL_pins & 0x0F);
 			}
 			else
@@ -839,7 +839,7 @@ void tms5110_device::PDC_set(int data)
 #ifdef DEBUG_COMMAND_DUMP
 					fprintf(stderr,"LOAD ADDRESS\n");
 #endif
-					m_next_is_address = TRUE;
+					m_next_is_address = true;
 					break;
 
 				case TMS5110_CMD_OUTPUT:
@@ -918,7 +918,7 @@ void tms5110_device::PDC_set(int data)
 					new_int_write(0,0,0,0);
 					new_int_write(1,0,0,0);
 					new_int_write(0,0,0,0);
-					m_schedule_dummy_read = FALSE;
+					m_schedule_dummy_read = false;
 					break;
 
 				case TMS5110_CMD_TEST_TALK:
@@ -1187,16 +1187,16 @@ void tms5110_device::device_reset()
 	if (m_table.found())
 	{
 		/* legacy interface */
-		m_schedule_dummy_read = TRUE;
+		m_schedule_dummy_read = true;
 	}
 	else
 	{
 		/* no dummy read! This makes bagman and ad2083 speech fail
 		 * with the new cycle and transition exact interfaces
 		 */
-		m_schedule_dummy_read = FALSE;
+		m_schedule_dummy_read = false;
 	}
-	m_next_is_address = FALSE;
+	m_next_is_address = false;
 	m_address = 0;
 	m_addr_bit = 0;
 }
@@ -1297,7 +1297,7 @@ READ8_MEMBER( tms5110_device::romclk_hack_r )
 	/* create and start timer if necessary */
 	if (!m_romclk_hack_timer_started)
 	{
-		m_romclk_hack_timer_started = TRUE;
+		m_romclk_hack_timer_started = true;
 		m_romclk_hack_timer->adjust(attotime::from_hz(clock() / 40), 0, attotime::from_hz(clock() / 40));
 	}
 	return m_romclk_hack_state;
@@ -1316,7 +1316,7 @@ READ8_MEMBER( tms5110_device::romclk_hack_r )
 
 void tms5110_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	INT16 sample_data[MAX_SAMPLE_CHUNK];
+	int16_t sample_data[MAX_SAMPLE_CHUNK];
 	stream_sample_t *buffer = outputs[0];
 
 	/* loop while we still have samples to generate */
@@ -1410,7 +1410,7 @@ void tmsprom_device::register_for_save_states()
 
 void tmsprom_device::update_prom_cnt()
 {
-	UINT8 prev_val = m_prom[m_prom_cnt] | 0x0200;
+	uint8_t prev_val = m_prom[m_prom_cnt] | 0x0200;
 	if (m_enable && (prev_val & (1<<m_stop_bit)))
 		m_prom_cnt |= 0x10;
 	else
@@ -1427,7 +1427,7 @@ void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	 * static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
 	 *              0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
 	 */
-	UINT16 ctrl;
+	uint16_t ctrl;
 
 	update_prom_cnt();
 	ctrl = (m_prom[m_prom_cnt] | 0x200);
@@ -1523,12 +1523,12 @@ WRITE_LINE_MEMBER( tmsprom_device::enable_w )
 
 const device_type TMS5110 = &device_creator<tms5110_device>;
 
-tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5110_device(mconfig, TMS5110, "TMS5110", tag, owner, clock, "tms5110", __FILE__)
 {
 }
 
-tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_sound_interface(mconfig, *this)
 	, m_table(*this, DEVICE_SELF)
@@ -1543,56 +1543,56 @@ tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, 
 
 const device_type TMS5100 = &device_creator<tms5100_device>;
 
-tms5100_device::tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms5100_device::tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5110_device(mconfig, TMS5100, "TMS5100", tag, owner, clock, "tms5100", __FILE__)
 {
 }
 
 const device_type TMC0281 = &device_creator<tmc0281_device>;
 
-tmc0281_device::tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmc0281_device::tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5110_device(mconfig, TMC0281, "TMC0281", tag, owner, clock, "tmc0281", __FILE__)
 {
 }
 
 const device_type TMS5100A = &device_creator<tms5100a_device>;
 
-tms5100a_device::tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms5100a_device::tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5110_device(mconfig, TMS5100A, "TMS5100A", tag, owner, clock, "tms5100a", __FILE__)
 {
 }
 
 const device_type TMC0281D = &device_creator<tmc0281d_device>;
 
-tmc0281d_device::tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmc0281d_device::tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5110_device(mconfig, TMC0281D, "TMC0281D", tag, owner, clock, "tmc0281d", __FILE__)
 {
 }
 
 const device_type CD2801 = &device_creator<cd2801_device>;
 
-cd2801_device::cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cd2801_device::cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5110_device(mconfig, CD2801, "CD2801", tag, owner, clock, "cd2801", __FILE__)
 {
 }
 
 const device_type CD2802 = &device_creator<cd2802_device>;
 
-cd2802_device::cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cd2802_device::cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5110_device(mconfig, CD2802, "CD2802", tag, owner, clock, "cd2802", __FILE__)
 {
 }
 
 const device_type TMS5110A = &device_creator<tms5110a_device>;
 
-tms5110a_device::tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms5110a_device::tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5110_device(mconfig, TMS5110A, "TMS5110A", tag, owner, clock, "tms5110a", __FILE__)
 {
 }
 
 const device_type M58817 = &device_creator<m58817_device>;
 
-m58817_device::m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m58817_device::m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5110_device(mconfig, M58817, "M58817", tag, owner, clock, "m58817", __FILE__)
 {
 }
@@ -1600,7 +1600,7 @@ m58817_device::m58817_device(const machine_config &mconfig, const char *tag, dev
 
 const device_type TMSPROM = &device_creator<tmsprom_device>;
 
-tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMSPROM, "TMSPROM", tag, owner, clock, "tmsprom", __FILE__),
 		m_rom(*this, DEVICE_SELF),
 		m_prom(*this, finder_base::DUMMY_TAG, 0x20),

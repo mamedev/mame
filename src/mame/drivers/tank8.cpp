@@ -462,10 +462,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(tank8_state,decode)
 {
-	const UINT8* DECODE = memregion("user1")->base();
+	const uint8_t* DECODE = memregion("user1")->base();
 
-	UINT8* p1 = memregion("maincpu")->base() + 0x00000;
-	UINT8* p2 = memregion("maincpu")->base() + 0x10000;
+	uint8_t* p1 = memregion("maincpu")->base() + 0x00000;
+	uint8_t* p2 = memregion("maincpu")->base() + 0x10000;
 
 	int i;
 

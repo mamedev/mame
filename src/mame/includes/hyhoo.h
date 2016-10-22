@@ -20,7 +20,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
-	required_shared_ptr<UINT8> m_clut;
+	required_shared_ptr<uint8_t> m_clut;
 
 	int m_blitter_destx;
 	int m_blitter_desty;
@@ -42,7 +42,7 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void hyhoo_gfxdraw();
 
 protected:

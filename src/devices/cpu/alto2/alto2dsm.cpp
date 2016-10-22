@@ -147,7 +147,7 @@ static const char* t_bus_alu[16] = {
 /**
  * @brief copy of the constant PROM, which this disassembler may not have access to
  */
-static UINT16 const_prom[PROM_SIZE] = {
+static uint16_t const_prom[PROM_SIZE] = {
 	/* 0000 */  0x0000, 0x0001, 0x0002, 0xfffe, 0xffff, 0xffff, 0x000f, 0xffff,
 	/* 0008 */  0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0xfff8, 0xfff8,
 	/* 0010 */  0x0010, 0x001f, 0x0020, 0x003f, 0x0040, 0x007f, 0x0080, 0x0007,
@@ -206,14 +206,14 @@ static const char *addrname(int a)
 	return dst;
 }
 
-offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	size_t len = 128;
 
-	UINT32 mir = (static_cast<UINT32>(oprom[0]) << 24) |
-			(static_cast<UINT32>(oprom[1]) << 16) |
-			(static_cast<UINT32>(oprom[2]) << 8) |
-			(static_cast<UINT32>(oprom[3]) << 0);
+	uint32_t mir = (static_cast<uint32_t>(oprom[0]) << 24) |
+			(static_cast<uint32_t>(oprom[1]) << 16) |
+			(static_cast<uint32_t>(oprom[2]) << 8) |
+			(static_cast<uint32_t>(oprom[3]) << 0);
 	int rsel = (mir >> 27) & 31;
 	int aluf = (mir >> 23) & 15;
 	int bs = (mir >> 20) & 7;
@@ -222,15 +222,15 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 	int t = (mir >> 11) & 1;
 	int l = (mir >> 10) & 1;
 	offs_t next = mir & 1023;
-	const UINT8* src = oprom - 4 * pc + 4 * next;
-	UINT32 next2 =  (static_cast<UINT32>(src[0]) << 24) |
-			(static_cast<UINT32>(src[1]) << 16) |
-			(static_cast<UINT32>(src[2]) << 8) |
-			(static_cast<UINT32>(src[3]) << 0);
-	UINT16 prefetch = next2 & 1023;
+	const uint8_t* src = oprom - 4 * pc + 4 * next;
+	uint32_t next2 =  (static_cast<uint32_t>(src[0]) << 24) |
+			(static_cast<uint32_t>(src[1]) << 16) |
+			(static_cast<uint32_t>(src[2]) << 8) |
+			(static_cast<uint32_t>(src[3]) << 0);
+	uint16_t prefetch = next2 & 1023;
 	char *dst = buffer;
 	offs_t result = 1 | DASMFLAG_SUPPORTED;
-	UINT8 pa;
+	uint8_t pa;
 
 	if (next != pc + 1)
 		result |= DASMFLAG_STEP_OUT;

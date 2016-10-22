@@ -40,7 +40,7 @@ enum rtc9701_state_t
 
 struct rtc_regs_t
 {
-	UINT8 sec, min, hour, day, wday, month, year;
+	uint8_t sec, min, hour, day, wday, month, year;
 };
 
 
@@ -51,7 +51,7 @@ class rtc9701_device :  public device_t,
 {
 public:
 	// construction/destruction
-	rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
 	// I/O operations
@@ -71,8 +71,8 @@ protected:
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
-	inline UINT8 rtc_read(UINT8 offset);
-	inline void rtc_write(UINT8 offset,UINT8 data);
+	inline uint8_t rtc_read(uint8_t offset);
+	inline void rtc_write(uint8_t offset,uint8_t data);
 
 	int                     m_latch;
 	int                     m_reset_line;
@@ -86,10 +86,10 @@ protected:
 	int rtc9701_address_pos;
 	int rtc9701_current_address;
 
-	UINT16 rtc9701_current_data;
+	uint16_t rtc9701_current_data;
 	int rtc9701_data_pos;
 
-	UINT16 rtc9701_data[0x100];
+	uint16_t rtc9701_data[0x100];
 
 	rtc_regs_t m_rtc;
 };

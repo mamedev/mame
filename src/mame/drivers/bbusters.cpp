@@ -269,7 +269,7 @@ READ16_MEMBER(bbusters_state::control_3_r)
 {
 	static const char *const port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
 
-	UINT16 retdata = ioport(port[m_gun_select])->read();
+	uint16_t retdata = ioport(port[m_gun_select])->read();
 
 	retdata >>=1; // by lowering the precision of the gun reading hardware the game seems to work better
 

@@ -24,7 +24,7 @@ public:
 protected:
 	static const format formats[];
 
-	virtual void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors, int track, int head) const override;
+	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const override;
 };
 
 extern const floppy_format_type FLOPPY_NASLITE_FORMAT;

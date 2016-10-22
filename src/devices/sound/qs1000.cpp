@@ -174,7 +174,7 @@ ROM_END
 //-------------------------------------------------
 //  qs1000_device - constructor
 //-------------------------------------------------
-qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QS1000, "QS1000", tag, owner, clock, "qs1000", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 24),
@@ -267,7 +267,7 @@ void qs1000_device::device_start()
 //-------------------------------------------------
 //  serial_in - send data to the chip
 //-------------------------------------------------
-void qs1000_device::serial_in(UINT8 data)
+void qs1000_device::serial_in(uint8_t data)
 {
 	m_serial_data_in = data;
 
@@ -475,9 +475,9 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// Iterate over voices and accumulate sample data
 	for (auto & chan : m_channels)
 	{
-		UINT8 lvol = chan.m_regs[6];
-		UINT8 rvol = chan.m_regs[7];
-		UINT8 vol  = chan.m_regs[8];
+		uint8_t lvol = chan.m_regs[6];
+		uint8_t rvol = chan.m_regs[7];
+		uint8_t vol  = chan.m_regs[8];
 
 		if (chan.m_flags & QS1000_PLAYING)
 		{
@@ -508,12 +508,12 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						if (chan.m_start + chan.m_adpcm_addr >=  chan.m_loop_end)
 							chan.m_adpcm_addr = chan.m_loop_start - chan.m_start;
 
-						UINT8 data = read_byte(chan.m_start + (chan.m_adpcm_addr >> 1));
-						UINT8 nibble = (chan.m_adpcm_addr & 1 ? data : data >> 4) & 0xf;
+						uint8_t data = read_byte(chan.m_start + (chan.m_adpcm_addr >> 1));
+						uint8_t nibble = (chan.m_adpcm_addr & 1 ? data : data >> 4) & 0xf;
 						chan.m_adpcm_signal = chan.m_adpcm.clock(nibble);
 					}
 
-					INT8 result = (chan.m_adpcm_signal >> 4);
+					int8_t result = (chan.m_adpcm_signal >> 4);
 					chan.m_acc += chan.m_freq;
 					chan.m_addr = (chan.m_addr + (chan.m_acc >> 18)) & QS1000_ADDRESS_MASK;
 					chan.m_acc &= ((1 << 18) - 1);
@@ -541,7 +541,7 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						}
 					}
 
-					INT8 result = read_byte(chan.m_addr) - 128;
+					int8_t result = read_byte(chan.m_addr) - 128;
 
 					chan.m_acc += chan.m_freq;
 					chan.m_addr = (chan.m_addr + (chan.m_acc >> 18)) & QS1000_ADDRESS_MASK;
@@ -558,12 +558,12 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void qs1000_device::start_voice(int ch)
 {
-	UINT32 table_addr = (m_channels[ch].m_regs[0x01] << 16) | (m_channels[ch].m_regs[0x02] << 8) | m_channels[ch].m_regs[0x03];
+	uint32_t table_addr = (m_channels[ch].m_regs[0x01] << 16) | (m_channels[ch].m_regs[0x02] << 8) | m_channels[ch].m_regs[0x03];
 
 	// Fetch the sound information
-	UINT16 freq = (read_byte(table_addr + 0) << 8) | read_byte(table_addr + 1);
-	UINT16 word1 = (read_byte(table_addr + 2) << 8) | read_byte(table_addr + 3);
-	UINT16 base = (read_byte(table_addr + 4) << 8) | read_byte(table_addr + 5);
+	uint16_t freq = (read_byte(table_addr + 0) << 8) | read_byte(table_addr + 1);
+	uint16_t word1 = (read_byte(table_addr + 2) << 8) | read_byte(table_addr + 3);
+	uint16_t base = (read_byte(table_addr + 4) << 8) | read_byte(table_addr + 5);
 
 	if (LOGGING_ENABLED)
 		printf("[%.6x] Freq:%.4x  ????:%.4x  Addr:%.4x\n", table_addr, freq, word1, base);
@@ -573,16 +573,16 @@ void qs1000_device::start_voice(int ch)
 		return;
 
 	// Fetch the sample pointers and flags
-	UINT8 byte0 = read_byte(base);
+	uint8_t byte0 = read_byte(base);
 
-	UINT32 start_addr;
+	uint32_t start_addr;
 
 	start_addr  = byte0 << 16;
 	start_addr |= read_byte(base + 1) << 8;
 	start_addr |= read_byte(base + 2) << 0;
 	start_addr &= QS1000_ADDRESS_MASK;
 
-	UINT32 loop_start;
+	uint32_t loop_start;
 
 	loop_start = (byte0 & 0xf0) << 16;
 	loop_start |= read_byte(base + 3) << 12;
@@ -590,7 +590,7 @@ void qs1000_device::start_voice(int ch)
 	loop_start |= read_byte(base + 5) >> 4;
 	loop_start &= QS1000_ADDRESS_MASK;
 
-	UINT32 loop_end;
+	uint32_t loop_end;
 
 	loop_end = (byte0 & 0xf0) << 16;
 	loop_end |= (read_byte(base + 5) & 0xf) << 16;
@@ -598,17 +598,17 @@ void qs1000_device::start_voice(int ch)
 	loop_end |= read_byte(base + 7);
 	loop_end &= QS1000_ADDRESS_MASK;
 
-	UINT8 byte8 = read_byte(base + 8);
+	uint8_t byte8 = read_byte(base + 8);
 
 	if (LOGGING_ENABLED)
 	{
-		UINT8 byte9 = read_byte(base + 9);
-		UINT8 byte10 = read_byte(base + 10);
-		UINT8 byte11 = read_byte(base + 11);
-		UINT8 byte12 = read_byte(base + 12);
-		UINT8 byte13 = read_byte(base + 13);
-		UINT8 byte14 = read_byte(base + 14);
-		UINT8 byte15 = read_byte(base + 15);
+		uint8_t byte9 = read_byte(base + 9);
+		uint8_t byte10 = read_byte(base + 10);
+		uint8_t byte11 = read_byte(base + 11);
+		uint8_t byte12 = read_byte(base + 12);
+		uint8_t byte13 = read_byte(base + 13);
+		uint8_t byte14 = read_byte(base + 14);
+		uint8_t byte15 = read_byte(base + 15);
 
 		printf("[%.6x] Sample Start:%.6x  Loop Start:%.6x  Loop End:%.6x  Params: %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n", base, start_addr, loop_start, loop_end, byte8, byte9, byte10, byte11, byte12, byte13, byte14, byte15);
 	}

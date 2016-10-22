@@ -84,7 +84,7 @@ public:
 	required_device<floppy_image_device> m_floppy1;
 	optional_device<m20_8086_device> m_apb;
 
-	required_shared_ptr<UINT16> m_p_videoram;
+	required_shared_ptr<uint16_t> m_p_videoram;
 	required_device<palette_device> m_palette;
 
 	virtual void machine_start() override;
@@ -102,7 +102,7 @@ public:
 
 private:
 	offs_t m_memsize;
-	UINT8 m_port21;
+	uint8_t m_port21;
 	void install_memory();
 
 public:
@@ -117,14 +117,14 @@ public:
 
 MC6845_UPDATE_ROW( m20_state::update_row )
 {
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i, j;
 
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ((ma | (ra << 1)) << 4) + i;
-		UINT16 data = m_p_videoram[ offset ];
+		uint16_t offset = ((ma | (ra << 1)) << 4) + i;
+		uint16_t data = m_p_videoram[ offset ];
 
 		for ( j = 15; j >= 0; j-- )
 		{
@@ -326,7 +326,7 @@ ADDRESS_MAP_END
 void m20_state::install_memory()
 {
 	m_memsize = m_ram->size();
-	UINT8 *memptr = m_ram->pointer();
+	uint8_t *memptr = m_ram->pointer();
 	address_space& pspace = m_maincpu->space(AS_PROGRAM);
 	address_space& dspace = m_maincpu->space(AS_DATA);
 
@@ -739,8 +739,8 @@ void m20_state::machine_start()
 
 void m20_state::machine_reset()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *RAM = (UINT8 *)(m_ram->pointer() + 0x4000);
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *RAM = (uint8_t *)(m_ram->pointer() + 0x4000);
 
 	if (m_memsize >= 256 * 1024)
 		m_port21 = 0xdf;

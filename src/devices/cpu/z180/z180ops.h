@@ -98,7 +98,7 @@ void z180_device::WM16( offs_t addr, PAIR *r )
  * reading opcodes. In case of system with memory mapped I/O,
  * this function can be used to greatly speed up emulation
  ***************************************************************/
-UINT8 z180_device::ROP()
+uint8_t z180_device::ROP()
 {
 	offs_t addr = _PCD;
 	_PC++;
@@ -111,14 +111,14 @@ UINT8 z180_device::ROP()
  * support systems that use different encoding mechanisms for
  * opcodes and opcode arguments
  ***************************************************************/
-UINT8 z180_device::ARG()
+uint8_t z180_device::ARG()
 {
 	offs_t addr = _PCD;
 	_PC++;
 	return m_direct->read_byte(MMU_REMAP_ADDR(addr));
 }
 
-UINT32 z180_device::ARG16()
+uint32_t z180_device::ARG16()
 {
 	offs_t addr = _PCD;
 	_PC += 2;
@@ -129,8 +129,8 @@ UINT32 z180_device::ARG16()
  * Calculate the effective addess m_ea of an opcode using
  * IX+offset resp. IY+offset addressing.
  ***************************************************************/
-#define EAX() m_ea = (UINT32)(UINT16)(_IX + (INT8)ARG())
-#define EAY() m_ea = (UINT32)(UINT16)(_IY + (INT8)ARG())
+#define EAX() m_ea = (uint32_t)(uint16_t)(_IX + (int8_t)ARG())
+#define EAY() m_ea = (uint32_t)(uint16_t)(_IY + (int8_t)ARG())
 
 /***************************************************************
  * POP
@@ -168,7 +168,7 @@ UINT32 z180_device::ARG16()
  ***************************************************************/
 #define JR()                                                    \
 {                                                               \
-	INT8 arg = (INT8)ARG(); /* ARG() also increments _PC */   \
+	int8_t arg = (int8_t)ARG(); /* ARG() also increments _PC */   \
 	_PC += arg;           /* so don't do _PC += ARG() */      \
 }
 
@@ -178,7 +178,7 @@ UINT32 z180_device::ARG16()
 #define JR_COND(cond,opcode)                                    \
 	if( cond )                                                  \
 	{                                                           \
-		INT8 arg = (INT8)ARG(); /* ARG() also increments _PC */ \
+		int8_t arg = (int8_t)ARG(); /* ARG() also increments _PC */ \
 		_PC += arg;           /* so don't do _PC += ARG() */  \
 		CC(ex,opcode);                                          \
 	}                                                           \
@@ -277,19 +277,19 @@ UINT32 z180_device::ARG16()
 /***************************************************************
  * INC  r8
  ***************************************************************/
-UINT8 z180_device::INC(UINT8 value)
+uint8_t z180_device::INC(uint8_t value)
 {
-	UINT8 res = value + 1;
+	uint8_t res = value + 1;
 	_F = (_F & CF) | SZHV_inc[res];
-	return (UINT8)res;
+	return (uint8_t)res;
 }
 
 /***************************************************************
  * DEC  r8
  ***************************************************************/
-UINT8 z180_device::DEC(UINT8 value)
+uint8_t z180_device::DEC(uint8_t value)
 {
-	UINT8 res = value - 1;
+	uint8_t res = value - 1;
 	_F = (_F & CF) | SZHV_dec[res];
 	return res;
 }
@@ -312,8 +312,8 @@ UINT8 z180_device::DEC(UINT8 value)
  * RLA
  ***************************************************************/
 #define RLA {                                                   \
-	UINT8 res = (_A << 1) | (_F & CF);                          \
-	UINT8 c = (_A & 0x80) ? CF : 0;                           \
+	uint8_t res = (_A << 1) | (_F & CF);                          \
+	uint8_t c = (_A & 0x80) ? CF : 0;                           \
 	_F = (_F & (SF | ZF | PF)) | c | (res & (YF | XF));         \
 	_A = res;                                                 \
 }
@@ -322,8 +322,8 @@ UINT8 z180_device::DEC(UINT8 value)
  * RRA
  ***************************************************************/
 #define RRA {                                                   \
-	UINT8 res = (_A >> 1) | (_F << 7);                          \
-	UINT8 c = (_A & 0x01) ? CF : 0;                           \
+	uint8_t res = (_A >> 1) | (_F << 7);                          \
+	uint8_t c = (_A & 0x01) ? CF : 0;                           \
 	_F = (_F & (SF | ZF | PF)) | c | (res & (YF | XF));         \
 	_A = res;                                                 \
 }
@@ -332,7 +332,7 @@ UINT8 z180_device::DEC(UINT8 value)
  * RRD
  ***************************************************************/
 #define RRD {                                                   \
-	UINT8 n = RM(_HL);                                          \
+	uint8_t n = RM(_HL);                                          \
 	WM( _HL, (n >> 4) | (_A << 4) );                          \
 	_A = (_A & 0xf0) | (n & 0x0f);                              \
 	_F = (_F & CF) | SZP[_A];                                 \
@@ -342,7 +342,7 @@ UINT8 z180_device::DEC(UINT8 value)
  * RLD
  ***************************************************************/
 #define RLD {                                                   \
-	UINT8 n = RM(_HL);                                          \
+	uint8_t n = RM(_HL);                                          \
 	WM( _HL, (n << 4) | (_A & 0x0f) );                            \
 	_A = (_A & 0xf0) | (n >> 4);                                \
 	_F = (_F & CF) | SZP[_A];                                 \
@@ -353,8 +353,8 @@ UINT8 z180_device::DEC(UINT8 value)
  ***************************************************************/
 #define ADD(value)                                              \
 {                                                               \
-	UINT32 ah = _AFD & 0xff00;                                    \
-	UINT32 res = (UINT8)((ah >> 8) + value);                    \
+	uint32_t ah = _AFD & 0xff00;                                    \
+	uint32_t res = (uint8_t)((ah >> 8) + value);                    \
 	_F = SZHVC_add[ah | res];                                 \
 	_A = res;                                                 \
 }
@@ -364,8 +364,8 @@ UINT8 z180_device::DEC(UINT8 value)
  ***************************************************************/
 #define ADC(value)                                              \
 {                                                               \
-	UINT32 ah = _AFD & 0xff00, c = _AFD & 1;                    \
-	UINT32 res = (UINT8)((ah >> 8) + value + c);                \
+	uint32_t ah = _AFD & 0xff00, c = _AFD & 1;                    \
+	uint32_t res = (uint8_t)((ah >> 8) + value + c);                \
 	_F = SZHVC_add[(c << 16) | ah | res];                     \
 	_A = res;                                                 \
 }
@@ -375,8 +375,8 @@ UINT8 z180_device::DEC(UINT8 value)
  ***************************************************************/
 #define SUB(value)                                              \
 {                                                               \
-	UINT32 ah = _AFD & 0xff00;                                    \
-	UINT32 res = (UINT8)((ah >> 8) - value);                    \
+	uint32_t ah = _AFD & 0xff00;                                    \
+	uint32_t res = (uint8_t)((ah >> 8) - value);                    \
 	_F = SZHVC_sub[ah | res];                                 \
 	_A = res;                                                 \
 }
@@ -386,8 +386,8 @@ UINT8 z180_device::DEC(UINT8 value)
  ***************************************************************/
 #define SBC(value)                                              \
 {                                                               \
-	UINT32 ah = _AFD & 0xff00, c = _AFD & 1;                    \
-	UINT32 res = (UINT8)((ah >> 8) - value - c);                \
+	uint32_t ah = _AFD & 0xff00, c = _AFD & 1;                    \
+	uint32_t res = (uint8_t)((ah >> 8) - value - c);                \
 	_F = SZHVC_sub[(c<<16) | ah | res];                       \
 	_A = res;                                                 \
 }
@@ -396,7 +396,7 @@ UINT8 z180_device::DEC(UINT8 value)
  * NEG
  ***************************************************************/
 #define NEG {                                                   \
-	UINT8 value = _A;                                         \
+	uint8_t value = _A;                                         \
 	_A = 0;                                                   \
 	SUB(value);                                                 \
 }
@@ -405,7 +405,7 @@ UINT8 z180_device::DEC(UINT8 value)
  * DAA
  ***************************************************************/
 #define DAA {                                                   \
-	UINT8 r = _A;                                         \
+	uint8_t r = _A;                                         \
 	if (_F&NF) {                                          \
 		if ((_F&HF)|((_A&0xf)>9)) r-=6;                     \
 		if ((_F&CF)|(_A>0x99)) r-=0x60;                     \
@@ -444,8 +444,8 @@ UINT8 z180_device::DEC(UINT8 value)
  ***************************************************************/
 #define CP(value)                                               \
 {                                                               \
-	UINT32 ah = _AFD & 0xff00;                                    \
-	UINT32 res = (UINT8)((ah >> 8) - value);                    \
+	uint32_t ah = _AFD & 0xff00;                                    \
+	uint32_t res = (uint8_t)((ah >> 8) - value);                    \
 	_F = SZHVC_sub[ah | res];                                 \
 }
 
@@ -492,11 +492,11 @@ UINT8 z180_device::DEC(UINT8 value)
  ***************************************************************/
 #define ADD16(DR,SR)                                            \
 {                                                               \
-	UINT32 res = m_##DR.d + m_##SR.d;                       \
+	uint32_t res = m_##DR.d + m_##SR.d;                       \
 	_F = (_F & (SF | ZF | VF)) |                                \
 		(((m_##DR.d ^ res ^ m_##SR.d) >> 8) & HF) |         \
 		((res >> 16) & CF);                                     \
-	m_##DR.w.l = (UINT16)res;                                 \
+	m_##DR.w.l = (uint16_t)res;                                 \
 }
 
 /***************************************************************
@@ -504,13 +504,13 @@ UINT8 z180_device::DEC(UINT8 value)
  ***************************************************************/
 #define ADC16(DR)                                               \
 {                                                               \
-	UINT32 res = _HLD + m_##DR.d + (_F & CF);                 \
+	uint32_t res = _HLD + m_##DR.d + (_F & CF);                 \
 	_F = (((_HLD ^ res ^ m_##DR.d) >> 8) & HF) |              \
 		((res >> 16) & CF) |                                    \
 		((res >> 8) & SF) |                                     \
 		((res & 0xffff) ? 0 : ZF) |                             \
 		(((m_##DR.d ^ _HLD ^ 0x8000) & (m_##DR.d ^ res) & 0x8000) >> 13); \
-	_HL = (UINT16)res;                                            \
+	_HL = (uint16_t)res;                                            \
 }
 
 /***************************************************************
@@ -518,19 +518,19 @@ UINT8 z180_device::DEC(UINT8 value)
  ***************************************************************/
 #define SBC16(DR)                                               \
 {                                                               \
-	UINT32 res = _HLD - m_##DR.d - (_F & CF);                 \
+	uint32_t res = _HLD - m_##DR.d - (_F & CF);                 \
 	_F = (((_HLD ^ res ^ m_##DR.d) >> 8) & HF) | NF |         \
 		((res >> 16) & CF) |                                    \
 		((res >> 8) & SF) |                                     \
 		((res & 0xffff) ? 0 : ZF) |                             \
 		(((m_##DR.d ^ _HLD) & (_HLD ^ res) &0x8000) >> 13);   \
-	_HL = (UINT16)res;                                            \
+	_HL = (uint16_t)res;                                            \
 }
 
 /***************************************************************
  * RLC  r8
  ***************************************************************/
-UINT8 z180_device::RLC(UINT8 value)
+uint8_t z180_device::RLC(uint8_t value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
@@ -542,7 +542,7 @@ UINT8 z180_device::RLC(UINT8 value)
 /***************************************************************
  * RRC  r8
  ***************************************************************/
-UINT8 z180_device::RRC(UINT8 value)
+uint8_t z180_device::RRC(uint8_t value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
@@ -554,7 +554,7 @@ UINT8 z180_device::RRC(UINT8 value)
 /***************************************************************
  * RL   r8
  ***************************************************************/
-UINT8 z180_device::RL(UINT8 value)
+uint8_t z180_device::RL(uint8_t value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
@@ -566,7 +566,7 @@ UINT8 z180_device::RL(UINT8 value)
 /***************************************************************
  * RR   r8
  ***************************************************************/
-UINT8 z180_device::RR(UINT8 value)
+uint8_t z180_device::RR(uint8_t value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
@@ -578,7 +578,7 @@ UINT8 z180_device::RR(UINT8 value)
 /***************************************************************
  * SLA  r8
  ***************************************************************/
-UINT8 z180_device::SLA(UINT8 value)
+uint8_t z180_device::SLA(uint8_t value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
@@ -590,7 +590,7 @@ UINT8 z180_device::SLA(UINT8 value)
 /***************************************************************
  * SRA  r8
  ***************************************************************/
-UINT8 z180_device::SRA(UINT8 value)
+uint8_t z180_device::SRA(uint8_t value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
@@ -602,7 +602,7 @@ UINT8 z180_device::SRA(UINT8 value)
 /***************************************************************
  * SLL  r8
  ***************************************************************/
-UINT8 z180_device::SLL(UINT8 value)
+uint8_t z180_device::SLL(uint8_t value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
@@ -614,7 +614,7 @@ UINT8 z180_device::SLL(UINT8 value)
 /***************************************************************
  * SRL  r8
  ***************************************************************/
-UINT8 z180_device::SRL(UINT8 value)
+uint8_t z180_device::SRL(uint8_t value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
@@ -639,7 +639,7 @@ UINT8 z180_device::SRL(UINT8 value)
 /***************************************************************
  * RES  bit,r8
  ***************************************************************/
-UINT8 z180_device::RES(UINT8 bit, UINT8 value)
+uint8_t z180_device::RES(uint8_t bit, uint8_t value)
 {
 	return value & ~(1<<bit);
 }
@@ -647,7 +647,7 @@ UINT8 z180_device::RES(UINT8 bit, UINT8 value)
 /***************************************************************
  * SET  bit,r8
  ***************************************************************/
-UINT8 z180_device::SET(UINT8 bit, UINT8 value)
+uint8_t z180_device::SET(uint8_t bit, uint8_t value)
 {
 	return value | (1<<bit);
 }
@@ -656,7 +656,7 @@ UINT8 z180_device::SET(UINT8 bit, UINT8 value)
  * LDI
  ***************************************************************/
 #define LDI {                                                   \
-	UINT8 io = RM(_HL);                                         \
+	uint8_t io = RM(_HL);                                         \
 	WM( _DE, io );                                              \
 	_F &= SF | ZF | CF;                                       \
 	if( (_A + io) & 0x02 ) _F |= YF; /* bit 1 -> flag 5 */      \
@@ -669,8 +669,8 @@ UINT8 z180_device::SET(UINT8 bit, UINT8 value)
  * CPI
  ***************************************************************/
 #define CPI {                                                   \
-	UINT8 val = RM(_HL);                                        \
-	UINT8 res = _A - val;                                     \
+	uint8_t val = RM(_HL);                                        \
+	uint8_t res = _A - val;                                     \
 	_HL++; _BC--;                                               \
 	_F = (_F & CF) | (SZ[res] & ~(YF|XF)) | ((_A ^ val ^ res) & HF) | NF;  \
 	if( _F & HF ) res -= 1;                                   \
@@ -683,7 +683,7 @@ UINT8 z180_device::SET(UINT8 bit, UINT8 value)
  * INI
  ***************************************************************/
 #define INI {                                                   \
-	UINT8 io = IN(_BC);                                         \
+	uint8_t io = IN(_BC);                                         \
 	_B--;                                                     \
 	WM( _HL, io );                                              \
 	_HL++;                                                        \
@@ -701,7 +701,7 @@ UINT8 z180_device::SET(UINT8 bit, UINT8 value)
  * OUTI
  ***************************************************************/
 #define OUTI {                                                  \
-	UINT8 io = RM(_HL);                                         \
+	uint8_t io = RM(_HL);                                         \
 	_B--;                                                     \
 	OUT( _BC, io );                                             \
 	_HL++;                                                        \
@@ -719,7 +719,7 @@ UINT8 z180_device::SET(UINT8 bit, UINT8 value)
  * LDD
  ***************************************************************/
 #define LDD {                                                   \
-	UINT8 io = RM(_HL);                                         \
+	uint8_t io = RM(_HL);                                         \
 	WM( _DE, io );                                              \
 	_F &= SF | ZF | CF;                                       \
 	if( (_A + io) & 0x02 ) _F |= YF; /* bit 1 -> flag 5 */      \
@@ -732,8 +732,8 @@ UINT8 z180_device::SET(UINT8 bit, UINT8 value)
  * CPD
  ***************************************************************/
 #define CPD {                                                   \
-	UINT8 val = RM(_HL);                                        \
-	UINT8 res = _A - val;                                     \
+	uint8_t val = RM(_HL);                                        \
+	uint8_t res = _A - val;                                     \
 	_HL--; _BC--;                                               \
 	_F = (_F & CF) | (SZ[res] & ~(YF|XF)) | ((_A ^ val ^ res) & HF) | NF;  \
 	if( _F & HF ) res -= 1;                                   \
@@ -746,7 +746,7 @@ UINT8 z180_device::SET(UINT8 bit, UINT8 value)
  * IND
  ***************************************************************/
 #define IND {                                                   \
-	UINT8 io = IN(_BC);                                         \
+	uint8_t io = IN(_BC);                                         \
 	_B--;                                                     \
 	WM( _HL, io );                                              \
 	_HL--;                                                        \
@@ -764,7 +764,7 @@ UINT8 z180_device::SET(UINT8 bit, UINT8 value)
  * OUTD
  ***************************************************************/
 #define OUTD {                                                  \
-	UINT8 io = RM(_HL);                                         \
+	uint8_t io = RM(_HL);                                         \
 	_B--;                                                     \
 	OUT( _BC, io );                                             \
 	_HL--;                                                        \

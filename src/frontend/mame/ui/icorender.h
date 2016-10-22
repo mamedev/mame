@@ -19,45 +19,45 @@
 // in an ICO file.
 typedef struct
 {
-	UINT8   bWidth;                // Width of the image
-	UINT8   bHeight;               // Height of the image (times 2)
-	UINT8   bColorCount;           // Number of colors in image (0 if >=8bpp)
-	UINT8   bReserved;             // Reserved
-	UINT16  wPlanes;               // Color Planes
-	UINT16  wBitCount;             // Bits per pixel
-	UINT32  dwBytesInRes;          // how many bytes in this resource?
-	UINT32  dwImageOffset;         // where in the file is this image
+	uint8_t   bWidth;                // Width of the image
+	uint8_t   bHeight;               // Height of the image (times 2)
+	uint8_t   bColorCount;           // Number of colors in image (0 if >=8bpp)
+	uint8_t   bReserved;             // Reserved
+	uint16_t  wPlanes;               // Color Planes
+	uint16_t  wBitCount;             // Bits per pixel
+	uint32_t  dwBytesInRes;          // how many bytes in this resource?
+	uint32_t  dwImageOffset;         // where in the file is this image
 } ICONDIRENTRY, *LPICONDIRENTRY;
 
 typedef struct
 {
-	UINT16  idReserved;            // Reserved
-	UINT16  idType;                // resource type (1 for icons)
-	UINT16  idCount;               // how many images?
+	uint16_t  idReserved;            // Reserved
+	uint16_t  idType;                // resource type (1 for icons)
+	uint16_t  idCount;               // how many images?
 	//ICONDIRENTRY  idEntries[1];  // the entries for each image
 } ICONDIR, *LPICONDIR;
 
 // size - 40 bytes
 typedef struct {
-	UINT32  biSize;
-	UINT32  biWidth;
-	UINT32  biHeight;   // Icon Height (added height of XOR-Bitmap and AND-Bitmap)
-	UINT16  biPlanes;
-	UINT16  biBitCount;
-	UINT32  biCompression;
-	INT32   biSizeImage;
-	UINT32  biXPelsPerMeter;
-	UINT32  biYPelsPerMeter;
-	UINT32  biClrUsed;
-	UINT32  biClrImportant;
+	uint32_t  biSize;
+	uint32_t  biWidth;
+	uint32_t  biHeight;   // Icon Height (added height of XOR-Bitmap and AND-Bitmap)
+	uint16_t  biPlanes;
+	uint16_t  biBitCount;
+	uint32_t  biCompression;
+	int32_t   biSizeImage;
+	uint32_t  biXPelsPerMeter;
+	uint32_t  biYPelsPerMeter;
+	uint32_t  biClrUsed;
+	uint32_t  biClrImportant;
 } s_BITMAPINFOHEADER, *s_PBITMAPINFOHEADER;
 
 // 46 bytes
 typedef struct{
 	s_BITMAPINFOHEADER  icHeader;       // DIB header
-	UINT32              icColors[1];    // Color table (short 4 bytes) //RGBQUAD
-	UINT8               icXOR[1];       // DIB bits for XOR mask
-	UINT8               icAND[1];       // DIB bits for AND mask
+	uint32_t              icColors[1];    // Color table (short 4 bytes) //RGBQUAD
+	uint8_t               icXOR[1];       // DIB bits for XOR mask
+	uint8_t               icAND[1];       // DIB bits for AND mask
 } ICONIMAGE, *LPICONIMAGE;
 
 //-------------------------------------------------
@@ -66,8 +66,8 @@ typedef struct{
 
 inline void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename)
 {
-	INT32 width = 0;
-	INT32 height = 0;
+	int32_t width = 0;
+	int32_t height = 0;
 
 	// deallocate previous bitmap
 	bitmap.reset();
@@ -86,8 +86,8 @@ inline void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *d
 		return;
 
 	// allocates a buffer for the image
-	UINT64 size = file.size();
-	UINT8 *buffer = global_alloc_array(UINT8, size + 1);
+	uint64_t size = file.size();
+	uint8_t *buffer = global_alloc_array(uint8_t, size + 1);
 
 	// read data from the file and set them in the buffer
 	file.read(buffer, size);
@@ -102,7 +102,7 @@ inline void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *d
 		return;
 	}
 
-	UINT8* cursor = buffer;
+	uint8_t* cursor = buffer;
 	cursor += 6;
 	ICONDIRENTRY* dirEntry = (ICONDIRENTRY*)(cursor);
 	int maxSize = 0;
@@ -153,7 +153,7 @@ inline void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *d
 	else if (realBitsCount == 8)  // 256 colors
 	{
 		// 256 color table
-		UINT8 *colors = cursor;
+		uint8_t *colors = cursor;
 		cursor += 256 * 4;
 		for (int x = 0; x < width; ++x)
 			for (int y = 0; y < height; ++y)
@@ -166,13 +166,13 @@ inline void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *d
 	else if (realBitsCount == 4)  // 16 colors
 	{
 		// 16 color table
-		UINT8 *colors = cursor;
+		uint8_t *colors = cursor;
 		cursor += 16 * 4;
 		for (int x = 0; x < width; ++x)
 			for (int y = 0; y < height; ++y)
 			{
 				int shift2 = (x + (height - y - 1) * width);
-				UINT8 index = cursor[shift2 / 2];
+				uint8_t index = cursor[shift2 / 2];
 				if (shift2 % 2 == 0)
 					index = (index >> 4) & 0xF;
 				else
@@ -184,7 +184,7 @@ inline void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *d
 	else if (realBitsCount == 1)  // 2 colors
 	{
 		// 2 color table
-		UINT8 *colors = cursor;
+		uint8_t *colors = cursor;
 		cursor += 2 * 4;
 		int boundary = width; // !!! 32 bit boundary (http://www.daubnet.com/en/file-format-ico)
 		while (boundary % 32 != 0) boundary++;
@@ -193,10 +193,10 @@ inline void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *d
 			for (int y = 0; y < height; ++y)
 			{
 				int shift2 = (x + (height - y - 1) * boundary);
-				UINT8 index = cursor[shift2 / 8];
+				uint8_t index = cursor[shift2 / 8];
 
 				// select 1 bit only
-				UINT8 bit = 7 - (x % 8);
+				uint8_t bit = 7 - (x % 8);
 				index = (index >> bit) & 0x01;
 				index *= 4;
 				bitmap.pix32(y, x) = rgb_t(255, colors[index + 2], colors[index + 1], colors[index]);
@@ -216,11 +216,11 @@ inline void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *d
 		for (int y = 0; y < height; ++y)
 			for (int x = 0; x < width; ++x)
 			{
-				UINT8 bit = 7 - (x % 8);
+				uint8_t bit = 7 - (x % 8);
 				int shift2 = (x + (height - y - 1) * boundary) / 8;
-				int mask = (0x01 & ((UINT8)cursor[shift2] >> bit));
+				int mask = (0x01 & ((uint8_t)cursor[shift2] >> bit));
 				rgb_t colors = bitmap.pix32(y, x);
-				UINT8 alpha = colors.a();
+				uint8_t alpha = colors.a();
 				alpha *= 1 - mask;
 				colors.set_a(alpha);
 				bitmap.pix32(y, x) = colors;

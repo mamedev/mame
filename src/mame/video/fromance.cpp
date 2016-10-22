@@ -58,11 +58,11 @@ TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_fg_tile_info){ get_nekkyoku_ti
 void fromance_state::init_common(  )
 {
 	/* allocate local videoram */
-	m_local_videoram[0] = std::make_unique<UINT8[]>(0x1000 * 3);
-	m_local_videoram[1] = std::make_unique<UINT8[]>(0x1000 * 3);
+	m_local_videoram[0] = std::make_unique<uint8_t[]>(0x1000 * 3);
+	m_local_videoram[1] = std::make_unique<uint8_t[]>(0x1000 * 3);
 
 	/* allocate local palette RAM */
-	m_local_paletteram = std::make_unique<UINT8[]>(0x800 * 2);
+	m_local_paletteram = std::make_unique<uint8_t[]>(0x800 * 2);
 
 	/* configure tilemaps */
 	m_fg_tilemap->set_transparent_pen(15);
@@ -284,7 +284,7 @@ WRITE8_MEMBER(fromance_state::fromance_crtc_register_w)
  *
  *************************************/
 
-UINT32 fromance_state::screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fromance_state::screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollx[0]);
 	m_bg_tilemap->set_scrolly(0, m_scrolly[0]);
@@ -297,9 +297,9 @@ UINT32 fromance_state::screen_update_fromance(screen_device &screen, bitmap_ind1
 }
 
 
-UINT32 fromance_state::screen_update_pipedrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fromance_state::screen_update_pipedrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8* sram = m_spriteram;
+	uint8_t* sram = m_spriteram;
 
 	/* there seems to be no logical mapping for the X scroll register -- maybe it's gone */
 	m_bg_tilemap->set_scrolly(0, m_scrolly[1]);
@@ -308,7 +308,7 @@ UINT32 fromance_state::screen_update_pipedrm(screen_device &screen, bitmap_ind16
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_spr_old->turbofrc_draw_sprites((UINT16*)sram, m_spriteram.bytes(), 0, bitmap, cliprect, screen.priority(), 0);
-	m_spr_old->turbofrc_draw_sprites((UINT16*)sram, m_spriteram.bytes(), 0, bitmap, cliprect, screen.priority(), 1);
+	m_spr_old->turbofrc_draw_sprites((uint16_t*)sram, m_spriteram.bytes(), 0, bitmap, cliprect, screen.priority(), 0);
+	m_spr_old->turbofrc_draw_sprites((uint16_t*)sram, m_spriteram.bytes(), 0, bitmap, cliprect, screen.priority(), 1);
 	return 0;
 }

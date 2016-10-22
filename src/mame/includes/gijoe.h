@@ -31,8 +31,8 @@ public:
 		m_soundlatch2(*this, "soundlatch2") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_workram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_workram;
 
 	/* video-related */
 	int         m_avac_bits[4];
@@ -43,7 +43,7 @@ public:
 	int         m_sprite_colorbase;
 
 	/* misc */
-	UINT16      m_cur_control2;
+	uint16_t      m_cur_control2;
 	emu_timer   *m_dmadelay_timer;
 
 	/* devices */
@@ -65,7 +65,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gijoe_interrupt);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	void gijoe_objdma();

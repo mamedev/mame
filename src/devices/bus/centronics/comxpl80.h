@@ -28,7 +28,7 @@ class comx_pl80_device :  public device_t,
 {
 public:
 	// construction/destruction
-	comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -61,15 +61,15 @@ private:
 	required_ioport m_sw;
 
 	// PL-80 plotter state
-	UINT16 m_font_addr;         // font ROM pack address latch
-	UINT8 m_x_motor_phase;      // X motor phase
-	UINT8 m_y_motor_phase;      // Y motor phase
-	UINT8 m_z_motor_phase;      // Z motor phase
-	UINT8 m_plotter_data;       // plotter data bus
+	uint16_t m_font_addr;         // font ROM pack address latch
+	uint8_t m_x_motor_phase;      // X motor phase
+	uint8_t m_y_motor_phase;      // Y motor phase
+	uint8_t m_z_motor_phase;      // Z motor phase
+	uint8_t m_plotter_data;       // plotter data bus
 	int m_plotter_ack;          // plotter acknowledge
 	int m_plotter_online;       // online LED
 
-	UINT8 m_data;
+	uint8_t m_data;
 };
 
 

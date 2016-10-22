@@ -58,7 +58,7 @@ class okim6295_device : public device_t,
 {
 public:
 	// construction/destruction
-	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
 	static void static_set_pin7(device_t &device, int pin7);
@@ -66,8 +66,8 @@ public:
 	// runtime configuration
 	void set_pin7(int pin7);
 
-	UINT8 read_status();
-	void write_command(UINT8 command);
+	uint8_t read_status();
+	void write_command(uint8_t command);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -95,9 +95,9 @@ protected:
 		oki_adpcm_state m_adpcm;        // current ADPCM state
 		bool            m_playing;
 		offs_t          m_base_offset;  // pointer to the base memory location
-		UINT32          m_sample;       // current sample number
-		UINT32          m_count;        // total samples to play
-		INT8            m_volume;       // output volume
+		uint32_t          m_sample;       // current sample number
+		uint32_t          m_count;        // total samples to play
+		int8_t            m_volume;       // output volume
 	};
 
 	// configuration state
@@ -107,11 +107,11 @@ protected:
 	static const int OKIM6295_VOICES = 4;
 
 	okim_voice          m_voice[OKIM6295_VOICES];
-	INT32               m_command;
+	int32_t               m_command;
 	sound_stream *      m_stream;
-	UINT8               m_pin7_state;
+	uint8_t               m_pin7_state;
 
-	static const UINT8 s_volume_table[16];
+	static const uint8_t s_volume_table[16];
 };
 
 

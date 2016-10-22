@@ -79,7 +79,7 @@ class pdp1_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_reset_param(device_t &device, const pdp1_reset_param_t *param) { downcast<pdp1_device &>(device).m_reset_param = param; }
 
@@ -97,9 +97,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 5; }
-	virtual UINT32 execute_max_cycles() const override { return 31; }
-	virtual UINT32 execute_input_lines() const override { return 16; }
+	virtual uint32_t execute_min_cycles() const override { return 5; }
+	virtual uint32_t execute_max_cycles() const override { return 31; }
+	virtual uint32_t execute_input_lines() const override { return 16; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -112,15 +112,15 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
 
 	/* processor registers */
-	UINT32 m_pc;      /* program counter (12, 15 or 16 bits) */
+	uint32_t m_pc;      /* program counter (12, 15 or 16 bits) */
 	int m_ir;         /* basic operation code of current instruction (5 bits) */
 	int m_mb;         /* memory buffer (used for holding the current instruction only) (18 bits) */
 	int m_ma;         /* memory address (12, 15 or 16 bits) */
@@ -153,11 +153,11 @@ private:
 	unsigned int m_ios;       /* i-o synchronizer: set on i-o operation completion */
 
 	/* sequence break system */
-	UINT16 m_irq_state;    /* mirrors the state of the interrupt pins */
-	UINT16 m_b1;           /* interrupt enable */
-	UINT16 m_b2;           /* interrupt pulse request pending - asynchronous with computer operation (set by pulses on irq_state, cleared when interrupt is taken) */
-	/*UINT16 m_b3;*/           /* interrupt request pending - synchronous with computer operation (logical or of irq_state and b2???) */
-	UINT16 m_b4;           /* interrupt in progress */
+	uint16_t m_irq_state;    /* mirrors the state of the interrupt pins */
+	uint16_t m_b1;           /* interrupt enable */
+	uint16_t m_b2;           /* interrupt pulse request pending - asynchronous with computer operation (set by pulses on irq_state, cleared when interrupt is taken) */
+	/*uint16_t m_b3;*/           /* interrupt request pending - synchronous with computer operation (logical or of irq_state and b2???) */
+	uint16_t m_b4;           /* interrupt in progress */
 
 	/* additional emulator state variables */
 	int m_rim_step;           /* current step in rim execution */
@@ -187,7 +187,7 @@ private:
 
 	address_space *m_program;
 	int m_icount;
-	UINT32 m_debugger_temp;
+	uint32_t m_debugger_temp;
 
 	void field_interrupt();
 	void execute_instruction();

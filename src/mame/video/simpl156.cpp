@@ -12,9 +12,9 @@
 void simpl156_state::video_start()
 {
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
-	m_pf1_rowscroll = make_unique_clear<UINT16[]>(0x800/2);
-	m_pf2_rowscroll = make_unique_clear<UINT16[]>(0x800/2);
-	m_spriteram = make_unique_clear<UINT16[]>(0x2000/2);
+	m_pf1_rowscroll = make_unique_clear<uint16_t[]>(0x800/2);
+	m_pf2_rowscroll = make_unique_clear<uint16_t[]>(0x800/2);
+	m_spriteram = make_unique_clear<uint16_t[]>(0x2000/2);
 
 	memset(m_spriteram.get(), 0xff, 0x2000);
 
@@ -24,7 +24,7 @@ void simpl156_state::video_start()
 	save_pointer(NAME(m_spriteram.get()), 0x2000/2);
 }
 
-UINT32 simpl156_state::screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t simpl156_state::screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0);
 

@@ -46,13 +46,13 @@ protected:
 	required_device<beta_disk_device> m_beta;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
-	UINT8 *m_p_ram;
+	uint8_t *m_p_ram;
 	void pentagon_update_memory();
 };
 
 DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
 {
-	UINT16 pc = m_maincpu->pcbase();
+	uint16_t pc = m_maincpu->pcbase();
 
 	if (m_beta->started() && m_beta->is_active() && (pc >= 0x4000))
 	{
@@ -91,7 +91,7 @@ DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
 
 void pentagon_state::pentagon_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
@@ -141,7 +141,7 @@ WRITE8_MEMBER(pentagon_state::pentagon_scr_w)
 {
 	spectrum_UpdateScreenBitmap();
 
-	*((UINT8*)m_bank2->base() + offset) = data;
+	*((uint8_t*)m_bank2->base() + offset) = data;
 }
 
 WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
@@ -149,7 +149,7 @@ WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
 	if ((m_port_7ffd_data & 0x0f) == 0x0f || (m_port_7ffd_data & 0x0f) == 5)
 		spectrum_UpdateScreenBitmap();
 
-	*((UINT8*)m_bank4->base() + offset) = data;
+	*((uint8_t*)m_bank4->base() + offset) = data;
 }
 
 void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -163,7 +163,7 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		irq_off(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pentagon_state::device_timer");
+		assert_always(false, "Unknown id in pentagon_state::device_timer");
 	}
 }
 
@@ -197,7 +197,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 

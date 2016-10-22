@@ -24,27 +24,27 @@ public:
 			m_rle(*this, "rle")
 			{ }
 
-	UINT16          m_playfield_base;
+	uint16_t          m_playfield_base;
 
 	required_device<atari_jsa_iiis_device> m_jsa;
 	required_device<atari_xga_device> m_xga;
 
-	required_shared_ptr<UINT32> m_mo_command;
+	required_shared_ptr<uint32_t> m_mo_command;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_rle_objects_device> m_rle;
 
-	UINT16          m_current_control;
-	UINT8           m_playfield_tile_bank;
-	UINT8           m_playfield_color_bank;
-	UINT16          m_playfield_xscroll;
-	UINT16          m_playfield_yscroll;
+	uint16_t          m_current_control;
+	uint8_t           m_playfield_tile_bank;
+	uint8_t           m_playfield_color_bank;
+	uint16_t          m_playfield_xscroll;
+	uint16_t          m_playfield_yscroll;
 
 	// LEGACY PROTECTION
-	UINT16          m_last_write;
-	UINT16          m_last_write_offset;
-	UINT32          m_protection_ram[0x1000];
+	uint16_t          m_last_write;
+	uint16_t          m_last_write_offset;
+	uint32_t          m_protection_ram[0x1000];
 
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
@@ -65,6 +65,6 @@ public:
 	DECLARE_MACHINE_START(atarigx2);
 	DECLARE_MACHINE_RESET(atarigx2);
 	DECLARE_VIDEO_START(atarigx2);
-	UINT32 screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( atarigx2_mo_control_w );
 };

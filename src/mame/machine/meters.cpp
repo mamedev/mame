@@ -17,7 +17,7 @@
 
 const device_type METERS = &device_creator<meters_device>;
 
-meters_device::meters_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+meters_device::meters_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, METERS, "Electro mechanical meters", tag, owner, clock, "meters", __FILE__),
 	m_number_mtr(0)
 {
@@ -42,7 +42,7 @@ void meters_device::device_start()
 		m_meter_info[i].meter_timer = timer_alloc(i);
 		m_meter_info[i].meter_timer->reset();
 
-		//save_item(NAME(m_meter_info[i].reacttime), i); //enable if void ReactTime(int id, INT32 cycles) gets used
+		//save_item(NAME(m_meter_info[i].reacttime), i); //enable if void ReactTime(int id, int32_t cycles) gets used
 		save_item(NAME(m_meter_info[i].state), i);
 		save_item(NAME(m_meter_info[i].count), i);
 		save_item(NAME(m_meter_info[i].on), i);
@@ -64,7 +64,7 @@ void meters_device::device_reset()
 void meters_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id >= m_number_mtr)
-			assert_always(FALSE, "Unknown id in meters_device::device_timer");
+			assert_always(false, "Unknown id in meters_device::device_timer");
 
 	m_meter_info[param].count++;
 }
@@ -79,7 +79,7 @@ int meters_device::GetNumberMeters(void)  // currently unused
 
 ///////////////////////////////////////////////////////////////////////////
 
-void meters_device::Setcount(int id, INT32 count) // currently unused
+void meters_device::Setcount(int id, int32_t count) // currently unused
 {
 	if ( id >= m_number_mtr )
 		return;
@@ -89,9 +89,9 @@ void meters_device::Setcount(int id, INT32 count) // currently unused
 
 ///////////////////////////////////////////////////////////////////////////
 
-INT32 meters_device::Getcount(int id) // currently unused
+int32_t meters_device::Getcount(int id) // currently unused
 {
-	INT32 result = 0;
+	int32_t result = 0;
 
 	if ( id < m_number_mtr )
 		result = m_meter_info[id].count;
@@ -101,7 +101,7 @@ INT32 meters_device::Getcount(int id) // currently unused
 
 ///////////////////////////////////////////////////////////////////////////
 
-void meters_device::ReactTime(int id, INT32 cycles) // currently unused
+void meters_device::ReactTime(int id, int32_t cycles) // currently unused
 {
 	if ( id >= m_number_mtr )
 		return;

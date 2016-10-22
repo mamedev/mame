@@ -7,7 +7,7 @@ const device_type H8_INTC  = &device_creator<h8_intc_device>;
 const device_type H8H_INTC = &device_creator<h8h_intc_device>;
 const device_type H8S_INTC = &device_creator<h8s_intc_device>;
 
-h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_INTC, "H8 INTC", tag, owner, clock, "h8_intc", __FILE__),
 	cpu(*this, DEVICE_SELF_OWNER), nmi_input(false), irq_input(0), ier(0), isr(0), iscr(0), icr_filter(0), ipr_filter(0)
 {
@@ -15,7 +15,7 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, d
 	irq_vector_nmi = 3;
 }
 
-h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source), irq_vector_base(0), irq_vector_nmi(0),
 	cpu(*this, DEVICE_SELF_OWNER), nmi_input(false), irq_input(0), ier(0), isr(0), iscr(0), icr_filter(0), ipr_filter(0)
 {
@@ -193,14 +193,14 @@ void h8_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 }
 
 
-h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_intc_device(mconfig, H8H_INTC, "H8H INTC", tag, owner, clock, "h8h_intc", __FILE__)
 {
 	irq_vector_base = 12;
 	irq_vector_nmi = 7;
 }
 
-h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	h8_intc_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -319,7 +319,7 @@ void h8h_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 	icr_pri = (icr >> (slot ^ 7)) & 1;
 }
 
-h8s_intc_device::h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s_intc_device::h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8h_intc_device(mconfig, H8S_INTC, "H8S INTC", tag, owner, clock, "h8s_intc", __FILE__)
 {
 	irq_vector_base = 16;

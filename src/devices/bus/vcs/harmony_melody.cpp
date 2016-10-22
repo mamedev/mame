@@ -66,7 +66,7 @@ map:
 const device_type A26_ROM_HARMONY = &device_creator<a26_rom_harmony_device>;
 
 
-a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 						: a26_rom_f8_device(mconfig, A26_ROM_HARMONY, "Atari 2600 ROM Cart HARMONY/MELODY", tag, owner, clock, "a2600_harmony", __FILE__),
 						m_cpu(*this, "arm")
 {
@@ -132,7 +132,7 @@ void a26_rom_harmony_device::check_bankswitch(offs_t offset)
 
 READ8_MEMBER(a26_rom_harmony_device::read_rom)
 {
-	UINT8 retvalue = read8_r(space, offset + 0xc00); // banks start at 0xc00
+	uint8_t retvalue = read8_r(space, offset + 0xc00); // banks start at 0xc00
 
 	check_bankswitch(offset);
 

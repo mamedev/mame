@@ -33,7 +33,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
 	tilemap_t* m_bg_tilemap;
@@ -52,7 +52,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cball);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -61,7 +61,7 @@ protected:
 
 TILE_GET_INFO_MEMBER(cball_state::get_tile_info)
 {
-	UINT8 code = m_video_ram[tile_index];
+	uint8_t code = m_video_ram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code, code >> 7, 0);
 }
@@ -80,7 +80,7 @@ void cball_state::video_start()
 }
 
 
-UINT32 cball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* draw playfield */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -104,7 +104,7 @@ void cball_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in cball_state::device_timer");
+		assert_always(false, "Unknown id in cball_state::device_timer");
 	}
 }
 

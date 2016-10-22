@@ -40,7 +40,7 @@ const device_type MOS8726 = &device_creator<mos8726_device>;
 //  mos8726_device - constructor
 //-------------------------------------------------
 
-mos8726_device::mos8726_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos8726_device::mos8726_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MOS8726, "MOS8726", tag, owner, clock, "mos8726", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -90,7 +90,7 @@ void mos8726_device::execute_run()
 
 READ8_MEMBER( mos8726_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	return data;
 }

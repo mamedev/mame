@@ -32,7 +32,7 @@ HgKairak: 86010000 1f201918 a0000000 Large Screen
 
 
 /* --- SPRITES --- */
-void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 scr)
+void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr)
 {
 	/*- Sprite Format 0x0000 - 0x2bff -**
 
@@ -54,15 +54,15 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	**- End Sprite Format -*/
 
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT32 *source = m_spriteram;
-	UINT16 *list = (UINT16 *)m_spriteram.target() + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
-	UINT16 listlen = (0xc00/2 - 0x04/2), listcntr = 0;
+	uint32_t *source = m_spriteram;
+	uint16_t *list = (uint16_t *)m_spriteram.target() + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
+	uint16_t listlen = (0xc00/2 - 0x04/2), listcntr = 0;
 	bool flipscreen = BIT(m_vidregs[1], (scr == 0 ? 31 : 23));
 	int screen_height = (scr == 0 ? m_lscreen : m_rscreen)->visible_area().max_y + 1;
 
 	while (listcntr < listlen)
 	{
-		UINT16 listdat, sprnum;
+		uint16_t listdat, sprnum;
 
 		listdat = list[BYTE_XOR_BE(listcntr)];
 		sprnum = (listdat & 0x03ff) * 2;
@@ -71,7 +71,7 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		if ((listdat & 0x8000) == 0 && (listdat & 0x2000) == scr) /* draw only selected screen */
 		{
 			int loopnum = 0, i, j;
-			UINT32 xpos, ypos, tnum, wide, high, colr, flipx, flipy;
+			uint32_t xpos, ypos, tnum, wide, high, colr, flipx, flipy;
 			int xstart, ystart, xend, yend, xinc, yinc;
 
 			ypos = (source[sprnum + 0] & 0x03ff0000) >> 16;
@@ -121,7 +121,7 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 psikyo4_state::screen_update_psikyo4_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t psikyo4_state::screen_update_psikyo4_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x800, cliprect);
 	m_gfxdecode->gfx(0)->set_palette(*m_palette);
@@ -129,7 +129,7 @@ UINT32 psikyo4_state::screen_update_psikyo4_left(screen_device &screen, bitmap_i
 	return 0;
 }
 
-UINT32 psikyo4_state::screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t psikyo4_state::screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x800, cliprect);
 	m_gfxdecode->gfx(0)->set_palette(*m_palette2);

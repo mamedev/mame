@@ -2,7 +2,7 @@
 // copyright-holders:smf
 #include "legscsi.h"
 
-legacy_scsi_host_adapter::legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+legacy_scsi_host_adapter::legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_selected(0)
 	, m_scsi_port(*this, finder_base::DUMMY_TAG)
@@ -38,7 +38,7 @@ bool legacy_scsi_host_adapter::select(int id)
 	return false;
 }
 
-void legacy_scsi_host_adapter::send_command(UINT8 *data, int bytes)
+void legacy_scsi_host_adapter::send_command(uint8_t *data, int bytes)
 {
 	scsihle_device *scsidev = get_device(m_selected);
 	if (scsidev != nullptr)
@@ -84,7 +84,7 @@ int legacy_scsi_host_adapter::get_phase(void)
 	}
 }
 
-void legacy_scsi_host_adapter::read_data(UINT8 *data, int bytes)
+void legacy_scsi_host_adapter::read_data(uint8_t *data, int bytes)
 {
 	scsihle_device *scsidev = get_device(m_selected);
 	if (scsidev != nullptr)
@@ -97,7 +97,7 @@ void legacy_scsi_host_adapter::read_data(UINT8 *data, int bytes)
 	}
 }
 
-void legacy_scsi_host_adapter::write_data(UINT8 *data, int bytes)
+void legacy_scsi_host_adapter::write_data(uint8_t *data, int bytes)
 {
 	scsihle_device *scsidev = get_device(m_selected);
 	if (scsidev != nullptr)
@@ -110,7 +110,7 @@ void legacy_scsi_host_adapter::write_data(UINT8 *data, int bytes)
 	}
 }
 
-UINT8 legacy_scsi_host_adapter::get_status()
+uint8_t legacy_scsi_host_adapter::get_status()
 {
 	scsihle_device *scsidev = get_device(m_selected);
 	if (scsidev != nullptr)

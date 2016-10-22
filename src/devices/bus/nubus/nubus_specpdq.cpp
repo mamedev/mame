@@ -82,7 +82,7 @@ const tiny_rom_entry *nubus_specpdq_device::device_rom_region() const
 //  nubus_specpdq_device - constructor
 //-------------------------------------------------
 
-nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, NUBUS_SPECPDQ, "SuperMac Spectrum PDQ video card", tag, owner, clock, "nb_spdq", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr), m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
@@ -92,7 +92,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const 
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr), m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
@@ -108,7 +108,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device
 
 void nubus_specpdq_device::device_start()
 {
-	UINT32 slotspace;
+	uint32_t slotspace;
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
@@ -119,7 +119,7 @@ void nubus_specpdq_device::device_start()
 //  printf("[specpdq %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	m_vram32 = (UINT32 *)&m_vram[0];
+	m_vram32 = (uint32_t *)&m_vram[0];
 	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_specpdq_device::vram_r), this), write32_delegate(FUNC(nubus_specpdq_device::vram_w), this));
 	m_nubus->install_device(slotspace+0x400000, slotspace+0xfbffff, read32_delegate(FUNC(nubus_specpdq_device::specpdq_r), this), write32_delegate(FUNC(nubus_specpdq_device::specpdq_w), this));
 
@@ -161,11 +161,11 @@ void nubus_specpdq_device::device_timer(emu_timer &timer, device_timer_id tid, i
 
 ***************************************************************************/
 
-UINT32 nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels, *vram;
+	uint8_t pixels, *vram;
 
 	// first time?  kick off the VBL timer
 	vram = &m_vram[0x9000];
@@ -426,7 +426,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			if (data == 2)
 			{
 				int x, y;
-				UINT8 *vram = &m_vram[m_vram_addr + m_patofsx]; // m_vram_addr is missing the low 2 bits, we add them back here
+				uint8_t *vram = &m_vram[m_vram_addr + m_patofsx]; // m_vram_addr is missing the low 2 bits, we add them back here
 
 //              printf("Fill rectangle with %02x %02x %02x %02x, width %d height %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_width, m_height);
 
@@ -441,8 +441,8 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			else if ((data == 0x101) || (data == 0x100))
 			{
 				int x, y;
-				UINT8 *vram = &m_vram[m_vram_addr];
-				UINT8 *vramsrc = &m_vram[m_vram_src];
+				uint8_t *vram = &m_vram[m_vram_addr];
+				uint8_t *vramsrc = &m_vram[m_vram_src];
 
 //              printf("Copy rectangle, width %d height %d  src %x dst %x\n", m_width, m_height, m_vram_addr, m_vram_src);
 

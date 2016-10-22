@@ -43,8 +43,8 @@ class msm5205_device : public device_t,
 							public device_sound_interface
 {
 public:
-	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~msm5205_device() {}
 
 	static void set_prescaler_selector(device_t &device, int select) { downcast<msm5205_device &>(device).m_select = select; }
@@ -62,7 +62,7 @@ public:
 	void playmode_w(int select);
 
 	void set_volume(int volume);
-	void change_clock_w(INT32 clock);
+	void change_clock_w(int32_t clock);
 
 protected:
 	// device-level overrides
@@ -78,15 +78,15 @@ protected:
 
 	// internal state
 	sound_stream * m_stream;    /* number of stream system      */
-	INT32 m_mod_clock;          /* clock rate                   */
+	int32_t m_mod_clock;          /* clock rate                   */
 	emu_timer *m_timer;         /* VCLK callback timer          */
-	INT32 m_data;               /* next adpcm data              */
-	INT32 m_vclk;               /* vclk signal (external mode)  */
-	INT32 m_reset;              /* reset pin signal             */
-	INT32 m_prescaler;          /* prescaler selector S1 and S2 */
-	INT32 m_bitwidth;           /* bit width selector -3B/4B    */
-	INT32 m_signal;             /* current ADPCM signal         */
-	INT32 m_step;               /* current ADPCM step           */
+	int32_t m_data;               /* next adpcm data              */
+	int32_t m_vclk;               /* vclk signal (external mode)  */
+	int32_t m_reset;              /* reset pin signal             */
+	int32_t m_prescaler;          /* prescaler selector S1 and S2 */
+	int32_t m_bitwidth;           /* bit width selector -3B/4B    */
+	int32_t m_signal;             /* current ADPCM signal         */
+	int32_t m_step;               /* current ADPCM step           */
 	int m_diff_lookup[49*16];
 	int m_select;
 	devcb_write_line m_vclk_cb;
@@ -97,7 +97,7 @@ extern const device_type MSM5205;
 class msm6585_device : public msm5205_device
 {
 public:
-	msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;

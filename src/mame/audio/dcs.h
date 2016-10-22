@@ -23,7 +23,7 @@ class dcs_audio_device : public device_t
 {
 public:
 	// construction/destruction
-	dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int rev = 1);
+	dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int rev = 1);
 
 	// for dcs2 (int dram_in_mb, offs_t polling_offset)
 	static void static_set_dram_in_mb(device_t &device, int dram_in_mb) { downcast<dcs_audio_device &>(device).m_dram_in_mb = dram_in_mb; }
@@ -34,12 +34,12 @@ public:
 	void set_fifo_callbacks(read16_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w);
 	void set_io_callbacks(write_line_delegate output_full_cb, write_line_delegate input_empty_cb);
 
-	UINT16 data_r();
+	uint16_t data_r();
 	void ack_w();
 	int data2_r();
 	int control_r();
 
-	void data_w(UINT16 data);
+	void data_w(uint16_t data);
 	void reset_w(int state);
 
 	void fifo_notify(int count, int max);
@@ -71,7 +71,7 @@ public:
 	DECLARE_WRITE16_MEMBER( denver_w );
 	DECLARE_READ16_MEMBER( latch_status_r );
 	DECLARE_READ16_MEMBER( fifo_input_r );
-	void dcs_delayed_data_w(UINT16 data);
+	void dcs_delayed_data_w(uint16_t data);
 	TIMER_CALLBACK_MEMBER( dcs_delayed_data_w_callback );
 	DECLARE_WRITE16_MEMBER( input_latch_ack_w );
 	DECLARE_READ16_MEMBER( input_latch_r );
@@ -99,10 +99,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( transfer_watchdog_callback );
 	TIMER_CALLBACK_MEMBER( s1_ack_callback2 );
 	TIMER_CALLBACK_MEMBER( s1_ack_callback1 );
-	int preprocess_stage_1(UINT16 data);
+	int preprocess_stage_1(uint16_t data);
 	TIMER_CALLBACK_MEMBER( s2_ack_callback );
-	int preprocess_stage_2(UINT16 data);
-	int preprocess_write(UINT16 data);
+	int preprocess_stage_2(uint16_t data);
+	int preprocess_write(uint16_t data);
 
 protected:
 	// device-level overrides
@@ -112,76 +112,76 @@ protected:
 protected:
 	struct sdrc_state
 	{
-		UINT16      reg[4];
-		UINT8       seed;
+		uint16_t      reg[4];
+		uint8_t       seed;
 	};
 
 
 	struct dsio_state
 	{
-		UINT16      reg[4];
-		UINT8       start_on_next_write;
-		UINT16      channelbits;
+		uint16_t      reg[4];
+		uint8_t       start_on_next_write;
+		uint16_t      channelbits;
 	};
 
 
 	struct hle_transfer_state
 	{
-		UINT8       hle_enabled;
-		INT32       dcs_state;
-		INT32       state;
-		INT32       start;
-		INT32       stop;
-		INT32       type;
-		INT32       temp;
-		INT32       writes_left;
-		UINT16      sum;
-		INT32       fifo_entries;
+		uint8_t       hle_enabled;
+		int32_t       dcs_state;
+		int32_t       state;
+		int32_t       start;
+		int32_t       stop;
+		int32_t       type;
+		int32_t       temp;
+		int32_t       writes_left;
+		uint16_t      sum;
+		int32_t       fifo_entries;
 		timer_device *watchdog;
 	};
 
 	adsp21xx_device *m_cpu;
 	address_space *m_program;
 	address_space *m_data;
-	UINT8       m_rev;
+	uint8_t       m_rev;
 	offs_t      m_polling_offset;
-	UINT32      m_polling_count;
+	uint32_t      m_polling_count;
 
 	/* sound output */
-	UINT8       m_channels;
-	UINT16      m_size;
-	UINT16      m_incs;
+	uint8_t       m_channels;
+	uint16_t      m_size;
+	uint16_t      m_incs;
 	dmadac_sound_device *m_dmadac[6];
 	timer_device *m_reg_timer;
 	timer_device *m_sport_timer;
 	timer_device *m_internal_timer;
-	INT32       m_ireg;
-	UINT16      m_ireg_base;
-	UINT16      m_control_regs[32];
+	int32_t       m_ireg;
+	uint16_t      m_ireg_base;
+	uint16_t      m_control_regs[32];
 
 	/* memory access/booting */
-	UINT16 *    m_bootrom;
-	UINT32      m_bootrom_words;
-	UINT16 *    m_sounddata;
-	UINT32      m_sounddata_words;
-	UINT32      m_sounddata_banks;
-	UINT16      m_sounddata_bank;
+	uint16_t *    m_bootrom;
+	uint32_t      m_bootrom_words;
+	uint16_t *    m_sounddata;
+	uint32_t      m_sounddata_words;
+	uint32_t      m_sounddata_banks;
+	uint16_t      m_sounddata_bank;
 
 	optional_memory_bank    m_data_bank;
 	memory_bank *           m_rom_page;
 	memory_bank *           m_dram_page;
 
 	/* I/O with the host */
-	UINT8       m_auto_ack;
-	UINT16      m_latch_control;
-	UINT16      m_input_data;
-	UINT16      m_output_data;
-	UINT16      m_pre_output_data;
-	UINT16      m_output_control;
-	UINT64      m_output_control_cycles;
-	UINT8       m_last_output_full;
-	UINT8       m_last_input_empty;
-	UINT16      m_progflags;
+	uint8_t       m_auto_ack;
+	uint16_t      m_latch_control;
+	uint16_t      m_input_data;
+	uint16_t      m_output_data;
+	uint16_t      m_pre_output_data;
+	uint16_t      m_output_control;
+	uint64_t      m_output_control_cycles;
+	uint8_t       m_last_output_full;
+	uint8_t       m_last_input_empty;
+	uint16_t      m_progflags;
 
 	write_line_delegate m_output_full_cb;
 	write_line_delegate m_input_empty_cb;
@@ -191,18 +191,18 @@ protected:
 	write_line_delegate m_fifo_reset_w;
 
 	/* timers */
-	UINT8       m_timer_enable;
-	UINT8       m_timer_ignore;
-	UINT64      m_timer_start_cycles;
-	UINT32      m_timer_start_count;
-	UINT32      m_timer_scale;
-	UINT32      m_timer_period;
-	UINT32      m_timers_fired;
+	uint8_t       m_timer_enable;
+	uint8_t       m_timer_ignore;
+	uint64_t      m_timer_start_cycles;
+	uint32_t      m_timer_start_count;
+	uint32_t      m_timer_scale;
+	uint32_t      m_timer_period;
+	uint32_t      m_timers_fired;
 
-	UINT16 *m_sram;
-	UINT16 *m_polling_base;
-	UINT32 *m_internal_program_ram;
-	UINT32 *m_external_program_ram;
+	uint16_t *m_sram;
+	uint16_t *m_polling_base;
+	uint32_t *m_internal_program_ram;
+	uint32_t *m_external_program_ram;
 
 	int m_dmovlay_val;
 
@@ -212,7 +212,7 @@ protected:
 
 	int m_dram_in_mb;
 
-	optional_shared_ptr<UINT16> m_iram;
+	optional_shared_ptr<uint16_t> m_iram;
 };
 
 
@@ -222,7 +222,7 @@ class dcs_audio_2k_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -238,7 +238,7 @@ class dcs_audio_2k_uart_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -254,7 +254,7 @@ class dcs_audio_8k_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -270,7 +270,7 @@ class dcs_audio_wpc_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -286,7 +286,7 @@ class dcs2_audio_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
@@ -299,7 +299,7 @@ class dcs2_audio_2115_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -315,7 +315,7 @@ class dcs2_audio_2104_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -331,7 +331,7 @@ class dcs2_audio_dsio_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -347,7 +347,7 @@ class dcs2_audio_denver_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

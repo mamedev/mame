@@ -38,7 +38,7 @@ class s2650_device : public cpu_device
 {
 public:
 	// construction/destruction
-	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_flag_handler(device_t &device, _Object object) { return downcast<s2650_device &>(device).m_flag_handler.set_callback(object); }
@@ -50,10 +50,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 5; }
-	virtual UINT32 execute_max_cycles() const override { return 13; }
-	virtual UINT32 execute_input_lines() const override { return 2; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 5; }
+	virtual uint32_t execute_max_cycles() const override { return 13; }
+	virtual uint32_t execute_input_lines() const override { return 2; }
+	virtual uint32_t execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -69,9 +69,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 3; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
@@ -80,18 +80,18 @@ private:
 	devcb_write_line m_flag_handler;
 	devcb_write_line m_intack_handler;
 
-	UINT16  m_ppc;    /* previous program counter (page + iar) */
-	UINT16  m_page;   /* 8K page select register (A14..A13) */
-	UINT16  m_iar;    /* instruction address register (A12..A0) */
-	UINT16  m_ea;     /* effective address (A14..A0) */
-	UINT8   m_psl;    /* processor status lower */
-	UINT8   m_psu;    /* processor status upper */
-	UINT8   m_r;      /* absolute addressing dst/src register */
-	UINT8   m_reg[7]; /* 7 general purpose registers */
-	UINT8   m_halt;   /* 1 if cpu is halted */
-	UINT8   m_ir;     /* instruction register */
-	UINT16  m_ras[8]; /* 8 return address stack entries */
-	UINT8   m_irq_state;
+	uint16_t  m_ppc;    /* previous program counter (page + iar) */
+	uint16_t  m_page;   /* 8K page select register (A14..A13) */
+	uint16_t  m_iar;    /* instruction address register (A12..A0) */
+	uint16_t  m_ea;     /* effective address (A14..A0) */
+	uint8_t   m_psl;    /* processor status lower */
+	uint8_t   m_psu;    /* processor status upper */
+	uint8_t   m_r;      /* absolute addressing dst/src register */
+	uint8_t   m_reg[7]; /* 7 general purpose registers */
+	uint8_t   m_halt;   /* 1 if cpu is halted */
+	uint8_t   m_ir;     /* instruction register */
+	uint16_t  m_ras[8]; /* 8 return address stack entries */
+	uint8_t   m_irq_state;
 
 	int     m_icount;
 	address_space *m_program;
@@ -99,14 +99,14 @@ private:
 	address_space *m_io;
 
 	// For debugger
-	UINT16  m_debugger_temp;
+	uint16_t  m_debugger_temp;
 
-	inline void set_psu(UINT8 new_val);
-	inline UINT8 get_sp();
-	inline void set_sp(UINT8 new_sp);
+	inline void set_psu(uint8_t new_val);
+	inline uint8_t get_sp();
+	inline void set_sp(uint8_t new_sp);
 	inline int check_irq_line();
-	inline UINT8 ROP();
-	inline UINT8 ARG();
+	inline uint8_t ROP();
+	inline uint8_t ARG();
 	void s2650_set_flag(int state);
 	int s2650_get_flag();
 	void s2650_set_sense(int state);

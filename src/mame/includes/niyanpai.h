@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 
-#include "sound/dac.h"
 #include "machine/gen_latch.h"
 #include "machine/tmp68301.h"
 
@@ -19,16 +18,12 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -52,17 +47,17 @@ public:
 	int m_nb19010_busyctr;
 	int m_nb19010_busyflag;
 	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
-	std::unique_ptr<UINT16[]> m_videoram[VRAM_MAX];
-	std::unique_ptr<UINT16[]> m_videoworkram[VRAM_MAX];
-	std::unique_ptr<UINT16[]> m_palette_ptr;
-	std::unique_ptr<UINT8[]> m_clut[VRAM_MAX];
+	std::unique_ptr<uint16_t[]> m_videoram[VRAM_MAX];
+	std::unique_ptr<uint16_t[]> m_videoworkram[VRAM_MAX];
+	std::unique_ptr<uint16_t[]> m_palette_ptr;
+	std::unique_ptr<uint8_t[]> m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
 	emu_timer *m_blitter_timer;
 
 	// musobana and derived machine configs
 	int m_musobana_inputport;
 	int m_musobana_outcoin_flag;
-	UINT8 m_motor_on;
+	uint8_t m_motor_on;
 
 	// common
 	DECLARE_WRITE8_MEMBER(soundbank_w);
@@ -94,11 +89,11 @@ public:
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(musobana);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int blitter_r(int vram, int offset);
-	void blitter_w(int vram, int offset, UINT8 data);
-	void clutsel_w(int vram, UINT8 data);
-	void clut_w(int vram, int offset, UINT8 data);
+	void blitter_w(int vram, int offset, uint8_t data);
+	void clutsel_w(int vram, uint8_t data);
+	void clut_w(int vram, int offset, uint8_t data);
 	void vramflip(int vram);
 	void update_pixel(int vram, int x, int y);
 	void gfxdraw(int vram);

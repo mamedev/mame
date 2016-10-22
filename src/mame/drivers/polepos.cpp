@@ -258,7 +258,7 @@ READ16_MEMBER(polepos_state::polepos2_ic25_r)
 	{
 		m_last_unsigned = offset & 0xff;
 		result = (m_last_result >> 8) & 0xff;
-		m_last_result = (INT8)m_last_signed * (UINT8)m_last_unsigned;
+		m_last_result = (int8_t)m_last_signed * (uint8_t)m_last_unsigned;
 	}
 
 //  logerror("%04X: read IC25 @ %04X = %02X\n", space.device().safe_pc(), offset, result);
@@ -365,7 +365,7 @@ WRITE8_MEMBER(polepos_state::out_1)
 
 READ8_MEMBER(polepos_state::namco_52xx_rom_r)
 {
-	UINT32 length = memregion("52xx")->bytes();
+	uint32_t length = memregion("52xx")->bytes();
 logerror("ROM @ %04X\n", offset);
 	return (offset < length) ? memregion("52xx")->base()[offset] : 0xff;
 }
@@ -385,8 +385,8 @@ READ8_MEMBER(polepos_state::namco_53xx_k_r)
 READ8_MEMBER(polepos_state::steering_changed_r)
 {
 	/* read the current steering value and update our delta */
-	UINT8 steer_new = ioport("STEER")->read();
-	m_steer_accum += (INT8)(steer_new - m_steer_last) * 2;
+	uint8_t steer_new = ioport("STEER")->read();
+	m_steer_accum += (int8_t)(steer_new - m_steer_last) * 2;
 	m_steer_last = steer_new;
 
 	/* if we have delta, clock things */

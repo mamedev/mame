@@ -31,8 +31,8 @@
 struct model3_polydata
 {
 	cached_texture *texture;
-	UINT32 color;
-	UINT32 texture_param;
+	uint32_t color;
+	uint32_t texture_param;
 	int transparency;
 	int intensity;
 };
@@ -52,13 +52,13 @@ public:
 	void draw_alpha_triangles(const m3_triangle* tris, int num_tris);
 	void clear_fb();
 	void clear_zb();
-	void draw_scanline_solid(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_solid_trans(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_colormod(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_contour(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_trans(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_alpha(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_solid(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_solid_trans(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_colormod(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_contour(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_trans(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_alpha(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
 	void wait_for_polys();
 
 private:
@@ -90,53 +90,53 @@ void model3_state::model3_exit()
 	file = fopen("m3_texture_ram.bin","wb");
 	for (i=0; i < 0x200000; i++)
 	{
-		fputc((UINT8)(m_texture_ram[0][i] >> 8), file);
-		fputc((UINT8)(m_texture_ram[0][i] >> 0), file);
+		fputc((uint8_t)(m_texture_ram[0][i] >> 8), file);
+		fputc((uint8_t)(m_texture_ram[0][i] >> 0), file);
 	}
 	for (i=0; i < 0x200000; i++)
 	{
-		fputc((UINT8)(m_texture_ram[1][i] >> 8), file);
-		fputc((UINT8)(m_texture_ram[1][i] >> 0), file);
+		fputc((uint8_t)(m_texture_ram[1][i] >> 8), file);
+		fputc((uint8_t)(m_texture_ram[1][i] >> 0), file);
 	}
 	fclose(file);
 
 	file = fopen("m3_displist.bin","wb");
 	for (i=0; i < 0x40000; i++)
 	{
-		fputc((UINT8)(m_display_list_ram[i] >> 24), file);
-		fputc((UINT8)(m_display_list_ram[i] >> 16), file);
-		fputc((UINT8)(m_display_list_ram[i] >> 8), file);
-		fputc((UINT8)(m_display_list_ram[i] >> 0), file);
+		fputc((uint8_t)(m_display_list_ram[i] >> 24), file);
+		fputc((uint8_t)(m_display_list_ram[i] >> 16), file);
+		fputc((uint8_t)(m_display_list_ram[i] >> 8), file);
+		fputc((uint8_t)(m_display_list_ram[i] >> 0), file);
 	}
 	fclose(file);
 
 	file = fopen("m3_culling_ram.bin","wb");
 	for (i=0; i < 0x100000; i++)
 	{
-		fputc((UINT8)(m_culling_ram[i] >> 24), file);
-		fputc((UINT8)(m_culling_ram[i] >> 16), file);
-		fputc((UINT8)(m_culling_ram[i] >> 8), file);
-		fputc((UINT8)(m_culling_ram[i] >> 0), file);
+		fputc((uint8_t)(m_culling_ram[i] >> 24), file);
+		fputc((uint8_t)(m_culling_ram[i] >> 16), file);
+		fputc((uint8_t)(m_culling_ram[i] >> 8), file);
+		fputc((uint8_t)(m_culling_ram[i] >> 0), file);
 	}
 	fclose(file);
 
 	file = fopen("m3_polygon_ram.bin","wb");
 	for (i=0; i < 0x100000; i++)
 	{
-		fputc((UINT8)(m_polygon_ram[i] >> 24), file);
-		fputc((UINT8)(m_polygon_ram[i] >> 16), file);
-		fputc((UINT8)(m_polygon_ram[i] >> 8), file);
-		fputc((UINT8)(m_polygon_ram[i] >> 0), file);
+		fputc((uint8_t)(m_polygon_ram[i] >> 24), file);
+		fputc((uint8_t)(m_polygon_ram[i] >> 16), file);
+		fputc((uint8_t)(m_polygon_ram[i] >> 8), file);
+		fputc((uint8_t)(m_polygon_ram[i] >> 0), file);
 	}
 	fclose(file);
 
 	file = fopen("m3_vrom.bin","wb");
 	for (i=0; i < 0x1000000; i++)
 	{
-		fputc((UINT8)(m_vrom[i] >> 24), file);
-		fputc((UINT8)(m_vrom[i] >> 16), file);
-		fputc((UINT8)(m_vrom[i] >> 8), file);
-		fputc((UINT8)(m_vrom[i] >> 0), file);
+		fputc((uint8_t)(m_vrom[i] >> 24), file);
+		fputc((uint8_t)(m_vrom[i] >> 16), file);
+		fputc((uint8_t)(m_vrom[i] >> 8), file);
+		fputc((uint8_t)(m_vrom[i] >> 0), file);
 	}
 	fclose(file);
 #endif
@@ -179,21 +179,21 @@ void model3_state::video_start()
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_state::model3_exit), this));
 
-	m_m3_char_ram = make_unique_clear<UINT64[]>(0x100000/8);
-	m_m3_tile_ram = make_unique_clear<UINT64[]>(0x8000/8);
+	m_m3_char_ram = make_unique_clear<uint64_t[]>(0x100000/8);
+	m_m3_tile_ram = make_unique_clear<uint64_t[]>(0x8000/8);
 
-	m_texture_fifo = make_unique_clear<UINT32[]>(0x100000/4);
+	m_texture_fifo = make_unique_clear<uint32_t[]>(0x100000/4);
 
 	/* 2x 4MB texture sheets */
-	m_texture_ram[0] = std::make_unique<UINT16[]>(0x400000/2);
-	m_texture_ram[1] = std::make_unique<UINT16[]>(0x400000/2);
+	m_texture_ram[0] = std::make_unique<uint16_t[]>(0x400000/2);
+	m_texture_ram[1] = std::make_unique<uint16_t[]>(0x400000/2);
 
 	/* 1MB Display List RAM */
-	m_display_list_ram = make_unique_clear<UINT32[]>(0x100000/4);
+	m_display_list_ram = make_unique_clear<uint32_t[]>(0x100000/4);
 	/* 4MB for nodes (< Step 2.0 have only 2MB) */
-	m_culling_ram = make_unique_clear<UINT32[]>(0x400000/4);
+	m_culling_ram = make_unique_clear<uint32_t[]>(0x400000/4);
 	/* 4MB Polygon RAM */
-	m_polygon_ram = make_unique_clear<UINT32[]>(0x400000/4);
+	m_polygon_ram = make_unique_clear<uint32_t[]>(0x400000/4);
 
 	m_vid_reg0 = 0;
 
@@ -207,18 +207,18 @@ void model3_state::video_start()
 	m_layer8[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer3_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	// 4-bit tiles
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, char4_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, char4_layout, (uint8_t*)m_m3_char_ram.get(), 0, m_palette->entries() / 16, 0));
 
 	// 8-bit tiles
-	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(*m_palette, char8_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 256, 0));
+	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(*m_palette, char8_layout, (uint8_t*)m_m3_char_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	init_matrix_stack();
 }
 
 #define MODEL3_TILE_INFO4(address)  \
 do { \
-	UINT16 *tiles = (UINT16*)&m_m3_tile_ram[address + (tile_index / 4)];    \
-	UINT16 t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
+	uint16_t *tiles = (uint16_t*)&m_m3_tile_ram[address + (tile_index / 4)];    \
+	uint16_t t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
 	int tile = ((t << 1) & 0x7ffe) | ((t >> 15) & 0x1); \
 	int color = (t & 0x7ff0) >> 4; \
 	SET_TILE_INFO_MEMBER(0, tile, color, 0); \
@@ -226,8 +226,8 @@ do { \
 
 #define MODEL3_TILE_INFO8(address)  \
 do { \
-	UINT16 *tiles = (UINT16*)&m_m3_tile_ram[address + (tile_index / 4)];    \
-	UINT16 t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
+	uint16_t *tiles = (uint16_t*)&m_m3_tile_ram[address + (tile_index / 4)];    \
+	uint16_t t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
 	int tile = ((t << 1) & 0x7ffe) | ((t >> 15) & 0x1); \
 	int color = (t & 0x7f00) >> 8; \
 	SET_TILE_INFO_MEMBER(1, tile >> 1, color, 0); \
@@ -248,10 +248,10 @@ void model3_state::draw_texture_sheet(bitmap_ind16 &bitmap, const rectangle &cli
 	int x,y;
 	for(y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *d = &bitmap.pix16(y);
+		uint16_t *d = &bitmap.pix16(y);
 		int index = (y*2)*2048;
 		for(x = cliprect.min_x; x <= cliprect.max_x; x++) {
-			UINT16 pix = m_texture_ram[0][index];
+			uint16_t pix = m_texture_ram[0][index];
 			index+=4;
 			if(pix != 0) {
 				d[x] = pix;
@@ -270,9 +270,9 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 	bitmap_ind16 &pixmap = tmap->pixmap();
 	const pen_t *pens = m_palette->pens();
 
-	UINT32* palram = (UINT32*)&m_paletteram64[0];
-	UINT16* rowscroll_ram = (UINT16*)&m_m3_char_ram[0x1ec00];
-	UINT32* rowmask_ram = (UINT32*)&m_m3_char_ram[0x1ee00];
+	uint32_t* palram = (uint32_t*)&m_paletteram64[0];
+	uint16_t* rowscroll_ram = (uint16_t*)&m_m3_char_ram[0x1ec00];
+	uint32_t* rowmask_ram = (uint32_t*)&m_m3_char_ram[0x1ee00];
 
 	int x1 = cliprect.min_x;
 	int y1 = cliprect.min_y;
@@ -292,14 +292,14 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 
 	for (int y = y1; y <= y2; y++)
 	{
-		UINT32* dst = &bitmap.pix32(y);
-		UINT16* src = &pixmap.pix16(iy & 0x1ff);
+		uint32_t* dst = &bitmap.pix32(y);
+		uint16_t* src = &pixmap.pix16(iy & 0x1ff);
 
 		int rowscroll = BYTE_REVERSE16(rowscroll_ram[((layer * 0x200) + y) ^ NATIVE_ENDIAN_VALUE_LE_BE(3,0)]) & 0x7fff;
 		if (rowscroll & 0x100)
 			rowscroll |= ~0x1ff;
 
-		UINT16 rowmask;
+		uint16_t rowmask;
 		if (prio && (layer == 1 || layer == 2))
 			rowmask = BYTE_REVERSE32(rowmask_ram[(y & 0x1ff) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)]) & 0xffff;
 		else
@@ -320,11 +320,11 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 
 		for (int x = rx1; x <= rx2; x++)
 		{
-			UINT32 mask = rowmask & (1 << ((iix & 0x1ff) >> 5));
+			uint32_t mask = rowmask & (1 << ((iix & 0x1ff) >> 5));
 
 			if (mask)
 			{
-				UINT16 p0 = src[iix & 0x1ff];
+				uint16_t p0 = src[iix & 0x1ff];
 				if ((palram[p0^NATIVE_ENDIAN_VALUE_LE_BE(1,0)] & NATIVE_ENDIAN_VALUE_LE_BE(0x00800000,0x00008000)) == 0)
 				{
 					dst[x] = pens[p0];
@@ -337,15 +337,15 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 	}
 }
 
-UINT32 model3_state::screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t model3_state::screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int layer_scroll_x[4], layer_scroll_y[4];
-	UINT32 layer_data[4];
+	uint32_t layer_data[4];
 
-	layer_data[0] = BYTE_REVERSE32((UINT32)(m_layer_scroll[0] >> 32));
-	layer_data[1] = BYTE_REVERSE32((UINT32)(m_layer_scroll[0] >> 0));
-	layer_data[2] = BYTE_REVERSE32((UINT32)(m_layer_scroll[1] >> 32));
-	layer_data[3] = BYTE_REVERSE32((UINT32)(m_layer_scroll[1] >> 0));
+	layer_data[0] = BYTE_REVERSE32((uint32_t)(m_layer_scroll[0] >> 32));
+	layer_data[1] = BYTE_REVERSE32((uint32_t)(m_layer_scroll[0] >> 0));
+	layer_data[2] = BYTE_REVERSE32((uint32_t)(m_layer_scroll[1] >> 32));
+	layer_data[3] = BYTE_REVERSE32((uint32_t)(m_layer_scroll[1] >> 0));
 	layer_scroll_x[0] = layer_data[0] & 0x1ff;
 	layer_scroll_y[0] = (layer_data[0] >> 16) & 0x1ff;
 	layer_scroll_x[1] = layer_data[1] & 0x1ff;
@@ -489,8 +489,8 @@ READ64_MEMBER(model3_state::model3_vid_reg_r)
 	{
 		case 0x00/8:    return m_vid_reg0;
 		case 0x08/8:    return U64(0xffffffffffffffff);     /* ??? */
-		case 0x20/8:    return (UINT64)m_layer_priority << 48;
-		case 0x40/8:    return ((UINT64)m_layer_modulate1 << 32) | (UINT64)m_layer_modulate2;
+		case 0x20/8:    return (uint64_t)m_layer_priority << 48;
+		case 0x40/8:    return ((uint64_t)m_layer_modulate1 << 32) | (uint64_t)m_layer_modulate2;
 		default:        logerror("read reg %02X\n", offset);break;
 	}
 	return 0;
@@ -500,26 +500,26 @@ WRITE64_MEMBER(model3_state::model3_vid_reg_w)
 {
 	switch(offset)
 	{
-		case 0x00/8:    logerror("vid_reg0: %08X%08X\n", (UINT32)(data>>32),(UINT32)(data)); m_vid_reg0 = data; break;
+		case 0x00/8:    logerror("vid_reg0: %08X%08X\n", (uint32_t)(data>>32),(uint32_t)(data)); m_vid_reg0 = data; break;
 		case 0x08/8:    break;      /* ??? */
 		case 0x10/8:    set_irq_line((data >> 56) & 0x0f, CLEAR_LINE); break;     /* VBL IRQ Ack */
 
 		case 0x20/8:    m_layer_priority = (data >> 48); break;
 
-		case 0x40/8:    m_layer_modulate1 = (UINT32)(data >> 32);
-						m_layer_modulate2 = (UINT32)(data);
+		case 0x40/8:    m_layer_modulate1 = (uint32_t)(data >> 32);
+						m_layer_modulate2 = (uint32_t)(data);
 						break;
 		case 0x60/8:    COMBINE_DATA(&m_layer_scroll[0]); break;
 		case 0x68/8:    COMBINE_DATA(&m_layer_scroll[1]); break;
-		default:        logerror("model3_vid_reg_w: %02X, %08X%08X\n", offset, (UINT32)(data >> 32), (UINT32)(data)); break;
+		default:        logerror("model3_vid_reg_w: %02X, %08X%08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data)); break;
 	}
 }
 
 WRITE64_MEMBER(model3_state::model3_palette_w)
 {
 	COMBINE_DATA(&m_paletteram64[offset]);
-	UINT32 data1 = BYTE_REVERSE32((UINT32)(m_paletteram64[offset] >> 32));
-	UINT32 data2 = BYTE_REVERSE32((UINT32)(m_paletteram64[offset] >> 0));
+	uint32_t data1 = BYTE_REVERSE32((uint32_t)(m_paletteram64[offset] >> 32));
+	uint32_t data2 = BYTE_REVERSE32((uint32_t)(m_paletteram64[offset] >> 0));
 
 	m_palette->set_pen_color((offset*2)+0, pal5bit(data1 >> 0), pal5bit(data1 >> 5), pal5bit(data1 >> 10));
 	m_palette->set_pen_color((offset*2)+1, pal5bit(data2 >> 0), pal5bit(data2 >> 5), pal5bit(data2 >> 10));
@@ -561,7 +561,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 	cached_texture *tex = m_texcache[page][texy][texx];
 	int pixheight = 32 << texheight;
 	int pixwidth = 32 << texwidth;
-	UINT32 alpha = ~0;
+	uint32_t alpha = ~0;
 	int x, y;
 
 	/* if we have one already, validate it */
@@ -570,7 +570,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			return tex;
 
 	/* create a new texture */
-	tex = (cached_texture *)auto_alloc_array(machine(), UINT8, sizeof(cached_texture) + (2 * pixwidth * 2 * pixheight) * sizeof(rgb_t));
+	tex = (cached_texture *)auto_alloc_array(machine(), uint8_t, sizeof(cached_texture) + (2 * pixwidth * 2 * pixheight) * sizeof(rgb_t));
 	tex->width = texwidth;
 	tex->height = texheight;
 	tex->format = format;
@@ -582,7 +582,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 	/* decode it */
 	for (y = 0; y < pixheight; y++)
 	{
-		const UINT16 *texsrc = &m_texture_ram[page][(texy * 32 + y) * 2048 + texx * 32];
+		const uint16_t *texsrc = &m_texture_ram[page][(texy * 32 + y) * 2048 + texx * 32];
 		rgb_t *dest = tex->data + 2 * pixwidth * y;
 
 		switch (format)
@@ -590,7 +590,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 0:     /* 1-5-5-5 ARGB */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT16 pixdata = texsrc[x];
+					uint16_t pixdata = texsrc[x];
 					alpha &= dest[x] = rgb_t(pal1bit(~pixdata >> 15), pal5bit(pixdata >> 10), pal5bit(pixdata >> 5), pal5bit(pixdata >> 0));
 				}
 				break;
@@ -598,8 +598,8 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 1:     /* A4L4 interleaved */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 grayvalue = pal4bit(texsrc[x] & 0xf);
-					UINT8 a = pal4bit((texsrc[x] >> 4) & 0xf);
+					uint8_t grayvalue = pal4bit(texsrc[x] & 0xf);
+					uint8_t a = pal4bit((texsrc[x] >> 4) & 0xf);
 					alpha &= dest[x] = rgb_t(a, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -607,8 +607,8 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 2:     /* A4L4? */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 grayvalue = pal4bit((texsrc[x] >> 0) & 0xf);
-					UINT8 a = pal4bit((texsrc[x] >> 4) & 0xf);
+					uint8_t grayvalue = pal4bit((texsrc[x] >> 0) & 0xf);
+					uint8_t a = pal4bit((texsrc[x] >> 4) & 0xf);
 					alpha &= dest[x] = rgb_t(a, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -616,8 +616,8 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 3:     /* A4L4 interleaved */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 grayvalue = pal4bit((texsrc[x] >> 8) & 0xf);
-					UINT8 a = pal4bit((texsrc[x] >> 12) & 0xf);
+					uint8_t grayvalue = pal4bit((texsrc[x] >> 8) & 0xf);
+					uint8_t a = pal4bit((texsrc[x] >> 12) & 0xf);
 					alpha &= dest[x] = rgb_t(a, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -625,7 +625,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 4:     /* 8-bit A4L4 */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 pixdata = texsrc[x] >> 8;
+					uint8_t pixdata = texsrc[x] >> 8;
 					alpha &= dest[x] = rgb_t(pal4bit(pixdata), pal4bit(pixdata >> 4), pal4bit(pixdata >> 4), pal4bit(pixdata >> 4));
 				}
 				break;
@@ -633,7 +633,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 5:     /* L8 */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 grayvalue = texsrc[x];
+					uint8_t grayvalue = texsrc[x];
 					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -641,7 +641,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 6:     /* L8 */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 grayvalue = texsrc[x] >> 8;
+					uint8_t grayvalue = texsrc[x] >> 8;
 					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -649,7 +649,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			case 7:     /* 4-4-4-4 ARGB */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT16 pixdata = texsrc[x];
+					uint16_t pixdata = texsrc[x];
 					alpha &= dest[x] = rgb_t(pal4bit(pixdata >> 0), pal4bit(pixdata >> 12), pal4bit(pixdata >> 8), pal4bit(pixdata >> 4));
 				}
 				break;
@@ -985,11 +985,11 @@ WRITE64_MEMBER(model3_state::real3d_display_list_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		m_display_list_ram[offset*2] = BYTE_REVERSE32((UINT32)(data >> 32));
+		m_display_list_ram[offset*2] = BYTE_REVERSE32((uint32_t)(data >> 32));
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		m_display_list_ram[(offset*2)+1] = BYTE_REVERSE32((UINT32)(data));
+		m_display_list_ram[(offset*2)+1] = BYTE_REVERSE32((uint32_t)(data));
 	}
 }
 
@@ -997,15 +997,15 @@ WRITE64_MEMBER(model3_state::real3d_polygon_ram_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		m_polygon_ram[offset*2] = BYTE_REVERSE32((UINT32)(data >> 32));
+		m_polygon_ram[offset*2] = BYTE_REVERSE32((uint32_t)(data >> 32));
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		m_polygon_ram[(offset*2)+1] = BYTE_REVERSE32((UINT32)(data));
+		m_polygon_ram[(offset*2)+1] = BYTE_REVERSE32((uint32_t)(data));
 	}
 }
 
-static const UINT8 texture_decode16[64] =
+static const uint8_t texture_decode16[64] =
 {
 		0,  1,  4,  5,  8,  9, 12, 13,
 		2,  3,  6,  7, 10, 11, 14, 15,
@@ -1017,7 +1017,7 @@ static const UINT8 texture_decode16[64] =
 	50, 51, 54, 55, 58, 59, 62, 63
 };
 
-static const UINT8 texture_decode8[32] =
+static const uint8_t texture_decode8[32] =
 {
 		1,  3,  5,  7,
 		0,  2,  4,  6,
@@ -1029,7 +1029,7 @@ static const UINT8 texture_decode8[32] =
 	24, 26, 28, 30
 };
 
-inline void model3_state::write_texture16(int xpos, int ypos, int width, int height, int page, UINT16 *data)
+inline void model3_state::write_texture16(int xpos, int ypos, int width, int height, int page, uint16_t *data)
 {
 	int x,y,i,j;
 
@@ -1037,7 +1037,7 @@ inline void model3_state::write_texture16(int xpos, int ypos, int width, int hei
 	{
 		for(x=xpos; x < xpos+width; x+=8)
 		{
-			UINT16 *texture = &m_texture_ram[page][y*2048+x];
+			uint16_t *texture = &m_texture_ram[page][y*2048+x];
 			int b = 0;
 			for(j=y; j < y+8; j++) {
 				for(i=x; i < x+8; i++) {
@@ -1051,7 +1051,7 @@ inline void model3_state::write_texture16(int xpos, int ypos, int width, int hei
 	}
 }
 
-inline void model3_state::write_texture8(int xpos, int ypos, int width, int height, int page, int upper, int lower, UINT16 *data)
+inline void model3_state::write_texture8(int xpos, int ypos, int width, int height, int page, int upper, int lower, uint16_t *data)
 {
 	int x,y,i,j;
 
@@ -1059,13 +1059,13 @@ inline void model3_state::write_texture8(int xpos, int ypos, int width, int heig
 	{
 		for(x=xpos; x < xpos+width; x+=8)
 		{
-			UINT16 *texture = &m_texture_ram[page][y*2048+x];
+			uint16_t *texture = &m_texture_ram[page][y*2048+x];
 			int b = 0;
 			for(j=y; j < y+8; j++)
 			{
 				for(i=x; i < x+8; i+=2)
 				{
-					UINT16 d = data[texture_decode8[b]];
+					uint16_t d = data[texture_decode8[b]];
 
 					if (upper)
 						*texture = (*texture & 0xff) | (d & 0xff00);
@@ -1122,7 +1122,7 @@ static const int mipmap_coords[9][2] =
 
 static const int mipmap_divider[9] = { 2, 4, 8, 16, 32, 64, 128, 256, 512 };
 
-void model3_state::real3d_upload_texture(UINT32 header, UINT32 *data)
+void model3_state::real3d_upload_texture(uint32_t header, uint32_t *data)
 {
 	int width   = 32 << ((header >> 14) & 0x7);
 	int height  = 32 << ((header >> 17) & 0x7);
@@ -1150,12 +1150,12 @@ void model3_state::real3d_upload_texture(UINT32 header, UINT32 *data)
 			{
 				if (bitdepth)
 				{
-					write_texture16(x, y, w, h, page, (UINT16*)data);
+					write_texture16(x, y, w, h, page, (uint16_t*)data);
 				}
 				else
 				{
 					//printf("write tex8: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
-					write_texture8(x, y, w, h, page, upper_byte, lower_byte, (UINT16*)data);
+					write_texture8(x, y, w, h, page, upper_byte, lower_byte, (uint16_t*)data);
 				}
 
 				data += (w * h * (bitdepth ? 2 : 1)) / 4;
@@ -1174,12 +1174,12 @@ void model3_state::real3d_upload_texture(UINT32 header, UINT32 *data)
 		{
 			if (bitdepth)
 			{
-				write_texture16(xpos, ypos, width, height, page, (UINT16*)data);
+				write_texture16(xpos, ypos, width, height, page, (uint16_t*)data);
 			}
 			else
 			{
 				//printf("write tex8: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
-				write_texture8(xpos, ypos, width, height, page, upper_byte, lower_byte, (UINT16*)data);
+				write_texture8(xpos, ypos, width, height, page, upper_byte, lower_byte, (uint16_t*)data);
 			}
 
 			invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
@@ -1198,12 +1198,12 @@ void model3_state::real3d_upload_texture(UINT32 header, UINT32 *data)
 			{
 				if (bitdepth)
 				{
-					write_texture16(x, y, w, h, page, (UINT16*)data);
+					write_texture16(x, y, w, h, page, (uint16_t*)data);
 				}
 				else
 				{
 					//printf("write tex8: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
-					write_texture8(x, y, w, h, page, upper_byte, lower_byte, (UINT16*)data);
+					write_texture8(x, y, w, h, page, upper_byte, lower_byte, (uint16_t*)data);
 				}
 
 				data += (w * h * (bitdepth ? 2 : 1)) / 4;
@@ -1235,7 +1235,7 @@ void model3_state::real3d_display_list_end()
 		while (i < m_texture_fifo_pos)
 		{
 			int length = (m_texture_fifo[i] / 2) + 2;
-			UINT32 header = m_texture_fifo[i+1];
+			uint32_t header = m_texture_fifo[i+1];
 			real3d_upload_texture(header, &m_texture_fifo[i+2]);
 			i += length;
 		};
@@ -1273,13 +1273,13 @@ void model3_state::real3d_display_list_end()
 	}
 }
 
-void model3_state::real3d_display_list1_dma(UINT32 src, UINT32 dst, int length, int byteswap)
+void model3_state::real3d_display_list1_dma(uint32_t src, uint32_t dst, int length, int byteswap)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int d = (dst & 0xffffff) / 4;
 	for (int i = 0; i < length; i += 4)
 	{
-		UINT32 w = space.read_dword(src);
+		uint32_t w = space.read_dword(src);
 
 		if (byteswap)
 			w = BYTE_REVERSE32(w);
@@ -1289,13 +1289,13 @@ void model3_state::real3d_display_list1_dma(UINT32 src, UINT32 dst, int length, 
 	}
 }
 
-void model3_state::real3d_display_list2_dma(UINT32 src, UINT32 dst, int length, int byteswap)
+void model3_state::real3d_display_list2_dma(uint32_t src, uint32_t dst, int length, int byteswap)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int d = (dst & 0xffffff) / 4;
 	for (int i = 0; i < length; i += 4)
 	{
-		UINT32 w = space.read_dword(src);
+		uint32_t w = space.read_dword(src);
 
 		if (byteswap)
 			w = BYTE_REVERSE32(w);
@@ -1305,15 +1305,15 @@ void model3_state::real3d_display_list2_dma(UINT32 src, UINT32 dst, int length, 
 	}
 }
 
-void model3_state::real3d_vrom_texture_dma(UINT32 src, UINT32 dst, int length, int byteswap)
+void model3_state::real3d_vrom_texture_dma(uint32_t src, uint32_t dst, int length, int byteswap)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	if ((dst & 0xff) == 0)
 	{
 		for (int i=0; i < length; i+=12)
 		{
-			UINT32 address = space.read_dword(src+i+0);
-			UINT32 header = space.read_dword(src+i+4);
+			uint32_t address = space.read_dword(src+i+0);
+			uint32_t header = space.read_dword(src+i+4);
 
 			if (byteswap)
 			{
@@ -1321,17 +1321,17 @@ void model3_state::real3d_vrom_texture_dma(UINT32 src, UINT32 dst, int length, i
 				header = BYTE_REVERSE32(header);
 			}
 
-			real3d_upload_texture(header, (UINT32*)&m_vrom[address]);
+			real3d_upload_texture(header, (uint32_t*)&m_vrom[address]);
 		}
 	}
 }
 
-void model3_state::real3d_texture_fifo_dma(UINT32 src, int length, int byteswap)
+void model3_state::real3d_texture_fifo_dma(uint32_t src, int length, int byteswap)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	for (int i = 0; i < length; i += 4)
 	{
-		UINT32 w = space.read_dword(src);
+		uint32_t w = space.read_dword(src);
 
 		if (byteswap)
 			w = BYTE_REVERSE32(w);
@@ -1342,13 +1342,13 @@ void model3_state::real3d_texture_fifo_dma(UINT32 src, int length, int byteswap)
 	}
 }
 
-void model3_state::real3d_polygon_ram_dma(UINT32 src, UINT32 dst, int length, int byteswap)
+void model3_state::real3d_polygon_ram_dma(uint32_t src, uint32_t dst, int length, int byteswap)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int d = (dst & 0xffffff) / 4;
 	for (int i = 0; i < length; i += 4)
 	{
-		UINT32 w = space.read_dword(src);
+		uint32_t w = space.read_dword(src);
 
 		if (byteswap)
 			w = BYTE_REVERSE32(w);
@@ -1523,14 +1523,14 @@ m3_triangle *model3_state::push_triangle(bool alpha)
 	}
 }
 
-void model3_state::draw_model(UINT32 addr)
+void model3_state::draw_model(uint32_t addr)
 {
 	// Polygon RAM is mapped to the low 4MB of VROM
-	UINT32 *model = (addr >= 0x100000) ? &m_vrom[addr] :  &m_polygon_ram[addr];
+	uint32_t *model = (addr >= 0x100000) ? &m_vrom[addr] :  &m_polygon_ram[addr];
 
-	UINT32 header[7];
+	uint32_t header[7];
 	int index = 0;
-	int last_polygon = FALSE, first_polygon = TRUE, back_face = FALSE;
+	bool last_polygon = false, first_polygon = true, back_face = false;
 	int num_vertices;
 	int i, v, vi;
 	float fixed_point_fraction;
@@ -1564,7 +1564,7 @@ void model3_state::draw_model(UINT32 addr)
 	while (!last_polygon)
 	{
 		float texture_coord_scale;
-		UINT32 color;
+		uint32_t color;
 		VECTOR3 normal;
 		VECTOR3 sn;
 		VECTOR p[4];
@@ -1575,13 +1575,13 @@ void model3_state::draw_model(UINT32 addr)
 
 		if (first_polygon && (header[0] & 0x0f) != 0)
 			return;
-		first_polygon = FALSE;
+		first_polygon = false;
 
 		if (header[6] == 0)
 			return;
 
 		if (header[1] & 0x4)
-			last_polygon = TRUE;
+			last_polygon = true;
 
 		if ((header[0] & 0x300) == 0x300)       // TODO: broken polygons in srally2 have these bits set
 			return;
@@ -1592,9 +1592,9 @@ void model3_state::draw_model(UINT32 addr)
 		texture_coord_scale = (header[1] & 0x40) ? 1.0f : (1.0f / 8.0f);
 
 		/* polygon normal (sign + 1.22 fixed-point) */
-		normal[0] = (float)((INT32)header[1] >> 8) * (1.0f / 4194304.0f);
-		normal[1] = (float)((INT32)header[2] >> 8) * (1.0f / 4194304.0f);
-		normal[2] = (float)((INT32)header[3] >> 8) * (1.0f / 4194304.0f);
+		normal[0] = (float)((int32_t)header[1] >> 8) * (1.0f / 4194304.0f);
+		normal[1] = (float)((int32_t)header[2] >> 8) * (1.0f / 4194304.0f);
+		normal[2] = (float)((int32_t)header[3] >> 8) * (1.0f / 4194304.0f);
 
 		/* load reused vertices */
 		vi = 0;
@@ -1605,22 +1605,22 @@ void model3_state::draw_model(UINT32 addr)
 		/* load new vertices */
 		for ( ; vi < num_vertices; vi++)
 		{
-			UINT32 xw = model[index++];
-			UINT32 yw = model[index++];
-			UINT32 zw = model[index++];
+			uint32_t xw = model[index++];
+			uint32_t yw = model[index++];
+			uint32_t zw = model[index++];
 
-			vertex[vi].x = (float)((INT32)(xw) >> 8) * fixed_point_fraction;
-			vertex[vi].y = (float)((INT32)(yw) >> 8) * fixed_point_fraction;
-			vertex[vi].z = (float)((INT32)(zw) >> 8) * fixed_point_fraction;
-			vertex[vi].u = (UINT16)(model[index] >> 16);
-			vertex[vi].v = (UINT16)(model[index++]);
-//          vertex[vi].nx = normal[0] + ((float)((INT8)(xw)) / 127.0f);
-//          vertex[vi].ny = normal[1] + ((float)((INT8)(yw)) / 127.0f);
-//          vertex[vi].nz = normal[2] + ((float)((INT8)(zw)) / 127.0f);
+			vertex[vi].x = (float)((int32_t)(xw) >> 8) * fixed_point_fraction;
+			vertex[vi].y = (float)((int32_t)(yw) >> 8) * fixed_point_fraction;
+			vertex[vi].z = (float)((int32_t)(zw) >> 8) * fixed_point_fraction;
+			vertex[vi].u = (uint16_t)(model[index] >> 16);
+			vertex[vi].v = (uint16_t)(model[index++]);
+//          vertex[vi].nx = normal[0] + ((float)((int8_t)(xw)) / 127.0f);
+//          vertex[vi].ny = normal[1] + ((float)((int8_t)(yw)) / 127.0f);
+//          vertex[vi].nz = normal[2] + ((float)((int8_t)(zw)) / 127.0f);
 
-			vertex[vi].nx = ((float)((INT8)(xw)) / 127.0f);
-			vertex[vi].ny = ((float)((INT8)(yw)) / 127.0f);
-			vertex[vi].nz = ((float)((INT8)(zw)) / 127.0f);
+			vertex[vi].nx = ((float)((int8_t)(xw)) / 127.0f);
+			vertex[vi].ny = ((float)((int8_t)(yw)) / 127.0f);
+			vertex[vi].nz = ((float)((int8_t)(zw)) / 127.0f);
 		}
 
 		/* Copy current vertices as previous vertices */
@@ -1803,7 +1803,7 @@ void model3_state::draw_model(UINT32 addr)
 /*****************************************************************************/
 /* display list parser */
 
-UINT32 *model3_state::get_memory_pointer(UINT32 address)
+uint32_t *model3_state::get_memory_pointer(uint32_t address)
 {
 	if (address & 0x800000)
 	{
@@ -1831,18 +1831,18 @@ void model3_state::load_matrix(int matrix_num, MATRIX *out)
 	(*out)[3][0] = matrix[0];   (*out)[3][1] = matrix[1];   (*out)[3][2] = matrix[2];   (*out)[3][3] = 1.0f;
 }
 
-void model3_state::traverse_list4(int lod_num, UINT32 address)
+void model3_state::traverse_list4(int lod_num, uint32_t address)
 {
 	/* does something with the LOD selection */
-	UINT32 *list = get_memory_pointer(address);
-	UINT32 link = list[0];
+	uint32_t *list = get_memory_pointer(address);
+	uint32_t link = list[0];
 
 	draw_model(link & 0xffffff);
 }
 
-void model3_state::traverse_list(UINT32 address)
+void model3_state::traverse_list(uint32_t address)
 {
-	UINT32 *list = get_memory_pointer(address);
+	uint32_t *list = get_memory_pointer(address);
 	int list_ptr = 0;
 
 	if (m_list_depth > 2)
@@ -1875,7 +1875,7 @@ void model3_state::traverse_list(UINT32 address)
 	m_list_depth--;
 }
 
-inline void model3_state::process_link(UINT32 address, UINT32 link)
+inline void model3_state::process_link(uint32_t address, uint32_t link)
 {
 	if (link != 0 && link != 0x0fffffff && link != 0x00800800 && link != 0x01000000)
 	{
@@ -1901,10 +1901,10 @@ inline void model3_state::process_link(UINT32 address, UINT32 link)
 	}
 }
 
-void model3_state::draw_block(UINT32 address)
+void model3_state::draw_block(uint32_t address)
 {
-	const UINT32 *node = get_memory_pointer(address);
-	UINT32 link;
+	const uint32_t *node = get_memory_pointer(address);
+	uint32_t link;
 	int node_matrix;
 	float x, y, z;
 	MATRIX matrix;
@@ -1945,10 +1945,10 @@ void model3_state::draw_block(UINT32 address)
 	}
 }
 
-void model3_state::draw_viewport(int pri, UINT32 address)
+void model3_state::draw_viewport(int pri, uint32_t address)
 {
-	const UINT32 *node = get_memory_pointer(address);
-	UINT32 link_address;
+	const uint32_t *node = get_memory_pointer(address);
+	uint32_t link_address;
 
 	link_address = node[1];
 
@@ -1998,7 +1998,7 @@ void model3_state::draw_viewport(int pri, UINT32 address)
 	m_parallel_light[1] = *(float *)&node[6];
 	m_parallel_light[2] = *(float *)&node[4];
 	m_parallel_light_intensity = *(float *)&node[7];
-	m_ambient_light_intensity = (UINT8)(node[36] >> 8) / 256.0f;
+	m_ambient_light_intensity = (uint8_t)(node[36] >> 8) / 256.0f;
 
 	/* set coordinate system matrix */
 	load_matrix(0, &m_coordinate_system);
@@ -2028,8 +2028,8 @@ void model3_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	for (j = cliprect.min_y; j <= cliprect.max_y; ++j)
 	{
-		UINT32 *dst = &bitmap.pix32(j);
-		UINT32 *src = &m_fb->pix32(j);
+		uint32_t *dst = &bitmap.pix32(j);
+		uint32_t *src = &m_fb->pix32(j);
 
 		for (i = cliprect.min_x; i <= cliprect.max_x; ++i)
 		{
@@ -2189,9 +2189,9 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 	}
 }
 
-void model3_renderer::draw_scanline_solid(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
+void model3_renderer::draw_scanline_solid(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	UINT32 *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix32(scanline);
 	float *zb = (float*)&m_zb->pix32(scanline);
 
 	float z = extent.param[0].start;
@@ -2219,9 +2219,9 @@ void model3_renderer::draw_scanline_solid(INT32 scanline, const extent_t &extent
 	}
 }
 
-void model3_renderer::draw_scanline_solid_trans(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
+void model3_renderer::draw_scanline_solid_trans(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	UINT32 *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix32(scanline);
 	float *zb = (float*)&m_zb->pix32(scanline);
 
 	float z = extent.param[0].start;
@@ -2258,26 +2258,26 @@ void model3_renderer::draw_scanline_solid_trans(INT32 scanline, const extent_t &
 #define TEX_FETCH_NOFILTER()                                \
 do {                                                        \
 	float intz = 1.0f / ooz;                                \
-	UINT32 u = uoz * intz;                                  \
-	UINT32 v = voz * intz;                                  \
-	UINT32 u1 = (u >> 8) & umask;                           \
-	UINT32 v1 = (v >> 8) & vmask;                           \
+	uint32_t u = uoz * intz;                                  \
+	uint32_t v = voz * intz;                                  \
+	uint32_t u1 = (u >> 8) & umask;                           \
+	uint32_t v1 = (v >> 8) & vmask;                           \
 	texel = texture->data[(v1 << width) + u1];              \
 } while(0);
 
 #define TEX_FETCH_BILINEAR()                                                    \
 do {                                                                            \
 	float intz = 1.0f / ooz;                                                    \
-	UINT32 u = uoz * intz;                                                      \
-	UINT32 v = voz * intz;                                                      \
-	UINT32 u1 = (u >> 8) & umask;                                               \
-	UINT32 v1 = (v >> 8) & vmask;                                               \
-	UINT32 u2 = (u1 + 1) & umask;                                               \
-	UINT32 v2 = (v1 + 1) & vmask;                                               \
-	UINT32 pix00 = texture->data[(v1 << width) + u1];                           \
-	UINT32 pix01 = texture->data[(v1 << width) + u2];                           \
-	UINT32 pix10 = texture->data[(v2 << width) + u1];                           \
-	UINT32 pix11 = texture->data[(v2 << width) + u2];                           \
+	uint32_t u = uoz * intz;                                                      \
+	uint32_t v = voz * intz;                                                      \
+	uint32_t u1 = (u >> 8) & umask;                                               \
+	uint32_t v1 = (v >> 8) & vmask;                                               \
+	uint32_t u2 = (u1 + 1) & umask;                                               \
+	uint32_t v2 = (v1 + 1) & vmask;                                               \
+	uint32_t pix00 = texture->data[(v1 << width) + u1];                           \
+	uint32_t pix01 = texture->data[(v1 << width) + u2];                           \
+	uint32_t pix10 = texture->data[(v2 << width) + u1];                           \
+	uint32_t pix11 = texture->data[(v2 << width) + u2];                           \
 	texel = rgbaint_t::bilinear_filter(pix00, pix01, pix10, pix11, u, v);       \
 } while(0);
 
@@ -2287,9 +2287,9 @@ do {                                                                            
 #define TEX_FETCH() TEX_FETCH_NOFILTER()
 #endif
 
-void model3_renderer::draw_scanline_tex(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
+void model3_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	UINT32 *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix32(scanline);
 	float *zb = (float*)&m_zb->pix32(scanline);
 	const cached_texture *texture = polydata.texture;
 
@@ -2304,15 +2304,15 @@ void model3_renderer::draw_scanline_tex(INT32 scanline, const extent_t &extent, 
 	float in = extent.param[4].start;
 	float inz = extent.param[4].dpdx;
 
-	UINT32 umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
-	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
-	UINT32 width = 6 + texture->width;
+	uint32_t umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
+	uint32_t vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
+	uint32_t width = 6 + texture->width;
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		if (z <= zb[x])
 		{
-			UINT32 texel;
+			uint32_t texel;
 			TEX_FETCH();        // TODO fetch rgbaint_t instead
 
 			rgbaint_t color(texel);
@@ -2331,9 +2331,9 @@ void model3_renderer::draw_scanline_tex(INT32 scanline, const extent_t &extent, 
 	}
 }
 
-void model3_renderer::draw_scanline_tex_colormod(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
+void model3_renderer::draw_scanline_tex_colormod(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	UINT32 *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix32(scanline);
 	float *zb = (float*)&m_zb->pix32(scanline);
 	const cached_texture *texture = polydata.texture;
 
@@ -2348,9 +2348,9 @@ void model3_renderer::draw_scanline_tex_colormod(INT32 scanline, const extent_t 
 	float in = extent.param[4].start;
 	float inz = extent.param[4].dpdx;
 
-	UINT32 umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
-	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
-	UINT32 width = 6 + texture->width;
+	uint32_t umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
+	uint32_t vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
+	uint32_t width = 6 + texture->width;
 
 	rgbaint_t polycolor(polydata.color);
 
@@ -2358,7 +2358,7 @@ void model3_renderer::draw_scanline_tex_colormod(INT32 scanline, const extent_t 
 	{
 		if (z <= zb[x])
 		{
-			UINT32 texel;
+			uint32_t texel;
 			TEX_FETCH();        // TODO fetch rgbaint_t instead
 
 			rgbaint_t color(texel);
@@ -2378,9 +2378,9 @@ void model3_renderer::draw_scanline_tex_colormod(INT32 scanline, const extent_t 
 	}
 }
 
-void model3_renderer::draw_scanline_tex_contour(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
+void model3_renderer::draw_scanline_tex_contour(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	UINT32 *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix32(scanline);
 	float *zb = (float*)&m_zb->pix32(scanline);
 	const cached_texture *texture = polydata.texture;
 
@@ -2395,9 +2395,9 @@ void model3_renderer::draw_scanline_tex_contour(INT32 scanline, const extent_t &
 	float in = extent.param[4].start;
 	float inz = extent.param[4].dpdx;
 
-	UINT32 umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
-	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
-	UINT32 width = 6 + texture->width;
+	uint32_t umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
+	uint32_t vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
+	uint32_t width = 6 + texture->width;
 
 	rgbaint_t polycolor(polydata.color);
 
@@ -2405,10 +2405,10 @@ void model3_renderer::draw_scanline_tex_contour(INT32 scanline, const extent_t &
 	{
 		if (z <= zb[x])
 		{
-			UINT32 texel;
+			uint32_t texel;
 			TEX_FETCH();
 
-			UINT32 fa = texel >> 24;
+			uint32_t fa = texel >> 24;
 			if (fa >= 0xf8)
 			{
 				rgbaint_t color(texel);
@@ -2430,9 +2430,9 @@ void model3_renderer::draw_scanline_tex_contour(INT32 scanline, const extent_t &
 	}
 }
 
-void model3_renderer::draw_scanline_tex_trans(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
+void model3_renderer::draw_scanline_tex_trans(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	UINT32 *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix32(scanline);
 	float *zb = (float*)&m_zb->pix32(scanline);
 	const cached_texture *texture = polydata.texture;
 
@@ -2449,9 +2449,9 @@ void model3_renderer::draw_scanline_tex_trans(INT32 scanline, const extent_t &ex
 
 	int trans = (polydata.transparency << 3) | (polydata.transparency >> 2);
 
-	UINT32 umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
-	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
-	UINT32 width = 6 + texture->width;
+	uint32_t umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
+	uint32_t vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
+	uint32_t width = 6 + texture->width;
 
 	rgbaint_t polycolor(polydata.color);
 
@@ -2459,7 +2459,7 @@ void model3_renderer::draw_scanline_tex_trans(INT32 scanline, const extent_t &ex
 	{
 		if (z <= zb[x])
 		{
-			UINT32 texel;
+			uint32_t texel;
 			TEX_FETCH();
 
 			rgbaint_t color(texel);
@@ -2479,9 +2479,9 @@ void model3_renderer::draw_scanline_tex_trans(INT32 scanline, const extent_t &ex
 	}
 }
 
-void model3_renderer::draw_scanline_tex_alpha(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
+void model3_renderer::draw_scanline_tex_alpha(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	UINT32 *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix32(scanline);
 	float *zb = (float*)&m_zb->pix32(scanline);
 	const cached_texture *texture = polydata.texture;
 
@@ -2499,18 +2499,18 @@ void model3_renderer::draw_scanline_tex_alpha(INT32 scanline, const extent_t &ex
 //  int srctrans = polydata.transparency;
 //  int desttrans = 32 - polydata.transparency;
 
-	UINT32 umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
-	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
-	UINT32 width = 6 + texture->width;
+	uint32_t umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
+	uint32_t vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
+	uint32_t width = 6 + texture->width;
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		if (z <= zb[x])
 		{
-			UINT32 texel;
+			uint32_t texel;
 			TEX_FETCH();
 
-			UINT32 fa = texel >> 24;
+			uint32_t fa = texel >> 24;
 			if (fa != 0)
 			{
 				rgbaint_t color(texel);

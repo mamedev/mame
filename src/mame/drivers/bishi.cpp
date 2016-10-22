@@ -129,7 +129,7 @@ READ16_MEMBER(bishi_state::bishi_mirror_r)
 
 READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
 {
-	UINT16 ouroffs;
+	uint16_t ouroffs;
 
 	ouroffs = (offset >> 1) * 8;
 	if (offset & 1)

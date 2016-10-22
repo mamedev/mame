@@ -56,7 +56,7 @@ const tiny_rom_entry *comx_epr_device::device_rom_region() const
 //  comx_epr_device - constructor
 //-------------------------------------------------
 
-comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COMX_EPR, "COMX-35 F&M EPROM Switchboard", tag, owner, clock, "comx_epr", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "f800"),
@@ -90,9 +90,9 @@ void comx_epr_device::device_reset()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_epr_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_epr_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset >= 0xc000 && offset < 0xe000)
 	{
@@ -112,7 +112,7 @@ UINT8 comx_epr_device::comx_mrd_r(address_space &space, offs_t offset, int *extr
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_epr_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
+void comx_epr_device::comx_io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset == 1)
 	{

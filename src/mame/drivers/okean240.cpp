@@ -85,15 +85,15 @@ public:
 	DECLARE_READ8_MEMBER(okean240a_keyboard_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE8_MEMBER(scroll_w);
-	UINT8 m_term_data;
-	UINT8 m_j;
-	UINT8 m_scroll;
-	required_shared_ptr<UINT8> m_p_videoram;
+	uint8_t m_term_data;
+	uint8_t m_j;
+	uint8_t m_scroll;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(okean240);
-	UINT32 screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	optional_ioport m_io_modifiers;
@@ -115,7 +115,7 @@ READ8_MEMBER( okean240_state::okean240_kbd_status_r )
 // see if a key is pressed and indicate status
 READ8_MEMBER( okean240_state::okean240a_kbd_status_r )
 {
-	UINT8 i,j;
+	uint8_t i,j;
 
 	for (i = 0; i < 11; i++)
 	{
@@ -148,7 +148,7 @@ READ8_MEMBER( okean240_state::okean240_keyboard_r )
 
 READ8_MEMBER( okean240_state::okean240a_keyboard_r )
 {
-	UINT8 i,j;
+	uint8_t i,j;
 
 	if (offset == 0) // port 40 (get a column)
 	{
@@ -192,7 +192,7 @@ WRITE8_MEMBER( okean240_state::okean240_keyboard_w )
 // for test rom
 READ8_MEMBER( okean240_state::term_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -380,7 +380,7 @@ void okean240_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in okean240_state::device_timer");
+		assert_always(false, "Unknown id in okean240_state::device_timer");
 	}
 }
 
@@ -413,7 +413,7 @@ WRITE8_MEMBER( okean240_state::kbd_put )
 
 DRIVER_INIT_MEMBER(okean240_state,okean240)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 }
 
@@ -421,15 +421,15 @@ void okean240_state::video_start()
 {
 }
 
-UINT32 okean240_state::screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t okean240_state::screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 gfx,ma; // ma must be 8bit
-	UINT16 x,y;
+	uint8_t gfx,ma; // ma must be 8bit
+	uint16_t x,y;
 
 	for (y = 0; y < 256; y++)
 	{
 		ma = y + m_scroll;
-		UINT16 *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix16(y);
 
 		for (x = 0; x < 0x4000; x+=0x200)
 		{

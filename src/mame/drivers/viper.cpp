@@ -381,15 +381,15 @@ public:
 	{
 	}
 
-	UINT32 m_epic_iack;
+	uint32_t m_epic_iack;
 	int m_cf_card_ide;
 	int m_unk1_bit;
-	UINT32 m_voodoo3_pci_reg[0x100];
+	uint32_t m_voodoo3_pci_reg[0x100];
 	int m_unk_serial_bit_w;
-	UINT16 m_unk_serial_cmd;
-	UINT16 m_unk_serial_data;
-	UINT16 m_unk_serial_data_r;
-	UINT8 m_unk_serial_regs[0x80];
+	uint16_t m_unk_serial_cmd;
+	uint16_t m_unk_serial_data;
+	uint16_t m_unk_serial_data_r;
+	uint8_t m_unk_serial_regs[0x80];
 
 	DECLARE_READ32_MEMBER(epic_r);
 	DECLARE_WRITE32_MEMBER(epic_w);
@@ -426,12 +426,12 @@ public:
 	DECLARE_DRIVER_INIT(viperhd);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
 #if VIPER_DEBUG_EPIC_REGS
-	const char* epic_get_register_name(UINT32 reg);
+	const char* epic_get_register_name(uint32_t reg);
 #endif
 	void epic_update_interrupts();
 	void mpc8240_interrupt(int irq);
@@ -442,30 +442,30 @@ public:
 	required_device<ppc_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<voodoo_3_device> m_voodoo;
-	required_shared_ptr<UINT64> m_workram;
+	required_shared_ptr<uint64_t> m_workram;
 };
 
-UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo");
 	return voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
-UINT32 m_mpc8240_regs[256/4];
+uint32_t m_mpc8240_regs[256/4];
 
 #ifdef UNUSED_FUNCTION
-static inline UINT64 read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
+static inline uint64_t read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
 {
-	UINT64 result = 0;
+	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)(handler)(space, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (uint64_t)(handler)(space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return result;
 }
 
 
-static inline void write64le_with_32le_device_handler(write32_delegate handler, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
+static inline void write64le_with_32le_device_handler(write32_delegate handler, address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
 		handler(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
@@ -474,19 +474,19 @@ static inline void write64le_with_32le_device_handler(write32_delegate handler, 
 }
 #endif
 
-static inline UINT64 read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
+static inline uint64_t read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	mem_mask = flipendian_int64(mem_mask);
-	UINT64 result = 0;
+	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
-		result = (UINT64)(handler)(space, offset * 2, mem_mask & 0xffffffff);
+		result = (uint64_t)(handler)(space, offset * 2, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return flipendian_int64(result);
 }
 
 
-static inline void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
+static inline void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	data = flipendian_int64(data);
 	mem_mask = flipendian_int64(mem_mask);
@@ -498,7 +498,7 @@ static inline void write64be_with_32le_device_handler(write32_delegate handler, 
 
 /*****************************************************************************/
 
-static UINT32 mpc8240_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t mpc8240_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 // device is null?
 //  viper_state *state = device->machine().driver_data<viper_state>();
@@ -513,7 +513,7 @@ static UINT32 mpc8240_pci_r(device_t *busdevice, device_t *device, int function,
 	//return state->m_mpc8240_regs[reg/4];
 }
 
-static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 // device is null?
 //  viper_state *state = device->machine().driver_data<viper_state>();
@@ -587,7 +587,7 @@ WRITE64_MEMBER(viper_state::pci_config_data_w)
 
 struct MPC8240_IRQ
 {
-	UINT32 vector;
+	uint32_t vector;
 	int priority;
 	int destination;
 	int active;
@@ -597,7 +597,7 @@ struct MPC8240_IRQ
 
 struct MPC8240_GLOBAL_TIMER
 {
-	UINT32 base_count;
+	uint32_t base_count;
 	int enable;
 	emu_timer *timer;
 };
@@ -606,18 +606,18 @@ struct MPC8240_GLOBAL_TIMER
 
 struct MPC8240_EPIC
 {
-	UINT32 iack;
-	UINT32 eicr;
-	UINT32 svr;
+	uint32_t iack;
+	uint32_t eicr;
+	uint32_t svr;
 
 	int active_irq;
 
 	MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS];
 
-	UINT8 i2c_adr;
+	uint8_t i2c_adr;
 	int i2c_freq_div, i2c_freq_sample_rate;
-	UINT8 i2c_cr;
-	UINT8 i2c_sr;
+	uint8_t i2c_cr;
+	uint8_t i2c_sr;
 	int i2c_state;
 
 	MPC8240_GLOBAL_TIMER global_timer[4];
@@ -628,7 +628,7 @@ struct MPC8240_EPIC
 static MPC8240_EPIC epic;
 
 #if VIPER_DEBUG_EPIC_REGS
-const char* viper_state::epic_get_register_name(UINT32 reg)
+const char* viper_state::epic_get_register_name(uint32_t reg)
 {
 	switch (reg >> 16)
 	{
@@ -835,7 +835,7 @@ READ32_MEMBER(viper_state::epic_r)
 	}
 #endif
 
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 
 	switch (reg >> 16)
 	{
@@ -1336,7 +1336,7 @@ void viper_state::mpc8240_epic_reset(void)
 /*****************************************************************************/
 
 
-static const UINT8 cf_card_tuples[] =
+static const uint8_t cf_card_tuples[] =
 {
 	0x01,       // Device Tuple
 	0x01,       // Tuple size
@@ -1351,7 +1351,7 @@ static const UINT8 cf_card_tuples[] =
 
 READ64_MEMBER(viper_state::cf_card_data_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -1386,7 +1386,7 @@ WRITE64_MEMBER(viper_state::cf_card_data_w)
 
 			default:
 			{
-				fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context(), offset & 0xf, (UINT16)(data >> 16));
+				fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context(), offset & 0xf, (uint16_t)(data >> 16));
 			}
 		}
 	}
@@ -1394,7 +1394,7 @@ WRITE64_MEMBER(viper_state::cf_card_data_w)
 
 READ64_MEMBER(viper_state::cf_card_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -1458,7 +1458,7 @@ READ64_MEMBER(viper_state::cf_card_r)
 WRITE64_MEMBER(viper_state::cf_card_w)
 {
 	#ifdef VIPER_DEBUG_LOG
-	//printf("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", machine().describe_context(), (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	//printf("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", machine().describe_context(), (uint32_t)(data>>32), (uint32_t)(data), offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 	#endif
 
 	if (ACCESSING_BITS_16_31)
@@ -1497,7 +1497,7 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 
 				default:
 				{
-					fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context(), offset & 0xf, (UINT16)((data >> 16) & 0xffff));
+					fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context(), offset & 0xf, (uint16_t)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -1517,7 +1517,7 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 				}
 				default:
 				{
-					fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context(), offset, (UINT16)((data >> 16) & 0xffff));
+					fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context(), offset, (uint16_t)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -1537,7 +1537,7 @@ WRITE64_MEMBER(viper_state::unk2_w)
 
 READ64_MEMBER(viper_state::ata_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -1575,7 +1575,7 @@ WRITE64_MEMBER(viper_state::ata_w)
 	}
 }
 
-static UINT32 voodoo3_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t voodoo3_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 	viper_state *state = device->machine().driver_data<viper_state>();
 
@@ -1615,7 +1615,7 @@ static UINT32 voodoo3_pci_r(device_t *busdevice, device_t *device, int function,
 	}
 }
 
-static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	viper_state *state = device->machine().driver_data<viper_state>();
 
@@ -1690,7 +1690,7 @@ READ64_MEMBER(viper_state::voodoo3_io_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
-//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
+//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, space.device().safe_pc());
 
 	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_io_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
@@ -1701,7 +1701,7 @@ READ64_MEMBER(viper_state::voodoo3_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_w)
 {
-//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
+//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, space.device().safe_pc());
 
 	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
@@ -1712,7 +1712,7 @@ READ64_MEMBER(viper_state::voodoo3_lfb_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
-//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
+//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, space.device().safe_pc());
 
 	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_fb_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
@@ -1727,13 +1727,13 @@ WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 #define DS2430_STATE_READ_MEM_ADDRESS       6
 
 static int unk1_bit = 1;
-static UINT8 ds2430_data;
+static uint8_t ds2430_data;
 static int ds2430_data_count = 0;
 static int ds2430_reset = 0;
 static int ds2430_state;
-static UINT8 ds2430_cmd;
-static UINT8 *ds2430_rom;
-static UINT8 ds2430_addr;
+static uint8_t ds2430_cmd;
+static uint8_t *ds2430_rom;
+static uint8_t ds2430_addr;
 
 
 TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
@@ -1755,14 +1755,14 @@ TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
 
 READ64_MEMBER(viper_state::unk1_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 	//return 0;//U64(0x0000400000000000);
 
 	r |= U64(0xffff00000000ffff);
 
 	if (ACCESSING_BITS_40_47)
 	{
-		UINT64 reg = 0;
+		uint64_t reg = 0;
 		reg |= (unk1_bit << 5);
 		reg |= 0x40;        // if this bit is 0, loads a disk copier instead
 		//r |= 0x04;    // screen flip
@@ -1770,7 +1770,7 @@ READ64_MEMBER(viper_state::unk1_r)
 
 		r |= reg << 40;
 
-		//r |= (UINT64)(unk1_bit << 5) << 40;
+		//r |= (uint64_t)(unk1_bit << 5) << 40;
 		//r |= U64(0x0000400000000000);
 
 		//r |= U64(0x0000040000000000); // screen flip
@@ -1778,17 +1778,17 @@ READ64_MEMBER(viper_state::unk1_r)
 	}
 	if (ACCESSING_BITS_32_39)
 	{
-		UINT64 reg = ioport("IN0")->read();
+		uint64_t reg = ioport("IN0")->read();
 		r |= reg << 32;
 	}
 	if (ACCESSING_BITS_24_31)
 	{
-		UINT64 reg = ioport("IN1")->read();
+		uint64_t reg = ioport("IN1")->read();
 		r |= reg << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT64 reg = 0;
+		uint64_t reg = 0;
 		//reg |= 0x80;                  // memory card check for boxingm
 		//reg |= 0x40;                  // memory card check for tsurugi
 		reg |= 0x3f;
@@ -1908,7 +1908,7 @@ READ64_MEMBER(viper_state::e70000_r)
 		ds2430_bit_timer->reset();
 		ds2430_bit_timer->start_time();
 
-//      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu->safe_pc());
+//      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
 	}
 
 	return 0;
@@ -1923,7 +1923,7 @@ WRITE64_MEMBER(viper_state::e70000_w)
 			ds2430_timer->adjust(attotime::from_usec(40), 1);   // presence pulse for 240 microsecs
 
 			unk1_bit = 1;
-//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, space.device().safe_pc());
+//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, space.device().safe_pc());
 		}
 		else
 		{
@@ -1948,7 +1948,7 @@ WRITE64_MEMBER(viper_state::unk1a_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
-	//  printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu->safe_pc());
+	//  printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
 	}
 }
 
@@ -1957,15 +1957,15 @@ WRITE64_MEMBER(viper_state::unk1b_w)
 	if (ACCESSING_BITS_56_63)
 	{
 		unk1_bit = 0;
-	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu->safe_pc());
+	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
 	}
 }
 
-static UINT64 e00008_data;
+static uint64_t e00008_data;
 
 READ64_MEMBER(viper_state::e00008_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 	if (ACCESSING_BITS_0_7)
 	{
 		r |= e00008_data;
@@ -1984,13 +1984,13 @@ WRITE64_MEMBER(viper_state::e00008_w)
 
 READ64_MEMBER(viper_state::e00000_r)
 {
-	UINT64 r = 0;//U64(0xffffffffffffffff);
+	uint64_t r = 0;//U64(0xffffffffffffffff);
 	return r;
 }
 
 READ64_MEMBER(viper_state::unk_serial_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 	if (ACCESSING_BITS_16_31)
 	{
 		int bit = m_unk_serial_data_r & 0x1;
@@ -2026,7 +2026,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 				if ((m_unk_serial_cmd & 0x80) == 0)     // register read
 				{
 					int reg = m_unk_serial_cmd & 0x7f;
-					UINT8 data = m_unk_serial_regs[reg];
+					uint8_t data = m_unk_serial_regs[reg];
 
 					m_unk_serial_data_r = ((data & 0x1) << 7) | ((data & 0x2) << 5) | ((data & 0x4) << 3) | ((data & 0x8) << 1) | ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
 
@@ -2154,9 +2154,9 @@ void viper_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, FALSE, m_workram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, false, m_workram);
 
-	ds2430_rom = (UINT8*)memregion("ds2430")->base();
+	ds2430_rom = (uint8_t*)memregion("ds2430")->base();
 }
 
 void viper_state::machine_reset()
@@ -2164,7 +2164,7 @@ void viper_state::machine_reset()
 	mpc8240_epic_reset();
 
 	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-	UINT16 *identify_device = hdd->identify_device_buffer();
+	uint16_t *identify_device = hdd->identify_device_buffer();
 
 	// Viper expects these settings or the BIOS fails
 	identify_device[51] = 0x0200;           /* 51: PIO data transfer cycle timing mode */

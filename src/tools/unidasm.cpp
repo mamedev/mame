@@ -42,7 +42,7 @@ struct dasm_table_entry
 {
 	const char *            name;
 	display_type            display;
-	INT8                    pcshift;
+	int8_t                    pcshift;
 	cpu_disassemble_func    func;
 };
 
@@ -51,14 +51,14 @@ struct options
 {
 	const char *            filename;
 	offs_t                  basepc;
-	UINT8                   norawbytes;
-	UINT8                   lower;
-	UINT8                   upper;
-	UINT8                   flipped;
+	uint8_t                   norawbytes;
+	uint8_t                   lower;
+	uint8_t                   upper;
+	uint8_t                   flipped;
 	int                     mode;
 	const dasm_table_entry *dasm;
-	UINT32                  skip;
-	UINT32                  count;
+	uint32_t                  skip;
+	uint32_t                  count;
 };
 
 
@@ -214,14 +214,14 @@ CPU_DISASSEMBLE( z8 );
 CPU_DISASSEMBLE( z80 );
 CPU_DISASSEMBLE( z8000 );
 
-CPU_DISASSEMBLE( sparcv7 )      { static sparc_disassembler dasm(nullptr, 7);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv8 )      { static sparc_disassembler dasm(nullptr, 8);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9 )      { static sparc_disassembler dasm(nullptr, 9);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis1 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_1);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis2 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis2p ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2p); return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis3 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis3b ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3b); return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv7 )      { static sparc_disassembler dasm(nullptr, 7);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv8 )      { static sparc_disassembler dasm(nullptr, 8);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9 )      { static sparc_disassembler dasm(nullptr, 9);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis1 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_1);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis2 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis2p ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2p); return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis3 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis3b ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3b); return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
 
 
 static const dasm_table_entry dasm_table[] =
@@ -393,11 +393,11 @@ static const dasm_table_entry dasm_table[] =
 
 static int parse_options(int argc, char *argv[], options *opts)
 {
-	int pending_base = FALSE;
-	int pending_arch = FALSE;
-	int pending_mode = FALSE;
-	int pending_skip = FALSE;
-	int pending_count = FALSE;
+	bool pending_base = false;
+	bool pending_arch = false;
+	bool pending_mode = false;
+	bool pending_skip = false;
+	bool pending_count = false;
 
 	memset(opts, 0, sizeof(*opts));
 
@@ -412,24 +412,24 @@ static int parse_options(int argc, char *argv[], options *opts)
 			if (pending_base || pending_arch || pending_mode || pending_skip || pending_count)
 				goto usage;
 
-			if (tolower((UINT8)curarg[1]) == 'a')
-				pending_arch = TRUE;
-			else if (tolower((UINT8)curarg[1]) == 'b')
-				pending_base = TRUE;
-			else if (tolower((UINT8)curarg[1]) == 'f')
-				opts->flipped = TRUE;
-			else if (tolower((UINT8)curarg[1]) == 'l')
-				opts->lower = TRUE;
-			else if (tolower((UINT8)curarg[1]) == 'm')
-				pending_mode = TRUE;
-			else if (tolower((UINT8)curarg[1]) == 's')
-				pending_skip = TRUE;
-			else if (tolower((UINT8)curarg[1]) == 'c')
-				pending_count = TRUE;
-			else if (tolower((UINT8)curarg[1]) == 'n')
-				opts->norawbytes = TRUE;
-			else if (tolower((UINT8)curarg[1]) == 'u')
-				opts->upper = TRUE;
+			if (tolower((uint8_t)curarg[1]) == 'a')
+				pending_arch = true;
+			else if (tolower((uint8_t)curarg[1]) == 'b')
+				pending_base = true;
+			else if (tolower((uint8_t)curarg[1]) == 'f')
+				opts->flipped = true;
+			else if (tolower((uint8_t)curarg[1]) == 'l')
+				opts->lower = true;
+			else if (tolower((uint8_t)curarg[1]) == 'm')
+				pending_mode = true;
+			else if (tolower((uint8_t)curarg[1]) == 's')
+				pending_skip = true;
+			else if (tolower((uint8_t)curarg[1]) == 'c')
+				pending_count = true;
+			else if (tolower((uint8_t)curarg[1]) == 'n')
+				opts->norawbytes = true;
+			else if (tolower((uint8_t)curarg[1]) == 'u')
+				opts->upper = true;
 			else
 				goto usage;
 		}
@@ -446,7 +446,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 				result = sscanf(&curarg[0], "%x", &opts->basepc);
 			if (result != 1)
 				goto usage;
-			pending_base = FALSE;
+			pending_base = false;
 		}
 
 		// mode
@@ -454,7 +454,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		{
 			if (sscanf(curarg, "%d", &opts->mode) != 1)
 				goto usage;
-			pending_mode = FALSE;
+			pending_mode = false;
 		}
 
 		// architecture
@@ -467,7 +467,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 			if (curarch == ARRAY_LENGTH(dasm_table))
 				goto usage;
 			opts->dasm = &dasm_table[curarch];
-			pending_arch = FALSE;
+			pending_arch = false;
 		}
 
 		// skip bytes
@@ -475,7 +475,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		{
 			if (sscanf(curarg, "%d", &opts->skip) != 1)
 				goto usage;
-			pending_skip = FALSE;
+			pending_skip = false;
 		}
 
 		// size
@@ -483,7 +483,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		{
 			if (sscanf(curarg, "%d", &opts->count) != 1)
 				goto usage;
-			pending_count = FALSE;
+			pending_count = false;
 		}
 
 		// filename
@@ -532,10 +532,10 @@ int main(int argc, char *argv[])
 	osd_file::error filerr;
 	int displayendian;
 	int displaychunk;
-	UINT32 curbyte;
-	UINT32 length;
+	uint32_t curbyte;
+	uint32_t length;
 	int maxchunks;
-	UINT32 curpc;
+	uint32_t curpc;
 	options opts;
 	int numbytes;
 	void *data;
@@ -574,9 +574,9 @@ int main(int argc, char *argv[])
 		curpc = opts.basepc;
 		for (curbyte = 0; curbyte < length; curbyte += numbytes)
 		{
-			UINT8 *oprom = (UINT8 *)data + opts.skip + curbyte;
+			uint8_t *oprom = (uint8_t *)data + opts.skip + curbyte;
 			char buffer[1024];
-			UINT32 pcdelta;
+			uint32_t pcdelta;
 			int numchunks;
 
 			// disassemble
@@ -591,12 +591,12 @@ int main(int argc, char *argv[])
 			if (opts.lower)
 			{
 				for (p = buffer; *p != 0; p++)
-					*p = tolower((UINT8)*p);
+					*p = tolower((uint8_t)*p);
 			}
 			else if (opts.upper)
 			{
 				for (p = buffer; *p != 0; p++)
-					*p = toupper((UINT8)*p);
+					*p = toupper((uint8_t)*p);
 			}
 
 			// round to the nearest display chunk

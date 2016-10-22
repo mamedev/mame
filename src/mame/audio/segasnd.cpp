@@ -66,7 +66,7 @@ static inline double step_cr_filter(g80_filter_state *state, double input)
 
 const device_type SEGASPEECH = &device_creator<speech_sound_device>;
 
-speech_sound_device::speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+speech_sound_device::speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGASPEECH, "Sega Speech Sound Board", tag, owner, clock, "sega_speech_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_drq(0),
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER(speech_sound_device::drq_w)
 TIMER_CALLBACK_MEMBER( speech_sound_device::delayed_speech_w )
 {
 	int data = param;
-	UINT8 old = m_latch;
+	uint8_t old = m_latch;
 
 	/* all 8 bits are latched */
 	m_latch = data;
@@ -228,7 +228,7 @@ MACHINE_CONFIG_FRAGMENT( sega_speech_board )
 	MCFG_SOUND_ADD("segaspeech", SEGASPEECH, 0)
 	MCFG_SOUND_ADD("speech", SP0250, SPEECH_MASTER_CLOCK)
 	MCFG_SP0250_DRQ_CALLBACK(DEVWRITELINE("segaspeech", speech_sound_device, drq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -239,7 +239,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGAUSB = &device_creator<usb_sound_device>;
 
-usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_ourcpu(*this, "ourcpu"),
@@ -258,7 +258,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 {
 }
 
-usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGAUSB, "Sega Universal Sound Board", tag, owner, clock, "segausb", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_ourcpu(*this, "ourcpu"),
@@ -468,7 +468,7 @@ WRITE8_MEMBER( usb_sound_device::p1_w )
 
 WRITE8_MEMBER( usb_sound_device::p2_w )
 {
-	UINT8 old = m_last_p2_value;
+	uint8_t old = m_last_p2_value;
 	m_last_p2_value = data;
 
 	/* low 2 bits control the bank of work RAM we are addressing */
@@ -505,7 +505,7 @@ READ8_MEMBER( usb_sound_device::t1_r )
 
 static inline void clock_channel(timer8253_channel *ch)
 {
-	UINT8 lastgate = ch->lastgate;
+	uint8_t lastgate = ch->lastgate;
 
 	/* update the gate */
 	ch->lastgate = ch->gate;
@@ -550,7 +550,7 @@ static inline void clock_channel(timer8253_channel *ch)
  *
  *************************************/
 
-void usb_sound_device::timer_w(int which, UINT8 offset, UINT8 data)
+void usb_sound_device::timer_w(int which, uint8_t offset, uint8_t data)
 {
 	timer8253 *g = &m_timer_group[which];
 	timer8253_channel *ch;
@@ -572,12 +572,12 @@ void usb_sound_device::timer_w(int which, UINT8 offset, UINT8 data)
 			{
 				case 1: /* low word only */
 					ch->count = data;
-					ch->holding = FALSE;
+					ch->holding = false;
 					break;
 
 				case 2: /* high word only */
 					ch->count = data << 8;
-					ch->holding = FALSE;
+					ch->holding = false;
 					break;
 
 				case 3: /* low word followed by high word */
@@ -589,7 +589,7 @@ void usb_sound_device::timer_w(int which, UINT8 offset, UINT8 data)
 					else
 					{
 						ch->count = (ch->count & 0x00ff) | (data << 8);
-						ch->holding = FALSE;
+						ch->holding = false;
 						ch->latchtoggle = 0;
 					}
 					break;
@@ -607,7 +607,7 @@ void usb_sound_device::timer_w(int which, UINT8 offset, UINT8 data)
 				ch = &g->chan[(data & 0xc0) >> 6];
 
 				/* extract the bits */
-				ch->holding = TRUE;
+				ch->holding = true;
 				ch->latchmode = (data >> 4) & 3;
 				ch->clockmode = (data >> 1) & 7;
 				ch->bcdmode = (data >> 0) & 1;
@@ -619,7 +619,7 @@ void usb_sound_device::timer_w(int which, UINT8 offset, UINT8 data)
 }
 
 
-void usb_sound_device::env_w(int which, UINT8 offset, UINT8 data)
+void usb_sound_device::env_w(int which, uint8_t offset, uint8_t data)
 {
 	timer8253 *g = &m_timer_group[which];
 
@@ -881,7 +881,7 @@ machine_config_constructor usb_sound_device::device_mconfig_additions() const
 
 const device_type SEGAUSBROM = &device_creator<usb_rom_sound_device>;
 
-usb_rom_sound_device::usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+usb_rom_sound_device::usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: usb_sound_device(mconfig, SEGAUSBROM, "Sega Universal Sound Board with ROM", tag, owner, clock, "segausbrom", __FILE__)
 {
 }

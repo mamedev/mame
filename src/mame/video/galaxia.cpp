@@ -63,16 +63,16 @@ PALETTE_INIT_MEMBER(galaxia_state,astrowar)
 
 TILE_GET_INFO_MEMBER(galaxia_state::get_galaxia_bg_tile_info)
 {
-	UINT8 code = m_video_ram[tile_index] & 0x7f; // d7 unused
-	UINT8 color = m_color_ram[tile_index] & 3; // highest bits unused
+	uint8_t code = m_video_ram[tile_index] & 0x7f; // d7 unused
+	uint8_t color = m_color_ram[tile_index] & 3; // highest bits unused
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxia_state::get_astrowar_bg_tile_info)
 {
-	UINT8 code = m_video_ram[tile_index];
-	UINT8 color = m_color_ram[tile_index] & 7; // highest bits unused
+	uint8_t code = m_video_ram[tile_index];
+	uint8_t color = m_color_ram[tile_index] & 7; // highest bits unused
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -108,7 +108,7 @@ VIDEO_START_MEMBER(galaxia_state,astrowar)
 
 /********************************************************************************/
 
-UINT32 galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
@@ -173,7 +173,7 @@ UINT32 galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind16 
 }
 
 
-UINT32 galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// astrowar has only one S2636
 	int x, y;
@@ -190,7 +190,7 @@ UINT32 galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind16
 		// draw bullets (guesswork)
 		if (m_bullet_ram[y])
 		{
-			UINT8 pos = m_bullet_ram[y] ^ 0xff;
+			uint8_t pos = m_bullet_ram[y] ^ 0xff;
 
 			// background vs. bullet collision detection
 			if (m_temp_bitmap.pix16(y, pos) & 1)

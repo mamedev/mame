@@ -181,9 +181,9 @@ WRITE8_MEMBER(qix_state::qixmcu_coinctrl_w)
 
 READ8_MEMBER(qix_state::qix_68705_portA_r)
 {
-	UINT8 ddr = m_68705_ddr[0];
-	UINT8 out = m_68705_port_out[0];
-	UINT8 in = m_68705_port_in[0];
+	uint8_t ddr = m_68705_ddr[0];
+	uint8_t out = m_68705_port_out[0];
+	uint8_t in = m_68705_port_in[0];
 	logerror("68705:portA_r = %02X (%02X)\n", (out & ddr) | (in & ~ddr), in);
 	return (out & ddr) | (in & ~ddr);
 }
@@ -191,18 +191,18 @@ READ8_MEMBER(qix_state::qix_68705_portA_r)
 
 READ8_MEMBER(qix_state::qix_68705_portB_r)
 {
-	UINT8 ddr = m_68705_ddr[1];
-	UINT8 out = m_68705_port_out[1];
-	UINT8 in = (ioport("COIN")->read() & 0x0f) | ((ioport("COIN")->read() & 0x80) >> 3);
+	uint8_t ddr = m_68705_ddr[1];
+	uint8_t out = m_68705_port_out[1];
+	uint8_t in = (ioport("COIN")->read() & 0x0f) | ((ioport("COIN")->read() & 0x80) >> 3);
 	return (out & ddr) | (in & ~ddr);
 }
 
 
 READ8_MEMBER(qix_state::qix_68705_portC_r)
 {
-	UINT8 ddr = m_68705_ddr[2];
-	UINT8 out = m_68705_port_out[2];
-	UINT8 in = (m_coinctrl & 0x08) | ((ioport("COIN")->read() & 0x70) >> 4);
+	uint8_t ddr = m_68705_ddr[2];
+	uint8_t out = m_68705_port_out[2];
+	uint8_t in = (m_coinctrl & 0x08) | ((ioport("COIN")->read() & 0x70) >> 4);
 	return (out & ddr) | (in & ~ddr);
 }
 

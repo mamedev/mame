@@ -38,8 +38,8 @@
 
 struct buf_t
 {
-	volatile UINT8 data;
-	volatile UINT8 stat;
+	volatile uint8_t data;
+	volatile uint8_t stat;
 	volatile int cnt;
 	volatile int data_cnt;
 };
@@ -60,7 +60,7 @@ struct osd_shared_mem
 class gaelco_serial_device : public device_t
 {
 public:
-	gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~gaelco_serial_device() {}
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<gaelco_serial_device &>(device).m_irq_handler.set_callback(object); }
@@ -94,7 +94,7 @@ private:
 	// internal state
 	devcb_write_line m_irq_handler;
 
-	UINT8 m_status;
+	uint8_t m_status;
 	int m_last_in_msg_cnt;
 	int m_slack_cnt;
 
@@ -108,7 +108,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER( set_status_cb );
 	TIMER_CALLBACK_MEMBER( link_cb );
-	void set_status(UINT8 mask, UINT8 set, int wait);
+	void set_status(uint8_t mask, uint8_t set, int wait);
 	void process_in();
 	void sync_link();
 };

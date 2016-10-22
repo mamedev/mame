@@ -151,7 +151,7 @@ machine_config_constructor a2232_device::device_mconfig_additions() const
 //  a2232_device - constructor
 //-------------------------------------------------
 
-a2232_device::a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2232_device::a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2232, "CBM A2232 Serial Card", tag, owner, clock, "a2232", __FILE__),
 	device_zorro2_card_interface(mconfig, *this),
 	m_iocpu(*this, "iocpu"),
@@ -311,7 +311,7 @@ WRITE_LINE_MEMBER( a2232_device::cfgin_w )
 
 READ16_MEMBER( a2232_device::shared_ram_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	if (ACCESSING_BITS_0_7)
 		data |= m_shared_ram[(offset << 1) + 1];
@@ -381,7 +381,7 @@ WRITE16_MEMBER( a2232_device::irq_w )
 
 READ16_MEMBER( a2232_device::reset_high_r )
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	if (VERBOSE)
 		logerror("%s('%s'): reset_high_r %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);

@@ -42,16 +42,16 @@
 
 PALETTE_DECODER_MEMBER(x68k_state, GGGGGRRRRRBBBBBI)
 {
-	UINT8 i = raw & 1;
-	UINT8 r = pal6bit(((raw >> 5) & 0x3e) | i);
-	UINT8 g = pal6bit(((raw >> 10) & 0x3e) | i);
-	UINT8 b = pal6bit(((raw >> 0) & 0x3e) | i);
+	uint8_t i = raw & 1;
+	uint8_t r = pal6bit(((raw >> 5) & 0x3e) | i);
+	uint8_t g = pal6bit(((raw >> 10) & 0x3e) | i);
+	uint8_t b = pal6bit(((raw >> 0) & 0x3e) | i);
 	return rgb_t(r, g, b);
 }
 
-inline void x68k_state::x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, UINT32 color)
+inline void x68k_state::x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix32(y, x) = (UINT16)color;
+	bitmap.pix32(y, x) = (uint16_t)color;
 }
 /*
 bitmap_rgb32* ::x68k_get_gfx_page(int pri,int type)
@@ -92,7 +92,7 @@ bitmap_rgb32* ::x68k_get_gfx_page(int pri,int type)
     return nullptr;  // should never reach here either.
 }
 */
-void x68k_state::x68k_crtc_text_copy(int src, int dest, UINT8 planes)
+void x68k_state::x68k_crtc_text_copy(int src, int dest, uint8_t planes)
 {
 	// copys one raster in T-VRAM to another raster
 	int src_ram = src * 256;  // 128 bytes per scanline
@@ -549,7 +549,7 @@ WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 
 WRITE16_MEMBER(x68k_state::x68k_tvram_w )
 {
-	UINT16 text_mask;
+	uint16_t text_mask;
 
 	text_mask = ~(m_crtc.reg[23]) & mem_mask;
 
@@ -579,7 +579,7 @@ WRITE16_MEMBER(x68k_state::x68k_tvram_w )
 
 READ16_MEMBER(x68k_state::x68k_gvram_r )
 {
-	UINT16 ret = 0;
+	uint16_t ret = 0;
 
 	if(m_crtc.reg[20] & 0x0800)  // G-VRAM set to buffer
 		return m_gvram[offset];
@@ -710,8 +710,8 @@ READ16_MEMBER(x68k_state::x68k_spriteram_r )
 void x68k_state::x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect)
 {
 	unsigned int line,pixel; // location on screen
-	UINT32 loc;  // location in TVRAM
-	UINT32 colour;
+	uint32_t loc;  // location in TVRAM
+	uint32_t colour;
 	int bit;
 
 	for(line=rect.min_y;line<=rect.max_y;line++)  // per scanline
@@ -741,18 +741,18 @@ void x68k_state::x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectan
 	}
 }
 
-bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority)
+bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, uint8_t priority)
 {
 	int pixel;
 	int page;
-	UINT32 loc;  // location in GVRAM
-	UINT32 lineoffset;
-	UINT16 xscr,yscr;
-	UINT16 colour = 0;
+	uint32_t loc;  // location in GVRAM
+	uint32_t lineoffset;
+	uint16_t xscr,yscr;
+	uint16_t colour = 0;
 	int shift;
 	int scanline;
 	bool blend, ret = false;
-	UINT16 *pal = (UINT16 *)m_gfxpalette->basemem().base();
+	uint16_t *pal = (uint16_t *)m_gfxpalette->basemem().base();
 
 	for(scanline=cliprect.min_y;scanline<=cliprect.max_y;scanline++)  // per scanline
 	{
@@ -920,7 +920,7 @@ void x68k_state::x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 
 	for(scanline=cliprect.min_y;scanline<=cliprect.max_y;scanline++)
 	{
-		UINT16 colour;
+		uint16_t colour;
 		bool blend = false;
 		for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 		{
@@ -1119,7 +1119,7 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 //  m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
 
-UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rectangle rect(0,0,0,0);
 	int priority;
@@ -1128,7 +1128,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bit
 	tilemap_t* x68k_bg0;
 	tilemap_t* x68k_bg1;
 	int pixel = 0, scanline = 0;
-	//UINT8 *rom;
+	//uint8_t *rom;
 
 	if((m_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.
 	{
@@ -1224,7 +1224,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bit
 			{
 				for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 				{
-					UINT8 colour = m_pcgbitmap.pix16(scanline, pixel) & 0xff;
+					uint8_t colour = m_pcgbitmap.pix16(scanline, pixel) & 0xff;
 					if((colour && (m_pcgpalette->pen(colour) & 0xffffff)) || ((m_video.reg[1] & 0x3000) == 0x2000))
 						bitmap.pix32(scanline, pixel) = m_pcgpalette->pen(colour);
 				}
@@ -1243,7 +1243,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bit
 
 	if((m_video.reg[2] & 0x1800) == 0x1000) // special priority
 	{
-		UINT16 colour;
+		uint16_t colour;
 		for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
 		{
 			for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)

@@ -662,7 +662,7 @@ void mario_state::sound_start()
 	if (!audiocpu) return;
 
 #if USE_8039
-	UINT8 *SND = memregion("audiocpu")->base();
+	uint8_t *SND = memregion("audiocpu")->base();
 
 	SND[0x1001] = 0x01;
 #endif
@@ -729,9 +729,9 @@ READ8_MEMBER(mario_state::mario_sh_t1_r)
 
 READ8_MEMBER(mario_state::mario_sh_tune_r)
 {
-	UINT8 *SND = memregion("audiocpu")->base();
-	UINT16 mask = memregion("audiocpu")->bytes()-1;
-	UINT8 p2 = I8035_P2_R(space);
+	uint8_t *SND = memregion("audiocpu")->base();
+	uint16_t mask = memregion("audiocpu")->bytes()-1;
+	uint8_t p2 = I8035_P2_R(space);
 
 	if ((p2 >> 7) & 1)
 		return m_soundlatch->read(space, offset);

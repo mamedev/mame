@@ -38,16 +38,16 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_charram;
-	required_shared_ptr<UINT8> m_video_control;
-	required_shared_ptr<UINT8> m_shift_hi;
-	required_shared_ptr<UINT8> m_shift_lo;
-	required_shared_ptr<UINT8> m_video_flags;
-	required_shared_ptr<UINT8> m_headlight_pos;
-	required_shared_ptr<UINT8> m_edge1_pos;
-	required_shared_ptr<UINT8> m_edge2_pos;
-	required_shared_ptr<UINT8> m_scroll;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_charram;
+	required_shared_ptr<uint8_t> m_video_control;
+	required_shared_ptr<uint8_t> m_shift_hi;
+	required_shared_ptr<uint8_t> m_shift_lo;
+	required_shared_ptr<uint8_t> m_video_flags;
+	required_shared_ptr<uint8_t> m_headlight_pos;
+	required_shared_ptr<uint8_t> m_edge1_pos;
+	required_shared_ptr<uint8_t> m_edge2_pos;
+	required_shared_ptr<uint8_t> m_scroll;
 
 	tilemap_t *m_tilemap_fg;
 	tilemap_t *m_tilemap_edge1[4];
@@ -72,12 +72,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_FG);
 	DECLARE_VIDEO_START(madalien);
 	DECLARE_PALETTE_INIT(madalien);
-	UINT32 screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int scan_helper(int col, int row, int section);
 	void draw_edges(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode);
 	void draw_headlight(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	void draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
-	inline UINT8 shift_common(UINT8 hi, UINT8 lo);
+	inline uint8_t shift_common(uint8_t hi, uint8_t lo);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<discrete_device> m_discrete;

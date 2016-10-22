@@ -103,7 +103,7 @@ inline bool cdp1869_device::is_ntsc()
 //  the given address
 //-------------------------------------------------
 
-inline UINT8 cdp1869_device::read_page_ram_byte(offs_t pma)
+inline uint8_t cdp1869_device::read_page_ram_byte(offs_t pma)
 {
 	return space().read_byte(pma);
 }
@@ -114,7 +114,7 @@ inline UINT8 cdp1869_device::read_page_ram_byte(offs_t pma)
 //  the given address
 //-------------------------------------------------
 
-inline void cdp1869_device::write_page_ram_byte(offs_t pma, UINT8 data)
+inline void cdp1869_device::write_page_ram_byte(offs_t pma, uint8_t data)
 {
 	space().write_byte(pma, data);
 }
@@ -125,9 +125,9 @@ inline void cdp1869_device::write_page_ram_byte(offs_t pma, UINT8 data)
 //  the given address
 //-------------------------------------------------
 
-inline UINT8 cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, UINT8 pmd)
+inline uint8_t cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!m_in_char_ram_func.isnull())
 	{
@@ -143,7 +143,7 @@ inline UINT8 cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, UINT8 pm
 //  the given address
 //-------------------------------------------------
 
-inline void cdp1869_device::write_char_ram_byte(offs_t pma, offs_t cma, UINT8 pmd, UINT8 data)
+inline void cdp1869_device::write_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd, uint8_t data)
 {
 	if (!m_out_char_ram_func.isnull())
 	{
@@ -156,7 +156,7 @@ inline void cdp1869_device::write_char_ram_byte(offs_t pma, offs_t cma, UINT8 pm
 //  read_pcb - read page control bit
 //-------------------------------------------------
 
-inline int cdp1869_device::read_pcb(offs_t pma, offs_t cma, UINT8 pmd)
+inline int cdp1869_device::read_pcb(offs_t pma, offs_t cma, uint8_t pmd)
 {
 	int pcb = 0;
 
@@ -260,7 +260,7 @@ inline int cdp1869_device::get_lines()
 //  get_pmemsize - get page memory size
 //-------------------------------------------------
 
-inline UINT16 cdp1869_device::get_pmemsize(int cols, int rows)
+inline uint16_t cdp1869_device::get_pmemsize(int cols, int rows)
 {
 	int pmemsize = cols * rows;
 
@@ -275,7 +275,7 @@ inline UINT16 cdp1869_device::get_pmemsize(int cols, int rows)
 //  get_pma - get page memory address
 //-------------------------------------------------
 
-inline UINT16 cdp1869_device::get_pma()
+inline uint16_t cdp1869_device::get_pma()
 {
 	if (m_dblpage)
 	{
@@ -340,7 +340,7 @@ inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 //  cdp1869_device - constructor
 //-------------------------------------------------
 
-cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CDP1869, "RCA CDP1869", tag, owner, clock, "cdp1869", __FILE__),
 	device_sound_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -507,7 +507,7 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 
-	INT16 signal = m_signal;
+	int16_t signal = m_signal;
 	stream_sample_t *buffer = outputs[0];
 
 	if (!m_toneoff && m_toneamp)
@@ -565,7 +565,7 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  draw_line - draw character line
 //-------------------------------------------------
 
-void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color)
+void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, uint8_t data, int color)
 {
 	int i;
 	pen_t fg = m_palette->pen(color);
@@ -610,13 +610,13 @@ void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int 
 //  draw_char - draw character
 //-------------------------------------------------
 
-void cdp1869_device::draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT16 pma)
+void cdp1869_device::draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, uint16_t pma)
 {
-	UINT8 pmd = read_page_ram_byte(pma);
+	uint8_t pmd = read_page_ram_byte(pma);
 
-	for (UINT8 cma = 0; cma < get_lines(); cma++)
+	for (uint8_t cma = 0; cma < get_lines(); cma++)
 	{
-		UINT8 data = read_char_ram_byte(pma, cma, pmd);
+		uint8_t data = read_char_ram_byte(pma, cma, pmd);
 
 		int ccb0 = BIT(data, CCB0);
 		int ccb1 = BIT(data, CCB1);
@@ -816,8 +816,8 @@ WRITE8_MEMBER( cdp1869_device::out7_w )
 
 READ8_MEMBER( cdp1869_device::char_ram_r )
 {
-	UINT8 cma = offset & 0x0f;
-	UINT16 pma;
+	uint8_t cma = offset & 0x0f;
+	uint16_t pma;
 
 	if (m_cmem)
 	{
@@ -833,7 +833,7 @@ READ8_MEMBER( cdp1869_device::char_ram_r )
 		cma &= 0x07;
 	}
 
-	UINT8 pmd = read_page_ram_byte(pma);
+	uint8_t pmd = read_page_ram_byte(pma);
 
 	return read_char_ram_byte(pma, cma, pmd);
 }
@@ -845,8 +845,8 @@ READ8_MEMBER( cdp1869_device::char_ram_r )
 
 WRITE8_MEMBER( cdp1869_device::char_ram_w )
 {
-	UINT8 cma = offset & 0x0f;
-	UINT16 pma;
+	uint8_t cma = offset & 0x0f;
+	uint16_t pma;
 
 	if (m_cmem)
 	{
@@ -862,7 +862,7 @@ WRITE8_MEMBER( cdp1869_device::char_ram_w )
 		cma &= 0x07;
 	}
 
-	UINT8 pmd = read_page_ram_byte(pma);
+	uint8_t pmd = read_page_ram_byte(pma);
 
 	write_char_ram_byte(pma, cma, pmd, data);
 }
@@ -874,7 +874,7 @@ WRITE8_MEMBER( cdp1869_device::char_ram_w )
 
 READ8_MEMBER( cdp1869_device::page_ram_r )
 {
-	UINT16 pma;
+	uint16_t pma;
 
 	if (m_cmem)
 	{
@@ -895,7 +895,7 @@ READ8_MEMBER( cdp1869_device::page_ram_r )
 
 WRITE8_MEMBER( cdp1869_device::page_ram_w )
 {
-	UINT16 pma;
+	uint16_t pma;
 
 	if (m_cmem)
 	{
@@ -934,7 +934,7 @@ READ_LINE_MEMBER( cdp1869_device::pal_ntsc_r )
 //  update_screen - update screen
 //-------------------------------------------------
 
-UINT32 cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rectangle screen_rect, outer;
 
@@ -982,8 +982,8 @@ UINT32 cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		int cols = m_freshorz ? CDP1869_COLUMNS_FULL : CDP1869_COLUMNS_HALF;
 		int rows = screen_rect.height() / height;
 
-		UINT16 pmemsize = get_pmemsize(cols, rows);
-		UINT16 addr = m_hma;
+		uint16_t pmemsize = get_pmemsize(cols, rows);
+		uint16_t addr = m_hma;
 
 		for (int sy = 0; sy < rows; sy++)
 		{

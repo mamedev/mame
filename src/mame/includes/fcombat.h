@@ -36,15 +36,15 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t    *m_bgmap;
-	UINT8      m_cocktail_flip;
-	UINT8      m_char_palette;
-	UINT8      m_sprite_palette;
-	UINT8      m_char_bank;
+	uint8_t      m_cocktail_flip;
+	uint8_t      m_char_palette;
+	uint8_t      m_sprite_palette;
+	uint8_t      m_char_bank;
 
 	/* misc */
 	int        m_fcombat_sh;
@@ -74,5 +74,5 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fcombat);
-	UINT32 screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

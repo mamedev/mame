@@ -41,13 +41,14 @@
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/atari400.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
+#include "machine/atarifdc.h"
 #include "sound/dac.h"
 #include "sound/pokey.h"
-#include "includes/atari400.h"
-#include "machine/atarifdc.h"
+#include "sound/volt_reg.h"
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"
 #include "bus/a800/a8sio.h"
@@ -300,7 +301,7 @@ protected:
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
 	required_device<pia6821_device> m_pia;
-	optional_device<dac_device> m_dac;
+	optional_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
 	optional_memory_bank m_0000;
 	optional_memory_bank m_8000;
@@ -310,9 +311,9 @@ protected:
 
 	int m_cart_disabled, m_cart_helper;
 	int m_last_offs;
-	UINT8 m_mmu, m_ext_bank;
+	uint8_t m_mmu, m_ext_bank;
 
-	void setup_ram(int bank,UINT32 size);
+	void setup_ram(int bank,uint32_t size);
 	void setup_cart(a800_cart_slot_device *slot);
 };
 
@@ -1001,7 +1002,7 @@ dependent upon display type.
  *
  **************************************************************/
 
-static const UINT8 atari_palette[256*3] =
+static const uint8_t atari_palette[256*3] =
 {
 	/* Grey */
 	0x00,0x00,0x00, 0x11,0x11,0x11, 0x22,0x22,0x22, 0x33,0x33,0x33,
@@ -1700,21 +1701,21 @@ LIGHT-ORANGE
  *
  **************************************************************/
 
-void a400_state::setup_ram(int bank, UINT32 size)
+void a400_state::setup_ram(int bank, uint32_t size)
 {
 	offs_t ram_top;
 
 	switch (bank)
 	{
 		case 0: // 0x0000-0x7fff
-			ram_top = std::min(size, UINT32(0x8000)) - 1;
+			ram_top = std::min(size, uint32_t(0x8000)) - 1;
 			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
 			if (m_0000 == nullptr)
 				m_0000.findit(false);
 			m_0000->set_base(m_ram->pointer());
 			break;
 		case 1: // 0x8000-0x9fff
-			ram_top = std::min(size, UINT32(0xa000)) - 1;
+			ram_top = std::min(size, uint32_t(0xa000)) - 1;
 			if (ram_top > 0x8000)
 			{
 				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x8000, ram_top, "8000");
@@ -1724,7 +1725,7 @@ void a400_state::setup_ram(int bank, UINT32 size)
 			}
 			break;
 		case 2: // 0xa000-0xbfff
-			ram_top = std::min(size, UINT32(0xc000)) - 1;
+			ram_top = std::min(size, uint32_t(0xc000)) - 1;
 			if (ram_top > 0xa000)
 			{
 				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xa000, ram_top, "a000");
@@ -2044,10 +2045,7 @@ MACHINE_START_MEMBER( a400_state, a5200 )
 
 WRITE8_MEMBER(a400_state::gtia_cb)
 {
-	if (data & 0x08)
-		m_dac->write_unsigned8((UINT8)-120);
-	else
-		m_dac->write_unsigned8(+120);
+	m_dac->write(BIT(data, 3));
 }
 
 /**************************************************************
@@ -2104,7 +2102,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_A8SIO_SLOT_ADD("a8sio", "sio", nullptr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
 	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
@@ -2119,12 +2117,13 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_POKEY_KEYBOARD_CB(atari_common_state, a800_keyboard)
 	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -2319,7 +2318,7 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_POKEY_KEYBOARD_CB(atari_common_state, a5200_keypads)
 	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
 

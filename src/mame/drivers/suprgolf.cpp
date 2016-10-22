@@ -44,22 +44,22 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	tilemap_t *m_tilemap;
-	std::unique_ptr<UINT8[]> m_paletteram;
-	std::unique_ptr<UINT8[]> m_bg_vram;
-	std::unique_ptr<UINT16[]> m_bg_fb;
-	std::unique_ptr<UINT16[]> m_fg_fb;
-	UINT8 m_rom_bank;
-	UINT8 m_bg_bank;
-	UINT8 m_vreg_bank;
-	UINT8 m_msm5205next;
-	UINT8 m_msm_nmi_mask;
-	UINT8 m_vreg_pen;
-	UINT8 m_palette_switch;
-	UINT8 m_bg_vreg_test;
-	UINT8 m_toggle;
+	std::unique_ptr<uint8_t[]> m_paletteram;
+	std::unique_ptr<uint8_t[]> m_bg_vram;
+	std::unique_ptr<uint16_t[]> m_bg_fb;
+	std::unique_ptr<uint16_t[]> m_fg_fb;
+	uint8_t m_rom_bank;
+	uint8_t m_bg_bank;
+	uint8_t m_vreg_bank;
+	uint8_t m_msm5205next;
+	uint8_t m_msm_nmi_mask;
+	uint8_t m_vreg_pen;
+	uint8_t m_palette_switch;
+	uint8_t m_bg_vreg_test;
+	uint8_t m_toggle;
 
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -86,7 +86,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
@@ -103,10 +103,10 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 void suprgolf_state::video_start()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
-	m_paletteram = std::make_unique<UINT8[]>(0x1000);
-	m_bg_vram = std::make_unique<UINT8[]>(0x2000*0x20);
-	m_bg_fb = std::make_unique<UINT16[]>(0x2000*0x20);
-	m_fg_fb = std::make_unique<UINT16[]>(0x2000*0x20);
+	m_paletteram = std::make_unique<uint8_t[]>(0x1000);
+	m_bg_vram = std::make_unique<uint8_t[]>(0x2000*0x20);
+	m_bg_fb = std::make_unique<uint16_t[]>(0x2000*0x20);
+	m_fg_fb = std::make_unique<uint16_t[]>(0x2000*0x20);
 
 	m_tilemap->set_transparent_pen(15);
 
@@ -121,7 +121,7 @@ void suprgolf_state::video_start()
 	save_pointer(NAME(m_fg_fb.get()), 0x2000*0x20);
 }
 
-UINT32 suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count,color;
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -222,8 +222,8 @@ READ8_MEMBER(suprgolf_state::bg_vram_r)
 
 WRITE8_MEMBER(suprgolf_state::bg_vram_w)
 {
-	UINT8 hi_nibble,lo_nibble;
-	UINT8 hi_dirty_dot,lo_dirty_dot; // helpers
+	uint8_t hi_nibble,lo_nibble;
+	uint8_t hi_dirty_dot,lo_dirty_dot; // helpers
 
 	hi_nibble = data & 0xf0;
 	lo_nibble = data & 0x0f;
@@ -314,7 +314,7 @@ WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 
 READ8_MEMBER(suprgolf_state::pedal_extra_bits_r)
 {
-	UINT8 p1_sht_sw,p2_sht_sw;
+	uint8_t p1_sht_sw,p2_sht_sw;
 
 	p1_sht_sw = (ioport("P1_RELEASE")->read() & 0x80)>>7;
 	p2_sht_sw = (ioport("P2_RELEASE")->read() & 0x80)>>6;
@@ -629,7 +629,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(suprgolf_state,suprgolf)
 {
-	UINT8 *ROM = memregion("user2")->base();
+	uint8_t *ROM = memregion("user2")->base();
 
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;

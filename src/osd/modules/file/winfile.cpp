@@ -161,7 +161,7 @@ DWORD create_path_recursive(TCHAR *path)
 //  osd_open
 //============================================================
 
-osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, ptr &file, std::uint64_t &filesize)
+osd_file::error osd_file::open(std::string const &orig_path, uint32_t openflags, ptr &file, std::uint64_t &filesize)
 {
 	std::string path;
 	try { osd_subst_env(path, orig_path); }
@@ -289,22 +289,22 @@ osd_file::error osd_file::remove(std::string const &filename)
 //  osd_get_physical_drive_geometry
 //============================================================
 
-int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UINT32 *heads, UINT32 *sectors, UINT32 *bps)
+bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
 {
 	DISK_GEOMETRY dg;
 	DWORD bytesRead;
 	HANDLE file;
 	int result;
 
-	// if it doesn't smell like a physical drive, just return FALSE
+	// if it doesn't smell like a physical drive, just return false
 	if (!is_path_to_physical_drive(filename))
-		return FALSE;
+		return false;
 
 	// do a create file on the drive
 	auto t_filename = osd::text::to_tstring(filename);
 	file = CreateFile(t_filename.c_str(), GENERIC_READ, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, nullptr);
 	if (file == INVALID_HANDLE_VALUE)
-		return FALSE;
+		return false;
 
 	// device I/O control should return the geometry
 	result = DeviceIoControl(file, IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &dg, sizeof(dg), &bytesRead, nullptr);
@@ -312,10 +312,10 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 
 	// if that failed, return false
 	if (!result)
-		return FALSE;
+		return false;
 
 	// store the results
-	*cylinders = (UINT32)dg.Cylinders.QuadPart;
+	*cylinders = (uint32_t)dg.Cylinders.QuadPart;
 	*heads = dg.TracksPerCylinder;
 	*sectors = dg.SectorsPerTrack;
 	*bps = dg.BytesPerSector;
@@ -326,7 +326,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 		*heads /= 2;
 		*cylinders *= 2;
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -368,7 +368,7 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 	strcpy(((char *) result) + sizeof(*result), path.c_str());
 	result->name = ((char *) result) + sizeof(*result);
 	result->type = win_attributes_to_entry_type(find_data.dwFileAttributes);
-	result->size = find_data.nFileSizeLow | ((UINT64) find_data.nFileSizeHigh << 32);
+	result->size = find_data.nFileSizeLow | ((uint64_t) find_data.nFileSizeHigh << 32);
 	result->last_modified = win_time_point_from_filetime(&find_data.ftLastWriteTime);
 
 	return std::unique_ptr<osd::directory::entry>(result);
@@ -434,7 +434,7 @@ const char *osd_get_volume_name(int idx)
 //  osd_is_valid_filename_char
 //============================================================
 
-bool osd_is_valid_filename_char(unicode_char uchar)
+bool osd_is_valid_filename_char(char32_t uchar)
 {
 	return osd_is_valid_filepath_char(uchar)
 		&& uchar != '/'
@@ -448,7 +448,7 @@ bool osd_is_valid_filename_char(unicode_char uchar)
 //  osd_is_valid_filepath_char
 //============================================================
 
-bool osd_is_valid_filepath_char(unicode_char uchar)
+bool osd_is_valid_filepath_char(char32_t uchar)
 {
 	return uchar >= 0x20
 		&& uchar != '<'

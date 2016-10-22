@@ -285,9 +285,9 @@ Notes:
 //  CONSTANTS
 //**************************************************************************
 
-const UINT32 MASTER_CLOCK = XTAL_40MHz;
-const UINT32 SOUND_CLOCK = XTAL_16MHz;
-const UINT32 MASTER_CLOCK_25MHz = XTAL_25_1748MHz;
+const uint32_t MASTER_CLOCK = XTAL_40MHz;
+const uint32_t SOUND_CLOCK = XTAL_16MHz;
+const uint32_t MASTER_CLOCK_25MHz = XTAL_25_1748MHz;
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
@@ -361,14 +361,14 @@ WRITE8_MEMBER( segaorun_state::video_control_w )
 
 READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	// PPI Input port A:
 	//  D5: left limit
 	//  D4: center
 	//  D3: right limit
 	//  other bits: ?
-	UINT8 pos = m_bankmotor_pos >> 8 & 0xff;
+	uint8_t pos = m_bankmotor_pos >> 8 & 0xff;
 
 	// these values may need to be tweaked when hooking up real motors to MAME
 	const int left_limit = 0x20;
@@ -434,7 +434,7 @@ WRITE8_MEMBER( segaorun_state::bankmotor_control_w )
 //  mapping for a given index
 //-------------------------------------------------
 
-void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index)
+void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index)
 {
 	switch (index)
 	{
@@ -475,7 +475,7 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 //  port on the memory mapper is read
 //-------------------------------------------------
 
-UINT8 segaorun_state::mapper_sound_r()
+uint8_t segaorun_state::mapper_sound_r()
 {
 	return 0;
 }
@@ -486,7 +486,7 @@ UINT8 segaorun_state::mapper_sound_r()
 //  port on the memory mapper is written
 //-------------------------------------------------
 
-void segaorun_state::mapper_sound_w(UINT8 data)
+void segaorun_state::mapper_sound_w(uint8_t data)
 {
 	synchronize(TID_SOUND_WRITE, data);
 }
@@ -647,7 +647,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 
 		default:
-			assert_always(FALSE, "Unknown id in segaorun_state::device_timer");
+			assert_always(false, "Unknown id in segaorun_state::device_timer");
 	}
 }
 
@@ -2898,7 +2898,7 @@ DRIVER_INIT_MEMBER(segaorun_state,generic)
 		m_nvram->set_base(m_workram, m_workram.bytes());
 
 	// point globals to allocated memory regions
-	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
+	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
 
 	// save state
 	save_item(NAME(m_adc_select));
@@ -2923,27 +2923,27 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 	DRIVER_INIT_CALL(outrun);
 
 	// hard code a memory map
-	static const UINT8 memory_map[] = { 0x02,0x00,0x0d,0x10,0x00,0x12,0x0c,0x13,0x08,0x14,0x0f,0x20,0x00,0x00,0x00,0x00 };
+	static const uint8_t memory_map[] = { 0x02,0x00,0x0d,0x10,0x00,0x12,0x0c,0x13,0x08,0x14,0x0f,0x20,0x00,0x00,0x00,0x00 };
 	m_custom_map = memory_map;
 
 	// main CPU: swap bits 11,12 and 6,7
-	UINT16 *word = (UINT16 *)memregion("maincpu")->base();
-	UINT32 length = memregion("maincpu")->bytes() / 2;
-	for (UINT32 i = 0; i < length; i++)
+	uint16_t *word = (uint16_t *)memregion("maincpu")->base();
+	uint32_t length = memregion("maincpu")->bytes() / 2;
+	for (uint32_t i = 0; i < length; i++)
 		word[i] = BITSWAP16(word[i], 15,14,11,12,13,10,9,8,6,7,5,4,3,2,1,0);
 
 	// sub CPU: swap bits 14,15 and 2,3
-	word = (UINT16 *)memregion("subcpu")->base();
+	word = (uint16_t *)memregion("subcpu")->base();
 	length = memregion("subcpu")->bytes() / 2;
-	for (UINT32 i = 0; i < length; i++)
+	for (uint32_t i = 0; i < length; i++)
 		word[i] = BITSWAP16(word[i], 14,15,13,12,11,10,9,8,7,6,5,4,2,3,1,0);
 
 	// road gfx
 	// rom a-2.bin: swap bits 6,7
 	// rom a-3.bin: swap bits 5,6
-	UINT8 *byte = memregion("gfx3")->base();
+	uint8_t *byte = memregion("gfx3")->base();
 	length = memregion("gfx3")->bytes() / 2;
-	for (UINT32 i = 0; i < length; i++)
+	for (uint32_t i = 0; i < length; i++)
 	{
 		byte[i]        = BITSWAP8(byte[i],        6,7,5,4,3,2,1,0);
 		byte[i+length] = BITSWAP8(byte[i+length], 7,5,6,4,3,2,1,0);
@@ -2952,7 +2952,7 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 	// Z80 code: swap bits 5,6
 	byte = memregion("soundcpu")->base();
 	length = memregion("soundcpu")->bytes();
-	for (UINT32 i = 0; i < length; i++)
+	for (uint32_t i = 0; i < length; i++)
 		byte[i] = BITSWAP8(byte[i], 7,5,6,4,3,2,1,0);
 }
 

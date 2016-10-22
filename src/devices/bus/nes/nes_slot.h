@@ -201,45 +201,45 @@ public:
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
-	void set_open_bus(UINT8 val) { m_open_bus = val; }
+	void set_open_bus(uint8_t val) { m_open_bus = val; }
 
-	UINT8* get_prg_base() { return m_prg; }
-	UINT8* get_prgram_base() { return &m_prgram[0]; }
-	UINT8* get_vrom_base() { return m_vrom; }
-	UINT8* get_vram_base() { return &m_vram[0]; }
-	UINT8* get_battery_base() { return &m_battery[0]; }
-	UINT8* get_mapper_sram_base() { return m_mapper_sram; }
+	uint8_t* get_prg_base() { return m_prg; }
+	uint8_t* get_prgram_base() { return &m_prgram[0]; }
+	uint8_t* get_vrom_base() { return m_vrom; }
+	uint8_t* get_vram_base() { return &m_vram[0]; }
+	uint8_t* get_battery_base() { return &m_battery[0]; }
+	uint8_t* get_mapper_sram_base() { return m_mapper_sram; }
 
-	UINT32 get_prg_size() { return m_prg_size; }
-	UINT32 get_prgram_size() { return m_prgram.size(); }
-	UINT32 get_vrom_size() { return m_vrom_size; }
-	UINT32 get_vram_size() { return m_vram.size(); }
-	UINT32 get_battery_size() { return m_battery.size(); }
-	UINT32 get_mapper_sram_size() { return m_mapper_sram_size; }
+	uint32_t get_prg_size() { return m_prg_size; }
+	uint32_t get_prgram_size() { return m_prgram.size(); }
+	uint32_t get_vrom_size() { return m_vrom_size; }
+	uint32_t get_vram_size() { return m_vram.size(); }
+	uint32_t get_battery_size() { return m_battery.size(); }
+	uint32_t get_mapper_sram_size() { return m_mapper_sram_size; }
 
 	virtual void ppu_latch(offs_t offset) {}
 	virtual void hblank_irq(int scanline, int vblank, int blanked) {}
 	virtual void scanline_irq(int scanline, int vblank, int blanked) {}
 
 	virtual void pcb_reset() {} // many pcb expect specific PRG/CHR banking at start
-	virtual void pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted);
+	virtual void pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted);
 	void pcb_reg_postload(running_machine &machine);
 	void nes_banks_restore();
 
-	UINT8 hi_access_rom(UINT32 offset);             // helper ROM access for a bunch of PCB reading 0x8000-0xffff for protection too
-	UINT8 account_bus_conflict(UINT32 offset, UINT8 data);
+	uint8_t hi_access_rom(uint32_t offset);             // helper ROM access for a bunch of PCB reading 0x8000-0xffff for protection too
+	uint8_t account_bus_conflict(uint32_t offset, uint8_t data);
 
 protected:
 
 	// internal state
-	UINT8 *m_prg;
-	UINT8 *m_vrom;
-	UINT8 *m_ciram;
-	dynamic_buffer m_prgram;
-	dynamic_buffer m_vram;
-	dynamic_buffer m_battery;
-	UINT32 m_prg_size;
-	UINT32 m_vrom_size;
+	uint8_t *m_prg;
+	uint8_t *m_vrom;
+	uint8_t *m_ciram;
+	std::vector<uint8_t> m_prgram;
+	std::vector<uint8_t> m_vram;
+	std::vector<uint8_t> m_battery;
+	uint32_t m_prg_size;
+	uint32_t m_vrom_size;
 
 	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
 	// main NES CPU here, even if it does not belong to this device.
@@ -247,9 +247,9 @@ protected:
 
 	// these are specific of some boards but must be accessible from the driver
 	// E.g. additional save ram for HKROM, X1-005 & X1-017 boards, or ExRAM for MMC5
-	UINT8 *m_mapper_sram;
-	dynamic_buffer m_ext_ntram;
-	UINT32 m_mapper_sram_size;
+	uint8_t *m_mapper_sram;
+	std::vector<uint8_t> m_ext_ntram;
+	uint32_t m_mapper_sram_size;
 
 	int m_ce_mask;
 	int m_ce_state;
@@ -261,15 +261,15 @@ protected:
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;
 	bool m_x1_005_alt_mirroring;    // temp hack for two kind of mirroring in Taito X1-005 boards (to be replaced with pin checking)
 	bool m_bus_conflict;
-	UINT8 m_open_bus;
+	uint8_t m_open_bus;
 
 	// PRG
 	inline int prg_8k_bank_num(int bank);
 	inline void update_prg_banks(int prg_bank_start, int prg_bank_end);
 	memory_bank *m_prg_bank_mem[4];
 	int m_prg_bank[4];
-	UINT32 m_prg_chunks;
-	UINT32 m_prg_mask;
+	uint32_t m_prg_chunks;
+	uint32_t m_prg_mask;
 
 	// PRG helpers
 	void prg32(int bank);
@@ -290,10 +290,10 @@ protected:
 	//because some of these change multiple times per scanline!
 	int m_chr_src[8]; //defines source of base pointer
 	int m_chr_orig[8]; //defines offset of 0x400 byte segment at base pointer
-	UINT8 *m_chr_access[8];  //source translated + origin -> valid pointer!
+	uint8_t *m_chr_access[8];  //source translated + origin -> valid pointer!
 
-	UINT32 m_vrom_chunks;
-	UINT32 m_vram_chunks;
+	uint32_t m_vrom_chunks;
+	uint32_t m_vram_chunks;
 
 	// CHR helpers
 	void chr8(int bank, int source);
@@ -321,12 +321,12 @@ protected:
 	int m_nt_src[4];
 	int m_nt_orig[4];
 	int m_nt_writable[4];
-	UINT8 *m_nt_access[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
+	uint8_t *m_nt_access[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
 	void set_nt_page(int page, int source, int bank, int writable);
 	void set_nt_mirroring(int mirroring);
 
-	std::vector<UINT16> m_prg_bank_map;
+	std::vector<uint16_t> m_prg_bank_map;
 };
 
 void nes_partialhash(util::hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
@@ -339,7 +339,7 @@ class nes_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_cart_slot_device();
 
 	// device-level overrides
@@ -367,8 +367,8 @@ public:
 
 	// slot interface overrides
 	virtual std::string get_default_card_software() override;
-	const char * get_default_card_ines(UINT8 *ROM, UINT32 len);
-	const char * get_default_card_unif(UINT8 *ROM, UINT32 len);
+	const char * get_default_card_ines(uint8_t *ROM, uint32_t len);
+	const char * get_default_card_unif(uint8_t *ROM, uint32_t len);
 	const char * nes_get_slot(int pcb_id);
 	int nes_get_pcb_id(const char *slot);
 
@@ -387,7 +387,7 @@ public:
 
 	int get_pcb_id() { return m_pcb_id; };
 
-	void pcb_start(UINT8 *ciram_ptr);
+	void pcb_start(uint8_t *ciram_ptr);
 	void pcb_reset();
 
 	// temporarily here
@@ -421,7 +421,7 @@ extern const device_type NES_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_NES_CARTRIDGE_NOT_MANDATORY                                     \
-	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(FALSE);
+	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(false);
 
 
 // Hacky configuration to add a slot with fixed disksys interface

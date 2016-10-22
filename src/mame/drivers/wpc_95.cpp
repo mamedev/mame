@@ -64,7 +64,7 @@ protected:
 	required_device<cpu_device> maincpu;
 	required_device<dcs_audio_wpc_device> dcs;
 	required_memory_bank rombank;
-	required_shared_ptr<UINT8> mainram;
+	required_shared_ptr<uint8_t> mainram;
 	required_device<nvram_device> nvram;
 	required_device<wpc_pic_device> pic;
 	required_device<wpc_lamp_device> lamp;
@@ -104,15 +104,15 @@ private:
 	static const char *const lamps_ttt[64];
 	static const char *const outputs_ttt[52];
 
-	UINT8 firq_src, zc;
-	UINT16 rtc_base_day;
+	uint8_t firq_src, zc;
+	uint16_t rtc_base_day;
 
 	bool serial_clock_state, serial_data1_state, serial_data2_state, serial_enable;
 	int serial_clock_counter;
-	UINT32 serial_out1_state, serial_out2_state;
+	uint32_t serial_out1_state, serial_out2_state;
 
 	bool afm_led_handler(int sid, bool state);
-	void sc_aux_lamps_handler_update(UINT32 &out, UINT32 mask, bool state, int id);
+	void sc_aux_lamps_handler_update(uint32_t &out, uint32_t mask, bool state, int id);
 	bool sc_aux_lamps_handler(int sid, bool state);
 };
 
@@ -184,9 +184,9 @@ READ8_MEMBER(wpc_95_state::rtc_r)
 	// This may get wonky if the game is running on year change.  Find
 	// something better to do at that time.
 
-	UINT8 day = (systime.local_time.day - rtc_base_day) & 31;
-	UINT8 hour = systime.local_time.hour;
-	UINT8 min = systime.local_time.minute;
+	uint8_t day = (systime.local_time.day - rtc_base_day) & 31;
+	uint8_t hour = systime.local_time.hour;
+	uint8_t min = systime.local_time.minute;
 
 	switch(offset) {
 	case 0:
@@ -205,7 +205,7 @@ READ8_MEMBER(wpc_95_state::firq_src_r)
 
 READ8_MEMBER(wpc_95_state::zc_r)
 {
-	UINT8 res = zc;
+	uint8_t res = zc;
 	zc &= 0x7f;
 	return res;
 }
@@ -258,7 +258,7 @@ void wpc_95_state::machine_reset()
 	mainram[0x1804] = systime.local_time.weekday+1;
 	mainram[0x1805] = 0;
 	mainram[0x1806] = 1;
-	UINT16 checksum = 0;
+	uint16_t checksum = 0;
 	for(int i=0x1800; i<=0x1806; i++)
 		checksum += mainram[i];
 	checksum = ~checksum;
@@ -297,7 +297,7 @@ bool wpc_95_state::afm_led_handler(int sid, bool state)
 	switch(sid) {
 	case 37:
 		if(!serial_clock_state && state) {
-			UINT16 mask = 1 << serial_clock_counter;
+			uint16_t mask = 1 << serial_clock_counter;
 			bool prev_state = serial_out1_state & mask;
 			if(prev_state != serial_data1_state) {
 				char buffer[32];
@@ -320,7 +320,7 @@ bool wpc_95_state::afm_led_handler(int sid, bool state)
 	return false;
 }
 
-void wpc_95_state::sc_aux_lamps_handler_update(UINT32 &out, UINT32 mask, bool state, int id)
+void wpc_95_state::sc_aux_lamps_handler_update(uint32_t &out, uint32_t mask, bool state, int id)
 {
 	bool prev_state = out & mask;
 	if(prev_state != state) {
@@ -344,7 +344,7 @@ bool wpc_95_state::sc_aux_lamps_handler(int sid, bool state)
 
 	case 38:
 		if(!serial_clock_state && state && !serial_enable) {
-			UINT32 mask = 1 << serial_clock_counter;
+			uint32_t mask = 1 << serial_clock_counter;
 			sc_aux_lamps_handler_update(serial_out1_state, mask, serial_data1_state, serial_clock_counter);
 			sc_aux_lamps_handler_update(serial_out2_state, mask, serial_data2_state, serial_clock_counter+24);
 			serial_clock_counter++;

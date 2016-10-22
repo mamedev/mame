@@ -27,17 +27,17 @@ class cbm2_24k_cartridge_device : public device_t,
 {
 public:
 	// construction/destruction
-	cbm2_24k_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cbm2_24k_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// device_cbm2_expansion_card_interface overrides
-	virtual UINT8 cbm2_bd_r(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3) override;
-	virtual void cbm2_bd_w(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3) override;
+	virtual uint8_t cbm2_bd_r(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) override;
+	virtual void cbm2_bd_w(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) override;
 
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 };
 
 

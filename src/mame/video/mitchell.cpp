@@ -18,7 +18,7 @@
 
 TILE_GET_INFO_MEMBER(mitchell_state::get_tile_info)
 {
-	UINT8 attr = m_colorram[tile_index];
+	uint8_t attr = m_colorram[tile_index];
 	int code = m_videoram[2 * tile_index] + (m_videoram[2 * tile_index + 1] << 8);
 	SET_TILE_INFO_MEMBER(0,
 			code,
@@ -284,7 +284,7 @@ void mitchell_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 mitchell_state::screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mitchell_state::screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

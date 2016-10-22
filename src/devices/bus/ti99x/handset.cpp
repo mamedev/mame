@@ -50,7 +50,7 @@ static const char *const joynames[2][4] =
 
 static const char *const keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
 
-ti99_handset_device::ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti99_handset_device::ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : joyport_attached_device(mconfig, HANDSET, "TI-99/4 IR handset", tag, owner, clock, "handset", __FILE__), m_ack(0), m_clock_high(false), m_buf(0), m_buflen(0), m_delay_timer(nullptr)
 {
 }
@@ -68,12 +68,12 @@ ti99_handset_device::ti99_handset_device(const machine_config &mconfig, const ch
 
     answer = |0|I|C|1|B|B|B|B|
 */
-UINT8 ti99_handset_device::read_dev()
+uint8_t ti99_handset_device::read_dev()
 {
 	return (m_buf & 0xf) | 0x10 | (m_clock_high? 0x20:0) | ( m_buflen==3? 0x00:0x40);
 }
 
-void ti99_handset_device::write_dev(UINT8 data)
+void ti99_handset_device::write_dev(uint8_t data)
 {
 	if (VERBOSE>7) LOG("ti99_handset_device: Set ack %d\n", data);
 	set_acknowledge(data);
@@ -148,12 +148,12 @@ void ti99_handset_device::post_message(int message)
     poll_keyboard()
     Poll the current state of one given handset keypad.
     num: number of the keypad to poll (0-3)
-    Returns TRUE if the handset state has changed and a message was posted.
+    Returns true if the handset state has changed and a message was posted.
 */
 bool ti99_handset_device::poll_keyboard(int num)
 {
-	UINT32 key_buf;
-	UINT8 current_key;
+	uint32_t key_buf;
+	uint8_t current_key;
 	int i;
 
 	/* read current key state */
@@ -219,11 +219,11 @@ bool ti99_handset_device::poll_keyboard(int num)
 
     Poll the current state of one given handset joystick.
     num: number of the joystick to poll (0-3)
-    Returns TRUE if the handset state has changed and a message was posted.
+    Returns true if the handset state has changed and a message was posted.
 */
 bool ti99_handset_device::poll_joystick(int num)
 {
-	UINT8 current_joy;
+	uint8_t current_joy;
 	int current_joy_x, current_joy_y;
 	int message;
 	/* read joystick position */
@@ -495,7 +495,7 @@ INPUT_PORTS_START( joysticks )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(2FIRE)", CODE_NONE, OSD_JOY2_FIRE, 0*/) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-ti99_twin_joystick::ti99_twin_joystick(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti99_twin_joystick::ti99_twin_joystick(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : joyport_attached_device(mconfig, HANDSET, "TI-99/4(A) Twin Joystick", tag, owner, clock, "twinjoy", __FILE__), m_joystick(0)
 {
 }
@@ -510,9 +510,9 @@ void ti99_twin_joystick::device_start(void)
 
     answer = |0|0|0|U|D|R|L|B|
 */
-UINT8 ti99_twin_joystick::read_dev()
+uint8_t ti99_twin_joystick::read_dev()
 {
-	UINT8 value;
+	uint8_t value;
 	if (m_joystick==1) value = ioport("JOY1")->read();
 	else
 	{
@@ -523,7 +523,7 @@ UINT8 ti99_twin_joystick::read_dev()
 	return value;
 }
 
-void ti99_twin_joystick::write_dev(UINT8 data)
+void ti99_twin_joystick::write_dev(uint8_t data)
 {
 	if (VERBOSE>7) LOG("ti99_twin_joystick: Select joystick %d\n", data);
 	m_joystick = data & 0x03;

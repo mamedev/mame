@@ -161,7 +161,7 @@ const device_type XT_HDC = &device_creator<xt_hdc_device>;
 const device_type EC1841_HDC = &device_creator<ec1841_device>;
 const device_type ST11M_HDC = &device_creator<st11m_device>;
 
-xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, XT_HDC, "Generic PC-XT Fixed Disk Controller", tag, owner, clock, "xt_hdc", __FILE__), buffer_ptr(nullptr), csb(0), status(0), error(0), m_current_cmd(0),
 		m_irq_handler(*this),
 		m_drq_handler(*this), drv(0), timer(nullptr), data_cnt(0), hdc_control(0), hdcdma_src(nullptr), hdcdma_dst(nullptr), hdcdma_read(0), hdcdma_write(0), hdcdma_size(0)
@@ -169,14 +169,14 @@ xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, dev
 	m_type = STANDARD;
 }
 
-xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), buffer_ptr(nullptr), csb(0), status(0), error(0), m_type(0), m_current_cmd(0),
 		m_irq_handler(*this),
 		m_drq_handler(*this), drv(0), timer(nullptr), data_cnt(0), hdc_control(0), hdcdma_src(nullptr), hdcdma_dst(nullptr), hdcdma_read(0), hdcdma_write(0), hdcdma_size(0)
 {
 }
 
-ec1841_device::ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ec1841_device::ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		xt_hdc_device(mconfig, EC1841_HDC, "EC1841 Fixed Disk Controller", tag, owner, clock, "ec1481", __FILE__),
 		m_irq_handler(*this),
 		m_drq_handler(*this)
@@ -184,7 +184,7 @@ ec1841_device::ec1841_device(const machine_config &mconfig, const char *tag, dev
 	m_type = EC1841;
 }
 
-st11m_device::st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+st11m_device::st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		xt_hdc_device(mconfig, EC1841_HDC, "Seagate ST11M Fixed Disk Controller", tag, owner, clock, "st11m", __FILE__),
 		m_irq_handler(*this),
 		m_drq_handler(*this)
@@ -323,7 +323,7 @@ int xt_hdc_device::get_lbasector()
 
 int xt_hdc_device::dack_r()
 {
-	UINT8 result;
+	uint8_t result;
 	hard_disk_info *info;
 	hard_disk_file *file;
 
@@ -368,7 +368,7 @@ int xt_hdc_device::dack_r()
 
 int xt_hdc_device::dack_rs()
 {
-	UINT8 result;
+	uint8_t result;
 
 	logerror("%s dack_rs(%d %d)\n", machine().describe_context(), hdcdma_read, hdcdma_size);
 
@@ -866,9 +866,9 @@ void xt_hdc_device::control_w(int data)
 
 
 
-UINT8 xt_hdc_device::data_r()
+uint8_t xt_hdc_device::data_r()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if(!(status & STA_COMMAND) && (m_current_cmd == CMD_READ || m_current_cmd == CMD_READLONG || m_current_cmd == CMD_READSBUFF))
 	{
@@ -914,7 +914,7 @@ UINT8 xt_hdc_device::data_r()
 
 
 
-UINT8 xt_hdc_device::status_r()
+uint8_t xt_hdc_device::status_r()
 {
 	return status;
 }
@@ -972,21 +972,21 @@ ioport_constructor isa8_hdc_device::device_input_ports() const
 //  isa8_hdc_device - constructor
 //-------------------------------------------------
 
-isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA8_HDC, "Fixed Disk Controller Card", tag, owner, clock, "hdc", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_hdc(*this,"hdc"), dip(0)
 {
 }
 
-isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_hdc(*this,"hdc"), dip(0)
 {
 }
 
-isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		isa8_hdc_device( mconfig, ISA8_HDC_EC1841, "EC1841 HDC", tag, owner, clock, "hdc_ec1841", __FILE__),
 		m_hdc(*this,"hdc")
 {
@@ -1000,7 +1000,7 @@ void isa8_hdc_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_device(0x0320, 0x0323, read8_delegate( FUNC(isa8_hdc_device::pc_hdc_r), this ), write8_delegate( FUNC(isa8_hdc_device::pc_hdc_w), this ) );
-	m_isa->set_dma_channel(3, this, FALSE);
+	m_isa->set_dma_channel(3, this, false);
 }
 
 //-------------------------------------------------
@@ -1023,7 +1023,7 @@ void isa8_hdc_device::device_reset()
  *************************************************************************/
 READ8_MEMBER( isa8_hdc_device::pc_hdc_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch( offset )
 	{
@@ -1054,7 +1054,7 @@ WRITE8_MEMBER( isa8_hdc_device::pc_hdc_w )
 }
 
 
-UINT8 isa8_hdc_device::dack_r(int line)
+uint8_t isa8_hdc_device::dack_r(int line)
 {
 	if (m_hdc->get_command() == CMD_READSBUFF)
 		return m_hdc->dack_rs();
@@ -1062,7 +1062,7 @@ UINT8 isa8_hdc_device::dack_r(int line)
 		return m_hdc->dack_r();
 }
 
-void isa8_hdc_device::dack_w(int line,UINT8 data)
+void isa8_hdc_device::dack_w(int line,uint8_t data)
 {
 	if (m_hdc->get_command() == CMD_WRITESBUFF)
 		m_hdc->dack_ws(data);
@@ -1085,7 +1085,7 @@ void isa8_hdc_device::dack_w(int line,UINT8 data)
 
  */
 
-UINT8 isa8_hdc_device::pc_hdc_dipswitch_r()
+uint8_t isa8_hdc_device::pc_hdc_dipswitch_r()
 {
 	m_hdc->set_ready();
 	if (LOG_HDC_STATUS)

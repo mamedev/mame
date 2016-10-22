@@ -21,8 +21,8 @@
 ***************************************************************************/
 
 int bcd_adjust(int value);
-UINT32 dec_2_bcd(UINT32 a);
-UINT32 bcd_2_dec(UINT32 a);
+uint32_t dec_2_bcd(uint32_t a);
+uint32_t bcd_2_dec(uint32_t a);
 
 
 /***************************************************************************
@@ -39,6 +39,6 @@ int gregorian_days_in_month(int month, int year);
 
 void rand_memory(void *memory, size_t length);
 
-UINT32 core_crc32(UINT32 crc, const UINT8 *buf, UINT32 len);
+uint32_t core_crc32(uint32_t crc, const uint8_t *buf, uint32_t len);
 
 #endif /* __COREUTIL_H__ */

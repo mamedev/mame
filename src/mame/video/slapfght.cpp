@@ -136,7 +136,7 @@ WRITE8_MEMBER(slapfght_state::palette_bank_w)
 
 void slapfght_state::draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer)
 {
-	UINT8 *src = m_spriteram->buffer();
+	uint8_t *src = m_spriteram->buffer();
 
 	for (int offs = 0; offs < m_spriteram->bytes(); offs += 4)
 	{
@@ -170,7 +170,7 @@ void slapfght_state::draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-UINT32 slapfght_state::screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t slapfght_state::screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE);
 	draw_perfrman_sprites(bitmap, cliprect, 0);
@@ -186,7 +186,7 @@ UINT32 slapfght_state::screen_update_perfrman(screen_device &screen, bitmap_ind1
 
 void slapfght_state::draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *src = m_spriteram->buffer();
+	uint8_t *src = m_spriteram->buffer();
 
 	for (int offs = 0; offs < m_spriteram->bytes(); offs += 4)
 	{
@@ -217,7 +217,7 @@ void slapfght_state::draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangl
 	}
 }
 
-UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_pf1_tilemap->set_scrollx(m_scrollx_hi << 8 | m_scrollx_lo);
 	m_pf1_tilemap->set_scrolly(m_scrolly);

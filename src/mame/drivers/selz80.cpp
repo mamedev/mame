@@ -47,9 +47,9 @@ public:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 	DECLARE_MACHINE_RESET(dagz80);
-	UINT8 m_digit;
+	uint8_t m_digit;
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT8> m_p_ram;
+	optional_shared_ptr<uint8_t> m_p_ram;
 };
 
 static ADDRESS_MAP_START(dagz80_mem, AS_PROGRAM, 8, selz80_state)
@@ -124,8 +124,8 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(selz80_state, dagz80)
 {
-	UINT8* rom = memregion("user1")->base();
-	UINT16 size = memregion("user1")->bytes();
+	uint8_t* rom = memregion("user1")->base();
+	uint16_t size = memregion("user1")->bytes();
 	memcpy(m_p_ram, rom, size);
 	m_maincpu->reset();
 }
@@ -142,7 +142,7 @@ WRITE8_MEMBER( selz80_state::digit_w )
 
 READ8_MEMBER( selz80_state::kbd_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_digit < 4)
 	{

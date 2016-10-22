@@ -41,7 +41,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<s100_bus_t> m_s100;
 	required_memory_region m_rom;
-	optional_shared_ptr<UINT8> m_map_ram;
+	optional_shared_ptr<uint8_t> m_map_ram;
 	required_ioport m_16c;
 
 	virtual void machine_start() override;
@@ -70,9 +70,9 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(mpz80_direct_update_handler);
 
 	// memory state
-	UINT32 m_addr;
-	UINT8 m_task;
-	UINT8 m_mask;
+	uint32_t m_addr;
+	uint8_t m_task;
+	uint8_t m_mask;
 
 	// interrupt state
 	int m_nmi;
@@ -80,10 +80,10 @@ public:
 	int m_int_pend;
 
 	// trap state
-	UINT8 m_pretrap_addr;
-	UINT8 m_trap_addr;
-	UINT8 m_status;
-	UINT16 m_trap_start;
+	uint8_t m_pretrap_addr;
+	uint8_t m_trap_addr;
+	uint8_t m_status;
+	uint16_t m_trap_start;
 	int m_pretrap;
 	int m_trap;
 	int m_trap_reset;

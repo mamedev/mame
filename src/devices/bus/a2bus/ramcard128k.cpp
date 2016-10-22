@@ -28,13 +28,13 @@ const device_type A2BUS_RAMCARD128K = &device_creator<a2bus_ssramcard_device>;
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ssramcard_device::a2bus_ssramcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_ssramcard_device::a2bus_ssramcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_last_offset(0), m_dxxx_bank(0), m_main_bank(0)
 {
 }
 
-a2bus_ssramcard_device::a2bus_ssramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_ssramcard_device::a2bus_ssramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_RAMCARD128K, "Saturn Systems 128K Extended Language Card", tag, owner, clock, "ssram128", __FILE__),
 	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_last_offset(0), m_dxxx_bank(0), m_main_bank(0)
 {
@@ -139,7 +139,7 @@ void a2bus_ssramcard_device::do_io(int offset)
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_ssramcard_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_ssramcard_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	do_io(offset & 0xf);
 	return 0xff;
@@ -150,12 +150,12 @@ UINT8 a2bus_ssramcard_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_ssramcard_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_ssramcard_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	do_io(offset & 0xf);
 }
 
-UINT8 a2bus_ssramcard_device::read_inh_rom(address_space &space, UINT16 offset)
+uint8_t a2bus_ssramcard_device::read_inh_rom(address_space &space, uint16_t offset)
 {
 	assert(m_inh_state & INH_READ); // this should never happen
 
@@ -167,7 +167,7 @@ UINT8 a2bus_ssramcard_device::read_inh_rom(address_space &space, UINT16 offset)
 	return m_ram[(offset & 0x1fff) + 0x2000 + m_main_bank];
 }
 
-void a2bus_ssramcard_device::write_inh_rom(address_space &space, UINT16 offset, UINT8 data)
+void a2bus_ssramcard_device::write_inh_rom(address_space &space, uint16_t offset, uint8_t data)
 {
 	// are writes enabled?
 	if (!(m_inh_state & INH_WRITE))

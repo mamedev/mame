@@ -55,13 +55,13 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 #define ZX81_DATA_LENGTH_OFFSET 0x0b
 #define ZX80_DATA_LENGTH_OFFSET 0x04
 
-static UINT8 zx_file_name[128];
-static UINT16 real_data_length = 0;
-static UINT8 zx_file_name_length = 0;
+static uint8_t zx_file_name[128];
+static uint16_t real_data_length = 0;
+static uint8_t zx_file_name_length = 0;
 
 /* common functions */
 
-static INT16 *zx81_emit_level(INT16 *p, int count, int level)
+static int16_t *zx81_emit_level(int16_t *p, int count, int level)
 {
 	int i;
 
@@ -70,7 +70,7 @@ static INT16 *zx81_emit_level(INT16 *p, int count, int level)
 	return p;
 }
 
-static INT16* zx81_emit_pulse(INT16 *p)
+static int16_t* zx81_emit_pulse(int16_t *p)
 {
 	p = zx81_emit_level (p, ZX81_PULSE_LENGTH/8, WAVEENTRY_LOW);
 	p = zx81_emit_level (p, ZX81_PULSE_LENGTH/8, WAVEENTRY_LOW);
@@ -84,14 +84,14 @@ static INT16* zx81_emit_pulse(INT16 *p)
 	return p;
 }
 
-static INT16* zx81_emit_pause(INT16 *p)
+static int16_t* zx81_emit_pause(int16_t *p)
 {
 	p = zx81_emit_level (p, ZX81_PAUSE_LENGTH, WAVEENTRY_ZERO);
 
 	return p;
 }
 
-static INT16* zx81_output_bit(INT16 *p, UINT8 bit)
+static int16_t* zx81_output_bit(int16_t *p, uint8_t bit)
 {
 	int i;
 
@@ -107,7 +107,7 @@ static INT16* zx81_output_bit(INT16 *p, UINT8 bit)
 		return p;
 }
 
-static INT16* zx81_output_byte(INT16 *p, UINT8 byte)
+static int16_t* zx81_output_byte(int16_t *p, uint8_t byte)
 {
 	int i;
 
@@ -117,9 +117,9 @@ static INT16* zx81_output_byte(INT16 *p, UINT8 byte)
 	return p;
 }
 
-static UINT16 zx81_cassette_calculate_number_of_1(const UINT8 *bytes, UINT16 length)
+static uint16_t zx81_cassette_calculate_number_of_1(const uint8_t *bytes, uint16_t length)
 {
-	UINT16 number_of_1 = 0;
+	uint16_t number_of_1 = 0;
 	int i,j;
 
 	for (i=0; i<length; i++)
@@ -132,7 +132,7 @@ static UINT16 zx81_cassette_calculate_number_of_1(const UINT8 *bytes, UINT16 len
 
 /* ZX-81 functions */
 
-static const UINT8 zx81_chars[]={
+static const uint8_t zx81_chars[]={
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*00h-07h*/
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*08h-0fh*/
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*10h-17h*/
@@ -154,11 +154,11 @@ static const UINT8 zx81_chars[]={
 static void zx81_fill_file_name(const char* name)
 {
 	for (zx_file_name_length=0; (zx_file_name_length<128) && name[zx_file_name_length]; zx_file_name_length++)
-		zx_file_name[zx_file_name_length] = ((UINT8) name[zx_file_name_length]<0x80) ? zx81_chars[(UINT8) name[zx_file_name_length]] : 0x00;
+		zx_file_name[zx_file_name_length] = ((uint8_t) name[zx_file_name_length]<0x80) ? zx81_chars[(uint8_t) name[zx_file_name_length]] : 0x00;
 	zx_file_name[zx_file_name_length-1] |= 0x80;
 }
 
-static int zx81_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int zx81_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	unsigned int number_of_0_data = 0;
 	unsigned int number_of_1_data = 0;
@@ -176,9 +176,9 @@ static int zx81_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 	return (number_of_0_data+number_of_0_name)*ZX81_LOW_BIT_LENGTH + (number_of_1_data+number_of_1_name)*ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
 }
 
-static int zx81_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int zx81_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
-	INT16 * p = buffer;
+	int16_t * p = buffer;
 	int i;
 
 	/* pilot */
@@ -235,7 +235,7 @@ CASSETTE_FORMATLIST_END
 
 /* ZX-80 functions */
 
-static int zx80_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int zx80_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	unsigned int number_of_0_data = 0;
 	unsigned int number_of_1_data = 0;
@@ -248,9 +248,9 @@ static int zx80_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 	return number_of_0_data*ZX81_LOW_BIT_LENGTH + number_of_1_data*ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
 }
 
-static int zx80_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int zx80_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
-	INT16 * p = buffer;
+	int16_t * p = buffer;
 	int i;
 
 	/* pilot */

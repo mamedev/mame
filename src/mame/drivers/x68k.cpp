@@ -184,7 +184,7 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_hd63450->drq3_w(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in x68k_state::device_timer");
+		assert_always(false, "Unknown id in x68k_state::device_timer");
 	}
 }
 
@@ -282,7 +282,7 @@ WRITE16_MEMBER(x68k_state::x68k_scc_w )
 	switch(offset)
 	{
 	case 0:
-		m_scc->reg_w(space, 0,(UINT8)data);
+		m_scc->reg_w(space, 0,(uint8_t)data);
 		if((m_scc->get_reg_b(5) & 0x02) != m_scc_prev)
 		{
 			if(m_scc->get_reg_b(5) & 0x02)  // Request to Send
@@ -295,13 +295,13 @@ WRITE16_MEMBER(x68k_state::x68k_scc_w )
 		}
 		break;
 	case 1:
-		m_scc->reg_w(space, 2,(UINT8)data);
+		m_scc->reg_w(space, 2,(uint8_t)data);
 		break;
 	case 2:
-		m_scc->reg_w(space, 1,(UINT8)data);
+		m_scc->reg_w(space, 1,(uint8_t)data);
 		break;
 	case 3:
-		m_scc->reg_w(space, 3,(UINT8)data);
+		m_scc->reg_w(space, 3,(uint8_t)data);
 		break;
 	}
 	m_scc_prev = m_scc->get_reg_b(5) & 0x02;
@@ -333,7 +333,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_scc_ack)
 
 void x68k_state::x68k_set_adpcm()
 {
-	UINT32 rate = 0;
+	uint32_t rate = 0;
 
 	switch(m_adpcm.rate & 0x0c)
 	{
@@ -361,12 +361,12 @@ void x68k_state::x68k_set_adpcm()
 // Button inputs (Start, A, B and C) are read in bits 5 and 6 (rather than 4
 // and 5 like on a Megadrive)
 
-UINT8 x68k_state::md_3button_r(int port)
+uint8_t x68k_state::md_3button_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = m_md3b->read() & 0xff;
-		UINT8 portb = (m_md3b->read() >> 8) & 0xff;
+		uint8_t porta = m_md3b->read() & 0xff;
+		uint8_t portb = (m_md3b->read() >> 8) & 0xff;
 		if(m_mdctrl.mux1 & 0x10)
 		{
 			return porta | 0x90;
@@ -378,8 +378,8 @@ UINT8 x68k_state::md_3button_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (m_md3b->read() >> 16) & 0xff;
-		UINT8 portb = (m_md3b->read() >> 24) & 0xff;
+		uint8_t porta = (m_md3b->read() >> 16) & 0xff;
+		uint8_t portb = (m_md3b->read() >> 24) & 0xff;
 		if(m_mdctrl.mux2 & 0x20)
 		{
 			return porta | 0x90;
@@ -409,13 +409,13 @@ void x68k_state::md_6button_init()
 	m_mdctrl.io_timeout2 = timer_alloc(TIMER_MD_6BUTTON_PORT2_TIMEOUT);
 }
 
-UINT8 x68k_state::md_6button_r(int port)
+uint8_t x68k_state::md_6button_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = m_md6b->read() & 0xff;
-		UINT8 portb = (m_md6b->read() >> 8) & 0xff;
-		UINT8 extra = m_md6b_extra->read() & 0x0f;
+		uint8_t porta = m_md6b->read() & 0xff;
+		uint8_t portb = (m_md6b->read() >> 8) & 0xff;
+		uint8_t extra = m_md6b_extra->read() & 0x0f;
 
 		switch(m_mdctrl.seq1)
 		{
@@ -451,9 +451,9 @@ UINT8 x68k_state::md_6button_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (m_md6b->read() >> 16) & 0xff;
-		UINT8 portb = (m_md6b->read() >> 24) & 0xff;
-		UINT8 extra = (m_md6b_extra->read() >> 4) & 0x0f;
+		uint8_t porta = (m_md6b->read() >> 16) & 0xff;
+		uint8_t portb = (m_md6b->read() >> 24) & 0xff;
+		uint8_t extra = (m_md6b_extra->read() >> 4) & 0x0f;
 
 		switch(m_mdctrl.seq2)
 		{
@@ -497,12 +497,12 @@ UINT8 x68k_state::md_6button_r(int port)
 // Output is the same as for standard controllers, but when ctl is high,
 // the directions refer to the right D-pad, and when low, the left D-pad
 // The buttons are read the same as normal, regardless of ctl.
-UINT8 x68k_state::xpd1lr_r(int port)
+uint8_t x68k_state::xpd1lr_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = m_xpd1lr->read() & 0xff;
-		UINT8 portb = (m_xpd1lr->read() >> 8) & 0xff;
+		uint8_t porta = m_xpd1lr->read() & 0xff;
+		uint8_t portb = (m_xpd1lr->read() >> 8) & 0xff;
 		if(m_mdctrl.mux1 & 0x10)
 		{
 			return porta;
@@ -514,8 +514,8 @@ UINT8 x68k_state::xpd1lr_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (m_xpd1lr->read() >> 16) & 0xff;
-		UINT8 portb = (m_xpd1lr->read() >> 24) & 0xff;
+		uint8_t porta = (m_xpd1lr->read() >> 16) & 0xff;
+		uint8_t portb = (m_xpd1lr->read() >> 24) & 0xff;
 		if(m_mdctrl.mux2 & 0x20)
 		{
 			return porta;
@@ -958,7 +958,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_bus_error)
 	m_bus_error = false;
 }
 
-void x68k_state::set_bus_error(UINT32 address, bool write, UINT16 mem_mask)
+void x68k_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
 {
 	if(m_bus_error)
 		return;
@@ -1484,7 +1484,7 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	   more or less do the same job */
 
 	int drive;
-	UINT8* romdata = memregion("user2")->base();
+	uint8_t* romdata = memregion("user2")->base();
 	attotime irq_time;
 
 	memset(m_ram->pointer(),0,m_ram->size());
@@ -1545,7 +1545,7 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/*  Install RAM handlers  */
-	m_spriteram = (UINT16*)(memregion("user1")->base());
+	m_spriteram = (uint16_t*)(memregion("user1")->base());
 	space.install_readwrite_bank(0x000000,m_ram->size()-1,"bank1");
 	membank("bank1")->set_base(m_ram->pointer());
 
@@ -1771,7 +1771,7 @@ MACHINE_CONFIG_END
 
 ROM_START( x68000 )
 	ROM_REGION16_BE(0x1000000, "maincpu", 0)  // 16MB address space
-	ROM_DEFAULT_BIOS("ipl10")
+	ROM_DEFAULT_BIOS("cz600ce")
 	ROM_LOAD( "cgrom.dat",  0xf00000, 0xc0000, CRC(9f3195f1) SHA1(8d72c5b4d63bb14c5dbdac495244d659aa1498b6) )
 	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0 (87/05/07)")
 	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(1) )
@@ -1781,6 +1781,9 @@ ROM_START( x68000 )
 	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
 	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS(4, "cz600ce",  "CZ-600CE IPL-ROM V1.0 (87/03/18)")
+	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(5) | ROM_SKIP(1) )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
 	ROM_FILL(0x0000,0x8000,0x00)
 	ROM_REGION(0x20000, "user2", 0)
@@ -1799,6 +1802,9 @@ ROM_START( x68ksupr )
 	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
 	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS(4, "cz600ce",  "CZ-600CE IPL-ROM V1.0 (87/03/18)")
+	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(5) | ROM_SKIP(1) )
 	ROM_LOAD("scsiinsu.bin",0xfc0000, 0x002000, CRC(f65a3e24) SHA1(15a17798839a3f7f361119205aebc301c2df5967) )  // Dumped from an X68000 Super HD
 //  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
@@ -1819,6 +1825,9 @@ ROM_START( x68kxvi )
 	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
 	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS(4, "cz600ce",  "CZ-600CE IPL-ROM V1.0 (87/03/18)")
+	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(5) | ROM_SKIP(1) )
 	ROM_LOAD("scsiinco.bin",0xfc0000, 0x002000, CRC(2485e14d) SHA1(101a9bba8ea4bb90965c144bcfd7182f889ab958) )  // Dumped from an X68000 XVI Compact
 //  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
@@ -1839,6 +1848,9 @@ ROM_START( x68030 )
 	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
 	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS(4, "cz600ce",  "CZ-600CE IPL-ROM V1.0 (87/03/18)")
+	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(5) | ROM_SKIP(1) )
 	ROM_LOAD("scsiinrom.dat",0xfc0000, 0x002000, CRC(1c6c889e) SHA1(3f063d4231cdf53da6adc4db96533725e260076a) BAD_DUMP )
 //  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding

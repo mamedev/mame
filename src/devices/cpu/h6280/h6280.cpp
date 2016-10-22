@@ -158,7 +158,7 @@ const device_type H6280 = &device_creator<h6280_device>;
 //  h6280_device - constructor
 //-------------------------------------------------
 
-h6280_device::h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+h6280_device::h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, H6280, "H6280", tag, owner, clock, "h6280", __FILE__),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 21),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 2)
@@ -282,7 +282,7 @@ void h6280_device::device_reset()
 	m_x = 0;
 	m_y = 0;
 	m_p = 0;
-	memset(m_mmr, 0, sizeof(UINT8) * 8);
+	memset(m_mmr, 0, sizeof(uint8_t) * 8);
 	m_irq_mask = 0;
 	m_timer_ack = 0;
 	m_timer_value = 0;
@@ -321,7 +321,7 @@ void h6280_device::device_stop()
 }
 
 
-inline UINT32 h6280_device::translated(UINT16 addr)
+inline uint32_t h6280_device::translated(uint16_t addr)
 {
 	return ((m_mmr[((addr) >> 13) & 7] << 13) | ((addr) & 0x1fff));
 }
@@ -335,7 +335,7 @@ inline void h6280_device::h6280_cycles(int cyc)
 #if LAZY_FLAGS
 
 #define NZ  m_NZ
-inline void h6280_device::set_nz(UINT8 n)
+inline void h6280_device::set_nz(uint8_t n)
 {
 	P &= ~_fT;
 	NZ = ((n & _fN) << 8) | n;
@@ -343,7 +343,7 @@ inline void h6280_device::set_nz(UINT8 n)
 
 #else
 
-inline void h6280_device::set_nz(UINT8 n)
+inline void h6280_device::set_nz(uint8_t n)
 {
 	P = (P & ~(_fN|_fT|_fZ)) |
 		(n & _fN) |
@@ -357,7 +357,7 @@ inline void h6280_device::clear_t()
 	P &= ~_fT;
 }
 
-inline void h6280_device::do_interrupt(UINT16 vector)
+inline void h6280_device::do_interrupt(uint16_t vector)
 {
 	h6280_cycles(7);    /* 7 cycles for an int */
 	push(PCH);
@@ -408,7 +408,7 @@ inline void h6280_device::check_irq_lines()
  * The CPU inserts 1 clock delay when accessing the VDC or VCE
  * area.
  ***************************************************************/
-inline void h6280_device::check_vdc_vce_penalty(UINT16 addr)
+inline void h6280_device::check_vdc_vce_penalty(uint16_t addr)
 {
 	if ( ( translated(addr) & 0x1FF800 ) == 0x1FE000 ) {
 		h6280_cycles(1);
@@ -424,7 +424,7 @@ inline void h6280_device::bra(bool cond)
 	if (cond)
 	{
 		h6280_cycles(4);
-		UINT8 tmp = read_opcode_arg();
+		uint8_t tmp = read_opcode_arg();
 		PCW++;
 		EAW = PCW + (signed char)tmp;
 		PCD = EAD;
@@ -547,7 +547,7 @@ inline void h6280_device::ea_idy()
 inline void h6280_device::ea_ind()
 {
 	ea_abs();
-	UINT8 tmp = program_read8(EAD);
+	uint8_t tmp = program_read8(EAD);
 	EAD++;
 	EAH = program_read8(EAD);
 	EAL = tmp;
@@ -560,139 +560,139 @@ inline void h6280_device::ea_iax()
 {
 	ea_abs();
 	EAD+=X;
-	UINT8 tmp = program_read8(EAD);
+	uint8_t tmp = program_read8(EAD);
 	EAD++;
 	EAH = program_read8(EAD);
 	EAL = tmp;
 }
 
-inline UINT8 h6280_device::rd_imm()
+inline uint8_t h6280_device::rd_imm()
 {
-	UINT8 tmp = read_opcode_arg();
+	uint8_t tmp = read_opcode_arg();
 	PCW++;
 	return tmp;
 }
 
-inline UINT8 h6280_device::rd_zpg()
+inline uint8_t h6280_device::rd_zpg()
 {
 	ea_zpg();
 	return program_read8z(EAD);
 }
 
-inline UINT8 h6280_device::rd_zpx()
+inline uint8_t h6280_device::rd_zpx()
 {
 	ea_zpx();
 	return program_read8z(EAD);
 }
 
-inline UINT8 h6280_device::rd_zpy()
+inline uint8_t h6280_device::rd_zpy()
 {
 	ea_zpy();
 	return program_read8z(EAD);
 }
 
-inline UINT8 h6280_device::rd_abs()
+inline uint8_t h6280_device::rd_abs()
 {
 	ea_abs();
 	return program_read8(EAD);
 }
 
-inline UINT8 h6280_device::rd_abx()
+inline uint8_t h6280_device::rd_abx()
 {
 	ea_abx();
 	return program_read8(EAD);
 }
 
-inline UINT8 h6280_device::rd_aby()
+inline uint8_t h6280_device::rd_aby()
 {
 	ea_aby();
 	return program_read8(EAD);
 }
 
-inline UINT8 h6280_device::rd_zpi()
+inline uint8_t h6280_device::rd_zpi()
 {
 	ea_zpi();
 	return program_read8(EAD);
 }
 
-inline UINT8 h6280_device::rd_idx()
+inline uint8_t h6280_device::rd_idx()
 {
 	ea_idx();
 	return program_read8(EAD);
 }
 
-inline UINT8 h6280_device::rd_idy()
+inline uint8_t h6280_device::rd_idy()
 {
 	ea_idy();
 	return program_read8(EAD);
 }
 
-inline UINT8 h6280_device::rd_tfl()
+inline uint8_t h6280_device::rd_tfl()
 {
 	ea_tflg();
 	return program_read8z(EAD);
 }
 
-inline void h6280_device::wr_zpg(UINT8 tmp)
+inline void h6280_device::wr_zpg(uint8_t tmp)
 {
 	ea_zpg();
 	wb_eaz(tmp);
 }
 
-inline void h6280_device::wr_zpx(UINT8 tmp)
+inline void h6280_device::wr_zpx(uint8_t tmp)
 {
 	ea_zpx();
 	wb_eaz(tmp);
 }
 
-inline void h6280_device::wr_zpy(UINT8 tmp)
+inline void h6280_device::wr_zpy(uint8_t tmp)
 {
 	ea_zpy();
 	wb_eaz(tmp);
 }
 
-inline void h6280_device::wr_abs(UINT8 tmp)
+inline void h6280_device::wr_abs(uint8_t tmp)
 {
 	ea_abs();
 	wb_ea(tmp);
 }
 
-inline void h6280_device::wr_abx(UINT8 tmp)
+inline void h6280_device::wr_abx(uint8_t tmp)
 {
 	ea_abx();
 	wb_ea(tmp);
 }
 
-inline void h6280_device::wr_aby(UINT8 tmp)
+inline void h6280_device::wr_aby(uint8_t tmp)
 {
 	ea_aby();
 	wb_ea(tmp);
 }
 
-inline void h6280_device::wr_zpi(UINT8 tmp)
+inline void h6280_device::wr_zpi(uint8_t tmp)
 {
 	ea_zpi();
 	wb_ea(tmp);
 }
 
-inline void h6280_device::wr_idx(UINT8 tmp)
+inline void h6280_device::wr_idx(uint8_t tmp)
 {
 	ea_idx();
 	wb_ea(tmp);
 }
 
-inline void h6280_device::wr_idy(UINT8 tmp)
+inline void h6280_device::wr_idy(uint8_t tmp)
 {
 	ea_idy();
 	wb_ea(tmp);
 }
 
-inline void h6280_device::wb_ea(UINT8 tmp)
+inline void h6280_device::wb_ea(uint8_t tmp)
 {
 	program_write8(EAD, tmp);
 }
 
-inline void h6280_device::wb_eaz(UINT8 tmp)
+inline void h6280_device::wb_eaz(uint8_t tmp)
 {
 	program_write8z(EAD, tmp);
 }
@@ -710,7 +710,7 @@ inline void h6280_device::wb_eaz(UINT8 tmp)
  ***************************************************************/
 #if LAZY_FLAGS
 
-inline void h6280_device::compose_p(UINT8 SET, UINT8 CLR)
+inline void h6280_device::compose_p(uint8_t SET, uint8_t CLR)
 {
 	P = (P & ~(_fN | _fZ | CLR)) |
 		(NZ >> 8) |
@@ -720,7 +720,7 @@ inline void h6280_device::compose_p(UINT8 SET, UINT8 CLR)
 
 #else
 
-inline void h6280_device::compose_p(UINT8 SET, UINT8 CLR)
+inline void h6280_device::compose_p(uint8_t SET, uint8_t CLR)
 {
 	P = (P & ~CLR) | SET;
 }
@@ -730,7 +730,7 @@ inline void h6280_device::compose_p(UINT8 SET, UINT8 CLR)
 /* 6280 ********************************************************
  *  ADC Add with carry
  ***************************************************************/
-inline void h6280_device::tadc(UINT8 tmp)
+inline void h6280_device::tadc(uint8_t tmp)
 {
 	clear_t();
 	int tflagtemp = rd_tfl();
@@ -761,7 +761,7 @@ inline void h6280_device::tadc(UINT8 tmp)
 			P |= _fV;
 		if (sum & 0xff00)
 			P |= _fC;
-		tflagtemp = (UINT8) sum;
+		tflagtemp = (uint8_t) sum;
 	}
 	set_nz(tflagtemp);
 	wb_eaz(tflagtemp);
@@ -769,7 +769,7 @@ inline void h6280_device::tadc(UINT8 tmp)
 }
 
 
-inline void h6280_device::adc(UINT8 tmp)
+inline void h6280_device::adc(uint8_t tmp)
 {
 	if(P & _fT)
 		tadc(tmp);
@@ -801,7 +801,7 @@ inline void h6280_device::adc(UINT8 tmp)
 				P |= _fV;
 			if (sum & 0xff00)
 				P |= _fC;
-			A = (UINT8) sum;
+			A = (uint8_t) sum;
 		}
 		set_nz(A);
 	}
@@ -810,22 +810,22 @@ inline void h6280_device::adc(UINT8 tmp)
 /* 6280 ********************************************************
  *  AND Logical and
  ***************************************************************/
-inline void h6280_device::tand(UINT8 tmp)
+inline void h6280_device::tand(uint8_t tmp)
 {
 	clear_t();
 	int tflagtemp = rd_tfl();
-	tflagtemp = (UINT8)(tflagtemp & tmp);
+	tflagtemp = (uint8_t)(tflagtemp & tmp);
 	wb_eaz(tflagtemp);
 	set_nz(tflagtemp);
 	h6280_cycles(3);
 }
 
-inline void h6280_device::and_a(UINT8 tmp)
+inline void h6280_device::and_a(uint8_t tmp)
 {
 	if(P & _fT)
 		tand(tmp);
 	else {
-		A = (UINT8)(A & tmp);
+		A = (uint8_t)(A & tmp);
 		set_nz(A);
 	}
 }
@@ -833,11 +833,11 @@ inline void h6280_device::and_a(UINT8 tmp)
 /* 6280 ********************************************************
  *  ASL Arithmetic shift left
  ***************************************************************/
-inline UINT8 h6280_device::asl(UINT8 tmp)
+inline uint8_t h6280_device::asl(uint8_t tmp)
 {
 	clear_t();
 	P = (P & ~_fC) | ((tmp >> 7) & _fC);
-	tmp = (UINT8)(tmp << 1);
+	tmp = (uint8_t)(tmp << 1);
 	set_nz(tmp);
 	return tmp;
 }
@@ -845,7 +845,7 @@ inline UINT8 h6280_device::asl(UINT8 tmp)
 /* 6280 ********************************************************
  *  BBR Branch if bit is reset
  ***************************************************************/
-inline void h6280_device::bbr(int bit, UINT8 tmp)
+inline void h6280_device::bbr(int bit, uint8_t tmp)
 {
 	bra(!(tmp & (1<<bit)));
 }
@@ -853,7 +853,7 @@ inline void h6280_device::bbr(int bit, UINT8 tmp)
 /* 6280 ********************************************************
  *  BBS Branch if bit is set
  ***************************************************************/
-inline void h6280_device::bbs(int bit, UINT8 tmp)
+inline void h6280_device::bbs(int bit, uint8_t tmp)
 {
 	bra(tmp & (1<<bit));
 }
@@ -889,7 +889,7 @@ inline void h6280_device::beq()
 /* 6280 ********************************************************
  *  BIT Bit test
  ***************************************************************/
-inline void h6280_device::bit(UINT8 tmp)
+inline void h6280_device::bit(uint8_t tmp)
 {
 	P = (P & ~(_fN|_fV|_fT|_fZ))
 		| ((tmp&0x80) ? _fN:0)
@@ -1049,46 +1049,46 @@ inline void h6280_device::cly()
 /* 6280 ********************************************************
  *  CMP Compare accumulator
  ***************************************************************/
-inline void h6280_device::cmp(UINT8 tmp)
+inline void h6280_device::cmp(uint8_t tmp)
 {
 	clear_t();
 	P &= ~_fC;
 	if (A >= tmp)
 		P |= _fC;
-	set_nz((UINT8)(A - tmp));
+	set_nz((uint8_t)(A - tmp));
 }
 
 /* 6280 ********************************************************
  *  CPX Compare index X
  ***************************************************************/
-inline void h6280_device::cpx(UINT8 tmp)
+inline void h6280_device::cpx(uint8_t tmp)
 {
 	clear_t();
 	P &= ~_fC;
 	if (X >= tmp)
 		P |= _fC;
-	set_nz((UINT8)(X - tmp));
+	set_nz((uint8_t)(X - tmp));
 }
 
 /* 6280 ********************************************************
  *  CPY Compare index Y
  ***************************************************************/
-inline void h6280_device::cpy(UINT8 tmp)
+inline void h6280_device::cpy(uint8_t tmp)
 {
 	clear_t();
 	P &= ~_fC;
 	if (Y >= tmp)
 		P |= _fC;
-	set_nz((UINT8)(Y - tmp));
+	set_nz((uint8_t)(Y - tmp));
 }
 
 /* 6280 ********************************************************
  *  DEC Decrement memory
  ***************************************************************/
-inline UINT8 h6280_device::dec(UINT8 tmp)
+inline uint8_t h6280_device::dec(uint8_t tmp)
 {
 	clear_t();
-	tmp = (UINT8)(tmp-1);
+	tmp = (uint8_t)(tmp-1);
 	set_nz(tmp);
 	return tmp;
 }
@@ -1099,7 +1099,7 @@ inline UINT8 h6280_device::dec(UINT8 tmp)
 inline void h6280_device::dex()
 {
 	clear_t();
-	X = (UINT8)(X - 1);
+	X = (uint8_t)(X - 1);
 	set_nz(X);
 }
 
@@ -1109,29 +1109,29 @@ inline void h6280_device::dex()
 inline void h6280_device::dey()
 {
 	clear_t();
-	Y = (UINT8)(Y - 1);
+	Y = (uint8_t)(Y - 1);
 	set_nz(Y);
 }
 
 /* 6280 ********************************************************
  *  EOR Logical exclusive or
  ***************************************************************/
-inline void h6280_device::teor(UINT8 tmp)
+inline void h6280_device::teor(uint8_t tmp)
 {
 	clear_t();
 	int tflagtemp = rd_tfl();
-	tflagtemp = (UINT8)(tflagtemp ^ tmp);
+	tflagtemp = (uint8_t)(tflagtemp ^ tmp);
 	wb_eaz(tflagtemp);
 	set_nz(tflagtemp);
 	h6280_cycles(3);
 }
 
-inline void h6280_device::eor(UINT8 tmp)
+inline void h6280_device::eor(uint8_t tmp)
 {
 	if(P & _fT)
 		teor(tmp);
 	else {
-		A = (UINT8)(A ^ tmp);
+		A = (uint8_t)(A ^ tmp);
 		set_nz(A);
 	}
 }
@@ -1139,10 +1139,10 @@ inline void h6280_device::eor(UINT8 tmp)
 /* 6280 ********************************************************
  *  INC Increment memory
  ***************************************************************/
-inline UINT8 h6280_device::inc(UINT8 tmp)
+inline uint8_t h6280_device::inc(uint8_t tmp)
 {
 	clear_t();
-	tmp = (UINT8)(tmp+1);
+	tmp = (uint8_t)(tmp+1);
 	set_nz(tmp);
 	return tmp;
 }
@@ -1153,7 +1153,7 @@ inline UINT8 h6280_device::inc(UINT8 tmp)
 inline void h6280_device::inx()
 {
 	clear_t();
-	X = (UINT8)(X + 1);
+	X = (uint8_t)(X + 1);
 	set_nz(X);
 }
 
@@ -1163,7 +1163,7 @@ inline void h6280_device::inx()
 inline void h6280_device::iny()
 {
 	clear_t();
-	Y = (UINT8)(Y + 1);
+	Y = (uint8_t)(Y + 1);
 	set_nz(Y);
 }
 
@@ -1194,30 +1194,30 @@ inline void h6280_device::jsr()
 /* 6280 ********************************************************
  *  LDA Load accumulator
  ***************************************************************/
-inline void h6280_device::lda(UINT8 tmp)
+inline void h6280_device::lda(uint8_t tmp)
 {
 	clear_t();
-	A = (UINT8)tmp;
+	A = (uint8_t)tmp;
 	set_nz(A);
 }
 
 /* 6280 ********************************************************
  *  LDX Load index X
  ***************************************************************/
-inline void h6280_device::ldx(UINT8 tmp)
+inline void h6280_device::ldx(uint8_t tmp)
 {
 	clear_t();
-	X = (UINT8)tmp;
+	X = (uint8_t)tmp;
 	set_nz(X);
 }
 
 /* 6280 ********************************************************
  *  LDY Load index Y
  ***************************************************************/
-inline void h6280_device::ldy(UINT8 tmp)
+inline void h6280_device::ldy(uint8_t tmp)
 {
 	clear_t();
-	Y = (UINT8)tmp;
+	Y = (uint8_t)tmp;
 	set_nz(Y);
 }
 
@@ -1225,11 +1225,11 @@ inline void h6280_device::ldy(UINT8 tmp)
  *  LSR Logic shift right
  *  0 -> [7][6][5][4][3][2][1][0] -> C
  ***************************************************************/
-inline UINT8 h6280_device::lsr(UINT8 tmp)
+inline uint8_t h6280_device::lsr(uint8_t tmp)
 {
 	clear_t();
 	P = (P & ~_fC) | (tmp & _fC);
-	tmp = (UINT8)tmp >> 1;
+	tmp = (uint8_t)tmp >> 1;
 	set_nz(tmp);
 	return tmp;
 }
@@ -1246,22 +1246,22 @@ inline void h6280_device::nop()
  *  ORA Logical inclusive or
  ***************************************************************/
 
-inline void h6280_device::tora(UINT8 tmp)
+inline void h6280_device::tora(uint8_t tmp)
 {
 	clear_t();
 	int tflagtemp = rd_tfl();
-	tflagtemp = (UINT8)(tflagtemp | tmp);
+	tflagtemp = (uint8_t)(tflagtemp | tmp);
 	wb_eaz(tflagtemp);
 	set_nz(tflagtemp);
 	h6280_cycles(3);
 }
 
-inline void h6280_device::ora(UINT8 tmp)
+inline void h6280_device::ora(uint8_t tmp)
 {
 	if(P & _fT)
 		tora(tmp);
 	else {
-		A = (UINT8)(A | tmp);
+		A = (uint8_t)(A | tmp);
 		set_nz(A);
 	}
 }
@@ -1354,7 +1354,7 @@ inline void h6280_device::ply()
 /* 6280 ********************************************************
  *  RMB Reset memory bit
  ***************************************************************/
-inline UINT8 h6280_device::rmb(int bit, UINT8 tmp)
+inline uint8_t h6280_device::rmb(int bit, uint8_t tmp)
 {
 	clear_t();
 	tmp &= ~(1<<bit);
@@ -1365,12 +1365,12 @@ inline UINT8 h6280_device::rmb(int bit, UINT8 tmp)
  *  ROL Rotate left
  *  new C <- [7][6][5][4][3][2][1][0] <- C
  ***************************************************************/
-inline UINT8 h6280_device::rol(UINT8 tmp)
+inline uint8_t h6280_device::rol(uint8_t tmp)
 {
 	clear_t();
 	int tmp9 = (tmp << 1) | (P & _fC);
 	P = (P & ~_fC) | ((tmp9 >> 8) & _fC);
-	tmp = (UINT8)tmp9;
+	tmp = (uint8_t)tmp9;
 	set_nz(tmp);
 	return tmp;
 }
@@ -1379,12 +1379,12 @@ inline UINT8 h6280_device::rol(UINT8 tmp)
  *  ROR Rotate right
  *  C -> [7][6][5][4][3][2][1][0] -> new C
  ***************************************************************/
-inline UINT8 h6280_device::ror(UINT8 tmp)
+inline uint8_t h6280_device::ror(uint8_t tmp)
 {
 	clear_t();
 	int tmp9 = tmp | (P & _fC) << 8;
 	P = (P & ~_fC) | (tmp & _fC);
-	tmp = (UINT8)(tmp9 >> 1);
+	tmp = (uint8_t)(tmp9 >> 1);
 	set_nz(tmp);
 	return tmp;
 }
@@ -1430,7 +1430,7 @@ inline void h6280_device::rts()
 inline void h6280_device::sax()
 {
 	clear_t();
-	UINT8 tmp = X;
+	uint8_t tmp = X;
 	X = A;
 	A = tmp;
 }
@@ -1441,7 +1441,7 @@ inline void h6280_device::sax()
 inline void h6280_device::say()
 {
 	clear_t();
-	UINT8 tmp = Y;
+	uint8_t tmp = Y;
 	Y = A;
 	A = tmp;
 }
@@ -1449,7 +1449,7 @@ inline void h6280_device::say()
 /* 6280 ********************************************************
  *  SBC Subtract with carry
  ***************************************************************/
-inline void h6280_device::tsbc(UINT8 tmp)
+inline void h6280_device::tsbc(uint8_t tmp)
 {
 	clear_t();
 	int tflagtemp = rd_tfl();
@@ -1480,14 +1480,14 @@ inline void h6280_device::tsbc(UINT8 tmp)
 			P |= _fV;
 		if ((sum & 0xff00) == 0)
 			P |= _fC;
-		tflagtemp = (UINT8) sum;
+		tflagtemp = (uint8_t) sum;
 	}
 	set_nz(tflagtemp);
 	wb_eaz(tflagtemp);
 	h6280_cycles(3);
 }
 
-inline void h6280_device::sbc(UINT8 tmp)
+inline void h6280_device::sbc(uint8_t tmp)
 {
 	if(P & _fT)
 		tsbc(tmp);
@@ -1519,7 +1519,7 @@ inline void h6280_device::sbc(UINT8 tmp)
 				P |= _fV;
 			if ((sum & 0xff00) == 0)
 				P |= _fC;
-			A = (UINT8) sum;
+			A = (uint8_t) sum;
 		}
 		set_nz(A);
 	}
@@ -1563,7 +1563,7 @@ inline void h6280_device::set()
 /* 6280 ********************************************************
  *  SMB Set memory bit
  ***************************************************************/
-inline UINT8 h6280_device::smb(int bit, UINT8 tmp)
+inline uint8_t h6280_device::smb(int bit, uint8_t tmp)
 {
 	clear_t();
 	tmp |= (1<<bit);
@@ -1573,7 +1573,7 @@ inline UINT8 h6280_device::smb(int bit, UINT8 tmp)
 /* 6280 ********************************************************
  *  ST0 Store at hardware address 0
  ***************************************************************/
-inline void h6280_device::st0(UINT8 tmp)
+inline void h6280_device::st0(uint8_t tmp)
 {
 	clear_t();
 	m_io->write_byte(0x0000,tmp);
@@ -1582,7 +1582,7 @@ inline void h6280_device::st0(UINT8 tmp)
 /* 6280 ********************************************************
  *  ST1 Store at hardware address 2
  ***************************************************************/
-inline void h6280_device::st1(UINT8 tmp)
+inline void h6280_device::st1(uint8_t tmp)
 {
 	clear_t();
 	m_io->write_byte(0x0002,tmp);
@@ -1591,7 +1591,7 @@ inline void h6280_device::st1(UINT8 tmp)
 /* 6280 ********************************************************
  *  ST2 Store at hardware address 3
  ***************************************************************/
-inline void h6280_device::st2(UINT8 tmp)
+inline void h6280_device::st2(uint8_t tmp)
 {
 	clear_t();
 	m_io->write_byte(0x0003,tmp);
@@ -1600,7 +1600,7 @@ inline void h6280_device::st2(UINT8 tmp)
 /* 6280 ********************************************************
  *  STA Store accumulator
  ***************************************************************/
-inline UINT8 h6280_device::sta()
+inline uint8_t h6280_device::sta()
 {
 	clear_t();
 	return A;
@@ -1609,7 +1609,7 @@ inline UINT8 h6280_device::sta()
 /* 6280 ********************************************************
  *  STX Store index X
  ***************************************************************/
-inline UINT8 h6280_device::stx()
+inline uint8_t h6280_device::stx()
 {
 	clear_t();
 	return X;
@@ -1618,7 +1618,7 @@ inline UINT8 h6280_device::stx()
 /* 6280 ********************************************************
  *  STY Store index Y
  ***************************************************************/
-inline UINT8 h6280_device::sty()
+inline uint8_t h6280_device::sty()
 {
 	clear_t();
 	return Y;
@@ -1627,7 +1627,7 @@ inline UINT8 h6280_device::sty()
 /* 6280 ********************************************************
  * STZ  Store zero
  ***************************************************************/
-inline UINT8 h6280_device::stz()
+inline uint8_t h6280_device::stz()
 {
 	clear_t();
 	return 0;
@@ -1639,7 +1639,7 @@ inline UINT8 h6280_device::stz()
 inline void h6280_device::sxy()
 {
 	clear_t();
-	UINT8 tmp = X;
+	uint8_t tmp = X;
 	X = Y;
 	Y = tmp;
 }
@@ -1668,7 +1668,7 @@ inline void h6280_device::tai()
 /* H6280 *******************************************************
  *  TAM Transfer accumulator to memory mapper register(s)
  ***************************************************************/
-inline void h6280_device::tam(UINT8 tmp)
+inline void h6280_device::tam(uint8_t tmp)
 {
 	clear_t();
 	if (tmp&0x01) m_mmr[0] = A;
@@ -1781,7 +1781,7 @@ inline void h6280_device::tin()
  *  TMA Transfer memory mapper register(s) to accumulator
  *  the highest bit set in tmp is the one that counts
  ***************************************************************/
-inline void h6280_device::tma(UINT8 tmp)
+inline void h6280_device::tma(uint8_t tmp)
 {
 	clear_t();
 	if (tmp&0x01) A = m_mmr[0];
@@ -1797,7 +1797,7 @@ inline void h6280_device::tma(UINT8 tmp)
 /* 6280 ********************************************************
  * TRB  Test and reset bits
  ***************************************************************/
-inline UINT8 h6280_device::trb(UINT8 tmp)
+inline uint8_t h6280_device::trb(uint8_t tmp)
 {
 	clear_t();
 	P = (P & ~(_fN|_fV|_fT|_fZ))
@@ -1811,7 +1811,7 @@ inline UINT8 h6280_device::trb(UINT8 tmp)
 /* 6280 ********************************************************
  * TSB  Test and set bits
  ***************************************************************/
-inline UINT8 h6280_device::tsb(UINT8 tmp)
+inline uint8_t h6280_device::tsb(uint8_t tmp)
 {
 	clear_t();
 	P = (P & ~(_fN|_fV|_fT|_fZ))
@@ -1835,7 +1835,7 @@ inline void h6280_device::tsx()
 /* 6280 ********************************************************
  *  TST
  ***************************************************************/
-inline void h6280_device::tst(UINT8 imm, UINT8 tmp)
+inline void h6280_device::tst(uint8_t imm, uint8_t tmp)
 {
 	P = (P & ~(_fN|_fV|_fT|_fZ))
 		| ((tmp&0x80) ? _fN:0)
@@ -2216,7 +2216,7 @@ void h6280_device::state_string_export(const device_state_entry &entry, std::str
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 h6280_device::disasm_min_opcode_bytes() const
+uint32_t h6280_device::disasm_min_opcode_bytes() const
 {
 	return 1;
 }
@@ -2227,7 +2227,7 @@ UINT32 h6280_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 h6280_device::disasm_max_opcode_bytes() const
+uint32_t h6280_device::disasm_max_opcode_bytes() const
 {
 	return 7;
 }
@@ -2238,7 +2238,7 @@ UINT32 h6280_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t h6280_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t h6280_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( h6280 );
 	return CPU_DISASSEMBLE_NAME(h6280)(this, buffer, pc, oprom, opram, options);
@@ -2250,7 +2250,7 @@ offs_t h6280_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 h6280_device::execute_min_cycles() const
+uint32_t h6280_device::execute_min_cycles() const
 {
 	return 2;
 }
@@ -2261,7 +2261,7 @@ UINT32 h6280_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 h6280_device::execute_max_cycles() const
+uint32_t h6280_device::execute_max_cycles() const
 {
 	return 17 + 6*65536;
 }
@@ -2272,7 +2272,7 @@ UINT32 h6280_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 h6280_device::execute_input_lines() const
+uint32_t h6280_device::execute_input_lines() const
 {
 	return 4;
 }
@@ -2309,7 +2309,7 @@ void h6280_device::execute_set_input(int inputnum, int state)
 /***************************************************************
  *  program_read8       read memory
  ***************************************************************/
-UINT8 h6280_device::program_read8(offs_t addr)
+uint8_t h6280_device::program_read8(offs_t addr)
 {
 	check_vdc_vce_penalty(addr);
 	return m_program->read_byte(translated(addr));
@@ -2318,7 +2318,7 @@ UINT8 h6280_device::program_read8(offs_t addr)
 /***************************************************************
  *  program_write8      write memory
  ***************************************************************/
-void h6280_device::program_write8(offs_t addr, UINT8 data)
+void h6280_device::program_write8(offs_t addr, uint8_t data)
 {
 	check_vdc_vce_penalty(addr);
 	m_program->write_byte(translated(addr), data);
@@ -2327,7 +2327,7 @@ void h6280_device::program_write8(offs_t addr, UINT8 data)
 /***************************************************************
  *  program_read8z      read memory - zero page
  ***************************************************************/
-UINT8 h6280_device::program_read8z(offs_t addr)
+uint8_t h6280_device::program_read8z(offs_t addr)
 {
 	return m_program->read_byte((m_mmr[1] << 13) | (addr & 0x1fff));
 }
@@ -2335,7 +2335,7 @@ UINT8 h6280_device::program_read8z(offs_t addr)
 /***************************************************************
  *  program_write8z     write memory - zero page
  ***************************************************************/
-void h6280_device::program_write8z(offs_t addr, UINT8 data)
+void h6280_device::program_write8z(offs_t addr, uint8_t data)
 {
 	m_program->write_byte((m_mmr[1] << 13) | (addr & 0x1fff), data);
 }
@@ -2343,7 +2343,7 @@ void h6280_device::program_write8z(offs_t addr, UINT8 data)
 /***************************************************************
  *  program_read16      read word from memory
  ***************************************************************/
-UINT16 h6280_device::program_read16(offs_t addr)
+uint16_t h6280_device::program_read16(offs_t addr)
 {
 	return m_program->read_byte(translated(addr)) |
 			(m_program->read_byte(translated(addr + 1)) << 8);
@@ -2352,7 +2352,7 @@ UINT16 h6280_device::program_read16(offs_t addr)
 /***************************************************************
  *  program_read16z     read a word from a zero page address
  ***************************************************************/
-UINT16 h6280_device::program_read16z(offs_t addr)
+uint16_t h6280_device::program_read16z(offs_t addr)
 {
 	if ((addr & 0xff) == 0xff)
 	{
@@ -2369,7 +2369,7 @@ UINT16 h6280_device::program_read16z(offs_t addr)
 /***************************************************************
  * push a register onto the stack
  ***************************************************************/
-void h6280_device::push(UINT8 value)
+void h6280_device::push(uint8_t value)
 {
 	m_program->write_byte((m_mmr[1] << 13) | m_sp.d, value);
 	S--;
@@ -2378,7 +2378,7 @@ void h6280_device::push(UINT8 value)
 /***************************************************************
  * pull a register from the stack
  ***************************************************************/
-void h6280_device::pull(UINT8 &value)
+void h6280_device::pull(uint8_t &value)
 {
 	S++;
 	value = m_program->read_byte((m_mmr[1] << 13) | m_sp.d);
@@ -2387,7 +2387,7 @@ void h6280_device::pull(UINT8 &value)
 /***************************************************************
  *  read_opcode     read an opcode
  ***************************************************************/
-UINT8 h6280_device::read_opcode()
+uint8_t h6280_device::read_opcode()
 {
 	return m_direct->read_byte(translated(PCW));
 }
@@ -2395,7 +2395,7 @@ UINT8 h6280_device::read_opcode()
 /***************************************************************
  *  read_opcode_arg read an opcode argument
  ***************************************************************/
-UINT8 h6280_device::read_opcode_arg()
+uint8_t h6280_device::read_opcode_arg()
 {
 	return m_direct->read_byte(translated(PCW));
 }
@@ -2568,15 +2568,15 @@ bool h6280_device::memory_translate(address_spacenum spacenum, int intention, of
 	if (spacenum == AS_PROGRAM)
 		address = translated(address);
 
-	return TRUE;
+	return true;
 }
 
-UINT8 h6280_device::io_get_buffer()
+uint8_t h6280_device::io_get_buffer()
 {
 	return m_io_buffer;
 }
 
-void h6280_device::io_set_buffer(UINT8 data)
+void h6280_device::io_set_buffer(uint8_t data)
 {
 	m_io_buffer = data;
 }

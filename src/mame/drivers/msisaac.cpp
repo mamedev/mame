@@ -115,7 +115,7 @@ MCU simulation TODO:
 			//6-down
 			//7-leftdwn
 
-			UINT8 val= (ioport("IN1")->read() >> 2) & 0x0f;
+			uint8_t val= (ioport("IN1")->read() >> 2) & 0x0f;
 			/* bit0 = left
 			   bit1 = right
 			   bit2 = down
@@ -131,7 +131,7 @@ MCU simulation TODO:
 			/*       0000   0001   0010   0011      0100   0101   0110   0111     1000   1001   1010   1011   1100   1101   1110   1111 */
 			/*      nochange left  right nochange   down downlft dwnrght down     up     upleft uprgt  up    nochnge left   right  nochange */
 
-			static const INT8 table[16] = { -1,    2,    6,     -1,       0,   1,      7,      0,       4,     3,     5,    4,     -1,     2,     6,    -1 };
+			static const int8_t table[16] = { -1,    2,    6,     -1,       0,   1,      7,      0,       4,     3,     5,    4,     -1,     2,     6,    -1 };
 
 			if (table[val] >= 0)
 				m_direction = table[val];

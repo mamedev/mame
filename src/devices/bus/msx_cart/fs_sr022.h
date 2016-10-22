@@ -13,7 +13,7 @@ class msx_cart_fs_sr022 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_fs_sr022(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_fs_sr022(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -25,8 +25,8 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 private:
-	const UINT8 *m_bunsetsu_rom;
-	UINT32 m_bunsetsu_address;
+	const uint8_t *m_bunsetsu_rom;
+	uint32_t m_bunsetsu_address;
 };
 
 

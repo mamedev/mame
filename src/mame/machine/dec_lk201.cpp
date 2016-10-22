@@ -510,7 +510,7 @@ ioport_constructor lk201_device::device_input_ports() const
 //  lk201_device - constructor
 //-------------------------------------------------
 
-lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LK201, "DEC LK201 keyboard", tag, owner, clock, "lk201", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_maincpu(*this, LK201_CPU_TAG),
@@ -639,9 +639,9 @@ void lk201_device::update_interrupts()
 
 READ8_MEMBER( lk201_device::timer_r )
 {
-	static UINT16 count;
+	static uint16_t count;
 
-	UINT8 ret = m_timer.regs[offset];
+	uint8_t ret = m_timer.regs[offset];
 
 	switch (offset)
 	{
@@ -664,7 +664,7 @@ READ8_MEMBER( lk201_device::timer_r )
 
 WRITE8_MEMBER( lk201_device::timer_w )
 {
-	static UINT16 count;
+	static uint16_t count;
 	static int save_tsr;
 
 	m_timer.regs[offset] = data;
@@ -695,14 +695,14 @@ WRITE8_MEMBER( lk201_device::ddr_w )
 {
 //  printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
-	UINT8 olddata = ddrs[offset];
+	uint8_t olddata = ddrs[offset];
 	ddrs[offset] = data;
 	send_port(space, offset, ports[offset] & olddata);
 }
 
 READ8_MEMBER( lk201_device::ports_r )
 {
-	UINT8 incoming = 0;
+	uint8_t incoming = 0;
 
 	// apply data direction registers
 	incoming &= (ddrs[offset] ^ 0xff);
@@ -716,17 +716,17 @@ READ8_MEMBER( lk201_device::ports_r )
 
 WRITE8_MEMBER( lk201_device::ports_w )
 {
-	UINT8 olddata = ports[offset];
+	uint8_t olddata = ports[offset];
 	ports[offset] = data;            //   "port writes are independent of DDRC"
 	send_port(space, offset, olddata & ddrs[offset]);
 //  printf("\nPORT %c write %02x (OLD = %02x) (DDR = %02x) (PC=%x)\n", 'A' + offset, data, olddata, ddrs[offset], m_maincpu->pc());
 }
 
-void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
+void lk201_device::send_port(address_space &space, uint8_t offset, uint8_t olddata)
 {
-	UINT8 porta = ports[0] & ddrs[0];
-	UINT8 portb = ports[1] & ddrs[1];
-	UINT8 portc = ports[2] & ddrs[2];
+	uint8_t porta = ports[0] & ddrs[0];
+	uint8_t portb = ports[1] & ddrs[1];
+	uint8_t portc = ports[2] & ddrs[2];
 
 	switch (offset)
 	{
@@ -817,7 +817,7 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 
 READ8_MEMBER( lk201_device::sci_r )
 {
-	UINT8 incoming = 0;
+	uint8_t incoming = 0;
 
 	switch (offset)
 	{
@@ -880,7 +880,7 @@ WRITE8_MEMBER( lk201_device::sci_w )
 
 READ8_MEMBER( lk201_device::spi_r )
 {
-	UINT8 incoming = 0;
+	uint8_t incoming = 0;
 
 	switch (offset)
 	{

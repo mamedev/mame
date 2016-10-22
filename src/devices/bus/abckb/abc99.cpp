@@ -485,7 +485,7 @@ inline void abc99_device::scan_mouse()
 //  abc99_device - constructor
 //-------------------------------------------------
 
-abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC99, "Luxor ABC 99", tag, owner, clock, "abc99", __FILE__),
 	abc_keyboard_interface(mconfig, *this), m_serial_timer(nullptr), m_mouse_timer(nullptr),
 	m_maincpu(*this, I8035_Z2_TAG),
@@ -664,7 +664,7 @@ READ8_MEMBER( abc99_device::z2_p2_r )
 
 	*/
 
-	UINT8 data = m_z14->read() << 5;
+	uint8_t data = m_z14->read() << 5;
 
 	return data;
 }
@@ -711,7 +711,7 @@ READ8_MEMBER( abc99_device::z5_p1_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// mouse buttons
 	data |= (m_mouseb->read() & 0x07) << 4;

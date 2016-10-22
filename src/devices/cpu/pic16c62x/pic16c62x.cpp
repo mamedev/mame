@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( pic16c62xa_ram, AS_DATA, 8, pic16c62x_device )
 ADDRESS_MAP_END
 
 
-pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int picmodel)
+pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int picmodel)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
 		, ( ( program_width == 9 ) ? ADDRESS_MAP_NAME(pic16c62x_rom_9) : ( ( program_width == 10 ) ? ADDRESS_MAP_NAME(pic16c62x_rom_10) : ADDRESS_MAP_NAME(pic16c62x_rom_11) )))
@@ -127,38 +127,38 @@ pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type ty
 }
 
 
-pic16c620_device::pic16c620_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c620_device::pic16c620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c62x_device(mconfig, PIC16C620, "PIC16C620", tag, owner, clock, "pic16c620", 9, 0x16C620)
 {
 }
 
-pic16c620a_device::pic16c620a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c620a_device::pic16c620a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c62x_device(mconfig, PIC16C620A, "PIC16C620A", tag, owner, clock, "pic16c620a", 9, 0x16C620A)
 {
 }
 
-pic16c621_device::pic16c621_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c621_device::pic16c621_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c62x_device(mconfig, PIC16C621, "PIC16C621", tag, owner, clock, "pic16c621", 9, 0x16C621)
 {
 }
 
-pic16c621a_device::pic16c621a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c621a_device::pic16c621a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c62x_device(mconfig, PIC16C621A, "PIC16C621A", tag, owner, clock, "pic16c621a", 9, 0x16C621A)
 {
 }
 
-pic16c622_device::pic16c622_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c622_device::pic16c622_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c62x_device(mconfig, PIC16C622, "PIC16C622", tag, owner, clock, "pic16c622", 9, 0x16C622)
 {
 }
 
-pic16c622a_device::pic16c622a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c622a_device::pic16c622a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c62x_device(mconfig, PIC16C622A, "PIC16C622A", tag, owner, clock, "pic16c622a", 9, 0x16C622A)
 {
 }
 
 
-offs_t pic16c62x_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t pic16c62x_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( pic16c62x );
 	return CPU_DISASSEMBLE_NAME(pic16c62x)(this, buffer, pc, oprom, opram, options);
@@ -167,13 +167,13 @@ offs_t pic16c62x_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 
 void pic16c62x_device::update_internalram_ptr()
 {
-	m_internalram = (UINT8 *)m_data->get_write_ptr(0x00);
+	m_internalram = (uint8_t *)m_data->get_write_ptr(0x00);
 }
 
 #define PIC16C62x_RDOP(A)         (m_direct->read_word((A)<<1))
-#define PIC16C62x_RAM_RDMEM(A)    ((UINT8)m_data->read_byte(A))
+#define PIC16C62x_RAM_RDMEM(A)    ((uint8_t)m_data->read_byte(A))
 #define PIC16C62x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
-#define PIC16C62x_In(Port)        ((UINT8)m_io->read_byte((Port)))
+#define PIC16C62x_In(Port)        ((uint8_t)m_io->read_byte((Port)))
 #define PIC16C62x_Out(Port,Value) (m_io->write_byte((Port),Value))
 /************  Read the state of the T0 Clock input signal  ************/
 #define PIC16C62x_T0_In           (m_io->read_byte(PIC16C62x_T0) >> 4)
@@ -255,7 +255,7 @@ void pic16c62x_device::update_internalram_ptr()
  *  Shortcuts
  ************************************************************************/
 
-#define CLR(flagreg, flag) ( flagreg &= (UINT8)(~flag) )
+#define CLR(flagreg, flag) ( flagreg &= (uint8_t)(~flag) )
 #define SET(flagreg, flag) ( flagreg |=  flag )
 
 
@@ -274,7 +274,7 @@ void pic16c62x_device::CALCULATE_Z_FLAG()
 
 void pic16c62x_device::CALCULATE_ADD_CARRY()
 {
-	if ((UINT8)(m_old_data) > (UINT8)(m_ALU)) {
+	if ((uint8_t)(m_old_data) > (uint8_t)(m_ALU)) {
 		SET(STATUS, C_FLAG);
 	}
 	else {
@@ -284,7 +284,7 @@ void pic16c62x_device::CALCULATE_ADD_CARRY()
 
 void pic16c62x_device::CALCULATE_ADD_DIGITCARRY()
 {
-	if (((UINT8)(m_old_data) & 0x0f) > ((UINT8)(m_ALU) & 0x0f)) {
+	if (((uint8_t)(m_old_data) & 0x0f) > ((uint8_t)(m_ALU) & 0x0f)) {
 		SET(STATUS, DC_FLAG);
 	}
 	else {
@@ -294,7 +294,7 @@ void pic16c62x_device::CALCULATE_ADD_DIGITCARRY()
 
 void pic16c62x_device::CALCULATE_SUB_CARRY()
 {
-	if ((UINT8)(m_old_data) < (UINT8)(m_ALU)) {
+	if ((uint8_t)(m_old_data) < (uint8_t)(m_ALU)) {
 		CLR(STATUS, C_FLAG);
 	}
 	else {
@@ -304,7 +304,7 @@ void pic16c62x_device::CALCULATE_SUB_CARRY()
 
 void pic16c62x_device::CALCULATE_SUB_DIGITCARRY()
 {
-	if (((UINT8)(m_old_data) & 0x0f) < ((UINT8)(m_ALU) & 0x0f)) {
+	if (((uint8_t)(m_old_data) & 0x0f) < ((uint8_t)(m_ALU) & 0x0f)) {
 		CLR(STATUS, DC_FLAG);
 	}
 	else {
@@ -313,9 +313,9 @@ void pic16c62x_device::CALCULATE_SUB_DIGITCARRY()
 }
 
 
-UINT16 pic16c62x_device::POP_STACK()
+uint16_t pic16c62x_device::POP_STACK()
 {
-	UINT16 data = m_STACK[7];
+	uint16_t data = m_STACK[7];
 	m_STACK[7] = m_STACK[6];
 	m_STACK[6] = m_STACK[5];
 	m_STACK[5] = m_STACK[4];
@@ -325,7 +325,7 @@ UINT16 pic16c62x_device::POP_STACK()
 	m_STACK[1] = m_STACK[0];
 	return (data & ADDR_MASK);
 }
-void pic16c62x_device::PUSH_STACK(UINT16 data)
+void pic16c62x_device::PUSH_STACK(uint16_t data)
 {
 	m_STACK[0] = m_STACK[1];
 	m_STACK[1] = m_STACK[2];
@@ -339,9 +339,9 @@ void pic16c62x_device::PUSH_STACK(UINT16 data)
 
 
 
-UINT8 pic16c62x_device::GET_REGFILE(offs_t addr)    /* Read from internal memory */
+uint8_t pic16c62x_device::GET_REGFILE(offs_t addr)    /* Read from internal memory */
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (addr == 0) {                        /* Indirect addressing  */
 		addr = (FSR & m_picRAMmask);
@@ -362,16 +362,16 @@ UINT8 pic16c62x_device::GET_REGFILE(offs_t addr)    /* Read from internal memory
 					data = M_RDRAM(addr & 0x7f);
 					break;
 		case 0x84:
-		case 0x04:  data = (FSR | (UINT8)(~m_picRAMmask));
+		case 0x04:  data = (FSR | (uint8_t)(~m_picRAMmask));
 					break;
 		case 0x05:  data = P_IN(0);
 					data &= m_TRISA;
-					data |= ((UINT8)(~m_TRISA) & PORTA);
+					data |= ((uint8_t)(~m_TRISA) & PORTA);
 					data &= 0x1f;       /* 5-bit port (only lower 5 bits used) */
 					break;
 		case 0x06:  data = P_IN(1);
 					data &= m_TRISB;
-					data |= ((UINT8)(~m_TRISB) & PORTB);
+					data |= ((uint8_t)(~m_TRISB) & PORTB);
 					break;
 		case 0x8a:
 		case 0x0a:  data = m_PCLATH;
@@ -388,7 +388,7 @@ UINT8 pic16c62x_device::GET_REGFILE(offs_t addr)    /* Read from internal memory
 	return data;
 }
 
-void pic16c62x_device::STORE_REGFILE(offs_t addr, UINT8 data)   /* Write to internal memory */
+void pic16c62x_device::STORE_REGFILE(offs_t addr, uint8_t data)   /* Write to internal memory */
 {
 	if (addr == 0) {                        /* Indirect addressing  */
 		addr = (FSR & m_picRAMmask);
@@ -408,15 +408,15 @@ void pic16c62x_device::STORE_REGFILE(offs_t addr, UINT8 data)   /* Write to inte
 					m_PC = (m_PCLATH << 8) | data;
 					break;
 		case 0x83:
-		case 0x03:  STATUS &= (UINT8)(~(IRP_FLAG|RP1_FLAG|RP0_FLAG)); STATUS |= (data & (IRP_FLAG|RP1_FLAG|RP0_FLAG));
+		case 0x03:  STATUS &= (uint8_t)(~(IRP_FLAG|RP1_FLAG|RP0_FLAG)); STATUS |= (data & (IRP_FLAG|RP1_FLAG|RP0_FLAG));
 					break;
 		case 0x84:
-		case 0x04:  FSR = (data | (UINT8)(~m_picRAMmask));
+		case 0x04:  FSR = (data | (uint8_t)(~m_picRAMmask));
 					break;
 		case 0x05:  data &= 0x1f;       /* 5-bit port (only lower 5 bits used) */
-					P_OUT(0,data & (UINT8)(~m_TRISA)); PORTA = data;
+					P_OUT(0,data & (uint8_t)(~m_TRISA)); PORTA = data;
 					break;
-		case 0x06:  P_OUT(1,data & (UINT8)(~m_TRISB)); PORTB = data;
+		case 0x06:  P_OUT(1,data & (uint8_t)(~m_TRISB)); PORTB = data;
 					break;
 		case 0x8a:
 		case 0x0a:
@@ -433,7 +433,7 @@ void pic16c62x_device::STORE_REGFILE(offs_t addr, UINT8 data)   /* Write to inte
 					{
 						m_TRISA = data | 0xf0;
 						P_OUT(2,m_TRISA);
-						P_OUT(0,PORTA & (UINT8)(~m_TRISA) & 0x0f);
+						P_OUT(0,PORTA & (uint8_t)(~m_TRISA) & 0x0f);
 						M_WRTRAM(addr, data);
 					}
 					break;
@@ -441,7 +441,7 @@ void pic16c62x_device::STORE_REGFILE(offs_t addr, UINT8 data)   /* Write to inte
 					{
 						m_TRISB = data;
 						P_OUT(3,m_TRISB);
-						P_OUT(1,PORTB & (UINT8)(~m_TRISB));
+						P_OUT(1,PORTB & (uint8_t)(~m_TRISB));
 						M_WRTRAM(addr, data);
 					}
 					break;
@@ -451,7 +451,7 @@ void pic16c62x_device::STORE_REGFILE(offs_t addr, UINT8 data)   /* Write to inte
 }
 
 
-void pic16c62x_device::STORE_RESULT(offs_t addr, UINT8 data)
+void pic16c62x_device::STORE_RESULT(offs_t addr, uint8_t data)
 {
 	if (m_opcode.b.l & 0x80)
 	{
@@ -575,7 +575,7 @@ void pic16c62x_device::clrwdt()
 
 void pic16c62x_device::comf()
 {
-	m_ALU = (UINT8)(~(GET_REGFILE(ADDR)));
+	m_ALU = (uint8_t)(~(GET_REGFILE(ADDR)));
 	STORE_RESULT(ADDR, m_ALU);
 	CALCULATE_Z_FLAG();
 }
@@ -960,7 +960,7 @@ void pic16c62x_device::state_import(const device_state_entry &entry)
 			PORTB = m_debugger_temp;
 			break;
 		case PIC16C62x_FSR:
-			FSR = ((m_debugger_temp & m_picRAMmask) | (UINT8)(~m_picRAMmask));
+			FSR = ((m_debugger_temp & m_picRAMmask) | (uint8_t)(~m_picRAMmask));
 			break;
 		case PIC16C62x_PSCL:
 			m_prescaler = m_debugger_temp;
@@ -985,7 +985,7 @@ void pic16c62x_device::state_export(const device_state_entry &entry)
 			m_debugger_temp = PORTB;
 			break;
 		case PIC16C62x_FSR:
-			m_debugger_temp = ((FSR) & m_picRAMmask) | (UINT8)(~m_picRAMmask);
+			m_debugger_temp = ((FSR) & m_picRAMmask) | (uint8_t)(~m_picRAMmask);
 			break;
 	}
 }
@@ -1027,7 +1027,7 @@ void pic16c62x_device::pic16c62x_reset_regs()
 	m_OPTION = 0xff;
 	STATUS = 0x18;
 	PCL    = 0;
-	FSR   |= (UINT8)(~m_picRAMmask);
+	FSR   |= (uint8_t)(~m_picRAMmask);
 	PORTA  = 0;
 	m_prescaler = 0;
 	m_delay_timer = 0;
@@ -1067,7 +1067,7 @@ void pic16c62x_device::pic16c62x_update_watchdog(int counts)
 
 	if ((m_opcode.w.l != 0x64) && (m_opcode.w.l != 0x63))
 	{
-		UINT16 old_WDT = m_WDT;
+		uint16_t old_WDT = m_WDT;
 
 		m_WDT -= counts;
 
@@ -1119,7 +1119,7 @@ void pic16c62x_device::pic16c62x_update_timer(int counts)
 
 void pic16c62x_device::execute_run()
 {
-	UINT8 T0_in;
+	uint8_t T0_in;
 
 	update_internalram_ptr();
 

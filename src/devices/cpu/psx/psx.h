@@ -140,10 +140,10 @@ class psxcpu_state
 public:
 	virtual ~psxcpu_state() {};
 
-	virtual UINT32 pc() = 0;
-	virtual UINT32 delayr() = 0;
-	virtual UINT32 delayv() = 0;
-	virtual UINT32 r(int i) = 0;
+	virtual uint32_t pc() = 0;
+	virtual uint32_t delayr() = 0;
+	virtual uint32_t delayv() = 0;
+	virtual uint32_t r(int i) = 0;
 };
 
 // ======================> psxcpu_device
@@ -167,7 +167,7 @@ public:
 	DECLARE_WRITE32_MEMBER( berr_w );
 	DECLARE_READ32_MEMBER( berr_r );
 
-	UINT32 exp_base();
+	uint32_t exp_base();
 
 	DECLARE_WRITE32_MEMBER( exp_base_w );
 	DECLARE_READ32_MEMBER( exp_base_r );
@@ -200,7 +200,7 @@ public:
 	void set_disable_rom_berr(bool mode);
 
 protected:
-	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -209,11 +209,11 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 40; }
-	virtual UINT32 execute_input_lines() const override { return 6; }
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return ( clocks + 3 ) / 4; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return cycles * 4; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 40; }
+	virtual uint32_t execute_input_lines() const override { return 6; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return ( clocks + 3 ) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return cycles * 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -225,19 +225,19 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// CPU registers
-	UINT32 m_pc;
-	UINT32 m_r[ 32 ];
-	UINT32 m_cp0r[ 16 ];
-	UINT32 m_hi;
-	UINT32 m_lo;
+	uint32_t m_pc;
+	uint32_t m_r[ 32 ];
+	uint32_t m_cp0r[ 16 ];
+	uint32_t m_hi;
+	uint32_t m_lo;
 
 	// internal stuff
-	UINT32 m_op;
+	uint32_t m_op;
 
 	// address spaces
 	const address_space_config m_program_config;
@@ -246,36 +246,36 @@ protected:
 
 	// other internal states
 	int m_icount;
-	UINT32 m_com_delay;
-	UINT32 m_delayv;
-	UINT32 m_delayr;
-	UINT32 m_berr;
-	UINT32 m_biu;
-	UINT32 m_icacheTag[ ICACHE_ENTRIES / 4 ];
-	UINT32 m_icache[ ICACHE_ENTRIES ];
-	UINT32 m_dcache[ DCACHE_ENTRIES ];
+	uint32_t m_com_delay;
+	uint32_t m_delayv;
+	uint32_t m_delayr;
+	uint32_t m_berr;
+	uint32_t m_biu;
+	uint32_t m_icacheTag[ ICACHE_ENTRIES / 4 ];
+	uint32_t m_icache[ ICACHE_ENTRIES ];
+	uint32_t m_dcache[ DCACHE_ENTRIES ];
 	int m_multiplier_operation;
-	UINT32 m_multiplier_operand1;
-	UINT32 m_multiplier_operand2;
+	uint32_t m_multiplier_operand1;
+	uint32_t m_multiplier_operand2;
 	int m_bus_attached;
-	UINT32 m_bad_byte_address_mask;
-	UINT32 m_bad_half_address_mask;
-	UINT32 m_bad_word_address_mask;
-	UINT32 m_exp_base;
-	UINT32 m_exp_config;
-	UINT32 m_ram_config;
-	UINT32 m_rom_config;
+	uint32_t m_bad_byte_address_mask;
+	uint32_t m_bad_half_address_mask;
+	uint32_t m_bad_word_address_mask;
+	uint32_t m_exp_base;
+	uint32_t m_exp_config;
+	uint32_t m_ram_config;
+	uint32_t m_rom_config;
 
 	void stop();
-	UINT32 cache_readword( UINT32 offset );
-	void cache_writeword( UINT32 offset, UINT32 data );
-	UINT8 readbyte( UINT32 address );
-	UINT16 readhalf( UINT32 address );
-	UINT32 readword( UINT32 address );
-	UINT32 readword_masked( UINT32 address, UINT32 mask );
-	void writeword( UINT32 address, UINT32 data );
-	void writeword_masked( UINT32 address, UINT32 data, UINT32 mask );
-	UINT32 log_bioscall_parameter( int parm );
+	uint32_t cache_readword( uint32_t offset );
+	void cache_writeword( uint32_t offset, uint32_t data );
+	uint8_t readbyte( uint32_t address );
+	uint16_t readhalf( uint32_t address );
+	uint32_t readword( uint32_t address );
+	uint32_t readword_masked( uint32_t address, uint32_t mask );
+	void writeword( uint32_t address, uint32_t data );
+	void writeword_masked( uint32_t address, uint32_t data, uint32_t mask );
+	uint32_t log_bioscall_parameter( int parm );
 	const char *log_bioscall_string( int parm );
 	const char *log_bioscall_hex( int parm );
 	const char *log_bioscall_char( int parm );
@@ -289,8 +289,8 @@ protected:
 	void funct_div();
 	void funct_divu();
 	void multiplier_update();
-	UINT32 get_hi();
-	UINT32 get_lo();
+	uint32_t get_hi();
+	uint32_t get_lo();
 	int execute_unstoppable_instructions( int executeCop2 );
 	void update_address_masks();
 	void update_scratchpad();
@@ -301,37 +301,37 @@ protected:
 	void set_pc( unsigned pc );
 	void fetch_next_op();
 	int advance_pc();
-	void load( UINT32 reg, UINT32 value );
-	void delayed_load( UINT32 reg, UINT32 value );
-	void branch( UINT32 address );
+	void load( uint32_t reg, uint32_t value );
+	void delayed_load( uint32_t reg, uint32_t value );
+	void branch( uint32_t address );
 	void conditional_branch( int takeBranch );
 	void unconditional_branch();
-	void common_exception( int exception, UINT32 romOffset, UINT32 ramOffset );
+	void common_exception( int exception, uint32_t romOffset, uint32_t ramOffset );
 	void exception( int exception );
 	void breakpoint_exception();
 	void fetch_bus_error_exception();
 	void load_bus_error_exception();
 	void store_bus_error_exception();
-	void load_bad_address( UINT32 address );
-	void store_bad_address( UINT32 address );
-	int data_address_breakpoint( int dcic_rw, int dcic_status, UINT32 address );
-	int load_data_address_breakpoint( UINT32 address );
-	int store_data_address_breakpoint( UINT32 address );
+	void load_bad_address( uint32_t address );
+	void store_bad_address( uint32_t address );
+	int data_address_breakpoint( int dcic_rw, int dcic_status, uint32_t address );
+	int load_data_address_breakpoint( uint32_t address );
+	int store_data_address_breakpoint( uint32_t address );
 
-	UINT32 get_register_from_pipeline( int reg );
+	uint32_t get_register_from_pipeline( int reg );
 	int cop0_usable();
 	void lwc( int cop, int sr_cu );
 	void swc( int cop, int sr_cu );
 	void bc( int cop, int sr_cu, int condition );
 
-	UINT32 getcp1dr( int reg );
-	void setcp1dr( int reg, UINT32 value );
-	UINT32 getcp1cr( int reg );
-	void setcp1cr( int reg, UINT32 value );
-	UINT32 getcp3dr( int reg );
-	void setcp3dr( int reg, UINT32 value );
-	UINT32 getcp3cr( int reg );
-	void setcp3cr( int reg, UINT32 value );
+	uint32_t getcp1dr( int reg );
+	void setcp1dr( int reg, uint32_t value );
+	uint32_t getcp1cr( int reg );
+	void setcp1cr( int reg, uint32_t value );
+	uint32_t getcp3dr( int reg );
+	void setcp3dr( int reg, uint32_t value );
+	uint32_t getcp3cr( int reg );
+	void setcp3cr( int reg, uint32_t value );
 
 	gte m_gte;
 
@@ -347,52 +347,52 @@ protected:
 
 private:
 	// disassembler interface
-	virtual UINT32 pc() override { return m_pc; }
-	virtual UINT32 delayr() override { return m_delayr; }
-	virtual UINT32 delayv() override { return m_delayv; }
-	virtual UINT32 r(int i) override { return m_r[ i ]; }
+	virtual uint32_t pc() override { return m_pc; }
+	virtual uint32_t delayr() override { return m_delayr; }
+	virtual uint32_t delayv() override { return m_delayv; }
+	virtual uint32_t r(int i) override { return m_r[ i ]; }
 };
 
 class cxd8530aq_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8530aq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8530aq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class cxd8530bq_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8530bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8530bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class cxd8530cq_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8530cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8530cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class cxd8661r_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8661r_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8661r_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class cxd8606bq_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8606bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8606bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class cxd8606cq_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8606cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8606cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // device type definition
@@ -408,8 +408,8 @@ extern const device_type CXD8606CQ;
 #define PSXCPU_DELAYR_PC ( 32 )
 #define PSXCPU_DELAYR_NOTPC ( 33 )
 
-#define PSXCPU_BYTE_EXTEND( a ) ( (INT32)(INT8)a )
-#define PSXCPU_WORD_EXTEND( a ) ( (INT32)(INT16)a )
+#define PSXCPU_BYTE_EXTEND( a ) ( (int32_t)(int8_t)a )
+#define PSXCPU_WORD_EXTEND( a ) ( (int32_t)(int16_t)a )
 
 #define INS_OP( op ) ( ( op >> 26 ) & 63 )
 #define INS_RS( op ) ( ( op >> 21 ) & 31 )
@@ -522,6 +522,6 @@ extern const device_type CXD8606CQ;
 #define CF_TLBP ( 8 )
 #define CF_RFE ( 16 )
 
-extern unsigned DasmPSXCPU( psxcpu_state *state, char *buffer, UINT32 pc, const UINT8 *opram );
+extern unsigned DasmPSXCPU( psxcpu_state *state, char *buffer, uint32_t pc, const uint8_t *opram );
 
 #endif /* __PSXCPU_H__ */

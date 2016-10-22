@@ -26,30 +26,30 @@ public:
 	required_device<m6502_device> m_maincpu;
 	required_device<x2212_device> m_nvram;
 	/* memory pointers */
-	std::unique_ptr<UINT8[]>    m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_paletteram;
+	std::unique_ptr<uint8_t[]>    m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_paletteram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	const UINT8 *m_syncprom;
-	const UINT8 *m_wpprom;
-	const UINT8 *m_priprom;
+	const uint8_t *m_syncprom;
+	const uint8_t *m_wpprom;
+	const uint8_t *m_priprom;
 	bitmap_ind16 m_spritebitmap;
 	double      m_rweights[3];
 	double      m_gweights[3];
 	double      m_bweights[3];
-	UINT8       m_video_control[8];
-	UINT8       m_bitmode_addr[2];
+	uint8_t       m_video_control[8];
+	uint8_t       m_bitmode_addr[2];
 
 	/* misc */
 	int         m_vblank_start;
 	int         m_vblank_end;
 	emu_timer   *m_irq_timer;
-	UINT8       m_irq_state;
+	uint8_t       m_irq_state;
 
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(cloud9_led_w);
@@ -67,9 +67,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_cloud9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cloud9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(clock_irq);
-	inline void cloud9_write_vram( UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba );
+	inline void cloud9_write_vram( uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba );
 	inline void bitmode_autoinc(  );
 	inline void schedule_next_irq(int curscanline);
 };

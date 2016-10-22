@@ -178,7 +178,7 @@ GFXDECODE_END
 
 void tail2nos_state::machine_start()
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank3")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 	membank("bank3")->set_entry(0);

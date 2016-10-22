@@ -55,16 +55,16 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 
-	required_shared_ptr<UINT8> m_fgram;
-	required_shared_ptr<UINT8> m_bgram;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_bgram;
 
-	UINT8 mux_data;
+	uint8_t mux_data;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -103,7 +103,7 @@ void chance32_state::video_start()
 }
 
 
-UINT32 chance32_state::screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -119,7 +119,7 @@ WRITE8_MEMBER(chance32_state::mux_w)
 
 READ8_MEMBER(chance32_state::mux_r)
 {
-	UINT8 res,i;
+	uint8_t res,i;
 	const char *const muxnames[4] = { "IN0", "IN1", "IN2", "IN3" };
 	res = 0;
 

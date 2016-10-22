@@ -9,7 +9,6 @@ Functions to emulate the video hardware of the machine.
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/dac.h"
 #include "includes/cheekyms.h"
 
 /* bit 3 and 7 of the char color PROMs are used for something -- not currently emulated -
@@ -17,7 +16,7 @@ Functions to emulate the video hardware of the machine.
 
 PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j, bit, r, g, b;
 
 	for (i = 0; i < 6; i++)
@@ -39,11 +38,16 @@ PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
 	}
 }
 
-
 WRITE8_MEMBER(cheekyms_state::port_40_w)
 {
-	/* the lower bits probably trigger sound samples */
-	m_dac->write_unsigned8(data ? 0x80 : 0);
+	m_dac0->write(BIT(data, 7)); // tune
+	m_dac1->write(BIT(data, 6)); // mouse eating cheese
+	m_dac2->write(BIT(data, 5)); // hammer
+	m_dac3->write(BIT(data, 4)); // mouse died
+	m_dac4->write(BIT(data, 3)); // mystery died
+	m_dac5->write(BIT(data, 2)); // mouse appears
+	m_dac6->write(BIT(data, 1)); // mystery appears
+	m_dac7->write(BIT(data, 0));
 }
 
 
@@ -142,7 +146,7 @@ void cheekyms_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-UINT32 cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, x;
 	int scrolly = ((*m_port_80 >> 3) & 0x07);

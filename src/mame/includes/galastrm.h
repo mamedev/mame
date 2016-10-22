@@ -20,7 +20,7 @@ class galastrm_renderer : public poly_manager<float, gs_poly_data, 2, 10000>
 public:
 	galastrm_renderer(galastrm_state &state);
 
-	void tc0610_draw_scanline(INT32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid);
+	void tc0610_draw_scanline(int32_t scanline, const extent_t& extent, const gs_poly_data& object, int threadid);
 	void tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectangle &clip);
 
 	bitmap_ind16 &screenbits() { return m_screenbits; }
@@ -62,8 +62,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT32> m_ram;
-	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<uint32_t> m_ram;
+	required_shared_ptr<uint32_t> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -74,13 +74,13 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	UINT16 m_coin_word;
-	UINT16 m_frame_counter;
+	uint16_t m_coin_word;
+	uint16_t m_frame_counter;
 	int m_tc0110pcr_addr;
 	int m_tc0610_0_addr;
 	int m_tc0610_1_addr;
-	UINT32 m_mem[2];
-	INT16 m_tc0610_ctrl_reg[2][8];
+	uint32_t m_mem[2];
+	int16_t m_tc0610_ctrl_reg[2][8];
 	std::unique_ptr<gs_tempsprite[]> m_spritelist;
 	struct gs_tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
@@ -100,7 +100,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 	virtual void video_start() override;
-	UINT32 screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);

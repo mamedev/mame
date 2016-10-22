@@ -167,18 +167,18 @@ public:
 	DECLARE_DRIVER_INIT(sol20);
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sol20_boot);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	UINT8 m_sol20_fa;
+	uint8_t m_sol20_fa;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT8 m_sol20_fc;
-	UINT8 m_sol20_fe;
-	const UINT8 *m_p_chargen;
-	UINT8 m_framecnt;
+	uint8_t m_sol20_fc;
+	uint8_t m_sol20_fe;
+	const uint8_t *m_p_chargen;
+	uint8_t m_framecnt;
 	cass_data_t m_cass_data;
 	emu_timer *m_cassette_timer;
 	cassette_image_device *cassette_device_image();
@@ -187,7 +187,7 @@ private:
 	required_device<cassette_image_device> m_cass2;
 	required_device<ay31015_device> m_uart;
 	required_device<ay31015_device> m_uart_s;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_ioport m_iop_arrows;
 	required_ioport m_iop_config;
 	required_ioport m_iop_s1;
@@ -222,7 +222,7 @@ void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		sol20_boot(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sol20_state::device_timer");
+		assert_always(false, "Unknown id in sol20_state::device_timer");
 	}
 }
 
@@ -230,7 +230,7 @@ void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 // identical to sorcerer
 TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 {
-	UINT8 cass_ws = 0;
+	uint8_t cass_ws = 0;
 	switch (m_sol20_fa & 0x20)
 	{
 		case 0x20:              /* Cassette 300 baud */
@@ -320,7 +320,7 @@ READ8_MEMBER( sol20_state::sol20_f8_r )
 {
 // d7 - TMBT; d6 - DAV; d5 - CTS; d4 - OE; d3 - PE; d2 - FE; d1 - DSR; d0 - CD
 	/* set unemulated bits (CTS/DSR/CD) high */
-	UINT8 data = 0x23;
+	uint8_t data = 0x23;
 
 	m_uart_s->set_input_pin(AY31015_SWE, 0);
 	data |= m_uart_s->get_output_pin(AY31015_TBMT) ? 0x80 : 0;
@@ -335,7 +335,7 @@ READ8_MEMBER( sol20_state::sol20_f8_r )
 
 READ8_MEMBER( sol20_state::sol20_f9_r)
 {
-	UINT8 data = m_uart_s->get_received_data();
+	uint8_t data = m_uart_s->get_received_data();
 	m_uart_s->set_input_pin(AY31015_RDAV, 0);
 	m_uart_s->set_input_pin(AY31015_RDAV, 1);
 	return data;
@@ -344,7 +344,7 @@ READ8_MEMBER( sol20_state::sol20_f9_r)
 READ8_MEMBER( sol20_state::sol20_fa_r )
 {
 	/* set unused bits high */
-	UINT8 data = 0x26;
+	uint8_t data = 0x26;
 
 	m_uart->set_input_pin(AY31015_SWE, 0);
 	data |= m_uart->get_output_pin(AY31015_TBMT) ? 0x80 : 0;
@@ -361,7 +361,7 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 
 READ8_MEMBER( sol20_state::sol20_fb_r)
 {
-	UINT8 data = m_uart->get_received_data();
+	uint8_t data = m_uart->get_received_data();
 	m_uart->set_input_pin(AY31015_RDAV, 0);
 	m_uart->set_input_pin(AY31015_RDAV, 1);
 	return data;
@@ -369,7 +369,7 @@ READ8_MEMBER( sol20_state::sol20_fb_r)
 
 READ8_MEMBER( sol20_state::sol20_fc_r )
 {
-	UINT8 data = m_iop_arrows->read();
+	uint8_t data = m_iop_arrows->read();
 	if (BIT(data, 0)) return 0x32;
 	if (BIT(data, 1)) return 0x34;
 	if (BIT(data, 2)) return 0x36;
@@ -561,9 +561,9 @@ void sol20_state::machine_start()
 
 void sol20_state::machine_reset()
 {
-	UINT8 data = 0, s_count = 0;
+	uint8_t data = 0, s_count = 0;
 	int s_clock;
-	const UINT16 s_bauds[8]={ 75, 110, 180, 300, 600, 1200, 2400, 4800 };
+	const uint16_t s_bauds[8]={ 75, 110, 180, 300, 600, 1200, 2400, 4800 };
 	m_sol20_fe=0;
 	m_sol20_fa=1;
 
@@ -613,7 +613,7 @@ void sol20_state::machine_reset()
 
 DRIVER_INIT_MEMBER(sol20_state,sol20)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
 }
 
@@ -622,17 +622,17 @@ void sol20_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 // Visible screen is 64 x 16, with start position controlled by scroll register.
 // Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.
 // Note on blinking characters:
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
-	UINT16 which = (m_iop_config->read() & 2) << 10;
-	UINT8 s1 = m_iop_s1->read();
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma,x,inv;
-	UINT8 polarity = (s1 & 8) ? 0xff : 0;
+	uint16_t which = (m_iop_config->read() & 2) << 10;
+	uint8_t s1 = m_iop_s1->read();
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma,x,inv;
+	uint8_t polarity = (s1 & 8) ? 0xff : 0;
 
 	bool cursor_inv = false;
 	if (((s1 & 0x30) == 0x20) || (((s1 & 0x30) == 0x10) && (m_framecnt & 0x08)))
@@ -646,7 +646,7 @@ UINT32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	{
 		for (ra = 0; ra < 13; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{

@@ -22,15 +22,15 @@
 
 struct ssi263_t
 {
-	UINT8 dr;
-	UINT8 p;
-	UINT16 i;
-	UINT8 r;
-	UINT8 t;
-	UINT8 c;
-	UINT8 a;
-	UINT8 f;
-	UINT8 mode;
+	uint8_t dr;
+	uint8_t p;
+	uint16_t i;
+	uint8_t r;
+	uint8_t t;
+	uint8_t c;
+	uint8_t a;
+	uint8_t f;
+	uint8_t mode;
 };
 
 class thayers_state : public driver_device
@@ -53,13 +53,13 @@ public:
 
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
-	UINT8 m_laserdisc_data;
+	uint8_t m_laserdisc_data;
 	int m_rx_bit;
 	int m_keylatch;
-	UINT8 m_cop_data_latch;
+	uint8_t m_cop_data_latch;
 	int m_cop_data_latch_enable;
-	UINT8 m_cop_l;
-	UINT8 m_cop_cmd_latch;
+	uint8_t m_cop_l;
+	uint8_t m_cop_cmd_latch;
 	int m_timer_int;
 	int m_data_rdy_int;
 	int m_ssi_data_request;
@@ -101,7 +101,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-static const UINT8 led_map[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
+static const uint8_t led_map[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
 
 /* Interrupts */
 
@@ -117,7 +117,7 @@ void thayers_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		check_interrupt();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in thayers_state::device_timer");
+		assert_always(false, "Unknown id in thayers_state::device_timer");
 	}
 }
 

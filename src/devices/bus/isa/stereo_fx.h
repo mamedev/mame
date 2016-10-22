@@ -5,7 +5,6 @@
 
 #include "emu.h"
 #include "isa.h"
-#include "sound/dac.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/3812intf.h"
@@ -21,14 +20,12 @@ class stereo_fx_device : public device_t,
 {
 public:
 	// construction/destruction
-	stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	required_device<dac_device> m_dacl;
-	required_device<dac_device> m_dacr;
 	required_device<pc_joy_device> m_joy;
 	required_device<cpu_device> m_cpu;
 
@@ -58,20 +55,20 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	UINT8 dack_r(int line) override;
-	void dack_w(int line, UINT8 data) override;
+	uint8_t dack_r(int line) override;
+	void dack_w(int line, uint8_t data) override;
 private:
 	// internal state
 	bool m_data_in;
-	UINT8 m_in_byte;
+	uint8_t m_in_byte;
 	bool m_data_out;
-	UINT8 m_out_byte;
+	uint8_t m_out_byte;
 
-	UINT8 m_port20;
-	UINT8 m_port00;
+	uint8_t m_port20;
+	uint8_t m_port00;
 	emu_timer *m_timer;
-	UINT8 m_t0;
-	UINT8 m_t1;
+	uint8_t m_t0;
+	uint8_t m_t1;
 };
 
 // device type definition

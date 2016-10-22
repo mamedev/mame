@@ -52,7 +52,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<comx_expansion_slot_device> m_exp;
 	required_memory_region m_rom;
-	optional_shared_ptr<UINT8> m_char_ram;
+	optional_shared_ptr<uint8_t> m_char_ram;
 	required_ioport m_d6;
 	required_ioport m_modifiers;
 
@@ -83,7 +83,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( prd_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( comx35_comx );
-	void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count);
+	void image_fread_memory(device_image_interface &image, uint16_t addr, uint32_t count);
 	CDP1869_CHAR_RAM_READ_MEMBER(comx35_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(comx35_charram_w);
 	CDP1869_PCB_READ_MEMBER(comx35_pcb_r);

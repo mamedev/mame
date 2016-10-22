@@ -664,25 +664,25 @@ ROM_END
 
 DRIVER_INIT_MEMBER(commando_state,commando)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// the first opcode is *not* encrypted
 	m_decrypted_opcodes[0] = rom[0];
 	for (int A = 1; A < 0xc000; A++)
 	{
-		UINT8 src = rom[A];
+		uint8_t src = rom[A];
 		m_decrypted_opcodes[A] = (src & 0x11) | ((src & 0xe0) >> 4) | ((src & 0x0e) << 4);
 	}
 }
 
 DRIVER_INIT_MEMBER(commando_state,spaceinv)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// the first opcode *is* encrypted
 	for (int A = 0; A < 0xc000; A++)
 	{
-		UINT8 src = rom[A];
+		uint8_t src = rom[A];
 		m_decrypted_opcodes[A] = (src & 0x11) | ((src & 0xe0) >> 4) | ((src & 0x0e) << 4);
 	}
 }

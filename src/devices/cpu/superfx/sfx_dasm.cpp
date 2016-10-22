@@ -14,9 +14,9 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 	va_end(vl);
 }
 
-offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 param1, UINT16 alt)
+offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uint8_t param1, uint16_t alt)
 {
-	UINT8 bytes_consumed = 1;
+	uint8_t bytes_consumed = 1;
 	output = buffer;
 
 	switch(op)
@@ -37,47 +37,47 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			print("ROL");
 			break;
 		case 0x05: // BRA
-			print("BRA     %d", (INT8)param0);
+			print("BRA     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x06: // BLT
-			print("BLT     %d", (INT8)param0);
+			print("BLT     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x07: // BGE
-			print("BGE     %d", (INT8)param0);
+			print("BGE     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x08: // BNE
-			print("BNE     %d", (INT8)param0);
+			print("BNE     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x09: // BEQ
-			print("BEQ     %d", (INT8)param0);
+			print("BEQ     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0a: // BPL
-			print("BPL     %d", (INT8)param0);
+			print("BPL     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0b: // BMI
-			print("BMI     %d", (INT8)param0);
+			print("BMI     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0c: // BCC
-			print("BCC     %d", (INT8)param0);
+			print("BCC     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0d: // BCS
-			print("BCS     %d", (INT8)param0);
+			print("BCS     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0e: // BVC
-			print("BVC     %d", (INT8)param0);
+			print("BVC     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0f: // BVS
-			print("BVS     %d", (INT8)param0);
+			print("BVS     %d", (int8_t)param0);
 			bytes_consumed = 2;
 			break;
 

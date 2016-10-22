@@ -16,8 +16,8 @@ Atari Poolshark Driver
 
 DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
 {
-	UINT8* pSprite = memregion("gfx1")->base();
-	UINT8* pOffset = memregion("proms")->base();
+	uint8_t* pSprite = memregion("gfx1")->base();
+	uint8_t* pOffset = memregion("proms")->base();
 
 	/* re-arrange sprite data using the PROM */
 
@@ -25,7 +25,7 @@ DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
 	{
 		for (int j = 0; j < 16; j++)
 		{
-			UINT16 v =
+			uint16_t v =
 				(pSprite[0] << 0xC) |
 				(pSprite[1] << 0x8) |
 				(pSprite[2] << 0x4) |
@@ -73,7 +73,7 @@ WRITE8_MEMBER(poolshrk_state::watchdog_w)
 READ8_MEMBER(poolshrk_state::input_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	UINT8 val = ioport(portnames[offset & 3])->read();
+	uint8_t val = ioport(portnames[offset & 3])->read();
 
 	int x = ioport((offset & 1) ? "AN1" : "AN0")->read();
 	int y = ioport((offset & 1) ? "AN3" : "AN2")->read();

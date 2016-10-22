@@ -32,7 +32,7 @@ struct xml_parse_info
 	XML_Parser          parser;
 	xml_data_node *     rootnode;
 	xml_data_node *     curnode;
-	UINT32              flags;
+	uint32_t              flags;
 };
 
 
@@ -42,7 +42,7 @@ struct xml_parse_info
 ***************************************************************************/
 
 /* expat interfaces */
-static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts);
+static bool expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts);
 static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes);
 static void expat_data(void *data, const XML_Char *s, int len);
 static void expat_element_end(void *data, const XML_Char *name);
@@ -103,7 +103,7 @@ static const char *copystring_lower(const char *input)
 	if (newstr != nullptr)
 	{
 		for (i = 0; input[i] != 0; i++)
-			newstr[i] = tolower((UINT8)input[i]);
+			newstr[i] = tolower((uint8_t)input[i]);
 		newstr[i] = 0;
 	}
 
@@ -197,7 +197,7 @@ xml_data_node *xml_string_read(const char *string, xml_parse_options *opts)
 		return nullptr;
 
 	/* parse the data */
-	if (XML_Parse(parse_info.parser, string, length, TRUE) == XML_STATUS_ERROR)
+	if (XML_Parse(parse_info.parser, string, length, 1) == XML_STATUS_ERROR)
 	{
 		if (opts != nullptr && opts->error != nullptr)
 		{
@@ -635,7 +635,7 @@ const char *xml_normalize_string(const char *string)
 
 static void *expat_malloc(size_t size)
 {
-	UINT32 *result = (UINT32 *)malloc(size + 4 * sizeof(UINT32));
+	uint32_t *result = (uint32_t *)malloc(size + 4 * sizeof(uint32_t));
 	*result = size;
 	return &result[4];
 }
@@ -651,7 +651,7 @@ static void *expat_malloc(size_t size)
 static void expat_free(void *ptr)
 {
 	if (ptr != nullptr)
-		free(&((UINT32 *)ptr)[-4]);
+		free(&((uint32_t *)ptr)[-4]);
 }
 
 /**
@@ -672,7 +672,7 @@ static void *expat_realloc(void *ptr, size_t size)
 		return nullptr;
 	if (ptr != nullptr)
 	{
-		UINT32 oldsize = ((UINT32 *)ptr)[-4];
+		uint32_t oldsize = ((uint32_t *)ptr)[-4];
 		memcpy(newptr, ptr, oldsize);
 		expat_free(ptr);
 	}
@@ -695,7 +695,7 @@ static void *expat_realloc(void *ptr, size_t size)
  * @return  An int.
  */
 
-static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
+static bool expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
 {
 	XML_Memory_Handling_Suite memcallbacks;
 
@@ -715,7 +715,7 @@ static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opt
 	/* create a root node */
 	parse_info->rootnode = xml_file_create();
 	if (parse_info->rootnode == nullptr)
-		return FALSE;
+		return false;
 	parse_info->curnode = parse_info->rootnode;
 
 	/* create the XML parser */
@@ -726,7 +726,7 @@ static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opt
 	if (parse_info->parser == nullptr)
 	{
 		free(parse_info->rootnode);
-		return FALSE;
+		return false;
 	}
 
 	/* configure the parser */
@@ -737,7 +737,7 @@ static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opt
 	/* optional parser initialization step */
 	if (opts != nullptr && opts->init_parser != nullptr)
 		(*opts->init_parser)(parse_info->parser);
-	return TRUE;
+	return true;
 }
 
 
@@ -856,11 +856,11 @@ static void expat_element_end(void *data, const XML_Char *name)
 		char *end = start + strlen(start);
 
 		/* first strip leading spaces */
-		while (*start && isspace((UINT8)*start))
+		while (*start && isspace((uint8_t)*start))
 			start++;
 
 		/* then strip trailing spaces */
-		while (end > start && isspace((UINT8)end[-1]))
+		while (end > start && isspace((uint8_t)end[-1]))
 			end--;
 
 		/* if nothing left, just free it */

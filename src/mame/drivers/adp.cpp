@@ -184,7 +184,7 @@ public:
 	required_ioport m_in0;
 
 	/* misc */
-	UINT8 m_mux_data;
+	uint8_t m_mux_data;
 
 	/* devices */
 	DECLARE_READ16_MEMBER(input_r);
@@ -207,7 +207,7 @@ void adp_state::skattva_nvram_init(nvram_device &nvram, void *base, size_t size)
     00F70A: 4EB9 0001 D7F4             jsr     $1d7f4.l                 ; initializes the HD63484
     00F710: 11FC 0010 E8AD             move.b  #$10, $e8ad.w
 */
-	UINT16 *ram = (UINT16 *)base;
+	uint16_t *ram = (uint16_t *)base;
 	ram[0x2450 >> 1] = 0x2400;
 	ram[0x2452 >> 1] = 0x0018;
 	ram[0x0000 >> 1] = 0x3141;
@@ -273,7 +273,7 @@ PALETTE_INIT_MEMBER(adp_state,fstation)
 
 READ16_MEMBER(adp_state::input_r)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	data &= ~(BIT(m_in0->read(), m_mux_data) ? 0x0000 : 0x0004);
 

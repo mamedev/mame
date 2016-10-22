@@ -63,15 +63,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
 private:
-	UINT8 m_pia0_a;
-	UINT8 m_pia0_b;
-	UINT8 m_pia1_a;
-	UINT8 m_pia1_b;
+	uint8_t m_pia0_a;
+	uint8_t m_pia0_b;
+	uint8_t m_pia1_a;
+	uint8_t m_pia1_b;
 	bool m_pia0_cb2;
 	bool m_pia0_timer;
-	UINT8 m_port1, m_port2;
-	//UINT8 m_digit;
-	UINT8 m_segment;
+	uint8_t m_port1, m_port2;
+	//uint8_t m_digit;
+	uint8_t m_segment;
 	virtual void machine_reset() override;
 	required_device<m6803_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
@@ -245,7 +245,7 @@ WRITE8_MEMBER( by6803_state::pia0_a_w )
 // switch returns
 READ8_MEMBER( by6803_state::pia0_b_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(m_pia0_a, 0))
 		data |= m_io_x0->read();
@@ -400,9 +400,9 @@ static MACHINE_CONFIG_START( by6803, by6803_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by6803_state, pia1_b_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by6803_state, pia1_cb2_w))
 
-	//MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD("tcs") // Cheap Squeak Turbo
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	//MCFG_SPEAKER_STANDARD_MONO("speaker")
+	//MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0) // Cheap Squeak Turbo
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

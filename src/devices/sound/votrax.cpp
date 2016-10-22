@@ -31,8 +31,8 @@
 
 // note that according to the patent timing circuit, p1/p2 and phi1/phi2
 // run 4x faster than all references in the patent text
-const UINT32 P_CLOCK_BIT = 5;       // 5 according to timing diagram
-const UINT32 PHI_CLOCK_BIT = 3;     // 3 according to timing diagram
+const uint32_t P_CLOCK_BIT = 5;       // 5 according to timing diagram
+const uint32_t PHI_CLOCK_BIT = 3;     // 3 according to timing diagram
 
 
 
@@ -94,7 +94,7 @@ const double votrax_sc01_device::s_glottal_wave[16] =
 //  votrax_sc01_device - constructor
 //-------------------------------------------------
 
-votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VOTRAX_SC01, "Votrax SC-01", tag, owner, clock, "votrax", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -123,7 +123,7 @@ WRITE8_MEMBER( votrax_sc01_device::write )
 
 	// only 6 bits matter
 	m_phoneme = data & 0x3f;
-const UINT8 *rom = m_rom + (m_phoneme << 3);
+const uint8_t *rom = m_rom + (m_phoneme << 3);
 osd_printf_debug("%s: STROBE %s (F1=%X F2=%X FC=%X F3=%X F2Q=%X VA=%X FA=%X CL=%X CLD=%X VD=%X PAC=%X PH=%02X)\n",
 		machine().time().as_string(3), s_phoneme_table[m_phoneme],
 		rom[0] >> 4, rom[1] >> 4, rom[2] >> 4, rom[3] >> 4, rom[4] >> 4, rom[5] >> 4, rom[6] >> 4,
@@ -263,7 +263,7 @@ void votrax_sc01_device::update_subphoneme_clock_period()
 	double period = 1000e-12 * (rx * (1.0 + 9e3 / 1e3) + 9e3);
 
 	// convert to master clock cycles and round up
-	m_subphoneme_period = UINT32(ceil(period * double(m_master_clock_freq)));
+	m_subphoneme_period = uint32_t(ceil(period * double(m_master_clock_freq)));
 }
 
 //-------------------------------------------------
@@ -271,7 +271,7 @@ void votrax_sc01_device::update_subphoneme_clock_period()
 //  a grid of bit-selected caps
 //-------------------------------------------------
 
-double votrax_sc01_device::bits_to_caps(UINT32 value, int caps_count, const double *caps_values)
+double votrax_sc01_device::bits_to_caps(uint32_t value, int caps_count, const double *caps_values)
 {
 	double sum = 0;
 	for(int i=0; i<caps_count; i++)
@@ -505,7 +505,7 @@ void votrax_sc01_device::sound_stream_update(sound_stream &stream, stream_sample
 	{
 		// run the digital logic at the master clock rate
 		double glottal_out = 0;
-		UINT8 noise_out_digital = 0;
+		uint8_t noise_out_digital = 0;
 		for (int curclock = 0; curclock < half_clocks_per_sample; curclock++)
 		{
 if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
@@ -543,7 +543,7 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 			m_master_clock ^= 1;
 
 			// on the falling edge of the master clock, advance the 10-bit counter at 34
-			UINT8 old_latch_72 = m_latch_72;
+			uint8_t old_latch_72 = m_latch_72;
 			if (m_master_clock == 0)
 				m_counter_34 = (m_counter_34 + 1) & 0x3ff;
 			else
@@ -555,13 +555,13 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 			// derive beta 1 clock:
 			//  set if m_latch_70.0 == 1
 			//  reset if m_latch_70.0 == 0
-//          UINT8 old_beta1 = m_beta1;
+//          uint8_t old_beta1 = m_beta1;
 			m_beta1 = BIT(m_latch_70, 0);
 
 			// derive p2 clock:
 			//  set if (m_counter_34.P_CLOCK_BIT & clock) == 1
 			//  reset if (m_counter_34.P_CLOCK_BIT == 0)
-			UINT8 old_p2 = m_p2;
+			uint8_t old_p2 = m_p2;
 			if (BIT(m_counter_34, P_CLOCK_BIT) & m_master_clock)
 				m_p2 = 1;
 			else if (!BIT(m_counter_34, P_CLOCK_BIT))
@@ -570,7 +570,7 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 			// derive p1 clock:
 			//  set if (!m_counter_34.P_CLOCK_BIT & clock) == 1
 			//  reset if (m_counter_34.P_CLOCK_BIT == 1)
-//          UINT8 old_p1 = m_p1;
+//          uint8_t old_p1 = m_p1;
 			if (BIT(~m_counter_34, P_CLOCK_BIT) & m_master_clock)
 				m_p1 = 1;
 			else if (BIT(m_counter_34, P_CLOCK_BIT))
@@ -579,7 +579,7 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 			// derive phi2 clock:
 			//  set if (m_counter_34.PHI_CLOCK_BIT & clock) == 1
 			//  reset if (m_counter_34.PHI_CLOCK_BIT == 0)
-			UINT8 old_phi2 = m_phi2;
+			uint8_t old_phi2 = m_phi2;
 			if (BIT(m_counter_34, PHI_CLOCK_BIT) & m_master_clock)
 				m_phi2 = 1;
 			else if (!BIT(m_counter_34, PHI_CLOCK_BIT))
@@ -588,7 +588,7 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 			// derive phi1 clock:
 			//  set if (!m_counter_34.PHI_CLOCK_BIT & clock) == 1
 			//  reset if (m_counter_34.PHI_CLOCK_BIT == 1)
-			UINT8 old_phi1 = m_phi1;
+			uint8_t old_phi1 = m_phi1;
 			if (BIT(~m_counter_34, PHI_CLOCK_BIT) & m_master_clock)
 				m_phi1 = 1;
 			else if (BIT(m_counter_34, PHI_CLOCK_BIT))
@@ -597,7 +597,7 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 			// derive alternate phi2 clock:
 			//  set if (m_counter_34.PHI_CLOCK_BIT & clock) == 1
 			//  reset if (m_counter_34.PHI_CLOCK_BIT == 0)
-			UINT8 old_phi2_20 = m_phi2_20;
+			uint8_t old_phi2_20 = m_phi2_20;
 			if (BIT(m_counter_34, PHI_CLOCK_BIT + 2) & m_master_clock)
 				m_phi2_20 = 1;
 			else if (!BIT(m_counter_34, PHI_CLOCK_BIT + 2))
@@ -606,23 +606,23 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 			// derive alternate phi1 clock:
 			//  set if (!m_counter_34.PHI_CLOCK_BIT & clock) == 1
 			//  reset if (m_counter_34.PHI_CLOCK_BIT == 1)
-//          UINT8 old_phi1_20 = m_phi1_20;
+//          uint8_t old_phi1_20 = m_phi1_20;
 			if (BIT(~m_counter_34, PHI_CLOCK_BIT + 2) & m_master_clock)
 				m_phi1_20 = 1;
 			else if (BIT(m_counter_34, PHI_CLOCK_BIT + 2))
 				m_phi1_20 = 0;
 
 			// determine rising edges of each clock of interest
-//          UINT8 beta1_rising = (old_beta1 ^ m_beta1) & m_beta1;
-			UINT8 p2_rising = (old_p2 ^ m_p2) & m_p2;
-//          UINT8 p1_rising = (old_p1 ^ m_p1) & m_p1;
-			UINT8 phi2_rising = (old_phi2 ^ m_phi2) & m_phi2;
-			UINT8 phi1_rising = (old_phi1 ^ m_phi1) & m_phi1;
-			UINT8 phi2_20_rising = (old_phi2_20 ^ m_phi2_20) & m_phi2_20;
-//          UINT8 phi1_20_rising = (old_phi1_20 ^ m_phi1_20) & m_phi1_20;
-			UINT8 a0_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 0);
-			UINT8 a2_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 2);
-			UINT8 _125k_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 3);
+//          uint8_t beta1_rising = (old_beta1 ^ m_beta1) & m_beta1;
+			uint8_t p2_rising = (old_p2 ^ m_p2) & m_p2;
+//          uint8_t p1_rising = (old_p1 ^ m_p1) & m_p1;
+			uint8_t phi2_rising = (old_phi2 ^ m_phi2) & m_phi2;
+			uint8_t phi1_rising = (old_phi1 ^ m_phi1) & m_phi1;
+			uint8_t phi2_20_rising = (old_phi2_20 ^ m_phi2_20) & m_phi2_20;
+//          uint8_t phi1_20_rising = (old_phi1_20 ^ m_phi1_20) & m_phi1_20;
+			uint8_t a0_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 0);
+			uint8_t a2_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 2);
+			uint8_t _125k_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 3);
 
 			// track subphoneme counter state
 			if (!(m_latch_42 | m_phi1))
@@ -633,9 +633,9 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 				m_latch_42 = (m_subphoneme_count < m_subphoneme_period);
 
 			// update the state of the subphoneme clock line
-			UINT8 old_clock_88 = m_clock_88;
+			uint8_t old_clock_88 = m_clock_88;
 			m_clock_88 = !m_latch_42;   //!(m_latch_42 | m_phi1); -- figure 7 seems to be wrong here
-			UINT8 clock_88_rising = (old_clock_88 ^ m_clock_88) & m_clock_88;
+			uint8_t clock_88_rising = (old_clock_88 ^ m_clock_88) & m_clock_88;
 
 			// the A/R line holds the counter in reset except during phoneme processing,
 			// when it is clocked on the rising edge of the subphoneme timer clock
@@ -670,7 +670,7 @@ osd_printf_debug("counter=%d\n", m_counter_84);
 
 			// fetch ROM data; note that the address lines come directly from
 			// counter_34 and not from the latches, which are 1 cycle delayed
-			UINT8 romdata = m_rom[(m_phoneme << 3) | ((m_counter_34 >> 4) & 7)];
+			uint8_t romdata = m_rom[(m_phoneme << 3) | ((m_counter_34 >> 4) & 7)];
 
 			// update the ROM data; ROM format is (upper nibble/lower nibble)
 			//  +00 = F1 parameter / 0
@@ -683,8 +683,8 @@ osd_printf_debug("counter=%d\n", m_counter_84);
 			//  +07 = Phoneme timing (full 7 bits)
 
 			// latch a new value from ROM on phi2
-			UINT8 a = m_latch_72 & 7;
-			UINT8 romdata_swapped;
+			uint8_t a = m_latch_72 & 7;
+			uint8_t romdata_swapped;
 			if (phi2_rising)
 			{
 				switch (a)
@@ -723,7 +723,7 @@ osd_printf_debug("counter=%d\n", m_counter_84);
 						{
 							m_latch_80 = romdata & 0x7f;
 osd_printf_debug("[PH=%02X]\n", m_latch_80);
-							UINT32 old_period = m_subphoneme_period;
+							uint32_t old_period = m_subphoneme_period;
 							update_subphoneme_clock_period();
 							m_subphoneme_count = (m_subphoneme_count * m_subphoneme_period) / old_period;
 							m_phoneme_timer->adjust(attotime::zero);
@@ -739,9 +739,9 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 			//==============================================
 
 			// determine the TC output from the counters (note that TC requires ET)
-			UINT8 counter_222_tc = (m_counter_222 == 0xf);
-			UINT8 counter_220_tc = (m_counter_220 == 0xf && counter_222_tc);
-			UINT8 counter_224_tc = (m_counter_224 == 0xf && counter_222_tc);
+			uint8_t counter_222_tc = (m_counter_222 == 0xf);
+			uint8_t counter_220_tc = (m_counter_220 == 0xf && counter_222_tc);
+			uint8_t counter_224_tc = (m_counter_224 == 0xf && counter_222_tc);
 
 			// clock glottal counter 224 on rising edge of a0
 			if (a0_rising)
@@ -807,7 +807,7 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 
 			// derive glottal circuit output signals
 #if !TEMP_HACKS
-			UINT8 old_glottal_sync = m_glottal_sync;
+			uint8_t old_glottal_sync = m_glottal_sync;
 #endif
 			m_glottal_sync = (m_counter_234 == 0);
 			glottal_out = s_glottal_wave[m_counter_234];
@@ -819,10 +819,10 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 			//==============================================
 
 			// divide 1.25k clock by 2 (lower-left of 46)
-			UINT8 old_0625_clock = m_0625_clock;
+			uint8_t old_0625_clock = m_0625_clock;
 			if (_125k_rising)
 				m_0625_clock = !m_0625_clock;
-			UINT8 _0625_rising = (old_0625_clock ^ m_0625_clock) & m_0625_clock;
+			uint8_t _0625_rising = (old_0625_clock ^ m_0625_clock) & m_0625_clock;
 
 			// update counter above
 			if (_0625_rising)
@@ -845,7 +845,7 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 #endif
 
 			// determine the read/write signal
-			UINT8 ram_write = 0;
+			uint8_t ram_write = 0;
 			switch (a)
 			{
 				// write if not FF and low 2 bits of latch
@@ -877,7 +877,7 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 			// (note we consolidate the serial addition and clocking steps here)
 			if (ram_write)
 			{
-				UINT8 old = (m_latch_168 << 4) | m_latch_170;
+				uint8_t old = (m_latch_168 << 4) | m_latch_170;
 				m_ram[a] = old - (old >> 3) + ((romdata & 0xf0) >> 3);
 			}
 
@@ -904,8 +904,8 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 #if TEMP_HACKS
 			if (phi2_rising)
 #else
-			UINT8 old_phi2_glottal = (old_phi2 & old_glottal_sync);
-			UINT8 new_phi2_glottal = m_phi2 & m_glottal_sync;
+			uint8_t old_phi2_glottal = (old_phi2 & old_glottal_sync);
+			uint8_t new_phi2_glottal = m_phi2 & m_glottal_sync;
 			if ((old_phi2_glottal ^ new_phi2_glottal) & new_phi2_glottal)
 #endif
 				switch (a)
@@ -941,10 +941,10 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 			//==============================================
 
 			// nose is clocked by the NOR of /FA and P1
-			UINT8 old_noise_clock = m_noise_clock;
+			uint8_t old_noise_clock = m_noise_clock;
 			m_noise_clock = !((m_fa == 0) | m_p1);
-			UINT8 noise_clock_rising = (old_noise_clock ^ m_noise_clock) & m_noise_clock;
-			UINT8 noise_clock_falling = (old_noise_clock ^ m_noise_clock) & old_noise_clock;
+			uint8_t noise_clock_rising = (old_noise_clock ^ m_noise_clock) & m_noise_clock;
+			uint8_t noise_clock_falling = (old_noise_clock ^ m_noise_clock) & old_noise_clock;
 
 			// falling edge clocks the shift register
 			if (noise_clock_falling)
@@ -962,7 +962,7 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 				// input at the low end is ((d1+4 ^ d2+5) ^ (d4+4 ^ d4+5)) ^ !(counter2 | counter3)
 				// output is tapped at d3+4
 
-				UINT32 old_shift = m_shift_252;
+				uint32_t old_shift = m_shift_252;
 				m_shift_252 <<= 1;
 				m_shift_252 |= ((BIT(old_shift, 17) ^ BIT(old_shift, 9)) ^ (BIT(old_shift, 3) ^ BIT(old_shift, 4))) ^
 									((m_counter_250 & 0xc) == 0);
@@ -1109,7 +1109,7 @@ osd_printf_debug("[PH=%02X]\n", m_latch_80);
 		// TODO: apply closure circuit (undocumented)
 
 		// output the current result
-		*dest++ = INT16(s4_out * 4000);
+		*dest++ = int16_t(s4_out * 4000);
 	}
 }
 
@@ -1318,7 +1318,7 @@ void votrax_sc01_device::device_reset()
 void votrax_sc01_device::device_clock_changed()
 {
 	// compute new frequency of the master clock, and update if changed
-	UINT32 newfreq = clock();
+	uint32_t newfreq = clock();
 	if (newfreq != m_master_clock_freq)
 	{
 		// if we have a stream
@@ -1329,7 +1329,7 @@ void votrax_sc01_device::device_clock_changed()
 		}
 
 		// determine how many clock ticks remained on the phoneme timer
-		UINT64 remaining = m_phoneme_timer->remaining().as_ticks(m_master_clock_freq);
+		uint64_t remaining = m_phoneme_timer->remaining().as_ticks(m_master_clock_freq);
 
 		// recompute the master clock
 		m_master_clock_freq = newfreq;
@@ -1363,7 +1363,7 @@ osd_printf_debug("%s: REQUEST\n", timer.machine().time().as_string(3));
 	}
 
 	// account for the rest of this subphoneme clock
-	UINT32 clocks_until_request = 0;
+	uint32_t clocks_until_request = 0;
 	if (m_counter_84 != 0)
 	{
 		if (m_subphoneme_count < m_subphoneme_period)
@@ -1372,6 +1372,6 @@ osd_printf_debug("%s: REQUEST\n", timer.machine().time().as_string(3));
 	}
 
 	// plus 1/2
-	clocks_until_request = std::max(clocks_until_request, UINT32(1 << P_CLOCK_BIT) / 2);
+	clocks_until_request = std::max(clocks_until_request, uint32_t(1 << P_CLOCK_BIT) / 2);
 	timer.adjust(attotime::from_ticks(clocks_until_request, m_master_clock_freq));
 }

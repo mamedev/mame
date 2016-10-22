@@ -186,7 +186,7 @@ machine_config_constructor sega_sk1100_device::device_mconfig_additions() const
 //  sega_sk1100_device - constructor
 //-------------------------------------------------
 
-sega_sk1100_device::sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sega_sk1100_device::sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA_SK1100, "Sega SK-1100 Keyboard", tag, owner, clock, "sega_sk1100", __FILE__),
 	device_sg1000_expansion_slot_interface(mconfig, *this),
 	m_cassette(*this, "cassette"),
@@ -229,7 +229,7 @@ WRITE8_MEMBER(sega_sk1100_device::peripheral_w)
 }
 
 
-bool sega_sk1100_device::is_readable(UINT8 offset)
+bool sega_sk1100_device::is_readable(uint8_t offset)
 {
 	return (m_keylatch != 0x07 ? true : false);
 }
@@ -273,7 +273,7 @@ READ8_MEMBER( sega_sk1100_device::ppi_pb_r )
 	*/
 
 	/* keyboard */
-	UINT8 data = m_pb[m_keylatch]->read();
+	uint8_t data = m_pb[m_keylatch]->read();
 
 	/* cartridge contact */
 	data |= 0x10;

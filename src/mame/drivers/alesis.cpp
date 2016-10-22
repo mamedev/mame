@@ -24,7 +24,7 @@ WRITE8_MEMBER( alesis_state::kb_matrix_w )
 
 READ8_MEMBER( alesis_state::kb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!(m_kb_matrix & 0x01))
 		data &= m_col1->read();
@@ -57,7 +57,7 @@ WRITE8_MEMBER( alesis_state::led_w )
 
 READ8_MEMBER( alesis_state::p3_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	data &= ~(m_cassette->input() > 0.01 ? 0x00 : 0x08);
 
@@ -102,7 +102,7 @@ READ8_MEMBER( alesis_state::mmt8_p3_r )
 {
 	// ---- -x--   Tape in
 	// ---- x---   Start/Stop input
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	data &= ~(m_cassette->input() > 0.01 ? 0x00 : 0x04);
 
@@ -467,8 +467,8 @@ ROM_END
 DRIVER_INIT_MEMBER(alesis_state,hr16)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *orig = memregion("user1")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *orig = memregion("user1")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 		ROM[BITSWAP16(i,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7)] = orig[i];

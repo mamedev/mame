@@ -1029,7 +1029,7 @@ void taitoz_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_subcpu->set_input_line(5, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in taitoz_state::device_timer");
+		assert_always(false, "Unknown id in taitoz_state::device_timer");
 	}
 }
 
@@ -1055,7 +1055,7 @@ INTERRUPT_GEN_MEMBER(taitoz_state::sci_interrupt)
                               EEPROM
 ******************************************************************/
 
-static const UINT16 spacegun_default_eeprom[64]=
+static const uint16_t spacegun_default_eeprom[64]=
 {
 	0x0000,0x00ff,0x0001,0x4141,0x0000,0x00ff,0x0000,0xf0f0,
 	0x0000,0x00ff,0x0001,0x4141,0x0000,0x00ff,0x0000,0xf0f0,
@@ -1103,7 +1103,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
 
 CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
 {
-	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	static const uint8_t retval[8] = { 0,1,3,2,6,7,5,4 };
 	ioport_port *port = ioport((const char *)param);
 	return retval[port != nullptr ? port->read() & 7 : 0];
 }
@@ -1113,8 +1113,8 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8 port = m_tc0220ioc->port_r(space, 0);   /* read port number */
-	UINT16 steer = 0xff80 + m_steer.read_safe(0x80);
+	uint8_t port = m_tc0220ioc->port_r(space, 0);   /* read port number */
+	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (port)
 	{
@@ -1134,8 +1134,8 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for extra inputs */
 
-	UINT8 port = m_tc0220ioc->port_r(space, 0);   /* read port number */
-	UINT16 steer = 0xff80 + m_steer.read_safe(0x80);
+	uint8_t port = m_tc0220ioc->port_r(space, 0);   /* read port number */
+	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (port)
 	{
@@ -1222,7 +1222,7 @@ WRITE16_MEMBER(taitoz_state::bshark_stick_w)
 
 READ16_MEMBER(taitoz_state::sci_steer_input_r)
 {
-	UINT16 steer = 0xff80 + m_steer.read_safe(0x80);
+	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (offset)
 	{
@@ -1293,7 +1293,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
 
 READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 {
-	UINT16 steer = 0xff80 + m_steer.read_safe(0x80);
+	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (offset)
 	{

@@ -20,21 +20,21 @@ struct tc0780fpa_polydata
 class tc0780fpa_renderer : public poly_manager<float, tc0780fpa_polydata, 6, 10000>
 {
 public:
-	tc0780fpa_renderer(device_t &parent, screen_device &screen, const UINT8 *texture_ram);
+	tc0780fpa_renderer(device_t &parent, screen_device &screen, const uint8_t *texture_ram);
 	~tc0780fpa_renderer() {}
 
-	void render_solid_scan(INT32 scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid);
-	void render_shade_scan(INT32 scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid);
-	void render_texture_scan(INT32 scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid);
+	void render_solid_scan(int32_t scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid);
+	void render_shade_scan(int32_t scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid);
+	void render_texture_scan(int32_t scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid);
 
-	void render(UINT16 *polygon_fifo, int length);
+	void render(uint16_t *polygon_fifo, int length);
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void swap_buffers();
 
 private:
 	std::unique_ptr<bitmap_ind16> m_fb[2];
 	std::unique_ptr<bitmap_ind16> m_zb;
-	const UINT8 *m_texture;
+	const uint8_t *m_texture;
 
 	rectangle m_cliprect;
 
@@ -45,7 +45,7 @@ private:
 class tc0780fpa_device : public device_t, public device_video_interface
 {
 public:
-	tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tc0780fpa_device() {}
 
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -64,14 +64,14 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	std::unique_ptr<UINT8[]> m_texture;
-	std::unique_ptr<UINT16[]> m_poly_fifo;
+	std::unique_ptr<uint8_t[]> m_texture;
+	std::unique_ptr<uint16_t[]> m_poly_fifo;
 	int m_poly_fifo_ptr;
 
 	std::unique_ptr<tc0780fpa_renderer> m_renderer;
 
-	UINT16 m_tex_address;
-	UINT16 m_tex_offset;
+	uint16_t m_tex_address;
+	uint16_t m_tex_offset;
 	int m_texbase_x;
 	int m_texbase_y;
 };

@@ -189,7 +189,7 @@ inline void mc68901_device::check_interrupts()
 	}
 }
 
-inline void mc68901_device::take_interrupt(UINT16 mask)
+inline void mc68901_device::take_interrupt(uint16_t mask)
 {
 	m_ipr |= mask;
 
@@ -315,7 +315,7 @@ inline void mc68901_device::gpio_input(int bit, int state)
 
 void mc68901_device::gpio_output()
 {
-	UINT8 new_gpio_output = m_gpip & m_ddr;
+	uint8_t new_gpio_output = m_gpip & m_ddr;
 
 	if (m_gpio_output != new_gpio_output)
 	{
@@ -332,7 +332,7 @@ void mc68901_device::gpio_output()
 //  mc68901_device - constructor
 //-------------------------------------------------
 
-mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC68901, "MC68901 MFP", tag, owner, clock, "mc68901", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_timer_clock(0),
@@ -571,7 +571,7 @@ READ8_MEMBER( mc68901_device::read )
 	case REGISTER_TSR:
 		{
 			/* clear UE bit (in reality, this won't be cleared until one full clock cycle of the transmitter has passed since the bit was set) */
-			UINT8 tsr = m_tsr;
+			uint8_t tsr = m_tsr;
 			m_tsr &= ~TSR_UNDERRUN_ERROR;
 
 			return tsr;
@@ -591,7 +591,7 @@ READ8_MEMBER( mc68901_device::read )
 //  register_w -
 //-------------------------------------------------
 
-void mc68901_device::register_w(offs_t offset, UINT8 data)
+void mc68901_device::register_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

@@ -7,7 +7,7 @@
 #include "machine/keyboard.ipp"
 
 
-qx10_keyboard_device::qx10_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
+qx10_keyboard_device::qx10_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: buffered_rs232_device(mconfig, QX10_KEYBOARD, "QX10 Keyboard", tag, owner, 0, "qx10_keyboard", __FILE__)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF")
 {
@@ -42,13 +42,13 @@ void qx10_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, in
 }
 
 
-void qx10_keyboard_device::key_make(UINT8 row, UINT8 column)
+void qx10_keyboard_device::key_make(uint8_t row, uint8_t column)
 {
 	transmit_byte((column << 4) | row);
 }
 
 
-void qx10_keyboard_device::received_byte(UINT8 data)
+void qx10_keyboard_device::received_byte(uint8_t data)
 {
 	switch (data & 0xe0)
 	{

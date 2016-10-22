@@ -13,11 +13,11 @@
 
 
 namespace {
-	INT32 get_disp16(UINT32 op) { return DISP19; }
-	INT32 get_disp19(UINT32 op) { return DISP19; }
-	INT32 get_disp22(UINT32 op) { return DISP19; }
+	int32_t get_disp16(uint32_t op) { return DISP19; }
+	int32_t get_disp19(uint32_t op) { return DISP19; }
+	int32_t get_disp22(uint32_t op) { return DISP19; }
 
-	const char *bicc_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op)
+	const char *bicc_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, uint32_t op)
 	{
 		if (!state || (state->get_translated_pc() != pc)) return nullptr;
 		auto const cc((use_cc && (BRCC & 0x2)) ? state->get_xcc() : state->get_icc());
@@ -42,7 +42,7 @@ namespace {
 		}
 		return nullptr;
 	}
-	const char *bfcc_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op)
+	const char *bfcc_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, uint32_t op)
 	{
 		if (!state || (state->get_translated_pc() != pc)) return nullptr;
 		auto const fcc(state->get_fcc(use_cc ? BRCC : 0));
@@ -67,10 +67,10 @@ namespace {
 		}
 		return nullptr;
 	}
-	const char *bpr_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op)
+	const char *bpr_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, uint32_t op)
 	{
 		if (!state || (state->get_translated_pc() != pc)) return nullptr;
-		const INT64 reg(state->get_reg_r(RS1));
+		const int64_t reg(state->get_reg_r(RS1));
 		switch (COND)
 		{
 		case 1: return (reg == 0) ? "will branch" : "will fall through";
@@ -568,7 +568,7 @@ const sparc_disassembler::vis_op_desc_map::value_type sparc_disassembler::VIS3B_
 };
 
 
-inline UINT32 sparc_disassembler::freg(UINT32 val, bool shift) const
+inline uint32_t sparc_disassembler::freg(uint32_t val, bool shift) const
 {
 	return (shift && (m_version >= 9)) ? ((val & 0x1e) | ((val << 5) & 0x20)) : val;
 }
@@ -730,7 +730,7 @@ sparc_disassembler::sparc_disassembler(const sparc_debug_state *state, unsigned 
 }
 
 
-offs_t sparc_disassembler::dasm(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 {
 	switch (OP)
 	{
@@ -1057,7 +1057,7 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, UINT32 op) const
 }
 
 
-offs_t sparc_disassembler::dasm_invalid(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_invalid(char *buf, offs_t pc, uint32_t op) const
 {
 	print(buf, "%-*s0x%08x ! ", m_op_field_width, ".word", op);
 	if (OP == 0)
@@ -1083,7 +1083,7 @@ offs_t sparc_disassembler::dasm_invalid(char *buf, offs_t pc, UINT32 op) const
 }
 
 
-offs_t sparc_disassembler::dasm_branch(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_branch(char *buf, offs_t pc, uint32_t op) const
 {
 	char *ptr(buf);
 	const branch_desc &desc(m_branch_desc[OP2]);
@@ -1094,7 +1094,7 @@ offs_t sparc_disassembler::dasm_branch(char *buf, offs_t pc, UINT32 op) const
 	pad_op_field(buf, ptr);
 	if (desc.use_cc) print(ptr, "%s,", desc.reg_cc[BRCC]);
 	if (OP2 == 3) print(ptr, "%s,", REG_NAMES[RS1]);
-	const INT32 disp(desc.get_disp(op));
+	const int32_t disp(desc.get_disp(op));
 	print(ptr, "%%pc%c0x%0*x ! 0x%08x", (disp < 0) ? '-' : '+', desc.disp_width, std::abs(disp), pc + disp);
 	//const char * const comment(desc.get_comment ? desc.get_comment(m_state, desc.use_cc, pc, op) : nullptr);
 	//if (comment) print(ptr, " - %s", comment);
@@ -1103,7 +1103,7 @@ offs_t sparc_disassembler::dasm_branch(char *buf, offs_t pc, UINT32 op) const
 }
 
 
-offs_t sparc_disassembler::dasm_shift(char *buf, offs_t pc, UINT32 op, const char *mnemonic, const char *mnemonicx, const char *mnemonicx0) const
+offs_t sparc_disassembler::dasm_shift(char *buf, offs_t pc, uint32_t op, const char *mnemonic, const char *mnemonicx, const char *mnemonicx0) const
 {
 	if ((m_version >= 9) && USEEXT)
 	{
@@ -1128,7 +1128,7 @@ offs_t sparc_disassembler::dasm_shift(char *buf, offs_t pc, UINT32 op, const cha
 }
 
 
-offs_t sparc_disassembler::dasm_read_state_reg(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_read_state_reg(char *buf, offs_t pc, uint32_t op) const
 {
 	if (RS1 == 0)
 	{
@@ -1158,7 +1158,7 @@ offs_t sparc_disassembler::dasm_read_state_reg(char *buf, offs_t pc, UINT32 op) 
 	else if ((m_version >= 9) && USEIMM && (RS1 == 15) && (RD == 0))
 	{
 		print(buf, "%-*s", m_op_field_width, "membar");
-		UINT32 mask(MMASK | (CMASK << 4));
+		uint32_t mask(MMASK | (CMASK << 4));
 		if (mask == 0) print(buf, "0");
 		if (mask & 1) print(buf, "#LoadLoad%s", (mask >> 1) ? "|" : "");
 		mask >>= 1;
@@ -1179,7 +1179,7 @@ offs_t sparc_disassembler::dasm_read_state_reg(char *buf, offs_t pc, UINT32 op) 
 }
 
 
-offs_t sparc_disassembler::dasm_write_state_reg(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_write_state_reg(char *buf, offs_t pc, uint32_t op) const
 {
 	if (RD == 0)
 	{
@@ -1242,7 +1242,7 @@ offs_t sparc_disassembler::dasm_write_state_reg(char *buf, offs_t pc, UINT32 op)
 }
 
 
-offs_t sparc_disassembler::dasm_move_cond(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_move_cond(char *buf, offs_t pc, uint32_t op) const
 {
 	if ((m_version < 9) || !MOVCC_CC_NAMES[MOVCC]) return dasm_invalid(buf, pc, op);
 
@@ -1257,7 +1257,7 @@ offs_t sparc_disassembler::dasm_move_cond(char *buf, offs_t pc, UINT32 op) const
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
-offs_t sparc_disassembler::dasm_move_reg_cond(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_move_reg_cond(char *buf, offs_t pc, uint32_t op) const
 {
 	if ((m_version < 9) || !MOVE_INT_COND_MNEMONICS[RCOND]) return dasm_invalid(buf, pc, op);
 
@@ -1270,7 +1270,7 @@ offs_t sparc_disassembler::dasm_move_reg_cond(char *buf, offs_t pc, UINT32 op) c
 }
 
 
-offs_t sparc_disassembler::dasm_fpop1(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_fpop1(char *buf, offs_t pc, uint32_t op) const
 {
 	const auto it(m_fpop1_desc.find(OPF));
 	if (it == m_fpop1_desc.end()) return dasm_invalid(buf, pc, op);
@@ -1283,7 +1283,7 @@ offs_t sparc_disassembler::dasm_fpop1(char *buf, offs_t pc, UINT32 op) const
 }
 
 
-offs_t sparc_disassembler::dasm_fpop2(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_fpop2(char *buf, offs_t pc, uint32_t op) const
 {
 	// Move Floating-Point Register on Condition
 	if ((m_version >= 9) && (((op >> 18) & 1) == 0) && MOVCC_CC_NAMES[OPFCC])
@@ -1334,7 +1334,7 @@ offs_t sparc_disassembler::dasm_fpop2(char *buf, offs_t pc, UINT32 op) const
 }
 
 
-offs_t sparc_disassembler::dasm_impdep1(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_impdep1(char *buf, offs_t pc, uint32_t op) const
 {
 	const auto it(m_vis_op_desc.find(OPF));
 	if (it != m_vis_op_desc.end())
@@ -1384,7 +1384,7 @@ offs_t sparc_disassembler::dasm_impdep1(char *buf, offs_t pc, UINT32 op) const
 }
 
 
-offs_t sparc_disassembler::dasm_jmpl(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_jmpl(char *buf, offs_t pc, uint32_t op) const
 {
 	if (USEIMM && (RD == 0) && ((RS1 == 15) || (RS1 == 31)) && (SIMM13 == 8))
 	{
@@ -1401,7 +1401,7 @@ offs_t sparc_disassembler::dasm_jmpl(char *buf, offs_t pc, UINT32 op) const
 }
 
 
-offs_t sparc_disassembler::dasm_return(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_return(char *buf, offs_t pc, uint32_t op) const
 {
 	print(buf, "%-*s", m_op_field_width, (m_version >= 9) ? "return" : "rett");
 	dasm_address(buf, op);
@@ -1409,7 +1409,7 @@ offs_t sparc_disassembler::dasm_return(char *buf, offs_t pc, UINT32 op) const
 }
 
 
-offs_t sparc_disassembler::dasm_tcc(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_tcc(char *buf, offs_t pc, uint32_t op) const
 {
 	static const char *const tcc_names[16] = {
 		"tn",   "te",   "tle",  "tl",   "tleu", "tcs",  "tneg", "tvs",
@@ -1442,7 +1442,7 @@ offs_t sparc_disassembler::dasm_tcc(char *buf, offs_t pc, UINT32 op) const
 }
 
 
-offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
+offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, uint32_t op) const
 {
 	if (m_version >= 9)
 	{
@@ -1582,7 +1582,7 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 }
 
 
-void sparc_disassembler::dasm_address(char *&output, UINT32 op) const
+void sparc_disassembler::dasm_address(char *&output, uint32_t op) const
 {
 	if (USEIMM)
 	{
@@ -1598,7 +1598,7 @@ void sparc_disassembler::dasm_address(char *&output, UINT32 op) const
 }
 
 
-void sparc_disassembler::dasm_asi(char *&output, UINT32 op) const
+void sparc_disassembler::dasm_asi(char *&output, uint32_t op) const
 {
 	if (USEIMM)
 	{
@@ -1615,7 +1615,7 @@ void sparc_disassembler::dasm_asi(char *&output, UINT32 op) const
 }
 
 
-void sparc_disassembler::dasm_asi_comment(char *&output, UINT32 op) const
+void sparc_disassembler::dasm_asi_comment(char *&output, uint32_t op) const
 {
 	if (!USEIMM)
 	{
@@ -1626,7 +1626,7 @@ void sparc_disassembler::dasm_asi_comment(char *&output, UINT32 op) const
 }
 
 
-void sparc_disassembler::dasm_vis_arg(char *&output, bool &args, vis_op_desc::arg fmt, UINT32 reg) const
+void sparc_disassembler::dasm_vis_arg(char *&output, bool &args, vis_op_desc::arg fmt, uint32_t reg) const
 {
 	switch (fmt)
 	{

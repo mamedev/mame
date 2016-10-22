@@ -168,7 +168,7 @@ READ8_MEMBER( c8280_t::riot1_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// end or identify in
 	data |= m_bus->eoi_r() << 5;
@@ -234,7 +234,7 @@ READ8_MEMBER( c8280_t::riot1_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// device number selection
 	data |= m_slot->get_address() - 8;
@@ -382,7 +382,7 @@ inline void c8280_t::update_ieee_signals()
 //  c8280_t - constructor
 //-------------------------------------------------
 
-c8280_t::c8280_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c8280_t::c8280_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C8280, "C8280", tag, owner, clock, "c8280", __FILE__),
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_DOS_TAG),
@@ -485,7 +485,7 @@ READ8_MEMBER( c8280_t::fk5_r )
 
 	*/
 
-	UINT8 data = m_fk5;
+	uint8_t data = m_fk5;
 
 	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 3;
 	data |= (m_floppy ? m_floppy->twosid_r() : 1) << 4;

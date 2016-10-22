@@ -20,7 +20,7 @@
 
 TILE_GET_INFO_MEMBER(gundealr_state::get_bg_tile_info)
 {
-	UINT8 attr = m_bg_videoram[2 * tile_index + 1];
+	uint8_t attr = m_bg_videoram[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(0,
 			m_bg_videoram[2 * tile_index] + ((attr & 0x07) << 8),
 			(attr & 0xf0) >> 4,
@@ -35,7 +35,7 @@ TILEMAP_MAPPER_MEMBER(gundealr_state::gundealr_scan)
 
 TILE_GET_INFO_MEMBER(gundealr_state::get_fg_tile_info)
 {
-	UINT8 attr = m_fg_videoram[2 * tile_index + 1];
+	uint8_t attr = m_fg_videoram[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(1,
 			m_fg_videoram[2 * tile_index] + ((attr & 0x03) << 8),
 			(attr & 0xf0) >> 4,
@@ -123,7 +123,7 @@ WRITE8_MEMBER(gundealr_state::gundealr_flipscreen_w)
 
 ***************************************************************************/
 
-UINT32 gundealr_state::screen_update_gundealr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gundealr_state::screen_update_gundealr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

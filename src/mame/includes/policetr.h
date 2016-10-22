@@ -22,26 +22,26 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	UINT32 m_control_data;
-	UINT32 m_bsmt_data_bank;
-	UINT32 m_bsmt_data_offset;
-	UINT32 *m_speedup_data;
-	UINT64 m_last_cycles;
-	UINT32 m_loop_count;
+	uint32_t m_control_data;
+	uint32_t m_bsmt_data_bank;
+	uint32_t m_bsmt_data_offset;
+	uint32_t *m_speedup_data;
+	uint64_t m_last_cycles;
+	uint32_t m_loop_count;
 	offs_t m_speedup_pc;
-	required_shared_ptr<UINT32> m_rambase;
-	UINT32 m_palette_offset;
-	UINT8 m_palette_index;
-	UINT8 m_palette_data[3];
+	required_shared_ptr<uint32_t> m_rambase;
+	uint32_t m_palette_offset;
+	uint8_t m_palette_index;
+	uint8_t m_palette_data[3];
 	rectangle m_render_clip;
-	UINT8 *m_srcbitmap;
-	std::unique_ptr<UINT8[]> m_dstbitmap;
-	UINT16 m_src_xoffs;
-	UINT16 m_src_yoffs;
-	UINT16 m_dst_xoffs;
-	UINT16 m_dst_yoffs;
-	UINT8 m_video_latch;
-	UINT32 m_srcbitmap_height_mask;
+	uint8_t *m_srcbitmap;
+	std::unique_ptr<uint8_t[]> m_dstbitmap;
+	uint16_t m_src_xoffs;
+	uint16_t m_src_yoffs;
+	uint16_t m_dst_xoffs;
+	uint16_t m_dst_yoffs;
+	uint8_t m_video_latch;
+	uint32_t m_srcbitmap_height_mask;
 	DECLARE_WRITE32_MEMBER(control_w);
 	DECLARE_WRITE32_MEMBER(policetr_bsmt2000_reg_w);
 	DECLARE_WRITE32_MEMBER(policetr_bsmt2000_data_w);
@@ -57,7 +57,7 @@ public:
 	DECLARE_DRIVER_INIT(sshooter);
 	DECLARE_DRIVER_INIT(plctr13b);
 	virtual void video_start() override;
-	UINT32 screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq4_gen);
 	void render_display_list(offs_t offset);
 	required_device<cpu_device> m_maincpu;

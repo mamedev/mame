@@ -22,7 +22,7 @@ WRITE_LINE_MEMBER( kaypro_state::write_centronics_busy )
 
 READ8_MEMBER( kaypro_state::pio_system_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* centronics busy */
 	data |= m_centronics_busy << 3;
@@ -89,7 +89,7 @@ WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 
 READ8_MEMBER( kaypro_state::kaypro2x_system_port_r )
 {
-	UINT8 data = m_centronics_busy << 6;
+	uint8_t data = m_centronics_busy << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
@@ -220,7 +220,7 @@ void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in kaypro_state::device_timer");
+		assert_always(false, "Unknown id in kaypro_state::device_timer");
 	}
 }
 
@@ -271,9 +271,9 @@ MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 
 QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro )
 {
-	UINT8 *RAM = memregion("rambank")->base();
-	UINT16 i;
-	UINT8 data;
+	uint8_t *RAM = memregion("rambank")->base();
+	uint16_t i;
+	uint8_t data;
 
 	/* Load image to the TPA (Transient Program Area) */
 	for (i = 0; i < quickload_size; i++)

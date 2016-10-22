@@ -151,39 +151,39 @@ public:
 	/* video-related */
 	bitmap_ind16 m_tmpbitmaps[4];
 
-	UINT8 m_vcu_video_reg[4];
-	UINT32 m_vcu_gfx_addr;
-	UINT32 m_vcu_gfx_param_addr;
+	uint8_t m_vcu_video_reg[4];
+	uint32_t m_vcu_gfx_addr;
+	uint32_t m_vcu_gfx_param_addr;
 
-	UINT8 m_bknd_col;
-	UINT8 m_port02_status;
-	UINT8 m_vbank;      /* video page select signal, likely for double buffering ?*/
-	UINT32 m_xpos;
-	UINT32 m_ypos;
-	UINT32 m_pix_xsize;
-	UINT32 m_pix_ysize;
-	UINT8 m_color1;
-	UINT8 m_color2;
-	UINT8 m_mode;
-	UINT8 m_plane;
-	UINT8 m_lookup_ram[0x100*4];
-	UINT32 m_gfx_rom_bank;  /* graphics ROMs are banked */
+	uint8_t m_bknd_col;
+	uint8_t m_port02_status;
+	uint8_t m_vbank;      /* video page select signal, likely for double buffering ?*/
+	uint32_t m_xpos;
+	uint32_t m_ypos;
+	uint32_t m_pix_xsize;
+	uint32_t m_pix_ysize;
+	uint8_t m_color1;
+	uint8_t m_color2;
+	uint8_t m_mode;
+	uint8_t m_plane;
+	uint8_t m_lookup_ram[0x100*4];
+	uint32_t m_gfx_rom_bank;  /* graphics ROMs are banked */
 
 	double m_weights_r[2];
 	double m_weights_g[3];
 	double m_weights_b[3];
 
 	/* misc */
-	UINT8 m_game_id; /* hacks per game */
-	UINT8 m_ls670_0[4];
-	UINT8 m_ls670_1[4];
+	uint8_t m_game_id; /* hacks per game */
+	uint8_t m_ls670_0[4];
+	uint8_t m_ls670_1[4];
 
-	UINT8 m_zpu_int_vector;
+	uint8_t m_zpu_int_vector;
 
-	UINT8 m_bcd_7445;
+	uint8_t m_bcd_7445;
 
-	UINT8 m_vsb_ls273;
-	UINT8 m_soundlatch;
+	uint8_t m_vsb_ls273;
+	uint8_t m_soundlatch;
 
 #if 0
 	int m_dbg_info;
@@ -219,7 +219,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mazerbla);
-	UINT32 screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
@@ -283,7 +283,7 @@ void mazerbla_state::video_start()
 }
 
 
-UINT32 mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vcu->screen_update(screen,bitmap,cliprect);
 	return 0;
@@ -379,11 +379,11 @@ READ8_MEMBER(mazerbla_state::vcu_set_cmd_param_r)
 
 READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 {
-	UINT8 * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
+	uint8_t * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
 	int x, y;
 	int bits = 0;
-	UINT8 color_base = 0;
+	uint8_t color_base = 0;
 
 	color_base = m_vcu_video_reg[1] << 4;
 
@@ -448,9 +448,9 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 			{
 				for (x = 0; x <= m_pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
-					UINT8 data = (pixeldata >> (6 - (bits & 7))) & 3;
-					UINT8 col = 0;
+					uint8_t pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					uint8_t data = (pixeldata >> (6 - (bits & 7))) & 3;
+					uint8_t col = 0;
 
 					switch(data)
 					{
@@ -491,8 +491,8 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 			{
 				for (x = 0; x <= m_pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
-					UINT8 data = (pixeldata >> (7 - (bits & 7))) & 1;
+					uint8_t pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					uint8_t data = (pixeldata >> (7 - (bits & 7))) & 1;
 
 					/* color = 4 MSB = front PEN, 4 LSB = background PEN */
 
@@ -518,9 +518,9 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 			{
 				for (x = 0; x <= m_pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
-					UINT8 data = (pixeldata >> (4 - (bits & 7))) & 15;
-					UINT8 col = 0;
+					uint8_t pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					uint8_t data = (pixeldata >> (4 - (bits & 7))) & 15;
+					uint8_t col = 0;
 
 					col = color_base | data;
 
@@ -543,12 +543,12 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 
 READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 {
-	UINT8 * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
+	uint8_t * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
 	int x, y;
 	int bits = 0;
 
-	UINT8 color_base = 0;
+	uint8_t color_base = 0;
 
 
 /*
@@ -604,9 +604,9 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 			{
 				for (x = 0; x <= m_pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
-					UINT8 data = (pixeldata >> (6 - (bits & 7))) & 3;
-					UINT8 col = 0;
+					uint8_t pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					uint8_t data = (pixeldata >> (6 - (bits & 7))) & 3;
+					uint8_t col = 0;
 
 					switch(data)
 					{
@@ -650,7 +650,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 colour = m_cfb_ram[offs + x + y * 16];
+						uint8_t colour = m_cfb_ram[offs + x + y * 16];
 
 						/* red component */
 						bit1 = (colour >> 7) & 0x01;
@@ -685,7 +685,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = m_cfb_ram[offs + x + y * 16];
+						uint8_t dat = m_cfb_ram[offs + x + y * 16];
 						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
@@ -699,7 +699,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = m_cfb_ram[offs + x + y * 16];
+						uint8_t dat = m_cfb_ram[offs + x + y * 16];
 						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
@@ -713,7 +713,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = m_cfb_ram[offs + x + y * 16];
+						uint8_t dat = m_cfb_ram[offs + x + y * 16];
 						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
@@ -865,7 +865,7 @@ READ8_MEMBER(mazerbla_state::zpu_inputs_r)
 	static const char *const strobenames[] = { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS", "STICK0_X", "STICK0_Y",
 												"STICK1_X", "STICK1_Y", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
 
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	ret = ioport(strobenames[m_bcd_7445])->read();
 
@@ -1649,7 +1649,7 @@ DRIVER_INIT_MEMBER(mazerbla_state,mazerbla)
 
 DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 {
-	UINT8 *rom = memregion("sub2")->base();
+	uint8_t *rom = memregion("sub2")->base();
 
 	m_game_id = GREATGUN;
 

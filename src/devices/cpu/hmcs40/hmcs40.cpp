@@ -78,56 +78,56 @@ ADDRESS_MAP_END
 
 
 // device definitions
-hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
+hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint16_t polarity, const char *shortname)
 	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, HMCS40_FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1k), 7 /* data width */, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
 { }
 
-hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs43_cpu_device(mconfig, HD38750, "HD38750", tag, owner, clock, IS_PMOS, "hd38750")
 { }
-hd38755_device::hd38755_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd38755_device::hd38755_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs43_cpu_device(mconfig, HD38755, "HD38755", tag, owner, clock, IS_PMOS, "hd38755")
 { }
-hd44750_device::hd44750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd44750_device::hd44750_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs43_cpu_device(mconfig, HD44750, "HD44750", tag, owner, clock, IS_CMOS, "hd44750")
 { }
-hd44758_device::hd44758_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd44758_device::hd44758_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs43_cpu_device(mconfig, HD44758, "HD44758", tag, owner, clock, IS_CMOS, "hd44758")
 { }
 
 
-hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
+hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint16_t polarity, const char *shortname)
 	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, HMCS40_FAMILY_HMCS44, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
 { }
 
-hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs44_cpu_device(mconfig, HD38800, "HD38800", tag, owner, clock, IS_PMOS, "hd38800")
 { }
-hd38805_device::hd38805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd38805_device::hd38805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs44_cpu_device(mconfig, HD38805, "HD38805", tag, owner, clock, IS_PMOS, "hd38805")
 { }
-hd44801_device::hd44801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd44801_device::hd44801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs44_cpu_device(mconfig, HD44801, "HD44801", tag, owner, clock, IS_CMOS, "hd44801")
 { }
-hd44808_device::hd44808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd44808_device::hd44808_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs44_cpu_device(mconfig, HD44808, "HD44808", tag, owner, clock, IS_CMOS, "hd44808")
 { }
 
 
-hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
+hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint16_t polarity, const char *shortname)
 	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, HMCS40_FAMILY_HMCS45, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
 { }
 
-hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs45_cpu_device(mconfig, HD38820, "HD38820", tag, owner, clock, IS_PMOS, "hd38820")
 { }
-hd38825_device::hd38825_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd38825_device::hd38825_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs45_cpu_device(mconfig, HD38825, "HD38825", tag, owner, clock, IS_PMOS, "hd38825")
 { }
-hd44820_device::hd44820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd44820_device::hd44820_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs45_cpu_device(mconfig, HD44820, "HD44820", tag, owner, clock, IS_CMOS, "hd44820")
 { }
-hd44828_device::hd44828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd44828_device::hd44828_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hmcs45_cpu_device(mconfig, HD44828, "HD44828", tag, owner, clock, IS_CMOS, "hd44828")
 { }
 
@@ -148,7 +148,7 @@ void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-offs_t hmcs40_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t hmcs40_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(hmcs40);
 	return CPU_DISASSEMBLE_NAME(hmcs40)(this, buffer, pc, oprom, opram, options);
@@ -306,10 +306,10 @@ void hmcs40_cpu_device::device_reset()
 //  i/o handling
 //-------------------------------------------------
 
-UINT8 hmcs40_cpu_device::read_r(int index)
+uint8_t hmcs40_cpu_device::read_r(int index)
 {
 	index &= 7;
-	UINT8 inp = 0;
+	uint8_t inp = 0;
 
 	switch (index)
 	{
@@ -329,7 +329,7 @@ UINT8 hmcs40_cpu_device::read_r(int index)
 		return (inp | m_r[index]) & 0xf;
 }
 
-void hmcs40_cpu_device::write_r(int index, UINT8 data)
+void hmcs40_cpu_device::write_r(int index, uint8_t data)
 {
 	index &= 7;
 	data &= 0xf;
@@ -371,7 +371,7 @@ void hmcs40_cpu_device::write_d(int index, int state)
 // R0 is input-only, R1 is i/o, R2,R3 are output-only, no R4-R7
 // D0-D3 are i/o, D4-D15 are output-only
 
-UINT8 hmcs43_cpu_device::read_r(int index)
+uint8_t hmcs43_cpu_device::read_r(int index)
 {
 	index &= 7;
 
@@ -381,7 +381,7 @@ UINT8 hmcs43_cpu_device::read_r(int index)
 	return hmcs40_cpu_device::read_r(index);
 }
 
-void hmcs43_cpu_device::write_r(int index, UINT8 data)
+void hmcs43_cpu_device::write_r(int index, uint8_t data)
 {
 	index &= 7;
 
@@ -405,7 +405,7 @@ int hmcs43_cpu_device::read_d(int index)
 // R0-R3 are i/o, R4,R5 are extra registers, no R6,R7
 // D0-D15 are i/o
 
-UINT8 hmcs44_cpu_device::read_r(int index)
+uint8_t hmcs44_cpu_device::read_r(int index)
 {
 	index &= 7;
 
@@ -415,7 +415,7 @@ UINT8 hmcs44_cpu_device::read_r(int index)
 	return hmcs40_cpu_device::read_r(index);
 }
 
-void hmcs44_cpu_device::write_r(int index, UINT8 data)
+void hmcs44_cpu_device::write_r(int index, uint8_t data)
 {
 	index &= 7;
 
@@ -429,7 +429,7 @@ void hmcs44_cpu_device::write_r(int index, UINT8 data)
 // R0-R5 are i/o, R6 is output-only, no R7
 // D0-D15 are i/o
 
-UINT8 hmcs45_cpu_device::read_r(int index)
+uint8_t hmcs45_cpu_device::read_r(int index)
 {
 	index &= 7;
 
@@ -439,7 +439,7 @@ UINT8 hmcs45_cpu_device::read_r(int index)
 	return hmcs40_cpu_device::read_r(index);
 }
 
-void hmcs45_cpu_device::write_r(int index, UINT8 data)
+void hmcs45_cpu_device::write_r(int index, uint8_t data)
 {
 	index &= 7;
 
@@ -553,8 +553,8 @@ void hmcs40_cpu_device::increment_tc()
 inline void hmcs40_cpu_device::increment_pc()
 {
 	// PC lower bits is a LFSR identical to TI TMS1000
-	UINT8 mask = 0x3f;
-	UINT8 low = m_pc & mask;
+	uint8_t mask = 0x3f;
+	uint8_t low = m_pc & mask;
 	int fb = (low << 1 & 0x20) == (low & 0x20);
 
 	if (low == (mask >> 1))

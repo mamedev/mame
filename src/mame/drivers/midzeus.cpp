@@ -44,16 +44,16 @@ The Grid         v1.2   10/18/2000
 #define BEAM_DX         3
 #define BEAM_XOFFS      40      /* table in the code indicates an offset of 20 with a beam height of 7 */
 
-static UINT32           gun_control;
-static UINT8            gun_irq_state;
+static uint32_t           gun_control;
+static uint8_t            gun_irq_state;
 static emu_timer *      gun_timer[2];
-static INT32            gun_x[2], gun_y[2];
+static int32_t            gun_x[2], gun_y[2];
 
-static UINT8            crusnexo_leds_select;
-static UINT8            keypad_select;
-static UINT8            bitlatch[10];
+static uint8_t            crusnexo_leds_select;
+static uint8_t            keypad_select;
+static uint8_t            bitlatch[10];
 
-static UINT8 cmos_protected;
+static uint8_t cmos_protected;
 
 
 static emu_timer *timer[2];
@@ -106,7 +106,7 @@ MACHINE_RESET_MEMBER(midzeus_state,midzeus)
 	*m_ram_base <<= 1;
 	m_maincpu->reset();
 
-	cmos_protected = TRUE;
+	cmos_protected = true;
 }
 
 
@@ -146,7 +146,7 @@ WRITE32_MEMBER(midzeus_state::cmos_w)
 		COMBINE_DATA(&m_nvram[offset]);
 	else
 		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", space.device().safe_pc(), bitlatch[2], cmos_protected);
-	cmos_protected = TRUE;
+	cmos_protected = true;
 }
 
 
@@ -158,7 +158,7 @@ READ32_MEMBER(midzeus_state::cmos_r)
 
 WRITE32_MEMBER(midzeus_state::cmos_protect_w)
 {
-	cmos_protected = FALSE;
+	cmos_protected = false;
 }
 
 
@@ -181,7 +181,7 @@ WRITE32_MEMBER(midzeus_state::zeus2_timekeeper_w)
 		m_m48t35->write(space, offset, data, 0xff);
 	else
 		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", machine().describe_context(), bitlatch[2], cmos_protected);
-	cmos_protected = TRUE;
+	cmos_protected = true;
 }
 
 
@@ -246,7 +246,7 @@ READ32_MEMBER(midzeus_state::bitlatches_r)
 
 WRITE32_MEMBER(midzeus_state::bitlatches_w)
 {
-	UINT32 oldval = bitlatch[offset];
+	uint32_t oldval = bitlatch[offset];
 	bitlatch[offset] = data;
 
 	switch (offset)
@@ -400,7 +400,7 @@ READ32_MEMBER(midzeus_state::tms32031_control_r)
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = (timer[which]->elapsed() * 10000000).as_double();
+		int32_t result = (timer[which]->elapsed() * 10000000).as_double();
 		return result;
 	}
 
@@ -441,7 +441,7 @@ WRITE32_MEMBER(midzeus_state::tms32031_control_w)
 
 CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
 {
-	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
+	static const uint8_t translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = (const char *)param;
 	const char *namey = namex + strlen(namex) + 1;
 	return (translate49[ioport(namey)->read() >> 4] << 4) | translate49[ioport(namex)->read() >> 4];
@@ -457,8 +457,8 @@ WRITE32_MEMBER(midzeus_state::keypad_select_w)
 
 CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 {
-	UINT32 bits = ioport((const char *)param)->read();
-	UINT8 select = keypad_select;
+	uint32_t bits = ioport((const char *)param)->read();
+	uint8_t select = keypad_select;
 	while ((select & 1) != 0)
 	{
 		select >>= 1;
@@ -525,7 +525,7 @@ TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
 
 WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 {
-	UINT32 old_control = gun_control;
+	uint32_t old_control = gun_control;
 	int player;
 
 	COMBINE_DATA(&gun_control);
@@ -537,7 +537,7 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 
 	for (player = 0; player < 2; player++)
 	{
-		UINT8 pmask = 0x04 << player;
+		uint8_t pmask = 0x04 << player;
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
 			const rectangle &visarea = m_screen->visible_area();
@@ -558,7 +558,7 @@ READ32_MEMBER(midzeus_state::invasn_gun_r)
 {
 	int beamx = m_screen->hpos();
 	int beamy = m_screen->vpos();
-	UINT32 result = 0xffff;
+	uint32_t result = 0xffff;
 	int player;
 
 	for (player = 0; player < 2; player++)

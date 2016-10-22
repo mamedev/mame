@@ -83,7 +83,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_l
 const device_type NEWPORT_VIDEO = &device_creator<newport_video_device>;
 
 
-newport_video_device::newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+newport_video_device::newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, NEWPORT_VIDEO, "SGI Newport graphics board", tag, owner, clock, "newport_video", __FILE__)
 {
 }
@@ -105,7 +105,7 @@ void newport_video_device::device_config_complete()
 
 void newport_video_device::device_start()
 {
-	m_base = make_unique_clear<UINT32[]>((1280+64) * (1024+64));
+	m_base = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
 
 	save_pointer(NAME(m_base.get()), (1280+64) * (1024+64));
 	save_item(NAME(m_VC2.nRegister));
@@ -211,13 +211,13 @@ void newport_video_device::device_reset()
 }
 
 
-UINT32 newport_video_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* loop over rows and copy to the destination */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32 *src = &m_base[1344 * y];
-		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t *src = &m_base[1344 * y];
+		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
 
 		/* loop over columns */
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
@@ -281,7 +281,7 @@ READ32_MEMBER( newport_video_device::cmap1_r )
 
 READ32_MEMBER( newport_video_device::xmap0_r )
 {
-	UINT8 nModeIdx;
+	uint8_t nModeIdx;
 
 	switch (m_REX3.nDCBRegSelect)
 	{
@@ -329,7 +329,7 @@ READ32_MEMBER( newport_video_device::xmap0_r )
 
 WRITE32_MEMBER( newport_video_device::xmap0_w )
 {
-	UINT8 n8BitVal = data & 0x000000ff;
+	uint8_t n8BitVal = data & 0x000000ff;
 
 	switch (m_REX3.nDCBRegSelect)
 	{
@@ -367,7 +367,7 @@ WRITE32_MEMBER( newport_video_device::xmap0_w )
 
 READ32_MEMBER( newport_video_device::xmap1_r )
 {
-	UINT8 nModeIdx;
+	uint8_t nModeIdx;
 
 	switch (m_REX3.nDCBRegSelect)
 	{
@@ -415,7 +415,7 @@ READ32_MEMBER( newport_video_device::xmap1_r )
 
 WRITE32_MEMBER( newport_video_device::xmap1_w )
 {
-	UINT8 n8BitVal = data & 0x000000ff;
+	uint8_t n8BitVal = data & 0x000000ff;
 
 	switch (m_REX3.nDCBRegSelect)
 	{
@@ -453,7 +453,7 @@ WRITE32_MEMBER( newport_video_device::xmap1_w )
 
 READ32_MEMBER( newport_video_device::vc2_r )
 {
-	UINT16 ret16;
+	uint16_t ret16;
 
 	switch (m_REX3.nDCBRegSelect)
 	{
@@ -591,7 +591,7 @@ WRITE32_MEMBER( newport_video_device::vc2_w )
 
 READ32_MEMBER( newport_video_device::rex3_r )
 {
-//  UINT32 nTemp;
+//  uint32_t nTemp;
 
 //  if( offset >= ( 0x0800 / 4 ) )
 //  {
@@ -878,18 +878,18 @@ READ32_MEMBER( newport_video_device::rex3_r )
 
 void newport_video_device::DoREX3Command()
 {
-	UINT32 nCommand = ( ( m_REX3.nDrawMode0 & ( 1 << 15 ) ) >> 15 ) |
+	uint32_t nCommand = ( ( m_REX3.nDrawMode0 & ( 1 << 15 ) ) >> 15 ) |
 						( ( m_REX3.nDrawMode0 & ( 1 <<  5 ) ) >>  4 ) |
 						( ( m_REX3.nDrawMode0 & ( 1 <<  9 ) ) >>  7 ) |
 						( ( m_REX3.nDrawMode0 & ( 1 <<  8 ) ) >>  5 ) |
 						( ( m_REX3.nDrawMode0 & 0x0000001c  ) <<  2 ) |
 						( ( m_REX3.nDrawMode0 & 0x00000003  ) <<  7 );
-	UINT16 nX, nY;
-	UINT16 nStartX = ( m_REX3.nXYStartI >> 16 ) & 0x0000ffff;
-	UINT16 nStartY = ( m_REX3.nXYStartI >>  0 ) & 0x0000ffff;
-	UINT16 nEndX = ( m_REX3.nXYEndI >> 16 ) & 0x0000ffff;
-	UINT16 nEndY = ( m_REX3.nXYEndI >>  0 ) & 0x0000ffff;
-	INT16 nMoveX, nMoveY;
+	uint16_t nX, nY;
+	uint16_t nStartX = ( m_REX3.nXYStartI >> 16 ) & 0x0000ffff;
+	uint16_t nStartY = ( m_REX3.nXYStartI >>  0 ) & 0x0000ffff;
+	uint16_t nEndX = ( m_REX3.nXYEndI >> 16 ) & 0x0000ffff;
+	uint16_t nEndY = ( m_REX3.nXYEndI >>  0 ) & 0x0000ffff;
+	int16_t nMoveX, nMoveY;
 
 	switch (nCommand)
 	{
@@ -946,8 +946,8 @@ void newport_video_device::DoREX3Command()
 		}
 		break;
 	case 0x0000019e:
-		nMoveX = (INT16)( ( m_REX3.nXYMove >> 16 ) & 0x0000ffff );
-		nMoveY = (INT16)( m_REX3.nXYMove & 0x0000ffff );
+		nMoveX = (int16_t)( ( m_REX3.nXYMove >> 16 ) & 0x0000ffff );
+		nMoveY = (int16_t)( m_REX3.nXYMove & 0x0000ffff );
 		//verboselog(machine(), 1, "FB to FB Copy: %04x, %04x - %04x, %04x to %04x, %04x\n", nStartX, nStartY, nEndX, nEndY, nStartX + nMoveX, nStartY + nMoveY );
 		for( nY = nStartY; nY <= nEndY; nY++ )
 		{
@@ -965,7 +965,7 @@ void newport_video_device::DoREX3Command()
 
 WRITE32_MEMBER( newport_video_device::rex3_w )
 {
-	UINT32 nTemp = 0;
+	uint32_t nTemp = 0;
 
 	if( offset & 0x00000200 )
 	{

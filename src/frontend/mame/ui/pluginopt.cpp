@@ -55,7 +55,7 @@ void menu_plugin_opt::handle()
 {
 	const event *menu_event = process(0);
 
-	if (menu_event != nullptr && (FPTR)menu_event->itemref)
+	if (menu_event != nullptr && (uintptr_t)menu_event->itemref)
 	{
 		std::string key;
 		switch(menu_event->iptkey)
@@ -84,7 +84,7 @@ void menu_plugin_opt::handle()
 			default:
 				return;
 		}
-		if(mame_machine_manager::instance()->lua()->menu_callback(m_menu, (FPTR)menu_event->itemref, key))
+		if(mame_machine_manager::instance()->lua()->menu_callback(m_menu, (uintptr_t)menu_event->itemref, key))
 			reset(reset_options::REMEMBER_REF);
 	}
 }
@@ -93,10 +93,10 @@ void menu_plugin_opt::populate()
 {
 	std::vector<lua_engine::menu_item> menu_list;
 	mame_machine_manager::instance()->lua()->menu_populate(m_menu, menu_list);
-	FPTR i = 1;
+	uintptr_t i = 1;
 	for(auto &item : menu_list)
 	{
-		UINT32 flags = 0;
+		uint32_t flags = 0;
 		if(item.flags == "off")
 			flags = FLAG_DISABLE;
 		else if(item.flags == "l")

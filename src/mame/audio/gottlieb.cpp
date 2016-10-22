@@ -11,6 +11,8 @@
 ***************************************************************************/
 
 #include "audio/gottlieb.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 #define SOUND1_CLOCK        XTAL_3_579545MHz
@@ -35,7 +37,7 @@ extern const device_type GOTTLIEB_SOUND_REV2 = &device_creator<gottlieb_sound_r2
 
 #if USE_FAKE_VOTRAX
 
-void gottlieb_sound_r1_device::trigger_sample(UINT8 data)
+void gottlieb_sound_r1_device::trigger_sample(uint8_t data)
 {
 	/* Reactor samples */
 	if (strcmp(machine().system().name, "reactor") == 0)
@@ -91,7 +93,7 @@ void gottlieb_sound_r1_device::device_timer(emu_timer &timer, device_timer_id id
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-void gottlieb_sound_r1_device::fake_votrax_data_w(UINT8 data)
+void gottlieb_sound_r1_device::fake_votrax_data_w(uint8_t data)
 {
 	static const char *const PhonemeTable[0x40] =
 	{
@@ -234,14 +236,14 @@ MACHINE_CONFIG_FRAGMENT( reactor_samples )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(reactor_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( qbert_samples )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(qbert_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 #endif
@@ -255,12 +257,11 @@ MACHINE_CONFIG_END
 //  gottlieb_sound_r0_device - constructors
 //-------------------------------------------------
 
-gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 0", tag, owner, clock, "gotsndr0", __FILE__)
 	, device_mixer_interface(mconfig, *this)
 	, m_audiocpu(*this, "audiocpu")
 	, m_r6530(*this, "r6530")
-	, m_dac(*this, "dac")
 	, m_sndcmd(0)
 {
 }
@@ -283,8 +284,8 @@ READ8_MEMBER( gottlieb_sound_r0_device::r6530b_r )
 WRITE8_MEMBER( gottlieb_sound_r0_device::write )
 {
 	// write the command data to the low 4 bits
-	UINT8 pb0_3 = data ^ 15;
-	UINT8 pb4_7 = ioport("SB0")->read() & 0x90;
+	uint8_t pb0_3 = data ^ 15;
+	uint8_t pb4_7 = ioport("SB0")->read() & 0x90;
 	m_sndcmd = pb0_3 | pb4_7;
 	m_r6530->write(space, offset, m_sndcmd);
 }
@@ -313,12 +314,13 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r0 )
 
 	// I/O configuration
 	MCFG_DEVICE_ADD("r6530", MOS6530, SOUND1_CLOCK/4) // unknown - same as cpu
-	MCFG_MOS6530_OUT_PA_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_MOS6530_OUT_PA_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_MOS6530_IN_PB_CB(READ8(gottlieb_sound_r0_device, r6530b_r))
 
 	// sound devices
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -380,12 +382,11 @@ void gottlieb_sound_r0_device::device_start()
 //  gottlieb_sound_r1_device - constructors
 //-------------------------------------------------
 
-gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", tag, owner, clock, "gotsndr1", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),
 		m_riot(*this, "riot"),
-		m_dac(*this, "dac"),
 		m_votrax(*this, "votrax"),
 		//m_populate_votrax(false),
 		m_last_speech_clock(0)
@@ -398,12 +399,11 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 {
 }
 
-gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool populate_votrax)
+gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool populate_votrax)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", tag, owner, clock, "gotsndr1", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),
 		m_riot(*this, "riot"),
-		m_dac(*this, "dac"),
 		m_votrax(*this, "votrax"),
 		//m_populate_votrax(populate_votrax),
 		m_last_speech_clock(0)
@@ -424,8 +424,8 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 WRITE8_MEMBER( gottlieb_sound_r1_device::write )
 {
 	// write the command data to the low 6 bits, and the trigger to the upper bit
-	UINT8 pa7 = (data & 0x0f) != 0xf;
-	UINT8 pa0_5 = ~data & 0x3f;
+	uint8_t pa7 = (data & 0x0f) != 0xf;
+	uint8_t pa0_5 = ~data & 0x3f;
 	m_riot->porta_in_set(pa0_5 | (pa7 << 7), 0xbf);
 
 #if USE_FAKE_VOTRAX
@@ -522,7 +522,7 @@ static ADDRESS_MAP_START( gottlieb_sound_r1_map, AS_PROGRAM, 8, gottlieb_sound_r
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0d80) AM_RAM
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0de0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_WRITE(votrax_data_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(speech_clock_dac_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
@@ -545,8 +545,9 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1 )
 	MCFG_RIOT6532_IRQ_CB(WRITELINE(gottlieb_sound_r1_device, snd_interrupt))
 
 	// sound devices
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1_with_votrax )
@@ -555,7 +556,7 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1_with_votrax )
 	// add the VOTRAX
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
 	MCFG_VOTRAX_SC01_REQUEST_CB(DEVWRITELINE(DEVICE_SELF, gottlieb_sound_r1_device, votrax_request))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
 MACHINE_CONFIG_END
 
 
@@ -625,7 +626,7 @@ void gottlieb_sound_r1_device::device_start()
 //  constructor
 //-------------------------------------------------
 
-gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gottlieb_sound_r1_device(mconfig, tag, owner, clock, true)
 {
 }
@@ -662,12 +663,11 @@ ioport_constructor gottlieb_sound_r1_with_votrax_device::device_input_ports() co
 //  gottlieb_sound_r2_device - constructor
 //-------------------------------------------------
 
-gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV2, "Gottlieb Sound rev. 2", tag, owner, clock, "gotsndr2", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),
 		m_speechcpu(*this, "speechcpu"),
-		m_dac(*this, "dac"),
 		m_ay1(*this, "ay1"),
 		m_ay2(*this, "ay2"),
 		m_sp0250(*this, "spsnd"),
@@ -803,27 +803,13 @@ CUSTOM_INPUT_MEMBER( gottlieb_sound_r2_device::speech_drq_custom_r )
 
 
 //-------------------------------------------------
-//  dac_w - write to one of the two DACs on the
-//  board
-//-------------------------------------------------
-
-WRITE8_MEMBER( gottlieb_sound_r2_device::dac_w )
-{
-	// dual DAC; the first DAC serves as the reference voltage for the
-	// second, effectively scaling the output
-	m_dac_data[offset] = data;
-	m_dac->write_unsigned16(m_dac_data[0] * m_dac_data[1]);
-}
-
-
-//-------------------------------------------------
 //  speech_control_w - primary audio control
 //  register on the speech board
 //-------------------------------------------------
 
 WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 {
-	UINT8 previous = m_speech_control;
+	uint8_t previous = m_speech_control;
 	m_speech_control = data;
 
 	// bit 0 enables/disables the NMI line
@@ -900,7 +886,8 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::sp0250_latch_w )
 
 static ADDRESS_MAP_START( gottlieb_sound_r2_map, AS_PROGRAM, 8, gottlieb_sound_r2_device )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x3c00) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x3ffe) AM_WRITE(dac_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x3ffe) AM_DEVWRITE("dacvol", dac_byte_interface, write)
+	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x3ffe) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3fff) AM_READ(audio_data_r)
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM
 ADDRESS_MAP_END
@@ -936,8 +923,11 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r2 )
 	MCFG_CPU_PROGRAM_MAP(gottlieb_speech_r2_map)
 
 	// sound hardware
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.075) // unknown DAC
+	MCFG_SOUND_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_ADD("ay1", AY8913, SOUND2_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15)
@@ -1002,9 +992,6 @@ void gottlieb_sound_r2_device::device_start()
 	m_nmi_rate = 0;
 	nmi_timer_adjust();
 
-	// reset the DACs
-	m_dac_data[0] = m_dac_data[1] = 0xff;
-
 	// disable the non-speech CPU for cobram3
 	if (m_cobram3_mod)
 		m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -1050,3 +1037,4 @@ void gottlieb_sound_r2_device::device_timer(emu_timer &timer, device_timer_id id
 			break;
 	}
 }
+

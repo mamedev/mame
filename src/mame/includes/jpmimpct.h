@@ -13,46 +13,46 @@
 
 struct duart_t
 {
-	UINT8 MR1A, MR2A;
-	UINT8 SRA, CSRA;
-	UINT8 CRA;
-	UINT8 RBA, TBA;
+	uint8_t MR1A, MR2A;
+	uint8_t SRA, CSRA;
+	uint8_t CRA;
+	uint8_t RBA, TBA;
 
-	UINT8 IPCR;
-	UINT8 ACR;
-	UINT8 ISR, IMR;
+	uint8_t IPCR;
+	uint8_t ACR;
+	uint8_t ISR, IMR;
 
 	union
 	{
-		UINT8 CUR, CLR;
-		UINT16 CR;
+		uint8_t CUR, CLR;
+		uint16_t CR;
 	};
 	union
 	{
-		UINT8 CTUR, CTLR;
-		UINT16 CT;
+		uint8_t CTUR, CTLR;
+		uint16_t CT;
 	};
 
 	int tc;
 
-	UINT8 MR1B, MR2B;
-	UINT8 SRB, CSRB;
-	UINT8 CRB;
-	UINT8 RBB, TBB;
+	uint8_t MR1B, MR2B;
+	uint8_t SRB, CSRB;
+	uint8_t CRB;
+	uint8_t RBB, TBB;
 
-	UINT8 IVR;
-	UINT8 IP;
-	UINT8 OP;
-	UINT8 OPR;
-	UINT8 OPCR;
+	uint8_t IVR;
+	uint8_t IP;
+	uint8_t OP;
+	uint8_t OPR;
+	uint8_t OPCR;
 };
 
 struct bt477_t
 {
-	UINT8 address;
-	UINT8 addr_cnt;
-	UINT8 pixmask;
-	UINT8 command;
+	uint8_t address;
+	uint8_t addr_cnt;
+	uint8_t pixmask;
+	uint8_t command;
 	rgb_t color;
 };
 
@@ -76,13 +76,13 @@ public:
 		m_meters(*this, "meters")
 		{ }
 
-	UINT8 m_tms_irq;
-	UINT8 m_duart_1_irq;
+	uint8_t m_tms_irq;
+	uint8_t m_duart_1_irq;
 	struct duart_t m_duart_1;
-	UINT8 m_touch_cnt;
-	UINT8 m_touch_data[3];
+	uint8_t m_touch_cnt;
+	uint8_t m_touch_data[3];
 	int m_lamp_strobe;
-	UINT8 m_Lamps[256];
+	uint8_t m_Lamps[256];
 	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
@@ -97,7 +97,7 @@ public:
 	int m_hopper[3];
 	int m_motor[3];
 	optional_device<s16lf01_t> m_vfd;
-	optional_shared_ptr<UINT16> m_vram;
+	optional_shared_ptr<uint16_t> m_vram;
 	struct bt477_t m_bt477;
 	DECLARE_READ16_MEMBER(duart_1_r);
 	DECLARE_WRITE16_MEMBER(duart_1_w);

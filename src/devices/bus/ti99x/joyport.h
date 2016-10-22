@@ -32,12 +32,12 @@ class joyport_device;
 class joyport_attached_device : public device_t
 {
 public:
-	joyport_attached_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	joyport_attached_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_joyport(nullptr)
 { }
 
-	virtual UINT8 read_dev() =0;
-	virtual void write_dev(UINT8 data) =0;
+	virtual uint8_t read_dev() =0;
+	virtual void write_dev(uint8_t data) =0;
 	virtual void pulse_clock() { };
 
 protected:
@@ -51,8 +51,8 @@ protected:
 class joyport_device : public device_t, public device_slot_interface
 {
 public:
-	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	UINT8   read_port();
+	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	uint8_t   read_port();
 	void    write_port(int data);
 	void    set_interrupt(int state);
 	void    pulse_clock();

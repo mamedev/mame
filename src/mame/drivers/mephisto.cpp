@@ -99,11 +99,11 @@ public:
 	DECLARE_READ8_MEMBER(read_keys);
 	DECLARE_WRITE8_MEMBER(write_led);
 	DECLARE_WRITE8_MEMBER(write_led_mm2);
-	UINT8 m_lcd_shift_counter;
-	UINT8 m_led_status;
-	//UINT8 *m_p_ram;
-	UINT8 m_led7;
-	UINT8 m_allowNMI;
+	uint8_t m_lcd_shift_counter;
+	uint8_t m_led_status;
+	//uint8_t *m_p_ram;
+	uint8_t m_led7;
+	uint8_t m_allowNMI;
 	DECLARE_DRIVER_INIT(mephisto);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -148,7 +148,7 @@ WRITE8_MEMBER( mephisto_state::mephisto_NMI )
 
 READ8_MEMBER( mephisto_state::read_keys )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (((m_led_status & 0x80) == 0x00))
 	{
@@ -185,7 +185,7 @@ READ8_MEMBER( mephisto_state::read_keys )
 
 WRITE8_MEMBER( mephisto_state::write_led )
 {
-	UINT8 LED_offset=100;
+	uint8_t LED_offset=100;
 	data &= 0x80;
 
 	if (data==0)m_led_status &= 255-(1<<offset) ; else m_led_status|=1<<offset;
@@ -196,7 +196,7 @@ WRITE8_MEMBER( mephisto_state::write_led )
 
 WRITE8_MEMBER( mephisto_state::write_led_mm2 )
 {
-	UINT8 LED_offset=100;
+	uint8_t LED_offset=100;
 	data &= 0x80;
 
 	if (data==0)

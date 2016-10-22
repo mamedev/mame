@@ -29,7 +29,7 @@ void segag80r_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_vblank_latch = 0;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in segag80r_state::device_timer");
+		assert_always(false, "Unknown id in segag80r_state::device_timer");
 	}
 }
 
@@ -74,7 +74,7 @@ INTERRUPT_GEN_MEMBER(segag80r_state::sindbadm_vblank_start)
  *
  *************************************/
 
-void segag80r_state::g80_set_palette_entry(int entry, UINT8 data)
+void segag80r_state::g80_set_palette_entry(int entry, uint8_t data)
 {
 	int bit0, bit1, bit2;
 	int r, g, b;
@@ -186,7 +186,7 @@ TILE_GET_INFO_MEMBER(segag80r_state::bg_get_tile_info)
 
 void segag80r_state::video_start()
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	static const int rg_resistances[3] = { 4700, 2400, 1200 };
 	static const int b_resistances[2] = { 2000, 1000 };
 
@@ -257,7 +257,7 @@ void segag80r_state::video_start()
 
 WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	/* accesses to the upper half of VRAM go to paletteram if selected */
 	if ((offset & 0x1000) && (m_video_control & 0x02))
 	{
@@ -628,9 +628,9 @@ WRITE8_MEMBER(segag80r_state::sindbadm_back_port_w)
  *
  *************************************/
 
-void segag80r_state::draw_videoram(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *transparent_pens)
+void segag80r_state::draw_videoram(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *transparent_pens)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int flipmask = m_video_flip ? 0x1f : 0x00;
 	int x, y;
 
@@ -641,7 +641,7 @@ void segag80r_state::draw_videoram(bitmap_ind16 &bitmap, const rectangle &clipre
 		for (x = cliprect.min_x / 8; x <= cliprect.max_x / 8; x++)
 		{
 			int offs = effy * 32 + (x ^ flipmask);
-			UINT8 tile = videoram[offs];
+			uint8_t tile = videoram[offs];
 
 			/* draw the tile */
 			m_gfxdecode->gfx(0)->transmask(bitmap,cliprect, tile, tile >> 4, m_video_flip, m_video_flip, x*8, y*8, transparent_pens[tile >> 4]);
@@ -676,15 +676,15 @@ void segag80r_state::draw_background_spaceod(bitmap_ind16 &bitmap, const rectang
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = (y + m_spaceod_vcounter + 22) ^ flipmask;
-		UINT16 *src = &pixmap.pix16(effy & ymask);
-		UINT16 *dst = &bitmap.pix16(y);
+		uint16_t *src = &pixmap.pix16(effy & ymask);
+		uint16_t *dst = &bitmap.pix16(y);
 
 		/* loop over horizontal pixels */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int effx = ((x + m_spaceod_hcounter) ^ flipmask) + xoffset;
-			UINT8 fgpix = m_paletteram[dst[x]];
-			UINT8 bgpix = src[effx & xmask] & 0x3f;
+			uint8_t fgpix = m_paletteram[dst[x]];
+			uint8_t bgpix = src[effx & xmask] & 0x3f;
 
 			/* the background detect flag is set if:
 			    - bgpix != 0 AND
@@ -733,8 +733,8 @@ void segag80r_state::draw_background_page_scroll(bitmap_ind16 &bitmap, const rec
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = m_bg_scrolly + (((y ^ flipmask) + (flipmask & 0xe0)) & 0xff);
-		UINT16 *src = &pixmap.pix16(effy & ymask);
-		UINT16 *dst = &bitmap.pix16(y);
+		uint16_t *src = &pixmap.pix16(effy & ymask);
+		uint16_t *dst = &bitmap.pix16(y);
 
 		/* loop over horizontal pixels */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -773,8 +773,8 @@ void segag80r_state::draw_background_full_scroll(bitmap_ind16 &bitmap, const rec
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = (y + m_bg_scrolly) ^ flipmask;
-		UINT16 *src = &pixmap.pix16(effy & ymask);
-		UINT16 *dst = &bitmap.pix16(y);
+		uint16_t *src = &pixmap.pix16(effy & ymask);
+		uint16_t *dst = &bitmap.pix16(y);
 
 		/* loop over horizontal pixels */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -793,9 +793,9 @@ void segag80r_state::draw_background_full_scroll(bitmap_ind16 &bitmap, const rec
  *
  *************************************/
 
-UINT32 segag80r_state::screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segag80r_state::screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 transparent_pens[16];
+	uint8_t transparent_pens[16];
 
 	switch (m_background_pcb)
 	{

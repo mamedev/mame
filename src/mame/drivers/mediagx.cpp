@@ -79,8 +79,8 @@
 
 struct speedup_entry
 {
-	UINT32          offset;
-	UINT32          pc;
+	uint32_t          offset;
+	uint32_t          pc;
 };
 
 class mediagx_state : public pcat_base_state
@@ -100,53 +100,53 @@ public:
 		{ }
 
 	required_device<ide_controller_32_device> m_ide;
-	required_shared_ptr<UINT32> m_main_ram;
-	required_shared_ptr<UINT32> m_cga_ram;
-	required_shared_ptr<UINT32> m_bios_ram;
-	required_shared_ptr<UINT32> m_vram;
+	required_shared_ptr<uint32_t> m_main_ram;
+	required_shared_ptr<uint32_t> m_cga_ram;
+	required_shared_ptr<uint32_t> m_bios_ram;
+	required_shared_ptr<uint32_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	UINT8 m_pal[768];
+	uint8_t m_pal[768];
 
 	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
 
-	UINT32 m_disp_ctrl_reg[256/4];
+	uint32_t m_disp_ctrl_reg[256/4];
 	int m_frame_width;
 	int m_frame_height;
 
-	UINT32 m_memory_ctrl_reg[256/4];
+	uint32_t m_memory_ctrl_reg[256/4];
 	int m_pal_index;
 
-	UINT32 m_biu_ctrl_reg[256/4];
+	uint32_t m_biu_ctrl_reg[256/4];
 
-	UINT8 m_mediagx_config_reg_sel;
-	UINT8 m_mediagx_config_regs[256];
+	uint8_t m_mediagx_config_reg_sel;
+	uint8_t m_mediagx_config_regs[256];
 
-	//UINT8 m_controls_data;
-	UINT8 m_parallel_pointer;
-	UINT8 m_parallel_latched;
-	UINT32 m_parport;
+	//uint8_t m_controls_data;
+	uint8_t m_parallel_pointer;
+	uint8_t m_parallel_latched;
+	uint32_t m_parport;
 	//int m_control_num;
 	//int m_control_num2;
 	//int m_control_read;
 
-	UINT32 m_cx5510_regs[256/4];
+	uint32_t m_cx5510_regs[256/4];
 
-	std::unique_ptr<INT16[]> m_dacl;
-	std::unique_ptr<INT16[]> m_dacr;
+	std::unique_ptr<int16_t[]> m_dacl;
+	std::unique_ptr<int16_t[]> m_dacr;
 	int m_dacl_ptr;
 	int m_dacr_ptr;
 
-	UINT8 m_ad1847_regs[16];
-	UINT32 m_ad1847_sample_counter;
-	UINT32 m_ad1847_sample_rate;
+	uint8_t m_ad1847_regs[16];
+	uint32_t m_ad1847_sample_counter;
+	uint32_t m_ad1847_sample_rate;
 
 	dmadac_sound_device *m_dmadac[2];
 
 #if SPEEDUP_HACKS
 	const speedup_entry *m_speedup_table;
-	UINT32 m_speedup_hits[12];
+	uint32_t m_speedup_hits[12];
 	int m_speedup_count;
 #endif
 	DECLARE_READ32_MEMBER(disp_ctrl_r);
@@ -165,7 +165,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ32_MEMBER(speedup0_r);
 	DECLARE_READ32_MEMBER(speedup1_r);
 	DECLARE_READ32_MEMBER(speedup2_r);
@@ -182,8 +182,8 @@ public:
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void ad1847_reg_write(int reg, UINT8 data);
-	inline UINT32 generic_speedup(address_space &space, int idx);
+	void ad1847_reg_write(int reg, uint8_t data);
+	inline uint32_t generic_speedup(address_space &space, int idx);
 	void report_speedups();
 	void install_speedups(const speedup_entry *entries, int count);
 	void init_mediagx();
@@ -242,7 +242,7 @@ void mediagx_state::video_start()
 void mediagx_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
-	const UINT8 *dp;
+	const uint8_t *dp;
 	int index = 0;
 	const pen_t *pens = &m_palette->pen(0);
 
@@ -250,10 +250,10 @@ void mediagx_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, g
 
 	for (j=y; j < y+8; j++)
 	{
-		UINT32 *p = &bitmap.pix32(j);
+		uint32_t *p = &bitmap.pix32(j);
 		for (i=x; i < x+8; i++)
 		{
-			UINT8 pen = dp[index++];
+			uint8_t pen = dp[index++];
 			if (pen)
 				p[i] = pens[gfx->colorbase() + (att & 0xf)];
 			else
@@ -294,13 +294,13 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
 	{
-		UINT8 *framebuf = (UINT8*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
-		UINT8 *pal = m_pal;
+		uint8_t *framebuf = (uint8_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint8_t *pal = m_pal;
 
 		for (j=0; j < m_frame_height; j++)
 		{
-			UINT32 *p = &bitmap.pix32(j);
-			UINT8 *si = &framebuf[j * line_delta];
+			uint32_t *p = &bitmap.pix32(j);
+			uint8_t *si = &framebuf[j * line_delta];
 			for (i=0; i < m_frame_width; i++)
 			{
 				int c = *si++;
@@ -314,18 +314,18 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 	}
 	else            // 16-bit
 	{
-		UINT16 *framebuf = (UINT16*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint16_t *framebuf = (uint16_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 
 		// RGB 5-6-5 mode
 		if ((m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x2) == 0)
 		{
 			for (j=0; j < m_frame_height; j++)
 			{
-				UINT32 *p = &bitmap.pix32(j);
-				UINT16 *si = &framebuf[j * (line_delta/2)];
+				uint32_t *p = &bitmap.pix32(j);
+				uint16_t *si = &framebuf[j * (line_delta/2)];
 				for (i=0; i < m_frame_width; i++)
 				{
-					UINT16 c = *si++;
+					uint16_t c = *si++;
 					int r = ((c >> 11) & 0x1f) << 3;
 					int g = ((c >> 5) & 0x3f) << 2;
 					int b = (c & 0x1f) << 3;
@@ -339,11 +339,11 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 		{
 			for (j=0; j < m_frame_height; j++)
 			{
-				UINT32 *p = &bitmap.pix32(j);
-				UINT16 *si = &framebuf[j * (line_delta/2)];
+				uint32_t *p = &bitmap.pix32(j);
+				uint16_t *si = &framebuf[j * (line_delta/2)];
 				for (i=0; i < m_frame_width; i++)
 				{
-					UINT16 c = *si++;
+					uint16_t c = *si++;
 					int r = ((c >> 10) & 0x1f) << 3;
 					int g = ((c >> 5) & 0x1f) << 3;
 					int b = (c & 0x1f) << 3;
@@ -359,7 +359,7 @@ void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT32 *cga = m_cga_ram;
+	uint32_t *cga = m_cga_ram;
 	int index = 0;
 
 	for (j=0; j < 25; j++)
@@ -378,7 +378,7 @@ void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT32 mediagx_state::screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mediagx_state::screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -393,7 +393,7 @@ UINT32 mediagx_state::screen_update_mediagx(screen_device &screen, bitmap_rgb32 
 
 READ32_MEMBER(mediagx_state::disp_ctrl_r)
 {
-	UINT32 r = m_disp_ctrl_reg[offset];
+	uint32_t r = m_disp_ctrl_reg[offset];
 
 	switch (offset)
 	{
@@ -489,7 +489,7 @@ WRITE32_MEMBER(mediagx_state::bios_ram_w)
 
 READ8_MEMBER(mediagx_state::io20_r)
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -517,11 +517,11 @@ WRITE8_MEMBER(mediagx_state::io20_w)
 
 READ32_MEMBER(mediagx_state::parallel_port_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 nibble = m_parallel_latched;
+		uint8_t nibble = m_parallel_latched;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
 		logerror("%08X:parallel_port_r()\n", space.device().safe_pc());
 #if 0
@@ -630,7 +630,7 @@ WRITE32_MEMBER(mediagx_state::parallel_port_w)
 	}
 }
 
-static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 	mediagx_state *state = busdevice->machine().driver_data<mediagx_state>();
 
@@ -643,7 +643,7 @@ static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, 
 	return state->m_cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	mediagx_state *state = busdevice->machine().driver_data<mediagx_state>();
 
@@ -665,7 +665,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
 	m_dacr_ptr = 0;
 }
 
-void mediagx_state::ad1847_reg_write(int reg, UINT8 data)
+void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
 {
 	static const int divide_factor[] = { 3072, 1536, 896, 768, 448, 384, 512, 2560 };
 
@@ -719,12 +719,12 @@ WRITE32_MEMBER(mediagx_state::ad1847_w)
 	{
 		if (ACCESSING_BITS_16_31)
 		{
-			UINT16 ldata = (data >> 16) & 0xffff;
+			uint16_t ldata = (data >> 16) & 0xffff;
 			m_dacl[m_dacl_ptr++] = ldata;
 		}
 		if (ACCESSING_BITS_0_15)
 		{
-			UINT16 rdata = data & 0xffff;
+			uint16_t rdata = data & 0xffff;
 			m_dacr[m_dacr_ptr++] = rdata;
 		}
 
@@ -846,13 +846,13 @@ INPUT_PORTS_END
 
 void mediagx_state::machine_start()
 {
-	m_dacl = std::make_unique<INT16[]>(65536);
-	m_dacr = std::make_unique<INT16[]>(65536);
+	m_dacl = std::make_unique<int16_t[]>(65536);
+	m_dacr = std::make_unique<int16_t[]>(65536);
 }
 
 void mediagx_state::machine_reset()
 {
-	UINT8 *rom = memregion("bios")->base();
+	uint8_t *rom = memregion("bios")->base();
 	memcpy(m_bios_ram, rom, 0x40000);
 	m_maincpu->reset();
 
@@ -917,7 +917,7 @@ void mediagx_state::init_mediagx()
 
 #if SPEEDUP_HACKS
 
-UINT32 mediagx_state::generic_speedup(address_space &space, int idx)
+uint32_t mediagx_state::generic_speedup(address_space &space, int idx)
 {
 	if (space.device().safe_pc() == m_speedup_table[idx].pc)
 	{

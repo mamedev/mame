@@ -197,7 +197,7 @@ static const line_aa_step line_aa_4step[] =
 //  INLINES
 //============================================================
 
-HashT renderer_ogl::texture_compute_hash(const render_texinfo *texture, UINT32 flags)
+HashT renderer_ogl::texture_compute_hash(const render_texinfo *texture, uint32_t flags)
 {
 	HashT h = (HashT)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 	//printf("hash %d\n", (int) h % HASH_SIZE);
@@ -268,7 +268,7 @@ static int glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
 //  Textures
 //============================================================
 
-static void texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, UINT32 flags);
+static void texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, uint32_t flags);
 
 //============================================================
 //  Static Variables
@@ -617,7 +617,7 @@ int renderer_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 void renderer_ogl::destroy_all_textures()
 {
 	ogl_texture_info *texture = nullptr;
-	int lock=FALSE;
+	bool lock=false;
 	int i;
 
 	if ( !m_initialized )
@@ -634,7 +634,7 @@ void renderer_ogl::destroy_all_textures()
 
 	if(win->m_primlist)
 	{
-		lock=TRUE;
+		lock=true;
 		win->m_primlist->acquire_lock();
 	}
 
@@ -682,7 +682,7 @@ void renderer_ogl::destroy_all_textures()
 			{
 				free(texture->data);
 				texture->data=nullptr;
-				texture->data_own=FALSE;
+				texture->data_own=false;
 			}
 			global_free(texture);
 		}
@@ -707,9 +707,9 @@ void renderer_ogl::loadGLExtensions()
 {
 	static int _once = 1;
 
-	// usevbo=FALSE; // You may want to switch VBO and PBO off, by uncommenting this statement
-	// usepbo=FALSE; // You may want to switch PBO off, by uncommenting this statement
-	// useglsl=FALSE; // You may want to switch GLSL off, by uncommenting this statement
+	// usevbo=false; // You may want to switch VBO and PBO off, by uncommenting this statement
+	// usepbo=false; // You may want to switch PBO off, by uncommenting this statement
+	// useglsl=false; // You may want to switch GLSL off, by uncommenting this statement
 
 	if (! m_usevbo)
 	{
@@ -719,7 +719,7 @@ void renderer_ogl::loadGLExtensions()
 			{
 				osd_printf_warning("OpenGL: PBO not supported, no VBO support. (sdlmame error)\n");
 			}
-			m_usepbo=FALSE;
+			m_usepbo=false;
 		}
 		if(m_useglsl) // should never ever happen ;-)
 		{
@@ -727,7 +727,7 @@ void renderer_ogl::loadGLExtensions()
 			{
 				osd_printf_warning("OpenGL: GLSL not supported, no VBO support. (sdlmame error)\n");
 			}
-			m_useglsl=FALSE;
+			m_useglsl=false;
 		}
 	}
 
@@ -763,7 +763,7 @@ void renderer_ogl::loadGLExtensions()
 			!pfn_glBindBuffer || !pfn_glBufferData || !pfn_glBufferSubData
 		) )
 	{
-		m_usepbo=FALSE;
+		m_usepbo=false;
 		if (_once)
 		{
 			osd_printf_warning("OpenGL: VBO not supported, missing: ");
@@ -795,13 +795,13 @@ void renderer_ogl::loadGLExtensions()
 			{
 				osd_printf_warning("OpenGL: PBO not supported, no VBO support.\n");
 			}
-			m_usepbo=FALSE;
+			m_usepbo=false;
 		}
 	}
 
 	if ( m_usepbo && ( !pfn_glMapBuffer || !pfn_glUnmapBuffer ) )
 	{
-		m_usepbo=FALSE;
+		m_usepbo=false;
 		if (_once)
 		{
 			osd_printf_warning("OpenGL: PBO not supported, missing: ");
@@ -822,7 +822,7 @@ void renderer_ogl::loadGLExtensions()
 			!pfn_glGenFramebuffers || !pfn_glCheckFramebufferStatus || !pfn_glFramebufferTexture2D
 		))
 	{
-		m_usefbo=FALSE;
+		m_usefbo=false;
 		if (_once)
 		{
 			osd_printf_warning("OpenGL: FBO not supported, missing: ");
@@ -930,7 +930,7 @@ void renderer_ogl::loadGLExtensions()
 	if ( m_useglsl )
 	{
 		int i;
-		video_config.filter = FALSE;
+		video_config.filter = false;
 		glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
 		m_glsl_program_num = 0;
 		m_glsl_program_mb2sc = 0;
@@ -1401,15 +1401,15 @@ static const char * texfmt_to_string[9] = {
 enum { SDL_TEXFORMAT_SRC_EQUALS_DEST, SDL_TEXFORMAT_SRC_HAS_PALETTE };
 
 static const GLint texture_copy_properties[9][2] = {
-	{ TRUE,  FALSE },   // SDL_TEXFORMAT_ARGB32
-	{ TRUE,  FALSE },   // SDL_TEXFORMAT_RGB32
-	{ TRUE,  TRUE  },   // SDL_TEXFORMAT_RGB32_PALETTED
-	{ FALSE, FALSE },   // SDL_TEXFORMAT_YUY16
-	{ FALSE, TRUE  },   // SDL_TEXFORMAT_YUY16_PALETTED
-	{ FALSE, TRUE  },   // SDL_TEXFORMAT_PALETTE16
-	{ TRUE,  FALSE },   // SDL_TEXFORMAT_RGB15
-	{ TRUE,  TRUE  },   // SDL_TEXFORMAT_RGB15_PALETTED
-	{ FALSE, TRUE  }    // SDL_TEXFORMAT_PALETTE16A
+	{ true,  false },   // SDL_TEXFORMAT_ARGB32
+	{ true,  false },   // SDL_TEXFORMAT_RGB32
+	{ true,  true  },   // SDL_TEXFORMAT_RGB32_PALETTED
+	{ false, false },   // SDL_TEXFORMAT_YUY16
+	{ false, true  },   // SDL_TEXFORMAT_YUY16_PALETTED
+	{ false, true  },   // SDL_TEXFORMAT_PALETTE16
+	{ true,  false },   // SDL_TEXFORMAT_RGB15
+	{ true,  true  },   // SDL_TEXFORMAT_RGB15_PALETTED
+	{ false, true  }    // SDL_TEXFORMAT_PALETTE16A
 };
 
 //============================================================
@@ -1420,13 +1420,13 @@ static const GLint texture_copy_properties[9][2] = {
 // glBufferData to push a nocopy texture to the GPU is slower than TexSubImage2D,
 // so don't use PBO here
 //
-// we also don't want to use PBO's in the case of nocopy==TRUE,
+// we also don't want to use PBO's in the case of nocopy==true,
 // since we now might have GLSL shaders - this decision simplifies out life ;-)
 //
-void renderer_ogl::texture_compute_type_subroutine(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
+void renderer_ogl::texture_compute_type_subroutine(const render_texinfo *texsource, ogl_texture_info *texture, uint32_t flags)
 {
 	texture->type = TEXTURE_TYPE_NONE;
-	texture->nocopy = FALSE;
+	texture->nocopy = false;
 
 	if ( texture->type == TEXTURE_TYPE_NONE &&
 			!PRIMFLAG_GET_SCREENTEX(flags))
@@ -1453,7 +1453,7 @@ void renderer_ogl::texture_compute_type_subroutine(const render_texinfo *texsour
 			!texture->borderpix && !texsource->palette &&
 			texsource->rowpixels <= m_texture_max_width )
 	{
-		texture->nocopy = TRUE;
+		texture->nocopy = true;
 	}
 
 	if( texture->type == TEXTURE_TYPE_NONE &&
@@ -1477,8 +1477,8 @@ static inline int get_valid_pow2_value(int v, int needPow2)
 	return (needPow2)?gl_round_to_pow2(v):v;
 }
 
-void renderer_ogl::texture_compute_size_subroutine(ogl_texture_info *texture, UINT32 flags,
-											UINT32 width, UINT32 height,
+void renderer_ogl::texture_compute_size_subroutine(ogl_texture_info *texture, uint32_t flags,
+											uint32_t width, uint32_t height,
 											int* p_width, int* p_height, int* p_width_create, int* p_height_create)
 {
 	int width_create;
@@ -1530,7 +1530,7 @@ void renderer_ogl::texture_compute_size_subroutine(ogl_texture_info *texture, UI
 		*p_height_create=height_create;
 }
 
-void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
+void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, ogl_texture_info *texture, uint32_t flags)
 {
 	int finalheight, finalwidth;
 	int finalheight_create, finalwidth_create;
@@ -1552,7 +1552,7 @@ void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, og
 		((finalwidth > m_texture_max_width && finalwidth - 2 <= m_texture_max_width) ||
 			(finalheight > m_texture_max_height && finalheight - 2 <= m_texture_max_height)))
 	{
-		texture->borderpix = FALSE;
+		texture->borderpix = false;
 
 		texture_compute_type_subroutine(texsource, texture, flags);
 
@@ -1563,10 +1563,10 @@ void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, og
 	// if we're above the max width/height, do what?
 	if (finalwidth_create > m_texture_max_width || finalheight_create > m_texture_max_height)
 	{
-		static int printed = FALSE;
+		static int printed = false;
 		if (!printed)
 			osd_printf_warning("Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth_create, finalheight_create, m_texture_max_width, m_texture_max_height);
-		printed = TRUE;
+		printed = true;
 	}
 
 	if(!texture->nocopy || texture->type==TEXTURE_TYPE_DYNAMIC || texture->type==TEXTURE_TYPE_SHADER ||
@@ -1588,7 +1588,7 @@ void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, og
 			(int)texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE],
 			texture->xprescale, texture->yprescale,
 			texture->borderpix, texsource->rowpixels, finalwidth, m_texture_max_width,
-			(int)sizeof(UINT32)
+			(int)sizeof(uint32_t)
 			);
 	}
 
@@ -1646,7 +1646,7 @@ static int gl_checkFramebufferStatus(void)
 	return -1;
 }
 
-static int texture_fbo_create(UINT32 text_unit, UINT32 text_name, UINT32 fbo_name, int width, int height)
+static int texture_fbo_create(uint32_t text_unit, uint32_t text_name, uint32_t fbo_name, int width, int height)
 {
 	pfn_glActiveTexture(text_unit);
 	pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, fbo_name);
@@ -1683,7 +1683,7 @@ static int texture_fbo_create(UINT32 text_unit, UINT32 text_name, UINT32 fbo_nam
 	return 0;
 }
 
-int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
+int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_texture_info *texture, uint32_t flags)
 {
 	int uniform_location;
 	int i;
@@ -1802,7 +1802,7 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->rawwidth_create);
 
-	UINT32 * dummy = nullptr;
+	uint32_t * dummy = nullptr;
 	GLint _width, _height;
 	if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8,
 					texture->rawwidth_create, texture->rawheight_create,
@@ -1815,8 +1815,8 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 		return -1;
 	}
 
-	dummy = (UINT32 *) malloc(texture->rawwidth_create * texture->rawheight_create * sizeof(UINT32));
-	memset(dummy, 0, texture->rawwidth_create * texture->rawheight_create * sizeof(UINT32));
+	dummy = (uint32_t *) malloc(texture->rawwidth_create * texture->rawheight_create * sizeof(uint32_t));
+	memset(dummy, 0, texture->rawwidth_create * texture->rawheight_create * sizeof(uint32_t));
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
 			texture->rawwidth_create, texture->rawheight_create,
 			0,
@@ -1856,7 +1856,7 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 	return 0;
 }
 
-ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, UINT32 flags)
+ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, uint32_t flags)
 {
 	ogl_texture_info *texture;
 
@@ -2000,14 +2000,14 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 
 		// set up the PBO dimension, ..
 		pfn_glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB,
-							texture->rawwidth * texture->rawheight * sizeof(UINT32),
+							texture->rawwidth * texture->rawheight * sizeof(uint32_t),
 					nullptr, GL_STREAM_DRAW);
 	}
 
 	if ( !texture->nocopy && texture->type!=TEXTURE_TYPE_DYNAMIC )
 	{
-		texture->data = (UINT32 *) malloc(texture->rawwidth* texture->rawheight * sizeof(UINT32));
-		texture->data_own=TRUE;
+		texture->data = (uint32_t *) malloc(texture->rawwidth* texture->rawheight * sizeof(uint32_t));
+		texture->data_own=true;
 	}
 
 	// add us to the texture list
@@ -2046,7 +2046,7 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 //  copyline_palette16
 //============================================================
 
-static inline void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
+static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
 {
 	int x;
 
@@ -2069,7 +2069,7 @@ static inline void copyline_palette16(UINT32 *dst, const UINT16 *src, int width,
 //  copyline_palettea16
 //============================================================
 
-static inline void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
+static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
 {
 	int x;
 
@@ -2092,7 +2092,7 @@ static inline void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width
 //  copyline_rgb32
 //============================================================
 
-static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
+static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
 {
 	int x;
 
@@ -2144,7 +2144,7 @@ static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, con
 //  copyline_argb32
 //============================================================
 
-static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
+static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
 {
 	int x;
 
@@ -2187,7 +2187,7 @@ static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, co
 	}
 }
 
-static inline UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
+static inline uint32_t ycc_to_rgb(uint8_t y, uint8_t cb, uint8_t cr)
 {
 	/* original equations:
 
@@ -2232,7 +2232,7 @@ static inline UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 //  copyline_yuy16_to_argb
 //============================================================
 
-static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
+static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
 {
 	int x;
 
@@ -2244,19 +2244,19 @@ static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int wi
 	{
 		if (xborderpix)
 		{
-			UINT16 srcpix0 = src[0];
-			UINT16 srcpix1 = src[1];
-			UINT8 cb = srcpix0 & 0xff;
-			UINT8 cr = srcpix1 & 0xff;
+			uint16_t srcpix0 = src[0];
+			uint16_t srcpix1 = src[1];
+			uint8_t cb = srcpix0 & 0xff;
+			uint8_t cr = srcpix1 & 0xff;
 			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
 			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
 		}
 		for (x = 0; x < width / 2; x++)
 		{
-			UINT16 srcpix0 = *src++;
-			UINT16 srcpix1 = *src++;
-			UINT8 cb = srcpix0 & 0xff;
-			UINT8 cr = srcpix1 & 0xff;
+			uint16_t srcpix0 = *src++;
+			uint16_t srcpix1 = *src++;
+			uint8_t cb = srcpix0 & 0xff;
+			uint8_t cr = srcpix1 & 0xff;
 			for (int x2 = 0; x2 < xprescale; x2++)
 				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
 			for (int x2 = 0; x2 < xprescale; x2++)
@@ -2264,10 +2264,10 @@ static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int wi
 		}
 		if (xborderpix)
 		{
-			UINT16 srcpix1 = *--src;
-			UINT16 srcpix0 = *--src;
-			UINT8 cb = srcpix0 & 0xff;
-			UINT8 cr = srcpix1 & 0xff;
+			uint16_t srcpix1 = *--src;
+			uint16_t srcpix0 = *--src;
+			uint8_t cb = srcpix0 & 0xff;
+			uint8_t cr = srcpix1 & 0xff;
 			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
 			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
 		}
@@ -2278,19 +2278,19 @@ static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int wi
 	{
 		if (xborderpix)
 		{
-			UINT16 srcpix0 = src[0];
-			UINT16 srcpix1 = src[1];
-			UINT8 cb = srcpix0 & 0xff;
-			UINT8 cr = srcpix1 & 0xff;
+			uint16_t srcpix0 = src[0];
+			uint16_t srcpix1 = src[1];
+			uint8_t cb = srcpix0 & 0xff;
+			uint8_t cr = srcpix1 & 0xff;
 			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
 			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
 		}
 		for (x = 0; x < width; x += 2)
 		{
-			UINT16 srcpix0 = *src++;
-			UINT16 srcpix1 = *src++;
-			UINT8 cb = srcpix0 & 0xff;
-			UINT8 cr = srcpix1 & 0xff;
+			uint16_t srcpix0 = *src++;
+			uint16_t srcpix1 = *src++;
+			uint8_t cb = srcpix0 & 0xff;
+			uint8_t cr = srcpix1 & 0xff;
 			for (int x2 = 0; x2 < xprescale; x2++)
 				*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
 			for (int x2 = 0; x2 < xprescale; x2++)
@@ -2298,10 +2298,10 @@ static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int wi
 		}
 		if (xborderpix)
 		{
-			UINT16 srcpix1 = *--src;
-			UINT16 srcpix0 = *--src;
-			UINT8 cb = srcpix0 & 0xff;
-			UINT8 cr = srcpix1 & 0xff;
+			uint16_t srcpix1 = *--src;
+			uint16_t srcpix0 = *--src;
+			uint8_t cb = srcpix0 & 0xff;
+			uint8_t cr = srcpix1 & 0xff;
 			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
 			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
 		}
@@ -2312,14 +2312,14 @@ static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int wi
 //  texture_set_data
 //============================================================
 
-static void texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, UINT32 flags)
+static void texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, uint32_t flags)
 {
 	if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
 		assert(texture->pbo);
 		assert(!texture->nocopy);
 
-		texture->data = (UINT32 *) pfn_glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
+		texture->data = (uint32_t *) pfn_glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
 	}
 
 	// note that nocopy and borderpix are mutually exclusive, IOW
@@ -2327,48 +2327,48 @@ static void texture_set_data(ogl_texture_info *texture, const render_texinfo *te
 	// borderpix code below writing to texsource->base .
 	if (texture->nocopy)
 	{
-		texture->data = (UINT32 *) texsource->base;
+		texture->data = (uint32_t *) texsource->base;
 	}
 
 	// always fill non-wrapping textures with an extra pixel on the top
 	if (texture->borderpix)
 	{
 		memset(texture->data, 0,
-				(texsource->width * texture->xprescale + 2) * sizeof(UINT32));
+				(texsource->width * texture->xprescale + 2) * sizeof(uint32_t));
 	}
 
 	// when necessary copy (and convert) the data
 	if (!texture->nocopy)
 	{
 		int y, y2;
-		UINT8 *dst;
+		uint8_t *dst;
 
 		for (y = 0; y < texsource->height; y++)
 		{
 			for (y2 = 0; y2 < texture->yprescale; y2++)
 			{
-				dst = (UINT8 *)(texture->data + (y * texture->yprescale + texture->borderpix + y2) * texture->rawwidth);
+				dst = (uint8_t *)(texture->data + (y * texture->yprescale + texture->borderpix + y2) * texture->rawwidth);
 
 				switch (PRIMFLAG_GET_TEXFORMAT(flags))
 				{
 					case TEXFORMAT_PALETTE16:
-						copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						copyline_palette16((uint32_t *)dst, (uint16_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_PALETTEA16:
-						copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						copyline_palettea16((uint32_t *)dst, (uint16_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_RGB32:
-						copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						copyline_rgb32((uint32_t *)dst, (uint32_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_ARGB32:
-						copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						copyline_argb32((uint32_t *)dst, (uint32_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_YUY16:
-						copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						copyline_yuy16_to_argb((uint32_t *)dst, (uint16_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					default:
@@ -2382,10 +2382,10 @@ static void texture_set_data(ogl_texture_info *texture, const render_texinfo *te
 	// always fill non-wrapping textures with an extra pixel on the bottom
 	if (texture->borderpix)
 	{
-		memset((UINT8 *)texture->data +
-				(texsource->height + 1) * texture->rawwidth * sizeof(UINT32),
+		memset((uint8_t *)texture->data +
+				(texsource->height + 1) * texture->rawwidth * sizeof(uint32_t),
 				0,
-			(texsource->width * texture->xprescale + 2) * sizeof(UINT32));
+			(texsource->width * texture->xprescale + 2) * sizeof(uint32_t));
 	}
 
 	if ( texture->type == TEXTURE_TYPE_SHADER )
@@ -2552,7 +2552,7 @@ void renderer_ogl::texture_coord_update(ogl_texture_info *texture, const render_
 
 void renderer_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
 {
-	UINT32 mpass_src_idx = texture->mpass_dest_idx;
+	uint32_t mpass_src_idx = texture->mpass_dest_idx;
 
 	texture->mpass_dest_idx = (mpass_src_idx+1) % 2;
 

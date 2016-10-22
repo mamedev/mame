@@ -39,8 +39,8 @@ public:
 		m_screen(*this, "screen") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_playfield_ram;
-	required_shared_ptr<UINT8> m_position_ram;
+	required_shared_ptr<uint8_t> m_playfield_ram;
+	required_shared_ptr<uint8_t> m_position_ram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -66,7 +66,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dragrace);
-	UINT32 screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dragrace_frame_callback);
 	void dragrace_update_misc_flags( address_space &space );
 };

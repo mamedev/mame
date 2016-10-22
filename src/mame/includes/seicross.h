@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "machine/nvram.h"
+#include "sound/dac.h"
 
 class seicross_state : public driver_device
 {
@@ -9,6 +10,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
+		m_dac(*this, "dac"),
 		m_nvram(*this, "nvram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -22,22 +24,23 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
+	required_device<dac_byte_interface> m_dac;
 	optional_device<nvram_device> m_nvram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	optional_ioport m_debug_port;
 
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_row_scroll;
-	required_shared_ptr<UINT8> m_spriteram2;
-	required_shared_ptr<UINT8> m_colorram;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_row_scroll;
+	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	UINT8 m_portb;
+	uint8_t m_portb;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_irq_mask;
+	uint8_t m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
@@ -54,8 +57,10 @@ public:
 	DECLARE_PALETTE_INIT(seicross);
 	DECLARE_DRIVER_INIT(friskytb);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
+
+	DECLARE_WRITE8_MEMBER(dac_w);
 };

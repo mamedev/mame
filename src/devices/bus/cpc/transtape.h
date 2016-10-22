@@ -18,13 +18,13 @@ class cpc_transtape_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual void set_mapping(UINT8 type) override;
+	virtual void set_mapping(uint8_t type) override;
 	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
 
 	DECLARE_READ8_MEMBER(input_r);
@@ -41,10 +41,10 @@ private:
 	cpc_expansion_slot_device *m_slot;
 	cpu_device* m_cpu;
 	address_space* m_space;
-	std::unique_ptr<UINT8[]> m_ram;  // 8kB internal RAM
+	std::unique_ptr<uint8_t[]> m_ram;  // 8kB internal RAM
 	bool m_rom_active;
 	bool m_romen;
-	UINT8 m_output;
+	uint8_t m_output;
 
 	void map_enable();
 };

@@ -68,7 +68,7 @@ void thunderx_state::video_start()
 
 ***************************************************************************/
 
-UINT32 thunderx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t thunderx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_update();
 

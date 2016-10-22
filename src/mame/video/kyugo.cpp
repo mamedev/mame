@@ -143,9 +143,9 @@ void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 {
 	/* sprite information is scattered through memory */
 	/* and uses a portion of the text layer memory (outside the visible area) */
-	UINT8 *spriteram_area1 = &m_spriteram_1[0x28];
-	UINT8 *spriteram_area2 = &m_spriteram_2[0x28];
-	UINT8 *spriteram_area3 = &m_fgvideoram[0x28];
+	uint8_t *spriteram_area1 = &m_spriteram_1[0x28];
+	uint8_t *spriteram_area2 = &m_spriteram_2[0x28];
+	uint8_t *spriteram_area3 = &m_fgvideoram[0x28];
 
 	int flip = flip_screen();
 
@@ -197,7 +197,7 @@ void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 }
 
 
-UINT32 kyugo_state::screen_update_kyugo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kyugo_state::screen_update_kyugo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (flip_screen())
 		m_bg_tilemap->set_scrollx(0, -(m_scroll_x_lo + (m_scroll_x_hi * 256)));

@@ -58,19 +58,19 @@ ADDRESS_MAP_END
 
 
 // device definitions
-upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_2k), 7 /* data width */, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
 { }
 
-upd557l_cpu_device::upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd557l_cpu_device::upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ucom4_cpu_device(mconfig, NEC_D557L, "uPD557L", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd557l", __FILE__)
 { }
 
-upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ucom4_cpu_device(mconfig, NEC_D650, "uPD650", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd650", __FILE__)
 { }
 
-upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ucom4_cpu_device(mconfig, NEC_D552, "uPD552", tag, owner, clock, NEC_UCOM44, 1, 10, ADDRESS_MAP_NAME(program_1k), 6, ADDRESS_MAP_NAME(data_64x4), "upd552", __FILE__)
 { }
 
@@ -95,7 +95,7 @@ void ucom4_cpu_device::state_string_export(const device_state_entry &entry, std:
 	}
 }
 
-offs_t ucom4_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t ucom4_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(ucom4);
 	return CPU_DISASSEMBLE_NAME(ucom4)(this, buffer, pc, oprom, opram, options);
@@ -220,10 +220,10 @@ void ucom4_cpu_device::device_reset()
 // default:
 // A,B are inputs, C,D are input/output, E,F,G,H,I are output
 
-UINT8 ucom4_cpu_device::input_r(int index)
+uint8_t ucom4_cpu_device::input_r(int index)
 {
 	index &= 0xf;
-	UINT8 inp = 0;
+	uint8_t inp = 0;
 
 	switch (index)
 	{
@@ -240,7 +240,7 @@ UINT8 ucom4_cpu_device::input_r(int index)
 	return inp & 0xf;
 }
 
-void ucom4_cpu_device::output_w(int index, UINT8 data)
+void ucom4_cpu_device::output_w(int index, uint8_t data)
 {
 	index &= 0xf;
 	data &= 0xf;
@@ -266,7 +266,7 @@ void ucom4_cpu_device::output_w(int index, UINT8 data)
 // uPD557L:
 // ports B,H,I are stripped, port G is reduced to 1 pin
 
-UINT8 upd557l_cpu_device::input_r(int index)
+uint8_t upd557l_cpu_device::input_r(int index)
 {
 	index &= 0xf;
 
@@ -278,7 +278,7 @@ UINT8 upd557l_cpu_device::input_r(int index)
 	return 0;
 }
 
-void upd557l_cpu_device::output_w(int index, UINT8 data)
+void upd557l_cpu_device::output_w(int index, uint8_t data)
 {
 	index &= 0xf;
 	data &= 0xf;

@@ -48,8 +48,8 @@ WRITE_LINE_MEMBER(qix_state::display_enable_changed)
 	/* on the rising edge, latch the scanline */
 	if (state)
 	{
-		UINT16 ma = m_crtc->get_ma();
-		UINT8 ra = m_crtc->get_ra();
+		uint16_t ma = m_crtc->get_ma();
+		uint8_t ra = m_crtc->get_ra();
 
 		/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
 		*m_scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
@@ -186,7 +186,7 @@ WRITE8_MEMBER(qix_state::slither_addresslatch_w)
 
 WRITE8_MEMBER(qix_state::qix_paletteram_w)
 {
-	UINT8 old_data = m_paletteram[offset];
+	uint8_t old_data = m_paletteram[offset];
 
 	/* set the palette RAM value */
 	m_paletteram[offset] = data;
@@ -223,7 +223,7 @@ void qix_state::set_pen(int offs)
 	/* this conversion table should be about right. It gives a reasonable */
 	/* gray scale in the test screen, and the red, green and blue squares */
 	/* in the same screen are barely visible, as the manual requires. */
-	static const UINT8 table[16] =
+	static const uint8_t table[16] =
 	{
 		0x00,   /* value = 0, intensity = 0 */
 		0x12,   /* value = 0, intensity = 1 */
@@ -245,7 +245,7 @@ void qix_state::set_pen(int offs)
 
 	int bits, intensity, r, g, b;
 
-	UINT8 data = m_paletteram[offs];
+	uint8_t data = m_paletteram[offs];
 
 	/* compute R, G, B from the table */
 	intensity = (data >> 0) & 0x03;
@@ -280,14 +280,14 @@ MC6845_BEGIN_UPDATE( qix_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( qix_state::crtc_update_row )
 {
-	UINT32 *dest = &bitmap.pix32(y);
+	uint32_t *dest = &bitmap.pix32(y);
 	pen_t *pens = &m_pens[m_palette_bank << 8];
 
 	/* the memory is hooked up to the MA, RA lines this way */
 	offs_t offs = ((ma << 6) & 0xf800) | ((ra << 8) & 0x0700);
 	offs_t offs_xor = m_flip ? 0xffff : 0;
 
-	for (UINT16 x = 0; x < x_count * 8; x++)
+	for (uint16_t x = 0; x < x_count * 8; x++)
 		dest[x] = pens[m_videoram[(offs + x) ^ offs_xor]];
 }
 

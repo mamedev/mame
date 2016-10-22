@@ -51,7 +51,7 @@ device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_inter
 //  adam_expansion_slot_device - constructor
 //-------------------------------------------------
 
-adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ADAM_EXPANSION_SLOT, "ADAM expansion slot", tag, owner, clock, "adam_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),
@@ -122,7 +122,7 @@ std::string adam_expansion_slot_device::get_default_card_software()
 //  bd_r - buffered data read
 //-------------------------------------------------
 
-UINT8 adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+uint8_t adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (m_card != nullptr)
 	{
@@ -137,7 +137,7 @@ UINT8 adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, UINT
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (m_card != nullptr)
 	{

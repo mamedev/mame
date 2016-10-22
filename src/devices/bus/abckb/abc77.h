@@ -31,8 +31,8 @@ class abc77_device :  public device_t,
 {
 public:
 	// construction/destruction
-	abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -79,7 +79,7 @@ protected:
 	int m_hys;                      // hysteresis
 	int m_reset;                    // reset
 	int m_stb;                      // strobe
-	UINT8 m_j3;
+	uint8_t m_j3;
 
 	// timers
 	emu_timer *m_serial_timer;
@@ -91,7 +91,7 @@ class abc55_device :  public abc77_device
 {
 public:
 	// construction/destruction
-	abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

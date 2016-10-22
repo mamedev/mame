@@ -32,7 +32,6 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
 #include "machine/i8255.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -540,7 +539,7 @@ INPUT_PORTS_END
 /* ckongs coinage DIPs are spread across two input ports */
 CUSTOM_INPUT_MEMBER(scramble_state::ckongs_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 

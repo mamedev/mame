@@ -77,9 +77,9 @@
 
 struct rollext_polydata
 {
-	UINT32 tex_bottom;
-	UINT32 tex_left;
-	UINT32 pal;
+	uint32_t tex_bottom;
+	uint32_t tex_left;
+	uint32_t pal;
 };
 
 class rollext_renderer : public poly_manager<float, rollext_polydata, 4, 10000>
@@ -91,42 +91,42 @@ public:
 		m_fb = std::make_unique<bitmap_rgb32>(1024, 1024);
 	}
 
-	void render_texture_scan(INT32 scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid);
+	void render_texture_scan(int32_t scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid);
 
-	void set_texture_ram(UINT8* texture_ram);
-	void set_palette_ram(UINT16* palette_ram);
-	void process_display_list(UINT32* dispram);
+	void set_texture_ram(uint8_t* texture_ram);
+	void set_palette_ram(uint16_t* palette_ram);
+	void process_display_list(uint32_t* dispram);
 
 	void clear_fb();
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 private:
 	std::unique_ptr<bitmap_rgb32> m_fb;
 
-	UINT8 *m_texture_ram;
-	UINT16 *m_palette_ram;
+	uint8_t *m_texture_ram;
+	uint16_t *m_palette_ram;
 };
 
-void rollext_renderer::set_texture_ram(UINT8* texture_ram)
+void rollext_renderer::set_texture_ram(uint8_t* texture_ram)
 {
 	m_texture_ram = texture_ram;
 }
 
-void rollext_renderer::set_palette_ram(UINT16* palette_ram)
+void rollext_renderer::set_palette_ram(uint16_t* palette_ram)
 {
 	m_palette_ram = palette_ram;
 }
 
-void rollext_renderer::render_texture_scan(INT32 scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid)
+void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid)
 {
 	float u = extent.param[0].start;
 	float v = extent.param[1].start;
 	float du = extent.param[0].dpdx;
 	float dv = extent.param[1].dpdx;
 
-	UINT32 *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix32(scanline);
 
-	UINT32 texbot = extradata.tex_bottom;
-	UINT32 texleft = extradata.tex_left;
+	uint32_t texbot = extradata.tex_bottom;
+	uint32_t texleft = extradata.tex_left;
 
 	int palnum = extradata.pal;
 
@@ -135,9 +135,9 @@ void rollext_renderer::render_texture_scan(INT32 scanline, const extent_t &exten
 		int iu = (int)(u * 29.0f);
 		int iv = (int)(v * 29.0f);
 
-		UINT8 p = m_texture_ram[((texbot - iv) * 2048) + texleft + iu];
+		uint8_t p = m_texture_ram[((texbot - iv) * 2048) + texleft + iu];
 
-		UINT16 texel = m_palette_ram[(palnum * 256) + BYTE_XOR_BE(p)];
+		uint16_t texel = m_palette_ram[(palnum * 256) + BYTE_XOR_BE(p)];
 		int r = ((texel >> 10) & 0x1f) << 3;
 		int g = ((texel >> 5) & 0x1f) << 3;
 		int b = (texel & 0x1f) << 3;
@@ -149,7 +149,7 @@ void rollext_renderer::render_texture_scan(INT32 scanline, const extent_t &exten
 	}
 }
 
-void rollext_renderer::process_display_list(UINT32* disp_ram)
+void rollext_renderer::process_display_list(uint32_t* disp_ram)
 {
 	const rectangle& visarea = screen().visible_area();
 
@@ -220,8 +220,8 @@ void rollext_renderer::process_display_list(UINT32* disp_ram)
 
 		for (int j=0; j < 4; j++)
 		{
-			UINT32 ix = disp_ram[(ii + (j*0x10) + 0x4) / 4];
-			UINT32 iy = disp_ram[(ii + (j*0x10) + 0xc) / 4];
+			uint32_t ix = disp_ram[(ii + (j*0x10) + 0x4) / 4];
+			uint32_t iy = disp_ram[(ii + (j*0x10) + 0xc) / 4];
 
 			vert[j].x = (int)((u2f(ix) / 2.0f) + 256.0f);
 			vert[j].y = (int)((u2f(iy) / 2.0f) + 192.0f);
@@ -290,9 +290,9 @@ public:
 	}
 
 	required_device<tms32082_mp_device> m_maincpu;
-	required_shared_ptr<UINT32> m_palette_ram;
-	required_shared_ptr<UINT32> m_texture_mask;
-	required_shared_ptr<UINT32> m_disp_ram;
+	required_shared_ptr<uint32_t> m_palette_ram;
+	required_shared_ptr<uint32_t> m_texture_mask;
+	required_shared_ptr<uint32_t> m_disp_ram;
 	required_device<screen_device> m_screen;
 
 	DECLARE_READ32_MEMBER(a0000000_r);
@@ -301,7 +301,7 @@ public:
 
 	DECLARE_WRITE32_MEMBER(cmd_callback);
 
-	std::unique_ptr<UINT8[]> m_texture;
+	std::unique_ptr<uint8_t[]> m_texture;
 	std::unique_ptr<rollext_renderer> m_renderer;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
@@ -310,12 +310,12 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void preprocess_texture_data();
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 void rollext_state::preprocess_texture_data()
 {
-	UINT8 *rom = (UINT8*)memregion("texture")->base();
+	uint8_t *rom = (uint8_t*)memregion("texture")->base();
 
 	for (int j=0; j < 16384; j+=2)
 	{
@@ -335,19 +335,19 @@ void rollext_state::preprocess_texture_data()
 
 void rollext_state::video_start()
 {
-	m_texture = std::make_unique<UINT8[]>(0x2000000);
+	m_texture = std::make_unique<uint8_t[]>(0x2000000);
 
 	preprocess_texture_data();
 
 	m_renderer = std::make_unique<rollext_renderer>(*m_screen);
 	m_renderer->set_texture_ram(m_texture.get());
-	m_renderer->set_palette_ram((UINT16*)&m_palette_ram[0]);
+	m_renderer->set_palette_ram((uint16_t*)&m_palette_ram[0]);
 }
 
-UINT32 rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 #if 0
-	UINT16 *pal = (UINT16*)&m_palette_ram[0];
+	uint16_t *pal = (uint16_t*)&m_palette_ram[0];
 
 	int palnum = 31;
 	// 24,25,31 for basic font
@@ -356,12 +356,12 @@ UINT32 rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	int ii=0;
 	for (int j=0; j < 384; j++)
 	{
-		UINT32 *fb = &bitmap.pix32(j);
+		uint32_t *fb = &bitmap.pix32(j);
 		for (int i=0; i < 512; i++)
 		{
-			UINT8 p = m_texture[ii++];
+			uint8_t p = m_texture[ii++];
 
-			UINT16 rgb = pal[(palnum * 256) + BYTE_XOR_BE(p)];
+			uint16_t rgb = pal[(palnum * 256) + BYTE_XOR_BE(p)];
 			int r = ((rgb >> 10) & 0x1f) << 3;
 			int g = ((rgb >> 5) & 0x1f) << 3;
 			int b = (rgb & 0x1f) << 3;
@@ -389,7 +389,7 @@ READ32_MEMBER(rollext_state::a0000000_r)
 	{
 		case 0:         // ??
 		{
-			UINT32 data = 0x20200;
+			uint32_t data = 0x20200;
 
 			//data |= ioport("INPUTS1")->read();
 			//data |= 0xfff7fff7;
@@ -424,7 +424,7 @@ READ32_MEMBER(rollext_state::b0000000_r)
 
 WRITE32_MEMBER(rollext_state::cmd_callback)
 {
-	UINT32 command = data;
+	uint32_t command = data;
 
 	// PP0
 	if (command & 1)
@@ -434,7 +434,7 @@ WRITE32_MEMBER(rollext_state::cmd_callback)
 			// simulate PP behavior for now...
 			space.write_dword(0x00000084, 3);
 
-			UINT32 num = space.read_dword(0x90);
+			uint32_t num = space.read_dword(0x90);
 
 			int consume_num = num;
 			if (consume_num > 32)
@@ -444,7 +444,7 @@ WRITE32_MEMBER(rollext_state::cmd_callback)
 			printf("0x00000084 = %08X\n", space.read_dword(0x84));
 
 
-			UINT32 ra = 0x1000280;
+			uint32_t ra = 0x1000280;
 
 			/*
 			printf("FIFO push:\n");
@@ -456,7 +456,7 @@ WRITE32_MEMBER(rollext_state::cmd_callback)
 			    {
 			        for (int l=0; l < 4; l++)
 			        {
-			            UINT32 dd = m_program->read_dword(ra);
+			            uint32_t dd = m_program->read_dword(ra);
 			            ra += 4;
 
 			            printf("%08X(%f) ", dd, u2f(dd));
@@ -470,13 +470,13 @@ WRITE32_MEMBER(rollext_state::cmd_callback)
 			ra = 0x1000280;
 
 			int oldnum = space.read_dword(0x600ffffc);
-			UINT32 rb = 0x60000000 + (oldnum * 0x60);
+			uint32_t rb = 0x60000000 + (oldnum * 0x60);
 
 			for (int i=0; i < consume_num; i++)
 			{
 				for (int k=0; k < 24; k++)
 				{
-					UINT32 dd = space.read_dword(ra);
+					uint32_t dd = space.read_dword(ra);
 					ra += 4;
 
 					space.write_dword(rb, dd);

@@ -205,22 +205,22 @@ public:
 private:
 	void determine_bios_rom(device_t &device, const char *specbios);
 	void count_roms();
-	void fill_random(UINT8 *base, UINT32 length);
+	void fill_random(uint8_t *base, uint32_t length);
 	void handle_missing_file(const rom_entry *romp, std::string tried_file_names, chd_error chderr);
 	void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes);
-	void verify_length_and_hash(const char *name, UINT32 explength, const util::hash_collection &hashes);
+	void verify_length_and_hash(const char *name, uint32_t explength, const util::hash_collection &hashes);
 	void display_loading_rom_message(const char *name, bool from_list);
 	void display_rom_load_results(bool from_list);
 	void region_post_process(const char *rgntag, bool invert);
 	int open_rom_file(const char *regiontag, const rom_entry *romp, std::string &tried_file_names, bool from_list);
-	int rom_fread(UINT8 *buffer, int length, const rom_entry *parent_region);
+	int rom_fread(uint8_t *buffer, int length, const rom_entry *parent_region);
 	int read_rom_data(const rom_entry *parent_region, const rom_entry *romp);
 	void fill_rom_data(const rom_entry *romp);
 	void copy_rom_data(const rom_entry *romp);
 	void process_rom_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, device_t *device, bool from_list);
 	chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd);
 	void process_disk_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag);
-	void normalize_flags_for_device(running_machine &machine, const char *rgntag, UINT8 &width, endianness_t &endian);
+	void normalize_flags_for_device(running_machine &machine, const char *rgntag, uint8_t &width, endianness_t &endian);
 	void process_region_list();
 
 
@@ -233,8 +233,8 @@ private:
 
 	int             m_romsloaded;         /* current ROMs loaded count */
 	int             m_romstotal;          /* total number of ROMs to read */
-	UINT32          m_romsloadedsize;     /* total size of ROMs loaded so far */
-	UINT32          m_romstotalsize;      /* total size of ROMs to read */
+	uint32_t          m_romsloadedsize;     /* total size of ROMs loaded so far */
+	uint32_t          m_romstotalsize;      /* total size of ROMs to read */
 
 	std::unique_ptr<emu_file>  m_file;               /* current file */
 	std::vector<std::unique_ptr<open_chd>> m_chd_list;     /* disks */
@@ -248,7 +248,7 @@ private:
 
 /* ----- Helpers ----- */
 
-std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, osd_file::error &filerr);
+std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, uint32_t crc, const rom_entry *romp, osd_file::error &filerr);
 
 /* return pointer to the first ROM region within a source */
 const rom_entry *rom_first_region(const device_t &device);
@@ -263,7 +263,7 @@ const rom_entry *rom_first_file(const rom_entry *romp);
 const rom_entry *rom_next_file(const rom_entry *romp);
 
 /* return the expected size of a file given the ROM description */
-UINT32 rom_file_size(const rom_entry *romp);
+uint32_t rom_file_size(const rom_entry *romp);
 
 /* return the appropriate name for a rom region */
 std::string rom_region_name(const device_t &device, const rom_entry *romp);

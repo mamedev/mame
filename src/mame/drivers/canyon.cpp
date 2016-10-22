@@ -67,7 +67,7 @@ PALETTE_INIT_MEMBER(canyon_state, canyon)
 
 READ8_MEMBER(canyon_state::canyon_switches_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	if ((ioport("IN2")->read() >> (offset & 7)) & 1)
 		val |= 0x80;

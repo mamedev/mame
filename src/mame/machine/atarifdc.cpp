@@ -45,21 +45,21 @@
 
 struct atari_dsk_format
 {
-	UINT8 density;
-	UINT8 tracks;
-	UINT8 door;
-	UINT8 sta1;
-	UINT8 spt;
-	UINT8 doublesided;
-	UINT8 highdensity;
-	UINT8 seclen_hi;
-	UINT8 seclen_lo;
-	UINT8 status;
-	UINT8 sta2;
-	UINT8 sta3;
-	UINT8 sta4;
-	UINT8 cr;
-	UINT8 info[65+1];
+	uint8_t density;
+	uint8_t tracks;
+	uint8_t door;
+	uint8_t sta1;
+	uint8_t spt;
+	uint8_t doublesided;
+	uint8_t highdensity;
+	uint8_t seclen_hi;
+	uint8_t seclen_lo;
+	uint8_t status;
+	uint8_t sta2;
+	uint8_t sta3;
+	uint8_t sta4;
+	uint8_t cr;
+	uint8_t info[65+1];
 };
 
 /* combined with the size the image should have */
@@ -113,7 +113,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 	int id = floppy_get_drive(image);
 	int size, i;
 
-	m_drv[id].image = std::make_unique<UINT8[]>(MAXSIZE);
+	m_drv[id].image = std::make_unique<uint8_t[]>(MAXSIZE);
 	if (!m_drv[id].image)
 		return;
 
@@ -141,7 +141,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 
 
 	/* re allocate the buffer; we don't want to be too lazy ;) */
-	//m_drv[id].image = (UINT8*)image.image_realloc(m_drv[id].image, size);
+	//m_drv[id].image = (uint8_t*)image.image_realloc(m_drv[id].image, size);
 
 	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype returns "" :/
 	bool is_softlist_entry = image.software_entry() != nullptr;
@@ -351,9 +351,9 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
  * F->A                    128/256 byte CKS   bad sector table
  *
  *****************************************************************************/
-static void make_chksum(device_t *device,UINT8 * chksum, UINT8 data)
+static void make_chksum(device_t *device,uint8_t * chksum, uint8_t data)
 {
-	UINT8 newone;
+	uint8_t newone;
 	newone= *chksum + data;
 	if (newone < *chksum)
 		newone++;
@@ -386,7 +386,7 @@ void atari_fdc_device::clr_serin(int ser_delay)
 	pokey->serin_ready(ser_delay * 40);
 }
 
-void atari_fdc_device::add_serin(UINT8 data, int with_checksum)
+void atari_fdc_device::add_serin(uint8_t data, int with_checksum)
 {
 	m_serin_buff[m_serin_count++] = data;
 	if (with_checksum)
@@ -751,7 +751,7 @@ legacy_floppy_image_device *atari_fdc_device::atari_floppy_get_device_child(int 
 
 const device_type ATARI_FDC = &device_creator<atari_fdc_device>;
 
-atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ATARI_FDC, "Atari FDC", tag, owner, clock, "atari_fdc", __FILE__),
 	m_serout_count(0),
 	m_serout_offs(0),

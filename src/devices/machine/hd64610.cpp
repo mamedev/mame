@@ -98,7 +98,7 @@ inline void hd64610_device::set_irq_line()
 //  read_counter -
 //-------------------------------------------------
 
-inline UINT8 hd64610_device::read_counter(int counter)
+inline uint8_t hd64610_device::read_counter(int counter)
 {
 	return bcd_2_dec(m_regs[counter]);
 }
@@ -108,7 +108,7 @@ inline UINT8 hd64610_device::read_counter(int counter)
 //  write_counter -
 //-------------------------------------------------
 
-inline void hd64610_device::write_counter(int counter, UINT8 value)
+inline void hd64610_device::write_counter(int counter, uint8_t value)
 {
 	m_regs[counter] = dec_2_bcd(value);
 }
@@ -150,7 +150,7 @@ inline void hd64610_device::check_alarm()
 //  hd64610_device - constructor
 //-------------------------------------------------
 
-hd64610_device::hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd64610_device::hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HD64610, "HD64610", tag, owner, clock, "hd64610", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -286,7 +286,7 @@ WRITE_LINE_MEMBER( hd64610_device::h_w )
 
 READ8_MEMBER( hd64610_device::read )
 {
-	UINT8 data =  m_regs[offset & 0x0f];
+	uint8_t data =  m_regs[offset & 0x0f];
 
 	if (LOG) logerror("HD64610 '%s' Register %u Read %02x\n", tag(), offset, data);
 

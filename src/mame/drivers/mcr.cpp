@@ -292,11 +292,11 @@
 #include "dpoker.lh"
 
 
-static UINT8 input_mux;
-static UINT8 last_op4;
+static uint8_t input_mux;
+static uint8_t last_op4;
 
-static UINT8 dpoker_coin_status;
-static UINT8 dpoker_output;
+static uint8_t dpoker_coin_status;
+static uint8_t dpoker_output;
 
 
 
@@ -411,7 +411,7 @@ READ8_MEMBER(mcr_state::dpoker_ip0_r)
 	// d3: Coin-out Down
 	// d6: Coin-drop Hit
 	// d7: Coin-drop Release
-	UINT8 p0 = ioport("ssio:IP0")->read();
+	uint8_t p0 = ioport("ssio:IP0")->read();
 	p0 |= (dpoker_coin_status >> 1 & 1);
 	p0 ^= (p0 << 1 & 0x80) | dpoker_coin_status;
 	return p0;
@@ -642,7 +642,7 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
 READ8_MEMBER(mcr_state::nflfoot_ip2_r)
 {
 	/* bit 7 = J3-2 on IPU board = TXDA on SIO */
-	UINT8 val = m_sio_txda << 7;
+	uint8_t val = m_sio_txda << 7;
 
 	if (space.device().safe_pc() != 0x107)
 		logerror("%04X:ip2_r = %02X\n", space.device().safe_pc(), val);
@@ -1791,7 +1791,7 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_MIDWAY_SSIO_ADD("ssio")
+	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1868,7 +1868,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91490_snt, mcr_91490 )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_SQUAWK_N_TALK_ADD("snt")
+	MCFG_SOUND_ADD("snt", MIDWAY_SQUAWK_N_TALK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1907,7 +1907,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91490_tcs, mcr_91490 )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD("tcs")
+	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2036,13 +2036,9 @@ ROM_START( dpoker )
 	ROM_LOAD( "vppp.d6",      0x5000, 0x1000, CRC(b0023bf1) SHA1(77a57a42dd403ef56f334ca295b5b43e94b99598) )
 	ROM_LOAD( "vppp.d7",      0x6000, 0x1000, CRC(a4012f5a) SHA1(011e77a6634fbb02a6ae99fe6685c92f2fad3fee) )
 
-	// The sound board was missing in this pcb set, we'll use the roms from Kick as placeholder.
-	// Funnily enough, according to a cabinet recording, the sound is actually very similar to Kickman.
-	ROM_REGION( 0x10000, "ssio:cpu", 0 )
-	ROM_LOAD( "vssp.a7",      0x0000, 0x1000, BAD_DUMP CRC(9e35c02e) SHA1(92afd0126dcfb2d4401927b2cf261090e186b6fa) )
-	ROM_LOAD( "vssp.a8",      0x1000, 0x1000, BAD_DUMP CRC(ca2b7c28) SHA1(fdcca3b755822c045c3c321cccc3f58112e2ad11) )
-	ROM_LOAD( "vssp.a9",      0x2000, 0x1000, BAD_DUMP CRC(d1901551) SHA1(fd7d6059f8ac59f95ae6f8ef12fbfce7ed16ec12) )
-	ROM_LOAD( "vssp.a10",     0x3000, 0x1000, BAD_DUMP CRC(d36ddcdc) SHA1(2d3ec83b9fa5a9d309c393a0c3ee45f0ba8192c9) )
+	ROM_REGION( 0x10000, "ssio:cpu", ROMREGION_ERASEFF ) // a9 and a10 are unpopulated
+	ROM_LOAD( "vssp.a7",      0x0000, 0x1000, CRC(f78b2283) SHA1(b69f987112f82c92f5cf38ca2577195a4972cc47) )
+	ROM_LOAD( "vssp.a8",      0x1000, 0x1000, CRC(3f531bd0) SHA1(0e860bb5af83985b7143abdab5715f46c6a1e804) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "vpbg.g4",      0x0000, 0x1000, CRC(9fe9aad8) SHA1(f9174bcce3886548b8c18c5a06995d5c69ce5486) )
@@ -2930,7 +2926,7 @@ GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, mcr_state, solarfox,  R
 GAME( 1981, kick,     0,        mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, kickman,  kick,     mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, kickc,    kick,     mcr_90009,     kickc, mcr_state,    kick,      ROT90,                      "Midway", "Kick (cocktail)", MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, dpoker,   0,        mcr_90009_dp,  dpoker, mcr_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_dpoker )
+GAMEL(1985, dpoker,   0,        mcr_90009_dp,  dpoker, mcr_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_SUPPORTS_SAVE, layout_dpoker )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
 GAME( 1981, shollow,  0,        mcr_90010,     shollow, mcr_state,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", MACHINE_SUPPORTS_SAVE )

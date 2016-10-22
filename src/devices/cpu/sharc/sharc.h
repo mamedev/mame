@@ -25,49 +25,49 @@ enum SHARC_BOOT_MODE
 
 struct alignas(16) SHARC_DAG
 {
-	UINT32 i[8];
-	UINT32 m[8];
-	UINT32 b[8];
-	UINT32 l[8];
+	uint32_t i[8];
+	uint32_t m[8];
+	uint32_t b[8];
+	uint32_t l[8];
 };
 
 union SHARC_REG
 {
-	INT32 r;
+	int32_t r;
 	float f;
 };
 
 struct SHARC_DMA_REGS
 {
-	UINT32 control;
-	UINT32 int_index;
-	UINT32 int_modifier;
-	UINT32 int_count;
-	UINT32 chain_ptr;
-	UINT32 gen_purpose;
-	UINT32 ext_index;
-	UINT32 ext_modifier;
-	UINT32 ext_count;
+	uint32_t control;
+	uint32_t int_index;
+	uint32_t int_modifier;
+	uint32_t int_count;
+	uint32_t chain_ptr;
+	uint32_t gen_purpose;
+	uint32_t ext_index;
+	uint32_t ext_modifier;
+	uint32_t ext_count;
 };
 
 struct SHARC_LADDR
 {
-	UINT32 addr;
-	UINT32 code;
-	UINT32 loop_type;
+	uint32_t addr;
+	uint32_t code;
+	uint32_t loop_type;
 };
 
 struct SHARC_DMA_OP
 {
-	UINT32 src;
-	UINT32 dst;
-	UINT32 chain_ptr;
-	INT32 src_modifier;
-	INT32 dst_modifier;
-	INT32 src_count;
-	INT32 dst_count;
-	INT32 pmode;
-	INT32 chained_direction;
+	uint32_t src;
+	uint32_t dst;
+	uint32_t chain_ptr;
+	int32_t src_modifier;
+	int32_t dst_modifier;
+	int32_t src_count;
+	int32_t dst_count;
+	int32_t pmode;
+	int32_t chained_direction;
 	emu_timer *timer;
 	bool active;
 };
@@ -113,7 +113,7 @@ struct SHARC_DMA_OP
 
 #define SIGN_EXTEND6(x)             (((x) & 0x20) ? (0xffffffc0 | (x)) : (x))
 #define SIGN_EXTEND24(x)            (((x) & 0x800000) ? (0xff000000 | (x)) : (x))
-#define MAKE_EXTRACT_MASK(start_bit, length)    ((0xffffffff << start_bit) & (((UINT32)0xffffffff) >> (32 - (start_bit + length))))
+#define MAKE_EXTRACT_MASK(start_bit, length)    ((0xffffffff << start_bit) & (((uint32_t)0xffffffff) >> (32 - (start_bit + length))))
 
 #define OP_USERFLAG_COUNTER_LOOP            0x00000001
 #define OP_USERFLAG_COND_LOOP               0x00000002
@@ -143,14 +143,14 @@ class adsp21062_device : public cpu_device
 
 public:
 	// construction/destruction
-	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	// static configuration helpers
 	static void set_boot_mode(device_t &device, const SHARC_BOOT_MODE boot_mode) { downcast<adsp21062_device &>(device).m_boot_mode = boot_mode; }
 
 	void set_flag_input(int flag_num, int state);
-	void external_iop_write(UINT32 address, UINT32 data);
-	void external_dma_write(UINT32 address, UINT64 data);
+	void external_iop_write(uint32_t address, uint32_t data);
+	void external_dma_write(uint32_t address, uint64_t data);
 
 	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
 	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
@@ -249,21 +249,21 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 8; }
-	virtual UINT32 execute_max_cycles() const override { return 8; }
-	virtual UINT32 execute_input_lines() const override { return 32; }
+	virtual uint32_t execute_min_cycles() const override { return 8; }
+	virtual uint32_t execute_max_cycles() const override { return 8; }
+	virtual uint32_t execute_input_lines() const override { return 32; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ); }
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value) override;
-	virtual bool memory_readop(offs_t offset, int size, UINT64 &value) override;
+	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value) override;
+	virtual bool memory_readop(offs_t offset, int size, uint64_t &value) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 6; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 6; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	direct_read_data *m_direct;
 
@@ -274,8 +274,8 @@ private:
 	typedef void (adsp21062_device::*opcode_func)();
 	struct SHARC_OP
 	{
-		UINT32 op_mask;
-		UINT32 op_bits;
+		uint32_t op_mask;
+		uint32_t op_bits;
 		opcode_func handler;
 	};
 	static const SHARC_OP s_sharc_opcode_table[];
@@ -286,24 +286,24 @@ private:
 		{
 			struct
 			{
-				UINT32 az;
-				UINT32 av;
-				UINT32 an;
-				UINT32 ac;
-				UINT32 as;
-				UINT32 ai;
-				UINT32 mn;
-				UINT32 mv;
-				UINT32 mu;
-				UINT32 mi;
-				UINT32 sv;
-				UINT32 sz;
-				UINT32 ss;
-				UINT32 btf;
-				UINT32 af;
-				UINT32 cacc;
+				uint32_t az;
+				uint32_t av;
+				uint32_t an;
+				uint32_t ac;
+				uint32_t as;
+				uint32_t ai;
+				uint32_t mn;
+				uint32_t mv;
+				uint32_t mu;
+				uint32_t mi;
+				uint32_t sv;
+				uint32_t sz;
+				uint32_t ss;
+				uint32_t btf;
+				uint32_t af;
+				uint32_t cacc;
 			};
-			UINT64 flags64[8];
+			uint64_t flags64[8];
 		};
 	};
 
@@ -312,23 +312,23 @@ private:
 		SHARC_REG r[16];
 		SHARC_REG reg_alt[16];
 
-		UINT32 pc;
-		UINT64 mrf;
-		UINT64 mrb;
+		uint32_t pc;
+		uint64_t mrf;
+		uint64_t mrb;
 
-		UINT32 pcstack[32];
-		UINT32 lcstack[6];
-		UINT32 lastack[6];
-		UINT32 lstkp;
+		uint32_t pcstack[32];
+		uint32_t lcstack[6];
+		uint32_t lastack[6];
+		uint32_t lstkp;
 
-		UINT32 faddr;
-		UINT32 daddr;
-		UINT32 pcstk;
-		UINT32 pcstkp;
+		uint32_t faddr;
+		uint32_t daddr;
+		uint32_t pcstk;
+		uint32_t pcstkp;
 		SHARC_LADDR laddr;
-		UINT32 curlcntr;
-		UINT32 lcntr;
-		UINT8 extdma_shift;
+		uint32_t curlcntr;
+		uint32_t lcntr;
+		uint8_t extdma_shift;
 
 		/* Data Address Generator (DAG) */
 		SHARC_DAG dag1;     // (DM bus)
@@ -339,80 +339,80 @@ private:
 		SHARC_DMA_REGS dma[12];
 
 		/* System registers */
-		UINT32 mode1;
-		UINT32 mode2;
-		UINT32 astat;
-		UINT32 stky;
-		UINT32 irptl;
-		UINT32 imask;
-		UINT32 imaskp;
-		UINT32 ustat1;
-		UINT32 ustat2;
+		uint32_t mode1;
+		uint32_t mode2;
+		uint32_t astat;
+		uint32_t stky;
+		uint32_t irptl;
+		uint32_t imask;
+		uint32_t imaskp;
+		uint32_t ustat1;
+		uint32_t ustat2;
 
-		UINT32 flag[4];
+		uint32_t flag[4];
 
-		UINT32 syscon;
-		UINT32 sysstat;
+		uint32_t syscon;
+		uint32_t sysstat;
 
 		struct
 		{
-			UINT32 mode1;
-			UINT32 astat;
+			uint32_t mode1;
+			uint32_t astat;
 		} status_stack[5];
-		INT32 status_stkp;
+		int32_t status_stkp;
 
-		UINT64 px;
+		uint64_t px;
 
 		int icount;
-		UINT64 opcode;
+		uint64_t opcode;
 
-		UINT32 nfaddr;
+		uint32_t nfaddr;
 
-		INT32 idle;
-		INT32 irq_pending;
-		INT32 active_irq_num;
+		int32_t idle;
+		int32_t irq_pending;
+		int32_t active_irq_num;
 
 		SHARC_DMA_OP dma_op[12];
-		UINT32 dma_status;
+		uint32_t dma_status;
 
-		INT32 interrupt_active;
+		int32_t interrupt_active;
 
-		UINT32 iop_delayed_reg;
-		UINT32 iop_delayed_data;
+		uint32_t iop_delayed_reg;
+		uint32_t iop_delayed_data;
 		emu_timer *delayed_iop_timer;
 
-		UINT32 delay_slot1, delay_slot2;
+		uint32_t delay_slot1, delay_slot2;
 
-		INT32 systemreg_latency_cycles;
-		INT32 systemreg_latency_reg;
-		UINT32 systemreg_latency_data;
-		UINT32 systemreg_previous_data;
+		int32_t systemreg_latency_cycles;
+		int32_t systemreg_latency_reg;
+		uint32_t systemreg_latency_data;
+		uint32_t systemreg_previous_data;
 
-		UINT32 astat_old;
-		UINT32 astat_old_old;
-		UINT32 astat_old_old_old;
+		uint32_t astat_old;
+		uint32_t astat_old_old;
+		uint32_t astat_old_old_old;
 
-		UINT32 arg0;
-		UINT32 arg1;
-		UINT32 arg2;
-		UINT32 arg3;
+		uint32_t arg0;
+		uint32_t arg1;
+		uint32_t arg2;
+		uint32_t arg3;
 
-		UINT64 arg64;
-		UINT32 mode1_delay_data;
+		uint64_t arg64;
+		uint32_t mode1_delay_data;
 
 		ASTAT_DRC astat_drc;
 		ASTAT_DRC astat_drc_copy;
 		ASTAT_DRC astat_delay_copy;
-		UINT32 dreg_temp;
-		UINT32 dreg_temp2;
-		UINT32 jmpdest;
-		UINT32 temp_return;
+		uint32_t dreg_temp;
+		uint32_t dreg_temp2;
+		uint32_t jmpdest;
+		uint32_t temp_return;
 
 		float fp0;
 		float fp1;
 
-		UINT32 force_recompile;
-		UINT32 cache_dirty;
+		uint32_t force_recompile;
+		uint32_t cache_dirty;
 	};
 
 	sharc_internal_state* m_core;
@@ -448,43 +448,43 @@ private:
 	uml::code_handle *m_swap_r0_7;
 	uml::code_handle *m_swap_r8_15;
 
-	UINT16 *m_internal_ram_block0, *m_internal_ram_block1;
+	uint16_t *m_internal_ram_block0, *m_internal_ram_block1;
 
 	address_space *m_program;
 	address_space *m_data;
 	opcode_func m_sharc_op[512];
 
-	UINT16 m_internal_ram[2 * 0x10000]; // 2x 128KB
+	uint16_t m_internal_ram[2 * 0x10000]; // 2x 128KB
 
 	bool m_enable_drc;
 
-	inline void CHANGE_PC(UINT32 newpc);
-	inline void CHANGE_PC_DELAYED(UINT32 newpc);
-	void sharc_iop_delayed_w(UINT32 reg, UINT32 data, int cycles);
-	UINT32 sharc_iop_r(UINT32 address);
-	void sharc_iop_w(UINT32 address, UINT32 data);
-	UINT32 pm_read32(UINT32 address);
-	void pm_write32(UINT32 address, UINT32 data);
-	UINT64 pm_read48(UINT32 address);
-	void pm_write48(UINT32 address, UINT64 data);
-	UINT32 dm_read32(UINT32 address);
-	void dm_write32(UINT32 address, UINT32 data);
-	void schedule_chained_dma_op(int channel, UINT32 dma_chain_ptr, int chained_direction);
-	void schedule_dma_op(int channel, UINT32 src, UINT32 dst, int src_modifier, int dst_modifier, int src_count, int dst_count, int pmode);
+	inline void CHANGE_PC(uint32_t newpc);
+	inline void CHANGE_PC_DELAYED(uint32_t newpc);
+	void sharc_iop_delayed_w(uint32_t reg, uint32_t data, int cycles);
+	uint32_t sharc_iop_r(uint32_t address);
+	void sharc_iop_w(uint32_t address, uint32_t data);
+	uint32_t pm_read32(uint32_t address);
+	void pm_write32(uint32_t address, uint32_t data);
+	uint64_t pm_read48(uint32_t address);
+	void pm_write48(uint32_t address, uint64_t data);
+	uint32_t dm_read32(uint32_t address);
+	void dm_write32(uint32_t address, uint32_t data);
+	void schedule_chained_dma_op(int channel, uint32_t dma_chain_ptr, int chained_direction);
+	void schedule_dma_op(int channel, uint32_t src, uint32_t dst, int src_modifier, int dst_modifier, int src_count, int dst_count, int pmode);
 	void dma_op(int channel);
 	void sharc_dma_exec(int channel);
-	void add_systemreg_write_latency_effect(int sysreg, UINT32 data, UINT32 prev_data);
-	inline void swap_register(UINT32 *a, UINT32 *b);
+	void add_systemreg_write_latency_effect(int sysreg, uint32_t data, uint32_t prev_data);
+	inline void swap_register(uint32_t *a, uint32_t *b);
 	void systemreg_write_latency_effect();
-	UINT32 GET_UREG(int ureg);
-	void SET_UREG(int ureg, UINT32 data);
+	uint32_t GET_UREG(int ureg);
+	void SET_UREG(int ureg, uint32_t data);
 	void SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx);
-	void COMPUTE(UINT32 opcode);
+	void COMPUTE(uint32_t opcode);
 	void check_interrupts();
-	inline void PUSH_PC(UINT32 pc);
-	inline UINT32 POP_PC();
-	inline UINT32 TOP_PC();
-	inline void PUSH_LOOP(UINT32 addr, UINT32 code, UINT32 type, UINT32 count);
+	inline void PUSH_PC(uint32_t pc);
+	inline uint32_t POP_PC();
+	inline uint32_t TOP_PC();
+	inline void PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count);
 	inline void POP_LOOP();
 	inline void PUSH_STATUS_STACK();
 	inline void POP_STATUS_STACK();
@@ -549,7 +549,7 @@ private:
 	inline void compute_max(int rn, int rx, int ry);
 	inline void compute_neg(int rn, int rx);
 	inline void compute_not(int rn, int rx);
-	inline UINT32 SCALB(SHARC_REG rx, int ry);
+	inline uint32_t SCALB(SHARC_REG rx, int ry);
 	inline void compute_float(int rn, int rx);
 	inline void compute_fix(int rn, int rx);
 	inline void compute_fix_scaled(int rn, int rx, int ry);
@@ -571,8 +571,8 @@ private:
 	inline void compute_fabs(int rn, int rx);
 	inline void compute_mul_uuin(int rn, int rx, int ry);
 	inline void compute_mul_ssin(int rn, int rx, int ry);
-	inline UINT32 compute_mrf_plus_mul_ssin(int rx, int ry);
-	inline UINT32 compute_mrb_plus_mul_ssin(int rx, int ry);
+	inline uint32_t compute_mrf_plus_mul_ssin(int rx, int ry);
+	inline uint32_t compute_mrb_plus_mul_ssin(int rx, int ry);
 	inline void compute_fmul(int rn, int rx, int ry);
 	inline void compute_multi_mr_to_reg(int ai, int rk);
 	inline void compute_multi_reg_to_mr(int ai, int rk);
@@ -593,14 +593,14 @@ private:
 	/* internal compiler state */
 	struct compiler_state
 	{
-		UINT32 cycles;                             /* accumulated cycles */
-		UINT8  checkints;                          /* need to check interrupts before next instruction */
+		uint32_t cycles;                             /* accumulated cycles */
+		uint8_t  checkints;                          /* need to check interrupts before next instruction */
 		uml::code_label  labelnum;                 /* index for local labels */
 		struct
 		{
 			int counter;
 			int mode;
-			UINT32 data;
+			uint32_t data;
 		} mode1_delay;
 	};
 
@@ -612,7 +612,7 @@ private:
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
 	void static_generate_memory_accessor(MEM_ACCESSOR_TYPE type, const char *name, uml::code_handle *&handleptr);
-	void static_generate_exception(UINT8 exception, const char *name);
+	void static_generate_exception(uint8_t exception, const char *name);
 	void static_generate_push_pc();
 	void static_generate_pop_pc();
 	void static_generate_push_loop();
@@ -623,8 +623,8 @@ private:
 	void load_fast_iregs(drcuml_block *block);
 	void save_fast_iregs(drcuml_block *block);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, bool last_delayslot);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception);
-	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
+	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_unimplemented_compute(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_compute(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_if_condition(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int condition, int skip_label);
@@ -633,17 +633,17 @@ private:
 	void generate_call(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, bool delayslot);
 	void generate_jump(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, bool delayslot, bool loopabort, bool clearint);
 	void generate_loop_jump(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_write_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 data);
-	void generate_set_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 data);
-	void generate_clear_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 data);
-	void generate_toggle_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 data);
+	void generate_write_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data);
+	void generate_set_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data);
+	void generate_clear_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data);
+	void generate_toggle_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data);
 	void generate_read_ureg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int ureg, bool has_compute);
-	void generate_write_ureg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int ureg, bool imm, UINT32 data);
+	void generate_write_ureg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int ureg, bool imm, uint32_t data);
 	void generate_update_circular_buffer(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int g, int i);
 	void generate_astat_copy(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
 	bool if_condition_always_true(int condition);
-	UINT32 do_condition_astat_bits(int condition);
+	uint32_t do_condition_astat_bits(int condition);
 };
 
 

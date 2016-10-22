@@ -17,7 +17,7 @@
 
 const device_type MB14241 = &device_creator<mb14241_device>;
 
-mb14241_device::mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mb14241_device::mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MB14241, "MB14241 Data Shifter", tag, owner, clock, "mb14241", __FILE__), m_shift_data(0), m_shift_count(0)
 {
 }
@@ -64,7 +64,7 @@ WRITE8_MEMBER( mb14241_device::shift_count_w )
 
 WRITE8_MEMBER( mb14241_device::shift_data_w )
 {
-	m_shift_data = (m_shift_data >> 8) | ((UINT16)data << 7);
+	m_shift_data = (m_shift_data >> 8) | ((uint16_t)data << 7);
 }
 
 READ8_MEMBER( mb14241_device::shift_result_r )

@@ -97,20 +97,20 @@ READ16_MEMBER( fitfight_state::hotmindff_unk_r )
 
 READ16_MEMBER(fitfight_state::fitfight_700000_r)
 {
-	UINT16 data = m_fof_700000_data;
+	uint16_t data = m_fof_700000_data;
 	return (data << 2);
 }
 
 READ16_MEMBER(fitfight_state::histryma_700000_r)
 {
-	UINT16 data = (m_fof_700000_data & 0x00AA);
+	uint16_t data = (m_fof_700000_data & 0x00AA);
 	data |= ((m_fof_700000_data & 0x0055) >> 2);
 	return (data);
 }
 
 READ16_MEMBER(fitfight_state::bbprot_700000_r)
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	data  =  (m_fof_700000_data & 0x000b);
 	data |= ((m_fof_700000_data & 0x01d0) >> 2);
 	data |= ((m_fof_700000_data & 0x0004) << 6);
@@ -991,7 +991,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(fitfight_state,fitfight)
 {
-//  UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
+//  uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 //  mem16[0x0165B2/2] = 0x4e71; // for now so it boots
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::fitfight_700000_r),this));
 	m_bbprot_kludge = 0;
@@ -999,7 +999,7 @@ DRIVER_INIT_MEMBER(fitfight_state,fitfight)
 
 DRIVER_INIT_MEMBER(fitfight_state,histryma)
 {
-//  UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
+//  uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 //  mem16[0x017FDC/2] = 0x4e71; // for now so it boots
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::histryma_700000_r),this));
 	m_bbprot_kludge = 0;

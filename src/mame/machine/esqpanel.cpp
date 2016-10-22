@@ -26,7 +26,7 @@ const device_type ESQPANEL2x16_SQ1 = &device_creator<esqpanel2x16_sq1_device>;
 //  esqpanel_device - constructor
 //-------------------------------------------------
 
-esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
 	m_write_tx(*this),
@@ -71,7 +71,7 @@ void esqpanel_device::device_timer(emu_timer &timer, device_timer_id id, int par
 void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 {
 	receive_register_extract();
-	UINT8 data = get_received_char();
+	uint8_t data = get_received_char();
 
 //  if (data >= 0xe0) printf("Got %02x from motherboard (second %s)\n", data, m_bCalibSecondByte ? "yes" : "no");
 
@@ -172,7 +172,7 @@ void esqpanel_device::tra_callback()    // Tx send bit
 	m_write_tx(transmit_register_get_data_bit());
 }
 
-void esqpanel_device::xmit_char(UINT8 data)
+void esqpanel_device::xmit_char(uint8_t data)
 {
 //  printf("Panel: xmit %02x\n", data);
 
@@ -193,7 +193,7 @@ void esqpanel_device::xmit_char(UINT8 data)
 	}
 }
 
-void esqpanel_device::set_analog_value(offs_t offset, UINT16 value)
+void esqpanel_device::set_analog_value(offs_t offset, uint16_t value)
 {
 	m_write_analog(offset, value);
 }
@@ -209,7 +209,7 @@ machine_config_constructor esqpanel1x22_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( esqpanel1x22 );
 }
 
-esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	esqpanel_device(mconfig, ESQPANEL1x22, "Ensoniq front panel with 1x22 VFD", tag, owner, clock, "esqpanel122", __FILE__),
 	m_vfd(*this, "vfd")
 {
@@ -227,7 +227,7 @@ machine_config_constructor esqpanel2x40_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( esqpanel2x40 );
 }
 
-esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	esqpanel_device(mconfig, ESQPANEL2x40, "Ensoniq front panel with 2x40 VFD", tag, owner, clock, "esqpanel240", __FILE__),
 	m_vfd(*this, "vfd")
 {
@@ -244,7 +244,7 @@ machine_config_constructor esqpanel2x16_sq1_device::device_mconfig_additions() c
 	return MACHINE_CONFIG_NAME( esqpanel2x16_sq1 );
 }
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
-esqpanel2x16_sq1_device::esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+esqpanel2x16_sq1_device::esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	esqpanel_device(mconfig, ESQPANEL2x16_SQ1, "Ensoniq front panel with 2x16 LCD", tag, owner, clock, "esqpanel216_sq1", __FILE__),
 	m_vfd(*this, "vfd")
 {

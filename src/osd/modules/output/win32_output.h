@@ -79,7 +79,7 @@
 
 struct copydata_id_string
 {
-	UINT32      id;                 // ID that was requested
+	uint32_t      id;                 // ID that was requested
 	char        string[1];          // string array containing the data
 };
 

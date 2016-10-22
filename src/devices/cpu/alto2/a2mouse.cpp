@@ -106,9 +106,9 @@ enum {
  *
  * @return lookup value from madr_a32
  */
-UINT16 alto2_cpu_device::mouse_read()
+uint16_t alto2_cpu_device::mouse_read()
 {
-	UINT16 data;
+	uint16_t data;
 
 	m_mouse.latch = (m_mouse.latch << 1) & MLATCH;
 	data = m_madr_a32[m_mouse.latch];
@@ -145,8 +145,8 @@ UINT16 alto2_cpu_device::mouse_read()
  */
 INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
 {
-	INT16 ox = static_cast<INT16>(oldval);
-	INT16 nx = static_cast<INT16>(newval);
+	int16_t ox = static_cast<int16_t>(oldval);
+	int16_t nx = static_cast<int16_t>(newval);
 	m_mouse.dx = std::min(std::max(0, m_mouse.dx + (nx - ox)), 639);
 }
 
@@ -159,8 +159,8 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
  */
 INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
 {
-	INT16 oy = static_cast<INT16>(oldval);
-	INT16 ny = static_cast<INT16>(newval);
+	int16_t oy = static_cast<int16_t>(oldval);
+	int16_t ny = static_cast<int16_t>(newval);
 	m_mouse.dy = std::min(std::max(0, m_mouse.dy + (ny - oy)), 824);
 }
 
@@ -203,7 +203,7 @@ static const prom_load_t pl_madr_a32 =
 	/* shift */ 0,
 	/* dmap */  DMAP_REVERSE_0_3,           // reverse D0-D3 to D3-D0
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 /**

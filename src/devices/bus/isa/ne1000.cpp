@@ -16,7 +16,7 @@ machine_config_constructor ne1000_device::device_mconfig_additions() const {
 	return MACHINE_CONFIG_NAME(ne1000_config);
 }
 
-ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, NE1000, "NE1000 Network Adapter", tag, owner, clock, "ne1000", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_dp8390(*this, "dp8390d"),
@@ -26,7 +26,7 @@ ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, dev
 
 void ne1000_device::device_start() {
 	char mac[7];
-	UINT32 num = rand();
+	uint32_t num = rand();
 	memset(m_prom, 0x57, 16);
 	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning

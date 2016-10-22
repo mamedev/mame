@@ -27,8 +27,8 @@ class nes_vaus_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_vaus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_vaus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -38,13 +38,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_bit34() override;
-	virtual void write(UINT8 data) override;
+	virtual uint8_t read_bit34() override;
+	virtual void write(uint8_t data) override;
 
 	required_ioport m_paddle;
 	required_ioport m_button;
-	UINT8 m_start_conv;
-	UINT32 m_latch;
+	uint8_t m_start_conv;
+	uint32_t m_latch;
 };
 
 
@@ -54,11 +54,11 @@ class nes_vausfc_device : public nes_vaus_device
 {
 public:
 	// construction/destruction
-	nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual UINT8 read_bit34() override { return 0; }
-	virtual UINT8 read_exp(offs_t offset) override;
+	virtual uint8_t read_bit34() override { return 0; }
+	virtual uint8_t read_exp(offs_t offset) override;
 };
 
 

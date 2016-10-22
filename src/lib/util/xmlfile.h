@@ -81,7 +81,7 @@ struct xml_parse_options
 {
 	xml_parse_error *       error;
 	void                    (*init_parser)(struct XML_ParserStruct *parser);
-	UINT32                  flags;
+	uint32_t                  flags;
 };
 
 

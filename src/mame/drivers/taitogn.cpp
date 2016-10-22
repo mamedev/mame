@@ -410,14 +410,14 @@ private:
 	required_device<intelfsh16_device> m_sndflash2;
 
 	bool m_has_zoom;
-	UINT8 m_control;
-	UINT16 m_control2;
-	UINT8 m_control3;
+	uint8_t m_control;
+	uint16_t m_control2;
+	uint8_t m_control3;
 	int m_v;
 
-	UINT8 m_n_znsecsel;
+	uint8_t m_n_znsecsel;
 
-	UINT8 m_coin_info;
+	uint8_t m_coin_info;
 
 	int m_cat702_1_dataout;
 	int m_cat702_2_dataout;

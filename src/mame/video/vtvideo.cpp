@@ -73,7 +73,7 @@ const device_type VT100_VIDEO = &device_creator<vt100_video_device>;
 const device_type RAINBOW_VIDEO = &device_creator<rainbow_video_device>;
 
 
-vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_video_interface(mconfig, *this)
 	, m_read_ram(*this)
@@ -84,13 +84,13 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, device_typ
 }
 
 
-vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vt100_video_device(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__)
 {
 }
 
 
-rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vt100_video_device(mconfig, RAINBOW_VIDEO, "Rainbow Video", tag, owner, clock, "rainbow_video", __FILE__)
 {
 }
@@ -356,9 +356,9 @@ WRITE8_MEMBER(vt100_video_device::brightness_w)
 
 
 
-void vt100_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type)
+void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type)
 {
-	UINT8 line = 0;
+	uint8_t line = 0;
 	int bit = 0, prevbit, invert = 0, j;
 	int double_width = (display_type == 2) ? 1 : 0;
 
@@ -421,15 +421,15 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, i
 
 void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 addr = 0;
+	uint16_t addr = 0;
 	int line = 0;
 	int xpos = 0;
 	int ypos = 0;
-	UINT8 code;
+	uint8_t code;
 	int x = 0;
-	UINT8 scroll_region = 1; // binary 1
-	UINT8 display_type = 3;  // binary 11
-	UINT16 temp = 0;
+	uint8_t scroll_region = 1; // binary 1
+	uint8_t display_type = 3;  // binary 11
+	uint16_t temp = 0;
 
 	if (m_read_ram(0) != 0x7f)
 		return;
@@ -502,23 +502,23 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 // 0 = display char. in BOLD      (encoded as 16 in display_type) LOW ACTIVE
 // 0 = display char. w. BLINK     (encoded as 32 in display_type) LOW ACTIVE
 // 0 = display char. w. UNDERLINE (encoded as 64 in display_type) LOW ACTIVE
-void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type)
+void rainbow_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type)
 {
-	UINT16 x_preset = x << 3; // x_preset = x * 9 (= 132 column mode)
+	uint16_t x_preset = x << 3; // x_preset = x * 9 (= 132 column mode)
 	x_preset += x;
 
 	if (m_columns == 80)
 		x_preset += x; //        x_preset = x * 10 (80 column mode)
 
-	UINT16 y_preset;
+	uint16_t y_preset;
 
-	UINT16 CHARPOS_y_preset = y << 3; // CHARPOS_y_preset = y * 10;
+	uint16_t CHARPOS_y_preset = y << 3; // CHARPOS_y_preset = y * 10;
 	CHARPOS_y_preset += y;
 	CHARPOS_y_preset += y;
 
-	UINT16 DOUBLE_x_preset = x_preset << 1; // 18 for 132 column mode, else 20 (x_preset * 2)
+	uint16_t DOUBLE_x_preset = x_preset << 1; // 18 for 132 column mode, else 20 (x_preset * 2)
 
-	UINT8 line = 0;
+	uint8_t line = 0;
 	int bit = 0, j = 0;
 	int fg_intensity;
 	int back_intensity, back_default_intensity;
@@ -691,16 +691,16 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 // ****** RAINBOW ******
 void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 addr = 0;
-	UINT16 attr_addr = 0;
+	uint16_t addr = 0;
+	uint16_t attr_addr = 0;
 	int line = 0;
 	int xpos = 0;
 	int ypos = 0;
-	UINT8 code;
+	uint8_t code;
 	int x = 0;
-	UINT8 scroll_region = 0;  // DEFAULT TO 0 = NOT PART OF scroll_region
-	UINT8 display_type = 3;  // NORMAL DISPLAY - binary 11
-	UINT16 temp = 0;
+	uint8_t scroll_region = 0;  // DEFAULT TO 0 = NOT PART OF scroll_region
+	uint8_t display_type = 3;  // NORMAL DISPLAY - binary 11
+	uint16_t temp = 0;
 
 	if (m_read_ram(0) != 0xff) // video uninitialized?
 		return;

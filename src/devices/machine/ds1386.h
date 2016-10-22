@@ -81,7 +81,7 @@ class ds1386_device : public device_t,
 					  public device_nvram_interface
 {
 public:
-	ds1386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, size_t size);
+	ds1386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, size_t size);
 
 	DECLARE_WRITE8_MEMBER( data_w );
 	DECLARE_READ8_MEMBER( data_r );
@@ -171,20 +171,20 @@ protected:
 	emu_timer *m_inta_timer;
 	emu_timer *m_intb_timer;
 
-	std::unique_ptr<UINT8[]> m_ram;
-	optional_region_ptr<UINT8> m_default_data;
+	std::unique_ptr<uint8_t[]> m_ram;
+	optional_region_ptr<uint8_t> m_default_data;
 
-	UINT8	m_hundredths;
-	UINT8	m_seconds;
-	UINT8	m_minutes;
-	UINT8	m_minutes_alarm;
-	UINT8	m_hours;
-	UINT8	m_hours_alarm;
-	UINT8	m_days;
-	UINT8	m_days_alarm;
-	UINT8	m_date;
-	UINT8	m_months_enables;
-	UINT8	m_years;
+	uint8_t	m_hundredths;
+	uint8_t	m_seconds;
+	uint8_t	m_minutes;
+	uint8_t	m_minutes_alarm;
+	uint8_t	m_hours;
+	uint8_t	m_hours_alarm;
+	uint8_t	m_days;
+	uint8_t	m_days_alarm;
+	uint8_t	m_date;
+	uint8_t	m_months_enables;
+	uint8_t	m_years;
 
 	const size_t m_ram_size;
 };
@@ -193,14 +193,14 @@ class ds1386_8k_device : public ds1386_device
 {
 public:
 	// construction/destruction
-	ds1386_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds1386_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ds1386_32k_device : public ds1386_device
 {
 public:
 	// construction/destruction
-	ds1386_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds1386_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // device type definition

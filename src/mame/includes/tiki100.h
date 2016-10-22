@@ -80,7 +80,7 @@ public:
 	required_device<tiki100_bus_t> m_exp;
 	required_memory_region m_rom;
 	required_memory_region m_prom;
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 	required_ioport_array<12> m_y;
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
@@ -88,7 +88,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mrq_r );
 	DECLARE_WRITE8_MEMBER( mrq_w );
@@ -131,9 +131,9 @@ public:
 	bool m_vire;
 
 	// video state
-	UINT8 m_scroll;
-	UINT8 m_mode;
-	UINT8 m_palette_val;
+	uint8_t m_scroll;
+	uint8_t m_mode;
+	uint8_t m_palette_val;
 
 	// keyboard state
 	int m_keylatch;

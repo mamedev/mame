@@ -18,12 +18,13 @@ DIP Locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/bking.h"
 #include "cpu/m6805/m6805.h"
+#include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "includes/bking.h"
+#include "sound/volt_reg.h"
 
 
 READ8_MEMBER(bking_state::bking_sndnmi_disable_r)
@@ -62,7 +63,7 @@ WRITE8_MEMBER(bking_state::bking3_addr_h_w)
 
 READ8_MEMBER(bking_state::bking3_extrarom_r)
 {
-	UINT8 *rom = memregion("user2")->base();
+	uint8_t *rom = memregion("user2")->base();
 	return rom[m_addr_h * 256 + m_addr_l];
 }
 
@@ -481,20 +482,21 @@ static MACHINE_CONFIG_START( bking, bking_state )
 	MCFG_PALETTE_INIT_OWNER(bking_state, bking)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_device, write_signed8))
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bking_state, port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bking3, bking )

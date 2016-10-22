@@ -86,7 +86,7 @@ ROM_END
 //  readbyte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT8 sed1330_device::readbyte(offs_t address)
+inline uint8_t sed1330_device::readbyte(offs_t address)
 {
 	return space().read_byte(address);
 }
@@ -96,7 +96,7 @@ inline UINT8 sed1330_device::readbyte(offs_t address)
 //  writebyte - write a byte at the given address
 //-------------------------------------------------
 
-inline void sed1330_device::writebyte(offs_t address, UINT8 data)
+inline void sed1330_device::writebyte(offs_t address, uint8_t data)
 {
 	space().write_byte(address, data);
 }
@@ -138,7 +138,7 @@ inline void sed1330_device::increment_csr()
 //  sed1330_device - constructor
 //-------------------------------------------------
 
-sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SED1330, "SED1330", tag, owner, clock, "sed1330", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -278,7 +278,7 @@ WRITE8_MEMBER( sed1330_device::command_w )
 
 READ8_MEMBER( sed1330_device::data_r )
 {
-	UINT8 data = readbyte(m_csr);
+	uint8_t data = readbyte(m_csr);
 
 	if (LOG) logerror("SED1330 '%s' Memory Read %02x from %04x\n", tag(), data, m_csr);
 
@@ -567,7 +567,7 @@ WRITE8_MEMBER( sed1330_device::data_w )
 //  draw_text_scanline -
 //-------------------------------------------------
 
-void sed1330_device::draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 va)
+void sed1330_device::draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va)
 {
 	int sx, x;
 
@@ -608,13 +608,13 @@ void sed1330_device::draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &c
 //  draw_graphics_scanline -
 //-------------------------------------------------
 
-void sed1330_device::draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 va)
+void sed1330_device::draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va)
 {
 	int sx, x;
 
 	for (sx = 0; sx < m_cr; sx++)
 	{
-		UINT8 data = readbyte(va++);
+		uint8_t data = readbyte(va++);
 
 		for (x = 0; x < m_fx; x++)
 		{
@@ -646,10 +646,10 @@ void sed1330_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect
 	{
 		for (y = 0; y < m_sl1; y++)
 		{
-			UINT16 sad1 = m_sad1 + ((y / m_fy) * m_ap);
-			UINT16 sad2 = m_sad2 + (y * m_ap);
-			UINT16 sad3 = m_sad3 + ((y / m_fy) * m_ap);
-			UINT16 sad4 = m_sad4 + (y * m_ap);
+			uint16_t sad1 = m_sad1 + ((y / m_fy) * m_ap);
+			uint16_t sad2 = m_sad2 + (y * m_ap);
+			uint16_t sad3 = m_sad3 + ((y / m_fy) * m_ap);
+			uint16_t sad4 = m_sad4 + (y * m_ap);
 
 			// draw graphics display page 2 scanline
 			draw_graphics_scanline(bitmap, cliprect, y, sad2);
@@ -671,7 +671,7 @@ void sed1330_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 sed1330_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sed1330_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_d)
 	{

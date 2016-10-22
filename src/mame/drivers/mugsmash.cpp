@@ -150,7 +150,7 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 #if USE_FAKE_INPUT_PORTS
 READ16_MEMBER(mugsmash_state::mugsmash_input_ports_r)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	switch (offset)
 	{

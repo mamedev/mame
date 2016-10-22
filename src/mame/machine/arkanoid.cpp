@@ -108,7 +108,7 @@ void arkanoid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		timer_68705_increment(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in arkanoid_state::device_timer");
+		assert_always(false, "Unknown id in arkanoid_state::device_timer");
 	}
 }
 
@@ -144,7 +144,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_68705_port_c_r)
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_c_w)
 {
 	m_portC_internal = data|0xF0;
-	UINT8 changed_m_portC_out = (m_portC_out^(m_portC_internal|(~m_ddrC)));
+	uint8_t changed_m_portC_out = (m_portC_out^(m_portC_internal|(~m_ddrC)));
 	m_portC_out = (m_portC_internal|(~m_ddrC));
 
 	/* bits 0 and 1 are inputs, should never be set as outputs here. if they are, ignore them. */
@@ -176,7 +176,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_c_w)
 {
 	if ((data|0xF0)^m_ddrC) // if ddr changed, recalculate the port c output
 	{
-		UINT8 changed_m_portC_out = (m_portC_out^(m_portC_internal|(~(data|0xF0))));
+		uint8_t changed_m_portC_out = (m_portC_out^(m_portC_internal|(~(data|0xF0))));
 		m_portC_out = (m_portC_internal|(~(data|0xF0)));
 
 		/* bits 0 and 1 are inputs, should never be set as outputs here. if they are, ignore them. */
@@ -291,7 +291,7 @@ TO DO (2006.09.12) :
 /* Kludge for some bootlegs that read this address */
 READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f000_r)
 {
-	UINT8 arkanoid_bootleg_val = 0x00;
+	uint8_t arkanoid_bootleg_val = 0x00;
 
 	switch (m_bootleg_id)
 	{
@@ -333,7 +333,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f000_r)
 /* Kludge for some bootlegs that read this address */
 READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f002_r)
 {
-	UINT8 arkanoid_bootleg_val = 0x00;
+	uint8_t arkanoid_bootleg_val = 0x00;
 
 	switch (m_bootleg_id)
 	{
@@ -682,9 +682,9 @@ READ8_MEMBER(arkanoid_state::block2_bootleg_f000_r)
 /* Kludge for some bootlegs that read this address */
 READ8_MEMBER(arkanoid_state::arkanoid_bootleg_d008_r)
 {
-	UINT8 arkanoid_bootleg_d008_bit[8];
-	UINT8 arkanoid_bootleg_d008_val;
-	UINT8 arkanoid_paddle_value = ioport("MUX")->read();
+	uint8_t arkanoid_bootleg_d008_bit[8];
+	uint8_t arkanoid_bootleg_d008_val;
+	uint8_t arkanoid_paddle_value = ioport("MUX")->read();
 	int b;
 
 	arkanoid_bootleg_d008_bit[4] = arkanoid_bootleg_d008_bit[6] = arkanoid_bootleg_d008_bit[7] = 0;  /* untested bits */

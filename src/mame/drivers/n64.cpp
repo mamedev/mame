@@ -30,7 +30,7 @@ public:
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(n64_cart);
-	void mempak_format(UINT8* pak);
+	void mempak_format(uint8_t* pak);
 	image_init_result disk_load(device_image_interface &image);
 	void disk_unload(device_image_interface &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( n64dd );
@@ -244,7 +244,7 @@ static INPUT_PORTS_START( n64 )
 
 INPUT_PORTS_END
 
-void n64_mess_state::mempak_format(UINT8* pak)
+void n64_mess_state::mempak_format(uint8_t* pak)
 {
 	unsigned char pak_header[] =
 	{
@@ -296,7 +296,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 {
 	int i, length;
 	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
-	UINT8 *cart = memregion("user2")->base();
+	uint8_t *cart = memregion("user2")->base();
 
 	if (image.software_entry() == nullptr)
 	{
@@ -313,10 +313,10 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 	{
 		for (i = 0; i < length; i += 4)
 		{
-			UINT8 b1 = cart[i + 0];
-			UINT8 b2 = cart[i + 1];
-			UINT8 b3 = cart[i + 2];
-			UINT8 b4 = cart[i + 3];
+			uint8_t b1 = cart[i + 0];
+			uint8_t b2 = cart[i + 1];
+			uint8_t b3 = cart[i + 2];
+			uint8_t b4 = cart[i + 3];
 			cart[i + 0] = b3;
 			cart[i + 1] = b4;
 			cart[i + 2] = b1;
@@ -327,10 +327,10 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 	{
 		for (i = 0; i < length; i += 4)
 		{
-			UINT8 b1 = cart[i + 0];
-			UINT8 b2 = cart[i + 1];
-			UINT8 b3 = cart[i + 2];
-			UINT8 b4 = cart[i + 3];
+			uint8_t b1 = cart[i + 0];
+			uint8_t b2 = cart[i + 1];
+			uint8_t b3 = cart[i + 2];
+			uint8_t b4 = cart[i + 3];
 			cart[i + 0] = b4;
 			cart[i + 1] = b3;
 			cart[i + 2] = b2;
@@ -346,7 +346,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 	if(battery_image)
 	{
 		//printf("Loading\n");
-		UINT8 data[0x30800];
+		uint8_t data[0x30800];
 		battery_image->battery_load(data, 0x30800, 0x00);
 		if (m_sram != nullptr)
 		{
@@ -371,14 +371,14 @@ MACHINE_START_MEMBER(n64_mess_state,n64dd)
 {
 	machine_start();
 	machine().device<n64_periphs>("rcp")->dd_present = true;
-	UINT8 *ipl = memregion("ddipl")->base();
+	uint8_t *ipl = memregion("ddipl")->base();
 
 	for (int i = 0; i < 0x400000; i += 4)
 	{
-		UINT8 b1 = ipl[i + 0];
-		UINT8 b2 = ipl[i + 1];
-		UINT8 b3 = ipl[i + 2];
-		UINT8 b4 = ipl[i + 3];
+		uint8_t b1 = ipl[i + 0];
+		uint8_t b2 = ipl[i + 1];
+		uint8_t b3 = ipl[i + 2];
+		uint8_t b4 = ipl[i + 3];
 		ipl[i + 0] = b1;
 		ipl[i + 1] = b2;
 		ipl[i + 2] = b3;

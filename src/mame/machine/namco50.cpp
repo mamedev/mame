@@ -163,7 +163,7 @@ READ8_MEMBER( namco_50xx_device::R2_r )
 
 WRITE8_MEMBER( namco_50xx_device::O_w )
 {
-	UINT8 out = (data & 0x0f);
+	uint8_t out = (data & 0x0f);
 	if (data & 0x10)
 		m_portO = (m_portO & 0x0f) | (out << 4);
 	else
@@ -205,7 +205,7 @@ WRITE_LINE_MEMBER(namco_50xx_device::read_request)
 
 READ8_MEMBER( namco_50xx_device::read )
 {
-	UINT8 res = m_portO;
+	uint8_t res = m_portO;
 
 	read_request(0);
 
@@ -239,7 +239,7 @@ ROM_END
 
 const device_type NAMCO_50XX = &device_creator<namco_50xx_device>;
 
-namco_50xx_device::namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_50xx_device::namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_50XX, "Namco 50xx", tag, owner, clock, "namco50", __FILE__),
 	m_cpu(*this, "mcu"),
 	m_latched_cmd(0),

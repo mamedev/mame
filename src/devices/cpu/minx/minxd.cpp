@@ -79,7 +79,7 @@ static const char *const s_mnemonic[] = {
 #define _OVER  DASMFLAG_STEP_OVER
 #define _OUT   DASMFLAG_STEP_OUT
 
-static const UINT32 s_flags[] = {
+static const uint32_t s_flags[] = {
 	0, 0, 0, 0, 0, 0, _OVER, _OVER, _OVER, _OVER, _OVER,
 	_OVER, _OVER, _OVER, _OVER, _OVER, _OVER, _OVER, _OVER,
 	_OVER, _OVER, _OVER, _OVER, _OVER, _OVER, _OVER, _OVER,
@@ -94,9 +94,9 @@ static const UINT32 s_flags[] = {
 };
 
 struct minxdasm {
-	UINT8   mnemonic;
-	UINT8   argument1;
-	UINT8   argument2;
+	uint8_t   mnemonic;
+	uint8_t   argument1;
+	uint8_t   argument2;
 };
 
 static const minxdasm mnemonic[256] = {
@@ -423,9 +423,9 @@ case OP1:   dst += sprintf( dst, "%c$%02X", fill, op1 ); break;
 CPU_DISASSEMBLE( minx )
 {
 	const minxdasm *instr;
-	UINT8 op, op1;
-	INT8  ofs8;
-	UINT16 ea;
+	uint8_t op, op1;
+	int8_t  ofs8;
+	uint16_t ea;
 	int pos = 0;
 	char *dst = buffer;
 

@@ -97,9 +97,9 @@ class apricot_expansion_slot_device : public device_t, public device_slot_interf
 {
 public:
 	// construction/destruction
-	apricot_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apricot_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	apricot_expansion_slot_device(const machine_config &mconfig, device_type type, const char *name,
-		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -115,7 +115,7 @@ class apricot_expansion_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apricot_expansion_bus_device();
 
 	template<class _Object> static devcb_base &set_dma1_handler(device_t &device, _Object object)

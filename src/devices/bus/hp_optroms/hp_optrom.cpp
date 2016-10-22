@@ -18,13 +18,13 @@ const device_type HP_OPTROM_SLOT = &device_creator<hp_optrom_slot_device>;
 // +---------------------+
 // |hp_optrom_cart_device|
 // +---------------------+
-hp_optrom_cart_device::hp_optrom_cart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+hp_optrom_cart_device::hp_optrom_cart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_card_interface(mconfig, *this)
 {
 }
 
-hp_optrom_cart_device::hp_optrom_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+hp_optrom_cart_device::hp_optrom_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, HP_OPTROM_CART, "HP9845 optional ROM cartridge", tag, owner, clock, "hp_optrom_cart", __FILE__),
 		device_slot_card_interface(mconfig, *this)
 {
@@ -33,7 +33,7 @@ hp_optrom_cart_device::hp_optrom_cart_device(const machine_config &mconfig, cons
 // +---------------------+
 // |hp_optrom_slot_device|
 // +---------------------+
-hp_optrom_slot_device::hp_optrom_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+hp_optrom_slot_device::hp_optrom_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, HP_OPTROM_SLOT, "HP9845 optional ROM Slot", tag, owner, clock, "hp_optrom_slot", __FILE__),
 		device_image_interface(mconfig, *this),
 		device_slot_interface(mconfig, *this),
@@ -98,7 +98,7 @@ image_init_result hp_optrom_slot_device::call_load()
 		logerror("hp_optrom: base_addr = %06x end_addr = %06x\n" , base_addr , end_addr);
 
 		m_content.resize(length * 2);
-		UINT8 *buffer = m_content.data();
+		uint8_t *buffer = m_content.data();
 		memcpy(buffer , get_software_region("rom") , length * 2);
 
 		// Install ROM in address space of every CPU

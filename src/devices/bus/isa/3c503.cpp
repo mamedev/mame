@@ -18,7 +18,7 @@ machine_config_constructor el2_3c503_device::device_mconfig_additions() const {
 	return MACHINE_CONFIG_NAME(el2_3c503_config);
 }
 
-el2_3c503_device::el2_3c503_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
+el2_3c503_device::el2_3c503_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: device_t(mconfig, EL2_3C503, "3C503 Network Adapter", tag, owner, clock, "el2_3c503", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_dp8390(*this, "dp8390d"),
@@ -28,7 +28,7 @@ el2_3c503_device::el2_3c503_device(const machine_config& mconfig, const char* ta
 
 void el2_3c503_device::device_start() {
 	char mac[7];
-	UINT32 num = rand();
+	uint32_t num = rand();
 	memset(m_prom, 0x57, 16);
 	sprintf(mac, "\x02\x60\x8c%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	memcpy(m_prom, mac, 6);
@@ -46,7 +46,7 @@ void el2_3c503_device::device_start() {
 			chan++;
 			idcfr >>= 1;
 		}
-		m_isa->set_dma_channel(chan, this, FALSE);
+		m_isa->set_dma_channel(chan, this, false);
 	}
 }
 
@@ -100,12 +100,12 @@ void el2_3c503_device::eop_w(int state) {
 	}
 }
 
-UINT8 el2_3c503_device::dack_r(int line) {
+uint8_t el2_3c503_device::dack_r(int line) {
 	set_drq(CLEAR_LINE);
 	return el2_3c503_mem_read(m_regs.da++);
 }
 
-void el2_3c503_device::dack_w(int line, UINT8 data) {
+void el2_3c503_device::dack_w(int line, uint8_t data) {
 	set_drq(CLEAR_LINE);
 	el2_3c503_mem_write(m_regs.da++, data);
 }
@@ -295,12 +295,12 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_mem_write) {
 	el2_3c503_mem_write(offset, data);
 }
 
-UINT8 el2_3c503_device::el2_3c503_mem_read(offs_t offset) {
+uint8_t el2_3c503_device::el2_3c503_mem_read(offs_t offset) {
 	if((offset < 8*1024) || (offset >= 16*1024)) return 0xff;
 	return m_board_ram[offset - (8*1024)];
 }
 
-void el2_3c503_device::el2_3c503_mem_write(offs_t offset, UINT8 data) {
+void el2_3c503_device::el2_3c503_mem_write(offs_t offset, uint8_t data) {
 	if((offset < 8*1024) || (offset >= 16*1024)) return;
 	m_board_ram[offset - (8*1024)] = data;
 }

@@ -74,11 +74,11 @@ public:
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
-	UINT8 *m_p_vram;
-	UINT8 *m_p_chargen;
+	uint8_t *m_p_vram;
+	uint8_t *m_p_chargen;
 private:
-	UINT8 m_4c;
-	UINT8 m_4e;
+	uint8_t m_4c;
+	uint8_t m_4e;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -261,7 +261,7 @@ WRITE8_MEMBER( unior_state::scroll_w )
 I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
+	uint8_t gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
 
 	if(linecount == 8)
 		gfx = 0;
@@ -275,7 +275,7 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 	if (rvv)
 		gfx ^= 0xff;
 
-	for(UINT8 i=0;i<6;i++)
+	for(uint8_t i=0;i<6;i++)
 		bitmap.pix32(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
 }
 

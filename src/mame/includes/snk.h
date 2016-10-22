@@ -35,10 +35,10 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_tx_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_tx_videoram;
 
 	int m_countryc_trackball;
 	int m_last_value[2];
@@ -59,15 +59,15 @@ public:
 	int m_sp16_scrolly;
 	int m_sp32_scrollx;
 	int m_sp32_scrolly;
-	UINT8 m_sprite_split_point;
+	uint8_t m_sprite_split_point;
 	int m_num_sprites;
 	int m_yscroll_mask;
-	UINT32 m_bg_tile_offset;
-	UINT32 m_tx_tile_offset;
+	uint32_t m_bg_tile_offset;
+	uint32_t m_tx_tile_offset;
 	int m_is_psychos;
 
-	UINT8 m_drawmode_table[16];
-	UINT8 m_empty_tile[16*16];
+	uint8_t m_drawmode_table[16];
+	uint8_t m_empty_tile[16*16];
 	int m_hf_posy;
 	int m_hf_posx;
 	int m_tc16_posy;
@@ -185,19 +185,19 @@ public:
 	DECLARE_VIDEO_START(psychos);
 	DECLARE_VIDEO_START(snk_3bpp_shadow);
 	DECLARE_VIDEO_START(snk_4bpp_shadow);
-	UINT32 screen_update_marvins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ikari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_fitegolf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_marvins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ikari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fitegolf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sgladiat_sndirq_update_callback);
 	TIMER_CALLBACK_MEMBER(sndirq_update_callback);
 	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_2);
 	void marvins_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int scrollx, const int scrolly, const int from, const int to);
 	void tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll);
-	void ikari_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int start, const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum );
-	void tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,  const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum, const int hw_xflip, const int from, const int to);
+	void ikari_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int start, const int xscroll, const int yscroll, const uint8_t *source, const int gfxnum );
+	void tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,  const int xscroll, const int yscroll, const uint8_t *source, const int gfxnum, const int hw_xflip, const int from, const int to);
 	int hardflags_check(int num);
 	int hardflags_check8(int num);
 	int turbofront_check(int small, int num);

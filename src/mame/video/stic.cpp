@@ -17,7 +17,7 @@ const device_type STIC = &device_creator<stic_device>;
 //  stic_device - constructor
 //-------------------------------------------------
 
-stic_device::stic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+stic_device::stic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 				device_t(mconfig, STIC, "STIC (Standard Television Interface Chip) Video Chip", tag, owner, clock, "stic", __FILE__),
 				m_grom(*this, "grom"),
 				m_x_scale(1),
@@ -145,7 +145,7 @@ const tiny_rom_entry *stic_device::device_rom_region() const
 
 /* initialized to non-zero, because we divide by it */
 
-void stic_device::intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+void stic_device::intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
 	int w, h;
 
@@ -159,7 +159,7 @@ void stic_device::intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 colo
 			bitmap.pix16(y + h, x + w) = color;
 }
 
-UINT32 stic_device::intv_get_pixel(bitmap_ind16 &bitmap, int x, int y)
+uint32_t stic_device::intv_get_pixel(bitmap_ind16 &bitmap, int x, int y)
 {
 	return GET_COLOR(bitmap.pix16(y * m_y_scale, x * m_x_scale));
 }
@@ -170,9 +170,9 @@ void stic_device::intv_plot_box(bitmap_ind16 &bitmap, int x, int y, int w, int h
 }
 
 
-int stic_device::sprites_collide(int spriteNum1, int spriteNum2)
+bool stic_device::sprites_collide(int spriteNum1, int spriteNum2)
 {
-	INT16 x0, y0, w0, h0, x1, y1, w1, h1, x2, y2, w2, h2;
+	int16_t x0, y0, w0, h0, x1, y1, w1, h1, x2, y2, w2, h2;
 
 	intv_sprite_type* s1 = &m_sprite[spriteNum1];
 	intv_sprite_type* s2 = &m_sprite[spriteNum2];
@@ -188,7 +188,7 @@ int stic_device::sprites_collide(int spriteNum1, int spriteNum2)
 
 	if ((x1 >= x2 + w2) || (y1 >= y2 + h2) ||
 		(x2 >= x1 + w1) || (y2 >= y1 + h1))
-		return FALSE;
+		return false;
 
 	// iterate over the intersecting bits to see if any touch
 	x0 = std::max(x1, x2);
@@ -205,11 +205,11 @@ int stic_device::sprites_collide(int spriteNum1, int spriteNum2)
 		{
 			if (m_sprite_buffers[spriteNum1][x0 + x1][y0 + y1] &&
 				m_sprite_buffers[spriteNum2][x0 + x2][y0 + y2])
-				return TRUE;
+				return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 void stic_device::determine_sprite_collisions()
@@ -238,13 +238,13 @@ void stic_device::determine_sprite_collisions()
 
 void stic_device::render_sprites()
 {
-	INT32 cardMemoryLocation, pixelSize;
-	INT32 spritePixelHeight;
-	INT32 nextMemoryLocation;
-	INT32 nextData;
-	INT32 nextX;
-	INT32 nextY;
-	INT32 xInc;
+	int32_t cardMemoryLocation, pixelSize;
+	int32_t spritePixelHeight;
+	int32_t nextMemoryLocation;
+	int32_t nextData;
+	int32_t nextX;
+	int32_t nextY;
+	int32_t xInc;
 
 	for (int i = 0; i < STIC_MOBS; i++)
 	{
@@ -279,9 +279,9 @@ void stic_device::render_sprites()
 	}
 }
 
-void stic_device::render_line(bitmap_ind16 &bitmap, UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor)
+void stic_device::render_line(bitmap_ind16 &bitmap, uint8_t nextByte, uint16_t x, uint16_t y, uint8_t fgcolor, uint8_t bgcolor)
 {
-	UINT32 color;
+	uint32_t color;
 
 	for (int i = 0; i < STIC_CARD_WIDTH; i++)
 	{
@@ -291,7 +291,7 @@ void stic_device::render_line(bitmap_ind16 &bitmap, UINT8 nextByte, UINT16 x, UI
 	}
 }
 
-void stic_device::render_colored_squares(bitmap_ind16 &bitmap, UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3)
+void stic_device::render_colored_squares(bitmap_ind16 &bitmap, uint16_t x, uint16_t y, uint8_t color0, uint8_t color1, uint8_t color2, uint8_t color3)
 {
 	intv_plot_box(bitmap, x, y, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color0);
 	intv_plot_box(bitmap, x + STIC_CSQM_WIDTH * STIC_X_SCALE, y, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color1);
@@ -301,9 +301,9 @@ void stic_device::render_colored_squares(bitmap_ind16 &bitmap, UINT16 x, UINT16 
 
 void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 {
-	INT16 w, h, nextx, nexty;
-	UINT8 csPtr = 0;
-	UINT16 nextCard;
+	int16_t w, h, nextx, nexty;
+	uint8_t csPtr = 0;
+	uint16_t nextCard;
 
 	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + m_row_delay) * STIC_Y_SCALE;
 			h < STIC_BACKTAB_HEIGHT;
@@ -318,11 +318,11 @@ void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 			// colored squares mode
 			if ((nextCard & (STIC_CSTM_FG3|STIC_CSTM_SEL)) == STIC_CSTM_FG3)
 			{
-				UINT8 csColor = m_stic_registers[STIC_CSR + csPtr];
-				UINT8 color0 = nextCard & STIC_CSQM_A;
-				UINT8 color1 = (nextCard & STIC_CSQM_B) >> 3;
-				UINT8 color2 = (nextCard & STIC_CSQM_C) >> 6;
-				UINT8 color3 = ((nextCard & STIC_CSQM_D2) >> 11) |
+				uint8_t csColor = m_stic_registers[STIC_CSR + csPtr];
+				uint8_t color0 = nextCard & STIC_CSQM_A;
+				uint8_t color1 = (nextCard & STIC_CSQM_B) >> 3;
+				uint8_t color2 = (nextCard & STIC_CSQM_C) >> 6;
+				uint8_t color3 = ((nextCard & STIC_CSQM_D2) >> 11) |
 				((nextCard & (STIC_CSQM_D10)) >> 9);
 				render_colored_squares(bitmap, nextx, nexty,
 										(color0 == 7 ? csColor : (color0 | FOREGROUND_BIT)),
@@ -333,9 +333,9 @@ void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 			//color stack mode
 			else
 			{
-				UINT8 isGrom;
-				UINT16 memoryLocation, fgcolor, bgcolor;
-				UINT8* memory;
+				uint8_t isGrom;
+				uint16_t memoryLocation, fgcolor, bgcolor;
+				uint8_t* memory;
 
 				//advance the color pointer, if necessary
 				if (nextCard & STIC_CSTM_ADV)
@@ -369,10 +369,10 @@ void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 
 void stic_device::render_fg_bg_mode(bitmap_ind16 &bitmap)
 {
-	INT16 w, h, nextx, nexty;
-	UINT8 isGrom, fgcolor, bgcolor;
-	UINT16 nextCard, memoryLocation;
-	UINT8* memory;
+	int16_t w, h, nextx, nexty;
+	uint8_t isGrom, fgcolor, bgcolor;
+	uint16_t nextCard, memoryLocation;
+	uint8_t* memory;
 
 	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + m_row_delay) * STIC_Y_SCALE;
 			h < STIC_BACKTAB_HEIGHT;
@@ -410,12 +410,12 @@ void stic_device::render_fg_bg_mode(bitmap_ind16 &bitmap)
 
 void stic_device::copy_sprites_to_background(bitmap_ind16 &bitmap)
 {
-	UINT8 width, currentPixel;
-	UINT8 borderCollision, foregroundCollision;
-	UINT8 spritePixelHeight, x, y;
-	INT16 leftX, nextY;
-	INT16 leftBorder, rightBorder, topBorder, bottomBorder;
-	INT32 nextX;
+	uint8_t width, currentPixel;
+	uint8_t borderCollision, foregroundCollision;
+	uint8_t spritePixelHeight, x, y;
+	int16_t leftX, nextY;
+	int16_t leftBorder, rightBorder, topBorder, bottomBorder;
+	int32_t nextX;
 
 	for (int i = STIC_MOBS - 1; i >= 0; i--)
 	{
@@ -423,8 +423,8 @@ void stic_device::copy_sprites_to_background(bitmap_ind16 &bitmap)
 		if (s->xpos == 0 || (!s->coll && !s->visible))
 			continue;
 
-		borderCollision = FALSE;
-		foregroundCollision = FALSE;
+		borderCollision = false;
+		foregroundCollision = false;
 
 		spritePixelHeight = (s->quady ? 4 : 1) * (s->doubley ? 2 : 1) * (s->doubleyres ? 2 : 1) * STIC_CARD_HEIGHT;
 		width = (s->doublex ? 2 : 1) * STIC_CARD_WIDTH;
@@ -451,7 +451,7 @@ void stic_device::copy_sprites_to_background(bitmap_ind16 &bitmap)
 				if ((nextX < leftBorder) || (nextX > rightBorder) ||
 					(nextY < topBorder) || (nextY > bottomBorder))
 				{
-					borderCollision = TRUE;
+					borderCollision = true;
 					continue;
 				}
 
@@ -460,7 +460,7 @@ void stic_device::copy_sprites_to_background(bitmap_ind16 &bitmap)
 				//check for foreground collision
 				if (currentPixel & FOREGROUND_BIT)
 				{
-					foregroundCollision = TRUE;
+					foregroundCollision = true;
 					if (s->behind_foreground)
 						continue;
 				}
@@ -967,7 +967,7 @@ WRITE16_MEMBER( stic_device::gram_write )
 
 
 
-UINT32 stic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t stic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

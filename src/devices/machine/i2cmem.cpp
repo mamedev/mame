@@ -69,7 +69,7 @@ const device_type I2CMEM = &device_creator<i2cmem_device>;
 //  i2cmem_device - constructor
 //-------------------------------------------------
 
-i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, I2CMEM, "I2C Memory", tag, owner, clock, "i2cmem", __FILE__),
 		device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
@@ -98,7 +98,7 @@ i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, de
 
 void i2cmem_device::device_start()
 {
-	m_data = std::make_unique<UINT8 []>(m_data_size);
+	m_data = std::make_unique<uint8_t []>(m_data_size);
 	m_page.resize( m_page_size );
 
 	save_item( NAME(m_scl) );

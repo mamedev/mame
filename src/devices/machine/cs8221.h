@@ -44,7 +44,7 @@ class cs8221_device : public device_t
 {
 public:
 	// construction/destruction
-	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_READ8_MEMBER( data_r );
@@ -65,12 +65,12 @@ private:
 
 	// internal state
 	//address_space *m_space;
-	//UINT8 *m_isa;
-	//UINT8 *m_bios;
-	//UINT8 *m_ram;
+	//uint8_t *m_isa;
+	//uint8_t *m_bios;
+	//uint8_t *m_ram;
 
 	// address selection
-	UINT8 m_address;
+	uint8_t m_address;
 	bool m_address_valid;
 
 	const char *m_cputag;
@@ -78,7 +78,7 @@ private:
 	const char *m_biostag;
 
 
-	UINT8 m_registers[0x10];
+	uint8_t m_registers[0x10];
 };
 
 

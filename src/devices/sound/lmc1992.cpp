@@ -138,7 +138,7 @@ inline void lmc1992_device::execute_command(int addr, int data)
 //  lmc1992_device - constructor
 //-------------------------------------------------
 
-lmc1992_device::lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lmc1992_device::lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LMC1992, "LMC1992", tag, owner, clock, "lmc1992", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
@@ -218,9 +218,9 @@ WRITE_LINE_MEMBER( lmc1992_device::enable_w )
 {
 	if ((m_enable == 0) && (state == 1))
 	{
-		UINT8 device_addr = (m_si & 0xc000) >> 14;
-		UINT8 addr = (m_si & 0x3800) >> 11;
-		UINT8 data = (m_si & 0x07e0) >> 5;
+		uint8_t device_addr = (m_si & 0xc000) >> 14;
+		uint8_t addr = (m_si & 0x3800) >> 11;
+		uint8_t data = (m_si & 0x07e0) >> 5;
 
 		if (device_addr == MICROWIRE_DEVICE_ADDRESS)
 		{

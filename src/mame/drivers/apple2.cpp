@@ -137,8 +137,8 @@ public:
 	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(apple2);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -169,8 +169,8 @@ private:
 	double m_joystick_x2_time;
 	double m_joystick_y2_time;
 
-	UINT16 m_lastchar, m_strobe;
-	UINT8 m_transchar;
+	uint16_t m_lastchar, m_strobe;
+	uint8_t m_transchar;
 	bool m_anykeydown;
 
 	int m_inh_slot;
@@ -179,7 +179,7 @@ private:
 	bool m_page2;
 	bool m_an0, m_an1, m_an2, m_an3;
 
-	UINT8 *m_ram_ptr;
+	uint8_t *m_ram_ptr;
 	int m_ram_size;
 
 	int m_inh_bank;
@@ -189,7 +189,7 @@ private:
 	device_a2bus_card_interface *m_slotdevice[8];
 
 	void do_io(address_space &space, int offset);
-	UINT8 read_floatingbus();
+	uint8_t read_floatingbus();
 };
 
 /***************************************************************************
@@ -366,7 +366,7 @@ PALETTE_INIT_MEMBER(napple2_state, apple2)
 	m_video->palette_init_apple2(palette);
 }
 
-UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
 	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
@@ -427,7 +427,7 @@ UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-UINT32 napple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t napple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
 	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
@@ -576,7 +576,7 @@ READ8_MEMBER(napple2_state::c000_r)
 
 		case 0x10:  // reads any key down, clears strobe
 			{
-				UINT8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 				m_strobe = 0;
 				return rv;
 			}
@@ -765,7 +765,7 @@ WRITE8_MEMBER(napple2_state::inh_w)
 }
 
 // floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
-UINT8 napple2_state::read_floatingbus()
+uint8_t napple2_state::read_floatingbus()
 {
 	enum
 	{
@@ -955,7 +955,7 @@ READ_LINE_MEMBER(napple2_state::ay3600_control_r)
 	return CLEAR_LINE;
 }
 
-static const UINT8 a2_key_remap[0x32][4] =
+static const uint8_t a2_key_remap[0x32][4] =
 {
 /*    norm shft ctrl both */
 	{ 0x33,0x23,0x33,0x23 },    /* 3 #     00     */
