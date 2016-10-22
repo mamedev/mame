@@ -368,48 +368,18 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 
 
 //============================================================
-//  remove_cache_target - remove an active cache target
-//============================================================
-
-void shaders::remove_cache_target(cache_target *cache)
-{
-	if (cache == nullptr)
-		return;
-
-	for (auto it = m_cache_target_list.begin(); it != m_cache_target_list.end(); it++)
-	{
-		if ((*it).get() == cache)
-		{
-			m_cache_target_list.erase(it);
-			break;
-		}
-	}
-}
-
-
-//============================================================
 //  remove_render_target - remove an active target
 //============================================================
 
-void shaders::remove_render_target(texture_info *texture)
+void shaders::remove_render_target(int source_width, int source_height, uint32_t screen_index)
 {
-	remove_render_target(find_render_target(texture));
-}
-
-void shaders::remove_render_target(int source_width, int source_height, uint32_t screen_index, uint32_t page_index)
-{
-	remove_render_target(find_render_target(source_width, source_height, screen_index, page_index));
+	remove_render_target(find_render_target(source_width, source_height, screen_index));
 }
 
 void shaders::remove_render_target(d3d_render_target *rt)
 {
 	if (rt == nullptr)
 		return;
-
-	int screen_index = rt->screen_index;
-	int other_page = 1 - rt->page_index;
-	int width = rt->width;
-	int height = rt->height;
 
 	for (auto it = m_render_target_list.begin(); it != m_render_target_list.end(); it++)
 	{
@@ -419,11 +389,6 @@ void shaders::remove_render_target(d3d_render_target *rt)
 			break;
 		}
 	}
-
-	remove_cache_target(find_cache_target(screen_index, width, height));
-
-	// Remove other double-buffered page (if it exists)
-	remove_render_target(width, height, screen_index, other_page);
 }
 
 
@@ -859,6 +824,7 @@ void shaders::begin_draw()
 		return;
 	}
 
+	curr_screen = 0;
 	curr_effect = default_effect;
 
 	default_effect->set_technique("ScreenTechnique");
@@ -939,48 +905,13 @@ void shaders::blit(
 //  shaders::find_render_target
 //============================================================
 
-d3d_render_target* shaders::find_render_target(texture_info *texture)
-{
-	uint32_t screen_index_data = (uint32_t)texture->get_texinfo().osddata;
-	uint32_t screen_index = screen_index_data >> 1;
-	uint32_t page_index = screen_index_data & 1;
-
-	return find_render_target(texture->get_width(), texture->get_height(), screen_index, page_index);
-}
-
-
-//============================================================
-//  shaders::find_render_target
-//============================================================
-
-d3d_render_target* shaders::find_render_target(int source_width, int source_height, uint32_t screen_index, uint32_t page_index)
+d3d_render_target* shaders::find_render_target(int source_width, int source_height, uint32_t screen_index)
 {
 	for (auto it = m_render_target_list.begin(); it != m_render_target_list.end(); it++)
 	{
 		if ((*it)->width == source_width &&
 			(*it)->height == source_height &&
-			(*it)->screen_index == screen_index &&
-			(*it)->page_index == page_index)
-		{
-			return (*it).get();
-		}
-	}
-
-	return nullptr;
-}
-
-
-//============================================================
-//  shaders::find_cache_target
-//============================================================
-
-cache_target *shaders::find_cache_target(uint32_t screen_index, int width, int height)
-{
-	for (auto it = m_cache_target_list.begin(); it != m_cache_target_list.end(); it++)
-	{
-		if ((*it)->screen_index == screen_index &&
-			(*it)->width == width &&
-			(*it)->height == height)
+			(*it)->screen_index == screen_index)
 		{
 			return (*it).get();
 		}
@@ -1128,7 +1059,7 @@ int shaders::defocus_pass(d3d_render_target *rt, int source_index, poly_info *po
 	return next_index;
 }
 
-int shaders::phosphor_pass(d3d_render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum)
+int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1141,7 +1072,7 @@ int shaders::phosphor_pass(d3d_render_target *rt, cache_target *ct, int source_i
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LastPass", ct->texture);
+	curr_effect->set_texture("LastPass", rt->cache_texture);
 	curr_effect->set_bool("Passthrough", false);
 
 	next_index = rt->next_index(next_index);
@@ -1154,7 +1085,7 @@ int shaders::phosphor_pass(d3d_render_target *rt, cache_target *ct, int source_i
 	curr_effect->set_bool("Passthrough", true);
 
 	// Avoid changing targets due to page flipping
-	blit(ct->target, true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->cache_surface, true, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1401,11 +1332,17 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 	auto win = d3d->assert_window();
 
-	if (PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != nullptr)
+	if (PRIMFLAG_GET_SCREENTEX(poly->flags()))
 	{
+		if (curr_texture == nullptr)
+		{
+			osd_printf_verbose("Direct3D: No texture\n");
+			return;
+		}
+
 		curr_screen = curr_screen < num_screens ? curr_screen : 0;
 
-		curr_render_target = find_render_target(curr_texture);
+		curr_render_target = find_render_target(curr_texture->get_width(), curr_texture->get_height(), curr_screen);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1413,8 +1350,6 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			osd_printf_verbose("Direct3D: No raster render target\n");
 			return;
 		}
-
-		cache_target *ct = find_cache_target(rt->screen_index, curr_texture->get_width(), curr_texture->get_height());
 
 		int next_index = 0;
 
@@ -1424,7 +1359,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = deconverge_pass(rt, next_index, poly, vertnum); // handled in bgfx
 		next_index = defocus_pass(rt, next_index, poly, vertnum); // 1st pass
 		next_index = defocus_pass(rt, next_index, poly, vertnum); // 2nd pass
-		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
+		next_index = phosphor_pass(rt, next_index, poly, vertnum);
 
 		// create bloom textures
 		int phosphor_index = next_index;
@@ -1450,13 +1385,15 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	}
 	else if (PRIMFLAG_GET_VECTOR(poly->flags()))
 	{
+		curr_screen = curr_screen < num_screens ? curr_screen : 0;
+
 		int source_width = int(poly->prim_width() + 0.5f);
 		int source_height = int(poly->prim_height() + 0.5f);
 		if (win->swap_xy())
 		{
 			std::swap(source_width, source_height);
 		}
-		curr_render_target = find_render_target(source_width, source_height, 0, 0);
+		curr_render_target = find_render_target(source_width, source_height, curr_screen);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1474,6 +1411,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		{
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
+
+		curr_screen++;
 	}
 	else if (PRIMFLAG_GET_VECTORBUF(poly->flags()))
 	{
@@ -1485,7 +1424,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		{
 			std::swap(source_width, source_height);
 		}
-		curr_render_target = find_render_target(source_width, source_height, 0, 0);
+		curr_render_target = find_render_target(source_width, source_height, curr_screen);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1494,15 +1433,13 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			return;
 		}
 
-		cache_target *ct = find_cache_target(rt->screen_index, rt->width, rt->height);
-
 		int next_index = 0;
 
 		next_index = vector_buffer_pass(rt, next_index, poly, vertnum);
 		next_index = deconverge_pass(rt, next_index, poly, vertnum);
 		next_index = defocus_pass(rt, next_index, poly, vertnum); // 1st pass
 		next_index = defocus_pass(rt, next_index, poly, vertnum); // 2nd pass
-		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
+		next_index = phosphor_pass(rt, next_index, poly, vertnum);
 
 		// create bloom textures
 		int phosphor_index = next_index;
@@ -1558,26 +1495,10 @@ void shaders::end_draw()
 
 
 //============================================================
-//  shaders::add_cache_target - register a cache target
-//============================================================
-
-bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height, int screen_index)
-{
-	auto target = std::make_unique<cache_target>();
-
-	if (!target->init(d3d, source_width, source_height, target_width, target_height, screen_index))
-		return false;
-
-	m_cache_target_list.push_back(std::move(target));
-
-	return true;
-}
-
-//============================================================
 //  shaders::get_texture_target
 //============================================================
 
-d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_info *texture)
+d3d_render_target* shaders::get_texture_target(render_primitive *prim, int width, int height, int screen)
 {
 	if (!enabled())
 	{
@@ -1586,6 +1507,9 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_i
 
 	auto win = d3d->assert_window();
 
+	int source_width = width;
+	int source_height = height;
+	int source_screen = screen;
 	int target_width = int(prim->get_full_quad_width() + 0.5f);
 	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
@@ -1596,24 +1520,25 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_i
 	}
 
 	// find render target and check if the size of the target quad has changed
-	d3d_render_target *target = find_render_target(texture);
+	d3d_render_target *target = find_render_target(source_width, source_height, source_screen);
 	if (target != nullptr)
 	{
-		if (PRIMFLAG_GET_SCREENTEX(prim->flags))
+		// check if the size of the screen quad has changed
+		if (target->target_width != target_width || target->target_height != target_height)
 		{
-			// check if the size of the screen quad has changed
-			if (target->target_width != target_width || target->target_height != target_height)
-			{
-				osd_printf_verbose("Direct3D: Get texture target - invalid size\n");
-				return nullptr;
-			}
+			osd_printf_verbose("Direct3D: Get texture target - invalid size\n");
+			return nullptr;
 		}
+	}
+	else
+	{
+		osd_printf_verbose("Direct3D: Get texture target - not found - %dx%d:%d\n", source_width, source_height, source_screen);
 	}
 
 	return target;
 }
 
-d3d_render_target* shaders::get_vector_target(render_primitive *prim)
+d3d_render_target* shaders::get_vector_target(render_primitive *prim, int screen)
 {
 	if (!enabled())
 	{
@@ -1624,6 +1549,7 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 
 	int source_width = int(prim->get_quad_width() + 0.5f);
 	int source_height = int(prim->get_quad_height() + 0.5f);
+	int source_screen = screen;
 	int target_width = int(prim->get_full_quad_width() + 0.5f);
 	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
@@ -1635,24 +1561,25 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 	}
 
 	// find render target
-	d3d_render_target *target = find_render_target(source_width, source_height, 0, 0);
+	d3d_render_target *target = find_render_target(source_width, source_height, source_screen);
 	if (target != nullptr)
 	{
-		if (PRIMFLAG_GET_VECTORBUF(prim->flags))
+		// check if the size of the screen quad has changed
+		if (target->target_width != target_width || target->target_height != target_height)
 		{
-			// check if the size of the screen quad has changed
-			if (target->target_width != target_width || target->target_height != target_height)
-			{
-				osd_printf_verbose("Direct3D: Get vector target - invalid size\n");
-				return nullptr;
-			}
+			osd_printf_verbose("Direct3D: Get vector target - invalid size\n");
+			return nullptr;
 		}
+	}
+	else
+	{
+		osd_printf_verbose("Direct3D: Get vector target - not found - %dx%d:%d\n", source_width, source_height, source_screen);
 	}
 
 	return target;
 }
 
-bool shaders::create_vector_target(render_primitive *prim)
+bool shaders::create_vector_target(render_primitive *prim, int screen)
 {
 	if (!enabled())
 	{
@@ -1663,6 +1590,7 @@ bool shaders::create_vector_target(render_primitive *prim)
 
 	int source_width = int(prim->get_quad_width() + 0.5f);
 	int source_height = int(prim->get_quad_height() + 0.5f);
+	int source_screen = screen;
 	int target_width = int(prim->get_full_quad_width() + 0.5f);
 	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
@@ -1674,7 +1602,7 @@ bool shaders::create_vector_target(render_primitive *prim)
 	}
 
 	osd_printf_verbose("Direct3D: Create vector target - %dx%d\n", target_width, target_height);
-	if (!add_render_target(d3d, prim, nullptr, source_width, source_height, target_width, target_height))
+	if (!add_render_target(d3d, prim, source_width, source_height, source_screen, target_width, target_height))
 	{
 		return false;
 	}
@@ -1687,37 +1615,14 @@ bool shaders::create_vector_target(render_primitive *prim)
 //  shaders::add_render_target - register a render target
 //============================================================
 
-bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, texture_info* texture, int source_width, int source_height, int target_width, int target_height)
+bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, int source_width, int source_height, int source_screen, int target_width, int target_height)
 {
-	uint32_t screen_index = 0;
-	uint32_t page_index = 0;
-	if (texture != nullptr)
-	{
-		uint32_t screen_index_data = (uint32_t)texture->get_texinfo().osddata;
-		screen_index = screen_index_data >> 1;
-		page_index = screen_index_data & 1;
-
-		remove_render_target(find_render_target(texture));
-	}
-	else
-	{
-		remove_render_target(find_render_target(source_width, source_height, 0, 0));
-	}
+	remove_render_target(find_render_target(source_width, source_height, source_screen));
 
 	auto target = std::make_unique<d3d_render_target>();
 
-	if (!target->init(d3d, source_width, source_height, target_width, target_height, screen_index, page_index))
+	if (!target->init(d3d, source_width, source_height, target_width, target_height, source_screen))
 		return false;
-
-	// cached target only for screen texture and vector buffer
-	if (PRIMFLAG_GET_SCREENTEX(prim->flags) || PRIMFLAG_GET_VECTORBUF(prim->flags))
-	{
-		if (!find_cache_target(target->screen_index, source_width, source_height))
-		{
-			if (!add_cache_target(d3d, texture, source_width, source_height, target_width, target_height, target->screen_index))
-				return false;
-		}
-	}
 
 	m_render_target_list.push_back(std::move(target));
 
@@ -1736,10 +1641,10 @@ void shaders::enumerate_screens()
 
 
 //============================================================
-//  shaders::register_texture(texture::info)
+//  shaders::create_texture_target
 //============================================================
 
-bool shaders::register_texture(render_primitive *prim, texture_info *texture)
+bool shaders::create_texture_target(render_primitive *prim, int width, int height, int screen)
 {
 	if (!enabled())
 	{
@@ -1748,8 +1653,9 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 
 	auto win = d3d->assert_window();
 
-	int source_width = texture->get_width();
-	int source_height = texture->get_height();
+	int source_width = width;
+	int source_height = height;
+	int source_screen = screen;
 	int target_width = int(prim->get_full_quad_width() + 0.5f);
 	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
@@ -1760,8 +1666,8 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 		std::swap(target_width, target_height);
 	}
 
-	osd_printf_verbose("Direct3D: Register texture - %dx%d\n", target_width, target_height);
-	if (!add_render_target(d3d, prim, texture, source_width, source_height, target_width, target_height))
+	osd_printf_verbose("Direct3D: Create texture target - %dx%d\n", target_width, target_height);
+	if (!add_render_target(d3d, prim, source_width, source_height, source_screen, target_width, target_height))
 	{
 		return false;
 	}
@@ -1789,8 +1695,6 @@ void shaders::delete_resources()
 		osd_printf_verbose("Direct3D: Store options\n");
 		last_options = *options;
 	}
-
-	m_cache_target_list.clear();
 
 	m_render_target_list.clear();
 

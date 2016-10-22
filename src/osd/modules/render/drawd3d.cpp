@@ -490,48 +490,7 @@ texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, u
 			(*it)->get_texinfo().height == texinfo->height &&
 			(((*it)->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		{
-			// Reject a texture if it belongs to an out-of-date render target, so as to cause the HLSL system to re-cache
-			if (m_renderer->get_shaders()->enabled() && texinfo->width != 0 && texinfo->height != 0 && (flags & PRIMFLAG_SCREENTEX_MASK) != 0)
-			{
-				if (m_renderer->get_shaders()->find_render_target((*it).get()) != nullptr)
-					return (*it).get();
-			}
-			else
-			{
-				return (*it).get();
-			}
-		}
-	}
-
-	// Nothing found, check if we need to unregister something with HLSL
-	if (m_renderer->get_shaders()->enabled())
-	{
-		if (texinfo->width == 0 || texinfo->height == 0)
-		{
-			return nullptr;
-		}
-
-		uint32_t prim_screen = texinfo->osddata >> 1;
-		uint32_t prim_page = texinfo->osddata & 1;
-
-		for (auto it = m_texture_list.begin(); it != m_texture_list.end(); it++)
-		{
-			uint32_t test_screen = (*it)->get_texinfo().osddata >> 1;
-			uint32_t test_page = (*it)->get_texinfo().osddata & 1;
-			if (test_screen != prim_screen || test_page != prim_page)
-			{
-				continue;
-			}
-
-			// Clear out our old texture reference
-			if ((*it)->get_hash() == hash &&
-				(*it)->get_texinfo().base == texinfo->base &&
-				(((*it)->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0 &&
-				((*it)->get_texinfo().width != texinfo->width ||
-				(*it)->get_texinfo().height != texinfo->height))
-			{
-				m_renderer->get_shaders()->remove_render_target((*it).get());
-			}
+			return (*it).get();
 		}
 	}
 
@@ -644,30 +603,40 @@ void d3d_texture_manager::update_textures()
 					texture->get_texinfo().seqid = prim.texture.seqid;
 				}
 			}
-
-			if (m_renderer->get_shaders()->enabled())
-			{
-				if (!m_renderer->get_shaders()->get_texture_target(&prim, texture))
-				{
-					if (!m_renderer->get_shaders()->register_texture(&prim, texture))
-					{
-						d3dintf->post_fx_available = false;
-					}
-				}
-			}
 		}
-		else if(PRIMFLAG_GET_VECTORBUF(prim.flags))
+	}
+
+	if (!m_renderer->get_shaders()->enabled())
+	{
+		return;
+	}
+
+	int screen_index = 0;
+	for (render_primitive &prim : *win->m_primlist)
+	{
+		if (PRIMFLAG_GET_SCREENTEX(prim.flags))
 		{
-			if (m_renderer->get_shaders()->enabled())
+			if (!m_renderer->get_shaders()->get_texture_target(&prim, prim.texture.width, prim.texture.height, screen_index))
 			{
-				if (!m_renderer->get_shaders()->get_vector_target(&prim))
+				if (!m_renderer->get_shaders()->create_texture_target(&prim, prim.texture.width, prim.texture.height, screen_index))
 				{
-					if (!m_renderer->get_shaders()->create_vector_target(&prim))
-					{
-						d3dintf->post_fx_available = false;
-					}
+					d3dintf->post_fx_available = false;
+					break;
 				}
 			}
+			screen_index++;
+		}
+		else if (PRIMFLAG_GET_VECTORBUF(prim.flags))
+		{
+			if (!m_renderer->get_shaders()->get_vector_target(&prim, screen_index))
+			{
+				if (!m_renderer->get_shaders()->create_vector_target(&prim, screen_index))
+				{
+					d3dintf->post_fx_available = false;
+					break;
+				}
+			}
+			screen_index++;
 		}
 	}
 }
@@ -929,7 +898,7 @@ int renderer_d3d9::device_create_resources()
 	HRESULT result = m_device->CreateVertexBuffer(
 		sizeof(vertex) * VERTEX_BUFFER_SIZE,
 		D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING | D3DUSAGE_WRITEONLY,
-		VERTEX_BASE_FORMAT | ((m_shaders->enabled() && d3dintf->post_fx_available)
+		VERTEX_BASE_FORMAT | ((m_shaders->enabled())
 			? D3DFVF_XYZW
 			: D3DFVF_XYZRHW),
 		D3DPOOL_DEFAULT, &m_vertexbuf, nullptr);
@@ -941,7 +910,7 @@ int renderer_d3d9::device_create_resources()
 
 	// set the vertex format
 	result = m_device->SetFVF(
-		(D3DFORMAT)(VERTEX_BASE_FORMAT | ((m_shaders->enabled() && d3dintf->post_fx_available)
+		(D3DFORMAT)(VERTEX_BASE_FORMAT | ((m_shaders->enabled())
 			? D3DFVF_XYZW
 			: D3DFVF_XYZRHW)));
 	if (FAILED(result))
@@ -1871,7 +1840,7 @@ void renderer_d3d9::primitive_flush_pending()
 
 		assert(vertnum + m_poly[polynum].numverts() <= m_numverts);
 
-		if(m_shaders->enabled() && d3dintf->post_fx_available)
+		if(m_shaders->enabled())
 		{
 			m_shaders->render_quad(&m_poly[polynum], vertnum);
 		}
@@ -2765,42 +2734,6 @@ void texture_info::prescale()
 
 
 //============================================================
-//  cache_target::~cache_target
-//============================================================
-
-cache_target::~cache_target()
-{
-	if (texture != nullptr)
-		texture->Release();
-
-	if (target != nullptr)
-		target->Release();
-}
-
-
-//============================================================
-//  cache_target::init - initializes a target cache
-//============================================================
-
-bool cache_target::init(renderer_d3d9 *d3d, int source_width, int source_height, int target_width, int target_height, int screen_index)
-{
-	this->width = source_width;
-	this->height = source_height;
-	this->target_width = target_width;
-	this->target_height = target_height;
-	this->screen_index = screen_index;
-
-	HRESULT result = d3d->get_device()->CreateTexture(target_width, target_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture, nullptr);
-	if (FAILED(result))
-		return false;
-
-	texture->GetSurfaceLevel(0, &target);
-
-	return true;
-}
-
-
-//============================================================
 //  d3d_render_target::~d3d_render_target
 //============================================================
 
@@ -2836,7 +2769,7 @@ d3d_render_target::~d3d_render_target()
 //  d3d_render_target::init - initializes a render target
 //============================================================
 
-bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_height, int target_width, int target_height, int screen_index, int page_index)
+bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_height, int target_width, int target_height, int screen_index)
 {
 	HRESULT result;
 
@@ -2847,7 +2780,6 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_he
 	this->target_height = target_height;
 
 	this->screen_index = screen_index;
-	this->page_index = page_index;
 
 	for (int index = 0; index < 2; index++)
 	{
@@ -2863,6 +2795,12 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_he
 
 		target_texture[index]->GetSurfaceLevel(0, &target_surface[index]);
 	}
+
+	result = d3d->get_device()->CreateTexture(target_width, target_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &cache_texture, nullptr);
+	if (FAILED(result))
+		return false;
+
+	cache_texture->GetSurfaceLevel(0, &cache_surface);
 
 	auto win = d3d->assert_window();
 

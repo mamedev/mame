@@ -283,18 +283,16 @@ public:
 	bool enabled() { return post_fx_enable && d3dintf->post_fx_available; }
 	void toggle() { post_fx_enable = initialized && !post_fx_enable; }
 
-	d3d_render_target* get_vector_target(render_primitive *prim);
-	bool create_vector_target(render_primitive *prim);
-
 	void begin_draw();
 	void end_draw();
 
 	void render_quad(poly_info *poly, int vertnum);
 
-	bool register_texture(render_primitive *prim, texture_info *texture);
-	d3d_render_target* get_texture_target(render_primitive *prim, texture_info *texture);
-	bool add_render_target(renderer_d3d9* d3d, render_primitive *prim, texture_info* texture, int source_width, int source_height, int target_width, int target_height);
-	bool add_cache_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height, int screen_index);
+	bool create_vector_target(render_primitive *prim, int screen);
+	d3d_render_target* get_vector_target(render_primitive *prim, int screen);
+	bool create_texture_target(render_primitive *prim, int width, int height, int screen);
+	d3d_render_target* get_texture_target(render_primitive *prim, int width, int height, int screen);
+	bool add_render_target(renderer_d3d9* d3d, render_primitive *prim, int source_width, int source_height, int source_screen, int target_width, int target_height);
 
 	void save_snapshot();
 	void record_movie();
@@ -302,11 +300,9 @@ public:
 
 	void init_fsfx_quad();
 
-	void                    set_texture(texture_info *info);
-	d3d_render_target *     find_render_target(texture_info *texture);
-	void                    remove_render_target(texture_info *texture);
-	void                    remove_render_target(int source_width, int source_height, uint32_t screen_index, uint32_t page_index);
-	void                    remove_render_target(d3d_render_target *rt);
+	void set_texture(texture_info *info);
+	void remove_render_target(int source_width, int source_height, uint32_t screen_index);
+	void remove_render_target(d3d_render_target *rt);
 
 	int create_resources();
 	void delete_resources();
@@ -324,9 +320,7 @@ private:
 
 	void                    render_snapshot(IDirect3DSurface9 *surface);
 
-	d3d_render_target*      find_render_target(int source_width, int source_height, uint32_t screen_index, uint32_t page_index);
-	cache_target *          find_cache_target(uint32_t screen_index, int width, int height);
-	void                    remove_cache_target(cache_target *cache);
+	d3d_render_target*      find_render_target(int source_width, int source_height, uint32_t screen_index);
 
 	rgb_t                   apply_color_convolution(rgb_t color);
 
@@ -336,7 +330,7 @@ private:
 	int                     prescale_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     deconverge_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     defocus_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     phosphor_pass(d3d_render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum);
+	int                     phosphor_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     post_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom);
 	int                     downsample_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
@@ -396,7 +390,6 @@ private:
 	poly_info *             curr_poly;
 
 	std::vector<std::unique_ptr<d3d_render_target>> m_render_target_list;
-	std::vector<std::unique_ptr<cache_target>> m_cache_target_list;
 
 	std::vector<slider*>    internal_sliders;
 	std::vector<ui::menu_item> m_sliders;
