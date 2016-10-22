@@ -9272,6 +9272,12 @@ quizard4                        // (c) TAB Austria 1998
 quizard4_40                     // (c) TAB Austria 1997
 quizard4_41                     // (c) TAB Austria 1998
 
+@source:cedar_magnet.cpp
+cedmag
+mag_time
+mag_exzi
+mag_xain
+
 @source:centiped.cpp
 bullsdrt                        // (c) 1985 Shinkai
 caterplr                        // (bootleg)
