@@ -1208,7 +1208,7 @@ void arm7_cpu_device::tg0b_5(uint32_t pc, uint32_t op) /* PUSH {Rlist}{LR} */
 		if (op & (1 << offs))
 		{
 			SetRegister(13, GetRegister(13) - 4);
-			WRITE32(GetRegister(13), GetRegister(GetRegister(offs)));
+			WRITE32(GetRegister(13), GetRegister(offs));
 		}
 	}
 	R15 += 2;
