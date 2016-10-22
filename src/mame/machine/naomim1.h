@@ -11,7 +11,7 @@
 class naomi_m1_board : public naomi_board
 {
 public:
-	naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(submap, 16) override;
 
@@ -21,34 +21,34 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void board_setup_address(UINT32 address, bool is_dma) override;
-	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit) override;
-	virtual void board_advance(UINT32 size) override;
+	virtual void board_setup_address(uint32_t address, bool is_dma) override;
+	virtual void board_get_buffer(uint8_t *&base, uint32_t &limit) override;
+	virtual void board_advance(uint32_t size) override;
 
 private:
 	enum { BUFFER_SIZE = 32768 };
-	UINT32 key;
-	UINT16 actel_id;
+	uint32_t key;
+	uint16_t actel_id;
 
-	std::unique_ptr<UINT8[]> buffer;
-	UINT8 dict[111], hist[2];
-	UINT64 avail_val;
-	UINT32 rom_cur_address, buffer_actual_size, avail_bits;
+	std::unique_ptr<uint8_t[]> buffer;
+	uint8_t dict[111], hist[2];
+	uint64_t avail_val;
+	uint32_t rom_cur_address, buffer_actual_size, avail_bits;
 	bool encryption, stream_ended, has_history;
 
 	required_memory_region m_region;
 
 	void gb_reset();
-	UINT32 lookb(int bits);
+	uint32_t lookb(int bits);
 	void skipb(int bits);
-	UINT32 getb(int bits);
+	uint32_t getb(int bits);
 
 	void enc_reset();
 	void enc_fill();
 
-	UINT32 get_decrypted_32b();
+	uint32_t get_decrypted_32b();
 
-	void wb(UINT8 byte);
+	void wb(uint8_t byte);
 };
 
 extern const device_type NAOMI_M1_BOARD;

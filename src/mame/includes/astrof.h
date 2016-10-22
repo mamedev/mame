@@ -24,25 +24,25 @@ public:
 		m_screen(*this, "screen") { }
 
 	/* video-related */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
-	std::unique_ptr<UINT8[]>    m_colorram;
-	required_shared_ptr<UINT8> m_astrof_color;
-	optional_shared_ptr<UINT8> m_tomahawk_protection;
+	std::unique_ptr<uint8_t[]>    m_colorram;
+	required_shared_ptr<uint8_t> m_astrof_color;
+	optional_shared_ptr<uint8_t> m_tomahawk_protection;
 	optional_ioport m_fake_port;
 
-	UINT8      m_astrof_palette_bank;
-	UINT8      m_red_on;
-	UINT8      m_flipscreen;
-	UINT8      m_screen_off;
-	UINT16     m_abattle_count;
+	uint8_t      m_astrof_palette_bank;
+	uint8_t      m_red_on;
+	uint8_t      m_flipscreen;
+	uint8_t      m_screen_off;
+	uint16_t     m_abattle_count;
 
 	/* sound-related */
-	UINT8      m_port_1_last;
-	UINT8      m_port_2_last;
-	UINT8      m_astrof_start_explosion;
-	UINT8      m_astrof_death_playing;
-	UINT8      m_astrof_bosskill_playing;
+	uint8_t      m_port_1_last;
+	uint8_t      m_port_2_last;
+	uint8_t      m_astrof_start_explosion;
+	uint8_t      m_astrof_death_playing;
+	uint8_t      m_astrof_bosskill_playing;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -79,15 +79,15 @@ public:
 	DECLARE_MACHINE_RESET(abattle);
 	DECLARE_MACHINE_START(spfghmk2);
 	DECLARE_MACHINE_START(tomahawk);
-	UINT32 screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_callback);
-	rgb_t make_pen( UINT8 data );
+	rgb_t make_pen( uint8_t data );
 	void astrof_get_pens( pen_t *pens );
 	void tomahawk_get_pens( pen_t *pens );
-	void astrof_set_video_control_2( UINT8 data );
-	void spfghmk2_set_video_control_2( UINT8 data );
-	void tomahawk_set_video_control_2( UINT8 data );
+	void astrof_set_video_control_2( uint8_t data );
+	void spfghmk2_set_video_control_2( uint8_t data );
+	void tomahawk_set_video_control_2( uint8_t data );
 	void video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens, int num_pens );
 };
 

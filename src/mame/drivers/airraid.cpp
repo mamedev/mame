@@ -169,9 +169,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
-	optional_shared_ptr<UINT8> m_mainram;
+	optional_shared_ptr<uint8_t> m_mainram;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	required_device<airraid_video_device> m_airraid_video;
 
@@ -556,7 +556,7 @@ DRIVER_INIT_MEMBER(airraid_state, cshooter)
 
 DRIVER_INIT_MEMBER(airraid_state,cshootere)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int A = 0x0000;A < 0x8000;A++)
 	{

@@ -64,9 +64,9 @@ bool mgt_format::supports_save() const
 	return true;
 }
 
-int mgt_format::identify(io_generic *io, UINT32 form_factor)
+int mgt_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 
 	if(/*size == 737280 || */ size == 819200)
 		return 50;
@@ -74,12 +74,12 @@ int mgt_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool mgt_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool mgt_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 	int sector_count = size == 737280 ? 9 : 10;
 
-	UINT8 sectdata[10*512];
+	uint8_t sectdata[10*512];
 	desc_s sectors[10];
 	for(int i=0; i<sector_count; i++) {
 		sectors[i].data = sectdata + 512*i;
@@ -109,7 +109,7 @@ bool mgt_format::save(io_generic *io, floppy_image *image)
 	else if(sector_count < 9)
 		sector_count = 9;
 
-	UINT8 sectdata[10*512];
+	uint8_t sectdata[10*512];
 	int track_size = sector_count*512;
 
 	for(int head=0; head < 2; head++) {

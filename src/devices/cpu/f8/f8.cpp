@@ -59,7 +59,7 @@
 const device_type F8 = &device_creator<f8_cpu_device>;
 
 
-f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, F8, "Fairchild F8", tag, owner, clock, "f8", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
@@ -111,7 +111,7 @@ void f8_cpu_device::ROMC_01()
 	 * on the data bus as signed binary number to PC0.
 	 */
 	m_dbus = m_direct->read_byte(m_pc0);
-	m_pc0 += (INT8)m_dbus;
+	m_pc0 += (int8_t)m_dbus;
 	m_icount -= cL;
 }
 
@@ -206,7 +206,7 @@ void f8_cpu_device::ROMC_0A()
 	 * All devices add the 8-bit value on the data bus, treated as
 	 * signed binary number, to the data counter.
 	 */
-	m_dc0 += (INT8)m_dbus;
+	m_dc0 += (int8_t)m_dbus;
 	m_icount -= cL;
 }
 
@@ -420,7 +420,7 @@ void f8_cpu_device::ROMC_1D()
 	 * Devices with DC0 and DC1 registers must switch registers.
 	 * Devices without a DC1 register perform no operation.
 	 */
-	UINT16 tmp = m_dc0;
+	uint16_t tmp = m_dc0;
 	m_dc0 = m_dc1;
 	m_dc1 = tmp;
 	m_icount -= cS;
@@ -859,12 +859,12 @@ void f8_cpu_device::f8_ai()
  ***************************************************/
 void f8_cpu_device::f8_ci()
 {
-	UINT16 tmp = ((UINT8)~m_a) + 1;
+	uint16_t tmp = ((uint8_t)~m_a) + 1;
 	ROMC_03(cL);
 	CLR_OZCS;
 	SET_OC(tmp,m_dbus);
 	tmp += m_dbus;
-	SET_SZ((UINT8)tmp);
+	SET_SZ((uint8_t)tmp);
 }
 
 /***************************************************
@@ -1146,13 +1146,13 @@ void f8_cpu_device::f8_amd()
    *NOTE* status flags are updated prior to the factor being added
 */
 
-	UINT8 augend=m_a;
+	uint8_t augend=m_a;
 	ROMC_02();
-	UINT8 addend=m_dbus;
-	UINT8 tmp=addend+augend;
+	uint8_t addend=m_dbus;
+	uint8_t tmp=addend+augend;
 
-	UINT8 c=0;              /* high order carry */
-	UINT8 ic=0;             /* low order carry */
+	uint8_t c=0;              /* high order carry */
+	uint8_t ic=0;             /* low order carry */
 	if(((augend+addend)&0xff0)>0xf0)
 	c=1;
 	if((augend&0x0f)+(addend&0x0f)>0x0F)
@@ -1214,12 +1214,12 @@ void f8_cpu_device::f8_xm()
  ***************************************************/
 void f8_cpu_device::f8_cm()    /* SKR changed to match f8_ci() */
 {
-	UINT16 tmp = ((UINT8)~m_a) + 1;
+	uint16_t tmp = ((uint8_t)~m_a) + 1;
 	ROMC_02();
 	CLR_OZCS;
 	SET_OC(tmp,m_dbus);
 	tmp += m_dbus;
-	SET_SZ((UINT8)tmp);
+	SET_SZ((uint8_t)tmp);
 }
 
 /***************************************************
@@ -1362,13 +1362,13 @@ void f8_cpu_device::f8_as_isar_d()
 void f8_cpu_device::f8_asd(int r)
 {
 /*SKR from F8 Guide To programming description of AMD */
-	UINT8 augend=m_a;
+	uint8_t augend=m_a;
 	ROMC_1C(cS);
-	UINT8 addend=m_r[r];
-	UINT8 tmp=augend+addend;
+	uint8_t addend=m_r[r];
+	uint8_t tmp=augend+addend;
 
-	UINT8 c=0;
-	UINT8 ic=0;
+	uint8_t c=0;
+	uint8_t ic=0;
 	if(((augend+addend)&0xff0)>0xf0)
 	c=1;
 	if((augend&0x0f)+(addend&0x0f)>0x0F)
@@ -1395,13 +1395,13 @@ void f8_cpu_device::f8_asd(int r)
 void f8_cpu_device::f8_asd_isar()
 {
 /*SKR from F8 Guide To programming description of AMD */
-	UINT8 augend=m_a;
+	uint8_t augend=m_a;
 	ROMC_1C(cS);
-	UINT8 addend=m_r[m_is];
-	UINT8 tmp=augend+addend;
+	uint8_t addend=m_r[m_is];
+	uint8_t tmp=augend+addend;
 
-	UINT8 c=0;
-	UINT8 ic=0;
+	uint8_t c=0;
+	uint8_t ic=0;
 	if(((augend+addend)&0xff0)>0xf0)
 	c=1;
 	if((augend&0x0f)+(addend&0x0f)>0x0F)
@@ -1428,13 +1428,13 @@ void f8_cpu_device::f8_asd_isar()
 void f8_cpu_device::f8_asd_isar_i()
 {
 /*SKR from F8 Guide To programming description of AMD */
-	UINT8 augend=m_a;
+	uint8_t augend=m_a;
 	ROMC_1C(cS);
-	UINT8 addend=m_r[m_is];
-	UINT8 tmp=augend+addend;
+	uint8_t addend=m_r[m_is];
+	uint8_t tmp=augend+addend;
 
-	UINT8 c=0;
-	UINT8 ic=0;
+	uint8_t c=0;
+	uint8_t ic=0;
 	if(((augend+addend)&0xff0)>0xf0)
 	c=1;
 	if((augend&0x0f)+(addend&0x0f)>0x0F)
@@ -1462,13 +1462,13 @@ void f8_cpu_device::f8_asd_isar_i()
 void f8_cpu_device::f8_asd_isar_d()
 {
 /*SKR from F8 Guide To programming description of AMD */
-	UINT8 augend=m_a;
+	uint8_t augend=m_a;
 	ROMC_1C(cS);
-	UINT8 addend=m_r[m_is];
-	UINT8 tmp=augend+addend;
+	uint8_t addend=m_r[m_is];
+	uint8_t tmp=augend+addend;
 
-	UINT8 c=0;
-	UINT8 ic=0;
+	uint8_t c=0;
+	uint8_t ic=0;
 	if(((augend+addend)&0xff0)>0xf0)
 	c=1;
 	if((augend&0x0f)+(addend&0x0f)>0x0F)
@@ -1583,7 +1583,7 @@ void f8_cpu_device::f8_ns_isar_d()
 
 void f8_cpu_device::device_reset()
 {
-	UINT8 data;
+	uint8_t data;
 	int i;
 
 	m_pc0 = 0;
@@ -1636,7 +1636,7 @@ void f8_cpu_device::execute_run()
 {
 	do
 	{
-		UINT8 op=m_dbus;
+		uint8_t op=m_dbus;
 
 		m_pc = (m_pc0 - 1) & 0xffff;
 		debugger_instruction_hook(this, (m_pc0 - 1) & 0xffff);
@@ -2062,7 +2062,7 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 }
 
 
-offs_t f8_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t f8_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( f8 );
 	return CPU_DISASSEMBLE_NAME(f8)(this, buffer, pc, oprom, opram, options);

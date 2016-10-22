@@ -61,14 +61,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_sys_regs;
+	required_shared_ptr<uint8_t> m_sys_regs;
 
-	UINT8 m_pic_data;
-	std::unique_ptr<UINT8[]> m_videoram;
-	std::unique_ptr<UINT8[]> m_paletteram;
-	std::unique_ptr<UINT8[]> m_colorram;
-	UINT8 m_eeprom_data[0x1000];
-	UINT16 m_eeprom_index;
+	uint8_t m_pic_data;
+	std::unique_ptr<uint8_t[]> m_videoram;
+	std::unique_ptr<uint8_t[]> m_paletteram;
+	std::unique_ptr<uint8_t[]> m_colorram;
+	uint8_t m_eeprom_data[0x1000];
+	uint16_t m_eeprom_index;
 
 	DECLARE_READ8_MEMBER(hitpoker_vram_r);
 	DECLARE_WRITE8_MEMBER(hitpoker_vram_w);
@@ -84,7 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
 	DECLARE_DRIVER_INIT(hitpoker);
 	virtual void video_start() override;
-	UINT32 screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hitpoker_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -96,12 +96,12 @@ public:
 
 void hitpoker_state::video_start()
 {
-	m_videoram = std::make_unique<UINT8[]>(0x35ff);
-	m_paletteram = std::make_unique<UINT8[]>(0x1000);
-	m_colorram = std::make_unique<UINT8[]>(0x2000);
+	m_videoram = std::make_unique<uint8_t[]>(0x35ff);
+	m_paletteram = std::make_unique<uint8_t[]>(0x1000);
+	m_colorram = std::make_unique<uint8_t[]>(0x2000);
 }
 
-UINT32 hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	int y,x;
@@ -129,7 +129,7 @@ UINT32 hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_ind1
 
 READ8_MEMBER(hitpoker_state::hitpoker_vram_r)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	if(m_pic_data & 0x10)
 		return m_videoram[offset];
@@ -139,7 +139,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_vram_r)
 
 WRITE8_MEMBER(hitpoker_state::hitpoker_vram_w)
 {
-//  UINT8 *ROM = memregion("maincpu")->base();
+//  uint8_t *ROM = memregion("maincpu")->base();
 
 //  if(m_sys_regs[0x00] & 0x10)
 	m_videoram[offset] = data;
@@ -147,7 +147,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_vram_w)
 
 READ8_MEMBER(hitpoker_state::hitpoker_cram_r)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	if(m_pic_data & 0x10)
 		return m_colorram[offset];
@@ -162,7 +162,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_cram_w)
 
 READ8_MEMBER(hitpoker_state::hitpoker_paletteram_r)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	if(m_pic_data & 0x10)
 		return m_paletteram[offset];
@@ -502,7 +502,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(hitpoker_state,hitpoker)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	// init nvram
 	machine().device<nvram_device>("nvram")->set_base(m_eeprom_data, sizeof(m_eeprom_data));

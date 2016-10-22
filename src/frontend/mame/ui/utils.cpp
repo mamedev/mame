@@ -15,60 +15,60 @@ extern const char UI_VERSION_TAG[];
 const char UI_VERSION_TAG[] = "# UI INFO ";
 
 // Years index
-UINT16 c_year::actual = 0;
+uint16_t c_year::actual = 0;
 std::vector<std::string> c_year::ui;
 
 // Manufacturers index
-UINT16 c_mnfct::actual = 0;
+uint16_t c_mnfct::actual = 0;
 std::vector<std::string> c_mnfct::ui;
 std::unordered_map<std::string, int> c_mnfct::uimap;
 
 // Main filters
-UINT16 main_filters::actual = 0;
+uint16_t main_filters::actual = 0;
 const char *main_filters::text[] = { "All", "Available", "Unavailable", "Working", "Not Working", "Mechanical", "Not Mechanical",
 	"Category", "Favorites", "BIOS", "Parents", "Clones", "Manufacturers", "Years", "Support Save",
 	"Not Support Save", "CHD", "No CHD", "Vertical", "Horizontal", "Custom" };
 size_t main_filters::length = ARRAY_LENGTH(main_filters::text);
 
 // Software filters
-UINT16 sw_filters::actual = 0;
+uint16_t sw_filters::actual = 0;
 const char *sw_filters::text[] = { "All", "Available", "Unavailable", "Parents", "Clones", "Years", "Publishers", "Supported",
 	"Partial Supported", "Unsupported", "Region", "Device Type", "Software List", "Custom" };
 size_t sw_filters::length = ARRAY_LENGTH(sw_filters::text);
 
 // Globals
-UINT8 ui_globals::rpanel = 0;
-UINT8 ui_globals::curimage_view = 0;
-UINT8 ui_globals::curdats_view = 0;
-UINT8 ui_globals::cur_sw_dats_total = 0;
-UINT8 ui_globals::curdats_total = 0;
-UINT8 ui_globals::cur_sw_dats_view = 0;
+uint8_t ui_globals::rpanel = 0;
+uint8_t ui_globals::curimage_view = 0;
+uint8_t ui_globals::curdats_view = 0;
+uint8_t ui_globals::cur_sw_dats_total = 0;
+uint8_t ui_globals::curdats_total = 0;
+uint8_t ui_globals::cur_sw_dats_view = 0;
 bool ui_globals::switch_image = false;
 bool ui_globals::default_image = true;
 bool ui_globals::reset = false;
 bool ui_globals::redraw_icon = false;
 int ui_globals::visible_main_lines = 0;
 int ui_globals::visible_sw_lines = 0;
-UINT16 ui_globals::panels_status = 0;
+uint16_t ui_globals::panels_status = 0;
 bool ui_globals::has_icons = false;
 
 // Custom filter
-UINT16 custfltr::main = 0;
-UINT16 custfltr::numother = 0;
-UINT16 custfltr::other[MAX_CUST_FILTER];
-UINT16 custfltr::mnfct[MAX_CUST_FILTER];
-UINT16 custfltr::year[MAX_CUST_FILTER];
-UINT16 custfltr::screen[MAX_CUST_FILTER];
+uint16_t custfltr::main = 0;
+uint16_t custfltr::numother = 0;
+uint16_t custfltr::other[MAX_CUST_FILTER];
+uint16_t custfltr::mnfct[MAX_CUST_FILTER];
+uint16_t custfltr::year[MAX_CUST_FILTER];
+uint16_t custfltr::screen[MAX_CUST_FILTER];
 
 // Custom filter
-UINT16 sw_custfltr::main = 0;
-UINT16 sw_custfltr::numother = 0;
-UINT16 sw_custfltr::other[MAX_CUST_FILTER];
-UINT16 sw_custfltr::mnfct[MAX_CUST_FILTER];
-UINT16 sw_custfltr::year[MAX_CUST_FILTER];
-UINT16 sw_custfltr::region[MAX_CUST_FILTER];
-UINT16 sw_custfltr::type[MAX_CUST_FILTER];
-UINT16 sw_custfltr::list[MAX_CUST_FILTER];
+uint16_t sw_custfltr::main = 0;
+uint16_t sw_custfltr::numother = 0;
+uint16_t sw_custfltr::other[MAX_CUST_FILTER];
+uint16_t sw_custfltr::mnfct[MAX_CUST_FILTER];
+uint16_t sw_custfltr::year[MAX_CUST_FILTER];
+uint16_t sw_custfltr::region[MAX_CUST_FILTER];
+uint16_t sw_custfltr::type[MAX_CUST_FILTER];
+uint16_t sw_custfltr::list[MAX_CUST_FILTER];
 
 char* chartrimcarriage(char str[])
 {

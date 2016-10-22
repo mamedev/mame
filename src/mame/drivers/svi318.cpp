@@ -113,7 +113,7 @@ private:
 	int m_rom3;
 	int m_ctrl1;
 
-	UINT8 m_keyboard_row;
+	uint8_t m_keyboard_row;
 };
 
 
@@ -363,7 +363,7 @@ READ8_MEMBER( svi3x8_state::mreq_r )
 	if (CCS1 || CCS2 || CCS3 || CCS4)
 		return m_cart_rom->read_rom(space, offset);
 
-	UINT8 data = m_expander->mreq_r(space, offset);
+	uint8_t data = m_expander->mreq_r(space, offset);
 
 	if (ROMCS)
 		data = m_basic->u8(offset);
@@ -415,7 +415,7 @@ WRITE8_MEMBER( svi3x8_state::bank_w )
 
 READ8_MEMBER( svi3x8_state::ppi_port_a_r )
 {
-	UINT8 data = 0x3f;
+	uint8_t data = 0x3f;
 
 	// bit 0-3, paddle or tablet input
 
@@ -500,7 +500,7 @@ WRITE8_MEMBER( svi3x8_state::excs_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 {
-	UINT32 size = m_cart_rom->common_get_size("rom");
+	uint32_t size = m_cart_rom->common_get_size("rom");
 
 	m_cart_rom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart_rom->common_load_rom(m_cart_rom->get_rom_base(), size, "rom");

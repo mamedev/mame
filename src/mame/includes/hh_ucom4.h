@@ -35,11 +35,11 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	UINT8 m_port[9];                    // MCU port A-I write data (optional)
-	UINT8 m_int;                        // MCU INT pin state
-	UINT16 m_inp_mux;                   // multiplexed inputs mask
+	uint8_t m_port[9];                    // MCU port A-I write data (optional)
+	uint8_t m_int;                        // MCU INT pin state
+	uint16_t m_inp_mux;                   // multiplexed inputs mask
 
-	UINT8 read_inputs(int columns);
+	uint8_t read_inputs(int columns);
 	void refresh_interrupts(void);
 	void set_interrupt(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
@@ -49,18 +49,18 @@ public:
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
 
-	UINT32 m_grid;                      // VFD current row data
-	UINT32 m_plate;                     // VFD current column data
+	uint32_t m_grid;                      // VFD current row data
+	uint32_t m_plate;                     // VFD current column data
 
-	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	UINT32 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x20];  // (internal use)
+	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
+	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	uint32_t m_display_cache[0x20];       // (internal use)
+	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update = true);
+	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;

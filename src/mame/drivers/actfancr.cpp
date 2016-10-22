@@ -63,7 +63,7 @@ WRITE8_MEMBER(actfancr_state::actfancr_sound_w)
 
 WRITE8_MEMBER(actfancr_state::actfancr_buffer_spriteram_w)
 {
-	UINT8 *src = reinterpret_cast<UINT8 *>(memshare("spriteram")->ptr());
+	uint8_t *src = reinterpret_cast<uint8_t *>(memshare("spriteram")->ptr());
 	// copy to a 16-bit region for our sprite draw code too
 	for (int i=0;i<0x800/2;i++)
 	{

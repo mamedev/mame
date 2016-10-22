@@ -188,8 +188,8 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 READ8_MEMBER(topspeed_state::input_bypass_r)
 {
 	// Read port number
-	UINT8 port = m_tc0220ioc->port_r(space, 0);
-	UINT16 steer = 0xff80 + m_steer.read_safe(0);
+	uint8_t port = m_tc0220ioc->port_r(space, 0);
+	uint16_t steer = 0xff80 + m_steer.read_safe(0);
 
 	switch (port)
 	{
@@ -206,7 +206,7 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 
 CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 {
-	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	static const uint8_t retval[8] = { 0,1,3,2,6,7,5,4 };
 	ioport_port *port = ioport((const char *)param);
 	return retval[port != nullptr ? port->read() & 7 : 0];
 }
@@ -260,7 +260,7 @@ void topspeed_state::msm5205_update(int chip)
 	if (m_msm_reset[chip])
 		return;
 
-	UINT8 data = m_msm_rom[chip][m_msm_pos[chip]];
+	uint8_t data = m_msm_rom[chip][m_msm_pos[chip]];
 	msm5205_device *msm = chip ? m_msm2 : m_msm1;
 
 	msm->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
@@ -339,7 +339,7 @@ WRITE_LINE_MEMBER(topspeed_state::z80ctc_to0)
 		else
 		{
 			// Update on falling edge of /VCK
-			UINT16 oldpos = m_msm_pos[1];
+			uint16_t oldpos = m_msm_pos[1];
 
 			msm5205_update(1);
 

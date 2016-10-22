@@ -25,7 +25,7 @@ const device_type CPC_DKSPEECH = &device_creator<cpc_dkspeech_device>;
 
 READ8_MEMBER(cpc_ssa1_device::ssa1_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	if(get_sby() == 0)
 		ret &= ~0x80;
@@ -43,7 +43,7 @@ WRITE8_MEMBER(cpc_ssa1_device::ssa1_w)
 
 READ8_MEMBER(cpc_dkspeech_device::dkspeech_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	// SBY is not connected
 
@@ -158,7 +158,7 @@ machine_config_constructor cpc_dkspeech_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_ssa1_device::cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_ssa1_device::cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_SSA1, "SSA-1", tag, owner, clock, "cpc_ssa1", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_rom(nullptr),
 	m_lrq(1), m_sby(0),
@@ -166,7 +166,7 @@ cpc_ssa1_device::cpc_ssa1_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-cpc_dkspeech_device::cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_dkspeech_device::cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_DKSPEECH, "DK'Tronics Speech Synthesiser", tag, owner, clock, "cpc_dkspeech", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_rom(nullptr),
 	m_lrq(1), m_sby(0),

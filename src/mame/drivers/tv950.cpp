@@ -73,7 +73,7 @@ private:
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	required_device<r6545_1_device> m_crtc;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 
 	int m_row_addr;
 };

@@ -37,7 +37,7 @@ protected:
 			device_type type, char const *name,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock,
+			uint32_t clock,
 			char const *shortname,
 			char const *source);
 	virtual ~hle_device_base() override;
@@ -52,11 +52,11 @@ protected:
 	virtual void tra_complete() override;
 
 	// device_matrix_keyboard_interface overrides
-	virtual void key_make(UINT8 row, UINT8 column) override;
-	virtual void key_break(UINT8 row, UINT8 column) override;
+	virtual void key_make(uint8_t row, uint8_t column) override;
+	virtual void key_break(uint8_t row, uint8_t column) override;
 
 	// customised transmit_byte method
-	void transmit_byte(UINT8 byte);
+	void transmit_byte(uint8_t byte);
 
 	required_ioport m_dips;
 
@@ -76,17 +76,17 @@ private:
 		LED_KANA
 	};
 
-	enum : UINT8 {
+	enum : uint8_t {
 		BEEPER_BELL = 0x01U,
 		BEEPER_CLICK = 0x02U
 	};
 
-	enum : UINT8 {
+	enum : uint8_t {
 		RX_IDLE,
 		RX_LED
 	};
 
-	enum : UINT8 {
+	enum : uint8_t {
 		COMMAND_RESET = 0x01U,
 		COMMAND_BELL_ON = 0x02U,
 		COMMAND_BELL_OFF = 0x03U,
@@ -97,18 +97,18 @@ private:
 	};
 
 	// device_buffered_serial_interface overrides
-	virtual void received_byte(UINT8 byte) override;
+	virtual void received_byte(uint8_t byte) override;
 
-	virtual UINT8 ident_byte() = 0;
+	virtual uint8_t ident_byte() = 0;
 
 	emu_timer                       *m_click_timer;
 	required_device<beep_device>    m_beeper;
 
-	UINT8   m_make_count;
-	UINT8   m_rx_state;
+	uint8_t   m_make_count;
+	uint8_t   m_rx_state;
 
-	UINT8   m_keyclick;
-	UINT8   m_beeper_state;
+	uint8_t   m_keyclick;
+	uint8_t   m_beeper_state;
 };
 
 
@@ -118,7 +118,7 @@ protected:
 	using hle_device_base::hle_device_base;
 
 private:
-	virtual UINT8 ident_byte() override;
+	virtual uint8_t ident_byte() override;
 };
 
 
@@ -129,12 +129,12 @@ public:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock);
+			uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	virtual UINT8 ident_byte() override;
+	virtual uint8_t ident_byte() override;
 };
 
 
@@ -145,7 +145,7 @@ public:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock);
+			uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -158,7 +158,7 @@ public:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock);
+			uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -171,7 +171,7 @@ public:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock);
+			uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -184,7 +184,7 @@ public:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock);
+			uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -197,7 +197,7 @@ public:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock);
+			uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };

@@ -105,7 +105,7 @@ enum
 //  ctor
 //-------------------------------------------------
 
-applefdc_base_device::applefdc_base_device(applefdc_base_device::applefdc_t fdc_type, const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+applefdc_base_device::applefdc_base_device(applefdc_base_device::applefdc_t fdc_type, const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_type(fdc_type),
 		m_interface(nullptr)
@@ -199,7 +199,7 @@ int applefdc_base_device::iwm_enable2()
 //  iwm_readenable2handshake - hackish function
 //-------------------------------------------------
 
-UINT8 applefdc_base_device::iwm_readenable2handshake()
+uint8_t applefdc_base_device::iwm_readenable2handshake()
 {
 	/* R. Nabet : This function looks more like a hack than a real feature of the IWM; */
 	/* it is not called from the Mac Plus driver */
@@ -214,9 +214,9 @@ UINT8 applefdc_base_device::iwm_readenable2handshake()
 //  statusreg_r - reads the status register
 //-------------------------------------------------
 
-UINT8 applefdc_base_device::statusreg_r()
+uint8_t applefdc_base_device::statusreg_r()
 {
-	UINT8 result;
+	uint8_t result;
 	int status;
 	const applefdc_interface *intf = get_interface();
 
@@ -243,7 +243,7 @@ UINT8 applefdc_base_device::statusreg_r()
 //  iwm_modereg_w - changes the mode register
 //-------------------------------------------------
 
-void applefdc_base_device::iwm_modereg_w(UINT8 data)
+void applefdc_base_device::iwm_modereg_w(uint8_t data)
 {
 	m_mode = data & 0x1f;   /* write mode register */
 
@@ -257,10 +257,10 @@ void applefdc_base_device::iwm_modereg_w(UINT8 data)
 //  read_reg - reads a register
 //-------------------------------------------------
 
-UINT8 applefdc_base_device::read_reg(int lines)
+uint8_t applefdc_base_device::read_reg(int lines)
 {
 	const applefdc_interface *intf = get_interface();
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	switch(lines)
 	{
@@ -308,7 +308,7 @@ UINT8 applefdc_base_device::read_reg(int lines)
 //  write_reg - writes a register
 //-------------------------------------------------
 
-void applefdc_base_device::write_reg(UINT8 data)
+void applefdc_base_device::write_reg(uint8_t data)
 {
 	const applefdc_interface *intf = get_interface();
 
@@ -441,10 +441,10 @@ void applefdc_base_device::iwm_access(int offset)
 //  read - reads a byte from the FDC
 //-------------------------------------------------
 
-UINT8 applefdc_base_device::read(UINT8 offset)
+uint8_t applefdc_base_device::read(uint8_t offset)
 {
 	const applefdc_interface *intf = get_interface();
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	// normalize offset
 	offset &= 0xf;
@@ -504,7 +504,7 @@ UINT8 applefdc_base_device::read(UINT8 offset)
 //  write - writes a byte to the FDC
 //-------------------------------------------------
 
-void applefdc_base_device::write(UINT8 offset, UINT8 data)
+void applefdc_base_device::write(uint8_t offset, uint8_t data)
 {
 	const applefdc_interface *intf = get_interface();
 
@@ -553,7 +553,7 @@ void applefdc_base_device::write(UINT8 offset, UINT8 data)
 //  get_lines - accessor
 //-------------------------------------------------
 
-UINT8 applefdc_base_device::get_lines()
+uint8_t applefdc_base_device::get_lines()
 {
 	return m_lines & 0x0f;
 }
@@ -566,7 +566,7 @@ UINT8 applefdc_base_device::get_lines()
 
 const device_type APPLEFDC = &device_creator<applefdc_device>;
 
-applefdc_device::applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+applefdc_device::applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: applefdc_base_device(APPLEFDC_APPLE2, mconfig, APPLEFDC, "Apple FDC", tag, owner, clock, "apple_fdc", __FILE__)
 {
 }
@@ -579,7 +579,7 @@ applefdc_device::applefdc_device(const machine_config &mconfig, const char *tag,
 
 const device_type IWM = &device_creator<iwm_device>;
 
-iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: applefdc_base_device(APPLEFDC_IWM, mconfig, IWM, "Apple IWM (Integrated Woz Machine)", tag, owner, clock, "iwm", __FILE__)
 {
 }

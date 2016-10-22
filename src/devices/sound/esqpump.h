@@ -18,7 +18,7 @@ class esq_5505_5510_pump : public device_t,
 	public device_sound_interface
 {
 public:
-	esq_5505_5510_pump(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esq_5505_5510_pump(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_otis(es5505_device *otis) { m_otis = otis; }
 	void set_esp(es5510_device *esp) { m_esp = esp; }
@@ -114,7 +114,7 @@ private:
 #endif
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
-	INT16 e[0x4000];
+	int16_t e[0x4000];
 	int ei;
 #endif
 };

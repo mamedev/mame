@@ -172,7 +172,7 @@ const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr), m_framecnt(0),
 	m_crtc(*this, VIDEOTERM_MC6845_NAME), m_rambank(0),
@@ -180,32 +180,32 @@ a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device
 {
 }
 
-a2bus_videoterm_device::a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_videoterm_device::a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VIDEOTERM, "Videx VideoTerm", tag, owner, clock, "a2vidtrm", __FILE__)
 {
 }
 
-a2bus_ap16_device::a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_ap16_device::a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_videx80_device(mconfig, A2BUS_IBSAP16, "IBS AP-16 80 column card", tag, owner, clock, "a2ap16", __FILE__)
 {
 }
 
-a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_videx80_device(mconfig, A2BUS_IBSAP16ALT, "IBS AP-16 80 column card (alt. version)", tag, owner, clock, "a2ap16a", __FILE__)
 {
 }
 
-a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VTC1, "Unknown VideoTerm clone #1", tag, owner, clock, "a2vtc1", __FILE__)
 {
 }
 
-a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VTC2, "Unknown VideoTerm clone #2", tag, owner, clock, "a2vtc2", __FILE__)
 {
 }
 
-a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_videx80_device(mconfig, A2BUS_AEVIEWMASTER80, "Applied Engineering Viewmaster 80", tag, owner, clock, "a2aevm80", __FILE__)
 {
 }
@@ -241,7 +241,7 @@ void a2bus_videx80_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_videx80_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_videx80_device::read_c0nx(address_space &space, uint8_t offset)
 {
 //    printf("Read c0n%x (PC=%x)\n", offset, space.device().safe_pc());
 
@@ -260,7 +260,7 @@ UINT8 a2bus_videx80_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_videx80_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_videx80_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 //    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
 
@@ -280,17 +280,17 @@ void a2bus_videx80_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_videx80_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_videx80_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	return m_rom[offset+0x300];
 }
 
-UINT8 a2bus_ap16_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_ap16_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	return m_rom[offset+0x1f00];
 }
 
-UINT8 a2bus_ap16alt_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_ap16alt_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	return m_rom[offset+0xb00];
 }
@@ -299,7 +299,7 @@ UINT8 a2bus_ap16alt_device::read_cnxx(address_space &space, UINT8 offset)
     write_cnxx - called for writes to this card's cnxx space
     the firmware writes here to switch in our $C800 a lot
 -------------------------------------------------*/
-void a2bus_videx80_device::write_cnxx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_videx80_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
 {
 }
 
@@ -307,7 +307,7 @@ void a2bus_videx80_device::write_cnxx(address_space &space, UINT8 offset, UINT8 
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-UINT8 a2bus_videx80_device::read_c800(address_space &space, UINT16 offset)
+uint8_t a2bus_videx80_device::read_c800(address_space &space, uint16_t offset)
 {
 	// ROM at c800-cbff
 	// bankswitched RAM at cc00-cdff
@@ -325,7 +325,7 @@ UINT8 a2bus_videx80_device::read_c800(address_space &space, UINT16 offset)
 /*-------------------------------------------------
     write_c800 - called for writes to this card's c800 space
 -------------------------------------------------*/
-void a2bus_videx80_device::write_c800(address_space &space, UINT16 offset, UINT8 data)
+void a2bus_videx80_device::write_c800(address_space &space, uint16_t offset, uint8_t data)
 {
 	if (offset >= 0x400)
 	{
@@ -337,17 +337,17 @@ void a2bus_videx80_device::write_c800(address_space &space, UINT16 offset, UINT8
 MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
-	UINT16  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ( ma + i ) & 0x7ff;
-		UINT8 chr = m_ram[ offset ];
-		UINT8 data = m_chrrom[ chr_base + chr * 16 ];
-		UINT8 fg = 15;
-		UINT8 bg = 0;
+		uint16_t offset = ( ma + i ) & 0x7ff;
+		uint8_t chr = m_ram[ offset ];
+		uint8_t data = m_chrrom[ chr_base + chr * 16 ];
+		uint8_t fg = 15;
+		uint8_t bg = 0;
 
 		if ( i == cursor_x )
 		{

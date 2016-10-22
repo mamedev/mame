@@ -7,7 +7,7 @@
 
 const device_type TECMO_MIXER = &device_creator<tecmo_mix_device>;
 
-tecmo_mix_device::tecmo_mix_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tecmo_mix_device::tecmo_mix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TECMO_MIXER, "Tecmo 16-bit Mixer", tag, owner, clock, "tecmo_mix", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_sprpri_shift(0),
@@ -100,29 +100,29 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32 *dd = &bitmap.pix32(y);
-		UINT16 *sd2 = &bitmap_sp->pix16(y);
-		UINT16 *fg = &bitmap_fg->pix16(y);
-		UINT16 *bg = &bitmap_bg->pix16(y);
+		uint32_t *dd = &bitmap.pix32(y);
+		uint16_t *sd2 = &bitmap_sp->pix16(y);
+		uint16_t *fg = &bitmap_fg->pix16(y);
+		uint16_t *bg = &bitmap_bg->pix16(y);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 sprpixel = (sd2[x]);
+			uint16_t sprpixel = (sd2[x]);
 
-			UINT16 m_sprpri = (sprpixel >> m_sprpri_shift) & 0x3;
-			UINT16 m_sprbln = (sprpixel >> m_sprbln_shift) & 0x1;
-			UINT16 m_sprcol = (sprpixel >> m_sprcol_shift) & 0xf;
+			uint16_t m_sprpri = (sprpixel >> m_sprpri_shift) & 0x3;
+			uint16_t m_sprbln = (sprpixel >> m_sprbln_shift) & 0x1;
+			uint16_t m_sprcol = (sprpixel >> m_sprcol_shift) & 0xf;
 
 
 			sprpixel = (sprpixel & 0xf) | (m_sprcol << 4);
 
 			//sprpixel &= 0xff;
 
-			UINT16 fgpixel = (fg[x]);
-			UINT16 fgbln = (fgpixel & 0x0100) >> 8;
+			uint16_t fgpixel = (fg[x]);
+			uint16_t fgbln = (fgpixel & 0x0100) >> 8;
 			fgpixel &= 0xff;
 
-			UINT16 bgpixel = (bg[x]);
+			uint16_t bgpixel = (bg[x]);
 			bgpixel &= 0xff;
 
 			if (sprpixel&0xf)

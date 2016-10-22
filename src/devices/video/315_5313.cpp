@@ -14,7 +14,7 @@
 
 const device_type SEGA315_5313 = &device_creator<sega315_5313_device>;
 
-sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega315_5124_device(mconfig, SEGA315_5313, "Sega 315-5313 Megadrive VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5313", __FILE__), m_render_bitmap(nullptr),
 	m_render_line(nullptr), m_render_line_raw(nullptr), m_megadriv_scanline_timer(nullptr),
 	m_sndirqline_callback(*this),
@@ -93,11 +93,11 @@ void sega315_5313_device::device_start()
 	m_32x_interrupt_func.bind_relative_to(*owner());
 	m_32x_scanline_helper_func.bind_relative_to(*owner());
 
-	m_vram  = std::make_unique<UINT16[]>(0x10000/2);
-	m_cram  = std::make_unique<UINT16[]>(0x80/2);
-	m_vsram = std::make_unique<UINT16[]>(0x80/2);
-	m_regs = std::make_unique<UINT16[]>(0x40/2);
-	m_internal_sprite_attribute_table = std::make_unique<UINT16[]>(0x400/2);
+	m_vram  = std::make_unique<uint16_t[]>(0x10000/2);
+	m_cram  = std::make_unique<uint16_t[]>(0x80/2);
+	m_vsram = std::make_unique<uint16_t[]>(0x80/2);
+	m_regs = std::make_unique<uint16_t[]>(0x40/2);
+	m_internal_sprite_attribute_table = std::make_unique<uint16_t[]>(0x400/2);
 
 	memset(m_vram.get(), 0x00, 0x10000);
 	memset(m_cram.get(), 0x00, 0x80);
@@ -132,15 +132,15 @@ void sega315_5313_device::device_start()
 	save_item(NAME(m_vblank_flag));
 	save_item(NAME(m_total_scanlines));
 
-	m_sprite_renderline = std::make_unique<UINT8[]>(1024);
-	m_highpri_renderline = std::make_unique<UINT8[]>(320);
-	m_video_renderline = std::make_unique<UINT32[]>(320);
+	m_sprite_renderline = std::make_unique<uint8_t[]>(1024);
+	m_highpri_renderline = std::make_unique<uint8_t[]>(320);
+	m_video_renderline = std::make_unique<uint32_t[]>(320);
 
-	m_palette_lookup = std::make_unique<UINT16[]>(0x40);
-	m_palette_lookup_sprite = std::make_unique<UINT16[]>(0x40);
+	m_palette_lookup = std::make_unique<uint16_t[]>(0x40);
+	m_palette_lookup_sprite = std::make_unique<uint16_t[]>(0x40);
 
-	m_palette_lookup_shadow = std::make_unique<UINT16[]>(0x40);
-	m_palette_lookup_highlight = std::make_unique<UINT16[]>(0x40);
+	m_palette_lookup_shadow = std::make_unique<uint16_t[]>(0x40);
+	m_palette_lookup_highlight = std::make_unique<uint16_t[]>(0x40);
 
 	memset(m_palette_lookup.get(),0x00,0x40*2);
 	memset(m_palette_lookup_sprite.get(),0x00,0x40*2);
@@ -152,9 +152,9 @@ void sega315_5313_device::device_start()
 	if (!m_use_alt_timing)
 		m_render_bitmap = std::make_unique<bitmap_ind16>(320, 512); // allocate maximum sizes we're going to use, it's safer.
 	else
-		m_render_line = std::make_unique<UINT16[]>(320);
+		m_render_line = std::make_unique<uint16_t[]>(320);
 
-	m_render_line_raw = std::make_unique<UINT16[]>(320);
+	m_render_line_raw = std::make_unique<uint16_t[]>(320);
 
 	// FIXME: are these all needed? I'm pretty sure some of these (most?) are just helpers which don't need to be saved,
 	// but better safe than sorry...
@@ -213,9 +213,9 @@ void sega315_5313_device::device_reset_old()
 
 
 
-void sega315_5313_device::vdp_vram_write(UINT16 data)
+void sega315_5313_device::vdp_vram_write(uint16_t data)
 {
-	UINT16 sprite_base_address = MEGADRIVE_REG0C_RS1?((MEGADRIVE_REG05_SPRITE_ADDR&0x7e)<<9):((MEGADRIVE_REG05_SPRITE_ADDR&0x7f)<<9);
+	uint16_t sprite_base_address = MEGADRIVE_REG0C_RS1?((MEGADRIVE_REG05_SPRITE_ADDR&0x7e)<<9):((MEGADRIVE_REG05_SPRITE_ADDR&0x7f)<<9);
 	int spritetable_size = MEGADRIVE_REG0C_RS1?0x400:0x200;
 	int lowlimit = sprite_base_address;
 	int highlimit = sprite_base_address+spritetable_size;
@@ -240,7 +240,7 @@ void sega315_5313_device::vdp_vram_write(UINT16 data)
 	m_vdp_address &= 0xffff;
 }
 
-void sega315_5313_device::vdp_vsram_write(UINT16 data)
+void sega315_5313_device::vdp_vsram_write(uint16_t data)
 {
 	m_vsram[(m_vdp_address&0x7e)>>1] = data;
 
@@ -275,7 +275,7 @@ void sega315_5313_device::write_cram_value(int offset, int data)
 	}
 }
 
-void sega315_5313_device::vdp_cram_write(UINT16 data)
+void sega315_5313_device::vdp_cram_write(uint16_t data)
 {
 	int offset;
 	offset = (m_vdp_address&0x7e)>>1;
@@ -383,7 +383,7 @@ void sega315_5313_device::data_port_w(int data)
 
 
 
-void sega315_5313_device::vdp_set_register(int regnum, UINT8 value)
+void sega315_5313_device::vdp_set_register(int regnum, uint8_t value)
 {
 	m_regs[regnum] = value;
 
@@ -445,7 +445,7 @@ void sega315_5313_device::update_code_and_address(void)
 
 // if either SVP CPU or segaCD is present, there is a 'lag' we have to compensate for
 // hence, for segacd and svp we set m_dma_delay to the appropriate value at start
-inline UINT16 sega315_5313_device::vdp_get_word_from_68k_mem(UINT32 source)
+inline uint16_t sega315_5313_device::vdp_get_word_from_68k_mem(uint32_t source)
 {
 	// should we limit the valid areas here?
 	// how does this behave with the segacd etc?
@@ -489,13 +489,13 @@ inline UINT16 sega315_5313_device::vdp_get_word_from_68k_mem(UINT32 source)
    as the 68k address bus isn't accessed */
 
 /* Wani Wani World, James Pond 3, Pirates Gold! */
-void sega315_5313_device::insta_vram_copy(UINT32 source, UINT16 length)
+void sega315_5313_device::insta_vram_copy(uint32_t source, uint16_t length)
 {
 	int x;
 
 	for (x=0;x<length;x++)
 	{
-		UINT8 source_byte;
+		uint8_t source_byte;
 
 		//osd_printf_debug("vram copy length %04x source %04x dest %04x\n",length, source, m_vdp_address );
 		if (source&1) source_byte = MEGADRIV_VDP_VRAM((source&0xffff)>>1)&0x00ff;
@@ -517,7 +517,7 @@ void sega315_5313_device::insta_vram_copy(UINT32 source, UINT16 length)
 }
 
 /* Instant, but we pause the 68k a bit */
-void sega315_5313_device::insta_68k_to_vram_dma(UINT32 source,int length)
+void sega315_5313_device::insta_68k_to_vram_dma(uint32_t source,int length)
 {
 	int count;
 
@@ -544,7 +544,7 @@ void sega315_5313_device::insta_68k_to_vram_dma(UINT32 source,int length)
 }
 
 
-void sega315_5313_device::insta_68k_to_cram_dma(UINT32 source,UINT16 length)
+void sega315_5313_device::insta_68k_to_cram_dma(uint32_t source,uint16_t length)
 {
 	int count;
 
@@ -572,7 +572,7 @@ void sega315_5313_device::insta_68k_to_cram_dma(UINT32 source,UINT16 length)
 
 }
 
-void sega315_5313_device::insta_68k_to_vsram_dma(UINT32 source,UINT16 length)
+void sega315_5313_device::insta_68k_to_vsram_dma(uint32_t source,uint16_t length)
 {
 	int count;
 
@@ -605,8 +605,8 @@ void sega315_5313_device::handle_dma_bits()
 #if 0
 	if (m_vdp_code&0x20)
 	{
-		UINT32 source;
-		UINT16 length;
+		uint32_t source;
+		uint16_t length;
 		source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8) | ((MEGADRIVE_REG17_DMASOURCE3&0xff)<<16))<<1;
 		length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8))<<1;
 		osd_printf_debug("%s 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", machine().describe_context(), source, length, m_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, m_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
@@ -620,8 +620,8 @@ void sega315_5313_device::handle_dma_bits()
 	{
 		if (MEGADRIVE_REG17_DMATYPE==0x0 || MEGADRIVE_REG17_DMATYPE==0x1)
 		{
-			UINT32 source;
-			UINT16 length;
+			uint32_t source;
+			uint16_t length;
 			source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8) | ((MEGADRIVE_REG17_DMASOURCE3&0x7f)<<16))<<1;
 			length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8))<<1;
 
@@ -641,8 +641,8 @@ void sega315_5313_device::handle_dma_bits()
 		}
 		else if (MEGADRIVE_REG17_DMATYPE==0x3)
 		{
-			UINT32 source;
-			UINT16 length;
+			uint32_t source;
+			uint16_t length;
 			source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8)); // source (byte offset)
 			length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8)); // length in bytes
 			//osd_printf_debug("setting vram copy mode length registers are %02x %02x other regs! %02x %02x %02x(Mode Bits %02x) Enable %02x\n", MEGADRIVE_REG13_DMALENGTH1, MEGADRIVE_REG14_DMALENGTH2, MEGADRIVE_REG15_DMASOURCE1, MEGADRIVE_REG16_DMASOURCE2, MEGADRIVE_REG17_DMASOURCE3, MEGADRIVE_REG17_DMATYPE, MEGADRIVE_REG01_DMA_ENABLE);
@@ -654,8 +654,8 @@ void sega315_5313_device::handle_dma_bits()
 	{
 		if (MEGADRIVE_REG17_DMATYPE==0x0 || MEGADRIVE_REG17_DMATYPE==0x1)
 		{
-			UINT32 source;
-			UINT16 length;
+			uint32_t source;
+			uint16_t length;
 			source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8) | ((MEGADRIVE_REG17_DMASOURCE3&0x7f)<<16))<<1;
 			length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8))<<1;
 
@@ -681,8 +681,8 @@ void sega315_5313_device::handle_dma_bits()
 	{
 		if (MEGADRIVE_REG17_DMATYPE==0x0 || MEGADRIVE_REG17_DMATYPE==0x1)
 		{
-			UINT32 source;
-			UINT16 length;
+			uint32_t source;
+			uint16_t length;
 			source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8) | ((MEGADRIVE_REG17_DMASOURCE3&0x7f)<<16))<<1;
 			length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8))<<1;
 
@@ -720,8 +720,8 @@ void sega315_5313_device::handle_dma_bits()
 		}
 		else if (MEGADRIVE_REG17_DMATYPE==0x3)
 		{
-			UINT32 source;
-			UINT16 length;
+			uint32_t source;
+			uint16_t length;
 			source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8)); // source (byte offset)
 			length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8)); // length in bytes
 			//osd_printf_debug("setting vram copy mode length registers are %02x %02x other regs! %02x %02x %02x(Mode Bits %02x) Enable %02x\n", MEGADRIVE_REG13_DMALENGTH1, MEGADRIVE_REG14_DMALENGTH2, MEGADRIVE_REG15_DMASOURCE1, MEGADRIVE_REG16_DMASOURCE2, MEGADRIVE_REG17_DMASOURCE3, MEGADRIVE_REG17_DMATYPE, MEGADRIVE_REG01_DMA_ENABLE);
@@ -821,24 +821,24 @@ WRITE16_MEMBER( sega315_5313_device::vdp_w )
 	}
 }
 
-UINT16 sega315_5313_device::vdp_vram_r(void)
+uint16_t sega315_5313_device::vdp_vram_r(void)
 {
 	return MEGADRIV_VDP_VRAM((m_vdp_address&0xfffe)>>1);
 }
 
-UINT16 sega315_5313_device::vdp_vsram_r(void)
+uint16_t sega315_5313_device::vdp_vsram_r(void)
 {
 	return m_vsram[(m_vdp_address&0x7e)>>1];
 }
 
-UINT16 sega315_5313_device::vdp_cram_r(void)
+uint16_t sega315_5313_device::vdp_cram_r(void)
 {
 	return m_cram[(m_vdp_address&0x7e)>>1];
 }
 
-UINT16 sega315_5313_device::data_port_r()
+uint16_t sega315_5313_device::data_port_r()
 {
-	UINT16 retdata=0;
+	uint16_t retdata=0;
 
 	//return machine().rand();
 
@@ -953,7 +953,7 @@ PAL, 256x224
 
 
 
-UINT16 sega315_5313_device::ctrl_port_r()
+uint16_t sega315_5313_device::ctrl_port_r()
 {
 	/* Battletoads is very fussy about the vblank flag
 	   it wants it to be 1. in scanline 224 */
@@ -975,7 +975,7 @@ UINT16 sega315_5313_device::ctrl_port_r()
 	int fifo_empty = 1;
 	int fifo_full = 0;
 
-	UINT16 hpos = get_hposition();
+	uint16_t hpos = get_hposition();
 
 	if (hpos>400) hblank_flag = 1;
 	if (hpos>460) hblank_flag = 0;
@@ -1022,7 +1022,7 @@ UINT16 sega315_5313_device::ctrl_port_r()
 			(m_vdp_pal << 0); // PAL MODE FLAG checked by striker for region prot..
 }
 
-static const UINT8 vc_ntsc_224[] =
+static const uint8_t vc_ntsc_224[] =
 {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a,    0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a,    0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -1043,7 +1043,7 @@ static const UINT8 vc_ntsc_224[] =
 	0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
 };
 
-static const UINT8 vc_ntsc_240[] =
+static const uint8_t vc_ntsc_240[] =
 {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -1064,7 +1064,7 @@ static const UINT8 vc_ntsc_240[] =
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05
 };
 
-static const UINT8 vc_pal_224[] =
+static const uint8_t vc_pal_224[] =
 {
 	0x00, 0x01, 0x02,    0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 	0x10, 0x11, 0x12,    0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -1088,7 +1088,7 @@ static const UINT8 vc_pal_224[] =
 	0xf7, 0xf8, 0xf9,    0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
 };
 
-static const UINT8 vc_pal_240[] =
+static const uint8_t vc_pal_240[] =
 {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a,    0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a,    0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -1113,9 +1113,9 @@ static const UINT8 vc_pal_240[] =
 };
 
 
-UINT16 sega315_5313_device::get_hposition()
+uint16_t sega315_5313_device::get_hposition()
 {
-	UINT16 value4;
+	uint16_t value4;
 
 	if (!m_use_alt_timing)
 	{
@@ -1125,7 +1125,7 @@ UINT16 sega315_5313_device::get_hposition()
 
 		if (time_elapsed_since_megadriv_scanline_timer.attoseconds() < (ATTOSECONDS_PER_SECOND/m_framerate /m_total_scanlines))
 		{
-			value4 = (UINT16)(MAX_HPOSITION*((double)(time_elapsed_since_megadriv_scanline_timer.attoseconds()) / (double)(ATTOSECONDS_PER_SECOND/m_framerate /m_total_scanlines)));
+			value4 = (uint16_t)(MAX_HPOSITION*((double)(time_elapsed_since_megadriv_scanline_timer.attoseconds()) / (double)(ATTOSECONDS_PER_SECOND/m_framerate /m_total_scanlines)));
 		}
 		else /* in some cases (probably due to rounding errors) we get some stupid results (the odd huge value where the time elapsed is much higher than the scanline time??!).. hopefully by clamping the result to the maximum we limit errors */
 		{
@@ -1150,14 +1150,14 @@ int sega315_5313_device::get_scanline_counter()
 }
 
 
-UINT16 sega315_5313_device::megadriv_read_hv_counters()
+uint16_t sega315_5313_device::megadriv_read_hv_counters()
 {
 	/* Bubble and Squeek wants vcount=0xe0 */
 	/* Dracula is very sensitive to this */
 	/* Marvel Land is sensitive to this */
 
 	int vpos = get_scanline_counter();
-	UINT16 hpos = get_hposition();
+	uint16_t hpos = get_hposition();
 
 //  if (hpos>424) vpos++; // fixes dracula, breaks road rash
 	if (hpos>460) vpos++; // when does vpos increase.. also on sms, check game gear manual..
@@ -1188,7 +1188,7 @@ UINT16 sega315_5313_device::megadriv_read_hv_counters()
 
 READ16_MEMBER( sega315_5313_device::vdp_r )
 {
-	UINT16 retvalue = 0;
+	uint16_t retvalue = 0;
 
 
 
@@ -1274,7 +1274,7 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 	int screenwidth;
 	int maxsprites=0;
 	int maxpixels=0;
-	UINT16 base_address=0;
+	uint16_t base_address=0;
 
 
 
@@ -1299,7 +1299,7 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 		int drawypos;
 		int /*drawwidth,*/ drawheight;
 		int spritemask = 0;
-		UINT8 height,width,link,xflip,yflip,colour,pri;
+		uint8_t height,width,link,xflip,yflip,colour,pri;
 
 		/* Get Sprite Attribs */
 		spritenum = 0;
@@ -1308,7 +1308,7 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 
 		do
 		{
-			//UINT16 value1,value2,value3,value4;
+			//uint16_t value1,value2,value3,value4;
 
 			//value1 = m_vram[((base_address>>1)+spritenum*4)+0x0];
 			//value2 = m_vram[((base_address>>1)+spritenum*4)+0x1];
@@ -1383,9 +1383,9 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 
 						if (!xflip)
 						{
-							UINT16 base_addr;
+							uint16_t base_addr;
 							int xxx;
-							UINT32 gfxdata;
+							uint32_t gfxdata;
 							int loopcount;
 
 							if(m_imode == 3)
@@ -1414,9 +1414,9 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 						}
 						else
 						{
-							UINT16 base_addr;
+							uint16_t base_addr;
 							int xxx;
-							UINT32 gfxdata;
+							uint32_t gfxdata;
 
 							int loopcount;
 
@@ -1461,20 +1461,20 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 /* Clean up this function (!) */
 void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 {
-	UINT16 base_a;
-	UINT16 base_w=0;
-	UINT16 base_b;
+	uint16_t base_a;
+	uint16_t base_w=0;
+	uint16_t base_b;
 
-	UINT16 size;
-	UINT16 hsize = 64;
-	UINT16 vsize = 64;
-	UINT16 window_right;
-//  UINT16 window_hpos;
-	UINT16 window_down;
-//  UINT16 window_vpos;
-	UINT16 hscroll_base;
-//  UINT8  vscroll_mode;
-//  UINT8  hscroll_mode;
+	uint16_t size;
+	uint16_t hsize = 64;
+	uint16_t vsize = 64;
+	uint16_t window_right;
+//  uint16_t window_hpos;
+	uint16_t window_down;
+//  uint16_t window_vpos;
+	uint16_t hscroll_base;
+//  uint8_t  vscroll_mode;
+//  uint8_t  hscroll_mode;
 	int window_firstline;
 	int window_lastline;
 	int window_firstcol;
@@ -1731,7 +1731,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				if (!tile_xflip)
 				{
 					/* 8 pixels */
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 
 					for (shift=hscroll_part;shift<8;shift++)
@@ -1742,7 +1742,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				}
 				else
 				{
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 					for (shift=hscroll_part;shift<8;shift++)
 					{
@@ -1799,7 +1799,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				if (!tile_xflip)
 				{
 					/* 8 pixels */
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 
 					for (shift=0;shift<8;shift++)
@@ -1810,7 +1810,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				}
 				else
 				{
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 					for (shift=0;shift<8;shift++)
 					{
@@ -1866,7 +1866,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				if (!tile_xflip)
 				{
 					/* 8 pixels */
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 
 					for (shift=0;shift<(hscroll_part);shift++)
@@ -1877,7 +1877,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				}
 				else
 				{
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 					for (shift=0;shift<(hscroll_part);shift++)
 					{
@@ -1951,7 +1951,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 			if (!tile_xflip)
 			{
 				/* 8 pixels */
-				UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+				uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 				int shift;
 
 				for (shift=0;shift<8;shift++)
@@ -1971,7 +1971,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 			}
 			else
 			{
-				UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+				uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 				int shift;
 				for (shift=0;shift<8;shift++)
 				{
@@ -2028,7 +2028,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 			if (!tile_xflip)
 			{
 				/* 8 pixels */
-				UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+				uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 				int shift;
 
 				for (shift=0;shift<8;shift++)
@@ -2048,7 +2048,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 			}
 			else
 			{
-				UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+				uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 				int shift;
 				for (shift=0;shift<8;shift++)
 				{
@@ -2146,7 +2146,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				if (!tile_xflip)
 				{
 					/* 8 pixels */
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 
 					for (shift=hscroll_part;shift<8;shift++)
@@ -2166,7 +2166,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				}
 				else
 				{
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 					for (shift=hscroll_part;shift<8;shift++)
 					{
@@ -2238,7 +2238,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				if (!tile_xflip)
 				{
 					/* 8 pixels */
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 
 					for (shift=0;shift<8;shift++)
@@ -2258,7 +2258,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				}
 				else
 				{
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 					for (shift=0;shift<8;shift++)
 					{
@@ -2326,7 +2326,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				if (!tile_xflip)
 				{
 					/* 8 pixels */
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 
 					for (shift=0;shift<(hscroll_part);shift++)
@@ -2346,7 +2346,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				}
 				else
 				{
-					UINT32 gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
+					uint32_t gfxdata = (MEGADRIV_VDP_VRAM(tile_addr+0)<<16)|MEGADRIV_VDP_VRAM(tile_addr+1);
 					int shift;
 					for (shift=0;shift<(hscroll_part);shift++)
 					{
@@ -2385,7 +2385,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 
 				if (m_sprite_renderline[x+128] & 0x40)
 				{
-					UINT8 spritedata;
+					uint8_t spritedata;
 					spritedata = m_sprite_renderline[x+128]&0x3f;
 
 					if ((spritedata==0x0e) || (spritedata==0x1e) || (spritedata==0x2e))
@@ -2458,7 +2458,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 			{
 				if (m_sprite_renderline[x+128] & 0x80)
 				{
-					UINT8 spritedata;
+					uint8_t spritedata;
 					spritedata = m_sprite_renderline[x+128]&0x3f;
 
 					if (spritedata==0x3e)
@@ -2485,7 +2485,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 /* This converts our render buffer to real screen colours */
 void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 {
-	UINT16 *lineptr;
+	uint16_t *lineptr;
 
 
 
@@ -2502,7 +2502,7 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 
 	for (int x = 0; x < 320; x++)
 	{
-		UINT32 dat = m_video_renderline[x];
+		uint32_t dat = m_video_renderline[x];
 
 		if (!(dat & 0x20000))
 			m_render_line_raw[x] = 0x100;

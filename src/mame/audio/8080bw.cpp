@@ -32,7 +32,7 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 
 WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_1_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
 	m_sn->enable_w(!(data & 0x01));         /* SAUCER SOUND */
 
@@ -57,7 +57,7 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 	   D2 = 82K
 	   D3 = 100K */
 
-	UINT8 rising_bits = data & ~m_port_2_last_extra;
+	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(4, 3);     /* FLEET */
 	if (rising_bits & 0x02) m_samples->start(4, 4);     /* FLEET */
@@ -80,7 +80,7 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 
 WRITE8_MEMBER(_8080bw_state::spacerng_sh_port_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last_extra;
+	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(4, 3);     /* FLEET */
 	if (rising_bits & 0x02) m_samples->start(4, 4);     /* FLEET */
@@ -101,7 +101,7 @@ WRITE8_MEMBER(_8080bw_state::spacerng_sh_port_2_w)
 
 WRITE8_MEMBER(_8080bw_state::spcewars_sh_port_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
 	m_sn->enable_w(!(data & 0x01));         /* Saucer Sound */
 
@@ -139,7 +139,7 @@ const char *const lrescue_sample_names[] =
 
 WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_1_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(0, 3);     /* Thrust */
 	if (rising_bits & 0x02) m_samples->start(1, 2);     /* Shot Sound */
@@ -156,7 +156,7 @@ WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_1_w)
 
 WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last_extra;
+	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(1, 8);     /* Footstep high tone */
 	if (rising_bits & 0x02) m_samples->start(1, 7);     /* Footstep low tone */
@@ -246,7 +246,7 @@ WRITE8_MEMBER( _8080bw_state::ballbomb_01_w )
 
 WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(1, 2);     /* Hit a balloon */
 	if (rising_bits & 0x02) m_samples->start(2, 0);     /* Shot Sound */
@@ -263,7 +263,7 @@ WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
 
 WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last_extra;
+	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
 	if (data & 0x01) m_samples->start(0, 7);        /* Indicates plane will drop bombs */
 	if (data & 0x04) m_samples->start(0, 4);        /* Plane is dropping new balloons at start of level */
@@ -322,7 +322,7 @@ DISCRETE_SOUND_END
 WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_1_w)
 {
 	/* bit 4 occurs every 5.25 seconds during gameplay */
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(1, 7);     /* Death */
 	if (rising_bits & 0x02) m_samples->start(0, 1);     /* Shot Sound */
@@ -336,7 +336,7 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_1_w)
 
 WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last_extra;
+	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(4, 0);     /* Bird dropped an egg, Lasso used */
 	if (rising_bits & 0x02) m_samples->start(4, 2);     /* Egg hatches, egg shot */
@@ -355,7 +355,7 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_3_w)
 
 WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_1_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(4, 7);     /* Lasso */
 	if (rising_bits & 0x04) m_samples->start(0, 1);     /* Shot Sound */
@@ -368,7 +368,7 @@ WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_1_w)
 
 WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last_extra;
+	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
 	if (rising_bits & 0x08) m_samples->start(2, 3);     /* Move */
 	if (rising_bits & 0x10) m_samples->start(3, 7);     /* Death */
@@ -1029,7 +1029,7 @@ WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_2_w)
 
 WRITE8_MEMBER(_8080bw_state::rollingc_sh_port_w)
 {
-	UINT8 rising_bits = data & ~m_port_3_last_extra;
+	uint8_t rising_bits = data & ~m_port_3_last_extra;
 
 	if (rising_bits & 0x02) m_samples->start(4, 0); /* Steering */
 	if (rising_bits & 0x04) m_samples->start(0, 1); /* Collision */
@@ -1065,8 +1065,8 @@ WRITE8_MEMBER( _8080bw_state::lupin3_00_w )
 
 WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
-	static UINT8 lupin3_step = 2;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
+	static uint8_t lupin3_step = 2;
 
 	if (rising_bits & 0x01)
 	{
@@ -1089,7 +1089,7 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)
 
 WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last_extra;
+	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(0, 6);     /* Lands on top of building, wife kicks man */
 	//if (rising_bits & 0x02) m_samples->start(3, 7);       /* deposit money, start intermission, end game */
@@ -1117,7 +1117,7 @@ WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_1_w)
 	   bit 3 = 1st speedup
 	   Death is a stream of ff's with some fe's thrown in */
 
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
 	if (rising_bits & 0x02) m_samples->start(1, 6);     /* Ran over a dot */
 	if (rising_bits & 0x10) m_samples->start(0, 1);     /* Death */
@@ -1143,7 +1143,7 @@ WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
 
 WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_1_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(0, 3);         /* Game Over */
 	if (rising_bits & 0x02) m_samples->start(2, 0);         /* Bird dead */
@@ -1158,7 +1158,7 @@ WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_1_w)
 
 WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last_extra;
+	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(1, 6);         /* Ready? , Game Over */
 	if (rising_bits & 0x04) m_samples->start(3, 7);         /* Big bird dead */
@@ -1182,7 +1182,7 @@ WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_2_w)
 WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_1_w)
 {
 	/* bit 3 is high while you are alive and playing */
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(4, 4);         /* Fleet move */
 	if (rising_bits & 0x02) m_samples->start(5, 8);         /* Extra Tank */
@@ -1227,7 +1227,7 @@ WRITE8_MEMBER( _8080bw_state::darthvdr_00_w )
 
 WRITE8_MEMBER( _8080bw_state::darthvdr_08_w )
 {
-	UINT8 rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
 	machine().sound().system_enable(data & 0x01);
 

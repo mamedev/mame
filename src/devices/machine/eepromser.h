@@ -152,22 +152,22 @@ protected:
 
 
 	// configuration state
-	UINT8           m_command_address_bits;     // number of address bits in a command
+	uint8_t           m_command_address_bits;     // number of address bits in a command
 	bool            m_streaming_enabled;        // true if streaming is enabled
 
 	// runtime state
 	eeprom_state    m_state;                    // current internal state
-	UINT8           m_cs_state;                 // state of the CS line
+	uint8_t           m_cs_state;                 // state of the CS line
 	attotime        m_last_cs_rising_edge_time; // time of the last CS rising edge
-	UINT8           m_oe_state;                 // state of the OE line
-	UINT8           m_clk_state;                // state of the CLK line
-	UINT8           m_di_state;                 // state of the DI line
+	uint8_t           m_oe_state;                 // state of the OE line
+	uint8_t           m_clk_state;                // state of the CLK line
+	uint8_t           m_di_state;                 // state of the DI line
 	bool            m_locked;                   // are we locked against writes?
-	UINT32          m_bits_accum;               // number of bits accumulated
-	UINT32          m_command_address_accum;    // accumulator of command+address bits
+	uint32_t          m_bits_accum;               // number of bits accumulated
+	uint32_t          m_command_address_accum;    // accumulator of command+address bits
 	eeprom_command  m_command;                  // current command
-	UINT32          m_address;                  // current address extracted from command
-	UINT32          m_shift_register;           // holds data coming in/going out
+	uint32_t          m_address;                  // current address extracted from command
+	uint32_t          m_shift_register;           // holds data coming in/going out
 };
 
 
@@ -247,10 +247,10 @@ protected:
 	void copy_ram_to_eeprom();
 	void copy_eeprom_to_ram();
 	void device_start() override;
-	UINT8 m_ram_length;
-	UINT16 m_ram_data[16];
-	UINT16 m_reading;
-	UINT8 m_store_latch;
+	uint8_t m_ram_length;
+	uint16_t m_ram_data[16];
+	uint16_t m_reading;
+	uint8_t m_store_latch;
 };
 
 
@@ -264,7 +264,7 @@ protected:
 class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##_baseclass##_device \
 { \
 public: \
-	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); \
+	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
 }; \
 extern const device_type EEPROM_SERIAL_##_uppercase##_##_bits##BIT;
 // standard 93CX6 class of 16-bit EEPROMs

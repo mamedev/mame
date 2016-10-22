@@ -79,10 +79,10 @@
 
 struct keyboard_t
 {
-	UINT8       keyrows[MBC55X_KEYROWS];
+	uint8_t       keyrows[MBC55X_KEYROWS];
 	emu_timer   *keyscan_timer;
 
-	UINT8       key_special;
+	uint8_t       key_special;
 };
 
 
@@ -148,10 +148,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vid_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_t2);
 
-	UINT32      m_debug_machine;
-	UINT32      m_debug_video;
-	UINT8       m_video_mem[VIDEO_MEM_SIZE];
-	UINT8       m_vram_page;
+	uint32_t      m_debug_machine;
+	uint32_t      m_debug_video;
+	uint8_t       m_video_mem[VIDEO_MEM_SIZE];
+	uint8_t       m_vram_page;
 
 	keyboard_t  m_keyboard;
 	DECLARE_READ8_MEMBER(mbcpic8259_r);

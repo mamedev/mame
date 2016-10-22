@@ -99,7 +99,7 @@ machine_config_constructor s32comm_device::device_mconfig_additions() const
 //  s32comm_device - constructor
 //-------------------------------------------------
 
-s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S32COMM, "SYSTEM32 COMMUNICATION BD", tag, owner, clock, "s32comm", __FILE__),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ)
@@ -140,7 +140,7 @@ void s32comm_device::device_reset()
 
 READ8_MEMBER(s32comm_device::zfg_r)
 {
-	UINT8 result = m_zfg | 0xFE;
+	uint8_t result = m_zfg | 0xFE;
 #ifdef __S32COMM_VERBOSE__
 	osd_printf_verbose("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -157,7 +157,7 @@ WRITE8_MEMBER(s32comm_device::zfg_w)
 
 READ8_MEMBER(s32comm_device::share_r)
 {
-	UINT8 result = m_shared[offset];
+	uint8_t result = m_shared[offset];
 #ifdef __S32COMM_VERBOSE__
 	osd_printf_verbose("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 #endif
@@ -228,7 +228,7 @@ void s32comm_device::check_vint_irq()
 }
 
 #ifdef __S32COMM_SIMULATION__
-void s32comm_device::set_linktype(UINT16 linktype)
+void s32comm_device::set_linktype(uint16_t linktype)
 {
 	m_linktype = linktype;
 

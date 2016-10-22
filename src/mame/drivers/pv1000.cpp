@@ -17,7 +17,7 @@ class pv1000_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER(voice_w);
 
@@ -34,9 +34,9 @@ private:
 	// internal state
 	struct
 	{
-		UINT32  count;
-		UINT16  period;
-		UINT8   val;
+		uint32_t  count;
+		uint16_t  period;
+		uint8_t   val;
 	}       m_voice[4];
 
 	sound_stream    *m_sh_channel;
@@ -46,7 +46,7 @@ extern const device_type PV1000;
 
 const device_type PV1000 = &device_creator<pv1000_sound_device>;
 
-pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock, "pv1000_sound", __FILE__),
 					device_sound_interface(mconfig, *this)
 {
@@ -116,7 +116,7 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 		for (int i = 0; i < 3; i++)
 		{
-			UINT32 per = (0x3f - (m_voice[i].period & 0x3f));
+			uint32_t per = (0x3f - (m_voice[i].period & 0x3f));
 
 			if (per != 0)   //OFF!
 				*buffer += m_voice[i].val * 8192;
@@ -156,26 +156,26 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(gfxram_w);
-	UINT8   m_io_regs[8];
-	UINT8   m_fd_data;
+	uint8_t   m_io_regs[8];
+	uint8_t   m_fd_data;
 
 	emu_timer       *m_irq_on_timer;
 	emu_timer       *m_irq_off_timer;
-	UINT8 m_pcg_bank;
-	UINT8 m_force_pattern;
-	UINT8 m_fd_buffer_flag;
-	UINT8 m_border_col;
+	uint8_t m_pcg_bank;
+	uint8_t m_force_pattern;
+	uint8_t m_fd_buffer_flag;
+	uint8_t m_border_col;
 
-	UINT8 * m_gfxram;
+	uint8_t * m_gfxram;
 	void pv1000_postload();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pv1000_sound_device> m_sound;
 	required_device<generic_slot_device> m_cart;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pv1000_cart );
@@ -200,7 +200,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER( pv1000_state::gfxram_w )
 {
-	UINT8 *gfxram = memregion( "gfxram" )->base();
+	uint8_t *gfxram = memregion( "gfxram" )->base();
 
 	gfxram[ offset ] = data;
 	m_gfxdecode->gfx(1)->mark_dirty(offset/32);
@@ -240,7 +240,7 @@ WRITE8_MEMBER( pv1000_state::io_w )
 
 READ8_MEMBER( pv1000_state::io_r )
 {
-	UINT8 data = m_io_regs[offset];
+	uint8_t data = m_io_regs[offset];
 
 //  logerror("io_r offset=%02x\n", offset );
 
@@ -305,7 +305,7 @@ INPUT_PORTS_END
 
 DEVICE_IMAGE_LOAD_MEMBER( pv1000_state, pv1000_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x2000 && size != 0x4000)
 	{
@@ -320,7 +320,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pv1000_state, pv1000_cart )
 }
 
 
-UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
@@ -330,7 +330,7 @@ UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &b
 	{
 		for ( x = 2; x < 30; x++ ) // left-right most columns are definitely masked by the border color
 		{
-			UINT16 tile = m_p_videoram[ y * 32 + x ];
+			uint16_t tile = m_p_videoram[ y * 32 + x ];
 
 			if ( tile < 0xe0 || m_force_pattern )
 			{

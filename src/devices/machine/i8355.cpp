@@ -56,9 +56,9 @@ ADDRESS_MAP_END
 //  read_port - read from input port
 //-------------------------------------------------
 
-inline UINT8 i8355_device::read_port(int port)
+inline uint8_t i8355_device::read_port(int port)
 {
-	UINT8 data = m_output[port] & m_ddr[port];
+	uint8_t data = m_output[port] & m_ddr[port];
 
 	if (m_ddr[port] != 0xff)
 	{
@@ -74,7 +74,7 @@ inline UINT8 i8355_device::read_port(int port)
 //  write_port - write to output port
 //-------------------------------------------------
 
-inline void i8355_device::write_port(int port, UINT8 data)
+inline void i8355_device::write_port(int port, uint8_t data)
 {
 	m_output[port] = data;
 
@@ -92,7 +92,7 @@ inline void i8355_device::write_port(int port, UINT8 data)
 //  i8355_device - constructor
 //-------------------------------------------------
 
-i8355_device::i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8355_device::i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I8355, "Intel 8355", tag, owner, clock, "i8355", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_in_pa_cb(*this),
@@ -153,7 +153,7 @@ READ8_MEMBER( i8355_device::io_r )
 {
 	int port = offset & 0x01;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x03)
 	{

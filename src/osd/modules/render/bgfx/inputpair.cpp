@@ -55,7 +55,7 @@ void bgfx_input_pair::bind(bgfx_effect *effect, const int32_t screen) const
 	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), chains().textures().handle(name));
 }
 
-INT32 bgfx_input_pair::slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t bgfx_input_pair::slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	return texture_changed(id, str, newval);
 }
@@ -96,7 +96,7 @@ void bgfx_input_pair::create_selection_slider(uint32_t screen_index)
 {
 	std::string description = "Window " + std::to_string(chains().window_index()) + ", Screen " + std::to_string(screen_index) + " " + m_selection + ":";
 	size_t size = sizeof(slider_state) + description.length();
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(chains().machine(), UINT8, size));
+	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(chains().machine(), uint8_t, size));
 
 	state->minval = 0;
 	state->defval = m_current_texture;

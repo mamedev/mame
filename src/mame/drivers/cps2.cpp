@@ -807,7 +807,7 @@ TIMER_CALLBACK_MEMBER(cps_state::cps2_update_digital_volume)
 
 READ16_MEMBER(cps_state::cps2_qsound_volume_r)
 {
-	static const UINT16 cps2_vol_states[40] =
+	static const uint16_t cps2_vol_states[40] =
 	{
 		0xf010, 0xf008, 0xf004, 0xf002, 0xf001, 0xe810, 0xe808, 0xe804, 0xe802, 0xe801,
 		0xe410, 0xe408, 0xe404, 0xe402, 0xe401, 0xe210, 0xe208, 0xe204, 0xe202, 0xe201,
@@ -815,7 +815,7 @@ READ16_MEMBER(cps_state::cps2_qsound_volume_r)
 		0xe050, 0xe048, 0xe044, 0xe042, 0xe041, 0xe030, 0xe028, 0xe024, 0xe022, 0xe021
 	};
 
-	UINT16 result;
+	uint16_t result;
 
 	result = cps2_vol_states[m_cps2digitalvolumelevel];
 
@@ -860,7 +860,7 @@ READ16_MEMBER(cps_state::joy_or_paddle_ecofghtr_r)
 {
 	if (m_readpaddle == 0 || (m_io_in1->read() & 0x10) == 0x10) // ignore bit if spinner not enabled
 	{
-		UINT16 ret = m_io_in0->read();
+		uint16_t ret = m_io_in0->read();
 
 		if ((m_io_in1->read() & 0x10) == 0x00)
 		{
@@ -877,7 +877,7 @@ READ16_MEMBER(cps_state::joy_or_paddle_ecofghtr_r)
 		int dial0 = (ioport("DIAL0")->read());
 		int dial1 = (ioport("DIAL1")->read());
 
-		UINT16 ret = (dial0 & 0xff) | ((dial1 & 0xff) << 8);
+		uint16_t ret = (dial0 & 0xff) | ((dial1 & 0xff) << 8);
 
 		// 1st dial
 		if ((dial0 & 0x800) == (m_ecofghtr_dial_last0 & 0x800))
@@ -9771,8 +9771,8 @@ void cps_state::gigaman2_gfx_reorder()
 {
 	int i;
 	int length = memregion( "gfx" )->bytes();
-	UINT16 *rom = (UINT16 *)memregion("gfx")->base();
-	std::vector<UINT16> buf( length );
+	uint16_t *rom = (uint16_t *)memregion("gfx")->base();
+	std::vector<uint16_t> buf( length );
 
 	memcpy (&buf[0], rom, length);
 
@@ -9789,7 +9789,7 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 
 	DRIVER_INIT_CALL(cps2nc);
 
-	m_gigaman2_dummyqsound_ram = std::make_unique<UINT16[]>(0x20000 / 2);
+	m_gigaman2_dummyqsound_ram = std::make_unique<uint16_t[]>(0x20000 / 2);
 	save_pointer(NAME(m_gigaman2_dummyqsound_ram.get()), 0x20000 / 2);
 
 	space.install_readwrite_handler(0x618000, 0x619fff, read16_delegate(FUNC(cps_state::gigaman2_dummyqsound_r),this), write16_delegate(FUNC(cps_state::gigaman2_dummyqsound_w), this)); // no qsound..

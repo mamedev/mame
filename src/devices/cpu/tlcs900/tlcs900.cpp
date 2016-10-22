@@ -42,13 +42,13 @@ static ADDRESS_MAP_START(tmp95c063_mem16, AS_PROGRAM, 16, tmp95c063_device )
 ADDRESS_MAP_END
 
 
-tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	m_am8_16(0)
 {
 }
 
-tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tlcs900h_device(mconfig, TMP95C061, "TMP95C061", tag, owner, clock, "tmp95c061" ),
 	m_port1_read(*this),
 	m_port1_write(*this),
@@ -87,7 +87,7 @@ void tmp95c061_device::device_config_complete()
 	}
 }
 
-tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tlcs900h_device(mconfig, TMP95C063, "TMP95C063", tag, owner, clock, "tmp95c063"),
 	m_port1_read(*this),
 	m_port1_write(*this),
@@ -141,7 +141,7 @@ void tmp95c063_device::device_config_complete()
 }
 
 
-offs_t tlcs900h_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tlcs900h_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tlcs900 );
 	return CPU_DISASSEMBLE_NAME(tlcs900)(this, buffer, pc, oprom, opram, options);
@@ -267,9 +267,9 @@ offs_t tlcs900h_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 #define FLAG_SF     0x80
 
 
-inline UINT8 tlcs900h_device::RDOP()
+inline uint8_t tlcs900h_device::RDOP()
 {
-	UINT8 data;
+	uint8_t data;
 
 	if ( m_prefetch_clear )
 	{
@@ -531,9 +531,9 @@ void tmp95c061_device::device_reset()
 
 #define TMP95C061_NUM_MASKABLE_IRQS   22
 static const struct {
-	UINT8 reg;
-	UINT8 iff;
-	UINT8 vector;
+	uint8_t reg;
+	uint8_t iff;
+	uint8_t vector;
 } tmp95c061_irq_vector_map[TMP95C061_NUM_MASKABLE_IRQS] =
 {
 	{ TMP95C061_INTETC32, 0x80, 0x80 },   /* INTTC3 */
@@ -564,7 +564,7 @@ static const struct {
 
 int tmp95c061_device::tlcs900_process_hdma( int channel )
 {
-	UINT8 vector = ( m_reg[0x7c + channel] & 0x1f ) << 2;
+	uint8_t vector = ( m_reg[0x7c + channel] & 0x1f ) << 2;
 
 	/* Check if any HDMA actions should be performed */
 	if ( vector >= 0x28 && vector != 0x3C && vector < 0x74 )
@@ -763,7 +763,7 @@ void tmp95c061_device::tlcs900_check_irqs()
 	/* Take irq */
 	if ( irq >= 0 )
 	{
-		UINT8 vector = tmp95c061_irq_vector_map[irq].vector;
+		uint8_t vector = tmp95c061_irq_vector_map[irq].vector;
 
 		m_xssp.d -= 4;
 		WRMEML( m_xssp.d, m_pc.d );
@@ -865,7 +865,7 @@ void tmp95c061_device::tlcs900_change_tff( int which, int change )
 
 void tmp95c061_device::tlcs900_handle_timers()
 {
-	UINT32  old_pre = m_timer_pre;
+	uint32_t  old_pre = m_timer_pre;
 
 	/* Is the pre-scaler active */
 	if ( m_reg[TMP95C061_TRUN] & 0x80 )
@@ -1450,9 +1450,9 @@ WRITE8_MEMBER( tmp95c061_device::internal_w )
 
 #define TMP95C063_NUM_MASKABLE_IRQS 30
 static const struct {
-	UINT8 reg;
-	UINT8 iff;
-	UINT8 vector;
+	uint8_t reg;
+	uint8_t iff;
+	uint8_t vector;
 } tmp95c063_irq_vector_map[TMP95C063_NUM_MASKABLE_IRQS] =
 {
 	{ TMP95C063_INTETC23, 0x80, 0xa0 },     /* INTTC3 */
@@ -1476,7 +1476,7 @@ static const struct {
 	{ TMP95C063_INTET23, 0x08, 0x58 },      /* INTT2 */
 	{ TMP95C063_INTET01, 0x80, 0x54 },      /* INTT1 */
 	{ TMP95C063_INTET01, 0x08, 0x50 },      /* INTT0 */
-	{ TMP95C063_INTE78, 0x80, 0x4c },       /* INT8 */
+	{ TMP95C063_INTE78, 0x80, 0x4c },       /* int8_t */
 	{ TMP95C063_INTE78, 0x08, 0x48 },       /* INT7 */
 	{ TMP95C063_INTE56, 0x80, 0x44 },       /* INT6 */
 	{ TMP95C063_INTE56, 0x08, 0x40 },       /* INT5 */
@@ -1492,7 +1492,7 @@ void tmp95c063_device::tlcs900_handle_timers()
 {
 	// TODO: implement timers 4-7
 
-	UINT32  old_pre = m_timer_pre;
+	uint32_t  old_pre = m_timer_pre;
 
 	/* Is the pre-scaler active */
 	if ( m_reg[TMP95C063_T8RUN] & 0x80 )
@@ -1717,7 +1717,7 @@ void tmp95c063_device::tlcs900_check_irqs()
 	/* Take irq */
 	if ( irq >= 0 )
 	{
-		UINT8 vector = tmp95c063_irq_vector_map[irq].vector;
+		uint8_t vector = tmp95c063_irq_vector_map[irq].vector;
 
 		m_xssp.d -= 4;
 		WRMEML( m_xssp.d, m_pc.d );

@@ -137,7 +137,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_control_w)
 
 READ16_MEMBER(qdrmfgp_state::v_rom_r)
 {
-	UINT8 *mem8 = memregion("gfx1")->base();
+	uint8_t *mem8 = memregion("gfx1")->base();
 	int bank = m_k056832->word_r(space, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;

@@ -104,8 +104,8 @@ fcscsi1_state(const machine_config &mconfig, device_type type, const char *tag) 
 	DECLARE_READ8_MEMBER (not_implemented_r);
 	DECLARE_WRITE8_MEMBER (not_implemented_w);
 
-	UINT8 fdc_irq_state;
-	UINT8 dmac_irq_state;
+	uint8_t fdc_irq_state;
+	uint8_t dmac_irq_state;
 	int dmac_irq_vector;
 
 	virtual void machine_start () override;
@@ -120,10 +120,10 @@ private:
 	required_device<hd63450_device> m_dmac;
 
 
-	UINT8 m_tcr;
+	uint8_t m_tcr;
 
 	// Pointer to System ROMs needed by bootvect_r
-	UINT16  *m_sysrom;
+	uint16_t  *m_sysrom;
 };
 
 static ADDRESS_MAP_START (fcscsi1_mem, AS_PROGRAM, 16, fcscsi1_state)
@@ -151,7 +151,7 @@ void fcscsi1_state::machine_start ()
 	LOG (("machine_start\n"));
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0xe00000);
+	m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0xe00000);
 
 }
 
@@ -174,7 +174,7 @@ Bit #: 7 6 5 4 3 2 1 0
 
 READ8_MEMBER (fcscsi1_state::tcr_r){
 	LOG(("%s\n", FUNCNAME));
-	return (UINT8) m_tcr;
+	return (uint8_t) m_tcr;
 }
 
 WRITE8_MEMBER (fcscsi1_state::tcr_w){
@@ -243,7 +243,7 @@ READ8_MEMBER (fcscsi1_state::not_implemented_r){
 		logerror(TODO);
 		printf(TODO);
 	}
-	return (UINT8) 0;
+	return (uint8_t) 0;
 }
 
 WRITE8_MEMBER (fcscsi1_state::not_implemented_w){

@@ -31,7 +31,7 @@ extern const device_type DEVCB_LINE_DISPATCH_6;
 
 template<int N> class devcb_line_dispatch_device : public device_t {
 public:
-	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, DEVCB_LINE_DISPATCH_2, "DEVCB_LINE_DISPATCH_2", tag, owner, clock, "devcb_line_dispatch_2", __FILE__) { }
 
 	void init_fwd() {

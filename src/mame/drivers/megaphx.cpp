@@ -84,7 +84,7 @@ public:
 	}
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT16> m_mainram;
+	required_shared_ptr<uint16_t> m_mainram;
 
 
 
@@ -102,9 +102,9 @@ public:
 	int m_pic_clock;
 	int m_pic_readbit;
 
-	UINT16 m_pic_result;
+	uint16_t m_pic_result;
 
-	UINT8 port_c_value;
+	uint8_t port_c_value;
 
 	required_device<inder_sb_device> m_indersb;
 	required_device<inder_vid_device> m_indervid;
@@ -245,7 +245,7 @@ READ8_MEMBER(megaphx_state::port_c_r)
 	//printf("read port c - write value was %02x\n", port_c_value);
 
 //  int pc = machine().device("maincpu")->safe_pc();
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 //  printf("(%06x) port_c_r (thru 8255)\n", pc);
 
@@ -370,7 +370,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(megaphx_state,megaphx)
 {
-	UINT16 *src = (UINT16*)memregion( "roms67" )->base();
+	uint16_t *src = (uint16_t*)memregion( "roms67" )->base();
 	// copy vector table? - it must be writable because the game write the irq vector..
 	memcpy(m_mainram, src, 0x80);
 

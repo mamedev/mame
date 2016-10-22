@@ -25,6 +25,7 @@ ToDo:
 #include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "atari_s2.lh"
 
 
@@ -49,17 +50,17 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 private:
 	bool m_timer_sb;
-	UINT8 m_timer_s[5];
-	UINT8 m_sound0;
-	UINT8 m_sound1;
-	UINT8 m_vol;
-	UINT8 m_t_c;
-	UINT8 m_segment[7];
-	UINT8 *m_p_prom;
+	uint8_t m_timer_s[5];
+	uint8_t m_sound0;
+	uint8_t m_sound1;
+	uint8_t m_vol;
+	uint8_t m_t_c;
+	uint8_t m_segment[7];
+	uint8_t *m_p_prom;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
-	required_device<dac_device> m_dac1;
+	required_device<dac_4bit_binary_weighted_device> m_dac;
+	required_device<dac_3bit_binary_weighted_device> m_dac1;
 };
 
 
@@ -344,13 +345,13 @@ WRITE8_MEMBER( atari_s2_state::sol0_w )
 
 WRITE8_MEMBER( atari_s2_state::display_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	if (offset<7)
 		m_segment[offset] = patterns[data&15];
 	else
 	{
 		data &= 7;
-		for (UINT8 i = 0; i < 7; i++)
+		for (uint8_t i = 0; i < 7; i++)
 			output().set_digit_value(i * 10 + data, m_segment[i]);
 	}
 }
@@ -391,7 +392,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::timer_s )
 			m_timer_s[2]++;
 			offs_t offs = (m_timer_s[2] & 31) | ((m_sound0 & 15) << 5);
 			if (BIT(m_sound0, 6))
-				m_dac->write_unsigned8(m_p_prom[offs]<< 4);
+				m_dac->write(m_p_prom[offs]);
 			// noise
 			if (BIT(m_sound0, 7))
 			{
@@ -399,7 +400,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::timer_s )
 				bool ab1 = !BIT(m_timer_s[3], 1);
 				m_timer_s[3] = (m_timer_s[3] << 1) | ab0;
 				m_timer_s[4] = (m_timer_s[4] << 1) | ab1;
-				m_dac1->write_unsigned8((m_timer_s[4] & 7)<< 5);
+				m_dac1->write(m_timer_s[4] & 7);
 			}
 			else
 			{
@@ -419,7 +420,7 @@ WRITE8_MEMBER( atari_s2_state::sound0_w )
 	m_sound0 = data;
 	offs_t offs = (m_timer_s[2] & 31) | ((m_sound0 & 15) << 5);
 	if (BIT(m_sound0, 6))
-		m_dac->write_unsigned8(m_p_prom[offs]<< 4);
+		m_dac->write(m_p_prom[offs]);
 }
 
 // d0-3 = volume
@@ -432,6 +433,7 @@ WRITE8_MEMBER( atari_s2_state::sound1_w )
 
 	if (data != m_vol)
 	{
+		// 4066  + r65-r68 (68k,33k,18k,8.2k)
 		m_vol = data;
 		float vol = m_vol/16.666+0.1;
 		m_dac->set_output_gain(0, vol);
@@ -451,6 +453,8 @@ void atari_s2_state::machine_reset()
 {
 	m_p_prom = memregion("proms")->base();
 	m_vol = 0;
+	m_dac->set_output_gain(0,0);
+	m_dac1->set_output_gain(0,0);
 	m_sound0 = 0;
 	m_sound1 = 0;
 }
@@ -465,11 +469,13 @@ static MACHINE_CONFIG_START( atari_s2, atari_s2_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r23-r26 (68k,33k,18k,8.2k)
+	MCFG_SOUND_ADD("dac1", DAC_3BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r18-r20 (100k,47k,100k)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_atari_s2)

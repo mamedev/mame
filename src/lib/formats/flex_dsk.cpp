@@ -33,7 +33,7 @@ bool flex_format::supports_save() const
 	return true;
 }
 
-int flex_format::identify(io_generic *io, UINT32 form_factor)
+int flex_format::identify(io_generic *io, uint32_t form_factor)
 {
 	io_generic_read(io, &info, 256 * 2, sizeof(struct sysinfo_sector));
 
@@ -45,7 +45,7 @@ int flex_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool flex_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool flex_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	int spt = info.last_sec;
 	int bps = 256;
@@ -76,7 +76,7 @@ bool flex_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		for(int head=0;head < head_num;head++)
 		{
 			desc_pc_sector sects[80];
-			UINT8 sect_data[20000];
+			uint8_t sect_data[20000];
 			int sdatapos = 0;
 			for(int i=0; i<spt; i++)
 			{

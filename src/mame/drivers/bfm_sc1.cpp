@@ -156,8 +156,8 @@ public:
 	int m_mux2_datalo;
 	int m_mux2_datahi;
 	int m_mux2_input;
-	UINT8 m_sc1_Inputs[64];
-	UINT8 m_codec_data[256];
+	uint8_t m_sc1_Inputs[64];
+	uint8_t m_codec_data[256];
 
 	int m_defaultbank;
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -407,7 +407,7 @@ WRITE8_MEMBER(bfm_sc1_state::vfd_w)
 
 // conversion table BFM strobe data to internal lamp numbers
 
-static const UINT8 BFM_strcnv[] =
+static const uint8_t BFM_strcnv[] =
 {
 	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,
 	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,
@@ -660,7 +660,7 @@ void bfm_sc1_state::machine_reset()
 
 // init rom bank ////////////////////////////////////////////////////////////////////
 	{
-		UINT8 *rom = memregion("maincpu")->base();
+		uint8_t *rom = memregion("maincpu")->base();
 
 		membank("bank1")->configure_entries(0, 4, &rom[0x0000], 0x02000);
 		membank("bank1")->set_entry(m_defaultbank);
@@ -1163,7 +1163,7 @@ int bfm_sc1_state::sc1_find_project_string( )
 {
 	// search for the project string to find the title (usually just at ff00)
 	char title_string[7][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2", "PR6121", "CHINA TOWN\x0d\x0a", "PROJECTNUMBER" };
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
 	for (auto & elem : title_string)
@@ -1176,8 +1176,8 @@ int bfm_sc1_state::sc1_find_project_string( )
 			int found = 1;
 			for (j=0;j<strlength;j+=1)
 			{
-				UINT8 rom = src[(i+j)];
-				UINT8 chr = elem[j];
+				uint8_t rom = src[(i+j)];
+				uint8_t chr = elem[j];
 
 				if (rom != chr)
 				{
@@ -1195,7 +1195,7 @@ int bfm_sc1_state::sc1_find_project_string( )
 
 				while (!end)
 				{
-					UINT8 rom;
+					uint8_t rom;
 					int addr;
 
 					addr = (i+count);

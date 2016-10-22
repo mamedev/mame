@@ -59,7 +59,7 @@ void snes_miracle_device::device_timer(emu_timer &timer, device_timer_id id, int
 //  snes_miracle_device - constructor
 //-------------------------------------------------
 
-snes_miracle_device::snes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+snes_miracle_device::snes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, SNES_MIRACLE, "Miracle Piano SNES Cable", tag, owner, clock, "snes_miracle", __FILE__),
 					device_serial_interface(mconfig, *this),
 					device_snes_control_port_interface(mconfig, *this),
@@ -107,9 +107,9 @@ void snes_miracle_device::device_reset()
 	m_tx_busy = false;
 }
 
-UINT8 snes_miracle_device::read_pin4()
+uint8_t snes_miracle_device::read_pin4()
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (m_midi_mode == MIRACLE_MIDI_RECEIVE)
 	{
@@ -128,12 +128,12 @@ UINT8 snes_miracle_device::read_pin4()
 	return ret;
 }
 
-void snes_miracle_device::write_pin6(UINT8 data)
+void snes_miracle_device::write_pin6(uint8_t data)
 {
 //  printf("%02x to pin6\n", data);
 }
 
-void snes_miracle_device::write_strobe(UINT8 data)
+void snes_miracle_device::write_strobe(uint8_t data)
 {
 //  printf("%02x to strobe\n", data);
 
@@ -223,7 +223,7 @@ void snes_miracle_device::write_strobe(UINT8 data)
 void snes_miracle_device::rcv_complete()    // Rx completed receiving byte
 {
 	receive_register_extract();
-	UINT8 rcv = get_received_char();
+	uint8_t rcv = get_received_char();
 
 //  printf("Got %02x -> [%d]\n", rcv, m_recv_write);
 	m_recvring[m_recv_write++] = rcv;
@@ -252,13 +252,13 @@ void snes_miracle_device::tra_complete()    // Tx completed sending byte
 
 void snes_miracle_device::tra_callback()    // Tx send bit
 {
-	UINT8 bit = transmit_register_get_data_bit();
+	uint8_t bit = transmit_register_get_data_bit();
 
 	// send this to midi out
 	m_midiout->write_txd(bit);
 }
 
-void snes_miracle_device::xmit_char(UINT8 data)
+void snes_miracle_device::xmit_char(uint8_t data)
 {
 	// if tx is busy it'll pick this up automatically when it completes
 	// if not, send now!

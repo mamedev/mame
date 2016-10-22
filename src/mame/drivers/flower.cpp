@@ -90,11 +90,11 @@ public:
 
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<UINT8> m_txvram;
-	required_shared_ptr<UINT8> m_bgvram;
-	required_shared_ptr<UINT8> m_fgvram;
+	required_shared_ptr<uint8_t> m_txvram;
+	required_shared_ptr<uint8_t> m_bgvram;
+	required_shared_ptr<uint8_t> m_fgvram;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };
@@ -111,8 +111,8 @@ void flower_state::legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 		int x = count % 32;
 		int y = count / 32;
 
-		UINT8 tile = m_txvram[count];
-		UINT8 attr = m_txvram[count+0x400];
+		uint8_t tile = m_txvram[count];
+		uint8_t attr = m_txvram[count+0x400];
 
 		if(attr & 0x03) // debug
 			attr = machine().rand() & 0xfc;
@@ -125,8 +125,8 @@ void flower_state::legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 		int x = count / 32;
 		int y = count % 32;
 
-		UINT8 tile = m_txvram[count];
-		UINT8 attr = m_txvram[count+0x400];
+		uint8_t tile = m_txvram[count];
+		uint8_t attr = m_txvram[count+0x400];
 
 		if(attr & 0x03) // debug
 			attr = machine().rand() & 0xfc;
@@ -145,7 +145,7 @@ void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &clip
 	{
 		int x = count % 16;
 		int y = count / 16;
-		UINT8 tile, attr;
+		uint8_t tile, attr;
 
 		tile = m_bgvram[count];
 		attr = m_bgvram[count+0x100];
@@ -163,7 +163,7 @@ void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &clip
 	}
 }
 
-UINT32 flower_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t flower_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	legacy_layers_draw(bitmap,cliprect);
 	legacy_tx_draw(bitmap,cliprect);

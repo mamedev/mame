@@ -40,8 +40,8 @@ enum
 struct hcd62121_dasm
 {
 	const char *str;
-	UINT8       arg1;
-	UINT8       arg2;
+	uint8_t       arg1;
+	uint8_t       arg2;
 };
 
 
@@ -131,9 +131,9 @@ static const hcd62121_dasm hcd62121_ops[256] =
 
 CPU_DISASSEMBLE( hcd62121 )
 {
-	UINT8 op;
-	UINT8 op1;
-	UINT8 op2;
+	uint8_t op;
+	uint8_t op1;
+	uint8_t op2;
 	int pos = 0;
 	const hcd62121_dasm *inst;
 

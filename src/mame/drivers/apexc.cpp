@@ -22,13 +22,13 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")  { }
 
-	UINT32 m_panel_data_reg;    /* value of a data register on the control panel which can
+	uint32_t m_panel_data_reg;    /* value of a data register on the control panel which can
 	                            be edited - the existence of this register is a personnal
 	                            guess */
 
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 
-	UINT32 m_old_edit_keys;
+	uint32_t m_old_edit_keys;
 	int m_old_control_keys;
 
 	int m_letters;
@@ -37,7 +37,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(apexc);
-	UINT32 screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apexc_interrupt);
 	DECLARE_READ8_MEMBER(tape_read);
 	DECLARE_WRITE8_MEMBER(tape_write);
@@ -74,7 +74,7 @@ class apexc_cylinder_image_device : public device_t, public device_image_interfa
 {
 public:
 	// construction/destruction
-	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_CYLINDER; }
@@ -98,7 +98,7 @@ private:
 
 const device_type APEXC_CYLINDER = &device_creator<apexc_cylinder_image_device>;
 
-apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APEXC_CYLINDER, "APEXC Cylinder", tag, owner, clock, "apexc_cylinder_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -115,7 +115,7 @@ image_init_result apexc_cylinder_image_device::call_load()
 	fread( machine().root_device().memregion("maincpu")->base(), 0x1000);
 #ifdef LSB_FIRST
 	{   /* fix endianness */
-		UINT32 *RAM = (UINT32 *)(machine().root_device().memregion("maincpu")->base());
+		uint32_t *RAM = (uint32_t *)(machine().root_device().memregion("maincpu")->base());
 
 		for (int i=0; i < 0x0400; i++)
 			RAM[i] = big_endianize_int32(RAM[i]);
@@ -136,7 +136,7 @@ void apexc_cylinder_image_device::call_unload()
 		fseek(0, SEEK_SET);
 #ifdef LSB_FIRST
 		{   /* fix endianness */
-			UINT32 *RAM = (UINT32 *)(machine().root_device().memregion("maincpu")->base());
+			uint32_t *RAM = (uint32_t *)(machine().root_device().memregion("maincpu")->base());
 
 			for (int i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = big_endianize_int32(RAM[i]);
@@ -201,7 +201,7 @@ class apexc_tape_puncher_image_device : public device_t, public device_image_int
 {
 public:
 	// construction/destruction
-	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -220,7 +220,7 @@ protected:
 
 const device_type APEXC_TAPE_PUNCHER = &device_creator<apexc_tape_puncher_image_device>;
 
-apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APEXC_TAPE_PUNCHER, "APEXC Tape Puncher", tag, owner, clock, "apexc_tape_puncher_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -233,7 +233,7 @@ class apexc_tape_reader_image_device :  public device_t, public device_image_int
 {
 public:
 	// construction/destruction
-	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -252,7 +252,7 @@ protected:
 
 const device_type APEXC_TAPE_READER = &device_creator<apexc_tape_reader_image_device>;
 
-apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APEXC_TAPE_READER, "APEXC Tape Reader", tag, owner, clock, "apexc_tape_reader_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -268,7 +268,7 @@ apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_con
 READ8_MEMBER(apexc_state::tape_read)
 {
 	device_t *device = machine().device("tape_reader");
-	UINT8 reply;
+	uint8_t reply;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 
 	if (image->exists() && (image->fread(& reply, 1) == 1))
@@ -280,7 +280,7 @@ READ8_MEMBER(apexc_state::tape_read)
 WRITE8_MEMBER(apexc_state::tape_write)
 {
 	device_t *device = machine().device("tape_puncher");
-	UINT8 data5 = (data & 0x1f);
+	uint8_t data5 = (data & 0x1f);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 
 	if (image->exists())
@@ -402,7 +402,7 @@ INPUT_PORTS_END
 INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT32 edit_keys;
+	uint32_t edit_keys;
 	int control_keys;
 
 	int control_transitions;
@@ -596,7 +596,7 @@ void apexc_state::apexc_draw_string(bitmap_ind16 &bitmap, const char *buf, int x
 }
 
 
-UINT32 apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	char the_char;
@@ -635,7 +635,7 @@ void apexc_state::apexc_teletyper_init()
 
 void apexc_state::apexc_teletyper_linefeed()
 {
-	UINT8 buf[teletyper_window_width];
+	uint8_t buf[teletyper_window_width];
 	int y;
 
 	for (y=teletyper_window_offset_y; y<teletyper_window_offset_y+teletyper_window_height-teletyper_scroll_step; y++)
@@ -729,7 +729,7 @@ enum
 /* apexc driver init : builds a font for use by the teletyper */
 DRIVER_INIT_MEMBER(apexc_state,apexc)
 {
-	UINT8 *dst;
+	uint8_t *dst;
 
 	static const unsigned char fontdata6x8[apexcfontdata_size] =
 	{   /* ASCII characters */

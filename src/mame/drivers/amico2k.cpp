@@ -51,7 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pb_w );
 
 	int m_ls145_p;
-	UINT8 m_segment;
+	uint8_t m_segment;
 
 	// timers
 	emu_timer *m_led_refresh_timer;

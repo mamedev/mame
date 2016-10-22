@@ -41,7 +41,7 @@ public:
 	DECLARE_READ16_MEMBER(stat_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -73,7 +73,7 @@ READ16_MEMBER( c900_state::port1e_r )
 
 READ16_MEMBER( c900_state::key_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

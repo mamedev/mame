@@ -77,7 +77,7 @@ struct ssg_callbacks
 typedef stream_sample_t FMSAMPLE;
 /*
 #if (FM_SAMPLE_BITS==16)
-typedef INT16 FMSAMPLE;
+typedef int16_t FMSAMPLE;
 #endif
 #if (FM_SAMPLE_BITS==8)
 typedef unsigned char  FMSAMPLE;

@@ -50,8 +50,8 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;
@@ -65,7 +65,7 @@ public:
 	required_device<tea1002_device> m_tea1002;
 	required_device<palette_device> m_palette;
 
-	UINT8 m_scrambler;
+	uint8_t m_scrambler;
 	tilemap_t *m_tilemap;
 
 	DECLARE_WRITE8_MEMBER(aquarius_videoram_w);
@@ -83,7 +83,7 @@ public:
 	TILE_GET_INFO_MEMBER(aquarius_gettileinfo);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(aquarius);
-	UINT32 screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(aquarius_reset);
 };
 #endif /* AQUARIUS_H_ */

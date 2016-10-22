@@ -547,7 +547,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(atetris_state,atetris)
 {
-	UINT8 *rgn = memregion("maincpu")->base();
+	uint8_t *rgn = memregion("maincpu")->base();
 
 	m_slapstic_device->slapstic_init();
 	m_slapstic_source = &rgn[0x10000];

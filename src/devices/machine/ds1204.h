@@ -22,7 +22,7 @@ class ds1204_device : public device_t,
 {
 public:
 	// construction/destruction
-	ds1204_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+	ds1204_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	DECLARE_WRITE_LINE_MEMBER( write_rst );
 	DECLARE_WRITE_LINE_MEMBER( write_clk );
@@ -41,8 +41,8 @@ protected:
 private:
 	inline void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, const char *s_fmt, ... );
 	void new_state(int state);
-	void writebit(UINT8 *buffer);
-	void readbit(UINT8 *buffer);
+	void writebit(uint8_t *buffer);
+	void readbit(uint8_t *buffer);
 
 	enum state_t
 	{
@@ -80,12 +80,12 @@ private:
 	int m_dqr;
 	int m_state;
 	int m_bit;
-	UINT8 m_command[3];
-	UINT8 m_compare_register[8];
-	UINT8 m_unique_pattern[2];
-	UINT8 m_identification[8];
-	UINT8 m_security_match[8];
-	UINT8 m_secure_memory[16];
+	uint8_t m_command[3];
+	uint8_t m_compare_register[8];
+	uint8_t m_unique_pattern[2];
+	uint8_t m_identification[8];
+	uint8_t m_security_match[8];
+	uint8_t m_secure_memory[16];
 };
 
 

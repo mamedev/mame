@@ -105,7 +105,6 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "sound/dac.h"
 #include "audio/galaxian.h"
 #include "includes/galaxold.h"
 
@@ -418,12 +417,12 @@ WRITE8_MEMBER( galaxold_state::guttang_rombank_w )
 //  printf("rombank %02x\n",data);
 	if (data&1)
 	{
-		UINT8 *rom = memregion("maincpu")->base();
+		uint8_t *rom = memregion("maincpu")->base();
 		membank("cpubank")->set_base(rom + 0x4000);
 	}
 	else
 	{
-		UINT8 *rom = memregion("maincpu")->base();
+		uint8_t *rom = memregion("maincpu")->base();
 		membank("cpubank")->set_base(rom + 0x2000);
 	}
 }
@@ -782,7 +781,7 @@ ADDRESS_MAP_END
 /* Lives Dips are spread across two input ports */
 CUSTOM_INPUT_MEMBER(galaxold_state::vpool_lives_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -1025,7 +1024,7 @@ INPUT_PORTS_END
 /* Coinage Dips are spread across two input ports */
 CUSTOM_INPUT_MEMBER(galaxold_state::ckongg_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -1537,7 +1536,7 @@ INPUT_PORTS_END
 /* Coinage Dips are spread across two input ports */
 CUSTOM_INPUT_MEMBER(galaxold_state::dkongjrm_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -2239,7 +2238,7 @@ static MACHINE_CONFIG_START( galaxold_base, galaxold_state )
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,galaxold)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 
@@ -2428,7 +2427,7 @@ static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
 	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -2457,7 +2456,7 @@ static MACHINE_CONFIG_START( drivfrcg, galaxold_state )
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,drivfrcg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END
@@ -2478,7 +2477,7 @@ static MACHINE_CONFIG_DERIVED( bongo, galaxold_base )
 	/* sound hardware */
 	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -2538,9 +2537,9 @@ static MACHINE_CONFIG_START( racknrol, galaxold_state )
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("snsnd", SN76489A, PIXEL_CLOCK/2) // SN76489AN
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2564,9 +2563,9 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("snsnd", SN76496, PIXEL_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2782,7 +2781,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
 {
-	UINT16 ckonggx_remap[88] = {
+	uint16_t ckonggx_remap[88] = {
 		0x5000, 0x0d00, 0x0e00, 0x0f00, 0x0c00, 0x0100, 0x0200, 0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800, 0x0900, 0x0a00, 0x0b00,
 		0x1400, 0x1500, 0x1600, 0x1700, 0x1800, 0x1900, 0x1a00, 0x1b00, 0x1c00, 0x1d00, 0x1e00, 0x1f00, 0x1000, 0x1100, 0x1200, 0x1300,
 		0x2400, 0x2500, 0x2600, 0x2700, 0x2800, 0x2900, 0x2a00, 0x2b00, 0x2c00, 0x2d00, 0x2e00, 0x2f00, 0x2000, 0x2100, 0x2200, 0x2300,
@@ -2792,8 +2791,8 @@ DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
 		/*^ at 0x0000 there is alt startup code? does it get banked in? */
 	};
 
-	UINT8 *rom = memregion("maincpu")->base();
-	dynamic_buffer buffer(0x5800);
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x5800);
 
 	for (int i=0;i<88;i++)
 	{
@@ -3486,7 +3485,7 @@ DRIVER_INIT_MEMBER(galaxold_state,guttangt)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_bank( 0x2000, 0x27ff, "cpubank" );
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	membank("cpubank")->set_base(rom + 0x2000);
 }
 

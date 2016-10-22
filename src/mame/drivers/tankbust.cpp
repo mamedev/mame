@@ -127,7 +127,7 @@ READ8_MEMBER(tankbust_state::debug_output_area_r)
 
 PALETTE_INIT_MEMBER(tankbust_state, tankbust)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 128; i++)

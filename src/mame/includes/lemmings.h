@@ -29,9 +29,9 @@ public:
 	/* video-related */
 	bitmap_ind16 m_bitmap0;
 	tilemap_t *m_vram_tilemap;
-	UINT16 m_sprite_triple_buffer_0[0x800];
-	UINT16 m_sprite_triple_buffer_1[0x800];
-	UINT8 m_vram_buffer[2048 * 64]; // 64 bytes per VRAM character
+	uint16_t m_sprite_triple_buffer_0[0x800];
+	uint16_t m_sprite_triple_buffer_1[0x800];
+	uint8_t m_vram_buffer[2048 * 64]; // 64 bytes per VRAM character
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -46,14 +46,14 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_control_data;
-	required_shared_ptr<UINT16> m_vram_data;
-	required_shared_ptr<UINT16> m_pixel_0_data;
-	required_shared_ptr<UINT16> m_pixel_1_data;
+	required_shared_ptr<uint16_t> m_control_data;
+	required_shared_ptr<uint16_t> m_vram_data;
+	required_shared_ptr<uint16_t> m_pixel_0_data;
+	required_shared_ptr<uint16_t> m_pixel_1_data;
 
 	DECLARE_WRITE16_MEMBER(lemmings_control_w);
 	DECLARE_READ16_MEMBER(lemmings_trackball_r);
-	void lemmings_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
+	void lemmings_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 	DECLARE_WRITE8_MEMBER(lemmings_sound_ack_w);
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_0_w);
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_1_w);
@@ -61,7 +61,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_lemmings(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lemmings(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_lemmings(screen_device &screen, bool state);
 	void lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect);
 

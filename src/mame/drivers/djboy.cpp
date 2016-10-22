@@ -355,9 +355,9 @@ WRITE8_MEMBER(djboy_state::beast_p2_w)
 
 READ8_MEMBER(djboy_state::beast_p3_r)
 {
-	UINT8 dsw = 0;
-	UINT8 dsw1 = ~ioport("DSW1")->read();
-	UINT8 dsw2 = ~ioport("DSW2")->read();
+	uint8_t dsw = 0;
+	uint8_t dsw1 = ~ioport("DSW1")->read();
+	uint8_t dsw2 = ~ioport("DSW2")->read();
 
 	switch ((m_beast_p0 >> 5) & 3)
 	{
@@ -505,9 +505,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(djboy_state::djboy_scanline)
 
 void djboy_state::machine_start()
 {
-	UINT8 *MAIN = memregion("maincpu")->base();
-	UINT8 *CPU1 = memregion("cpu1")->base();
-	UINT8 *CPU2 = memregion("cpu2")->base();
+	uint8_t *MAIN = memregion("maincpu")->base();
+	uint8_t *CPU1 = memregion("cpu1")->base();
+	uint8_t *CPU2 = memregion("cpu2")->base();
 
 	membank("bank1")->configure_entries(0, 4,  &MAIN[0x00000], 0x2000);
 	membank("bank1")->configure_entries(4, 28, &MAIN[0x10000], 0x2000);

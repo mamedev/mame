@@ -146,12 +146,12 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
-	required_shared_ptr<UINT8> m_vram0;
-	required_shared_ptr<UINT8> m_attr0;
-	required_shared_ptr<UINT8> m_vram1;
-	required_shared_ptr<UINT8> m_attr1;
+	required_shared_ptr<uint8_t> m_vram0;
+	required_shared_ptr<uint8_t> m_attr0;
+	required_shared_ptr<uint8_t> m_vram1;
+	required_shared_ptr<uint8_t> m_attr1;
 
-	UINT8 m_laserdisc_data;
+	uint8_t m_laserdisc_data;
 	int m_nmimask;
 	DECLARE_READ8_MEMBER(acia_status_hack_r);
 	DECLARE_READ8_MEMBER(sound_status_r);
@@ -159,12 +159,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
-	UINT32 screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
 };
 
-void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank )
+void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int i,spr_offs,x,y,col,fx,fy;
@@ -209,7 +209,7 @@ void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;

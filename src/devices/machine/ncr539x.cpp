@@ -116,7 +116,7 @@ const device_type NCR539X = &device_creator<ncr539x_device>;
 //  ncr539x_device - constructor/destructor
 //-------------------------------------------------
 
-ncr539x_device::ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ncr539x_device::ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	legacy_scsi_host_adapter(mconfig, NCR539X, "539x SCSI", tag, owner, clock, "ncr539x", __FILE__),
 	m_out_irq_cb(*this),
 	m_out_drq_cb(*this)
@@ -163,13 +163,13 @@ void ncr539x_device::device_reset()
 	m_out_drq_cb(CLEAR_LINE);
 }
 
-void ncr539x_device::dma_read_data(int bytes, UINT8 *pData)
+void ncr539x_device::dma_read_data(int bytes, uint8_t *pData)
 {
 	read_data(pData, bytes);
 }
 
 
-void ncr539x_device::dma_write_data(int bytes, UINT8 *pData)
+void ncr539x_device::dma_write_data(int bytes, uint8_t *pData)
 {
 	write_data(pData, bytes);
 }
@@ -292,7 +292,7 @@ void ncr539x_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 
 READ8_MEMBER( ncr539x_device::read )
 {
-	UINT8 rv = 0;
+	uint8_t rv = 0;
 
 	#if VERBOSE
 	#if VERBOSE_READS
@@ -312,7 +312,7 @@ READ8_MEMBER( ncr539x_device::read )
 
 		case 2: // FIFO
 			{
-				UINT8 fifo_bytes = m_fifo_internal_state & 0x1f;
+				uint8_t fifo_bytes = m_fifo_internal_state & 0x1f;
 
 				if (!fifo_bytes)
 				{
@@ -753,7 +753,7 @@ void ncr539x_device::check_fifo_executable()
 	}
 }
 
-void ncr539x_device::fifo_write(UINT8 data)
+void ncr539x_device::fifo_write(uint8_t data)
 {
 	int phase = (m_status & 7);
 

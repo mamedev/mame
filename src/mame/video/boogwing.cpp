@@ -28,15 +28,15 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 	bitmap_ind8* priority_bitmap;
 
 	address_space &space = machine().driver_data()->generic_space();
-	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
+	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	sprite_bitmap1 = &m_sprgen1->get_sprite_temp_bitmap();
 	sprite_bitmap2 = &m_sprgen2->get_sprite_temp_bitmap();
 	priority_bitmap = &screen.priority();
 
-	UINT32* dstline;
-	UINT16 *srcline1, *srcline2;
-	UINT8 *srcpriline;
+	uint32_t* dstline;
+	uint16_t *srcline1, *srcline2;
+	uint8_t *srcpriline;
 
 	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
@@ -48,8 +48,8 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
-			UINT16 pix1 = srcline1[x];
-			UINT16 pix2 = srcline2[x];
+			uint16_t pix1 = srcline1[x];
+			uint16_t pix2 = srcline2[x];
 
 			/* Here we have
 			 pix1 - raw pixel / colour / priority data from first 1sdt chip
@@ -131,7 +131,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 					break;
 			}
 
-			UINT8 bgpri = srcpriline[x];
+			uint8_t bgpri = srcpriline[x];
 			/* once we get here we have
 
 			pri1 - 4/16/64 (sprite chip 1 pixel priority relative to bg)
@@ -167,7 +167,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 						}
 						else
 						{
-							UINT32 base = dstline[x];
+							uint32_t base = dstline[x];
 							dstline[x] = alpha_blend_r32(base, paldata[(pix2&0xff)+0x700], alpha2);
 						}
 					}
@@ -177,11 +177,11 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 }
 
-UINT32 boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	/* Draw sprite planes to bitmaps for later mixing */
 	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);

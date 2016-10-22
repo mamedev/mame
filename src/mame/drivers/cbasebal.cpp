@@ -335,9 +335,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
 {
-	UINT8 *src = memregion("maincpu")->base();
+	uint8_t *src = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
-	m_decoded = std::make_unique<UINT8[]>(size);
+	m_decoded = std::make_unique<uint8_t[]>(size);
 	pang_decode(src, m_decoded.get(), size);
 	membank("bank1")->configure_entries(0, 32, src + 0x10000, 0x4000);
 	membank("bank0d")->set_base(m_decoded.get());

@@ -8,7 +8,7 @@
 class k001604_device : public device_t, public device_gfx_interface
 {
 public:
-	k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k001604_device() {}
 
 	// static configuration
@@ -40,9 +40,9 @@ private:
 	tilemap_t      *m_layer_8x8[2];
 	tilemap_t      *m_layer_roz;
 
-	std::unique_ptr<UINT32[]>       m_tile_ram;
-	std::unique_ptr<UINT32[]>       m_char_ram;
-	std::unique_ptr<UINT32[]>       m_reg;
+	std::unique_ptr<uint32_t[]>       m_tile_ram;
+	std::unique_ptr<uint32_t[]>       m_char_ram;
+	std::unique_ptr<uint32_t[]>       m_reg;
 
 	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_0_size0);
 	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_0_size1);

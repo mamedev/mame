@@ -9,8 +9,8 @@ class gameboy_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	gameboy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gameboy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER(sound_r);
 	virtual DECLARE_READ8_MEMBER(wave_r) = 0;
@@ -78,41 +78,41 @@ protected:
 	struct SOUND
 	{
 		/* Common */
-		UINT8  reg[5];
+		uint8_t  reg[5];
 		bool   on;
-		UINT8  channel;
-		UINT8  length;
-		UINT8  length_mask;
+		uint8_t  channel;
+		uint8_t  length;
+		uint8_t  length_mask;
 		bool   length_counting;
 		bool   length_enabled;
 		/* Mode 1, 2, 3 */
-		UINT64 cycles_left;
-		INT8   duty;
+		uint64_t cycles_left;
+		int8_t   duty;
 		/* Mode 1, 2, 4 */
 		bool   envelope_enabled;
-		INT8   envelope_value;
-		INT8   envelope_direction;
-		UINT8  envelope_time;
-		UINT8  envelope_count;
-		INT8   signal;
+		int8_t   envelope_value;
+		int8_t   envelope_direction;
+		uint8_t  envelope_time;
+		uint8_t  envelope_count;
+		int8_t   signal;
 		/* Mode 1 */
-		UINT16 frequency;
-		UINT16 frequency_counter;
+		uint16_t frequency;
+		uint16_t frequency_counter;
 		bool   sweep_enabled;
 		bool   sweep_neg_mode_used;
-		UINT8  sweep_shift;
-		INT32  sweep_direction;
-		UINT8  sweep_time;
-		UINT8  sweep_count;
+		uint8_t  sweep_shift;
+		int32_t  sweep_direction;
+		uint8_t  sweep_time;
+		uint8_t  sweep_count;
 		/* Mode 3 */
-		UINT8  level;
-		UINT8  offset;
-		UINT32 duty_count;
-		INT8   current_sample;
+		uint8_t  level;
+		uint8_t  offset;
+		uint32_t duty_count;
+		int8_t   current_sample;
 		bool   sample_reading;
 		/* Mode 4 */
 		bool   noise_short;
-		UINT16 noise_lfsr;
+		uint16_t noise_lfsr;
 	};
 
 	struct SOUND  m_snd_1;
@@ -122,31 +122,31 @@ protected:
 
 	struct
 	{
-		UINT8 on;
-		UINT8 vol_left;
-		UINT8 vol_right;
-		UINT8 mode1_left;
-		UINT8 mode1_right;
-		UINT8 mode2_left;
-		UINT8 mode2_right;
-		UINT8 mode3_left;
-		UINT8 mode3_right;
-		UINT8 mode4_left;
-		UINT8 mode4_right;
-		UINT64 cycles;
+		uint8_t on;
+		uint8_t vol_left;
+		uint8_t vol_right;
+		uint8_t mode1_left;
+		uint8_t mode1_right;
+		uint8_t mode2_left;
+		uint8_t mode2_right;
+		uint8_t mode3_left;
+		uint8_t mode3_right;
+		uint8_t mode4_left;
+		uint8_t mode4_right;
+		uint64_t cycles;
 		bool wave_ram_locked;
 	} m_snd_control;
 
-	UINT8 m_snd_regs[0x30];
+	uint8_t m_snd_regs[0x30];
 	attotime m_last_updated;
 	emu_timer *m_timer;
 
 	virtual void apu_power_off() = 0;
-	void sound_w_internal(int offset, UINT8 data);
-	void update_square_channel(struct SOUND &snd, UINT64 cycles);
-	virtual void update_wave_channel(struct SOUND &snd, UINT64 cycles) = 0;
-	void update_noise_channel(struct SOUND &snd, UINT64 cycles);
-	INT32 calculate_next_sweep(struct SOUND &snd);
+	void sound_w_internal(int offset, uint8_t data);
+	void update_square_channel(struct SOUND &snd, uint64_t cycles);
+	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) = 0;
+	void update_noise_channel(struct SOUND &snd, uint64_t cycles);
+	int32_t calculate_next_sweep(struct SOUND &snd);
 	void apply_next_sweep(struct SOUND &snd);
 	void tick_length(struct SOUND &snd);
 	void tick_sweep(struct SOUND &snd);
@@ -154,7 +154,7 @@ protected:
 	void update_state();
 	bool dac_enabled(struct SOUND &snd);
 	virtual void corrupt_wave_ram() { };
-	UINT64 noise_period_cycles();
+	uint64_t noise_period_cycles();
 	TIMER_CALLBACK_MEMBER(timer_callback);
 };
 
@@ -162,7 +162,7 @@ protected:
 class dmg_apu_device : public gameboy_sound_device
 {
 public:
-	dmg_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmg_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER(wave_r) override;
 	virtual DECLARE_WRITE8_MEMBER(wave_w) override;
@@ -171,14 +171,14 @@ public:
 protected:
 	virtual void apu_power_off() override;
 	virtual void corrupt_wave_ram() override;
-	virtual void update_wave_channel(struct SOUND &snd, UINT64 cycles) override;
+	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) override;
 };
 
 
 class cgb04_apu_device : public gameboy_sound_device
 {
 public:
-	cgb04_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cgb04_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER(wave_r) override;
 	virtual DECLARE_WRITE8_MEMBER(wave_w) override;
@@ -187,7 +187,7 @@ public:
 protected:
 	virtual void device_reset() override;
 	virtual void apu_power_off() override;
-	virtual void update_wave_channel(struct SOUND &snd, UINT64 cycles) override;
+	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) override;
 };
 
 

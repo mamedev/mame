@@ -137,7 +137,7 @@ READ8_MEMBER( c80_state::pio1_pa_r )
 
 	*/
 
-	UINT8 data = !m_pio1_brdy << 4 | 0x07;
+	uint8_t data = !m_pio1_brdy << 4 | 0x07;
 
 	int i;
 

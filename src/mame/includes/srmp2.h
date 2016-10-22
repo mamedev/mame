@@ -6,9 +6,9 @@
 struct iox_t
 {
 	int reset,ff_event,ff_1,protcheck[4],protlatch[4];
-	UINT8 data;
-	UINT8 mux;
-	UINT8 ff;
+	uint8_t data;
+	uint8_t mux;
+	uint8_t ff;
 };
 
 class srmp2_state : public driver_device
@@ -28,8 +28,8 @@ public:
 	int m_gfx_bank;
 	int m_adpcm_bank;
 	int m_adpcm_data;
-	UINT32 m_adpcm_sptr;
-	UINT32 m_adpcm_eptr;
+	uint32_t m_adpcm_sptr;
+	uint32_t m_adpcm_eptr;
 	iox_t m_iox;
 
 	// common
@@ -69,10 +69,10 @@ public:
 	DECLARE_MACHINE_START(rmgoldyh);
 	DECLARE_MACHINE_START(mjyuugi);
 
-	UINT32 screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mjyuugi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mjyuugi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
 
-	UINT8 iox_key_matrix_calc(UINT8 p_side);
+	uint8_t iox_key_matrix_calc(uint8_t p_side);
 };

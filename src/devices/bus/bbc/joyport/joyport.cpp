@@ -48,7 +48,7 @@ device_bbc_joyport_interface::~device_bbc_joyport_interface()
 //  bbcmc_joyport_slot_device - constructor
 //-------------------------------------------------
 
-bbc_joyport_slot_device::bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bbc_joyport_slot_device::bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, BBC_JOYPORT_SLOT, "BBC Master Compact Joystick/Mouse port", tag, owner, clock, "bbc_joyport_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 	m_device(nullptr)
@@ -65,7 +65,7 @@ void bbc_joyport_slot_device::device_start()
 	m_device = dynamic_cast<device_bbc_joyport_interface *>(get_card_device());
 }
 
-UINT8 bbc_joyport_slot_device::cb_r()
+uint8_t bbc_joyport_slot_device::cb_r()
 {
 	if (m_device)
 		return m_device->cb_r();
@@ -73,7 +73,7 @@ UINT8 bbc_joyport_slot_device::cb_r()
 		return 0xff;
 }
 
-UINT8 bbc_joyport_slot_device::pb_r()
+uint8_t bbc_joyport_slot_device::pb_r()
 {
 	if (m_device)
 		return m_device->pb_r();

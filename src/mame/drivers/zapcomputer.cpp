@@ -43,18 +43,18 @@ public:
 	DECLARE_WRITE8_MEMBER(display_7seg_w);
 
 private:
-	UINT8 decode7seg(UINT8 data);
+	uint8_t decode7seg(uint8_t data);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 };
 
-UINT8 zapcomp_state::decode7seg(UINT8 data)
+uint8_t zapcomp_state::decode7seg(uint8_t data)
 {
 	//These are bit patterns representing the conversion of 4bit values
 	//into the status of the segments of the 7 segment displays
 	//controlled by a 82S23 PROM
 
-	UINT8 patterns[16] = {
+	uint8_t patterns[16] = {
 		0x77, 0x41, 0x6e, 0x6b,
 		0x59, 0x3b, 0x3f, 0x61,
 		0x7f, 0x79, 0x7d, 0x1f,
@@ -88,9 +88,9 @@ WRITE8_MEMBER( zapcomp_state::display_7seg_w )
 
 READ8_MEMBER( zapcomp_state::keyboard_r )
 {
-	UINT8 retval = 0x00;
-	UINT8 special = ioport("X1")->read();
-	UINT16 hex_keys = ioport("X0")->read();
+	uint8_t retval = 0x00;
+	uint8_t special = ioport("X1")->read();
+	uint16_t hex_keys = ioport("X0")->read();
 
 	if (BIT(special, 2)) /* "SHIFT" key is pressed */
 		retval |= 0x40; /* turn on the SHIFT bit but DO NOT turn on the strobe bit */

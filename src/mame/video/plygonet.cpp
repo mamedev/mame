@@ -38,14 +38,14 @@ TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 
 READ32_MEMBER(polygonet_state::polygonet_ttl_ram_r)
 {
-	UINT32 *vram = (UINT32 *)m_ttl_vram;
+	uint32_t *vram = (uint32_t *)m_ttl_vram;
 
 	return vram[offset];
 }
 
 WRITE32_MEMBER(polygonet_state::polygonet_ttl_ram_w)
 {
-	UINT32 *vram = (UINT32 *)m_ttl_vram;
+	uint32_t *vram = (uint32_t *)m_ttl_vram;
 
 	COMBINE_DATA(&vram[offset]);
 
@@ -55,14 +55,14 @@ WRITE32_MEMBER(polygonet_state::polygonet_ttl_ram_w)
 
 READ32_MEMBER(polygonet_state::polygonet_roz_ram_r)
 {
-	UINT32 *vram = (UINT32 *)m_roz_vram;
+	uint32_t *vram = (uint32_t *)m_roz_vram;
 
 	return vram[offset];
 }
 
 WRITE32_MEMBER(polygonet_state::polygonet_roz_ram_w)
 {
-	UINT32 *vram = (UINT32 *)m_roz_vram;
+	uint32_t *vram = (uint32_t *)m_roz_vram;
 
 	COMBINE_DATA(&vram[offset]);
 
@@ -118,7 +118,7 @@ void polygonet_state::video_start()
 	save_item(NAME(m_roz_vram));
 }
 
-UINT32 polygonet_state::screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t polygonet_state::screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0);
 	bitmap.fill(m_palette->black_pen(), cliprect);

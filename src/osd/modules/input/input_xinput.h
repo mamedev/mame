@@ -85,7 +85,7 @@ struct gamepad_state
 // state information for a gamepad; state must be first element
 struct xinput_api_state
 {
-	UINT32                  player_index;
+	uint32_t                  player_index;
 	XINPUT_STATE            xstate;
 	XINPUT_CAPABILITIES     caps;
 };

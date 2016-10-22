@@ -23,7 +23,7 @@
 //  GLOBALS
 //**************************************************************************
 
-UINT64 resource_pool::s_id = 0;
+uint64_t resource_pool::s_id = 0;
 
 
 
@@ -67,7 +67,7 @@ void resource_pool::add(resource_pool_item &item, size_t size, const char *type)
 	std::lock_guard<std::mutex> lock(m_listlock);
 
 	// insert into hash table
-	int hashval = reinterpret_cast<FPTR>(item.m_ptr) % m_hash_size;
+	int hashval = reinterpret_cast<uintptr_t>(item.m_ptr) % m_hash_size;
 	item.m_next = m_hash[hashval];
 	m_hash[hashval] = &item;
 
@@ -75,7 +75,7 @@ void resource_pool::add(resource_pool_item &item, size_t size, const char *type)
 	// before, so if we don't find it, check 4 bytes ahead
 	item.m_id = ++s_id;
 	if (LOG_ALLOCS)
-		fprintf(stderr, "#%06d, add %s, %d bytes\n", (UINT32)item.m_id, type, UINT32(size));
+		fprintf(stderr, "#%06d, add %s, %d bytes\n", (uint32_t)item.m_id, type, uint32_t(size));
 
 	// find the entry to insert after
 	resource_pool_item *insert_after;
@@ -121,7 +121,7 @@ void resource_pool::remove(void *ptr)
 	// search for the item
 	std::lock_guard<std::mutex> lock(m_listlock);
 
-	int hashval = reinterpret_cast<FPTR>(ptr) % m_hash_size;
+	int hashval = reinterpret_cast<uintptr_t>(ptr) % m_hash_size;
 	for (resource_pool_item **scanptr = &m_hash[hashval]; *scanptr != nullptr; scanptr = &(*scanptr)->m_next)
 
 		// must match the pointer
@@ -143,7 +143,7 @@ void resource_pool::remove(void *ptr)
 
 			// delete the object and break
 			if (LOG_ALLOCS)
-				fprintf(stderr, "#%06d, delete %d bytes\n", (UINT32)deleteme->m_id, static_cast<UINT32>(deleteme->m_size));
+				fprintf(stderr, "#%06d, delete %d bytes\n", (uint32_t)deleteme->m_id, static_cast<uint32_t>(deleteme->m_size));
 			global_free(deleteme);
 			break;
 		}
@@ -160,7 +160,7 @@ resource_pool_item *resource_pool::find(void *ptr)
 	// search for the item
 	std::lock_guard<std::mutex> lock(m_listlock);
 
-	int hashval = reinterpret_cast<FPTR>(ptr) % m_hash_size;
+	int hashval = reinterpret_cast<uintptr_t>(ptr) % m_hash_size;
 	resource_pool_item *item;
 	for (item = m_hash[hashval]; item != nullptr; item = item->m_next)
 		if (item->m_ptr == ptr)
@@ -177,8 +177,8 @@ resource_pool_item *resource_pool::find(void *ptr)
 
 bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 {
-	UINT8 *ptrstart = reinterpret_cast<UINT8 *>(_ptrstart);
-	UINT8 *ptrend = reinterpret_cast<UINT8 *>(_ptrend);
+	uint8_t *ptrstart = reinterpret_cast<uint8_t *>(_ptrstart);
+	uint8_t *ptrend = reinterpret_cast<uint8_t *>(_ptrend);
 
 	// search for the item
 	std::lock_guard<std::mutex> lock(m_listlock);
@@ -186,8 +186,8 @@ bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 	resource_pool_item *item = nullptr;
 	for (item = m_ordered_head; item != nullptr; item = item->m_ordered_next)
 	{
-		UINT8 *objstart = reinterpret_cast<UINT8 *>(item->m_ptr);
-		UINT8 *objend = objstart + item->m_size;
+		uint8_t *objstart = reinterpret_cast<uint8_t *>(item->m_ptr);
+		uint8_t *objend = objstart + item->m_size;
 		if (ptrstart >= objstart && ptrend <= objend)
 			return true;
 	}

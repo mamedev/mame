@@ -25,7 +25,7 @@ class electron_plus3_device:
 {
 public:
 	// construction/destruction
-	electron_plus3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	electron_plus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 

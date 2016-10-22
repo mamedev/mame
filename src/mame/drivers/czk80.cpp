@@ -74,7 +74,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<upd765a_device> m_fdc;
@@ -88,7 +88,7 @@ WRITE8_MEMBER( czk80_state::port40_w )
 
 READ8_MEMBER( czk80_state::port80_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -168,7 +168,7 @@ MACHINE_RESET_MEMBER( czk80_state, czk80 )
 
 DRIVER_INIT_MEMBER( czk80_state, czk80 )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);

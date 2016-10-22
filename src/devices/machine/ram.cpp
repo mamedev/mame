@@ -27,7 +27,7 @@ const device_type RAM = &device_creator<ram_device>;
 //  ram_device - constructor
 //-------------------------------------------------
 
-ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RAM, "RAM", tag, owner, clock, "ram", __FILE__)
 {
 	m_size = 0;
@@ -73,7 +73,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 {
 	const char *ramsize_string = nullptr;
 	int is_valid = FALSE;
-	UINT32 specified_ram;
+	uint32_t specified_ram;
 	const char *gamename_option;
 
 	/* verify default ram value */
@@ -115,7 +115,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 					/* try to parse each option */
 					while(p <= e)
 					{
-						UINT32 option_ram_size = parse_string(p);
+						uint32_t option_ram_size = parse_string(p);
 
 						if (option_ram_size == 0)
 							osd_printf_error("Invalid RAM option: %s\n", p);
@@ -171,9 +171,9 @@ void ram_device::device_validity_check(validity_checker &valid) const
 //  integer value
 //-------------------------------------------------
 
-UINT32 ram_device::parse_string(const char *s)
+uint32_t ram_device::parse_string(const char *s)
 {
-	UINT32 ram;
+	uint32_t ram;
 	char suffix = '\0';
 
 	sscanf(s, "%u%c", &ram, &suffix);
@@ -207,7 +207,7 @@ UINT32 ram_device::parse_string(const char *s)
 //  default_size
 //-------------------------------------------------
 
-UINT32 ram_device::default_size(void) const
+uint32_t ram_device::default_size(void) const
 {
 	return parse_string(m_default_size);
 }

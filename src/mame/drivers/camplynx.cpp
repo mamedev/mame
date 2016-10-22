@@ -119,9 +119,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
-#include "sound/dac.h"
 #include "imagedev/cassette.h"
+#include "sound/dac.h"
 #include "sound/wave.h"
+#include "sound/volt_reg.h"
 #include "formats/camplynx_cas.h"
 #include "machine/wd_fdc.h"
 #include "formats/camplynx_dsk.h"
@@ -161,17 +162,17 @@ public:
 	MC6845_UPDATE_ROW(lynx128k_update_row);
 	required_device<palette_device> m_palette;
 private:
-	UINT8 m_port58;
-	UINT8 m_port80;
-	UINT8 m_bankdata;
-	UINT8 m_wbyte;
-	UINT8 *m_p_ram;
+	uint8_t m_port58;
+	uint8_t m_port80;
+	uint8_t m_bankdata;
+	uint8_t m_wbyte;
+	uint8_t *m_p_ram;
 	bool m_is_128k;
 	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	//required_device<> m_printer;
 	required_device<mc6845_device> m_crtc;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	optional_device<fd1793_t> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
@@ -195,7 +196,7 @@ d7 = read from bank 4 */
 	// do writes
 	m_wbyte = (data & 0x0f) | ((m_port80 & 0x0c) << 3);
 	// do reads
-	UINT8 rbyte = (data & 0x70) | (m_port80 & 0x0c);
+	uint8_t rbyte = (data & 0x70) | (m_port80 & 0x0c);
 	switch (rbyte)
 	{
 		case 0x00:
@@ -314,7 +315,7 @@ d0 = read from bank 4 */
 	// do writes
 	m_wbyte = BITSWAP8(data, 0, 0, 0, 0, 4, 5, 6, 7) & 0x0f; // rearrange to 1,2,3,4
 	// do reads
-	UINT8 rbyte = BITSWAP8(data, 0, 0, 0, 0, 0, 1, 2, 3) & 0x0f; // rearrange to 0,1,2,4
+	uint8_t rbyte = BITSWAP8(data, 0, 0, 0, 0, 0, 1, 2, 3) & 0x0f; // rearrange to 0,1,2,4
 	if (BIT(rbyte, 1))
 		rbyte &= 0x07; // remove 4 if 1 selected (AND gate in IC82)
 //printf("%s:%X:%X:%X\n", machine().describe_context(), data, rbyte, m_wbyte);
@@ -605,7 +606,7 @@ WRITE8_MEMBER( camplynx_state::bank6_w )
 
 READ8_MEMBER( camplynx_state::port80_r )
 {
-	UINT8 data = ioport("LINE0")->read();
+	uint8_t data = ioport("LINE0")->read();
 	// when reading tape, bit 0 becomes cass-in signal
 	if (BIT(m_port80, 1))
 	{
@@ -650,7 +651,7 @@ WRITE8_MEMBER( camplynx_state::port84_w )
 		m_cass->output(BIT(data, 5) ? -1.0 : +1.0);
 	}
 	else    // speaker output
-		m_dac->write_unsigned8(space, 0, data);
+		m_dac->write(data);
 }
 
 /*
@@ -660,7 +661,7 @@ d1 = serial data in
 d0 = serial h/s in */
 READ8_MEMBER( camplynx_state::port82_r )
 {
-	UINT8 data = 0xfb; // guess
+	uint8_t data = 0xfb; // guess
 	data |= (m_cass->input() > +0.02) ? 4 : 0;
 	return data;
 }
@@ -685,9 +686,9 @@ MACHINE_RESET_MEMBER(camplynx_state, lynx128k)
 
 MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 {
-	UINT8 r,g,b,x;
-	UINT32 green_bank, *p = &bitmap.pix32(y);
-	UINT16 mem = ((ma << 2) + (ra << 5)) & 0x1fff;
+	uint8_t r,g,b,x;
+	uint32_t green_bank, *p = &bitmap.pix32(y);
+	uint16_t mem = ((ma << 2) + (ra << 5)) & 0x1fff;
 
 	// determine green bank
 	if (BIT(m_port80, 4))
@@ -714,9 +715,9 @@ MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 
 MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 {
-	UINT8 r,g,b,x;
-	UINT32 green_bank, *p = &bitmap.pix32(y);
-	UINT16 mem = ((ma << 2) + (ra << 6)) & 0x3fff;
+	uint8_t r,g,b,x;
+	uint32_t green_bank, *p = &bitmap.pix32(y);
+	uint16_t mem = ((ma << 2) + (ra << 6)) & 0x3fff;
 	// determine green bank
 	if (BIT(m_port80, 4))
 		green_bank = 0x2c000+mem; // alt green
@@ -787,11 +788,12 @@ static MACHINE_CONFIG_FRAGMENT( lynx_common )
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.02)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.02)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( lynx_disk )

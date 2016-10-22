@@ -95,7 +95,7 @@ struct GOURAUDTEXTUREDVERTEX
 
 union PACKET
 {
-	UINT32 n_entry[ 16 ];
+	uint32_t n_entry[ 16 ];
 
 	struct
 	{
@@ -189,17 +189,17 @@ class psxgpu_device : public device_t
 {
 public:
 	// construction/destruction
-	psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_vblank_handler(device_t &device, _Object object) { return downcast<psxgpu_device &>(device).m_vblank_handler.set_callback(object); }
 
-	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
-	void dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size );
-	void dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size );
+	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
+	void dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void lightgun_set( int, int );
 	int vramSize;
 	void vblank(screen_device &screen, bool vblank_state);
@@ -211,7 +211,7 @@ protected:
 
 private:
 	void updatevisiblearea();
-	void decode_tpage( UINT32 tpage );
+	void decode_tpage( uint32_t tpage );
 	void FlatPolygon( int n_points );
 	void FlatTexturedPolygon( int n_points );
 	void GouraudPolygon( int n_points );
@@ -229,77 +229,77 @@ private:
 	void MoveImage( void );
 	void psx_gpu_init( int n_gputype );
 	void gpu_reset();
-	void gpu_read( UINT32 *p_ram, INT32 n_size );
-	void gpu_write( UINT32 *p_ram, INT32 n_size );
+	void gpu_read( uint32_t *p_ram, int32_t n_size );
+	void gpu_write( uint32_t *p_ram, int32_t n_size );
 
-	INT32 m_n_tx;
-	INT32 m_n_ty;
-	INT32 n_abr;
-	INT32 n_tp;
-	INT32 n_ix;
-	INT32 n_iy;
-	INT32 n_ti;
+	int32_t m_n_tx;
+	int32_t m_n_ty;
+	int32_t n_abr;
+	int32_t n_tp;
+	int32_t n_ix;
+	int32_t n_iy;
+	int32_t n_ti;
 
-	std::unique_ptr<UINT16[]> p_vram;
-	UINT32 n_vramx;
-	UINT32 n_vramy;
-	UINT32 n_twy;
-	UINT32 n_twx;
-	UINT32 n_twh;
-	UINT32 n_tww;
-	UINT32 n_drawarea_x1;
-	UINT32 n_drawarea_y1;
-	UINT32 n_drawarea_x2;
-	UINT32 n_drawarea_y2;
-	UINT32 n_horiz_disstart;
-	UINT32 n_horiz_disend;
-	UINT32 n_vert_disstart;
-	UINT32 n_vert_disend;
-	UINT32 b_reverseflag;
-	INT32 n_drawoffset_x;
-	INT32 n_drawoffset_y;
-	UINT32 m_n_displaystartx;
-	UINT32 n_displaystarty;
+	std::unique_ptr<uint16_t[]> p_vram;
+	uint32_t n_vramx;
+	uint32_t n_vramy;
+	uint32_t n_twy;
+	uint32_t n_twx;
+	uint32_t n_twh;
+	uint32_t n_tww;
+	uint32_t n_drawarea_x1;
+	uint32_t n_drawarea_y1;
+	uint32_t n_drawarea_x2;
+	uint32_t n_drawarea_y2;
+	uint32_t n_horiz_disstart;
+	uint32_t n_horiz_disend;
+	uint32_t n_vert_disstart;
+	uint32_t n_vert_disend;
+	uint32_t b_reverseflag;
+	int32_t n_drawoffset_x;
+	int32_t n_drawoffset_y;
+	uint32_t m_n_displaystartx;
+	uint32_t n_displaystarty;
 	int m_n_gputype;
-	UINT32 n_gpustatus;
-	UINT32 n_gpuinfo;
-	UINT32 n_gpu_buffer_offset;
-	UINT32 n_lightgun_x;
-	UINT32 n_lightgun_y;
-	UINT32 n_screenwidth;
-	UINT32 n_screenheight;
+	uint32_t n_gpustatus;
+	uint32_t n_gpuinfo;
+	uint32_t n_gpu_buffer_offset;
+	uint32_t n_lightgun_x;
+	uint32_t n_lightgun_y;
+	uint32_t n_screenwidth;
+	uint32_t n_screenheight;
 
 	PACKET m_packet;
 
-	UINT16 *p_p_vram[ 1024 ];
+	uint16_t *p_p_vram[ 1024 ];
 
-	UINT16 p_n_redshade[ MAX_LEVEL * MAX_SHADE ];
-	UINT16 p_n_greenshade[ MAX_LEVEL * MAX_SHADE ];
-	UINT16 p_n_blueshade[ MAX_LEVEL * MAX_SHADE ];
-	UINT16 p_n_redlevel[ 0x10000 ];
-	UINT16 p_n_greenlevel[ 0x10000 ];
-	UINT16 p_n_bluelevel[ 0x10000 ];
+	uint16_t p_n_redshade[ MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_greenshade[ MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_blueshade[ MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_redlevel[ 0x10000 ];
+	uint16_t p_n_greenlevel[ 0x10000 ];
+	uint16_t p_n_bluelevel[ 0x10000 ];
 
-	UINT16 p_n_f025[ MAX_LEVEL * MAX_SHADE ];
-	UINT16 p_n_f05[ MAX_LEVEL * MAX_SHADE ];
-	UINT16 p_n_f1[ MAX_LEVEL * MAX_SHADE ];
-	UINT16 p_n_redb05[ 0x10000 ];
-	UINT16 p_n_greenb05[ 0x10000 ];
-	UINT16 p_n_blueb05[ 0x10000 ];
-	UINT16 p_n_redb1[ 0x10000 ];
-	UINT16 p_n_greenb1[ 0x10000 ];
-	UINT16 p_n_blueb1[ 0x10000 ];
-	UINT16 p_n_redaddtrans[ MAX_LEVEL * MAX_LEVEL ];
-	UINT16 p_n_greenaddtrans[ MAX_LEVEL * MAX_LEVEL ];
-	UINT16 p_n_blueaddtrans[ MAX_LEVEL * MAX_LEVEL ];
-	UINT16 p_n_redsubtrans[ MAX_LEVEL * MAX_LEVEL ];
-	UINT16 p_n_greensubtrans[ MAX_LEVEL * MAX_LEVEL ];
-	UINT16 p_n_bluesubtrans[ MAX_LEVEL * MAX_LEVEL ];
+	uint16_t p_n_f025[ MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_f05[ MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_f1[ MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_redb05[ 0x10000 ];
+	uint16_t p_n_greenb05[ 0x10000 ];
+	uint16_t p_n_blueb05[ 0x10000 ];
+	uint16_t p_n_redb1[ 0x10000 ];
+	uint16_t p_n_greenb1[ 0x10000 ];
+	uint16_t p_n_blueb1[ 0x10000 ];
+	uint16_t p_n_redaddtrans[ MAX_LEVEL * MAX_LEVEL ];
+	uint16_t p_n_greenaddtrans[ MAX_LEVEL * MAX_LEVEL ];
+	uint16_t p_n_blueaddtrans[ MAX_LEVEL * MAX_LEVEL ];
+	uint16_t p_n_redsubtrans[ MAX_LEVEL * MAX_LEVEL ];
+	uint16_t p_n_greensubtrans[ MAX_LEVEL * MAX_LEVEL ];
+	uint16_t p_n_bluesubtrans[ MAX_LEVEL * MAX_LEVEL ];
 
-	UINT16 p_n_g0r0[ 0x10000 ];
-	UINT16 p_n_b0[ 0x10000 ];
-	UINT16 p_n_r1[ 0x10000 ];
-	UINT16 p_n_b1g1[ 0x10000 ];
+	uint16_t p_n_g0r0[ 0x10000 ];
+	uint16_t p_n_b0[ 0x10000 ];
+	uint16_t p_n_r1[ 0x10000 ];
+	uint16_t p_n_b1g1[ 0x10000 ];
 
 	devcb_write_line m_vblank_handler;
 
@@ -320,42 +320,42 @@ class cxd8514q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class cxd8538q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class cxd8561q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class cxd8561bq_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class cxd8561cq_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class cxd8654q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 #endif

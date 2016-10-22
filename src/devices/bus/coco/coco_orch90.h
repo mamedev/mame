@@ -21,7 +21,7 @@ class coco_orch90_device :
 {
 public:
 		// construction/destruction
-		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -31,8 +31,8 @@ protected:
 		virtual DECLARE_WRITE8_MEMBER(write) override;
 private:
 		// internal state
-		dac_device *m_left_dac;
-		dac_device *m_right_dac;
+		required_device<dac_byte_interface> m_ldac;
+		required_device<dac_byte_interface> m_rdac;
 };
 
 

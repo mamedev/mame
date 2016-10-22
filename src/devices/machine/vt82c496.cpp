@@ -15,7 +15,7 @@
 const device_type VT82C496 = &device_creator<vt82c496_device>;
 
 
-vt82c496_device::vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vt82c496_device::vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, VT82C496, "VIA VT82C496G system chipset", tag, owner, clock, "vt82c496", __FILE__), m_cpu_tag(nullptr), m_region_tag(nullptr), m_space(nullptr), m_ram(nullptr), m_rom(nullptr), m_reg_select(0)
 	{
 }
@@ -93,7 +93,7 @@ WRITE8_MEMBER(vt82c496_device::write)
 	}
 }
 
-void vt82c496_device::update_mem_c0(UINT8 data)
+void vt82c496_device::update_mem_c0(uint8_t data)
 {
 	if(data & 0x80)
 		machine().root_device().membank("bios_cc_r")->set_base(m_ram->pointer()+0xcc000);
@@ -144,7 +144,7 @@ void vt82c496_device::update_mem_c0(UINT8 data)
 		m_space->nop_write(0xc0000,0xc3fff);
 }
 
-void vt82c496_device::update_mem_d0(UINT8 data)
+void vt82c496_device::update_mem_d0(uint8_t data)
 {
 	if(data & 0x80)
 		machine().root_device().membank("bios_dc_r")->set_base(m_ram->pointer()+0xdc000);
@@ -195,7 +195,7 @@ void vt82c496_device::update_mem_d0(UINT8 data)
 		m_space->nop_write(0xd0000,0xd3fff);
 }
 
-void vt82c496_device::update_mem_e0(UINT8 data)
+void vt82c496_device::update_mem_e0(uint8_t data)
 {
 	if(data & 0x80)
 		machine().root_device().membank("bios_e0_r")->set_base(m_ram->pointer()+0xe0000);

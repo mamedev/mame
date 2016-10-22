@@ -15,7 +15,7 @@ class taito_en_device : public device_t
 
 {
 public:
-	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~taito_en_device() {}
 
 	DECLARE_READ8_MEMBER( en_68000_share_r );
@@ -43,17 +43,17 @@ private:
 	required_device<es5505_device> m_ensoniq;
 	required_device<mc68681_device> m_duart68681;
 	required_device<mb87078_device> m_mb87078;
-	required_shared_ptr<UINT32> m_snd_shared_ram;
+	required_shared_ptr<uint32_t> m_snd_shared_ram;
 
 	//todo: hook up cpu/es5510
-	UINT16   m_es5510_dsp_ram[0x200];
-	UINT32   m_es5510_gpr[0xc0];
-	UINT32   m_es5510_dram[1<<24];
-	UINT32   m_es5510_dol_latch;
-	UINT32   m_es5510_dil_latch;
-	UINT32   m_es5510_dadr_latch;
-	UINT32   m_es5510_gpr_latch;
-	UINT8    m_es5510_ram_sel;
+	uint16_t   m_es5510_dsp_ram[0x200];
+	uint32_t   m_es5510_gpr[0xc0];
+	uint32_t   m_es5510_dram[1<<24];
+	uint32_t   m_es5510_dol_latch;
+	uint32_t   m_es5510_dil_latch;
+	uint32_t   m_es5510_dadr_latch;
+	uint32_t   m_es5510_gpr_latch;
+	uint8_t    m_es5510_ram_sel;
 };
 
 extern const device_type TAITO_EN;

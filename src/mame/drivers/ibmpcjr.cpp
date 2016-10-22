@@ -69,24 +69,24 @@ public:
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart1) { return load_cart(image, m_cart1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart2) { return load_cart(image, m_cart2); }
-	void pc_speaker_set_spkrdata(UINT8 data);
+	void pc_speaker_set_spkrdata(uint8_t data);
 
-	UINT8 m_pc_spkrdata;
-	UINT8 m_pit_out2;
-	UINT8 m_pcjr_dor;
-	UINT8 m_pcjx_1ff_count;
-	UINT8 m_pcjx_1ff_val;
-	UINT8 m_pcjx_1ff_bankval;
-	UINT8 m_pcjx_1ff_bank[20][2];
+	uint8_t m_pc_spkrdata;
+	uint8_t m_pit_out2;
+	uint8_t m_pcjr_dor;
+	uint8_t m_pcjx_1ff_count;
+	uint8_t m_pcjx_1ff_val;
+	uint8_t m_pcjx_1ff_bankval;
+	uint8_t m_pcjx_1ff_bank[20][2];
 	int m_ppi_portc_switch_high;
-	UINT8 m_ppi_portb;
+	uint8_t m_ppi_portb;
 
-	UINT8 m_pc_keyb_data;
-	UINT8 m_transferring;
-	UINT8 m_latch;
-	UINT32 m_raw_keyb_data;
+	uint8_t m_pc_keyb_data;
+	uint8_t m_transferring;
+	uint8_t m_latch;
+	uint32_t m_raw_keyb_data;
 	int m_signal_count;
-	UINT8 m_nmi_enabled;
+	uint8_t m_nmi_enabled;
 
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer *m_pc_int_delay_timer;
@@ -186,7 +186,7 @@ void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 WRITE_LINE_MEMBER(pcjr_state::pic8259_set_int_line)
 {
-	UINT32 pc = m_maincpu->pc();
+	uint32_t pc = m_maincpu->pc();
 	if ( (pc == 0xF0453) || (pc == 0xFF196) )
 	{
 		m_pc_int_delay_timer->adjust( m_maincpu->cycles_to_attotime(20), state );
@@ -202,7 +202,7 @@ WRITE_LINE_MEMBER(pcjr_state::pic8259_set_int_line)
  *      PC Speaker related
  *
  *************************************************************************/
-void pcjr_state::pc_speaker_set_spkrdata(UINT8 data)
+void pcjr_state::pc_speaker_set_spkrdata(uint8_t data)
 {
 	m_pc_spkrdata = data ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
@@ -258,7 +258,7 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 
 	if(state && (data = m_keyboard->read(machine().driver_data()->generic_space(), 0)))
 	{
-		UINT8   parity = 0;
+		uint8_t   parity = 0;
 		int     i;
 
 		m_latch = 1;
@@ -369,7 +369,7 @@ READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
 WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 {
 	logerror("fdc: dor = %02x\n", data);
-	UINT8 pdor = m_pcjr_dor;
+	uint8_t pdor = m_pcjr_dor;
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = nullptr;
 
@@ -438,7 +438,7 @@ READ8_MEMBER(pcjr_state::pcjx_port_1ff_r)
 
 image_init_result pcjr_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32 size = slot->common_get_size("rom");
+	uint32_t size = slot->common_get_size("rom");
 	bool imagic_hack = false;
 
 	if (image.software_entry() == nullptr)
@@ -478,7 +478,7 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 		// the first chunk is unique, the second is repeated 4 times up to 0xa000 size
 
 		// mirroring
-		UINT8 *ROM = slot->get_rom_base();
+		uint8_t *ROM = slot->get_rom_base();
 		memcpy(ROM + 0xe000, ROM + 0x2000, 0x2000);
 		memcpy(ROM + 0xc000, ROM + 0x2000, 0x2000);
 		memcpy(ROM + 0xa000, ROM + 0x2000, 0x2000);

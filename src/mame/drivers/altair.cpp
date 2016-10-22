@@ -50,7 +50,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_mc6850;
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 };
 
 

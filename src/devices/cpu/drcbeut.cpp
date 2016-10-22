@@ -30,7 +30,7 @@ using namespace uml;
 //  drc_hash_table - constructor
 //-------------------------------------------------
 
-drc_hash_table::drc_hash_table(drc_cache &cache, UINT32 modes, UINT8 addrbits, UINT8 ignorebits)
+drc_hash_table::drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbits, uint8_t ignorebits)
 	: m_cache(cache),
 		m_modes(modes),
 		m_nocodeptr(nullptr),
@@ -85,7 +85,7 @@ bool drc_hash_table::reset()
 //  block_begin - note the beginning of a block
 //-------------------------------------------------
 
-void drc_hash_table::block_begin(drcuml_block &block, const uml::instruction *instlist, UINT32 numinst)
+void drc_hash_table::block_begin(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst)
 {
 	// before generating code, pre-allocate any hash entries; we do this by setting dummy hash values
 	for (int inum = 0; inum < numinst; inum++)
@@ -157,7 +157,7 @@ void drc_hash_table::set_default_codeptr(drccodeptr nocodeptr)
 //  mode/pc
 //-------------------------------------------------
 
-bool drc_hash_table::set_codeptr(UINT32 mode, UINT32 pc, drccodeptr code)
+bool drc_hash_table::set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code)
 {
 	// copy-on-write for the l1 hash table
 	assert(mode < m_modes);
@@ -171,7 +171,7 @@ bool drc_hash_table::set_codeptr(UINT32 mode, UINT32 pc, drccodeptr code)
 	}
 
 	// copy-on-write for the l2 hash table
-	UINT32 l1 = (pc >> m_l1shift) & m_l1mask;
+	uint32_t l1 = (pc >> m_l1shift) & m_l1mask;
 	if (m_base[mode][l1] == m_emptyl2)
 	{
 		drccodeptr *newtable = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits);
@@ -182,7 +182,7 @@ bool drc_hash_table::set_codeptr(UINT32 mode, UINT32 pc, drccodeptr code)
 	}
 
 	// set the new entry
-	UINT32 l2 = (pc >> m_l2shift) & m_l2mask;
+	uint32_t l2 = (pc >> m_l2shift) & m_l2mask;
 	m_base[mode][l1][l2] = code;
 	return true;
 }
@@ -197,7 +197,7 @@ bool drc_hash_table::set_codeptr(UINT32 mode, UINT32 pc, drccodeptr code)
 //  drc_map_variables - constructor
 //-------------------------------------------------
 
-drc_map_variables::drc_map_variables(drc_cache &cache, UINT64 uniquevalue)
+drc_map_variables::drc_map_variables(drc_cache &cache, uint64_t uniquevalue)
 	: m_cache(cache),
 		m_uniquevalue(uniquevalue)
 {
@@ -244,13 +244,13 @@ void drc_map_variables::block_end(drcuml_block &block)
 		return;
 
 	// begin "code generation" aligned to an 8-byte boundary
-	drccodeptr *top = m_cache.begin_codegen(sizeof(UINT64) + sizeof(UINT32) + 2 * sizeof(UINT32) * m_entry_list.count());
+	drccodeptr *top = m_cache.begin_codegen(sizeof(uint64_t) + sizeof(uint32_t) + 2 * sizeof(uint32_t) * m_entry_list.count());
 	if (top == nullptr)
 		block.abort();
-	UINT32 *dest = (UINT32 *)(((FPTR)*top + 7) & ~7);
+	uint32_t *dest = (uint32_t *)(((uintptr_t)*top + 7) & ~7);
 
 	// store the cookie first
-	*(UINT64 *)dest = m_uniquevalue;
+	*(uint64_t *)dest = m_uniquevalue;
 	dest += 2;
 
 	// get the pointer to the first item and store an initial backwards offset
@@ -259,7 +259,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 	dest++;
 
 	// now iterate over entries and store them
-	UINT32 curvalue[MAPVAR_COUNT] = { 0 };
+	uint32_t curvalue[MAPVAR_COUNT] = { 0 };
 	bool changed[MAPVAR_COUNT] = { false };
 	for (map_entry *entry = m_entry_list.first(); entry != nullptr; entry = entry->next())
 	{
@@ -275,7 +275,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 		{
 			// build a mask of changed variables
 			int numchanged = 0;
-			UINT32 varmask = 0;
+			uint32_t varmask = 0;
 			for (int varnum = 0; varnum < ARRAY_LENGTH(changed); varnum++)
 				if (changed[varnum])
 				{
@@ -289,7 +289,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 				continue;
 
 			// first word is a code delta plus mask of changed variables
-			UINT32 codedelta = entry->m_codeptr - lastptr;
+			uint32_t codedelta = entry->m_codeptr - lastptr;
 			while (codedelta > 0xffff)
 			{
 				*dest++ = 0xffff << 16;
@@ -321,7 +321,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 //  code pointer
 //-------------------------------------------------
 
-void drc_map_variables::set_value(drccodeptr codebase, UINT32 mapvar, UINT32 newvalue)
+void drc_map_variables::set_value(drccodeptr codebase, uint32_t mapvar, uint32_t newvalue)
 {
 	assert(mapvar >= MAPVAR_M0 && mapvar < MAPVAR_END);
 
@@ -349,14 +349,14 @@ void drc_map_variables::set_value(drccodeptr codebase, UINT32 mapvar, UINT32 new
 //  code pointer
 //-------------------------------------------------
 
-UINT32 drc_map_variables::get_value(drccodeptr codebase, UINT32 mapvar) const
+uint32_t drc_map_variables::get_value(drccodeptr codebase, uint32_t mapvar) const
 {
 	assert(mapvar >= MAPVAR_M0 && mapvar < MAPVAR_END);
 	mapvar -= MAPVAR_M0;
 
 	// get an aligned pointer to start scanning
-	UINT64 *curscan = (UINT64 *)(((FPTR)codebase | 7) + 1);
-	UINT64 *endscan = (UINT64 *)m_cache.top();
+	uint64_t *curscan = (uint64_t *)(((uintptr_t)codebase | 7) + 1);
+	uint64_t *endscan = (uint64_t *)m_cache.top();
 
 	// look for the signature
 	while (curscan < endscan && *curscan++ != m_uniquevalue) {};
@@ -364,19 +364,19 @@ UINT32 drc_map_variables::get_value(drccodeptr codebase, UINT32 mapvar) const
 		return 0;
 
 	// switch to 32-bit pointers for processing the rest
-	UINT32 *data = (UINT32 *)curscan;
+	uint32_t *data = (uint32_t *)curscan;
 
 	// first get the 32-bit starting offset to the code
 	drccodeptr curcode = (drccodeptr)data - *data;
 	data++;
 
 	// now loop until we advance past our target
-	UINT32 varmask = 0x10 << mapvar;
-	UINT32 result = 0;
+	uint32_t varmask = 0x10 << mapvar;
+	uint32_t result = 0;
 	while (true)
 	{
 		// a 0 is a terminator
-		UINT32 controlword = *data++;
+		uint32_t controlword = *data++;
 		if (controlword == 0)
 			break;
 
@@ -390,7 +390,7 @@ UINT32 drc_map_variables::get_value(drccodeptr codebase, UINT32 mapvar) const
 		{
 			// count how many words precede the one we care about
 			int dataoffs = 0;
-			for (UINT32 skipmask = (controlword & (varmask - 1)) >> 4; skipmask != 0; skipmask = skipmask & (skipmask - 1))
+			for (uint32_t skipmask = (controlword & (varmask - 1)) >> 4; skipmask != 0; skipmask = skipmask & (skipmask - 1))
 				dataoffs++;
 
 			// fetch the one we want
@@ -405,7 +405,7 @@ UINT32 drc_map_variables::get_value(drccodeptr codebase, UINT32 mapvar) const
 	return result;
 }
 
-UINT32 drc_map_variables::static_get_value(drc_map_variables &map, drccodeptr codebase, UINT32 mapvar)
+uint32_t drc_map_variables::static_get_value(drc_map_variables &map, drccodeptr codebase, uint32_t mapvar)
 {
 	return map.get_value(codebase, mapvar);
 }
@@ -417,7 +417,7 @@ UINT32 drc_map_variables::static_get_value(drc_map_variables &map, drccodeptr co
 //  map value
 //-------------------------------------------------
 
-UINT32 drc_map_variables::get_last_value(UINT32 mapvar)
+uint32_t drc_map_variables::get_last_value(uint32_t mapvar)
 {
 	assert(mapvar >= MAPVAR_M0 && mapvar < MAPVAR_END);
 	return m_mapvalue[mapvar - MAPVAR_M0];

@@ -39,15 +39,15 @@ public:
 	DECLARE_READ8_MEMBER(llc2_port1_b_r);
 	DECLARE_READ8_MEMBER(llc2_port2_a_r);
 	DECLARE_WRITE8_MEMBER(llc2_port1_b_w);
-	const UINT8 *m_p_chargen;
+	const uint8_t *m_p_chargen;
 	optional_device<speaker_sound_device> m_speaker;
-	optional_shared_ptr<UINT8> m_p_videoram;
+	optional_shared_ptr<uint8_t> m_p_videoram;
 	bool m_rv;
-	UINT8 m_term_status;
-	UINT8 m_llc1_key;
+	uint8_t m_term_status;
+	uint8_t m_llc1_key;
 private:
-	UINT8 m_porta;
-	UINT8 m_term_data;
+	uint8_t m_porta;
+	uint8_t m_term_data;
 public:
 	DECLARE_DRIVER_INIT(llc2);
 	DECLARE_DRIVER_INIT(llc1);
@@ -55,8 +55,8 @@ public:
 	DECLARE_MACHINE_START(llc1);
 	DECLARE_MACHINE_RESET(llc1);
 	DECLARE_MACHINE_RESET(llc2);
-	UINT32 screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_llc2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_llc2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<ram_device> m_ram;
 };

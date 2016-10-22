@@ -58,14 +58,14 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_bg_scroll;
-	required_shared_ptr<UINT8> m_reel1_ram;
-	required_shared_ptr<UINT8> m_reel2_ram;
-	required_shared_ptr<UINT8> m_reel3_ram;
-	required_shared_ptr<UINT8> m_reel4_ram;
-	required_shared_ptr<UINT8> m_bg_scroll2;
-	required_shared_ptr<UINT8> m_fg_tile_ram;
-	required_shared_ptr<UINT8> m_fg_color_ram;
+	required_shared_ptr<uint8_t> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_reel1_ram;
+	required_shared_ptr<uint8_t> m_reel2_ram;
+	required_shared_ptr<uint8_t> m_reel3_ram;
+	required_shared_ptr<uint8_t> m_reel4_ram;
+	required_shared_ptr<uint8_t> m_bg_scroll2;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
 
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
@@ -75,8 +75,8 @@ public:
 	int m_video_enable;
 	int m_nmi_enable;
 	int m_hopper;
-	UINT8 m_out[3];
-	UINT8 m_igs_magic[2];
+	uint8_t m_out[3];
+	uint8_t m_igs_magic[2];
 
 	DECLARE_WRITE8_MEMBER(reel1_ram_w);
 	DECLARE_WRITE8_MEMBER(reel2_ram_w);
@@ -114,7 +114,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(gp98);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -295,7 +295,7 @@ VIDEO_START_MEMBER(igs009_state,gp98)
 }
 
 
-UINT32 igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = m_video_enable ? -1 : 0;
 
@@ -1056,12 +1056,12 @@ ROM_END
 
 void igs009_state::decrypt_jingbell()
 {
-	UINT8 *rom  = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
 
 	for (int i=0; i<size; i++)
 	{
-		UINT8 x = rom[i];
+		uint8_t x = rom[i];
 		if (i & 0x0080)
 		{
 			if ((i & 0x0420) == 0x0420) x ^= 0x20;
@@ -1084,7 +1084,7 @@ DRIVER_INIT_MEMBER(igs009_state,jingbelli)
 	decrypt_jingbell();
 
 	// protection patch
-	UINT8 *rom  = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x01f19] = 0x18;
 }
 
@@ -1093,7 +1093,7 @@ DRIVER_INIT_MEMBER(igs009_state,jingbell)
 	decrypt_jingbell();
 
 	// protection patch
-	UINT8 *rom  = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x0e753] = 0x18;
 }
 

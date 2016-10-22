@@ -77,7 +77,7 @@
 const device_type E01 = &device_creator<e01_device>;
 const device_type E01S = &device_creator<e01s_device>;
 
-e01s_device::e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e01s_device::e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:e01_device(mconfig, E01S, "Acorn FileStore E01S", tag, owner, clock, "e01s", __FILE__) { m_variant = TYPE_E01S; }
 
 
@@ -377,7 +377,7 @@ inline void e01_device::hdc_irq_enable(int enabled)
 //  e01_device - constructor
 //-------------------------------------------------
 
-e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, E01, "Acorn FileStore E01", tag, owner, clock, "e01" , __FILE__),
 		device_econet_interface(mconfig, *this),
 		m_maincpu(*this, R65C102_TAG),
@@ -407,7 +407,7 @@ e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t 
 }
 
 
-e01_device::e01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+e01_device::e01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_econet_interface(mconfig, *this),
 		m_maincpu(*this, R65C102_TAG),
@@ -487,7 +487,7 @@ void e01_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 READ8_MEMBER( e01_device::read )
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (m_ram_en)
 	{
@@ -622,7 +622,7 @@ WRITE8_MEMBER( e01_device::network_irq_enable_w )
 
 READ8_MEMBER( e01_device::hdc_data_r )
 {
-	UINT8 data = m_scsi_data_in->read();
+	uint8_t data = m_scsi_data_in->read();
 
 	m_scsibus->write_ack(1);
 

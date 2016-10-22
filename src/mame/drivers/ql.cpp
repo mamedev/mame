@@ -181,7 +181,7 @@ public:
 	int m_extintl;
 
 	// IPC
-	UINT8 m_keylatch;
+	uint8_t m_keylatch;
 	int m_ipl;
 	int m_comdata_to_ipc;
 	int m_baudx4;
@@ -203,7 +203,7 @@ public:
 
 READ8_MEMBER( ql_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	int cart_romoeh = 0;
 	int exp_romoeh = 0;
 
@@ -369,7 +369,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// SER2 serial data input
 	data |= m_ser2->rxd_r();
@@ -462,7 +462,7 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(m_keylatch, 0)) data |= m_y[0]->read() | m_joy[0]->read();
 	if (BIT(m_keylatch, 1)) data |= m_y[1]->read() | m_joy[1]->read();

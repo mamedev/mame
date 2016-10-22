@@ -20,11 +20,11 @@ class ds2401_device : public device_t
 {
 public:
 	// construction/destruction
-	ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( write );
 	DECLARE_READ_LINE_MEMBER( read );
-	UINT8 direct_read(int index);
+	uint8_t direct_read(int index);
 
 protected:
 	enum {
@@ -55,9 +55,9 @@ protected:
 
 	// internal state
 	int m_state, m_bit, m_shift;
-	UINT8 m_byte;
+	uint8_t m_byte;
 	bool m_rx, m_tx;
-	UINT8 m_data[SIZE_DATA];
+	uint8_t m_data[SIZE_DATA];
 	emu_timer *m_timer_main, *m_timer_reset;
 	attotime t_samp, t_rdv, t_rstl, t_pdh, t_pdl;
 

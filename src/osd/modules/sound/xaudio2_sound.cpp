@@ -124,7 +124,7 @@ typedef std::unique_ptr<IXAudio2MasteringVoice, xaudio2_custom_deleter> masterin
 typedef std::unique_ptr<IXAudio2SourceVoice, xaudio2_custom_deleter> src_voice_ptr;
 
 // Typedef for pointer to XAudio2Create
-typedef HRESULT (WINAPI *xaudio2_create_ptr)(IXAudio2 **, UINT32, XAUDIO2_PROCESSOR);
+typedef HRESULT (WINAPI *xaudio2_create_ptr)(IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR);
 
 //============================================================
 //  Helper classes
@@ -202,8 +202,8 @@ private:
 	std::thread                      m_audioThread;
 	std::queue<xaudio2_buffer>       m_queue;
 	std::unique_ptr<bufferpool>      m_buffer_pool;
-	UINT32                           m_overflows;
-	UINT32                           m_underflows;
+	uint32_t                           m_overflows;
+	uint32_t                           m_underflows;
 	BOOL                             m_in_underflow;
 	osd::dynamic_module::ptr         m_xaudio_dll;
 	xaudio2_create_ptr               XAudio2Create;
@@ -238,11 +238,11 @@ public:
 	void exit() override;
 
 	// sound_module
-	void update_audio_stream(bool is_throttled, INT16 const *buffer, int samples_this_frame) override;
+	void update_audio_stream(bool is_throttled, int16_t const *buffer, int samples_this_frame) override;
 	void set_mastervolume(int attenuation) override;
 
 	// Xaudio callbacks
-	void STDAPICALLTYPE OnVoiceProcessingPassStart(UINT32 bytes_required) override;
+	void STDAPICALLTYPE OnVoiceProcessingPassStart(uint32_t bytes_required) override;
 	void STDAPICALLTYPE OnVoiceProcessingPassEnd() override {}
 	void STDAPICALLTYPE OnStreamEnd() override {}
 	void STDAPICALLTYPE OnBufferStart(void* pBufferContext) override {}
@@ -384,21 +384,21 @@ void sound_xaudio2::exit()
 
 void sound_xaudio2::update_audio_stream(
 	bool is_throttled,
-	INT16 const *buffer,
+	int16_t const *buffer,
 	int samples_this_frame)
 {
 	if (!m_initialized || sample_rate() == 0 || !m_buffer)
 		return;
 
-	UINT32 const bytes_this_frame = samples_this_frame * m_sample_bytes;
+	uint32_t const bytes_this_frame = samples_this_frame * m_sample_bytes;
 
 	std::lock_guard<std::mutex> lock(m_buffer_lock);
 
-	UINT32 bytes_left = bytes_this_frame;
+	uint32_t bytes_left = bytes_this_frame;
 
 	while (bytes_left > 0)
 	{
-		UINT32 chunk = std::min(UINT32(m_buffer_size), bytes_left);
+		uint32_t chunk = std::min(uint32_t(m_buffer_size), bytes_left);
 
 		// Roll the buffer if needed
 		if (m_writepos + chunk >= m_buffer_size)
@@ -464,7 +464,7 @@ void sound_xaudio2::OnBufferEnd(void *pBufferContext)
 //============================================================
 
 // The XAudio2 voice callback triggered on every pass
-void sound_xaudio2::OnVoiceProcessingPassStart(UINT32 bytes_required)
+void sound_xaudio2::OnVoiceProcessingPassStart(uint32_t bytes_required)
 {
 	if (bytes_required == 0)
 	{
@@ -491,8 +491,8 @@ void sound_xaudio2::create_buffers(const WAVEFORMATEX &format)
 	// Compute the buffer size
 	// buffer size is equal to the bytes we need to hold in memory per X tenths of a second where X is audio_latency
 	float audio_latency_in_seconds = m_audio_latency / 10.0f;
-	UINT32 format_bytes_per_second = format.nSamplesPerSec * format.nBlockAlign;
-	UINT32 total_buffer_size = format_bytes_per_second * audio_latency_in_seconds * RESAMPLE_TOLERANCE;
+	uint32_t format_bytes_per_second = format.nSamplesPerSec * format.nBlockAlign;
+	uint32_t total_buffer_size = format_bytes_per_second * audio_latency_in_seconds * RESAMPLE_TOLERANCE;
 
 	// We want to be able to submit buffers every X milliseconds
 	// I want to divide these up into "packets" so figure out how many buffers we need
@@ -502,7 +502,7 @@ void sound_xaudio2::create_buffers(const WAVEFORMATEX &format)
 	m_buffer_size = std::max(DWORD(1024), total_buffer_size / m_buffer_count);
 
 	// Make the buffer a multiple of the format size bytes (rounding up)
-	UINT32 remainder = m_buffer_size % format.nBlockAlign;
+	uint32_t remainder = m_buffer_size % format.nBlockAlign;
 	if (remainder != 0)
 		m_buffer_size += format.nBlockAlign - remainder;
 

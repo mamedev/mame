@@ -114,7 +114,7 @@
 
 const device_type RAIDEN2COP = &device_creator<raiden2cop_device>;
 
-raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RAIDEN2COP, "Seibu COP (Raiden 2)", tag, owner, clock, "raiden2cop", __FILE__),
 	cop_latch_addr(0),
 	cop_latch_trigger(0),
@@ -166,18 +166,18 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_videoramout_cb(*this),
 	m_palette(*this, ":palette")
 {
-	memset(cop_func_trigger, 0, sizeof(UINT16)*(0x100/8));
-	memset(cop_func_value, 0, sizeof(UINT16)*(0x100/8));
-	memset(cop_func_mask, 0, sizeof(UINT16)*(0x100/8));
-	memset(cop_program, 0, sizeof(UINT16)*(0x100));
+	memset(cop_func_trigger, 0, sizeof(uint16_t)*(0x100/8));
+	memset(cop_func_value, 0, sizeof(uint16_t)*(0x100/8));
+	memset(cop_func_mask, 0, sizeof(uint16_t)*(0x100/8));
+	memset(cop_program, 0, sizeof(uint16_t)*(0x100));
 
-	memset(cop_dma_src, 0, sizeof(UINT16)*(0x200));
-	memset(cop_dma_dst, 0, sizeof(UINT16)*(0x200));
-	memset(cop_dma_size, 0, sizeof(UINT16)*(0x200));
+	memset(cop_dma_src, 0, sizeof(uint16_t)*(0x200));
+	memset(cop_dma_dst, 0, sizeof(uint16_t)*(0x200));
+	memset(cop_dma_size, 0, sizeof(uint16_t)*(0x200));
 
-	memset(cop_itoa_digits, 0, sizeof(UINT8)*10);
+	memset(cop_itoa_digits, 0, sizeof(uint8_t)*10);
 
-	memset(cop_regs, 0, sizeof(UINT32)*8);
+	memset(cop_regs, 0, sizeof(uint32_t)*8);
 
 
 	memset(cop_collision_info, 0, sizeof(colinfo)*2);
@@ -282,22 +282,22 @@ void raiden2cop_device::device_start()
 	m_word_endian_val = m_host_endian ? 2 : 0;
 }
 
-UINT16 raiden2cop_device::cop_read_word(int address)
+uint16_t raiden2cop_device::cop_read_word(int address)
 {
 	return m_host_space->read_word(address ^ m_word_endian_val);
 }
 
-UINT8 raiden2cop_device::cop_read_byte(int address)
+uint8_t raiden2cop_device::cop_read_byte(int address)
 {
 	return m_host_space->read_byte(address ^ m_byte_endian_val);
 }
 
-void raiden2cop_device::cop_write_word(int address, UINT16 data)
+void raiden2cop_device::cop_write_word(int address, uint16_t data)
 {
 	m_host_space->write_word(address ^ m_word_endian_val, data);
 }
 
-void raiden2cop_device::cop_write_byte(int address, UINT8 data)
+void raiden2cop_device::cop_write_byte(int address, uint8_t data)
 {
 	m_host_space->write_byte(address ^ m_byte_endian_val, data);
 }
@@ -453,7 +453,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_pgm_trigger_w)
 
 
 // currently only used by legionna.c implementation
-int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
+int raiden2cop_device::find_trigger_match(uint16_t triggerval, uint16_t mask)
 {
 	/* search the uploaded 'trigger' table for a matching trigger*/
 	/* note, I don't know what the 'mask' or 'value' tables are... probably important, might determine what actually gets executed! */
@@ -652,7 +652,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 }
 
 //  only used by legionna.c implementation
-int raiden2cop_device::check_command_matches(int command, UINT16 seq0, UINT16 seq1, UINT16 seq2, UINT16 seq3, UINT16 seq4, UINT16 seq5, UINT16 seq6, UINT16 seq7, UINT16 _funcval_, UINT16 _funcmask_)
+int raiden2cop_device::check_command_matches(int command, uint16_t seq0, uint16_t seq1, uint16_t seq2, uint16_t seq3, uint16_t seq4, uint16_t seq5, uint16_t seq6, uint16_t seq7, uint16_t _funcval_, uint16_t _funcmask_)
 {
 	command *= 8;
 
@@ -718,7 +718,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_pal_brightness_mode_w)
 }
 
 /* RE from Seibu Cup Soccer bootleg */
-UINT8 raiden2cop_device::fade_table(int v)
+uint8_t raiden2cop_device::fade_table(int v)
 {
 	int low  = v & 0x001f;
 	int high = v & 0x03e0;
@@ -771,7 +771,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 	/********************************************************************************************************************/
 	case 0x09:
 	{
-		UINT32 src, dst, size;
+		uint32_t src, dst, size;
 		int i;
 
 		src = (cop_dma_src[cop_dma_mode] << 6);
@@ -792,7 +792,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 	/********************************************************************************************************************/
 	case 0x0e:  // Godzilla / Seibu Cup Soccer
 	{
-		UINT32 src, dst, size, i;
+		uint32_t src, dst, size, i;
 
 		src = (cop_dma_src[cop_dma_mode] << 6);
 		dst = (cop_dma_dst[cop_dma_mode] << 6);
@@ -810,7 +810,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 	/********************************************************************************************************************/
 	case 0x116: // Godzilla
 	{
-		UINT32 length, address;
+		uint32_t length, address;
 		int i;
 
 		//if(cop_dma_dst[cop_dma_mode] != 0x0000) // Invalid?
@@ -846,7 +846,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 void raiden2cop_device::bcd_update()
 {
 		//int digits = 1 << cop_itoa_mode*2;
-	UINT32 val = cop_itoa;
+	uint32_t val = cop_itoa;
 
 	//if(digits > 9)
 		int digits = 9;
@@ -873,7 +873,7 @@ void raiden2cop_device::bcd_update()
 
 WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
 {
-	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
+	cop_itoa = (cop_itoa & ~uint32_t(mem_mask)) | (data & mem_mask);
 
 	bcd_update();
 }
@@ -949,7 +949,7 @@ READ16_MEMBER( raiden2cop_device::cop_reg_low_r)
 
 WRITE16_MEMBER( raiden2cop_device::cop_reg_low_w)
 {
-	cop_regs[offset] = (cop_regs[offset] & ~UINT32(mem_mask)) | (data & mem_mask);
+	cop_regs[offset] = (cop_regs[offset] & ~uint32_t(mem_mask)) | (data & mem_mask);
 }
 
 WRITE16_MEMBER( raiden2cop_device::cop_hitbox_baseadr_w)
@@ -957,7 +957,7 @@ WRITE16_MEMBER( raiden2cop_device::cop_hitbox_baseadr_w)
 	COMBINE_DATA(&cop_hit_baseadr);
 }
 
-void  raiden2cop_device::cop_collision_read_pos(int slot, UINT32 spradr, bool allow_swap)
+void  raiden2cop_device::cop_collision_read_pos(int slot, uint32_t spradr, bool allow_swap)
 {
 	cop_collision_info[slot].allow_swap = allow_swap;
 	cop_collision_info[slot].flags_swap = cop_read_word(spradr+2);
@@ -986,9 +986,9 @@ Y = collides between 0xd0 and 0x30 (not inclusive)
 0x588 bits 2 & 3 = 0x580 bits 0 & 1
 */
 
-void  raiden2cop_device::cop_collision_update_hitbox(UINT16 data, int slot, UINT32 hitadr)
+void  raiden2cop_device::cop_collision_update_hitbox(uint16_t data, int slot, uint32_t hitadr)
 {
-	UINT32 hitadr2 = m_host_space->read_word(hitadr) | (cop_hit_baseadr << 16); // DON'T use cop_read_word here, doesn't need endian fixing?!
+	uint32_t hitadr2 = m_host_space->read_word(hitadr) | (cop_hit_baseadr << 16); // DON'T use cop_read_word here, doesn't need endian fixing?!
 	int num_axis = 2;
 	int extraxor = 0;
 	if (m_host_endian) extraxor = 1;
@@ -1009,19 +1009,19 @@ void  raiden2cop_device::cop_collision_update_hitbox(UINT16 data, int slot, UINT
 		cop_collision_info[slot].size[i] = m_host_space->read_byte(extraxor^ (hitadr2++));
 	}
 
-	INT16 dx[3],size[3];
+	int16_t dx[3],size[3];
 
 	for (i = 0; i < num_axis; i++)
 	{
-		size[i] = UINT8(cop_collision_info[slot].size[i]);
-		dx[i] = INT8(cop_collision_info[slot].dx[i]);
+		size[i] = uint8_t(cop_collision_info[slot].size[i]);
+		dx[i] = int8_t(cop_collision_info[slot].dx[i]);
 	}
 
-	//printf("%02x %02x %02x %02x %02x %02x\n", (UINT8)size[i], (UINT8)dx[i], (UINT8)size[1], (UINT8)dx[1], (UINT8)size[2], (UINT8)dx[2]);
+	//printf("%02x %02x %02x %02x %02x %02x\n", (uint8_t)size[i], (uint8_t)dx[i], (uint8_t)size[1], (uint8_t)dx[1], (uint8_t)size[2], (uint8_t)dx[2]);
 
 	int j = slot;
 
-	UINT8 res;
+	uint8_t res;
 
 	if (num_axis==3) res = 7;
 	else res = 3;
@@ -1355,7 +1355,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	{
 		return;
 	}
-	UINT16 funcval, funcmask;
+	uint16_t funcval, funcmask;
 	// this is pointless.. all we use it for is comparing against the same value
 	funcval = get_func_value(command);
 	funcmask = get_func_mask(command);

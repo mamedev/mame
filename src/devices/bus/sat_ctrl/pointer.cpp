@@ -50,7 +50,7 @@ ioport_constructor saturn_track_device::device_input_ports() const
 //  saturn_track_device - constructor
 //-------------------------------------------------
 
-saturn_track_device::saturn_track_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+saturn_track_device::saturn_track_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, SATURN_TRACK, "Sega Saturn Pointing Controller / Trackball", tag, owner, clock, "saturn_track", __FILE__),
 					device_saturn_control_port_interface(mconfig, *this),
 					m_pointx(*this, "POINT_X"),
@@ -83,12 +83,12 @@ void saturn_track_device::device_reset()
 //  read_ctrl
 //-------------------------------------------------
 
-UINT8 saturn_track_device::read_ctrl(UINT8 offset)
+uint8_t saturn_track_device::read_ctrl(uint8_t offset)
 {
-	UINT8 res = 0;
-	UINT8 mouse_ctrl = m_buttons->read();
-	INT16 mouse_x = m_pointx->read();
-	INT16 mouse_y = m_pointy->read();
+	uint8_t res = 0;
+	uint8_t mouse_ctrl = m_buttons->read();
+	int16_t mouse_x = m_pointx->read();
+	int16_t mouse_y = m_pointy->read();
 
 	if (mouse_x < 0)
 		mouse_ctrl |= 0x10;

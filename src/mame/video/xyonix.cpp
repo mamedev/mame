@@ -5,7 +5,7 @@
 
 PALETTE_INIT_MEMBER(xyonix_state, xyonix)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 
@@ -54,7 +54,7 @@ void xyonix_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xyonix_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 80, 32);
 }
 
-UINT32 xyonix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t xyonix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

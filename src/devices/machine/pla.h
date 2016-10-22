@@ -88,19 +88,19 @@ class pla_device : public device_t
 {
 public:
 	// construction/destruction
-	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	static void set_num_inputs(device_t &device, UINT32 i) { downcast<pla_device &>(device).m_inputs = i; }
-	static void set_num_outputs(device_t &device, UINT32 o) { downcast<pla_device &>(device).m_outputs = o; }
-	static void set_num_terms(device_t &device, UINT32 t) { downcast<pla_device &>(device).m_terms = t; }
-	static void set_inputmask(device_t &device, UINT32 mask) { downcast<pla_device &>(device).m_input_mask = mask; } // UINT32!
+	static void set_num_inputs(device_t &device, uint32_t i) { downcast<pla_device &>(device).m_inputs = i; }
+	static void set_num_outputs(device_t &device, uint32_t o) { downcast<pla_device &>(device).m_outputs = o; }
+	static void set_num_terms(device_t &device, uint32_t t) { downcast<pla_device &>(device).m_terms = t; }
+	static void set_inputmask(device_t &device, uint32_t mask) { downcast<pla_device &>(device).m_input_mask = mask; } // uint32_t!
 	static void set_format(device_t &device, int format) { downcast<pla_device &>(device).m_format = format; }
 
-	UINT32 inputs() { return m_inputs; }
-	UINT32 outputs() { return m_outputs; }
+	uint32_t inputs() { return m_inputs; }
+	uint32_t outputs() { return m_outputs; }
 
-	UINT32 read(UINT32 input);
+	uint32_t read(uint32_t input);
 
 protected:
 	// device-level overrides
@@ -113,21 +113,21 @@ private:
 
 	int m_format;
 
-	UINT32 m_inputs;
-	UINT32 m_outputs;
-	UINT32 m_terms;
-	UINT64 m_input_mask;
-	UINT64 m_xor;
+	uint32_t m_inputs;
+	uint32_t m_outputs;
+	uint32_t m_terms;
+	uint64_t m_input_mask;
+	uint64_t m_xor;
 
 	int m_cache_size;
-	std::vector<UINT32> m_cache;
-	UINT64 m_cache2[CACHE2_SIZE];
-	UINT8 m_cache2_ptr;
+	std::vector<uint32_t> m_cache;
+	uint64_t m_cache2[CACHE2_SIZE];
+	uint8_t m_cache2_ptr;
 
 	struct term
 	{
-		UINT64 and_mask;
-		UINT64 or_mask;
+		uint64_t and_mask;
+		uint64_t or_mask;
 	} m_term[MAX_TERMS];
 };
 

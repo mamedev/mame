@@ -604,7 +604,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 			/* Some games (like Connect 4) use 'programmable' LED displays, built from light display lines in section 2. */
 			/* These are mostly low-tech machines, where such wiring proved cheaper than an extender card */
 			/* TODO: replace this with 'segment' lamp masks, to make it more generic */
-			UINT8 pled_segs[2] = {0,0};
+			uint8_t pled_segs[2] = {0,0};
 
 			static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 133 };
 			static const int lamps2[8] = { 114, 115, 116, 117, 112, 113, 118, 119 };
@@ -849,7 +849,7 @@ READ8_MEMBER(mpu4_state::pia_ic5_porta_r)
 	}
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
 
-	UINT8 tempinput = m_aux1_port->read()|m_aux1_input;
+	uint8_t tempinput = m_aux1_port->read()|m_aux1_input;
 	if (m_aux1_invert)
 	{
 		return ~tempinput;
@@ -1052,7 +1052,7 @@ READ8_MEMBER(mpu4_state::pia_ic5_portb_r)
 	machine().bookkeeping().coin_lockout_w(2, (m_pia5->b_output() & 0x04) );
 	machine().bookkeeping().coin_lockout_w(3, (m_pia5->b_output() & 0x08) );
 
-	UINT8 tempinput = m_aux2_port->read()|m_aux2_input;
+	uint8_t tempinput = m_aux2_port->read()|m_aux2_input;
 	if (m_aux2_invert)
 	{
 		return ~tempinput;
@@ -1980,7 +1980,7 @@ READ8_MEMBER(mpu4_state::characteriser_r)
 		int addr = space.device().state().state_int(M6809_X);
 		if ((addr>=0x800) && (addr<=0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
 
-		UINT8 ret = space.read_byte(addr);
+		uint8_t ret = space.read_byte(addr);
 		logerror(" (returning %02x)",ret);
 
 		logerror("\n");
@@ -2475,7 +2475,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m_blsbys)
 DRIVER_INIT_MEMBER(mpu4_state,m4default_banks)
 {
 	//Initialise paging for non-extended ROM space
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &rom[0x01000], 0x10000);
 	membank("bank1")->set_entry(0);
 }
@@ -2520,7 +2520,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 		m_bwb_bank=1;
 		space.install_write_handler(0x0858, 0x0858, write8_delegate(FUNC(mpu4_state::bankswitch_w),this));
 		space.install_write_handler(0x0878, 0x0878, write8_delegate(FUNC(mpu4_state::bankset_w),this));
-		UINT8 *rom = memregion("maincpu")->base();
+		uint8_t *rom = memregion("maincpu")->base();
 
 		m_numbanks = size / 0x10000;
 
@@ -2559,11 +2559,11 @@ DRIVER_INIT_MEMBER(mpu4_state,m_frkstn)
 }
 
 // thanks to Project Amber for descramble information
-static void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor)
+static void descramble_crystal( uint8_t* region, int start, int end, uint8_t extra_xor)
 {
 	for (int i=start;i<end;i++)
 	{
-		UINT8 x = region[i];
+		uint8_t x = region[i];
 		switch (i & 0x58)
 		{
 		case 0x00: // same as 0x08

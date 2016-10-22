@@ -30,7 +30,7 @@
 class namco_51xx_device : public device_t
 {
 public:
-	namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_input_0_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_0.set_callback(object); }
 	template<class _Object> static devcb_base &set_input_1_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_1.set_callback(object); }
@@ -59,16 +59,16 @@ private:
 	devcb_write8 m_out_0;
 	devcb_write8 m_out_1;
 
-	INT32 m_lastcoins;
-	INT32 m_lastbuttons;
-	INT32 m_credits;
-	INT32 m_coins[2];
-	INT32 m_coins_per_cred[2];
-	INT32 m_creds_per_coin[2];
-	INT32 m_in_count;
-	INT32 m_mode;
-	INT32 m_coincred_mode;
-	INT32 m_remap_joy;
+	int32_t m_lastcoins;
+	int32_t m_lastbuttons;
+	int32_t m_credits;
+	int32_t m_coins[2];
+	int32_t m_coins_per_cred[2];
+	int32_t m_creds_per_coin[2];
+	int32_t m_in_count;
+	int32_t m_mode;
+	int32_t m_coincred_mode;
+	int32_t m_remap_joy;
 };
 
 extern const device_type NAMCO_51XX;

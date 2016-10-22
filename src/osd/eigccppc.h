@@ -41,10 +41,10 @@
 -------------------------------------------------*/
 
 #define mul_32x32_hi _mul_32x32_hi
-static inline INT32 ATTR_CONST ATTR_FORCE_INLINE
-_mul_32x32_hi(INT32 val1, INT32 val2)
+static inline int32_t ATTR_CONST ATTR_FORCE_INLINE
+_mul_32x32_hi(int32_t val1, int32_t val2)
 {
-	INT32 result;
+	int32_t result;
 
 	__asm__ (
 		" mulhw  %[result], %[val1], %[val2] \n"
@@ -64,10 +64,10 @@ _mul_32x32_hi(INT32 val1, INT32 val2)
 -------------------------------------------------*/
 
 #define mulu_32x32_hi _mulu_32x32_hi
-static inline UINT32 ATTR_CONST ATTR_FORCE_INLINE
-_mulu_32x32_hi(UINT32 val1, UINT32 val2)
+static inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
+_mulu_32x32_hi(uint32_t val1, uint32_t val2)
 {
-	UINT32 result;
+	uint32_t result;
 
 	__asm__ (
 		" mulhwu  %[result], %[val1], %[val2] \n"
@@ -89,10 +89,10 @@ _mulu_32x32_hi(UINT32 val1, UINT32 val2)
 
 #if !defined(__ppc64__) && !defined(__PPC64__) && !defined(_ARCH_PPC64)
 #define mul_32x32_shift _mul_32x32_shift
-static inline INT32 ATTR_CONST ATTR_FORCE_INLINE
-_mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
+static inline int32_t ATTR_CONST ATTR_FORCE_INLINE
+_mul_32x32_shift(int32_t val1, int32_t val2, uint8_t shift)
 {
-	INT32 result;
+	int32_t result;
 
 	/* Valid for (0 <= shift <= 32) */
 	__asm__ (
@@ -123,10 +123,10 @@ _mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
 
 #if !defined(__ppc64__) && !defined(__PPC64__) && !defined(_ARCH_PPC64)
 #define mulu_32x32_shift _mulu_32x32_shift
-static inline UINT32 ATTR_CONST ATTR_FORCE_INLINE
-_mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
+static inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
+_mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
 {
-	UINT32 result;
+	uint32_t result;
 
 	/* Valid for (0 <= shift <= 32) */
 	__asm__ (
@@ -248,10 +248,10 @@ _recip_approx(float value)
 -------------------------------------------------*/
 
 #define count_leading_zeros _count_leading_zeros
-static inline UINT8 ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_zeros(UINT32 value)
+static inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_zeros(uint32_t value)
 {
-	UINT32 result;
+	uint32_t result;
 
 	__asm__ (
 		" cntlzw  %[result], %[value] \n"
@@ -269,10 +269,10 @@ _count_leading_zeros(UINT32 value)
 -------------------------------------------------*/
 
 #define count_leading_ones _count_leading_ones
-static inline UINT8 ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_ones(UINT32 value)
+static inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_ones(uint32_t value)
 {
-	UINT32 result;
+	uint32_t result;
 
 	__asm__ (
 		" not     %[result], %[value]  \n"

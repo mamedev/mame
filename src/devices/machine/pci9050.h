@@ -29,7 +29,7 @@ class pci9050_device :
 	public pci_device
 {
 public:
-	pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// PCI9050 I/O register space handlers
 	DECLARE_READ32_MEMBER( lasrr_r  );
@@ -69,8 +69,8 @@ private:
 	device_t *m_devices[4];
 	address_map_constructor m_maps[4];
 
-	UINT32 m_lasrr[4], m_lasba[4], m_lasbrd[4], m_csbase[4];
-	UINT32 m_eromrr, m_eromba, m_erombrd, m_intcsr, m_cntrl;
+	uint32_t m_lasrr[4], m_lasba[4], m_lasbrd[4], m_csbase[4];
+	uint32_t m_eromrr, m_eromba, m_erombrd, m_intcsr, m_cntrl;
 
 	void remap_local(int id);
 	void remap_rom();

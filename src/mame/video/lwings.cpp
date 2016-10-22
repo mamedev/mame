@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
 TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
 {
 	int code, color;
-	UINT8 *rom = memregion("gfx5")->base();
+	uint8_t *rom = memregion("gfx5")->base();
 	int mask = memregion("gfx5")->bytes() - 1;
 
 	tile_index = (tile_index + m_bg2_image * 0x20) & mask;
@@ -165,7 +165,7 @@ WRITE8_MEMBER(lwings_state::trojan_bg2_image_w)
 
 ***************************************************************************/
 
-inline int lwings_state::is_sprite_on( UINT8 *buffered_spriteram, int offs )
+inline int lwings_state::is_sprite_on( uint8_t *buffered_spriteram, int offs )
 {
 	int sx, sy;
 
@@ -177,7 +177,7 @@ inline int lwings_state::is_sprite_on( UINT8 *buffered_spriteram, int offs )
 
 void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
 	for (offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
@@ -213,7 +213,7 @@ void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 
 void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
 	for (offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
@@ -259,7 +259,7 @@ void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 	}
 }
 
-UINT32 lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	lwings_draw_sprites(bitmap, cliprect);
@@ -267,7 +267,7 @@ UINT32 lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 lwings_state::screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lwings_state::screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);

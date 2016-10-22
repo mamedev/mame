@@ -37,8 +37,8 @@ class isa8_aga_device :
 {
 public:
 	// construction/destruction
-	isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	isa8_aga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_aga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	// device-level overrides
 	virtual void device_start() override;
 	// optional information overrides
@@ -77,23 +77,23 @@ public:
 
 	int     m_update_row_type;
 	AGA_MODE    m_mode;
-	UINT8   m_mda_mode_control;
-	UINT8   m_mda_status;
-	UINT8   *m_mda_chr_gen;
+	uint8_t   m_mda_mode_control;
+	uint8_t   m_mda_status;
+	uint8_t   *m_mda_chr_gen;
 
-	UINT8   m_cga_mode_control;
-	UINT8   m_cga_color_select;
-	UINT8   m_cga_status;
-	UINT8   *m_cga_chr_gen;
+	uint8_t   m_cga_mode_control;
+	uint8_t   m_cga_color_select;
+	uint8_t   m_cga_status;
+	uint8_t   *m_cga_chr_gen;
 
 	int   m_framecnt;
-	UINT8   m_vsync;
-	UINT8   m_hsync;
+	uint8_t   m_vsync;
+	uint8_t   m_hsync;
 
 
-	UINT8   m_cga_palette_lut_2bpp[4];
+	uint8_t   m_cga_palette_lut_2bpp[4];
 
-	std::unique_ptr<UINT8[]>  m_videoram;
+	std::unique_ptr<uint8_t[]>  m_videoram;
 };
 
 // device type definition
@@ -106,15 +106,15 @@ class isa8_aga_pc200_device :
 {
 public:
 	// construction/destruction
-	isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// device-level overrides
 	virtual void device_start() override;
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	UINT8 m_port8;
-	UINT8 m_portd;
-	UINT8 m_porte;
+	uint8_t m_port8;
+	uint8_t m_portd;
+	uint8_t m_porte;
 
 	DECLARE_READ8_MEMBER( pc200_videoram_r );
 	DECLARE_WRITE8_MEMBER( pc200_videoram_w );

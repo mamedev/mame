@@ -14,7 +14,7 @@
 class ncr5390_device : public nscsi_device
 {
 public:
-	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr5390_device &>(device).m_irq_handler.set_callback(object); }
@@ -44,8 +44,8 @@ public:
 
 	virtual void scsi_ctrl_changed() override;
 
-	UINT8 dma_r();
-	void dma_w(UINT8 val);
+	uint8_t dma_r();
+	void dma_w(uint8_t val);
 
 protected:
 	virtual void device_start() override;
@@ -184,10 +184,10 @@ private:
 
 	emu_timer *tm;
 
-	UINT8 command[2], config, status, istatus;
-	UINT8 clock_conv, sync_offset, sync_period, bus_id, select_timeout, seq;
-	UINT8 fifo[16];
-	UINT16 tcount;
+	uint8_t command[2], config, status, istatus;
+	uint8_t clock_conv, sync_offset, sync_period, bus_id, select_timeout, seq;
+	uint8_t fifo[16];
+	uint16_t tcount;
 	int mode, fifo_pos, command_pos;
 	int state, xfr_phase;
 	int command_length;
@@ -202,8 +202,8 @@ private:
 
 	void start_command();
 	void step(bool timeout);
-	bool check_valid_command(UINT8 cmd);
-	int derive_msg_size(UINT8 msg_id);
+	bool check_valid_command(uint8_t cmd);
+	int derive_msg_size(uint8_t msg_id);
 	void function_complete();
 	void function_bus_complete();
 	void bus_complete();
@@ -215,8 +215,8 @@ private:
 	void reset_soft();
 	void reset_disconnect();
 
-	UINT8 fifo_pop();
-	void fifo_push(UINT8 val);
+	uint8_t fifo_pop();
+	void fifo_push(uint8_t val);
 	void send_byte();
 	void recv_byte();
 

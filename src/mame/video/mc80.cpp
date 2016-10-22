@@ -14,7 +14,7 @@
 // This is not a content of U402 510
 // but order is fine
 
-static const UINT8 prom[] = {
+static const uint8_t prom[] = {
 	0x0c,0x11,0x13,0x15,0x17,0x10,0x0e,0x00, // @
 	0x04,0x0a,0x11,0x11,0x1f,0x11,0x11,0x00, // A
 	0x1e,0x11,0x11,0x1e,0x11,0x11,0x1e,0x00, // B
@@ -98,16 +98,16 @@ VIDEO_START_MEMBER(mc80_state,mc8020)
 {
 }
 
-UINT32 mc80_state::screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mc80_state::screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
 	for(y = 0; y < 8; y++ )
 	{
 		for (ra = 0; ra < 16; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 32; x++)
 			{
@@ -143,14 +143,14 @@ VIDEO_START_MEMBER(mc80_state,mc8030)
 	m_p_videoram.set_target(memregion("vram")->base(),m_p_videoram.bytes());
 }
 
-UINT32 mc80_state::screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mc80_state::screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 gfx;
-	UINT16 y=0,ma=0,x;
+	uint8_t gfx;
+	uint16_t y=0,ma=0,x;
 
 	for(y = 0; y < 256; y++ )
 	{
-		UINT16 *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix16(y);
 		{
 			for (x = ma; x < ma + 64; x++)
 			{

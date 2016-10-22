@@ -260,7 +260,7 @@ static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs51_cpu_device)
 ADDRESS_MAP_END
 
 
-mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
+mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0
 		, ( ( program_width == 12 ) ? ADDRESS_MAP_NAME(program_12bit) : ( ( program_width == 13 ) ? ADDRESS_MAP_NAME(program_13bit) : nullptr ) ))
@@ -286,91 +286,91 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 }
 
 
-i8031_device::i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8031_device::i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, I8031, "I8031", tag, owner, clock, "i8031", 0, 7)
 {
 }
 
-i8051_device::i8051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8051_device::i8051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, I8051, "I8051", tag, owner, clock, "i8051", 12, 7)
 {
 }
 
-i8751_device::i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8751_device::i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, I8751, "I8751", tag, owner, clock, "i8751", 12, 7)
 {
 }
 
-i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
+i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features)
 	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I8052)
 {
 	m_num_interrupts = 6;
 }
 
-i8052_device::i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8052_device::i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, I8052, "I8052", tag, owner, clock, "i8052", 13, 8, FEATURE_I8052)
 {
 	m_num_interrupts = 6;
 }
 
-i8032_device::i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8032_device::i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8052_device(mconfig, I8032, "I8032", tag, owner, clock, "i8032", 0, 8)
 {
 }
 
-i8752_device::i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8752_device::i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8052_device(mconfig, I8752, "I8752", tag, owner, clock, "i8752", 13, 8)
 {
 }
 
-i80c31_device::i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i80c31_device::i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8052_device(mconfig, I80C31, "I80C31", tag, owner, clock, "i80c31", 0, 7)
 {
 }
 
-i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
+i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features)
 	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_CMOS)
 {
 }
 
-i80c51_device::i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i80c51_device::i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, I80C51, "I80C51", tag, owner, clock, "i80c51", 12, 7)
 {
 }
 
-i87c51_device::i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i87c51_device::i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c51_device(mconfig, I87C51, "I87C51", tag, owner, clock, "i87c51", 12, 7)
 {
 }
 
 
-i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
+i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features)
 	: i8052_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I80C52 | FEATURE_CMOS)
 {
 }
 
-i80c52_device::i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i80c52_device::i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8052_device(mconfig, I80C52, "I80C52", tag, owner, clock, "i80C52", 13, 8, FEATURE_I80C52 | FEATURE_CMOS)
 {
 }
 
-i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c52_device(mconfig, I80C32, "I80C32", tag, owner, clock, "i80c32", 0, 8)
 {
 }
 
 
-i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c52_device(mconfig, I87C52, "I87C52", tag, owner, clock, "i87c52", 13, 8)
 {
 }
 
-at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c51_device(mconfig, AT89C4051, "AT89C4051", tag, owner, clock, "at89c4051", 12, 7)
 {
 }
 
-ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, DS5002FP, "DS5002FP", tag, owner, clock, "ds5002fp", 12, 7, FEATURE_DS5002FP | FEATURE_CMOS)
 {
 }
@@ -385,10 +385,10 @@ ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag,
 #define ROP_ARG(pc)     m_direct->read_byte(pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
-#define CODEMEM_R(a)    (UINT8)m_program->read_byte(a)
+#define CODEMEM_R(a)    (uint8_t)m_program->read_byte(a)
 
 /* Read/Write a byte from/to External Data Memory (Usually RAM or other I/O) */
-#define DATAMEM_R(a)    (UINT8)m_io->read_byte(a)
+#define DATAMEM_R(a)    (uint8_t)m_io->read_byte(a)
 #define DATAMEM_W(a,v)  m_io->write_byte(a, v)
 
 /* Read/Write a byte from/to the Internal RAM */
@@ -398,8 +398,8 @@ ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag,
 
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
-UINT8 mcs51_cpu_device::iram_iread(offs_t a) { return (a <= m_ram_mask) ? m_data->read_byte(a) : 0xff; }
-void mcs51_cpu_device::iram_iwrite(offs_t a, UINT8 d) { if (a <= m_ram_mask) m_data->write_byte(a, d); }
+uint8_t mcs51_cpu_device::iram_iread(offs_t a) { return (a <= m_ram_mask) ? m_data->read_byte(a) : 0xff; }
+void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m_data->write_byte(a, d); }
 
 #define IRAM_IR(a)      iram_iread(a)
 #define IRAM_IW(a, d)   iram_iwrite(a, d)
@@ -413,7 +413,7 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, UINT8 d) { if (a <= m_ram_mask) m_d
 #define BIT_W(a,v)      bit_address_w(a, v)
 
 /* Input/Output a byte from given I/O port */
-#define IN(port)        ((UINT8)m_io->read_byte(port))
+#define IN(port)        ((uint8_t)m_io->read_byte(port))
 #define OUT(port,value) m_io->write_byte(port,value)
 
 
@@ -434,10 +434,10 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, UINT8 d) { if (a <= m_ram_mask) m_d
 #define ACC         SFR_A(ADDR_ACC)
 #define PSW         SFR_A(ADDR_PSW)
 
-#define P0          ((const UINT8) SFR_A(ADDR_P0))
-#define P1          ((const UINT8) SFR_A(ADDR_P1))
-#define P2          ((const UINT8) SFR_A(ADDR_P2))
-#define P3          ((const UINT8) SFR_A(ADDR_P3))
+#define P0          ((const uint8_t) SFR_A(ADDR_P0))
+#define P1          ((const uint8_t) SFR_A(ADDR_P1))
+#define P2          ((const uint8_t) SFR_A(ADDR_P2))
+#define P3          ((const uint8_t) SFR_A(ADDR_P3))
 
 #define SP          SFR_A(ADDR_SP)
 #define DPL         SFR_A(ADDR_DPL)
@@ -728,14 +728,14 @@ void mcs51_cpu_device::clear_current_irq()
 	LOG(("New: %d %02x\n", m_cur_irq_prio, m_irq_active));
 }
 
-UINT8 mcs51_cpu_device::r_acc() { return SFR_A(ADDR_ACC); }
+uint8_t mcs51_cpu_device::r_acc() { return SFR_A(ADDR_ACC); }
 
-UINT8 mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
+uint8_t mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
 
 void mcs51_cpu_device::update_ptrs()
 {
-	m_internal_ram = (UINT8 *)m_data->get_write_ptr(0x00);
-	m_sfr_ram = (UINT8 *)m_data->get_write_ptr(0x100);
+	m_internal_ram = (uint8_t *)m_data->get_write_ptr(0x00);
+	m_sfr_ram = (uint8_t *)m_data->get_write_ptr(0x100);
 }
 
 
@@ -773,9 +773,9 @@ void mcs51_cpu_device::update_ptrs()
 offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 {
 	/* Memory Range (RG1 and RG0 @ MCON and RPCTL registers) */
-	static const UINT16 ds5002fp_ranges[4] = { 0x1fff, 0x3fff, 0x7fff, 0xffff };
+	static const uint16_t ds5002fp_ranges[4] = { 0x1fff, 0x3fff, 0x7fff, 0xffff };
 	/* Memory Partition Table (RG1 & RG0 @ MCON & RPCTL registers) */
-	static const UINT32 ds5002fp_partitions[16] = {
+	static const uint32_t ds5002fp_partitions[16] = {
 		0x0000, 0x1000, 0x2000, 0x3000, 0x4000, 0x5000, 0x6000,  0x7000,
 		0x8000, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000, 0x10000 };
 
@@ -800,12 +800,12 @@ offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 
 /* Internal ram read/write */
 
-UINT8 mcs51_cpu_device::iram_read(size_t offset)
+uint8_t mcs51_cpu_device::iram_read(size_t offset)
 {
 	return (((offset) < 0x80) ? m_data->read_byte(offset) : sfr_read(offset));
 }
 
-void mcs51_cpu_device::iram_write(size_t offset, UINT8 data)
+void mcs51_cpu_device::iram_write(size_t offset, uint8_t data)
 {
 	if ((offset) < 0x80)
 		m_data->write_byte(offset, data);
@@ -816,7 +816,7 @@ void mcs51_cpu_device::iram_write(size_t offset, UINT8 data)
 /*Push the current PC to the stack*/
 void mcs51_cpu_device::push_pc()
 {
-	UINT8 tmpSP = SP+1;                     //Grab and Increment Stack Pointer
+	uint8_t tmpSP = SP+1;                     //Grab and Increment Stack Pointer
 	IRAM_IW(tmpSP, (PC & 0xff));                //Store low byte of PC to Internal Ram (Use IRAM_IW to store stack above 128 bytes)
 	tmpSP++;                                    // ""
 	SP = tmpSP;                             // ""
@@ -826,7 +826,7 @@ void mcs51_cpu_device::push_pc()
 /*Pop the current PC off the stack and into the pc*/
 void mcs51_cpu_device::pop_pc()
 {
-	UINT8 tmpSP = SP;                           //Grab Stack Pointer
+	uint8_t tmpSP = SP;                           //Grab Stack Pointer
 	PC = (IRAM_IR(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
 	PC = PC | IRAM_IR(tmpSP--);                 //Store lo byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
 	SP = tmpSP;                             //Decrement Stack Pointer
@@ -836,9 +836,9 @@ void mcs51_cpu_device::pop_pc()
 void mcs51_cpu_device::set_parity()
 {
 	//This flag will be set when the accumulator contains an odd # of bits set..
-	UINT8 p = 0;
+	uint8_t p = 0;
 	int i;
-	UINT8 a = ACC;
+	uint8_t a = ACC;
 
 	for (i=0; i<8; i++) {       //Test for each of the 8 bits in the ACC!
 		p ^= (a & 1);
@@ -848,10 +848,10 @@ void mcs51_cpu_device::set_parity()
 	SET_P(p & 1);
 }
 
-UINT8 mcs51_cpu_device::bit_address_r(UINT8 offset)
+uint8_t mcs51_cpu_device::bit_address_r(uint8_t offset)
 {
-	UINT8   word;
-	UINT8   mask;
+	uint8_t   word;
+	uint8_t   mask;
 	int bit_pos;
 	int distance;   /* distance between bit addressable words */
 					/* 1 for normal bits, 8 for sfr bit addresses */
@@ -875,12 +875,12 @@ UINT8 mcs51_cpu_device::bit_address_r(UINT8 offset)
 }
 
 
-void mcs51_cpu_device::bit_address_w(UINT8 offset, UINT8 bit)
+void mcs51_cpu_device::bit_address_w(uint8_t offset, uint8_t bit)
 {
 	int word;
-	UINT8   mask;
+	uint8_t   mask;
 	int bit_pos;
-	UINT8   result;
+	uint8_t   result;
 	int distance;
 
 	/* User defined bit addresses 0x20-0x2f (values are 0x0-0x7f) */
@@ -907,10 +907,10 @@ void mcs51_cpu_device::bit_address_w(UINT8 offset, UINT8 bit)
 	}
 }
 
-void mcs51_cpu_device::do_add_flags(UINT8 a, UINT8 data, UINT8 c)
+void mcs51_cpu_device::do_add_flags(uint8_t a, uint8_t data, uint8_t c)
 {
-	UINT16 result = a+data+c;
-	INT16 result1 = (INT8)a+(INT8)data+c;
+	uint16_t result = a+data+c;
+	int16_t result1 = (int8_t)a+(int8_t)data+c;
 
 	SET_CY((result & 0x100) >> 8);
 	result = (a&0x0f)+(data&0x0f)+c;
@@ -918,10 +918,10 @@ void mcs51_cpu_device::do_add_flags(UINT8 a, UINT8 data, UINT8 c)
 	SET_OV(result1 < -128 || result1 > 127);
 }
 
-void mcs51_cpu_device::do_sub_flags(UINT8 a, UINT8 data, UINT8 c)
+void mcs51_cpu_device::do_sub_flags(uint8_t a, uint8_t data, uint8_t c)
 {
-	UINT16 result = a-(data+c);
-	INT16 result1 = (INT8)a-(INT8)(data+c);
+	uint16_t result = a-(data+c);
+	int16_t result1 = (int8_t)a-(int8_t)(data+c);
 
 	SET_CY((result & 0x100) >> 8);
 	result = (a&0x0f)-((data&0x0f)+c);
@@ -1004,11 +1004,11 @@ void mcs51_cpu_device::transmit_receive(int source)
 void mcs51_cpu_device::update_timer_t0(int cycles)
 {
 	int mode = (GET_M0_1<<1) | GET_M0_0;
-	UINT32 count;
+	uint32_t count;
 
 	if (GET_TR0)
 	{
-		UINT32 delta;
+		uint32_t delta;
 
 		/* counter / external input */
 		delta = GET_CT0 ? m_t0_cnt : cycles;
@@ -1038,7 +1038,7 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 				TL0 = count & 0xff;
 				break;
 			case 2:         /* 8 Bit Autoreload */
-				count = ((UINT32) TL0) + delta;
+				count = ((uint32_t) TL0) + delta;
 				if ( count & 0xffffff00 )               /* Check for overflow */
 				{
 					SET_TF0(1);
@@ -1049,7 +1049,7 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 				break;
 			case 3:
 				/* Split Timer 1 */
-				count = ((UINT32) TL0) + delta;
+				count = ((uint32_t) TL0) + delta;
 				if ( count & 0xffffff00 )               /* Check for overflow */
 					SET_TF0(1);
 				TL0 = count & 0xff;                     /* Update new values of the counter */
@@ -1062,7 +1062,7 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 		{
 		case 3:
 			/* Split Timer 2 */
-			count = ((UINT32) TH0) + cycles;            /* No gate control or counting !*/
+			count = ((uint32_t) TH0) + cycles;            /* No gate control or counting !*/
 			if ( count & 0xffffff00 )               /* Check for overflow */
 				SET_TF1(1);
 			TH0 = count & 0xff;                     /* Update new values of the counter */
@@ -1089,16 +1089,16 @@ switching it into or out of Mode 3 or it can be assigned as a baud rate generato
 
 void mcs51_cpu_device::update_timer_t1(int cycles)
 {
-	UINT8 mode = (GET_M1_1<<1) | GET_M1_0;
-	UINT8 mode_0 = (GET_M0_1<<1) | GET_M0_0;
-	UINT32 count;
+	uint8_t mode = (GET_M1_1<<1) | GET_M1_0;
+	uint8_t mode_0 = (GET_M0_1<<1) | GET_M0_0;
+	uint32_t count;
 
 	if (mode_0 != 3)
 	{
 		if (GET_TR1)
 		{
-			UINT32 delta;
-			UINT32 overflow = 0;
+			uint32_t delta;
+			uint32_t overflow = 0;
 
 			/* counter / external input */
 			delta = GET_CT1 ? m_t1_cnt : cycles;
@@ -1126,7 +1126,7 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 					TL1 = count & 0xff;
 					break;
 				case 2:         /* 8 Bit Autoreload */
-					count = ((UINT32) TL1) + delta;
+					count = ((uint32_t) TL1) + delta;
 					overflow = count & 0xffffff00; /* Check for overflow */
 					if ( overflow )
 					{
@@ -1148,8 +1148,8 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 	}
 	else
 	{
-		UINT32 delta;
-		UINT32 overflow = 0;
+		uint32_t delta;
+		uint32_t overflow = 0;
 
 		delta =  cycles;
 		/* taken, reset */
@@ -1170,7 +1170,7 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 				TL1 = count & 0xff;
 				break;
 			case 2:         /* 8 Bit Autoreload */
-				count = ((UINT32) TL1) + delta;
+				count = ((uint32_t) TL1) + delta;
 				overflow = count & 0xffffff00; /* Check for overflow */
 				if ( overflow )
 				{
@@ -1197,7 +1197,7 @@ void mcs51_cpu_device::update_timer_t2(int cycles)
 		int mode = ((GET_TCLK | GET_RCLK) << 1) | GET_CP;
 		int delta = GET_CT2 ? m_t2_cnt : (mode & 2) ? cycles * (12/2) : cycles;
 
-		UINT32 count = ((TH2<<8) | TL2) + delta;
+		uint32_t count = ((TH2<<8) | TL2) + delta;
 		m_t2_cnt = 0;
 
 		switch (mode)
@@ -1260,7 +1260,7 @@ void mcs51_cpu_device::update_timers(int cycles)
 //Set up to transmit data out of serial port
 //NOTE: Enable Serial Port Interrupt bit is NOT required to send/receive data!
 
-void mcs51_cpu_device::serial_transmit(UINT8 data)
+void mcs51_cpu_device::serial_transmit(uint8_t data)
 {
 	int mode = (GET_SM0<<1) | GET_SM1;
 
@@ -1315,7 +1315,7 @@ void mcs51_cpu_device::update_serial(int cycles)
 }
 
 /* Check and update status of serial port */
-void mcs51_cpu_device::update_irq_prio(UINT8 ipl, UINT8 iph)
+void mcs51_cpu_device::update_irq_prio(uint8_t ipl, uint8_t iph)
 {
 	int i;
 	for (i=0; i<8; i++)
@@ -1327,12 +1327,12 @@ void mcs51_cpu_device::update_irq_prio(UINT8 ipl, UINT8 iph)
     OPCODES
 ***************************************************************************/
 
-#define OPHANDLER( _name ) void mcs51_cpu_device::_name (UINT8 r)
+#define OPHANDLER( _name ) void mcs51_cpu_device::_name (uint8_t r)
 
 #include "mcs51ops.hxx"
 
 
-void mcs51_cpu_device::execute_op(UINT8 op)
+void mcs51_cpu_device::execute_op(uint8_t op)
 {
 	if (m_recalc_parity)
 	{
@@ -1658,7 +1658,7 @@ void mcs51_cpu_device::execute_op(UINT8 op)
 ***************************************************************************/
 
 /* # of oscilations each opcode requires*/
-const UINT8 mcs51_cpu_device::mcs51_cycles[256] = {
+const uint8_t mcs51_cpu_device::mcs51_cycles[256] = {
 	1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
 	2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
 	2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -1696,10 +1696,10 @@ const UINT8 mcs51_cpu_device::mcs51_cycles[256] = {
  **********************************************************************************/
 void mcs51_cpu_device::check_irqs()
 {
-	UINT8 ints = (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3)
+	uint8_t ints = (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3)
 			| ((GET_RI|GET_TI)<<4));
-	UINT8 int_vec = 0;
-	UINT8 int_mask;
+	uint8_t int_vec = 0;
+	uint8_t int_mask;
 	int priority_request = -1;
 	int i;
 
@@ -1843,9 +1843,9 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 	 * for at least one cycle (12 states)
 	 *
 	 */
-	UINT32 new_state = (m_last_line_state & ~(1 << irqline)) | ((state != CLEAR_LINE) << irqline);
+	uint32_t new_state = (m_last_line_state & ~(1 << irqline)) | ((state != CLEAR_LINE) << irqline);
 	/* detect 0->1 transistions */
-	UINT32 tr_state = (~m_last_line_state) & new_state;
+	uint32_t tr_state = (~m_last_line_state) & new_state;
 
 	switch( irqline )
 	{
@@ -1948,7 +1948,7 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 /* Execute cycles - returns number of cycles actually run */
 void mcs51_cpu_device::execute_run()
 {
-	UINT8 op;
+	uint8_t op;
 
 	update_ptrs();
 
@@ -2013,7 +2013,7 @@ void mcs51_cpu_device::execute_run()
  * MCS51/8051 Section
  ****************************************************************************/
 
-void mcs51_cpu_device::sfr_write(size_t offset, UINT8 data)
+void mcs51_cpu_device::sfr_write(size_t offset, uint8_t data)
 {
 	/* update register */
 	assert(offset >= 0x80 && offset <= 0xff);
@@ -2045,14 +2045,14 @@ void mcs51_cpu_device::sfr_write(size_t offset, UINT8 data)
 		case ADDR_SCON:
 			break;
 		default:
-			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", tag(), (UINT32)offset,PC,data));
+			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", tag(), (uint32_t)offset,PC,data));
 			/* no write in this case according to manual */
 			return;
 	}
 	m_data->write_byte((size_t)offset | 0x100, data);
 }
 
-UINT8 mcs51_cpu_device::sfr_read(size_t offset)
+uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 {
 	assert(offset >= 0x80 && offset <= 0xff);
 
@@ -2085,7 +2085,7 @@ UINT8 mcs51_cpu_device::sfr_read(size_t offset)
 			return m_data->read_byte((size_t) offset | 0x100);
 		/* Illegal or non-implemented sfr */
 		default:
-			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (UINT32)offset,PC));
+			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (uint32_t)offset,PC));
 			/* according to the manual, the read may return random bits */
 			return 0xff;
 	}
@@ -2314,7 +2314,7 @@ void mcs51_cpu_device::device_reset()
  * 8052 Section
  ****************************************************************************/
 
-void i8052_device::sfr_write(size_t offset, UINT8 data)
+void i8052_device::sfr_write(size_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -2332,7 +2332,7 @@ void i8052_device::sfr_write(size_t offset, UINT8 data)
 	}
 }
 
-UINT8 i8052_device::sfr_read(size_t offset)
+uint8_t i8052_device::sfr_read(size_t offset)
 {
 	switch (offset)
 	{
@@ -2353,7 +2353,7 @@ UINT8 i8052_device::sfr_read(size_t offset)
  * 80C52 Section
  ****************************************************************************/
 
-void i80c52_device::sfr_write(size_t offset, UINT8 data)
+void i80c52_device::sfr_write(size_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -2375,7 +2375,7 @@ void i80c52_device::sfr_write(size_t offset, UINT8 data)
 	m_data->write_byte((size_t) offset | 0x100, data);
 }
 
-UINT8 i80c52_device::sfr_read(size_t offset)
+uint8_t i80c52_device::sfr_read(size_t offset)
 {
 	switch (offset)
 	{
@@ -2398,9 +2398,9 @@ UINT8 i80c52_device::sfr_read(size_t offset)
 #define DS5_LOGW(a, d)  LOG(("ds5002fp '%s': write to  " # a " register at 0x%04x, data=%x\n", tag(), PC, d))
 #define DS5_LOGR(a, d)  LOG(("ds5002fp '%s': read from " # a " register at 0x%04x\n", tag(), PC))
 
-UINT8 mcs51_cpu_device::ds5002fp_protected(size_t offset, UINT8 data, UINT8 ta_mask, UINT8 mask)
+uint8_t mcs51_cpu_device::ds5002fp_protected(size_t offset, uint8_t data, uint8_t ta_mask, uint8_t mask)
 {
-	UINT8 is_timed_access;
+	uint8_t is_timed_access;
 
 	is_timed_access = (m_ds5002fp.ta_window > 0) && (TA == 0x55);
 	if (is_timed_access)
@@ -2411,7 +2411,7 @@ UINT8 mcs51_cpu_device::ds5002fp_protected(size_t offset, UINT8 data, UINT8 ta_m
 	return (m_sfr_ram[offset] & (~mask)) | (data & mask);
 }
 
-void ds5002fp_device::sfr_write(size_t offset, UINT8 data)
+void ds5002fp_device::sfr_write(size_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -2440,7 +2440,7 @@ void ds5002fp_device::sfr_write(size_t offset, UINT8 data)
 	m_data->write_byte((size_t) offset | 0x100, data);
 }
 
-UINT8 ds5002fp_device::sfr_read(size_t offset)
+uint8_t ds5002fp_device::sfr_read(size_t offset)
 {
 	switch (offset)
 	{
@@ -2462,42 +2462,42 @@ UINT8 ds5002fp_device::sfr_read(size_t offset)
 }
 
 
-offs_t mcs51_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t mcs51_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( i8051 );
 	return CPU_DISASSEMBLE_NAME(i8051)(this, buffer, pc, oprom, opram, options);
 }
 
 
-offs_t i8052_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t i8052_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( i8052 );
 	return CPU_DISASSEMBLE_NAME(i8052)(this, buffer, pc, oprom, opram, options);
 }
 
 
-offs_t i80c31_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t i80c31_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( i80c51 );
 	return CPU_DISASSEMBLE_NAME(i80c51)(this, buffer, pc, oprom, opram, options);
 }
 
 
-offs_t i80c51_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t i80c51_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( i80c51 );
 	return CPU_DISASSEMBLE_NAME(i80c51)(this, buffer, pc, oprom, opram, options);
 }
 
 
-offs_t i80c52_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t i80c52_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( i80c52 );
 	return CPU_DISASSEMBLE_NAME(i80c52)(this, buffer, pc, oprom, opram, options);
 }
 
 
-offs_t ds5002fp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t ds5002fp_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( ds5002fp );
 	return CPU_DISASSEMBLE_NAME(ds5002fp)(this, buffer, pc, oprom, opram, options);

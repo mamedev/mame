@@ -44,7 +44,7 @@ class tms99xx_device : public cpu_device
 public:
 	tms99xx_device(const machine_config &mconfig, device_type type,  const char *name,
 				const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
-				device_t *owner, UINT32 clock, const char *shortname, const char *source);
+				device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	~tms99xx_device();
 
@@ -74,16 +74,16 @@ protected:
 	virtual void        resolve_lines();
 
 	// device_execute_interface overrides
-	virtual UINT32      execute_min_cycles() const override;
-	virtual UINT32      execute_max_cycles() const override;
-	virtual UINT32      execute_input_lines() const override;
+	virtual uint32_t      execute_min_cycles() const override;
+	virtual uint32_t      execute_max_cycles() const override;
+	virtual uint32_t      execute_input_lines() const override;
 	virtual void        execute_set_input(int irqline, int state) override;
 	virtual void        execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual UINT32      disasm_min_opcode_bytes() const override;
-	virtual UINT32      disasm_max_opcode_bytes() const override;
-	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t      disasm_min_opcode_bytes() const override;
+	virtual uint32_t      disasm_max_opcode_bytes() const override;
+	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	const address_space_config* memory_space_config(address_spacenum spacenum) const override;
 
@@ -91,35 +91,35 @@ protected:
 	virtual void        mem_read(void);
 	virtual void        mem_write(void);
 	virtual void        acquire_instruction(void);
-	void                decode(UINT16 inst);
+	void                decode(uint16_t inst);
 
 	const address_space_config  m_program_config;
 	const address_space_config  m_io_config;
 	address_space*          m_prgspace;
 	address_space*          m_cru;
 
-	virtual UINT16  read_workspace_register_debug(int reg);
-	virtual void    write_workspace_register_debug(int reg, UINT16 data);
+	virtual uint16_t  read_workspace_register_debug(int reg);
+	virtual void    write_workspace_register_debug(int reg, uint16_t data);
 
 	// Cycle counter
 	int     m_icount;
 
 	// TMS9900 hardware registers
-	UINT16  WP;     // Workspace pointer
-	UINT16  PC;     // Program counter
-	UINT16  ST;     // Status register
+	uint16_t  WP;     // Workspace pointer
+	uint16_t  PC;     // Program counter
+	uint16_t  ST;     // Status register
 
 	// Internal register
-	UINT16  IR;     // Instruction register
+	uint16_t  IR;     // Instruction register
 
 	// Stored address
-	UINT16  m_address;
+	uint16_t  m_address;
 
 	// Stores the recently read word or the word to be written
-	UINT16  m_current_value;
+	uint16_t  m_current_value;
 
 	// Decoded command
-	UINT16  m_command;
+	uint16_t  m_command;
 
 	// Is it a byte operation? Only format 1 commands with the byte flag set
 	// and CRU commands with less than 9 bits to transfer are byte operations.
@@ -140,8 +140,8 @@ protected:
 	int     m_mem_phase;
 
 	// Max address
-	const UINT16  m_prgaddr_mask;
-	const UINT16  m_cruaddr_mask;
+	const uint16_t  m_prgaddr_mask;
+	const uint16_t  m_cruaddr_mask;
 
 	bool    m_load_state;
 	bool    m_irq_state;
@@ -219,7 +219,7 @@ private:
 	bool    m_hold_state;
 
 	// State / debug management
-	UINT16  m_state_any;
+	uint16_t  m_state_any;
 	static const char* s_statename[];
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
@@ -234,7 +234,7 @@ private:
 	void build_command_lookup_table();
 
 	// Sequence of micro-operations
-	typedef const UINT8* microprogram;
+	typedef const uint8_t* microprogram;
 
 	// Method pointer
 	typedef void (tms99xx_device::*ophandler)(void);
@@ -242,7 +242,7 @@ private:
 	// Opcode list entry
 	struct tms_instruction
 	{
-		UINT16              opcode;
+		uint16_t              opcode;
 		int                 id;
 		int                 format;
 		microprogram        prog;       // Microprogram
@@ -347,39 +347,39 @@ private:
 	bool m_destination_even;
 
 	// Intermediate storage for the source operand
-	UINT16 m_source_address;
-	UINT16 m_source_value;
-	UINT16  m_address_saved;
+	uint16_t m_source_address;
+	uint16_t m_source_value;
+	uint16_t  m_address_saved;
 
 	// Another copy of the address
-	UINT16  m_address_copy;
+	uint16_t  m_address_copy;
 
 	// Stores the recently read register contents
-	UINT16  m_register_contents;
+	uint16_t  m_register_contents;
 
 	// Stores the register number for the next register access
 	int     m_regnumber;
 
 	// CRU support: Stores the CRU address
-	UINT16  m_cru_address;
+	uint16_t  m_cru_address;
 
 	// CRU support: Stores the number of bits to be transferred
 	int     m_count;
 
 	// Copy of the value
-	UINT16  m_value_copy;
+	uint16_t  m_value_copy;
 
 	// Another internal register, storing intermediate values
 	// Using 32 bits to support MPY
-	UINT32  m_value;
+	uint32_t  m_value;
 
 	// For two-argument commands. Indicates whether this is the second operand.
 	bool    m_get_destination;
 
 	// Status register update
 	inline void set_status_bit(int bit, bool state);
-	inline void compare_and_set_lae(UINT16 value1, UINT16 value2);
-	void set_status_parity(UINT8 value);
+	inline void compare_and_set_lae(uint16_t value1, uint16_t value2);
+	void set_status_parity(uint8_t value);
 };
 
 /*****************************************************************************/
@@ -387,7 +387,7 @@ private:
 class tms9900_device : public tms99xx_device
 {
 public:
-	tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

@@ -28,7 +28,7 @@ class pet_userport_joystick_and_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	pet_userport_joystick_and_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pet_userport_joystick_and_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -37,7 +37,7 @@ public:
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) override;
 
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 
 	// device_pet_user_port_interface overrides
 	WRITE_LINE_MEMBER( write_up1 ) { m_up1 = state; update_port1(); }

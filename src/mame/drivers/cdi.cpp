@@ -140,7 +140,7 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 {
 	bool send = false;
 
-	switch((FPTR)param)
+	switch((uintptr_t)param)
 	{
 		case 0x39:
 			if (m_input1.read_safe(0) & 0x01) send = true;
@@ -177,7 +177,7 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 
 	if(send)
 	{
-		UINT8 data = (UINT8)((FPTR)param & 0x000000ff);
+		uint8_t data = (uint8_t)((uintptr_t)param & 0x000000ff);
 		m_scc->quizard_rx(data);
 	}
 }
@@ -293,8 +293,8 @@ INTERRUPT_GEN_MEMBER( cdi_state::mcu_frame )
 
 MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
 {
-	UINT16 *src   = (UINT16*)memregion("maincpu")->base();
-	UINT16 *dst   = m_planea;
+	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
+	uint16_t *dst   = m_planea;
 	memcpy(dst, src, 0x8);
 	memset(m_servo_io_regs, 0, 0x20);
 	memset(m_slave_io_regs, 0, 0x20);
@@ -307,8 +307,8 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
 
 MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
 {
-	UINT16 *src   = (UINT16*)memregion("maincpu")->base();
-	UINT16 *dst   = m_planea;
+	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
+	uint16_t *dst   = m_planea;
 	memcpy(dst, src, 0x8);
 
 	m_maincpu->reset();
@@ -422,7 +422,7 @@ READ8_MEMBER( cdi_state::servo_io_r )
 		return 0;
 	}
 
-	UINT8 ret = m_servo_io_regs[offset];
+	uint8_t ret = m_servo_io_regs[offset];
 
 	switch(offset)
 	{
@@ -493,28 +493,28 @@ READ8_MEMBER( cdi_state::servo_io_r )
 			break;
 		case m68hc05eg_io_reg_t::COUNT_HI:
 		{
-			const UINT16 count = (m_servo->total_cycles() / 4) & 0x0000ffff;
+			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
 			verboselog(*this, 1, "SERVO Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::COUNT_LO:
 		{
-			const UINT16 count = (m_servo->total_cycles() / 4) & 0x0000ffff;
+			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
 			verboselog(*this, 1, "SERVO Count Lo read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_HI:
 		{
-			const UINT16 count = (m_servo->total_cycles() / 4) & 0x0000ffff;
+			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
 			verboselog(*this, 1, "SERVO Alternate Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_LO:
 		{
-			const UINT16 count = (m_servo->total_cycles() / 4) & 0x0000ffff;
+			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
 			verboselog(*this, 1, "SERVO Alternate Count Lo read (%02x)\n", ret);
 			break;
@@ -622,7 +622,7 @@ READ8_MEMBER( cdi_state::slave_io_r )
 		return 0;
 	}
 
-	UINT8 ret = m_slave_io_regs[offset];
+	uint8_t ret = m_slave_io_regs[offset];
 
 	switch(offset)
 	{
@@ -691,28 +691,28 @@ READ8_MEMBER( cdi_state::slave_io_r )
 			break;
 		case m68hc05eg_io_reg_t::COUNT_HI:
 		{
-			const UINT16 count = (m_slave->total_cycles() / 4) & 0x0000ffff;
+			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
 			verboselog(*this, 1, "SLAVE Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::COUNT_LO:
 		{
-			const UINT16 count = (m_slave->total_cycles() / 4) & 0x0000ffff;
+			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
 			verboselog(*this, 1, "SLAVE Count Lo read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_HI:
 		{
-			const UINT16 count = (m_slave->total_cycles() / 4) & 0x0000ffff;
+			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
 			verboselog(*this, 1, "SLAVE Alternate Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_LO:
 		{
-			const UINT16 count = (m_slave->total_cycles() / 4) & 0x0000ffff;
+			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
 			verboselog(*this, 1, "SLAVE Alternate Count Lo read (%02x)\n", ret);
 			break;

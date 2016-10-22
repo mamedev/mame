@@ -57,14 +57,14 @@ class speaker_device : public device_t,
 
 public:
 	// construction/destruction
-	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~speaker_device();
 
 	// inline configuration helpers
 	static void static_set_position(device_t &device, double x, double y, double z);
 
 	// internally for use by the sound system
-	void mix(INT32 *leftmix, INT32 *rightmix, int &samples_this_update, bool suppress);
+	void mix(int32_t *leftmix, int32_t *rightmix, int &samples_this_update, bool suppress);
 
 protected:
 	// device-level overrides
@@ -77,9 +77,9 @@ protected:
 
 	// internal state
 #ifdef MAME_DEBUG
-	INT32               m_max_sample;           // largest sample value we've seen
-	INT32               m_clipped_samples;      // total number of clipped samples
-	INT32               m_total_samples;        // total number of samples
+	int32_t               m_max_sample;           // largest sample value we've seen
+	int32_t               m_clipped_samples;      // total number of clipped samples
+	int32_t               m_total_samples;        // total number of samples
 #endif
 };
 

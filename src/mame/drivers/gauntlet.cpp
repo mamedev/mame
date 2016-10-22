@@ -1636,8 +1636,8 @@ ROM_END
 
 void gauntlet_state::swap_memory(void *ptr1, void *ptr2, int bytes)
 {
-	UINT8 *p1 = (UINT8 *)ptr1;
-	UINT8 *p2 = (UINT8 *)ptr2;
+	uint8_t *p1 = (uint8_t *)ptr1;
+	uint8_t *p2 = (uint8_t *)ptr2;
 	while (bytes--)
 	{
 		int temp = *p1;
@@ -1648,7 +1648,7 @@ void gauntlet_state::swap_memory(void *ptr1, void *ptr2, int bytes)
 
 void gauntlet_state::common_init(int vindctr2)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
@@ -1671,8 +1671,8 @@ DRIVER_INIT_MEMBER(gauntlet_state,gauntlet)
 
 DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 {
-	UINT8 *gfx2_base = memregion("gfx2")->base();
-	dynamic_buffer data(0x8000);
+	uint8_t *gfx2_base = memregion("gfx2")->base();
+	std::vector<uint8_t> data(0x8000);
 	int i;
 
 	common_init(1);

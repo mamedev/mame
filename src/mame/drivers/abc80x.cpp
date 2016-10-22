@@ -251,7 +251,7 @@ void abc802_state::bankswitch()
 void abc806_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT32 videoram_mask = m_ram->size() - (32 * 1024) - 1;
+	uint32_t videoram_mask = m_ram->size() - (32 * 1024) - 1;
 	int bank;
 	char bank_name[10];
 
@@ -259,15 +259,15 @@ void abc806_state::bankswitch()
 	{
 		// 32K block mapping
 
-		UINT32 videoram_start = (m_hrs & 0xf0) << 11;
+		uint32_t videoram_start = (m_hrs & 0xf0) << 11;
 
 		for (bank = 1; bank <= 8; bank++)
 		{
 			// 0x0000-0x7FFF is video RAM
 
-			UINT16 start_addr = 0x1000 * (bank - 1);
-			UINT16 end_addr = start_addr + 0xfff;
-			UINT32 videoram_offset = (videoram_start + start_addr) & videoram_mask;
+			uint16_t start_addr = 0x1000 * (bank - 1);
+			uint16_t end_addr = start_addr + 0xfff;
+			uint32_t videoram_offset = (videoram_start + start_addr) & videoram_mask;
 			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
@@ -280,8 +280,8 @@ void abc806_state::bankswitch()
 		{
 			// 0x8000-0xFFFF is main RAM
 
-			UINT16 start_addr = 0x1000 * (bank - 1);
-			UINT16 end_addr = start_addr + 0xfff;
+			uint16_t start_addr = 0x1000 * (bank - 1);
+			uint16_t end_addr = start_addr + 0xfff;
 			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
@@ -295,10 +295,10 @@ void abc806_state::bankswitch()
 
 		for (bank = 1; bank <= 16; bank++)
 		{
-			UINT16 start_addr = 0x1000 * (bank - 1);
-			UINT16 end_addr = start_addr + 0xfff;
-			UINT8 map = m_map[bank - 1];
-			UINT32 videoram_offset = ((map & 0x7f) << 12) & videoram_mask;
+			uint16_t start_addr = 0x1000 * (bank - 1);
+			uint16_t end_addr = start_addr + 0xfff;
+			uint8_t map = m_map[bank - 1];
+			uint32_t videoram_offset = ((map & 0x7f) << 12) & videoram_mask;
 			sprintf(bank_name,"bank%d",bank);
 			if (BIT(map, 7) && m_eme)
 			{
@@ -350,15 +350,15 @@ void abc806_state::bankswitch()
 	{
 		// 30K block mapping
 
-		UINT32 videoram_start = (m_hrs & 0xf0) << 11;
+		uint32_t videoram_start = (m_hrs & 0xf0) << 11;
 
 		for (bank = 1; bank <= 8; bank++)
 		{
 			// 0x0000-0x77FF is video RAM
 
-			UINT16 start_addr = 0x1000 * (bank - 1);
-			UINT16 end_addr = start_addr + 0xfff;
-			UINT32 videoram_offset = (videoram_start + start_addr) & videoram_mask;
+			uint16_t start_addr = 0x1000 * (bank - 1);
+			uint16_t end_addr = start_addr + 0xfff;
+			uint32_t videoram_offset = (videoram_start + start_addr) & videoram_mask;
 			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Video RAM %04x (30K)\n", start_addr, end_addr, videoram_offset);
 
@@ -902,7 +902,7 @@ void abc802_state::machine_start()
 
 void abc802_state::machine_reset()
 {
-	UINT8 config = m_config->read();
+	uint8_t config = m_config->read();
 	m_sb = m_io_sb->read();
 
 	// memory banking
@@ -936,8 +936,8 @@ void abc806_state::machine_start()
 	m_ctc_timer->adjust(attotime::from_hz(ABC800_X01/2/2/2), 0, attotime::from_hz(ABC800_X01/2/2/2));
 
 	// setup memory banking
-	UINT8 *mem = m_rom->base();
-	UINT32 videoram_size = m_ram->size() - (32 * 1024);
+	uint8_t *mem = m_rom->base();
+	uint32_t videoram_size = m_ram->size() - (32 * 1024);
 	int bank;
 	char bank_name[10];
 

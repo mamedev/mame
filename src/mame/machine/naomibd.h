@@ -13,7 +13,7 @@
 class naomi_board : public naomi_g1_device
 {
 public:
-	naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void static_set_eeprom_tag(device_t &device, const char *_eeprom_tag);
 
@@ -37,21 +37,21 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram) override;
-	virtual void dma_advance(UINT32 size) override;
+	virtual void dma_get_position(uint8_t *&base, uint32_t &limit, bool to_mainram) override;
+	virtual void dma_advance(uint32_t size) override;
 
 	// To be defined in the underlying class
-	virtual void board_setup_address(UINT32 address, bool is_dma) = 0;
-	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit) = 0;
-	virtual void board_advance(UINT32 size) = 0;
+	virtual void board_setup_address(uint32_t address, bool is_dma) = 0;
+	virtual void board_get_buffer(uint8_t *&base, uint32_t &limit) = 0;
+	virtual void board_advance(uint32_t size) = 0;
 
 	// To be optionally defined in the underlying class
-	virtual void board_write(offs_t offset, UINT16 data);
+	virtual void board_write(offs_t offset, uint16_t data);
 
-	UINT32 rom_offset;
+	uint32_t rom_offset;
 private:
-	UINT32 dma_offset, dma_cur_offset;
-	UINT16 dma_count;
+	uint32_t dma_offset, dma_cur_offset;
+	uint16_t dma_count;
 	bool pio_ready, dma_ready;
 
 	const char *eeprom_tag;

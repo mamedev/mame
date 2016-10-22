@@ -73,7 +73,7 @@ machine_config_constructor decobsmt_device::device_mconfig_additions() const
 //  decobsmt_device - constructor
 //-------------------------------------------------
 
-decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, DECOBSMT, "Data East/Sega/Stern BSMT2000 Sound Board", tag, owner, clock, "decobsmt", __FILE__),
 	m_ourcpu(*this, M6809_TAG),
 	m_bsmt(*this, BSMT_TAG)
@@ -101,7 +101,7 @@ void decobsmt_device::device_reset()
 
 WRITE8_MEMBER(decobsmt_device::bsmt_reset_w)
 {
-	UINT8 diff = data ^ m_bsmt_reset;
+	uint8_t diff = data ^ m_bsmt_reset;
 	m_bsmt_reset = data;
 	if ((diff & 0x80) && !(data & 0x80))
 		m_bsmt->reset();

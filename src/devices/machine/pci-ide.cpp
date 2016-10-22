@@ -4,7 +4,7 @@
 
 const device_type IDE_PCI = &device_creator<ide_pci_device>;
 
-ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, IDE_PCI, "IDE PCI interface", tag, owner, clock, "ide_pci", __FILE__),
 	m_ide(*this, "ide"),
 	m_ide2(*this, "ide2"),
@@ -94,7 +94,7 @@ void ide_pci_device::device_reset()
 READ32_MEMBER(ide_pci_device::ide_read_cs1)
 {
 	// PCI offset starts at 0x3f4, idectrl expects 0x3f0
-	UINT32 data = 0;
+	uint32_t data = 0;
 	data = m_ide->read_cs1(space, ++offset, mem_mask);
 	if (0)
 		logerror("%s:ide_read_cs1 offset=%08X data=%08X mask=%08X\n", machine().describe_context(), offset, data, mem_mask);
@@ -110,7 +110,7 @@ WRITE32_MEMBER(ide_pci_device::ide_write_cs1)
 READ32_MEMBER(ide_pci_device::ide2_read_cs1)
 {
 	// PCI offset starts at 0x374, idectrl expects 0x370
-	UINT32 data = 0;
+	uint32_t data = 0;
 	data = m_ide2->read_cs1(space, ++offset, mem_mask);
 	return data;
 }

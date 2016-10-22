@@ -27,9 +27,9 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram_fg;
-	required_shared_ptr<UINT16> m_videoram_bg;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_videoram_fg;
+	required_shared_ptr<uint16_t> m_videoram_bg;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t   *m_tilemap_bg;
@@ -45,7 +45,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -139,7 +139,7 @@ void drtomy_state::video_start()
 	m_tilemap_fg->set_transparent_pen(0);
 }
 
-UINT32 drtomy_state::screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t drtomy_state::screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 0);

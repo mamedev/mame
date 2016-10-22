@@ -79,7 +79,7 @@ public:
 		m_sprites(*this, "sprites")
 		{ }
 
-	required_shared_ptr<UINT16> m_tilemapram;
+	required_shared_ptr<uint16_t> m_tilemapram;
 	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
 	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
 	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
@@ -96,10 +96,10 @@ public:
 		return machine().rand();
 	}
 
-	UINT8 m_txt_bank;
+	uint8_t m_txt_bank;
 
 	virtual void video_start() override;
-	UINT32 screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -112,7 +112,7 @@ void blackt96_state::video_start()
 }
 
 
-UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -127,7 +127,7 @@ UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind1
 	{
 		for (y=0;y<32;y++)
 		{
-			UINT16 tile = (m_tilemapram[count*2]&0xff);
+			uint16_t tile = (m_tilemapram[count*2]&0xff);
 			tile += m_txt_bank * 0x100;
 			gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
 			count++;

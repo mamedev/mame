@@ -31,7 +31,7 @@ class c8280_t :  public device_t,
 {
 public:
 	// construction/destruction
-	c8280_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8280_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -78,7 +78,7 @@ private:
 	int m_atna;                         // attention acknowledge
 	int m_ifc;
 
-	UINT8 m_fk5;
+	uint8_t m_fk5;
 };
 
 

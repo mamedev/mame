@@ -148,13 +148,13 @@ void sm510_base_device::device_reset()
 //  lcd driver
 //-------------------------------------------------
 
-inline UINT16 sm510_base_device::get_lcd_row(int column, UINT8* ram)
+inline uint16_t sm510_base_device::get_lcd_row(int column, uint8_t* ram)
 {
 	// output 0 if lcd blackpate/bleeder is off, or in case row doesn't exist
 	if (ram == nullptr || m_bc || !m_bp)
 		return 0;
 
-	UINT16 rowdata = 0;
+	uint16_t rowdata = 0;
 	for (int i = 0; i < 0x10; i++)
 		rowdata |= (ram[i] >> column & 1) << i;
 
@@ -172,7 +172,7 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
 		m_write_segc(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
 
 		// bs output from L/X and Y regs
-		UINT8 bs = (m_l >> h & 1) | ((m_x*2) >> h & 2);
+		uint8_t bs = (m_l >> h & 1) | ((m_x*2) >> h & 2);
 		m_write_segbs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
 	}
 
@@ -200,7 +200,7 @@ void sm510_base_device::clock_melody()
 
 	// tone cycle table (SM511/SM512 datasheet fig.5)
 	// cmd 0 = cmd, 1 = stop, > 13 = illegal(unknown)
-	static const UINT8 lut_tone_cycles[4*16] =
+	static const uint8_t lut_tone_cycles[4*16] =
 	{
 		0, 0, 7, 8, 8, 9, 9, 10,11,11,12,13,14,14, 7*2, 8*2,
 		0, 0, 8, 8, 9, 9, 10,11,11,12,13,13,14,15, 8*2, 8*2,
@@ -208,8 +208,8 @@ void sm510_base_device::clock_melody()
 		0, 0, 8, 9, 9, 10,10,11,11,12,13,14,14,15, 8*2, 9*2
 	};
 
-	UINT8 cmd = m_melody_rom[m_melody_address] & 0x3f;
-	UINT8 out = 0;
+	uint8_t cmd = m_melody_rom[m_melody_address] & 0x3f;
+	uint8_t out = 0;
 
 	// clock duty cycle if tone is active
 	if ((cmd & 0xf) > 1)
@@ -234,7 +234,7 @@ void sm510_base_device::clock_melody()
 	// clock time base on F8(d7)
 	if ((m_div & 0x7f) == 0)
 	{
-		UINT8 mask = (cmd & 0x20) ? 0x1f : 0x0f;
+		uint8_t mask = (cmd & 0x20) ? 0x1f : 0x0f;
 		m_melody_step_count = (m_melody_step_count + 1) & mask;
 
 		if (m_melody_step_count == 0)
@@ -257,7 +257,7 @@ void sm510_base_device::init_melody()
 	// verify melody rom
 	for (int i = 0; i < 0x100; i++)
 	{
-		UINT8 data = m_melody_rom[i];
+		uint8_t data = m_melody_rom[i];
 		if (data & 0xc0 || (data & 0x0f) > 13)
 			logerror("%s unknown melody ROM data $%02X at $%02X\n", tag(), data, i);
 	}

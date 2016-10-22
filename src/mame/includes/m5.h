@@ -93,14 +93,14 @@ public:
 	DECLARE_WRITE8_MEMBER( mem64KBI_w );
 	DECLARE_WRITE8_MEMBER( mem64KBF_w );
 	DECLARE_WRITE8_MEMBER( mem64KRX_w );
-	UINT8 m_ram_mode;
-	UINT8 m_ram_type;
+	uint8_t m_ram_mode;
+	uint8_t m_ram_type;
 	memory_region *m_cart_rom;
 	m5_cart_slot_device *m_cart_ram, *m_cart;
 
 	// floppy state for fd5
-	UINT8 m_fd5_data;
-	UINT8 m_fd5_com;
+	uint8_t m_fd5_data;
+	uint8_t m_fd5_com;
 	int m_intra;
 	int m_ibfa;
 	int m_obfa;
@@ -153,13 +153,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT8 m_rambank; // bank #
-	UINT8 m_ramcpu; //where Ramdisk bank is mapped
+	uint8_t m_rambank; // bank #
+	uint8_t m_ramcpu; //where Ramdisk bank is mapped
 	bool m_romen;
 	bool m_ramen;
 
 
-	UINT8 m_rammap[16]; // memory map
+	uint8_t m_rammap[16]; // memory map
 };
 
 #endif

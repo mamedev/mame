@@ -35,7 +35,7 @@ class prof80_mmu_device : public device_t,
 							public device_memory_interface
 {
 public:
-	prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(z80_program_map, 8);
 
@@ -55,7 +55,7 @@ protected:
 private:
 	const address_space_config m_program_space_config;
 
-	UINT8 m_blk[16];
+	uint8_t m_blk[16];
 	bool m_enabled;
 };
 

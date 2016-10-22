@@ -47,7 +47,7 @@ void zx_state::zx_tape_input()
 void zx_state::drop_sync()
 {
 	if (m_vsync_active) {
-		UINT64 time = m_maincpu->total_cycles();
+		uint64_t time = m_maincpu->total_cycles();
 		m_vsync_active = false;
 		m_cassette->output(-1.0);
 
@@ -69,11 +69,11 @@ void zx_state::drop_sync()
 				xe = 0;
 			}
 			if(ys == ye) {
-				UINT16 *dest = &m_bitmap_render->pix16(ys, xs);
+				uint16_t *dest = &m_bitmap_render->pix16(ys, xs);
 				for(int x = xs; x < xe; x++)
 					*dest++ = 1;
 			} else {
-				UINT16 *dest = &m_bitmap_render->pix16(ys, xs);
+				uint16_t *dest = &m_bitmap_render->pix16(ys, xs);
 				for(int x = xs; x < 384; x++)
 					*dest++ = 1;
 				for(int y = ys+1; y < ye; y++) {
@@ -113,7 +113,7 @@ READ8_MEMBER( zx_state::zx80_io_r )
 	/* port FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
 	    The upper 8 bits are used to select a keyboard scan line */
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!(offset & 0x01))
 	{
@@ -157,7 +157,7 @@ READ8_MEMBER( zx_state::zx81_io_r )
     FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
     The upper 8 bits are used to select a keyboard scan line */
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!(offset & 0x01))
 	{
@@ -204,8 +204,8 @@ READ8_MEMBER( zx_state::pc8300_io_r )
     The upper 8 bits are used to select a keyboard scan line.
     No TV diode */
 
-	UINT8 data = 0xff;
-	UINT8 offs = offset & 0xff;
+	uint8_t data = 0xff;
+	uint8_t offs = offset & 0xff;
 
 	if (offs == 0xf5)
 	{
@@ -249,8 +249,8 @@ READ8_MEMBER( zx_state::pow3000_io_r )
     FE = read keyboard and cass bit; turn off HSYNC-generator/cass-out
     The upper 8 bits are used to select a keyboard scan line */
 
-	UINT8 data = 0xff;
-	UINT8 offs = offset & 0xff;
+	uint8_t data = 0xff;
+	uint8_t offs = offset & 0xff;
 
 	if (offs == 0x7e)
 	{
@@ -294,7 +294,7 @@ WRITE8_MEMBER( zx_state::zx80_io_w )
 {
 /* port FF = write HSYNC and cass data */
 
-	UINT8 offs = offset & 0xff;
+	uint8_t offs = offset & 0xff;
 
 	if (offs == 0xff)
 		m_cassette->output(-1.0);

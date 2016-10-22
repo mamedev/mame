@@ -146,8 +146,8 @@ confirmed
 
 void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
+	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -240,8 +240,8 @@ void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind
 
 void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
+	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -425,8 +425,8 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 
 void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
+	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -520,8 +520,8 @@ void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16
 
 void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
+	uint16_t *spriteram = m_spriteram;
 	int offs, start_offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -624,8 +624,8 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 
 void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
+	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -718,8 +718,8 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 
 void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
+	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -832,9 +832,9 @@ WRITE16_MEMBER(taitoz_state::contcirc_out_w)
 }
 
 
-UINT32 taitoz_state::screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoz_state::screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[3];
+	uint8_t layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -858,9 +858,9 @@ UINT32 taitoz_state::screen_update_contcirc(screen_device &screen, bitmap_ind16 
 
 /* Nightstr and ChaseHQ */
 
-UINT32 taitoz_state::screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoz_state::screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[3];
+	uint8_t layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -883,9 +883,9 @@ UINT32 taitoz_state::screen_update_chasehq(screen_device &screen, bitmap_ind16 &
 }
 
 
-UINT32 taitoz_state::screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoz_state::screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[3];
+	uint8_t layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -908,9 +908,9 @@ UINT32 taitoz_state::screen_update_bshark(screen_device &screen, bitmap_ind16 &b
 }
 
 
-UINT32 taitoz_state::screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoz_state::screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[3];
+	uint8_t layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -933,9 +933,9 @@ UINT32 taitoz_state::screen_update_sci(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-UINT32 taitoz_state::screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoz_state::screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[3];
+	uint8_t layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -958,9 +958,9 @@ UINT32 taitoz_state::screen_update_aquajack(screen_device &screen, bitmap_ind16 
 }
 
 
-UINT32 taitoz_state::screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoz_state::screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[3];
+	uint8_t layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -983,10 +983,10 @@ UINT32 taitoz_state::screen_update_spacegun(screen_device &screen, bitmap_ind16 
 }
 
 
-UINT32 taitoz_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoz_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[5];
-	UINT16 priority;
+	uint8_t layer[5];
+	uint16_t priority;
 
 	m_tc0480scp->tilemap_update();
 
@@ -1018,10 +1018,10 @@ UINT32 taitoz_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16 &
 }
 
 
-UINT32 taitoz_state::screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoz_state::screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[5];
-	UINT16 priority;
+	uint8_t layer[5];
+	uint16_t priority;
 
 	m_tc0480scp->tilemap_update();
 

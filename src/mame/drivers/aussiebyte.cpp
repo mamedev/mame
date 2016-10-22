@@ -265,28 +265,28 @@ WRITE_LINE_MEMBER( aussiebyte_state::busreq_w )
 ************************************************************/
 WRITE_LINE_MEMBER( aussiebyte_state::sio1_rdya_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xfd) | (UINT8)(state << 1);
+	m_port17_rdy = (m_port17_rdy & 0xfd) | (uint8_t)(state << 1);
 	if (m_port17 == 1)
 		m_dma->rdy_w(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::sio1_rdyb_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xfb) | (UINT8)(state << 2);
+	m_port17_rdy = (m_port17_rdy & 0xfb) | (uint8_t)(state << 2);
 	if (m_port17 == 2)
 		m_dma->rdy_w(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::sio2_rdya_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xef) | (UINT8)(state << 4);
+	m_port17_rdy = (m_port17_rdy & 0xef) | (uint8_t)(state << 4);
 	if (m_port17 == 4)
 		m_dma->rdy_w(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::sio2_rdyb_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xdf) | (UINT8)(state << 5);
+	m_port17_rdy = (m_port17_rdy & 0xdf) | (uint8_t)(state << 5);
 	if (m_port17 == 5)
 		m_dma->rdy_w(state);
 }
@@ -397,16 +397,16 @@ WRITE_LINE_MEMBER( aussiebyte_state::votrax_w )
 
 WRITE_LINE_MEMBER( aussiebyte_state::fdc_intrq_w )
 {
-	UINT8 data = (m_port19 & 0xbf) | (state ? 0x40 : 0);
+	uint8_t data = (m_port19 & 0xbf) | (state ? 0x40 : 0);
 	m_port19 = data;
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::fdc_drq_w )
 {
-	UINT8 data = (m_port19 & 0x7f) | (state ? 0x80 : 0);
+	uint8_t data = (m_port19 & 0x7f) | (state ? 0x80 : 0);
 	m_port19 = data;
 	state ^= 1; // inverter on pin38 of fdc
-	m_port17_rdy = (m_port17_rdy & 0xfe) | (UINT8)state;
+	m_port17_rdy = (m_port17_rdy & 0xfe) | (uint8_t)state;
 	if (m_port17 == 0)
 		m_dma->rdy_w(state);
 }
@@ -539,8 +539,8 @@ DRIVER_INIT_MEMBER( aussiebyte_state, aussiebyte )
 {
 	// Main ram is divided into 16k blocks (0-15). The boot rom is block number 16.
 	// For convenience, bank 0 is permanently assigned to C000-FFFF
-	UINT8 *main = memregion("roms")->base();
-	UINT8 *ram = memregion("mram")->base();
+	uint8_t *main = memregion("roms")->base();
+	uint8_t *ram = memregion("mram")->base();
 
 	membank("bankr0")->configure_entries(0, 16, &ram[0x0000], 0x4000);
 	membank("bankw0")->configure_entries(0, 16, &ram[0x0000], 0x4000);

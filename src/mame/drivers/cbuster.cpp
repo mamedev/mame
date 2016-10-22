@@ -575,8 +575,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	UINT8 *PTR;
+	uint8_t *RAM = memregion("maincpu")->base();
+	uint8_t *PTR;
 	int i, j;
 
 	/* Main cpu decrypt */

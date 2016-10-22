@@ -30,7 +30,7 @@ void sshangha_state::video_start()
 
 /******************************************************************************/
 
-UINT32 sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram, 0x800, true);
 
@@ -40,7 +40,7 @@ UINT32 sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb3
 
 	// flip screen
 	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	flip_screen_set(BIT(flip, 7));
 
 	bitmap.fill(m_palette->black_pen(), cliprect);

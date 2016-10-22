@@ -45,12 +45,12 @@
 
 #define I8                          (m_exec_ir & 0xff)
 #define I16                         (((m_exec_ir >> 8) & 0xff00) | (m_exec_ir & 0xff))
-#define I16_ZEX                     ((UINT32)(I16))
-#define I16_SEX                     ((INT32)(INT16)I16)
+#define I16_ZEX                     ((uint32_t)(I16))
+#define I16_SEX                     ((int32_t)(int16_t)I16)
 #define I16_OEX                     (0xffff0000 | I16)
 
 #define JMP_ZEX                     (I16 << 2)
-#define JMP_SEX                     ((INT32)(INT16)(((m_exec_ir >> 8) & 0xff00) | (m_exec_ir & 0xff)) << 2)
+#define JMP_SEX                     ((int32_t)(int16_t)(((m_exec_ir >> 8) & 0xff00) | (m_exec_ir & 0xff)) << 2)
 
 #define BOOLEAN_MASK                (1 << 31)
 #define BOOLEAN_TRUE                (1 << 31)
@@ -67,31 +67,31 @@
 								m_alu |= (r == 0) << ALU_Z_SHIFT;
 
 #define SET_ALU_N(r)            m_alu &= ~ALU_N; \
-								m_alu |= ((UINT32)r & 0x80000000) >> (31 - ALU_N_SHIFT);
+								m_alu |= ((uint32_t)r & 0x80000000) >> (31 - ALU_N_SHIFT);
 
-#define CALC_C_ADD(r, a)        ((UINT32)(r) < (UINT32)(a))
+#define CALC_C_ADD(r, a)        ((uint32_t)(r) < (uint32_t)(a))
 
 #define SET_ALU_C_ADD(r, a)     m_alu &= ~ALU_C; \
 								m_alu |= CALC_C_ADD(r, a) << ALU_C_SHIFT;
 
-#define CALC_C_SUB(a, b)        (!((UINT32)(a) < (UINT32)(b)))
+#define CALC_C_SUB(a, b)        (!((uint32_t)(a) < (uint32_t)(b)))
 
 #define SET_ALU_C_SUB(a, b)     m_alu &= ~ALU_C; \
 								m_alu |= CALC_C_SUB(a, b) << ALU_C_SHIFT;
 
 #define SET_ALU_V_ADD(r, a, b)  m_alu &= ~ALU_V; \
-								m_alu |= (((INT32)(~((a) ^ (b)) & ((a) ^ (r))) < 0)) << ALU_V_SHIFT;
+								m_alu |= (((int32_t)(~((a) ^ (b)) & ((a) ^ (r))) < 0)) << ALU_V_SHIFT;
 
 #define SET_ALU_V_SUB(r, a, b)  m_alu &= ~ALU_V; \
-								m_alu |= ((INT32)(((a) ^ (b)) & ((a) ^ (r))) < 0) << ALU_V_SHIFT;
+								m_alu |= ((int32_t)(((a) ^ (b)) & ((a) ^ (r))) < 0) << ALU_V_SHIFT;
 
 #define GET_CARRY               ((m_alu >> ALU_C_SHIFT) & 1)
 
 
 
-UINT32 am29000_cpu_device::read_spr(UINT32 idx)
+uint32_t am29000_cpu_device::read_spr(uint32_t idx)
 {
-	UINT32 val = 0;
+	uint32_t val = 0;
 
 	switch (idx)
 	{
@@ -129,7 +129,7 @@ UINT32 am29000_cpu_device::read_spr(UINT32 idx)
 }
 
 
-void am29000_cpu_device::write_spr(UINT32 idx, UINT32 val)
+void am29000_cpu_device::write_spr(uint32_t idx, uint32_t val)
 {
 	switch (idx)
 	{
@@ -203,9 +203,9 @@ void am29000_cpu_device::write_spr(UINT32 idx, UINT32 val)
 
 void am29000_cpu_device::ADD()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = a + b;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = a + b;
 
 	if (!FREEZE_MODE)
 	{
@@ -235,14 +235,14 @@ void am29000_cpu_device::ADDC()
 
 void am29000_cpu_device::ADDCS()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = a + b + GET_CARRY;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = a + b + GET_CARRY;
 
 	if (!FREEZE_MODE)
 	{
-		UINT32 carry = GET_CARRY;
-		UINT32 tmp = a + b;
+		uint32_t carry = GET_CARRY;
+		uint32_t tmp = a + b;
 
 		SET_ALU_V_ADD(r, a, b);
 		SET_ALU_Z(r);
@@ -264,9 +264,9 @@ void am29000_cpu_device::ADDCU()
 
 void am29000_cpu_device::SUB()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
-	UINT32 r = a - b;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
+	uint32_t r = a - b;
 
 	if (!FREEZE_MODE)
 	{
@@ -282,9 +282,9 @@ void am29000_cpu_device::SUB()
 
 void am29000_cpu_device::SUBS()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
-	UINT32 r = a - b;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
+	uint32_t r = a - b;
 
 	if (!FREEZE_MODE)
 	{
@@ -294,7 +294,7 @@ void am29000_cpu_device::SUBS()
 		SET_ALU_C_SUB(a, b);
 	}
 
-	if ((INT32)(((a) ^ (b)) & ((a) ^ (r))) < 0)
+	if ((int32_t)(((a) ^ (b)) & ((a) ^ (r))) < 0)
 		SIGNAL_EXCEPTION(EXCEPTION_OUT_OF_RANGE);
 
 	m_r[RC] = r;
@@ -322,9 +322,9 @@ void am29000_cpu_device::SUBCU()
 
 void am29000_cpu_device::SUBR()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
-	UINT32 r = b - a;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
+	uint32_t r = b - a;
 
 	if (!FREEZE_MODE)
 	{
@@ -349,9 +349,9 @@ void am29000_cpu_device::SUBRU()
 
 void am29000_cpu_device::SUBRC()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
-	UINT32 r = b - a - 1 + GET_CARRY;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
+	uint32_t r = b - a - 1 + GET_CARRY;
 
 	if (!FREEZE_MODE)
 	{
@@ -387,16 +387,16 @@ void am29000_cpu_device::MULTIPLY()
 void am29000_cpu_device::MUL()
 {
 	/* TODO: Zero/Neg flags ? */
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
-	UINT32 r;
-	UINT64 v;
-	UINT32 sign;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
+	uint32_t r;
+	uint64_t v;
+	uint32_t sign;
 
 	if (m_q & 1)
 	{
 		r = a + b;
-		sign = (r >> 31) ^ (((INT32)(~((a) ^ (b)) & ((a) ^ (r))) < 0));
+		sign = (r >> 31) ^ (((int32_t)(~((a) ^ (b)) & ((a) ^ (r))) < 0));
 	}
 	else
 	{
@@ -404,7 +404,7 @@ void am29000_cpu_device::MUL()
 		sign = b >> 31;
 	}
 
-	v = ((((UINT64)r << 32) | m_q) >> 1) | ((UINT64)sign << 63);
+	v = ((((uint64_t)r << 32) | m_q) >> 1) | ((uint64_t)sign << 63);
 	m_q = v & 0xffffffff;
 
 	m_r[RC] = v >> 32;
@@ -413,16 +413,16 @@ void am29000_cpu_device::MUL()
 void am29000_cpu_device::MULL()
 {
 	/* TODO: Zero/Neg flags ? */
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
-	UINT32 r;
-	UINT64 v;
-	UINT32 sign;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
+	uint32_t r;
+	uint64_t v;
+	uint32_t sign;
 
 	if (m_q & 1)
 	{
 		r = b - a;
-		sign = (r >> 31) ^ ((INT32)(((a) ^ (b)) & ((a) ^ (r))) < 0);
+		sign = (r >> 31) ^ ((int32_t)(((a) ^ (b)) & ((a) ^ (r))) < 0);
 	}
 	else
 	{
@@ -430,7 +430,7 @@ void am29000_cpu_device::MULL()
 		sign = b >> 31;
 	}
 
-	v = ((((UINT64)r << 32) | m_q) >> 1) | ((UINT64)sign << 63);
+	v = ((((uint64_t)r << 32) | m_q) >> 1) | ((uint64_t)sign << 63);
 	m_q = v & 0xffffffff;
 
 	m_r[RC] = v >> 32;
@@ -439,16 +439,16 @@ void am29000_cpu_device::MULL()
 void am29000_cpu_device::MULU()
 {
 	/* TODO: Zero/Neg flags ? */
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
-	UINT32 r;
-	UINT64 v;
-	UINT32 c;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
+	uint32_t r;
+	uint64_t v;
+	uint32_t c;
 
 	if (m_q & 1)
 	{
 		r = a + b;
-		c = (UINT32)(r) < (UINT32)(a);
+		c = (uint32_t)(r) < (uint32_t)(a);
 	}
 	else
 	{
@@ -456,7 +456,7 @@ void am29000_cpu_device::MULU()
 		c = 0;
 	}
 
-	v = ((((UINT64)r << 32) | m_q) >> 1) | ((UINT64)c << 63);
+	v = ((((uint64_t)r << 32) | m_q) >> 1) | ((uint64_t)c << 63);
 	m_q = v & 0xffffffff;
 
 	m_r[RC] = v >> 32;
@@ -478,8 +478,8 @@ void am29000_cpu_device::DIVIDU()
 
 void am29000_cpu_device::DIV0()
 {
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT64 v;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint64_t v;
 
 	if (!FREEZE_MODE)
 	{
@@ -487,7 +487,7 @@ void am29000_cpu_device::DIV0()
 		SET_ALU_N(b);
 	}
 
-	v = (((UINT64)b << 32) | m_q) << 1;
+	v = (((uint64_t)b << 32) | m_q) << 1;
 
 	m_q = v & 0xffffffff;
 
@@ -496,22 +496,22 @@ void am29000_cpu_device::DIV0()
 
 void am29000_cpu_device::DIV()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 c;
-	UINT32 r;
-	UINT64 r64;
-	UINT32 df;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t c;
+	uint32_t r;
+	uint64_t r64;
+	uint32_t df;
 
 	if (m_alu & ALU_DF)
 	{
 		r = a - b;
-		c = !((UINT32)(a) < (UINT32)(b));
+		c = !((uint32_t)(a) < (uint32_t)(b));
 	}
 	else
 	{
 		r = a + b;
-		c = (UINT32)(r) < (UINT32)(a);
+		c = (uint32_t)(r) < (uint32_t)(a);
 	}
 
 
@@ -524,7 +524,7 @@ void am29000_cpu_device::DIV()
 		SET_ALU_N(r);
 	}
 
-	r64 = ((((UINT64)r << 32) | m_q) << 1) | df;
+	r64 = ((((uint64_t)r << 32) | m_q) << 1) | df;
 	m_q = r64 & 0xffffffff;
 
 	m_r[RC] = r64 >> 32;
@@ -532,21 +532,21 @@ void am29000_cpu_device::DIV()
 
 void am29000_cpu_device::DIVL()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 c;
-	UINT32 r;
-	UINT32 df;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t c;
+	uint32_t r;
+	uint32_t df;
 
 	if (m_alu & ALU_DF)
 	{
 		r = a - b;
-		c = !((UINT32)(a) < (UINT32)(b));
+		c = !((uint32_t)(a) < (uint32_t)(b));
 	}
 	else
 	{
 		r = a + b;
-		c = (UINT32)(r) < (UINT32)(a);
+		c = (uint32_t)(r) < (uint32_t)(a);
 	}
 
 	df = (~(c ^ (m_alu >> ALU_DF_SHIFT) ^ (m_alu >> ALU_N_SHIFT)) & 1);
@@ -564,8 +564,8 @@ void am29000_cpu_device::DIVL()
 
 void am29000_cpu_device::DIVREM()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
 
 	if (m_alu & ALU_DF)
 		m_r[RC] = a;
@@ -580,99 +580,99 @@ void am29000_cpu_device::DIVREM()
 
 void am29000_cpu_device::CPEQ()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = a == b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = a == b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::CPNEQ()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = a != b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = a != b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::CPLT()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = (INT32)a < (INT32)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = (int32_t)a < (int32_t)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::CPLTU()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = (UINT32)a < (UINT32)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = (uint32_t)a < (uint32_t)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::CPLE()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = (INT32)a <= (INT32)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = (int32_t)a <= (int32_t)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::CPLEU()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = (UINT32)a <= (UINT32)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = (uint32_t)a <= (uint32_t)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::CPGT()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = (INT32)a > (INT32)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = (int32_t)a > (int32_t)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::CPGTU()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = (UINT32)a > (UINT32)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = (uint32_t)a > (uint32_t)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::CPGE()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = (INT32)a >= (INT32)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = (int32_t)a >= (int32_t)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::CPGEU()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = (UINT32)a >= (UINT32)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = (uint32_t)a >= (uint32_t)b ? BOOLEAN_TRUE : BOOLEAN_FALSE;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::CPBYTE()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8 : GET_RB_VAL;
-	UINT32 r =
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
+	uint32_t r =
 			((a & 0xff000000) == (b & 0xff000000)) ||
 			((a & 0x00ff0000) == (b & 0x00ff0000)) ||
 			((a & 0x0000ff00) == (b & 0x0000ff00)) ||
@@ -702,7 +702,7 @@ void am29000_cpu_device::ASLT()
 {
 	if (USER_MODE && INST_VN < 64)
 		SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
-	else if (!((INT32)GET_RA_VAL < (INT32)GET_RB_VAL))
+	else if (!((int32_t)GET_RA_VAL < (int32_t)GET_RB_VAL))
 		SIGNAL_EXCEPTION(INST_VN);
 }
 
@@ -710,7 +710,7 @@ void am29000_cpu_device::ASLTU()
 {
 	if (USER_MODE && INST_VN < 64)
 		SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
-	else if (!((UINT32)GET_RA_VAL < (UINT32)GET_RB_VAL))
+	else if (!((uint32_t)GET_RA_VAL < (uint32_t)GET_RB_VAL))
 		SIGNAL_EXCEPTION(INST_VN);
 }
 
@@ -718,7 +718,7 @@ void am29000_cpu_device::ASLE()
 {
 	if (USER_MODE && INST_VN < 64)
 		SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
-	else if (!((INT32)GET_RA_VAL <= (INT32)GET_RB_VAL))
+	else if (!((int32_t)GET_RA_VAL <= (int32_t)GET_RB_VAL))
 		SIGNAL_EXCEPTION(INST_VN);
 }
 
@@ -726,7 +726,7 @@ void am29000_cpu_device::ASLEU()
 {
 	if (USER_MODE && INST_VN < 64)
 		SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
-	else if (!((UINT32)GET_RA_VAL <= (UINT32)GET_RB_VAL))
+	else if (!((uint32_t)GET_RA_VAL <= (uint32_t)GET_RB_VAL))
 		SIGNAL_EXCEPTION(INST_VN);
 }
 
@@ -734,7 +734,7 @@ void am29000_cpu_device::ASGT()
 {
 	if (USER_MODE && INST_VN < 64)
 		SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
-	else if (!((INT32)GET_RA_VAL > (INT32)GET_RB_VAL))
+	else if (!((int32_t)GET_RA_VAL > (int32_t)GET_RB_VAL))
 		SIGNAL_EXCEPTION(INST_VN);
 }
 
@@ -742,7 +742,7 @@ void am29000_cpu_device::ASGTU()
 {
 	if (USER_MODE && INST_VN < 64)
 		SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
-	else if (!((UINT32)GET_RA_VAL > (UINT32)GET_RB_VAL))
+	else if (!((uint32_t)GET_RA_VAL > (uint32_t)GET_RB_VAL))
 		SIGNAL_EXCEPTION(INST_VN);
 }
 
@@ -750,7 +750,7 @@ void am29000_cpu_device::ASGE()
 {
 	if (USER_MODE && INST_VN < 64)
 		SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
-	else if (!((INT32)GET_RA_VAL >= (INT32)GET_RB_VAL))
+	else if (!((int32_t)GET_RA_VAL >= (int32_t)GET_RB_VAL))
 		SIGNAL_EXCEPTION(INST_VN);
 }
 
@@ -758,7 +758,7 @@ void am29000_cpu_device::ASGEU()
 {
 	if (USER_MODE && INST_VN < 64)
 		SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
-	else if (!((UINT32)GET_RA_VAL >= (UINT32)GET_RB_VAL))
+	else if (!((uint32_t)GET_RA_VAL >= (uint32_t)GET_RB_VAL))
 		SIGNAL_EXCEPTION(INST_VN);
 }
 
@@ -769,9 +769,9 @@ void am29000_cpu_device::ASGEU()
 
 void am29000_cpu_device::AND()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = a & b;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = a & b;
 
 	if (!FREEZE_MODE)
 	{
@@ -784,9 +784,9 @@ void am29000_cpu_device::AND()
 
 void am29000_cpu_device::ANDN()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = a & ~b;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = a & ~b;
 
 	if (!FREEZE_MODE)
 	{
@@ -799,9 +799,9 @@ void am29000_cpu_device::ANDN()
 
 void am29000_cpu_device::NAND()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = ~(a & b);
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = ~(a & b);
 
 	if (!FREEZE_MODE)
 	{
@@ -814,9 +814,9 @@ void am29000_cpu_device::NAND()
 
 void am29000_cpu_device::OR()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = a | b;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = a | b;
 
 	if (!FREEZE_MODE)
 	{
@@ -829,9 +829,9 @@ void am29000_cpu_device::OR()
 
 void am29000_cpu_device::NOR()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = ~(a | b);
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = ~(a | b);
 
 	if (!FREEZE_MODE)
 	{
@@ -844,9 +844,9 @@ void am29000_cpu_device::NOR()
 
 void am29000_cpu_device::XOR()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = a ^ b;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = a ^ b;
 
 	if (!FREEZE_MODE)
 	{
@@ -859,9 +859,9 @@ void am29000_cpu_device::XOR()
 
 void am29000_cpu_device::XNOR()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r = ~(a ^ b);
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r = ~(a ^ b);
 
 	if (!FREEZE_MODE)
 	{
@@ -879,38 +879,38 @@ void am29000_cpu_device::XNOR()
 
 void am29000_cpu_device::SLL()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = (INST_M_BIT ? I8: GET_RB_VAL) & 0x1f;
-	UINT32 r = a << b;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = (INST_M_BIT ? I8: GET_RB_VAL) & 0x1f;
+	uint32_t r = a << b;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::SRL()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = (INST_M_BIT ? I8: GET_RB_VAL) & 0x1f;
-	UINT32 r = a >> b;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = (INST_M_BIT ? I8: GET_RB_VAL) & 0x1f;
+	uint32_t r = a >> b;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::SRA()
 {
-	INT32 a = GET_RA_VAL;
-	UINT32 b = (INST_M_BIT ? I8: GET_RB_VAL) & 0x1f;
-	UINT32 r = a >> b;
+	int32_t a = GET_RA_VAL;
+	uint32_t b = (INST_M_BIT ? I8: GET_RB_VAL) & 0x1f;
+	uint32_t r = a >> b;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::EXTRACT()
 {
-	INT32 a = GET_RA_VAL;
-	UINT32 b = (INST_M_BIT ? I8: GET_RB_VAL);
-	UINT64 r;
+	int32_t a = GET_RA_VAL;
+	uint32_t b = (INST_M_BIT ? I8: GET_RB_VAL);
+	uint64_t r;
 
-	r = (((UINT64)a << 32) | b) << GET_ALU_FC;
+	r = (((uint64_t)a << 32) | b) << GET_ALU_FC;
 
 	m_r[RC] = r >> 32;
 }
@@ -922,8 +922,8 @@ void am29000_cpu_device::EXTRACT()
 
 void am29000_cpu_device::LOAD()
 {
-	UINT32 addr = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 r;
+	uint32_t addr = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t r;
 
 	if (INST_UA_BIT)
 		fatalerror("Am29000: UA bit set on LOAD\n");
@@ -986,14 +986,14 @@ void am29000_cpu_device::LOADSET()
 
 void am29000_cpu_device::LOADM()
 {
-	UINT32 addr = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t addr = INST_M_BIT ? I8: GET_RB_VAL;
 
 	if (INST_UA_BIT)
 	{
 		fatalerror("Am29000: UA bit set on LOAD\n");
 	}
 
-	UINT32 r;
+	uint32_t r;
 	if (INST_CE_BIT)
 	{
 		logerror("Am29000: Attempting a co-processor LOAD!\n");
@@ -1033,7 +1033,7 @@ void am29000_cpu_device::LOADM()
 
 	r = RA;
 
-	for (INT32 cnt = 0; cnt <= GET_CHC_CR; ++cnt)
+	for (int32_t cnt = 0; cnt <= GET_CHC_CR; ++cnt)
 	{
 		m_r[r] = m_data->read_dword(addr);
 
@@ -1049,7 +1049,7 @@ void am29000_cpu_device::LOADM()
 
 void am29000_cpu_device::STORE()
 {
-	UINT32 addr = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t addr = INST_M_BIT ? I8: GET_RB_VAL;
 
 	if (INST_UA_BIT)
 	{
@@ -1102,14 +1102,14 @@ void am29000_cpu_device::STOREL()
 
 void am29000_cpu_device::STOREM()
 {
-	UINT32 addr = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t addr = INST_M_BIT ? I8: GET_RB_VAL;
 
 	if (INST_UA_BIT)
 	{
 		fatalerror("Am29000: UA bit set on LOAD\n");
 	}
 
-	UINT32 r;
+	uint32_t r;
 	if (INST_CE_BIT)
 	{
 		logerror("Am29000: Attempting a co-processor LOAD!\n");
@@ -1146,7 +1146,7 @@ void am29000_cpu_device::STOREM()
 
 	r = RA;
 
-	for (INT32 cnt = 0; cnt <= GET_CHC_CR; ++cnt)
+	for (int32_t cnt = 0; cnt <= GET_CHC_CR; ++cnt)
 	{
 		m_data->write_dword(addr, m_r[r]);
 
@@ -1161,11 +1161,11 @@ void am29000_cpu_device::STOREM()
 
 void am29000_cpu_device::EXBYTE()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 bp = GET_ALU_BP;
-	UINT8 srcbyte;
-	UINT32 r;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t bp = GET_ALU_BP;
+	uint8_t srcbyte;
+	uint32_t r;
 
 	if (m_cfg & CFG_BO)
 		srcbyte = a >> 8 * bp;
@@ -1179,11 +1179,11 @@ void am29000_cpu_device::EXBYTE()
 
 void am29000_cpu_device::EXHW()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 wp = ((m_alu >> ALU_BP_SHIFT) & ALU_BP_MASK) >> 1;
-	UINT16 srcword;
-	UINT32 r;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t wp = ((m_alu >> ALU_BP_SHIFT) & ALU_BP_MASK) >> 1;
+	uint16_t srcword;
+	uint32_t r;
 
 	if (m_cfg & CFG_BO)
 		srcword = a >> 16 * wp;
@@ -1197,28 +1197,28 @@ void am29000_cpu_device::EXHW()
 
 void am29000_cpu_device::EXHWS()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 wp = ((m_alu >> ALU_BP_SHIFT) & ALU_BP_MASK) >> 1;
-	UINT16 srcword;
-	UINT32 r;
+	uint32_t a = GET_RA_VAL;
+	uint32_t wp = ((m_alu >> ALU_BP_SHIFT) & ALU_BP_MASK) >> 1;
+	uint16_t srcword;
+	uint32_t r;
 
 	if (m_cfg & CFG_BO)
 		srcword = a >> 16 * wp;
 	else
 		srcword = a >> (16 * (1 - wp));
 
-	r = (INT32)(INT16)srcword;
+	r = (int32_t)(int16_t)srcword;
 
 	m_r[RC] = r;
 }
 
 void am29000_cpu_device::INBYTE()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 bp = GET_ALU_BP;
-	UINT8 shift = (m_cfg & CFG_BO) ? 8 * bp : (8 * (3 - bp));
-	UINT32 r;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t bp = GET_ALU_BP;
+	uint8_t shift = (m_cfg & CFG_BO) ? 8 * bp : (8 * (3 - bp));
+	uint32_t r;
 
 	r = (a & ~(0xff << shift)) | ((b & 0xff) << shift);
 
@@ -1227,11 +1227,11 @@ void am29000_cpu_device::INBYTE()
 
 void am29000_cpu_device::INHW()
 {
-	UINT32 a = GET_RA_VAL;
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
-	UINT32 wp = ((m_alu >> ALU_BP_SHIFT) & ALU_BP_MASK) >> 1;
-	UINT32 shift = (m_cfg & CFG_BO) ? 16 * wp : (16 * (1 - wp));
-	UINT32 r;
+	uint32_t a = GET_RA_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t wp = ((m_alu >> ALU_BP_SHIFT) & ALU_BP_MASK) >> 1;
+	uint32_t shift = (m_cfg & CFG_BO) ? 16 * wp : (16 * (1 - wp));
+	uint32_t r;
 
 	r = (a & ~(0xffff << shift)) | ((b & 0xffff) << shift);
 
@@ -1290,7 +1290,7 @@ void am29000_cpu_device::CONSTN()
 
 void am29000_cpu_device::CALL()
 {
-	UINT32 ret = m_next_pc;
+	uint32_t ret = m_next_pc;
 
 	if (INST_M_BIT)
 		m_next_pc = JMP_ZEX;
@@ -1303,7 +1303,7 @@ m_next_pl_flags |= PFLAG_JUMP;
 
 void am29000_cpu_device::CALLI()
 {
-	UINT32 ret = m_next_pc;
+	uint32_t ret = m_next_pc;
 	m_next_pc = GET_RB_VAL;
 	m_r[RA] = ret;
 	m_next_pl_flags |= PFLAG_JUMP;
@@ -1372,7 +1372,7 @@ void am29000_cpu_device::JMPFI()
 
 void am29000_cpu_device::JMPFDEC()
 {
-	UINT32 a = GET_RA_VAL;
+	uint32_t a = GET_RA_VAL;
 
 	if ((a & BOOLEAN_MASK) == BOOLEAN_FALSE)
 	{
@@ -1394,7 +1394,7 @@ void am29000_cpu_device::JMPFDEC()
 
 void am29000_cpu_device::CLZ()
 {
-	UINT32 b = INST_M_BIT ? I8: GET_RB_VAL;
+	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
 
 	m_r[RC] = count_leading_zeros(b);
 }

@@ -768,7 +768,7 @@ MACHINE_START_MEMBER(ojankohs_state,common)
 
 MACHINE_START_MEMBER(ojankohs_state,ojankohs)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x40, &ROM[0x10000], 0x4000);
 
@@ -777,7 +777,7 @@ MACHINE_START_MEMBER(ojankohs_state,ojankohs)
 
 MACHINE_START_MEMBER(ojankohs_state,ojankoy)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x4000);
 
@@ -786,7 +786,7 @@ MACHINE_START_MEMBER(ojankohs_state,ojankoy)
 
 MACHINE_START_MEMBER(ojankohs_state,ojankoc)
 {
-	UINT8 *ROM = memregion("user1")->base();
+	uint8_t *ROM = memregion("user1")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
 

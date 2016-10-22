@@ -94,7 +94,7 @@ const lc8670_cpu_device::dasm_entry lc8670_cpu_device::s_dasm_table[] =
 	{ "SET1",   OP_D9B3,   OP_NULL, 0 },
 };
 
-void lc8670_cpu_device::dasm_arg(UINT8 op, char *buffer, offs_t pc, int arg, const UINT8 *oprom, int &pos)
+void lc8670_cpu_device::dasm_arg(uint8_t op, char *buffer, offs_t pc, int arg, const uint8_t *oprom, int &pos)
 {
 	switch( arg )
 	{
@@ -151,12 +151,12 @@ void lc8670_cpu_device::dasm_arg(UINT8 op, char *buffer, offs_t pc, int arg, con
 //  helper function
 //-------------------------------------------------
 
-offs_t lc8670_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t lc8670_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	int pos = 0;
 	char arg1[16], arg2[16];
 
-	UINT8 op = oprom[pos++];
+	uint8_t op = oprom[pos++];
 
 	int op_idx = decode_op(op);
 	const dasm_entry *inst = &s_dasm_table[op_idx];

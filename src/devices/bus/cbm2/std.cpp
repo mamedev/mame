@@ -26,7 +26,7 @@ const device_type CBM2_STD = &device_creator<cbm2_standard_cartridge_device>;
 //  cbm2_standard_cartridge_device - constructor
 //-------------------------------------------------
 
-cbm2_standard_cartridge_device::cbm2_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cbm2_standard_cartridge_device::cbm2_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CBM2_STD, "CBM-II standard cartridge", tag, owner, clock, "cbm2_standard", __FILE__),
 	device_cbm2_expansion_card_interface(mconfig, *this)
 {
@@ -46,7 +46,7 @@ void cbm2_standard_cartridge_device::device_start()
 //  cbm2_bd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 cbm2_standard_cartridge_device::cbm2_bd_r(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3)
+uint8_t cbm2_standard_cartridge_device::cbm2_bd_r(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (!csbank1 && m_bank1.bytes())
 	{

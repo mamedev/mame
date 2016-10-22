@@ -30,7 +30,7 @@
 
 PALETTE_INIT_MEMBER(snk_state,tnk3)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	int num_colors = 0x400;
 
@@ -664,7 +664,7 @@ WRITE8_MEMBER(snk_state::tdfever_spriteram_w)
 void snk_state::marvins_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int scrollx, const int scrolly, const int from, const int to)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(3);
-	const UINT8 *source, *finish;
+	const uint8_t *source, *finish;
 
 	source = m_spriteram + from*4;
 	finish = m_spriteram + to*4;
@@ -706,7 +706,7 @@ void snk_state::marvins_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 	const int size = gfx->width();
 	int tile_number, attributes, color, sx, sy;
@@ -768,7 +768,7 @@ void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-void snk_state::ikari_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int start, const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum )
+void snk_state::ikari_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int start, const int xscroll, const int yscroll, const uint8_t *source, const int gfxnum )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(gfxnum);
 	const int size = gfx->width();
@@ -838,7 +838,7 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-void snk_state::tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,   const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum,
+void snk_state::tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,   const int xscroll, const int yscroll, const uint8_t *source, const int gfxnum,
 										const int hw_xflip, const int from, const int to)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(gfxnum);
@@ -901,7 +901,7 @@ void snk_state::tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 /**************************************************************/
 
-UINT32 snk_state::screen_update_marvins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snk_state::screen_update_marvins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
@@ -918,7 +918,7 @@ UINT32 snk_state::screen_update_marvins(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-UINT32 snk_state::screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snk_state::screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
@@ -930,7 +930,7 @@ UINT32 snk_state::screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-UINT32 snk_state::screen_update_fitegolf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snk_state::screen_update_fitegolf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
@@ -944,7 +944,7 @@ UINT32 snk_state::screen_update_fitegolf2(screen_device &screen, bitmap_ind16 &b
 
 
 
-UINT32 snk_state::screen_update_ikari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snk_state::screen_update_ikari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
@@ -960,7 +960,7 @@ UINT32 snk_state::screen_update_ikari(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-UINT32 snk_state::screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snk_state::screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
@@ -977,7 +977,7 @@ UINT32 snk_state::screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-UINT32 snk_state::screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snk_state::screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);

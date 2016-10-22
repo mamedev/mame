@@ -204,7 +204,7 @@ void v1050_state::bankswitch()
 
 // Keyboard HACK
 
-static const UINT8 V1050_KEYCODES[4][12][8] =
+static const uint8_t V1050_KEYCODES[4][12][8] =
 {
 	{   // unshifted
 		{ 0xc0, 0xd4, 0xd8, 0xdc, 0xe0, 0xe4, 0xe8, 0xec },
@@ -273,7 +273,7 @@ void v1050_state::scan_keyboard()
 	int table = 0, row, col;
 	int keydata = 0xff;
 
-	UINT8 line_mod = ioport("ROW12")->read();
+	uint8_t line_mod = ioport("ROW12")->read();
 
 	if((line_mod & 0x07) && (line_mod & 0x18))
 	{
@@ -291,7 +291,7 @@ void v1050_state::scan_keyboard()
 	// scan keyboard
 	for (row = 0; row < 12; row++)
 	{
-		UINT8 data = ioport(keynames[row])->read();
+		uint8_t data = ioport(keynames[row])->read();
 
 		for (col = 0; col < 8; col++)
 		{
@@ -331,7 +331,7 @@ READ8_MEMBER( v1050_state::kb_data_r )
 
 READ8_MEMBER( v1050_state::kb_status_r )
 {
-	UINT8 val = m_uart_kb->status_r(space, 0);
+	uint8_t val = m_uart_kb->status_r(space, 0);
 
 	return val | (m_keyavail ? 0x02 : 0x00);
 }
@@ -723,7 +723,7 @@ READ8_MEMBER(v1050_state::misc_ppi_pc_r)
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_centronics_busy << 4;
 	data |= m_centronics_perror << 5;
@@ -945,7 +945,7 @@ WRITE_LINE_MEMBER( v1050_state::fdc_drq_w )
 
 IRQ_CALLBACK_MEMBER(v1050_state::v1050_int_ack)
 {
-	UINT8 vector = 0xf0 | (m_pic->a_r() << 1);
+	uint8_t vector = 0xf0 | (m_pic->a_r() << 1);
 
 	//logerror("Interrupt Acknowledge Vector: %02x\n", vector);
 
@@ -966,7 +966,7 @@ void v1050_state::machine_start()
 	m_rtc->cs1_w(1);
 
 	// setup memory banking
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	membank("bank1")->configure_entries(0, 2, ram, 0x10000);
 	membank("bank1")->configure_entry(2, ram + 0x1c000);

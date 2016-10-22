@@ -19,8 +19,8 @@ const device_type COLECO_SUPER_ACTION_CONTROLLER = &device_creator<coleco_super_
 
 CUSTOM_INPUT_MEMBER( coleco_super_action_controller_t::keypad_r )
 {
-	UINT8 data = 0xf;
-	UINT16 keypad = m_io_keypad->read();
+	uint8_t data = 0xf;
+	uint16_t keypad = m_io_keypad->read();
 
 	if (!BIT(keypad, 0)) data &= 0x0a;
 	if (!BIT(keypad, 1)) data &= 0x0d;
@@ -101,7 +101,7 @@ ioport_constructor coleco_super_action_controller_t::device_input_ports() const
 //  coleco_super_action_controller_t - constructor
 //-------------------------------------------------
 
-coleco_super_action_controller_t::coleco_super_action_controller_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+coleco_super_action_controller_t::coleco_super_action_controller_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COLECO_SUPER_ACTION_CONTROLLER, "ColecoVision Super Action Controller", tag, owner, clock, "coleco_sac", __FILE__),
 	device_colecovision_control_port_interface(mconfig, *this),
 	m_io_common0(*this, "COMMON0"),
@@ -127,9 +127,9 @@ void coleco_super_action_controller_t::device_start()
 //  joy_r - joystick read
 //-------------------------------------------------
 
-UINT8 coleco_super_action_controller_t::joy_r()
+uint8_t coleco_super_action_controller_t::joy_r()
 {
-	UINT8 data = 0x7f;
+	uint8_t data = 0x7f;
 
 	if (!m_common0) data &= m_io_common0->read();
 	if (!m_common1) data &= m_io_common1->read();

@@ -61,35 +61,35 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<mb14241_device> m_mb14241;
 	optional_device<watchdog_timer_device> m_watchdog;
-	required_shared_ptr<UINT8> m_main_ram;
-	optional_shared_ptr<UINT8> m_colorram;
-	optional_shared_ptr<UINT8> m_colorram2;
+	required_shared_ptr<uint8_t> m_main_ram;
+	optional_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_colorram2;
 	optional_device<discrete_device> m_discrete;
 
 	/* sound-related */
-	UINT8       m_port_1_last;
-	UINT8       m_port_2_last;
-	UINT8       m_port_1_last_extra;
-	UINT8       m_port_2_last_extra;
-	UINT8       m_port_3_last_extra;
+	uint8_t       m_port_1_last;
+	uint8_t       m_port_2_last;
+	uint8_t       m_port_1_last_extra;
+	uint8_t       m_port_2_last_extra;
+	uint8_t       m_port_3_last_extra;
 
 	/* misc game specific */
-	UINT16      m_phantom2_cloud_counter;
-	UINT8       m_flip_screen;
-	UINT8       m_rev_shift_res;
-	UINT8       m_maze_tone_timing_state;   /* output of IC C1, pin 5 */
-	UINT8       m_desertgun_controller_select;
-	UINT8       m_clowns_controller_select;
+	uint16_t      m_phantom2_cloud_counter;
+	uint8_t       m_flip_screen;
+	uint8_t       m_rev_shift_res;
+	uint8_t       m_maze_tone_timing_state;   /* output of IC C1, pin 5 */
+	uint8_t       m_desertgun_controller_select;
+	uint8_t       m_clowns_controller_select;
 
-	UINT8       m_spcenctr_strobe_state;
-	UINT8       m_spcenctr_trench_width;
-	UINT8       m_spcenctr_trench_center;
-	UINT8       m_spcenctr_trench_slope[16];  /* 16x4 bit RAM */
-	UINT8       m_spcenctr_bright_control;
-	UINT8       m_spcenctr_brightness;
+	uint8_t       m_spcenctr_strobe_state;
+	uint8_t       m_spcenctr_trench_width;
+	uint8_t       m_spcenctr_trench_center;
+	uint8_t       m_spcenctr_trench_slope[16];  /* 16x4 bit RAM */
+	uint8_t       m_spcenctr_bright_control;
+	uint8_t       m_spcenctr_brightness;
 
-	std::unique_ptr<UINT8[]> m_scattered_colorram;
-	std::unique_ptr<UINT8[]> m_scattered_colorram2;
+	std::unique_ptr<uint8_t[]> m_scattered_colorram;
+	std::unique_ptr<uint8_t[]> m_scattered_colorram2;
 
 	/* timer */
 	emu_timer   *m_interrupt_timer;
@@ -164,10 +164,10 @@ public:
 	DECLARE_MACHINE_START(phantom2);
 	DECLARE_MACHINE_START(invaders);
 	DECLARE_SOUND_START(samples);
-	UINT32 screen_update_mw8080bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spcenctr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mw8080bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spcenctr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_phantom2(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
 	TIMER_CALLBACK_MEMBER(mw8080bw_interrupt_callback);
@@ -198,12 +198,12 @@ public:
 	DECLARE_WRITE8_MEMBER(invad2ct_audio_3_w);
 	DECLARE_WRITE8_MEMBER(invad2ct_audio_4_w);
 	void maze_update_discrete();
-	void maze_write_discrete(UINT8 maze_tone_timing_state);
-	UINT8 vpos_to_vysnc_chain_counter( int vpos );
-	int vysnc_chain_counter_to_vpos( UINT8 counter, int vblank );
+	void maze_write_discrete(uint8_t maze_tone_timing_state);
+	uint8_t vpos_to_vysnc_chain_counter( int vpos );
+	int vysnc_chain_counter_to_vpos( uint8_t counter, int vblank );
 	void mw8080bw_create_interrupt_timer(  );
 	void mw8080bw_start_interrupt_timer(  );
-	UINT8 tornbase_get_cabinet_type();
+	uint8_t tornbase_get_cabinet_type();
 	int invaders_is_cabinet_cocktail();
 };
 

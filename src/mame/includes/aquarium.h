@@ -25,10 +25,10 @@ public:
 		{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_mid_videoram;
-	required_shared_ptr<UINT16> m_bak_videoram;
-	required_shared_ptr<UINT16> m_txt_videoram;
-	required_shared_ptr<UINT16> m_scroll;
+	required_shared_ptr<uint16_t> m_mid_videoram;
+	required_shared_ptr<uint16_t> m_bak_videoram;
+	required_shared_ptr<uint16_t> m_txt_videoram;
+	required_shared_ptr<uint16_t> m_scroll;
 
 	/* video-related */
 	tilemap_t  *m_txt_tilemap;
@@ -64,8 +64,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_aquarium(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT8 aquarium_snd_bitswap( UINT8 scrambled_data );
+	uint32_t screen_update_aquarium(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint8_t aquarium_snd_bitswap( uint8_t scrambled_data );
 	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_mask, int priority_value);
 	bitmap_ind16 m_temp_sprite_bitmap;
 };

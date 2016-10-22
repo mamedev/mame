@@ -26,7 +26,7 @@
 
 class pc_fdc_family_device : public pc_fdc_interface {
 public:
-	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).intrq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).drq_cb.set_callback(object); }
@@ -36,9 +36,9 @@ public:
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 
 	virtual void tc_w(bool state) override;
-	virtual UINT8 dma_r() override;
-	virtual void dma_w(UINT8 data) override;
-	virtual UINT8 do_dir_r() override;
+	virtual uint8_t dma_r() override;
+	virtual void dma_w(uint8_t data) override;
+	virtual uint8_t do_dir_r() override;
 
 	READ8_MEMBER(dor_r);
 	WRITE8_MEMBER(dor_w);
@@ -54,7 +54,7 @@ protected:
 
 	bool irq, drq, fdc_drq, fdc_irq;
 	devcb_write_line intrq_cb, drq_cb;
-	UINT8 dor;
+	uint8_t dor;
 
 	floppy_image_device *floppy[4];
 
@@ -64,7 +64,7 @@ protected:
 
 class pc_fdc_xt_device : public pc_fdc_family_device {
 public:
-	pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 	WRITE8_MEMBER(dor_fifo_w);
@@ -72,7 +72,7 @@ public:
 
 class pc_fdc_at_device : public pc_fdc_family_device {
 public:
-	pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };

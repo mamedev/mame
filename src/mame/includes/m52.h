@@ -14,17 +14,17 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	optional_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t*             m_bg_tilemap;
-	UINT8                m_bg1xpos;
-	UINT8                m_bg1ypos;
-	UINT8                m_bg2xpos;
-	UINT8                m_bg2ypos;
-	UINT8                m_bgcontrol;
+	uint8_t                m_bg1xpos;
+	uint8_t                m_bg1ypos;
+	uint8_t                m_bg2xpos;
+	uint8_t                m_bg2ypos;
+	uint8_t                m_bgcontrol;
 	DECLARE_WRITE8_MEMBER(m52_scroll_w);
 	DECLARE_WRITE8_MEMBER(m52_videoram_w);
 	DECLARE_WRITE8_MEMBER(m52_colorram_w);
@@ -40,7 +40,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(m52);
-	UINT32 screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

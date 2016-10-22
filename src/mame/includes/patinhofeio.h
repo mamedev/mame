@@ -26,25 +26,25 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( patinho_tape );
 	void load_tape(const char* name);
 	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
-	void update_panel(UINT8 ACC, UINT8 opcode, UINT8 mem_data, UINT16 mem_addr, UINT16 PC, UINT8 FLAGS, UINT16 RC, UINT8 mode);
+	void update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode);
 	virtual void machine_start() override;
 
 	required_device<patinho_feio_cpu_device> m_maincpu;
 	required_device<teleprinter_device> m_decwriter;
 	required_device<teleprinter_device> m_tty;
 private:
-	UINT8* paper_tape_data;
-	UINT32 paper_tape_length;
-	UINT32 paper_tape_address;
+	uint8_t* paper_tape_data;
+	uint32_t paper_tape_length;
+	uint32_t paper_tape_address;
 
 	emu_timer *m_decwriter_timer;
 	emu_timer *m_teletype_timer;
 	output_manager *m_out;
-	UINT8 m_prev_ACC;
-	UINT8 m_prev_opcode;
-	UINT8 m_prev_mem_data;
-	UINT16 m_prev_mem_addr;
-	UINT16 m_prev_PC;
-	UINT8 m_prev_FLAGS;
-	UINT16 m_prev_RC;
+	uint8_t m_prev_ACC;
+	uint8_t m_prev_opcode;
+	uint8_t m_prev_mem_data;
+	uint16_t m_prev_mem_addr;
+	uint16_t m_prev_PC;
+	uint8_t m_prev_FLAGS;
+	uint16_t m_prev_RC;
 };

@@ -38,18 +38,18 @@ void mz80_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 mz80_state::screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mz80_state::screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_mz80k_vertical ^= 1;
 	m_mz80k_cursor_cnt++;
-	UINT8 y,ra,chr,gfx;
-	UINT16 x,sy=0,ma=0;
+	uint8_t y,ra,chr,gfx;
+	uint16_t x,sy=0,ma=0;
 
 	for(y = 0; y < 25; y++ )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 40; x++)
 			{
@@ -73,18 +73,18 @@ UINT32 mz80_state::screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitm
 }
 
 // same as above except bits are in reverse order
-UINT32 mz80_state::screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mz80_state::screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_mz80k_vertical ^= 1;
 	m_mz80k_cursor_cnt++;
-	UINT8 y,ra,chr,gfx;
-	UINT16 x,sy=0,ma=0;
+	uint8_t y,ra,chr,gfx;
+	uint16_t x,sy=0,ma=0;
 
 	for(y = 0; y < 25; y++ )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 40; x++)
 			{
@@ -108,18 +108,18 @@ UINT32 mz80_state::screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bit
 }
 
 // has twice as much video ram and uses a scroll register
-UINT32 mz80_state::screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mz80_state::screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_mz80k_vertical ^= 1;
 	m_mz80k_cursor_cnt++;
-	UINT8 y,ra,chr,gfx;
-	UINT16 x,sy=0, ma=m_p_ram[0x17d] | (m_p_ram[0x17e] << 8);
+	uint8_t y,ra,chr,gfx;
+	uint16_t x,sy=0, ma=m_p_ram[0x17d] | (m_p_ram[0x17e] << 8);
 
 	for(y = 0; y < 25; y++ )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 40; x++)
 			{

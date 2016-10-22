@@ -67,7 +67,7 @@ inline void hd44102_device::count_up_or_down()
 //  hd44102_device - constructor
 //-------------------------------------------------
 
-hd44102_device::hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd44102_device::hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HD44102, "HD44102", tag, owner, clock, "hd44102", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_cs2(0),
@@ -127,7 +127,7 @@ void hd44102_device::device_reset()
 
 READ8_MEMBER( hd44102_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_cs2)
 	{
@@ -228,7 +228,7 @@ WRITE8_MEMBER( hd44102_device::control_w )
 
 READ8_MEMBER( hd44102_device::data_r )
 {
-	UINT8 data = m_output;
+	uint8_t data = m_output;
 
 	m_output = m_ram[m_x][m_y];
 
@@ -264,7 +264,7 @@ WRITE_LINE_MEMBER( hd44102_device::cs2_w )
 //  update_screen - update screen
 //-------------------------------------------------
 
-UINT32 hd44102_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hd44102_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 50; y++)
 	{
@@ -272,7 +272,7 @@ UINT32 hd44102_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 		for (int x = 0; x < 32; x++)
 		{
-			UINT8 data = m_ram[z / 8][y];
+			uint8_t data = m_ram[z / 8][y];
 
 			int sy = m_sy + z;
 			int sx = m_sx + y;

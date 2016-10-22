@@ -59,7 +59,7 @@ class apricot_keyboard_bus_device : public device_t, public device_slot_interfac
 {
 public:
 	// construction/destruction
-	apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apricot_keyboard_bus_device();
 
 	// callbacks

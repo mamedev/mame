@@ -23,39 +23,39 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_scrlram;
-	required_shared_ptr<UINT8> m_sharedram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_scrlram;
+	required_shared_ptr<uint8_t> m_sharedram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
-	std::vector<UINT8> m_paletteram;
-	std::vector<UINT8> m_paletteram_ext;
-	UINT8 m_gfxctrl;
-	UINT8 m_char_bank;
-	UINT8 m_palette_bank;
+	std::vector<uint8_t> m_paletteram;
+	std::vector<uint8_t> m_paletteram_ext;
+	uint8_t m_gfxctrl;
+	uint8_t m_char_bank;
+	uint8_t m_palette_bank;
 
 	/* mcu */
-	UINT8 m_from_main;
-	UINT8 m_from_mcu;
+	uint8_t m_from_main;
+	uint8_t m_from_mcu;
 	int m_mcu_sent;
 	int m_main_sent;
-	UINT8 m_port_a_in;
-	UINT8 m_port_a_out;
-	UINT8 m_ddr_a;
-	UINT8 m_port_b_in;
-	UINT8 m_port_b_out;
-	UINT8 m_ddr_b;
-	UINT8 m_port_c_in;
-	UINT8 m_port_c_out;
-	UINT8 m_ddr_c;
+	uint8_t m_port_a_in;
+	uint8_t m_port_a_out;
+	uint8_t m_ddr_a;
+	uint8_t m_port_b_in;
+	uint8_t m_port_b_out;
+	uint8_t m_ddr_b;
+	uint8_t m_port_c_in;
+	uint8_t m_port_c_out;
+	uint8_t m_ddr_c;
 
 	/* misc */
 	int m_generic_control_reg;
 	int m_sound_nmi_enable;
 	int m_pending_nmi;
-	UINT8 m_snd_data;
+	uint8_t m_snd_data;
 	int m_vol_ctrl[16];
 	int  m_gametype;
 	int m_mask;
@@ -117,7 +117,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(ta7630);
-	UINT32 screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	int nycaptor_spot(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );

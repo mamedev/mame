@@ -26,29 +26,29 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	required_shared_ptr<UINT8> m_palette_val;
-	required_shared_ptr<UINT8> m_motor_on;
-	required_shared_ptr<UINT8> m_lamps;
-	required_shared_ptr<UINT8> m_display_buffer;
-	required_shared_ptr<UINT8> m_videoram_b;
-	required_shared_ptr<UINT8> m_videoram_d;
-	required_shared_ptr<UINT8> m_videoram_e;
-	required_shared_ptr<UINT8> m_videoram_f;
+	required_shared_ptr<uint8_t> m_palette_val;
+	required_shared_ptr<uint8_t> m_motor_on;
+	required_shared_ptr<uint8_t> m_lamps;
+	required_shared_ptr<uint8_t> m_display_buffer;
+	required_shared_ptr<uint8_t> m_videoram_b;
+	required_shared_ptr<uint8_t> m_videoram_d;
+	required_shared_ptr<uint8_t> m_videoram_e;
+	required_shared_ptr<uint8_t> m_videoram_f;
 
 	/* machine state */
 	int    m_vert_pos;
 	int    m_horiz_pos;
 
 	/* video state */
-	UINT8  m_y_scroll_d;
-	UINT8  m_y_scroll_e;
-	UINT8  m_y_scroll_f;
-	UINT8  m_frame_count;
-	UINT8  m_shot_standby;
-	UINT8  m_shot_arrive;
-	UINT16 m_beam_state;
-	UINT16 m_old_beam_state;
-	UINT16 m_beam_states_per_frame;
+	uint8_t  m_y_scroll_d;
+	uint8_t  m_y_scroll_e;
+	uint8_t  m_y_scroll_f;
+	uint8_t  m_frame_count;
+	uint8_t  m_shot_standby;
+	uint8_t  m_shot_arrive;
+	uint16_t m_beam_state;
+	uint16_t m_old_beam_state;
+	uint16_t m_beam_states_per_frame;
 
 	DECLARE_READ8_MEMBER(vert_pos_r);
 	DECLARE_READ8_MEMBER(horiz_pos_r);
@@ -69,9 +69,9 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(stactics);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_beam();
-	inline int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll);
+	inline int get_pixel_on_plane(uint8_t *videoram, uint8_t y, uint8_t x, uint8_t y_scroll);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_indicator_leds(int data, const char *output_name, int base_index);
 	void update_artwork();

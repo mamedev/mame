@@ -41,10 +41,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	UINT8 *m_p_chargen;
+	uint8_t *m_p_chargen;
 	required_device<via6522_device> m_via_0;
 	required_device<via6522_device> m_via_1;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -124,9 +124,9 @@ void ec65_state::video_start()
 MC6845_UPDATE_ROW( ec65_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx,inv;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx,inv;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{

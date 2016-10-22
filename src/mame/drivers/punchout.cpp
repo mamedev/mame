@@ -225,7 +225,7 @@ READ8_MEMBER(punchout_state::spunchout_exp_r)
 	// d5: _ALARM from RP5C01
 	// d6: COUNTER OUT from RP5H01
 	// d7: DATA OUT from RP5H01 - always 0?
-	UINT8 ret = m_rtc->read(space, offset >> 4 & 0xf) & 0xf;
+	uint8_t ret = m_rtc->read(space, offset >> 4 & 0xf) & 0xf;
 	ret |= 0x10;
 	ret |= m_rtc->alarm_r() ? 0x00 : 0x20;
 	ret |= m_rp5h01->counter_r() ? 0x00 : 0x40;

@@ -68,7 +68,7 @@ static const char * const bankname[] = { "bank2", "bank3", "bank4", "bank5" };
 static const struct
 {
 	void (taitol_state::*notifier)(int);
-	UINT32 offset;
+	uint32_t offset;
 } rambank_modify_notifiers[12] =
 {
 	{ &taitol_state::taitol_chardef14_m, 0x0000 }, // 14
@@ -90,9 +90,9 @@ static const struct
 
 void taitol_state::palette_notifier(int addr)
 {
-	UINT8 *p = m_palette_ram + (addr & ~1);
-	UINT8 byte0 = *p++;
-	UINT8 byte1 = *p;
+	uint8_t *p = m_palette_ram + (addr & ~1);
+	uint8_t byte0 = *p++;
+	uint8_t byte1 = *p;
 
 	//  addr &= 0x1ff;
 
@@ -107,7 +107,7 @@ void taitol_state::palette_notifier(int addr)
 	}
 }
 
-static const UINT8 puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0x47, 0x05, 0x00 };
+static const uint8_t puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0x47, 0x05, 0x00 };
 
 void taitol_state::state_register(  )
 {
@@ -421,7 +421,7 @@ READ8_MEMBER(taitol_state::rambankswitch_r)
 	return m_cur_rambank[offset];
 }
 
-void taitol_state::bank_w(address_space &space, offs_t offset, UINT8 data, int banknum )
+void taitol_state::bank_w(address_space &space, offs_t offset, uint8_t data, int banknum )
 {
 	if (m_current_base[banknum][offset] != data)
 	{
@@ -702,7 +702,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(taitol_state::sound_bankswitch_w)
 {
-	UINT8 *RAM = memregion("audiocpu")->base();
+	uint8_t *RAM = memregion("audiocpu")->base();
 	int banknum = data & 0x03;
 
 	membank ("bank7")->set_base (&RAM [(banknum * 0x4000)]);
@@ -1715,7 +1715,7 @@ WRITE8_MEMBER(taitol_state::portA_w)
 	if (m_cur_bank != (data & 0x03))
 	{
 		int bankaddress;
-		UINT8 *RAM = memregion("audiocpu")->base();
+		uint8_t *RAM = memregion("audiocpu")->base();
 
 		m_cur_bank = data & 0x03;
 		bankaddress = m_cur_bank * 0x4000;
@@ -2561,8 +2561,8 @@ ROM_END
 // bits 7..0 => bits 0..7
 DRIVER_INIT_MEMBER(taitol_state,plottinga)
 {
-	UINT8 tab[256];
-	UINT8 *p;
+	uint8_t tab[256];
+	uint8_t *p;
 	int i;
 
 	for (i = 0; i < 256; i++)

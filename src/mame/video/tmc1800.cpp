@@ -26,7 +26,7 @@ READ_LINE_MEMBER( tmc2000_state::gdata_r )
 
 /* OSM-200 */
 
-UINT32 osc1000b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t osc1000b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

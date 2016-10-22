@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <string>
 
-using INT32 = std::int32_t;
+using int32_t = std::int32_t;
 
 class running_machine;
 
@@ -23,7 +23,7 @@ class slider_changed_notifier
 public:
 	virtual ~slider_changed_notifier() { }
 
-	virtual INT32 slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval) = 0;
+	virtual int32_t slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval) = 0;
 };
 
 #endif // __SLIDER_CHANGED_NOTIFIER__

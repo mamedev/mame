@@ -75,7 +75,7 @@ inline void cdp1862_device::initialize_palette()
 //  cdp1862_device - constructor
 //-------------------------------------------------
 
-cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDP1862, "CDP1862", tag, owner, clock, "cdp1862", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_read_rd(*this),
@@ -188,7 +188,7 @@ WRITE_LINE_MEMBER( cdp1862_device::con_w )
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 cdp1862_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cdp1862_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 

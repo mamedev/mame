@@ -40,7 +40,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(subhuntr);
-	UINT32 screen_update_subhuntr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_subhuntr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -54,7 +54,7 @@ PALETTE_INIT_MEMBER(subhuntr_state, subhuntr)
 {
 }
 
-UINT32 subhuntr_state::screen_update_subhuntr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subhuntr_state::screen_update_subhuntr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

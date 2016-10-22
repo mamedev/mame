@@ -26,6 +26,7 @@ Paste facility was tested but doesn't work, so all code remnants removed.
 #include "formats/rk_cas.h"
 #include "softlist.h"
 #include "ut88mini.lh"
+#include "sound/volt_reg.h"
 
 static GFXDECODE_START( ut88 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ut88_charlayout, 0, 1 )
@@ -198,11 +199,13 @@ static MACHINE_CONFIG_START( ut88, ut88_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ut88 )
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -230,9 +233,9 @@ static MACHINE_CONFIG_START( ut88mini, ut88_state )
 	MCFG_DEFAULT_LAYOUT(layout_ut88mini)
 
 	/* Cassette */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rku_cassette_formats)

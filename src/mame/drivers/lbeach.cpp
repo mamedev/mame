@@ -50,11 +50,11 @@ public:
 
 	/* devices / memory pointers */
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_bg_vram;
-	required_shared_ptr<UINT8> m_fg_vram;
-	required_shared_ptr<UINT8> m_scroll_y;
-	required_shared_ptr<UINT8> m_sprite_x;
-	required_shared_ptr<UINT8> m_sprite_code;
+	required_shared_ptr<uint8_t> m_bg_vram;
+	required_shared_ptr<uint8_t> m_fg_vram;
+	required_shared_ptr<uint8_t> m_scroll_y;
+	required_shared_ptr<uint8_t> m_sprite_x;
+	required_shared_ptr<uint8_t> m_sprite_code;
 
 	int m_collision_bg_car;
 	int m_collision_fg_car;
@@ -77,7 +77,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lbeach);
-	UINT32 screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -118,14 +118,14 @@ TILE_GET_INFO_MEMBER(lbeach_state::get_bg_tile_info)
 	// d0-d4: code
 	// d5: unused?
 	// d6,d7: color
-	UINT8 code = m_bg_vram[tile_index];
+	uint8_t code = m_bg_vram[tile_index];
 
 	SET_TILE_INFO_MEMBER(1, code & 0x1f, code >> 6 & 3, 0);
 }
 
 TILE_GET_INFO_MEMBER(lbeach_state::get_fg_tile_info)
 {
-	UINT8 code = m_fg_vram[tile_index];
+	uint8_t code = m_fg_vram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
@@ -141,7 +141,7 @@ void lbeach_state::video_start()
 }
 
 
-UINT32 lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// draw bg layer (road)
 	m_bg_tilemap->set_scrolly(0, *m_scroll_y);
@@ -207,8 +207,8 @@ READ8_MEMBER(lbeach_state::lbeach_in1_r)
 READ8_MEMBER(lbeach_state::lbeach_in2_r)
 {
 	// d6 and d7 are for collision detection
-	UINT8 d6 = m_collision_fg_car ? 0x40 : 0;
-	UINT8 d7 = m_collision_bg_car ? 0x80 : 0;
+	uint8_t d6 = m_collision_fg_car ? 0x40 : 0;
+	uint8_t d7 = m_collision_bg_car ? 0x80 : 0;
 
 	return (ioport("IN2")->read() & 0x3f) | d6 | d7;
 }

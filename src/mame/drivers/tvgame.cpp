@@ -27,11 +27,11 @@ public:
 	{ }
 
 	DECLARE_WRITE8_MEMBER(speaker_w);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 };
 
 static ADDRESS_MAP_START( tvgame_mem, AS_PROGRAM, 8, tvgame_state )
@@ -64,14 +64,14 @@ WRITE8_MEMBER( tvgame_state::speaker_w )
 	m_speaker->level_w(BIT(data, 0));
 }
 
-UINT32 tvgame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tvgame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,gfx;
-	UINT16 sy=0,ma=241,x;
+	uint8_t y,gfx;
+	uint16_t sy=0,ma=241,x;
 
 	for (y = 0; y < 213; y++)
 	{
-		UINT16 *p = &bitmap.pix16(sy++);
+		uint16_t *p = &bitmap.pix16(sy++);
 		for (x = ma; x < ma+27; x++)
 		{
 			gfx = m_p_videoram[x];

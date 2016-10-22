@@ -7,7 +7,7 @@
 
 PALETTE_INIT_MEMBER(spdodgeb_state, spdodgeb)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0;i < palette.entries();i++)
 	{
@@ -53,8 +53,8 @@ TILEMAP_MAPPER_MEMBER(spdodgeb_state::background_scan)
 
 TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
 {
-	UINT8 code = m_videoram[tile_index];
-	UINT8 attr = m_videoram[tile_index + 0x800];
+	uint8_t code = m_videoram[tile_index];
+	uint8_t attr = m_videoram[tile_index + 0x800];
 	SET_TILE_INFO_MEMBER(0,
 			code + ((attr & 0x1f) << 8),
 			((attr & 0xe0) >> 5) + 8 * m_tile_palbank,
@@ -200,7 +200,7 @@ void spdodgeb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 #undef DRAW_SPRITE
 
 
-UINT32 spdodgeb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spdodgeb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,m_lastscroll+5);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);

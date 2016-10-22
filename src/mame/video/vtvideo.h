@@ -18,8 +18,8 @@ class vt100_video_device : public device_t,
 	public device_video_interface
 {
 public:
-	vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~vt100_video_device() {}
 
 	template<class _Object> static devcb_base &set_ram_rd_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(object); }
@@ -41,7 +41,7 @@ protected:
 
 	// internal state
 	void recompute_parameters();
-	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type);
+	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type);
 	TIMER_CALLBACK_MEMBER(lba7_change);
 
 	devcb_read8        m_read_ram;
@@ -53,20 +53,20 @@ protected:
 	int MHFU_counter;
 
 	// dc012 attributes
-	UINT8 m_scroll_latch;
+	uint8_t m_scroll_latch;
 	bool m_scroll_latch_valid;
-	UINT8 m_blink_flip_flop;
-	UINT8 m_reverse_field;
-	UINT8 m_basic_attribute;
+	uint8_t m_blink_flip_flop;
+	uint8_t m_reverse_field;
+	uint8_t m_basic_attribute;
 	// dc011 attributes
-	UINT8 m_columns;
-	UINT8 m_height;
-	UINT8 m_height_MAX;
-	UINT8 m_fill_lines;
-	UINT8 m_frequency;
-	UINT8 m_interlaced;
+	uint8_t m_columns;
+	uint8_t m_height;
+	uint8_t m_height_MAX;
+	uint8_t m_fill_lines;
+	uint8_t m_frequency;
+	uint8_t m_interlaced;
 
-	required_region_ptr<UINT8> m_char_rom; /* character rom region */
+	required_region_ptr<uint8_t> m_char_rom; /* character rom region */
 	required_device<palette_device> m_palette;
 
 	bool m_notify_vblank;
@@ -79,7 +79,7 @@ protected:
 class rainbow_video_device : public vt100_video_device
 {
 public:
-	rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void video_blanking(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -88,7 +88,7 @@ public:
 	void palette_select(int choice);
 	void notify_vblank(bool choice);
 protected:
-	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type) override;
+	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type) override;
 	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };

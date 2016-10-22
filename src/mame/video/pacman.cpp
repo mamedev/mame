@@ -65,7 +65,7 @@
 
 PALETTE_INIT_MEMBER(pacman_state,pacman)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -108,7 +108,7 @@ PALETTE_INIT_MEMBER(pacman_state,pacman)
 	/* allocate the colortable */
 	for (i = 0; i < 64*4; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 
 		/* first palette bank */
 		palette.set_pen_indirect(i, ctabentry);
@@ -202,7 +202,7 @@ WRITE8_MEMBER(pacman_state::pacman_flipscreen_w)
 }
 
 
-UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_bgpriority != 0)
 		bitmap.fill(0, cliprect);
@@ -211,8 +211,8 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 
 	if( m_spriteram != nullptr )
 	{
-		UINT8 *spriteram = m_spriteram;
-		UINT8 *spriteram_2 = m_spriteram2;
+		uint8_t *spriteram = m_spriteram;
+		uint8_t *spriteram_2 = m_spriteram2;
 		int offs;
 
 		rectangle spriteclip(2*8, 34*8-1, 0*8, 28*8-1);
@@ -224,7 +224,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 		{
 			int color;
 			int sx,sy;
-			UINT8 fx,fy;
+			uint8_t fx,fy;
 
 			if(m_inv_spr)
 			{
@@ -263,7 +263,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 		{
 			int color;
 			int sx,sy;
-			UINT8 fx,fy;
+			uint8_t fx,fy;
 
 			if(m_inv_spr)
 			{
@@ -390,10 +390,10 @@ VIDEO_START_MEMBER(pacman_state,s2650games)
 	m_bg_tilemap->set_scroll_cols(32);
 }
 
-UINT32 pacman_state::screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pacman_state::screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	UINT8 *spriteram_2 = m_spriteram2;
+	uint8_t *spriteram = m_spriteram;
+	uint8_t *spriteram_2 = m_spriteram2;
 	int offs;
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);

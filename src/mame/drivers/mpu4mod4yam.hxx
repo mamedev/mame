@@ -15,7 +15,7 @@ DRIVER_INIT_MEMBER( mpu4_state, m4_debug_mod4yam )
 
 	// many original barcrest / bwb sets have identification info around here
 	// this helps with sorting
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
 	for (int j=0;j<size;j+=0x10000)

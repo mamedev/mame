@@ -70,7 +70,7 @@ public:
 	bool spare_chip_select_enabled(void) { return m_gime_registers[0] & 0x04 ? true : false; }
 
 	// the GIME seems to intercept writes to $FF22 (not precisely sure how)
-	void ff22_write(UINT8 data) { m_ff22_value = data; }
+	void ff22_write(uint8_t data) { m_ff22_value = data; }
 
 	// updates the cart ROM
 	void update_cart_rom(void);
@@ -91,7 +91,7 @@ public:
 	void set_il2(bool value) { set_interrupt_value(INTERRUPT_EI2, value); }
 
 protected:
-	gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, const char *shortname, const char *source);
+	gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start(void) override;
@@ -105,33 +105,33 @@ protected:
 	virtual void new_frame(void) override;
 	virtual void horizontal_sync_changed(bool line) override;
 	virtual void enter_bottom_border(void) override;
-	virtual void record_border_scanline(UINT16 physical_scanline) override;
-	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline) override;
-	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock) override;
+	virtual void record_border_scanline(uint16_t physical_scanline) override;
+	virtual void record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
+	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) override;
 
 private:
 	typedef mc6847_friend_device super;
 
 	struct scanline_record
 	{
-		UINT8 m_border;
-		UINT8 m_line_in_row;
-		UINT8 m_ff22_value;
-		UINT8 m_ff98_value;
-		UINT8 m_ff99_value;
-		UINT8 m_mode[160];
-		UINT8 m_data[160];
-		UINT16 m_palette[160];
+		uint8_t m_border;
+		uint8_t m_line_in_row;
+		uint8_t m_ff22_value;
+		uint8_t m_ff98_value;
+		uint8_t m_ff99_value;
+		uint8_t m_mode[160];
+		uint8_t m_data[160];
+		uint16_t m_palette[160];
 	};
 
-	typedef UINT32 (gime_base_device::*get_data_func)(UINT32, UINT8 *, UINT8 *);
+	typedef uint32_t (gime_base_device::*get_data_func)(uint32_t, uint8_t *, uint8_t *);
 
 	class palette_resolver
 	{
 	public:
 		palette_resolver(gime_base_device *gime, const pixel_t *palette);
-		const pixel_t *get_palette(UINT16 palette_rotation);
-		pixel_t lookup(UINT8 color);
+		const pixel_t *get_palette(uint16_t palette_rotation);
+		pixel_t lookup(uint8_t color);
 
 	private:
 		gime_base_device *m_gime;
@@ -160,7 +160,7 @@ private:
 	static const device_timer_id TIMER_GIME_CLOCK = 4;
 
 	// statics
-	static const UINT8 hires_font[128][12];
+	static const uint8_t hires_font[128][12];
 
 	// callbacks
 	devcb_write_line   m_write_irq;
@@ -168,26 +168,26 @@ private:
 	devcb_read8        m_read_floating_bus;
 
 	// device state
-	UINT8                       m_gime_registers[16];
-	UINT8                       m_mmu[16];
-	UINT8                       m_ff22_value;
-	UINT8                       m_interrupt_value;
-	UINT8                       m_irq;
-	UINT8                       m_firq;
-	UINT16                      m_timer_value;
+	uint8_t                       m_gime_registers[16];
+	uint8_t                       m_mmu[16];
+	uint8_t                       m_ff22_value;
+	uint8_t                       m_interrupt_value;
+	uint8_t                       m_irq;
+	uint8_t                       m_firq;
+	uint16_t                      m_timer_value;
 	bool                        m_is_blinking;
 	bool                        m_composite_phase_invert;
 
 	// video state
 	bool                        m_legacy_video;
-	UINT32                      m_video_position;
-	UINT8                       m_line_in_row;
+	uint32_t                      m_video_position;
+	uint8_t                       m_line_in_row;
 	scanline_record             m_scanlines[25+192+26];
 	bool                        m_displayed_rgb;
 
 	// palette state
-	UINT8                       m_palette_rotated[1024][16];
-	UINT16                      m_palette_rotated_position;
+	uint8_t                       m_palette_rotated[1024][16];
+	uint16_t                      m_palette_rotated_position;
 	bool                        m_palette_rotated_position_used;
 
 	// incidentals
@@ -196,12 +196,12 @@ private:
 	cococart_slot_device *      m_cart_device;
 	memory_bank *               m_read_banks[9];
 	memory_bank *               m_write_banks[9];
-	UINT8 *                     m_rom;
-	UINT8 *                     m_cart_rom;
+	uint8_t *                     m_rom;
+	uint8_t *                     m_cart_rom;
 	pixel_t                     m_composite_palette[64];
 	pixel_t                     m_composite_bw_palette[64];
 	pixel_t                     m_rgb_palette[64];
-	UINT8                       m_dummy_bank[0x2000];
+	uint8_t                       m_dummy_bank[0x2000];
 
 	const char *m_maincpu_tag;  /* tag of main CPU */
 	const char *m_ram_tag;      /* tag of RAM device */
@@ -215,31 +215,31 @@ private:
 	static const device_timer_id TIMER_FSYNC_ON = 4;
 
 	// read/write
-	UINT8 read(offs_t offset);
-	UINT8 read_gime_register(offs_t offset);
-	UINT8 read_mmu_register(offs_t offset);
-	UINT8 read_palette_register(offs_t offset);
-	UINT8 read_floating_bus(void);
-	void write(offs_t offset, UINT8 data);
-	void write_gime_register(offs_t offset, UINT8 data);
-	void write_mmu_register(offs_t offset, UINT8 data);
-	void write_palette_register(offs_t offset, UINT8 data);
+	uint8_t read(offs_t offset);
+	uint8_t read_gime_register(offs_t offset);
+	uint8_t read_mmu_register(offs_t offset);
+	uint8_t read_palette_register(offs_t offset);
+	uint8_t read_floating_bus(void);
+	void write(offs_t offset, uint8_t data);
+	void write_gime_register(offs_t offset, uint8_t data);
+	void write_mmu_register(offs_t offset, uint8_t data);
+	void write_palette_register(offs_t offset, uint8_t data);
 	void write_sam_register(offs_t offset);
 
 	// memory
 	void update_memory(void);
 	void update_memory(int bank);
-	UINT8 *memory_pointer(UINT32 address);
+	uint8_t *memory_pointer(uint32_t address);
 
 	// interrupts
-	void interrupt_rising_edge(UINT8 interrupt);
+	void interrupt_rising_edge(uint8_t interrupt);
 	void recalculate_irq(void);
 	void recalculate_firq(void);
 
-	ATTR_FORCE_INLINE void set_interrupt_value(UINT8 interrupt, bool value)
+	ATTR_FORCE_INLINE void set_interrupt_value(uint8_t interrupt, bool value)
 	{
 		/* save the old interrupt value */
-		UINT8 old_interrupt_value = m_interrupt_value;
+		uint8_t old_interrupt_value = m_interrupt_value;
 
 		/* update the interrupt value */
 		if (value)
@@ -265,27 +265,27 @@ private:
 	void update_geometry(void);
 	void update_rgb_palette(void);
 	void update_composite_palette(void);
-	void update_border(UINT16 physical_scanline);
+	void update_border(uint16_t physical_scanline);
 	pixel_t get_composite_color(int color);
 	pixel_t get_rgb_color(int color);
 	offs_t get_video_base(void);
-	UINT16 get_lines_per_row(void);
-	UINT32 get_data_mc6847(UINT32 video_position, UINT8 *data, UINT8 *mode);
-	UINT32 get_data_without_attributes(UINT32 video_position, UINT8 *data, UINT8 *mode);
-	UINT32 get_data_with_attributes(UINT32 video_position, UINT8 *data, UINT8 *mode);
+	uint16_t get_lines_per_row(void);
+	uint32_t get_data_mc6847(uint32_t video_position, uint8_t *data, uint8_t *mode);
+	uint32_t get_data_without_attributes(uint32_t video_position, uint8_t *data, uint8_t *mode);
+	uint32_t get_data_with_attributes(uint32_t video_position, uint8_t *data, uint8_t *mode);
 
 	// template function for doing video update collection
-	template<UINT8 xres, get_data_func get_data, bool record_mode>
-	UINT32 record_scanline_res(int scanline);
+	template<uint8_t xres, get_data_func get_data, bool record_mode>
+	uint32_t record_scanline_res(int scanline);
 
 	// rendering sampled graphics
-	typedef UINT32 (gime_base_device::*emit_samples_proc)(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
-	UINT32 emit_dummy_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
-	UINT32 emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	typedef uint32_t (gime_base_device::*emit_samples_proc)(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	uint32_t emit_dummy_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	uint32_t emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
 	template<int xscale>
-	UINT32 emit_gime_text_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	uint32_t emit_gime_text_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
 	template<int xscale, int bits_per_pixel>
-	UINT32 emit_gime_graphics_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	uint32_t emit_gime_graphics_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
 	template<int sample_count, emit_samples_proc emit_samples>
 	void render_scanline(const scanline_record *scanline, pixel_t *pixels, int min_x, int max_x, palette_resolver *resolver);
 };
@@ -298,13 +298,13 @@ private:
 class gime_ntsc_device : public gime_base_device
 {
 public:
-	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class gime_pal_device : public gime_base_device
 {
 public:
-	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type GIME_NTSC;

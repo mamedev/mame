@@ -64,7 +64,7 @@ class via6522_device :  public device_t
 {
 public:
 	// construction/destruction
-	via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// TODO: REMOVE THESE
 	template<class _Object> static devcb_base &set_readpa_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_a_handler.set_callback(object); }
@@ -140,7 +140,7 @@ private:
 	static const device_timer_id TIMER_T2 = 2;
 	static const device_timer_id TIMER_CA2 = 3;
 
-	UINT16 get_counter1_value();
+	uint16_t get_counter1_value();
 
 	void set_int(int data);
 	void clear_int(int data);
@@ -149,9 +149,9 @@ private:
 	void write_pa(int line, int state);
 	void write_pb(int line, int state);
 
-	UINT8 input_pa();
+	uint8_t input_pa();
 	void output_pa();
-	UINT8 input_pb();
+	uint8_t input_pb();
 	void output_pb();
 	void output_irq();
 
@@ -168,49 +168,49 @@ private:
 	devcb_write_line m_cb2_handler;
 	devcb_write_line m_irq_handler;
 
-	UINT8 m_in_a;
+	uint8_t m_in_a;
 	int m_in_ca1;
 	int m_in_ca2;
-	UINT8 m_out_a;
+	uint8_t m_out_a;
 	int m_out_ca2;
-	UINT8 m_ddr_a;
-	UINT8 m_latch_a;
+	uint8_t m_ddr_a;
+	uint8_t m_latch_a;
 
-	UINT8 m_in_b;
+	uint8_t m_in_b;
 	int m_in_cb1;
 	int m_in_cb2;
-	UINT8 m_out_b;
+	uint8_t m_out_b;
 	int m_out_cb1;
 	int m_out_cb2;
-	UINT8 m_ddr_b;
-	UINT8 m_latch_b;
+	uint8_t m_ddr_b;
+	uint8_t m_latch_b;
 
-	UINT8 m_t1cl;
-	UINT8 m_t1ch;
-	UINT8 m_t1ll;
-	UINT8 m_t1lh;
-	UINT8 m_t2cl;
-	UINT8 m_t2ch;
-	UINT8 m_t2ll;
-	UINT8 m_t2lh;
+	uint8_t m_t1cl;
+	uint8_t m_t1ch;
+	uint8_t m_t1ll;
+	uint8_t m_t1lh;
+	uint8_t m_t2cl;
+	uint8_t m_t2ch;
+	uint8_t m_t2ll;
+	uint8_t m_t2lh;
 
-	UINT8 m_sr;
-	UINT8 m_pcr;
-	UINT8 m_acr;
-	UINT8 m_ier;
-	UINT8 m_ifr;
+	uint8_t m_sr;
+	uint8_t m_pcr;
+	uint8_t m_acr;
+	uint8_t m_ier;
+	uint8_t m_ifr;
 
 	emu_timer *m_t1;
 	attotime m_time1;
-	UINT8 m_t1_active;
+	uint8_t m_t1_active;
 	int m_t1_pb7;
 	emu_timer *m_t2;
 	attotime m_time2;
-	UINT8 m_t2_active;
+	uint8_t m_t2_active;
 	emu_timer *m_ca2_timer;
 
 	emu_timer *m_shift_timer;
-	UINT8 m_shift_counter;
+	uint8_t m_shift_counter;
 };
 
 

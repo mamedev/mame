@@ -64,7 +64,7 @@ void namcos22_renderer::reset()
 /*********************************************************************************************/
 
 // poly scanline callbacks
-void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
+void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
 {
 	float z = extent.param[0].start;
 	float u = extent.param[1].start;
@@ -76,7 +76,7 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 	float di = extent.param[3].dpdx;
 	int bn = extra.bn * 0x1000;
 	const pen_t *pens = extra.pens;
-	const UINT8 *czram = extra.czram;
+	const uint8_t *czram = extra.czram;
 	int cz_adjust = extra.cz_adjust;
 	int cz_sdelta = extra.cz_sdelta;
 	int zfog_enabled = extra.zfog_enabled;
@@ -90,12 +90,12 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 	int penmask = 0xff;
 	int penshift = 0;
 	int prioverchar = extra.prioverchar;
-	UINT32 *dest = &extra.destbase->pix32(scanline);
-	UINT8 *primap = &extra.primap->pix8(scanline);
-	UINT16 *ttmap = m_state.m_texture_tilemap;
-	UINT8 *ttattr = m_state.m_texture_tileattr.get();
-	UINT8 *ttdata = m_state.m_texture_tiledata;
-	UINT8 *tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel.get();
+	uint32_t *dest = &extra.destbase->pix32(scanline);
+	uint8_t *primap = &extra.primap->pix8(scanline);
+	uint16_t *ttmap = m_state.m_texture_tilemap;
+	uint8_t *ttattr = m_state.m_texture_tileattr.get();
+	uint8_t *ttdata = m_state.m_texture_tiledata;
+	uint8_t *tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel.get();
 
 	if (extra.cmode & 4)
 	{
@@ -118,16 +118,16 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 		for (int x = extent.startx; x < extent.stopx; x++)
 		{
 			float ooz = 1.0f / z;
-			INT32 tx = (int)(u * ooz);
-			INT32 ty = (int)(v * ooz) + bn;
-			INT32 to = ((ty & 0xfff0) << 4) | ((tx & 0xff0) >> 4);
-			INT32 pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
+			int32_t tx = (int)(u * ooz);
+			int32_t ty = (int)(v * ooz) + bn;
+			int32_t to = ((ty & 0xfff0) << 4) | ((tx & 0xff0) >> 4);
+			int32_t pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
 			// pen = 0x55; // debug: disable textures
 
 			rgbaint_t rgb(pens[pen >> penshift & penmask]);
 
 			// apply shading before fog
-			INT32 shade = i*ooz;
+			int32_t shade = i*ooz;
 			rgb.scale_imm_and_clamp(shade << 2);
 
 			// per-z distance fogging
@@ -135,7 +135,7 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 			{
 				int cz = ooz + cz_adjust;
 				// discard low byte and clamp to 0-1fff
-				if ((UINT32)cz < 0x200000) cz >>= 8;
+				if ((uint32_t)cz < 0x200000) cz >>= 8;
 				else cz = (cz < 0) ? 0 : 0x1fff;
 				fogfactor = czram[cz] + cz_sdelta;
 				if (fogfactor > 0)
@@ -191,7 +191,7 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 			{
 				int cz = ooz + cz_adjust;
 				// discard low byte and clamp to 0-1fff
-				if ((UINT32)cz < 0x200000) cz >>= 8;
+				if ((uint32_t)cz < 0x200000) cz >>= 8;
 				else cz = (cz < 0) ? 0 : 0x1fff;
 				fogfactor = czram[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ cz];
 				if (fogfactor != 0)
@@ -225,7 +225,7 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 }
 
 
-void namcos22_renderer::renderscanline_sprite(INT32 scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
+void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
 {
 	int y_index = extent.param[1].start - extra.flipy;
 	float x_index = extent.param[0].start - extra.flipx;
@@ -237,9 +237,9 @@ void namcos22_renderer::renderscanline_sprite(INT32 scanline, const extent_t &ex
 	int fadefactor = 0xff - extra.fadefactor;
 	rgbaint_t fogcolor(extra.fogcolor);
 	rgbaint_t fadecolor(extra.fadecolor);
-	UINT8 *source = (UINT8 *)extra.source + y_index * extra.line_modulo;
-	UINT32 *dest = &extra.destbase->pix32(scanline);
-	UINT8 *primap = &extra.primap->pix8(scanline);
+	uint8_t *source = (uint8_t *)extra.source + y_index * extra.line_modulo;
+	uint32_t *dest = &extra.destbase->pix32(scanline);
+	uint8_t *primap = &extra.primap->pix8(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -440,7 +440,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			int cztype = flags & 3;
 			if (nthword(m_state.m_czattr, 4) & (4 << (cztype * 4)))
 			{
-				int delta = (INT16)nthword(m_state.m_czattr, cztype);
+				int delta = (int16_t)nthword(m_state.m_czattr, cztype);
 				extra.fogcolor.set(0, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
 				if (direct)
 				{
@@ -492,7 +492,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			else
 			{
 				extra.zfog_enabled = 1;
-				extra.czram = (UINT8*)&m_state.m_czram[cztype << (13-2)];
+				extra.czram = (uint8_t*)&m_state.m_czram[cztype << (13-2)];
 			}
 		}
 	}
@@ -504,8 +504,8 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 void namcos22_renderer::poly3d_drawsprite(
 	screen_device &screen,
 	bitmap_rgb32 &dest_bmp,
-	UINT32 code,
-	UINT32 color,
+	uint32_t code,
+	uint32_t color,
 	int flipx, int flipy,
 	int sx, int sy,
 	int scalex, int scaley,
@@ -646,7 +646,7 @@ struct namcos22_scenenode *namcos22_renderer::alloc_scenenode(running_machine &m
 	return node;
 }
 
-struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &machine, UINT32 zsort, namcos22_scenenode_type type)
+struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &machine, uint32_t zsort, namcos22_scenenode_type type)
 {
 	struct namcos22_scenenode *node = &m_scenenode_root;
 	struct namcos22_scenenode *prev = nullptr;
@@ -744,9 +744,9 @@ void namcos22_renderer::render_scene(screen_device &screen, bitmap_rgb32 &bitmap
 
 // slave dsp render
 
-float namcos22_state::dspfloat_to_nativefloat(UINT32 val)
+float namcos22_state::dspfloat_to_nativefloat(uint32_t val)
 {
-	INT16 mantissa = (INT16)val;
+	int16_t mantissa = (int16_t)val;
 	float result = mantissa;//?((float)mantissa):((float)0x10000);
 	int exponent = (val >> 16) & 0xff;
 	while (exponent < 0x2e)
@@ -811,7 +811,7 @@ void namcos22_state::transform_normal(float *nx, float *ny, float *nz, float m[4
 	*nz = m[0][2]*x + m[1][2]*y + m[2][2]*z;
 }
 
-void namcos22_state::register_normals(INT32 addr, float m[4][4])
+void namcos22_state::register_normals(int32_t addr, float m[4][4])
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -830,7 +830,7 @@ void namcos22_state::register_normals(INT32 addr, float m[4][4])
 }
 
 
-void namcos22_state::draw_direct_poly(const UINT16 *src)
+void namcos22_state::draw_direct_poly(const uint16_t *src)
 {
 	if (machine().video().skip_this_frame())
 		return;
@@ -862,7 +862,7 @@ void namcos22_state::draw_direct_poly(const UINT16 *src)
 	*    xx-- ---- // BRI
 	*    --xx xxxx // zpos
 	*/
-	UINT32 zsort = ((src[1] & 0xfff) << 12) | (src[0] & 0xfff);
+	uint32_t zsort = ((src[1] & 0xfff) << 12) | (src[0] & 0xfff);
 	struct namcos22_scenenode *node = m_poly->new_scenenode(machine(), zsort, NAMCOS22_SCENENODE_QUAD);
 	int cztype = src[3] & 3;
 
@@ -896,7 +896,7 @@ void namcos22_state::draw_direct_poly(const UINT16 *src)
 			p->v = src[1] & 0x0fff;
 		}
 
-		int mantissa = (INT16)src[5];
+		int mantissa = (int16_t)src[5];
 		float zf = (float)mantissa;
 		int exponent = (src[4]) & 0xff;
 		if (mantissa)
@@ -923,8 +923,8 @@ void namcos22_state::draw_direct_poly(const UINT16 *src)
 			p->z = 1.0f / zf;
 		}
 
-		p->x = (INT16)src[2];
-		p->y = -(INT16)src[3];
+		p->x = (int16_t)src[2];
+		p->y = -(int16_t)src[3];
 		p->bri = src[4] >> 8;
 		src += 6;
 	}
@@ -969,10 +969,10 @@ void namcos22_state::draw_direct_poly(const UINT16 *src)
  *    0x07350 - guardrail
  *    0x061a8 - red car
  */
-void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, UINT32 color, UINT32 addr, float m[4][4], INT32 polyshift, int flags, int packetformat)
+void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint32_t addr, float m[4][4], int32_t polyshift, int flags, int packetformat)
 {
 	int absolute_priority = m_absolute_priority;
-	INT32 zsort;
+	int32_t zsort;
 	float zmin = 0.0f;
 	float zmax = 0.0f;
 	namcos22_polyvertex v[4];
@@ -1045,15 +1045,15 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, UINT32 color, UINT32
 	switch (flags & 0x300)
 	{
 		case 0x000:
-			zsort = (INT32)zmin;
+			zsort = (int32_t)zmin;
 			break;
 
 		case 0x100:
-			zsort = (INT32)zmax;
+			zsort = (int32_t)zmax;
 			break;
 
 		default:
-			zsort = (INT32)((zmin + zmax) / 2.0f);
+			zsort = (int32_t)((zmin + zmax) / 2.0f);
 			break;
 	}
 
@@ -1110,7 +1110,7 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, UINT32 color, UINT32
 }
 
 
-void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, INT32 addr, float m[4][4], INT32 base)
+void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4], int32_t base)
 {
 //  int additionalnormals = 0;
 	int chunklength = point_read(addr++);
@@ -1201,13 +1201,13 @@ void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, INT32 addr, float m[4][4],
 
 void namcos22_state::blit_polyobject(bitmap_rgb32 &bitmap, int code, float m[4][4])
 {
-	UINT32 addr1 = point_read(code);
+	uint32_t addr1 = point_read(code);
 	m_LitSurfaceCount = 0;
 	m_LitSurfaceIndex = 0;
 
 	for (;;)
 	{
-		INT32 addr2 = point_read(addr1++);
+		int32_t addr2 = point_read(addr1++);
 		if (addr2 < 0)
 			break;
 		blit_quads(bitmap, addr2, m, code);
@@ -1254,7 +1254,7 @@ void namcos22_state::blit_polyobject(bitmap_rgb32 &bitmap, int code, float m[4][
  * 0x5: transform
  * >=0x45: draw primitive
  */
-void namcos22_state::slavesim_handle_bb0003(const INT32 *src)
+void namcos22_state::slavesim_handle_bb0003(const int32_t *src)
 {
 	/*
 	    bb0003 or 3b0003
@@ -1282,8 +1282,8 @@ void namcos22_state::slavesim_handle_bb0003(const INT32 *src)
 	m_camera_lz = dspfixed_to_nativefloat(src[0x4]);
 
 	m_absolute_priority = src[0x3] >> 16;
-	m_camera_vx = (INT16)(src[5] >> 16);
-	m_camera_vy = (INT16)(src[5] & 0xffff);
+	m_camera_vx = (int16_t)(src[5] >> 16);
+	m_camera_vy = (int16_t)(src[5] & 0xffff);
 	m_camera_zoom = dspfloat_to_nativefloat(src[6]);
 	m_camera_vw = dspfloat_to_nativefloat(src[7]) * m_camera_zoom;
 	m_camera_vh = dspfloat_to_nativefloat(src[9]) * m_camera_zoom;
@@ -1303,7 +1303,7 @@ void namcos22_state::slavesim_handle_bb0003(const INT32 *src)
 	transform_normal(&m_camera_lx, &m_camera_ly, &m_camera_lz, m_viewmatrix);
 }
 
-void namcos22_state::slavesim_handle_200002(bitmap_rgb32 &bitmap, const INT32 *src)
+void namcos22_state::slavesim_handle_200002(bitmap_rgb32 &bitmap, const int32_t *src)
 {
 	if (m_PrimitiveID >= 0x45)
 	{
@@ -1337,7 +1337,7 @@ void namcos22_state::slavesim_handle_200002(bitmap_rgb32 &bitmap, const INT32 *s
 	}
 }
 
-void namcos22_state::slavesim_handle_300000(const INT32 *src)
+void namcos22_state::slavesim_handle_300000(const int32_t *src)
 {
 	m_viewmatrix[0][0] = dspfixed_to_nativefloat(src[1]);
 	m_viewmatrix[1][0] = dspfixed_to_nativefloat(src[2]);
@@ -1352,7 +1352,7 @@ void namcos22_state::slavesim_handle_300000(const INT32 *src)
 	m_viewmatrix[2][2] = dspfixed_to_nativefloat(src[9]);
 }
 
-void namcos22_state::slavesim_handle_233002(const INT32 *src)
+void namcos22_state::slavesim_handle_233002(const int32_t *src)
 {
 	/*
 	00233002
@@ -1370,8 +1370,8 @@ void namcos22_state::slavesim_handle_233002(const INT32 *src)
 
 void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 {
-	const INT32 *src = 0x300 + (INT32 *)m_polygonram.target();
-	INT16 len;
+	const int32_t *src = 0x300 + (int32_t *)m_polygonram.target();
+	int16_t len;
 
 	matrix3d_identity(m_viewmatrix);
 
@@ -1386,9 +1386,9 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 
 	for (;;)
 	{
-		INT16 next;
+		int16_t next;
 		m_PrimitiveID = *src++;
-		len  = (INT16)*src++;
+		len  = (int16_t)*src++;
 
 		switch (len)
 		{
@@ -1409,7 +1409,7 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 				break;
 
 			default:
-				logerror("unk 3d data(%d) addr=0x%x!", len, (int)(src-(INT32*)m_polygonram.target()));
+				logerror("unk 3d data(%d) addr=0x%x!", len, (int)(src-(int32_t*)m_polygonram.target()));
 				{
 					int i;
 					for (i = 0; i < len; i++)
@@ -1424,8 +1424,8 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 		/* hackery! commands should be streamed, not parsed here */
 		src += len;
 		src++; /* always 0xffff */
-		next = (INT16)*src++; /* link to next command */
-		if ((next & 0x7fff) != (src - (INT32 *)m_polygonram.target()))
+		next = (int16_t)*src++; /* link to next command */
+		if ((next & 0x7fff) != (src - (int32_t *)m_polygonram.target()))
 		{
 			/* end of list */
 			break;
@@ -1446,7 +1446,7 @@ void namcos22_state::draw_polygons(bitmap_rgb32 &bitmap)
 
 /*********************************************************************************************/
 
-void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT32 *src, const UINT32 *attr, int num_sprites, int deltax, int deltay, int y_lowres)
+void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *src, const uint32_t *attr, int num_sprites, int deltax, int deltay, int y_lowres)
 {
 	for (int i = 0; i < num_sprites; i++)
 	{
@@ -1496,11 +1496,11 @@ void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cl
 		int linktype = (src[2] & 0x00ff0000) >> 16;
 		int flipx = (src[2] >> 7) & 0x1;
 		int cols = (src[2] >> 4) & 0x7;
-		UINT32 code = src[3];
+		uint32_t code = src[3];
 		int tile = code >> 16;
 		int translucency = (code & 0xff00) >> 8;
 
-		UINT32 zcoord = attr[0] & 0x00ffffff;
+		uint32_t zcoord = attr[0] & 0x00ffffff;
 		int color = attr[1] >> 16;
 		int cz = attr[1] & 0xff;
 
@@ -1509,10 +1509,10 @@ void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cl
 
 		// set window clipping
 		int clip = src[2] >> 23 & 0xe;
-		int cx_min = -deltax + (INT16)(m_spriteram[0x80|clip] >> 16);
-		int cx_max = -deltax + (INT16)(m_spriteram[0x80|clip] & 0xffff);
-		int cy_min = -deltay + (INT16)(m_spriteram[0x81|clip] >> 16);
-		int cy_max = -deltay + (INT16)(m_spriteram[0x81|clip] & 0xffff);
+		int cx_min = -deltax + (int16_t)(m_spriteram[0x80|clip] >> 16);
+		int cx_max = -deltax + (int16_t)(m_spriteram[0x80|clip] & 0xffff);
+		int cy_min = -deltay + (int16_t)(m_spriteram[0x81|clip] >> 16);
+		int cy_max = -deltay + (int16_t)(m_spriteram[0x81|clip] & 0xffff);
 
 		if (rows == 0) rows = 8;
 		if (cols == 0) cols = 8;
@@ -1573,8 +1573,8 @@ void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cl
 
 void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const UINT32 *src;
-	const UINT32 *attr;
+	const uint32_t *src;
+	const uint32_t *attr;
 
 #if 0 // show reg contents
 	int i;
@@ -1698,7 +1698,7 @@ void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 READ32_MEMBER(namcos22_state::namcos22s_vics_control_r)
 {
-	UINT32 ret = m_vics_control[offset];
+	uint32_t ret = m_vics_control[offset];
 
 	switch (offset*4)
 	{
@@ -1731,7 +1731,7 @@ WRITE32_MEMBER(namcos22_state::namcos22s_vics_control_w)
 
 TILE_GET_INFO_MEMBER(namcos22_state::get_text_tile_info)
 {
-	UINT16 data = nthword(m_textram, tile_index);
+	uint16_t data = nthword(m_textram, tile_index);
 	/**
 	* xxxx.----.----.---- palette select
 	* ----.xx--.----.---- flip
@@ -1759,7 +1759,7 @@ READ32_MEMBER(namcos22_state::namcos22_tilemapattr_r)
 	{
 		case 2:
 		{
-			UINT16 lo, hi = (m_tilemapattr[offset] & 0xffff0000) >> 16;
+			uint16_t lo, hi = (m_tilemapattr[offset] & 0xffff0000) >> 16;
 			// assume current scanline, 0x1ff if in vblank (used in alpinesa)
 			// or maybe relative to posirq?
 			if (m_screen->vblank()) lo = 0x1ff;
@@ -1874,15 +1874,15 @@ WRITE32_MEMBER(namcos22_state::namcos22s_spotram_w)
 void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival)
 {
 	const pen_t *pens = m_palette->pens();
-	UINT16 *src;
-	UINT32 *dest;
-	UINT8 *pri;
+	uint16_t *src;
+	uint32_t *dest;
+	uint8_t *pri;
 
 	// prepare alpha
-	UINT8 alpha_check12 = nthbyte(m_mixer, 0x12);
-	UINT8 alpha_check13 = nthbyte(m_mixer, 0x13);
-	UINT8 alpha_mask    = nthbyte(m_mixer, 0x14);
-	UINT8 alpha_factor  = nthbyte(m_mixer, 0x15);
+	uint8_t alpha_check12 = nthbyte(m_mixer, 0x12);
+	uint8_t alpha_check13 = nthbyte(m_mixer, 0x13);
+	uint8_t alpha_mask    = nthbyte(m_mixer, 0x14);
+	uint8_t alpha_factor  = nthbyte(m_mixer, 0x15);
 
 	// prepare spot
 	int spot_flags = m_mixer_flags >> 16;
@@ -1910,7 +1910,7 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 				// apply alpha
 				if (alpha_factor)
 				{
-					UINT8 pen = src[x] & 0xff;
+					uint8_t pen = src[x] & 0xff;
 					if ((pen & 0xf) == alpha_mask || pen == alpha_check12 || pen == alpha_check13)
 					{
 						rgb.blend(rgbaint_t(dest[x]), 0xff - alpha_factor);
@@ -1920,7 +1920,7 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 				// apply spot
 				if (spot_enabled)
 				{
-					UINT8 pen = src[x] & 0xff;
+					uint8_t pen = src[x] & 0xff;
 					rgbaint_t mix(dest[x]);
 					if (spot_flags & 8)
 					{
@@ -1950,13 +1950,13 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = m_palette->pens();
-	UINT16 *src;
-	UINT32 *dest;
-	UINT8 *pri;
+	uint16_t *src;
+	uint32_t *dest;
+	uint8_t *pri;
 
-	const UINT8 *rlut = &m_gamma_proms[0x000];
-	const UINT8 *glut = &m_gamma_proms[0x100];
-	const UINT8 *blut = &m_gamma_proms[0x200];
+	const uint8_t *rlut = &m_gamma_proms[0x000];
+	const uint8_t *glut = &m_gamma_proms[0x100];
+	const uint8_t *blut = &m_gamma_proms[0x200];
 
 	// prepare fader and shadow factor
 	bool fade_enabled = m_mixer_flags & 2 && m_poly_fade_enabled;
@@ -1977,7 +1977,7 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 		pri = &screen.priority().pix8(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT32 pixel = dest[x];
+			uint32_t pixel = dest[x];
 
 			// skip if transparent or under poly
 			if (pri[x] == 2)
@@ -2073,8 +2073,8 @@ void namcos22_state::update_palette()
 WRITE32_MEMBER(namcos22_state::namcos22s_czram_w)
 {
 	int bank = nthword(m_czattr, 0xa/2) & 3;
-	UINT32 prev = (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
-	UINT32 temp = prev;
+	uint32_t prev = (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
+	uint32_t temp = prev;
 	COMBINE_DATA(&temp);
 	data = temp;
 	m_banked_czram[bank][offset * 2] = data >> 16;
@@ -2286,7 +2286,7 @@ void namcos22_state::update_mixer()
 
 /*********************************************************************************************/
 
-UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_mixer();
 	update_palette();
@@ -2303,7 +2303,7 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 	bitmap.fill(bg_color.to_rgba(), cliprect);
 
 	// layers
-	UINT8 layer = nthbyte(m_mixer, 0x1f);
+	uint8_t layer = nthbyte(m_mixer, 0x1f);
 	if (layer & 4) draw_text_layer(screen, bitmap, cliprect);
 	if (layer & 2) draw_sprites(bitmap, cliprect);
 	if (layer & 1) draw_polygons(bitmap);
@@ -2311,12 +2311,12 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 	if (layer & 4) namcos22s_mix_text_layer(screen, bitmap, cliprect, 6);
 
 	// apply gamma
-	const UINT8 *rlut = (const UINT8 *)&m_mixer[0x100/4];
-	const UINT8 *glut = (const UINT8 *)&m_mixer[0x200/4];
-	const UINT8 *blut = (const UINT8 *)&m_mixer[0x300/4];
+	const uint8_t *rlut = (const uint8_t *)&m_mixer[0x100/4];
+	const uint8_t *glut = (const uint8_t *)&m_mixer[0x200/4];
+	const uint8_t *blut = (const uint8_t *)&m_mixer[0x300/4];
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32 *dest = &bitmap.pix32(y);
+		uint32_t *dest = &bitmap.pix32(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int rgb = dest[x];
@@ -2330,7 +2330,7 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_mixer();
 	update_palette();
@@ -2353,7 +2353,7 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 
 void namcos22_state::init_tables()
 {
-	m_dirtypal = std::make_unique<UINT8[]>(0x8000/4);
+	m_dirtypal = std::make_unique<uint8_t[]>(0x8000/4);
 	memset(m_dirtypal.get(), 1, 0x8000/4);
 	memset(m_paletteram, 0, 0x8000);
 
@@ -2361,43 +2361,43 @@ void namcos22_state::init_tables()
 
 	// init spotram (super22 only)
 	if (m_is_ss22)
-		m_spotram = make_unique_clear<UINT16[]>(SPOTRAM_SIZE);
+		m_spotram = make_unique_clear<uint16_t[]>(SPOTRAM_SIZE);
 
 	// init czram tables (super22 only)
 	if (m_is_ss22)
 	{
 		for (int table = 0; table < 4; table++)
 		{
-			m_banked_czram[table] = make_unique_clear<UINT16[]>(0x100);
-			m_recalc_czram[table] = make_unique_clear<UINT8[]>(0x2000);
+			m_banked_czram[table] = make_unique_clear<uint16_t[]>(0x100);
+			m_recalc_czram[table] = make_unique_clear<uint8_t[]>(0x2000);
 			m_cz_was_written[table] = 1;
 		}
 	}
 
 	// init pointrom
 	m_pointrom_size = memregion("pointrom")->bytes()/3;
-	m_pointrom = auto_alloc_array(machine(), INT32, m_pointrom_size);
-	UINT8* pointrom_low = memregion("pointrom")->base();
-	UINT8* pointrom_mid = pointrom_low + m_pointrom_size;
-	UINT8* pointrom_high = pointrom_mid + m_pointrom_size;
+	m_pointrom = auto_alloc_array(machine(), int32_t, m_pointrom_size);
+	uint8_t* pointrom_low = memregion("pointrom")->base();
+	uint8_t* pointrom_mid = pointrom_low + m_pointrom_size;
+	uint8_t* pointrom_high = pointrom_mid + m_pointrom_size;
 	for (int i = 0; i < m_pointrom_size; i++)
 	{
 		m_pointrom[i] = signed24(pointrom_high[i] << 16 | pointrom_mid[i] << 8 | pointrom_low[i]);
 	}
 
-	m_pointram = make_unique_clear<UINT32[]>(0x20000);
+	m_pointram = make_unique_clear<uint32_t[]>(0x20000);
 
 	// force all texture tiles to be decoded now
 	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)
 		m_gfxdecode->gfx(1)->get_data(i);
 
-	m_texture_tilemap = (UINT16 *)memregion("textilemap")->base();
-	m_texture_tiledata = (UINT8 *)m_gfxdecode->gfx(1)->get_data(0);
-	m_texture_tileattr = std::make_unique<UINT8[]>(0x080000*2);
+	m_texture_tilemap = (uint16_t *)memregion("textilemap")->base();
+	m_texture_tiledata = (uint8_t *)m_gfxdecode->gfx(1)->get_data(0);
+	m_texture_tileattr = std::make_unique<uint8_t[]>(0x080000*2);
 
 	// unpack textures
-	UINT8 *packed_tileattr = 0x200000 + (UINT8 *)memregion("textilemap")->base();
-	UINT8 *unpacked_tileattr = m_texture_tileattr.get();
+	uint8_t *packed_tileattr = 0x200000 + (uint8_t *)memregion("textilemap")->base();
+	uint8_t *unpacked_tileattr = m_texture_tileattr.get();
 	for (int i = 0; i < 0x80000; i++)
 	{
 		*unpacked_tileattr++ = (*packed_tileattr) >> 4;
@@ -2406,7 +2406,7 @@ void namcos22_state::init_tables()
 	}
 
 	// make attr/y/x lookup table
-	m_texture_ayx_to_pixel = std::make_unique<UINT8[]>(16*16*16);
+	m_texture_ayx_to_pixel = std::make_unique<uint8_t[]>(16*16*16);
 	for (int attr = 0; attr < 16; attr++)
 	{
 		for (int y = 0; y < 16; y++)
@@ -2469,7 +2469,7 @@ void namcos22_state::video_start()
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos22_state::get_text_tile_info), this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 
-	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_cgram.target());
+	m_gfxdecode->gfx(0)->set_source((uint8_t *)m_cgram.target());
 
 	m_poly = auto_alloc(machine(), namcos22_renderer(*this));
 }

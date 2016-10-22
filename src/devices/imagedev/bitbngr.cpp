@@ -21,7 +21,7 @@ const device_type BITBANGER = &device_creator<bitbanger_device>;
     ctor
 -------------------------------------------------*/
 
-bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BITBANGER, "Bitbanger", tag, owner, clock, "bitbanger", __FILE__),
 	device_image_interface(mconfig, *this)
 {
@@ -33,7 +33,7 @@ bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *ta
     native_output - outputs data to a file
 -------------------------------------------------*/
 
-void bitbanger_device::output(UINT8 data)
+void bitbanger_device::output(uint8_t data)
 {
 	if (exists())
 	{
@@ -46,7 +46,7 @@ void bitbanger_device::output(UINT8 data)
     native_input - inputs data from a file
 -------------------------------------------------*/
 
-UINT32 bitbanger_device::input(void *buffer, UINT32 length)
+uint32_t bitbanger_device::input(void *buffer, uint32_t length)
 {
 	if (exists())
 	{

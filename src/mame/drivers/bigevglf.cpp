@@ -93,7 +93,7 @@ READ8_MEMBER(bigevglf_state::beg_fromsound_r)
 
 READ8_MEMBER(bigevglf_state::beg_soundstate_r)
 {
-	UINT8 ret = m_sound_state;
+	uint8_t ret = m_sound_state;
 	/* set a timer to force synchronization after the read */
 	machine().scheduler().synchronize();
 	m_sound_state &= ~2; /* read from port 21 clears bit 1 in status */
@@ -602,7 +602,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(bigevglf_state,bigevglf)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0xff, &ROM[0x10000], 0x800);
 }
 

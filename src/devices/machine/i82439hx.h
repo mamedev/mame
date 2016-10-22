@@ -14,7 +14,7 @@
 
 class i82439hx_host_device : public pci_host_device {
 public:
-	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);
@@ -49,8 +49,8 @@ public:
 
 	virtual void reset_all_mappings() override;
 
-	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-						   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
@@ -62,11 +62,11 @@ private:
 	const char *cpu_tag;
 	int ram_size;
 	cpu_device *cpu;
-	std::vector<UINT32> ram;
+	std::vector<uint32_t> ram;
 
-	UINT8 pcon, cc, dramec, dramc, dramt;
-	UINT8 pam[7], drb[8];
-	UINT8 drt, drat, smram, errcmd, errsts, errsyn;
+	uint8_t pcon, cc, dramec, dramc, dramt;
+	uint8_t pam[7], drb[8];
+	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
 };
 
 extern const device_type I82439HX;

@@ -83,7 +83,7 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
-	//const UINT16 stop_values[4] = { 0xc00, 0, 0, 0 };
+	//const uint16_t stop_values[4] = { 0xc00, 0, 0, 0 };
 	address_space &space = machine().driver_data()->generic_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
@@ -202,7 +202,7 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	return 0;
 }
 
-void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 header, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
+void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t header, int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t y1, int32_t y2, int32_t *nx1, int32_t *nx2 )
 {
 	if (y1 > cliprect.max_y)
 		return;
@@ -231,7 +231,7 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	if (x1 > x2 || (x1==x2 && sl1 > sl2))
 	{
-		INT32 t, *tp;
+		int32_t t, *tp;
 		t = x1;
 		x1 = x2;
 		x2 = t;
@@ -298,10 +298,10 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void taitoair_state::fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q )
 {
-	INT32 sl1, sl2, cury, limy, x1, x2;
+	int32_t sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
 	struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT * 2];
-	UINT16 header = q->header;
+	uint16_t header = q->header;
 	int pcount = q->pcount;
 
 	for (i = 0; i < pcount; i++)
@@ -507,17 +507,17 @@ void taitoair_state::video_start()
 	//m_buffer3d = std::make_unique<bitmap_ind16>(width, height);
 }
 
-UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int sprite_ptr;
 	m_tc0080vco->tilemap_update();
 
-	UINT32 counter1 = (m_tc0430grw[0] << 16) | m_tc0430grw[1];
-	UINT32 inc1x    = INT16(m_tc0430grw[2]);
-	UINT32 inc1y    = INT16(m_tc0430grw[3]);
-	UINT32 counter2 = (m_tc0430grw[4] << 16) | m_tc0430grw[5];
-	UINT32 inc2x    = INT16(m_tc0430grw[6]);
-	UINT32 inc2y    = INT16(m_tc0430grw[7]);
+	uint32_t counter1 = (m_tc0430grw[0] << 16) | m_tc0430grw[1];
+	uint32_t inc1x    = int16_t(m_tc0430grw[2]);
+	uint32_t inc1y    = int16_t(m_tc0430grw[3]);
+	uint32_t counter2 = (m_tc0430grw[4] << 16) | m_tc0430grw[5];
+	uint32_t inc2x    = int16_t(m_tc0430grw[6]);
+	uint32_t inc2y    = int16_t(m_tc0430grw[7]);
 
 	// Deltas are 118/31
 	int dx = cliprect.min_x      + 118;
@@ -527,12 +527,12 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 	counter2 += dx*inc2x + dy*inc2y;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
-		UINT32 c1b = counter1;
-		UINT32 c2b = counter2;
-		UINT16 *dest = &bitmap.pix(y, cliprect.min_x);
+		uint32_t c1b = counter1;
+		uint32_t c2b = counter2;
+		uint16_t *dest = &bitmap.pix(y, cliprect.min_x);
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
-			UINT16 base = 0;
-			UINT32 cntr = 0;
+			uint16_t base = 0;
+			uint32_t cntr = 0;
 			if(c2b & 0x800000) {
 				base = 0x2040;
 				cntr = c2b;

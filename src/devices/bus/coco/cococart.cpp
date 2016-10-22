@@ -34,7 +34,7 @@ const device_type COCOCART_SLOT = &device_creator<cococart_slot_device>;
 //-------------------------------------------------
 //  cococart_slot_device - constructor
 //-------------------------------------------------
-cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, COCOCART_SLOT, "CoCo Cartridge Slot", tag, owner, clock, "cococart_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
@@ -134,7 +134,7 @@ void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, in
 
 READ8_MEMBER(cococart_slot_device::read)
 {
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 	if (m_cart)
 		result = m_cart->read(space, offset);
 	return result;
@@ -297,7 +297,7 @@ void cococart_slot_device::cart_set_line(cococart_slot_device::line which, cococ
 //  get_cart_base
 //-------------------------------------------------
 
-UINT8* cococart_slot_device::get_cart_base()
+uint8_t* cococart_slot_device::get_cart_base()
 {
 	if (m_cart != nullptr)
 		return m_cart->get_cart_base();
@@ -410,7 +410,7 @@ WRITE8_MEMBER(device_cococart_interface::write)
 //  get_cart_base
 //-------------------------------------------------
 
-UINT8* device_cococart_interface::get_cart_base()
+uint8_t* device_cococart_interface::get_cart_base()
 {
 	return nullptr;
 }

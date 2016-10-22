@@ -75,7 +75,7 @@ const device_type CQUESTROT = &device_creator<cquestrot_cpu_device>;
 const device_type CQUESTLIN = &device_creator<cquestlin_cpu_device>;
 
 
-cquestsnd_cpu_device::cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cquestsnd_cpu_device::cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, CQUESTSND, "Cube Quest Sound CPU", tag, owner, clock, "cquestsnd", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 64, 8, -3)
 	, m_dac_w(*this)
@@ -84,14 +84,14 @@ cquestsnd_cpu_device::cquestsnd_cpu_device(const machine_config &mconfig, const 
 }
 
 
-offs_t cquestsnd_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t cquestsnd_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cquestsnd );
 	return CPU_DISASSEMBLE_NAME(cquestsnd)(this, buffer, pc, oprom, opram, options);
 }
 
 
-cquestrot_cpu_device::cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cquestrot_cpu_device::cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, CQUESTROT, "Cube Quest Rotate CPU", tag, owner, clock, "cquestrot", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 64, 9, -3)
 	, m_linedata_w(*this)
@@ -105,14 +105,14 @@ READ16_MEMBER( cquestrot_cpu_device::linedata_r )
 }
 
 
-offs_t cquestrot_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t cquestrot_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cquestrot );
 	return CPU_DISASSEMBLE_NAME(cquestrot)(this, buffer, pc, oprom, opram, options);
 }
 
 
-cquestlin_cpu_device::cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cquestlin_cpu_device::cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, CQUESTLIN, "Cube Quest Line CPU", tag, owner, clock, "cquestlin", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 64, 8, -3)
 	, m_linedata_r(*this)
@@ -122,7 +122,7 @@ cquestlin_cpu_device::cquestlin_cpu_device(const machine_config &mconfig, const 
 }
 
 
-offs_t cquestlin_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t cquestlin_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cquestlin );
 	return CPU_DISASSEMBLE_NAME(cquestlin)(this, buffer, pc, oprom, opram, options);
@@ -169,7 +169,7 @@ void cquestsnd_cpu_device::device_start()
 {
 	m_dac_w.resolve_safe();
 	assert(m_sound_region_tag != nullptr);
-	m_sound_data = (UINT16*)machine().root_device().memregion(m_sound_region_tag)->base();
+	m_sound_data = (uint16_t*)machine().root_device().memregion(m_sound_region_tag)->base();
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
@@ -525,9 +525,9 @@ void cquestsnd_cpu_device::execute_run()
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = m_direct->read_qword(SND_PC << 3);
-		UINT32 inslow = inst & 0xffffffff;
-		UINT32 inshig = inst >> 32;
+		uint64_t inst = m_direct->read_qword(SND_PC << 3);
+		uint32_t inslow = inst & 0xffffffff;
+		uint32_t inshig = inst >> 32;
 
 		int t       = (inshig >> 24) & 0xff;
 		int b       = (inshig >> 20) & 0xf;
@@ -554,12 +554,12 @@ void cquestsnd_cpu_device::execute_run()
 
 		/* Handle the AM2901 ALU instruction */
 		{
-			UINT16 r = 0;
-			UINT16 s = 0;
+			uint16_t r = 0;
+			uint16_t s = 0;
 
-			UINT32 res = 0;
-			UINT32 cflag = 0;
-			UINT32 vflag = 0;
+			uint32_t res = 0;
+			uint32_t cflag = 0;
+			uint32_t vflag = 0;
 
 			/* Determine the ALU sources */
 			switch (i2_0)
@@ -632,7 +632,7 @@ void cquestsnd_cpu_device::execute_run()
 					break;
 				case RAMQD:
 				{
-					UINT16 qin;
+					uint16_t qin;
 
 					m_ram[b] = (_rin ? 0 : 0x8000) | (m_f >> 1);
 					m_q >>= 1;
@@ -663,7 +663,7 @@ void cquestsnd_cpu_device::execute_run()
 		/* Now handle any SRAM accesses from the previous cycle */
 		if (!m_prev_ipram)
 		{
-			UINT16 addr = m_adrlatch | (m_adrcntr & 0x7f);
+			uint16_t addr = m_adrlatch | (m_adrcntr & 0x7f);
 
 			if (!m_prev_ipwrt)
 			m_sram[addr] = m_ramwlatch;
@@ -781,10 +781,10 @@ void cquestrot_cpu_device::execute_run()
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = m_direct->read_qword(ROT_PC << 3);
+		uint64_t inst = m_direct->read_qword(ROT_PC << 3);
 
-		UINT32 inslow = inst & 0xffffffff;
-		UINT32 inshig = inst >> 32;
+		uint32_t inslow = inst & 0xffffffff;
+		uint32_t inshig = inst >> 32;
 
 		int t       = (inshig >> 20) & 0xfff;
 		int jmp     = (inshig >> 16) & 0xf;
@@ -802,7 +802,7 @@ void cquestrot_cpu_device::execute_run()
 		int i2_0    = (inslow >> 16) & 0x7;
 
 		int dsrclatch;
-		UINT16 data_in = 0xffff;
+		uint16_t data_in = 0xffff;
 
 		debugger_instruction_hook(this, ROT_PC);
 
@@ -854,12 +854,12 @@ void cquestrot_cpu_device::execute_run()
 
 		/* No do the ALU operation */
 		{
-			UINT16 r = 0;
-			UINT16 s = 0;
+			uint16_t r = 0;
+			uint16_t s = 0;
 
-			UINT32 res = 0;
-			UINT32 cflag = 0;
-			UINT32 vflag = 0;
+			uint32_t res = 0;
+			uint32_t cflag = 0;
+			uint32_t vflag = 0;
 
 			/* First, determine correct I1 bit */
 			if ((spf == SPF_MULT) && !_BIT(m_q, 0))
@@ -943,10 +943,10 @@ void cquestrot_cpu_device::execute_run()
 					break;
 				case RAMQD:
 				{
-					UINT16 q0 = m_q & 1;
-					UINT16 r0 = m_f & 1;
-					UINT16 q15 = 0;
-					UINT16 r15 = 0;
+					uint16_t q0 = m_q & 1;
+					uint16_t r0 = m_f & 1;
+					uint16_t q15 = 0;
+					uint16_t r15 = 0;
 
 					/* Determine Q15 and RAM15 */
 					switch (sel)
@@ -970,8 +970,8 @@ void cquestrot_cpu_device::execute_run()
 				}
 				case RAMD:
 				{
-					UINT16 r0 = m_f & 1;
-					UINT16 r15 = 0;
+					uint16_t r0 = m_f & 1;
+					uint16_t r15 = 0;
 
 					switch (sel)
 					{
@@ -989,10 +989,10 @@ void cquestrot_cpu_device::execute_run()
 				}
 				case RAMQU:
 				{
-					UINT16 q15 = BIT(m_q, 15);
-					UINT16 r15 = BIT(m_f, 15);
-					UINT16 q0 = 0;
-					UINT16 r0 = 0;
+					uint16_t q15 = BIT(m_q, 15);
+					uint16_t r15 = BIT(m_f, 15);
+					uint16_t q0 = 0;
+					uint16_t r0 = 0;
 
 					switch (sel)
 					{
@@ -1014,9 +1014,9 @@ void cquestrot_cpu_device::execute_run()
 				}
 				case RAMU:
 				{
-					UINT16 q15 = BIT(m_q, 15);
-					UINT16 r15 = BIT(m_f, 15);
-					UINT16 r0 = 0;
+					uint16_t q15 = BIT(m_q, 15);
+					uint16_t r15 = BIT(m_f, 15);
+					uint16_t r0 = 0;
 
 					switch (sel)
 					{
@@ -1160,13 +1160,13 @@ void cquestlin_cpu_device::cubeqcpu_clear_stack()
 }
 
 
-UINT8 cquestlin_cpu_device::cubeqcpu_get_ptr_ram_val(int i)
+uint8_t cquestlin_cpu_device::cubeqcpu_get_ptr_ram_val(int i)
 {
 	return m_ptr_ram[((m_field^1) * 256) + i];
 }
 
 
-UINT32* cquestlin_cpu_device::cubeqcpu_get_stack_ram()
+uint32_t* cquestlin_cpu_device::cubeqcpu_get_stack_ram()
 {
 	if (m_field != ODD_FIELD)
 		return m_o_stack;
@@ -1179,8 +1179,8 @@ void cquestlin_cpu_device::execute_run()
 {
 #define LINE_PC ((m_pc[prog] & 0x7f) | ((prog == BACKGROUND) ? 0x80 : 0))
 
-	UINT32  *stack_ram;
-	UINT8   *ptr_ram;
+	uint32_t  *stack_ram;
+	uint8_t   *ptr_ram;
 
 	/* Check the field and set the stack/pointer RAM pointers appropriately */
 	if (m_field == ODD_FIELD)
@@ -1201,10 +1201,10 @@ void cquestlin_cpu_device::execute_run()
 		int prog = (m_clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
 		m_curpc = LINE_PC;
-		UINT64 inst = m_direct->read_qword(LINE_PC << 3);
+		uint64_t inst = m_direct->read_qword(LINE_PC << 3);
 
-		UINT32 inslow = inst & 0xffffffff;
-		UINT32 inshig = inst >> 32;
+		uint32_t inslow = inst & 0xffffffff;
+		uint32_t inshig = inst >> 32;
 
 		int t       = (inshig >> 24) & 0xff;
 		int jmp     = (inshig >> 20) & 0xf;
@@ -1219,7 +1219,7 @@ void cquestlin_cpu_device::execute_run()
 		int _pbcs   = (inslow >> 27) & 0x1;
 		int i2_0    = (inslow >> 24) & 0x7;
 
-		UINT16  data_in = 0;
+		uint16_t  data_in = 0;
 
 		debugger_instruction_hook(this, m_pc[prog]);
 
@@ -1247,9 +1247,9 @@ void cquestlin_cpu_device::execute_run()
 			if (_BIT(m_fglatch, 4) && (m_ycnt < 256))
 			{
 				/* 20-bit words */
-				UINT32 data;
-				UINT16 h = m_xcnt;
-				UINT8 v = m_ycnt & 0xff;
+				uint32_t data;
+				uint16_t h = m_xcnt;
+				uint8_t v = m_ycnt & 0xff;
 
 				/* Clamp H between 0 and 319 */
 				if (h >= 320)
@@ -1282,12 +1282,12 @@ void cquestlin_cpu_device::execute_run()
 
 		/* Now do the ALU operation */
 		{
-			UINT16 r = 0;
-			UINT16 s = 0;
+			uint16_t r = 0;
+			uint16_t s = 0;
 
-			UINT16 res = 0;
-			UINT32 cflag = 0;
-			UINT32 vflag = 0;
+			uint16_t res = 0;
+			uint32_t cflag = 0;
+			uint32_t vflag = 0;
 
 			/* Determine the ALU sources */
 			switch (i2_0)
@@ -1364,8 +1364,8 @@ void cquestlin_cpu_device::execute_run()
 					break;
 				case RAMQD:
 				{
-					UINT16 r11 = (BIT(m_f, 11) ^ m_vflag) ? 0x800 : 0;
-					UINT16 q11 = (prog == BACKGROUND) ? 0x800 : 0;
+					uint16_t r11 = (BIT(m_f, 11) ^ m_vflag) ? 0x800 : 0;
+					uint16_t q11 = (prog == BACKGROUND) ? 0x800 : 0;
 
 					m_ram[b] = r11 | (m_f >> 1);
 					m_q = q11 | (m_q >> 1);
@@ -1374,7 +1374,7 @@ void cquestlin_cpu_device::execute_run()
 				}
 				case RAMD:
 				{
-					UINT16 r11 = (BIT(m_f, 11) ^ m_vflag) ? 0x800 : 0;
+					uint16_t r11 = (BIT(m_f, 11) ^ m_vflag) ? 0x800 : 0;
 
 					m_ram[b] = r11 | (m_f >> 1);
 					m_y = m_f;
@@ -1383,7 +1383,7 @@ void cquestlin_cpu_device::execute_run()
 				case RAMQU:
 				{
 					/* Determine shift inputs */
-					UINT16 r0 = (prog == BACKGROUND);
+					uint16_t r0 = (prog == BACKGROUND);
 
 					/* This should never happen - Q0 will be invalid */
 					m_ram[b] = (m_f << 1) | r0;
@@ -1393,7 +1393,7 @@ void cquestlin_cpu_device::execute_run()
 				}
 				case RAMU:
 				{
-					UINT16 r0 = (prog == BACKGROUND);
+					uint16_t r0 = (prog == BACKGROUND);
 
 					m_ram[b] = (m_f << 1) | r0;
 					m_y = m_f;

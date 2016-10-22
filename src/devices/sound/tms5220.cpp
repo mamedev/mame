@@ -294,7 +294,7 @@ in MCU code). Look for a 16-pin chip at U6 labeled "ECHO-3 SN".
 #include "emu.h"
 #include "tms5220.h"
 
-static INT16 clip_analog(INT16 cliptemp);
+static int16_t clip_analog(int16_t cliptemp);
 
 /* *****optional defines***** */
 
@@ -391,7 +391,7 @@ static INT16 clip_analog(INT16 cliptemp);
 // ctl bus is switching direction, next will be above
 #define CTL_STATE_NEXT_OUTPUT         (4)
 
-static const UINT8 reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5220c and cd2501ecd only; 5200 and 5220 always reload with 0; keep in mind this is loaded on IP=0 PC=12 subcycle=1 so it immediately will increment after one sample, effectively being 1,3,5,7 as in the comments above.
+static const uint8_t reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5220c and cd2501ecd only; 5200 and 5220 always reload with 0; keep in mind this is loaded on IP=0 PC=12 subcycle=1 so it immediately will increment after one sample, effectively being 1,3,5,7 as in the comments above.
 
 // Pull in the ROM tables
 #include "tms5110r.hxx"
@@ -557,7 +557,7 @@ static void printbits(long data, int num)
     tms5220_device::new_int_write -- wrap a write to the VSM
 
 ***********************************************************************************************/
-void tms5220_device::new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
+void tms5220_device::new_int_write(uint8_t rc, uint8_t m0, uint8_t m1, uint8_t addr)
 {
 	if (!m_m0_cb.isnull())
 		m_m0_cb(m0);
@@ -577,7 +577,7 @@ void tms5220_device::new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
     tms5220_device::new_int_write_addr -- wrap a 'load address' set of writes to the VSM
 
 ***********************************************************************************************/
-void tms5220_device::new_int_write_addr(UINT8 addr)
+void tms5220_device::new_int_write_addr(uint8_t addr)
 {
 	new_int_write(1, 0, 1, addr); // romclk 1, m0 0, m1 1, addr bus nybble = xxxx
 	new_int_write(0, 0, 1, addr); // romclk 0, m0 0, m1 1, addr bus nybble = xxxx
@@ -590,7 +590,7 @@ void tms5220_device::new_int_write_addr(UINT8 addr)
     tms5220_device::new_int_write_addr -- wrap a 'read bit' set of writes to the VSM
 
 ***********************************************************************************************/
-UINT8 tms5220_device::new_int_read()
+uint8_t tms5220_device::new_int_read()
 {
 	new_int_write(1, 1, 0, 0); // romclk 1, m0 1, m1 0, addr bus nybble = 0/open bus
 	new_int_write(0, 1, 0, 0); // romclk 0, m0 1, m1 0, addr bus nybble = 0/open bus
@@ -911,11 +911,11 @@ int tms5220_device::int_read()
 
 ***********************************************************************************************/
 
-void tms5220_device::process(INT16 *buffer, unsigned int size)
+void tms5220_device::process(int16_t *buffer, unsigned int size)
 {
 	int buf_count=0;
 	int i, bitout;
-	INT32 this_sample;
+	int32_t this_sample;
 
 #ifdef VERBOSE
 	logerror("process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
@@ -1072,9 +1072,9 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 				 * disabled, forcing all samples beyond 51d to be == 51d
 				 */
 				if (m_pitch_count >= 51)
-					m_excitation_data = (INT8)m_coeff->chirptable[51];
+					m_excitation_data = (int8_t)m_coeff->chirptable[51];
 				else /*m_pitch_count < 51*/
-					m_excitation_data = (INT8)m_coeff->chirptable[m_pitch_count];
+					m_excitation_data = (int8_t)m_coeff->chirptable[m_pitch_count];
 			}
 
 			// Update LFSR *20* times every sample (once per T cycle), like patent shows
@@ -1206,7 +1206,7 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 
 ***********************************************************************************************/
 
-static INT16 clip_analog(INT16 cliptemp)
+static int16_t clip_analog(int16_t cliptemp)
 {
 	/* clipping, just like the patent shows:
 	 * the top 10 bits of this result are visible on the digital output IO pin.
@@ -1248,9 +1248,9 @@ static INT16 clip_analog(INT16 cliptemp)
      output, this makes almost no difference in the computation.
 
 **********************************************************************************************/
-static INT32 matrix_multiply(INT32 a, INT32 b)
+static int32_t matrix_multiply(int32_t a, int32_t b)
 {
-	INT32 result;
+	int32_t result;
 	while (a>511) { a-=1024; }
 	while (a<-512) { a+=1024; }
 	while (b>16383) { b-=32768; }
@@ -1271,7 +1271,7 @@ static INT32 matrix_multiply(INT32 a, INT32 b)
 
 ***********************************************************************************************/
 
-INT32 tms5220_device::lattice_filter()
+int32_t tms5220_device::lattice_filter()
 {
 	// Lattice filter here
 	// Aug/05/07: redone as unrolled loop, for clarity - LN
@@ -1306,7 +1306,7 @@ INT32 tms5220_device::lattice_filter()
 		m_u[1] = m_u[2] - matrix_multiply(m_current_k[1], m_x[1]);
 		m_u[0] = m_u[1] - matrix_multiply(m_current_k[0], m_x[0]);
 #ifdef DEBUG_LATTICE
-		INT32 err = m_x[9] + matrix_multiply(m_current_k[9], m_u[9]); //x_10, real chip doesn't use or calculate this
+		int32_t err = m_x[9] + matrix_multiply(m_current_k[9], m_u[9]); //x_10, real chip doesn't use or calculate this
 #endif
 		m_x[9] = m_x[8] + matrix_multiply(m_current_k[8], m_u[8]);
 		m_x[8] = m_x[7] + matrix_multiply(m_current_k[7], m_u[7]);
@@ -1824,7 +1824,7 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
  */
 WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 {
-	UINT8 new_val;
+	uint8_t new_val;
 
 	m_true_timing = 1;
 	state &= 0x01;
@@ -1876,7 +1876,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
  */
 WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 {
-	UINT8 new_val;
+	uint8_t new_val;
 
 	m_true_timing = 1;
 	state &= 0x01;
@@ -1940,8 +1940,8 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
  */
 WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 {
-	UINT8 new_val;
-	UINT8 falling_edges;
+	uint8_t new_val;
+	uint8_t falling_edges;
 	m_true_timing = 1;
 #ifdef DEBUG_RS_WS
 	logerror("/RS and /WS written with %d and %d respectively\n", (data&2)>>1, data&1);
@@ -2132,7 +2132,7 @@ READ_LINE_MEMBER( tms5220_device::intq_r )
 
 void tms5220_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	INT16 sample_data[MAX_SAMPLE_CHUNK];
+	int16_t sample_data[MAX_SAMPLE_CHUNK];
 	stream_sample_t *buffer = outputs[0];
 
 	/* loop while we still have samples to generate */
@@ -2167,7 +2167,7 @@ void tms5220_device::set_frequency(int frequency)
 
 const device_type TMS5220C = &device_creator<tms5220c_device>;
 
-tms5220c_device::tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms5220c_device::tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5220_device(mconfig, TMS5220C, "TMS5220C", tag, owner, clock, "tms5220c", __FILE__)
 {
 }
@@ -2175,7 +2175,7 @@ tms5220c_device::tms5220c_device(const machine_config &mconfig, const char *tag,
 
 const device_type TMS5220 = &device_creator<tms5220_device>;
 
-tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMS5220, "TMS5220", tag, owner, clock, "tms5220", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
@@ -2189,7 +2189,7 @@ tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
@@ -2216,7 +2216,7 @@ void tms5220_device::device_config_complete()
 
 const device_type CD2501E = &device_creator<cd2501e_device>;
 
-cd2501e_device::cd2501e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cd2501e_device::cd2501e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5220_device(mconfig, CD2501E, "CD2501E", tag, owner, clock, "cd2501e", __FILE__)
 {
 }
@@ -2224,7 +2224,7 @@ cd2501e_device::cd2501e_device(const machine_config &mconfig, const char *tag, d
 
 const device_type TMS5200 = &device_creator<tms5200_device>;
 
-tms5200_device::tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms5200_device::tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5220_device(mconfig, TMS5200, "TMS5200", tag, owner, clock, "tms5200", __FILE__)
 {
 }
@@ -2232,7 +2232,7 @@ tms5200_device::tms5200_device(const machine_config &mconfig, const char *tag, d
 
 const device_type CD2501ECD = &device_creator<cd2501ecd_device>;
 
-cd2501ecd_device::cd2501ecd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cd2501ecd_device::cd2501ecd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms5220_device(mconfig, CD2501ECD, "CD2501ECD", tag, owner, clock, "cd2501ecd", __FILE__)
 {
 }

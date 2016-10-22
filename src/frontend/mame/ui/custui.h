@@ -183,7 +183,7 @@ protected:
 
 private:
 	// draw palette menu
-	virtual void draw(UINT32 flags) override;
+	virtual void draw(uint32_t flags) override;
 
 	virtual void populate() override;
 	virtual void handle() override;

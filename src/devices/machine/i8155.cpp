@@ -108,7 +108,7 @@ ADDRESS_MAP_END
 //  INLINE HELPERS
 //**************************************************************************
 
-inline UINT8 i8155_device::get_timer_mode()
+inline uint8_t i8155_device::get_timer_mode()
 {
 	return (m_count_length >> 8) & TIMER_MODE_MASK;
 }
@@ -154,9 +154,9 @@ inline int i8155_device::get_port_mode(int port)
 	return mode;
 }
 
-inline UINT8 i8155_device::read_port(int port)
+inline uint8_t i8155_device::read_port(int port)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (get_port_mode(port))
 	{
@@ -177,7 +177,7 @@ inline UINT8 i8155_device::read_port(int port)
 	return data;
 }
 
-inline void i8155_device::write_port(int port, UINT8 data)
+inline void i8155_device::write_port(int port, uint8_t data)
 {
 	switch (get_port_mode(port))
 	{
@@ -202,7 +202,7 @@ inline void i8155_device::write_port(int port, UINT8 data)
 //  i8155_device - constructor
 //-------------------------------------------------
 
-i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I8155, "8155 RIOT", tag, owner, clock, "i8155", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_in_pa_cb(*this),
@@ -352,7 +352,7 @@ const address_space_config *i8155_device::memory_space_config(address_spacenum s
 
 READ8_MEMBER( i8155_device::io_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x07)
 	{
@@ -392,7 +392,7 @@ READ8_MEMBER( i8155_device::io_r )
 //  register_w - register write
 //-------------------------------------------------
 
-void i8155_device::register_w(int offset, UINT8 data)
+void i8155_device::register_w(int offset, uint8_t data)
 {
 	switch (offset & 0x07)
 	{
@@ -557,7 +557,7 @@ WRITE8_MEMBER( i8155_device::ale_w )
 
 READ8_MEMBER( i8155_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (m_io_m)
 	{

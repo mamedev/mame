@@ -91,7 +91,7 @@ WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)
 }
 
 
-UINT32 snowbros_state::screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snowbros_state::screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* This clears & redraws the entire screen each pass */
 	bitmap.fill(0xf0, cliprect);
@@ -248,7 +248,7 @@ WRITE8_MEMBER(snowbros_state::prot_io_w)
 	{
 		case 0x00:
 		{
-			UINT16 word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
+			uint16_t word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
 			word = (word & 0xff00) | (data << 0);
 			m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset] = word;
 			break;
@@ -256,7 +256,7 @@ WRITE8_MEMBER(snowbros_state::prot_io_w)
 
 		case 0x01:
 		{
-			UINT16 word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
+			uint16_t word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
 			word = (word & 0x00ff) | (data << 8);
 			m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset] = word;
 			break;
@@ -422,7 +422,7 @@ READ16_MEMBER(snowbros_state::sb3_sound_r)
 
 void snowbros_state::sb3_play_music(int data)
 {
-	UINT8 *snd;
+	uint8_t *snd;
 
 	/* sample is actually played in interrupt function so it loops */
 	m_sb3_music = data;
@@ -1743,7 +1743,7 @@ GFXDECODE_END
 
 MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 {
-	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
+	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
@@ -1752,7 +1752,7 @@ MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 
 MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 {
-	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
+	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
@@ -2783,12 +2783,12 @@ READ16_MEMBER(snowbros_state::_4in1_02_read)
 
 DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 {
-	UINT8 *src = memregion("maincpu")->base();
+	uint8_t *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
 
 	/* strange order */
 	{
-		dynamic_buffer buffer(len);
+		std::vector<uint8_t> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			if (i&1) buffer[i] = BITSWAP8(src[i],6,7,5,4,3,2,1,0);
@@ -2802,7 +2802,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 
 	/* strange order */
 	{
-		dynamic_buffer buffer(len);
+		std::vector<uint8_t> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[i^0x4000];
@@ -2813,12 +2813,12 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 
 DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 {
-	UINT8 *src = memregion("maincpu")->base();
+	uint8_t *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
 
 	/* strange order */
 	{
-		dynamic_buffer buffer(len);
+		std::vector<uint8_t> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
@@ -2860,7 +2860,7 @@ DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)
 DRIVER_INIT_MEMBER(snowbros_state,toto)
 {
 	// every single rom has bits 0x10 and 0x08 swapped
-	UINT8 *src = memregion("maincpu")->base();
+	uint8_t *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
 
 	for (int i = 0; i < len; i++)
@@ -2897,7 +2897,7 @@ DRIVER_INIT_MEMBER(snowbros_state, hyperpac)
 DRIVER_INIT_MEMBER(snowbros_state, yutnori)
 {
 	// presumably related to the PIC protection
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	rom[0x4878 / 2] = 0x4e71;
 	rom[0xd820 / 2] = 0x4e71;
 	rom[0xc3b6 / 2] = 0x4e71;

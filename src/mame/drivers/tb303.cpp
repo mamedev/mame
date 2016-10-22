@@ -26,8 +26,8 @@ public:
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	UINT8 m_ram[0xc00];
-	UINT16 m_ram_address;
+	uint8_t m_ram[0xc00];
+	uint16_t m_ram_address;
 	bool m_ram_ce;
 	bool m_ram_we;
 
@@ -67,7 +67,7 @@ void tb303_state::refresh_ram()
 	// MCU E2,E3 goes through a 4556 IC(pin 14,13) to one of uPD444 _CE:
 	// _Q0: N/C, _Q1: IC-5, _Q2: IC-3, _Q3: IC-4
 	m_ram_ce = true;
-	UINT8 hi = 0;
+	uint8_t hi = 0;
 	switch (m_port[NEC_UCOM4_PORTE] >> 2 & 3)
 	{
 		case 0: m_ram_ce = false; break;

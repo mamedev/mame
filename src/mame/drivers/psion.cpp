@@ -31,10 +31,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-UINT8 psion_state::kb_read()
+uint8_t psion_state::kb_read()
 {
 	static const char *const bitnames[] = {"K1", "K2", "K3", "K4", "K5", "K6", "K7"};
-	UINT8 line, data = 0x7c;
+	uint8_t line, data = 0x7c;
 
 	if (m_kb_counter)
 	{
@@ -132,7 +132,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
 }
 
 /* Read/Write common */
-void psion_state::io_rw(address_space &space, UINT16 offset)
+void psion_state::io_rw(address_space &space, uint16_t offset)
 {
 	if (space.debugger_access())
 		return;
@@ -463,7 +463,7 @@ void psion_state::machine_start()
 
 	if (m_rom_bank_count)
 	{
-		UINT8* rom_base = (UINT8 *)memregion("maincpu")->base();
+		uint8_t* rom_base = (uint8_t *)memregion("maincpu")->base();
 
 		membank("rombank")->configure_entry(0, rom_base + 0x8000);
 		membank("rombank")->configure_entries(1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
@@ -472,8 +472,8 @@ void psion_state::machine_start()
 
 	if (m_ram_bank_count)
 	{
-		m_paged_ram = std::make_unique<UINT8[]>(m_ram_bank_count * 0x4000);
-		memset(m_paged_ram.get(), 0, sizeof(UINT8) * (m_ram_bank_count * 0x4000));
+		m_paged_ram = std::make_unique<uint8_t[]>(m_ram_bank_count * 0x4000);
+		memset(m_paged_ram.get(), 0, sizeof(uint8_t) * (m_ram_bank_count * 0x4000));
 		membank("rambank")->configure_entries(0, m_ram_bank_count, m_paged_ram.get(), 0x4000);
 		membank("rambank")->set_entry(0);
 	}
@@ -519,7 +519,7 @@ HD44780_PIXEL_UPDATE(psion_state::lz_pixel_update)
 {
 	if (pos < 40)
 	{
-		static const UINT8 psion_display_layout[] =
+		static const uint8_t psion_display_layout[] =
 		{
 			0x00, 0x01, 0x02, 0x03, 0x28, 0x29, 0x2a, 0x2b, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x2c, 0x2d, 0x2e, 0x2f,
 			0x30, 0x31, 0x32, 0x33, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b,
@@ -527,7 +527,7 @@ HD44780_PIXEL_UPDATE(psion_state::lz_pixel_update)
 			0x44, 0x45, 0x46, 0x47, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f
 		};
 
-		UINT8 char_pos = psion_display_layout[line*40 + pos];
+		uint8_t char_pos = psion_display_layout[line*40 + pos];
 		bitmap.pix16((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = state;
 	}
 }

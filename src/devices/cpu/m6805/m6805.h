@@ -26,7 +26,7 @@ class m6805_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width, const char *shortname, const char *source);
+	m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
@@ -34,42 +34,42 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override = 0;
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override;
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 private:
 	// opcode/condition tables
-	static const UINT8 m_flags8i[256];
-	static const UINT8 m_flags8d[256];
-	static const UINT8 m_cycles1[256];
+	static const uint8_t m_flags8i[256];
+	static const uint8_t m_flags8d[256];
+	static const uint8_t m_cycles1[256];
 
 protected:
-	void rd_s_handler_b(UINT8 *b);
+	void rd_s_handler_b(uint8_t *b);
 	void rd_s_handler_w(PAIR *p);
-	void wr_s_handler_b(UINT8 *b);
+	void wr_s_handler_b(uint8_t *b);
 	void wr_s_handler_w(PAIR *p);
-	void RM16(UINT32 addr, PAIR *p);
+	void RM16(uint32_t addr, PAIR *p);
 
-	void brset(UINT8 bit);
-	void brclr(UINT8 bit);
-	void bset(UINT8 bit);
-	void bclr(UINT8 bit);
+	void brset(uint8_t bit);
+	void brclr(uint8_t bit);
+	void bset(uint8_t bit);
+	void bclr(uint8_t bit);
 
 	void bra();
 	void brn();
@@ -267,15 +267,15 @@ protected:
 	// CPU registers
 	PAIR    m_ea;           /* effective address */
 
-	UINT32  m_sp_mask;      /* Stack pointer address mask */
-	UINT32  m_sp_low;       /* Stack pointer low water mark (or floor) */
+	uint32_t  m_sp_mask;      /* Stack pointer address mask */
+	uint32_t  m_sp_low;       /* Stack pointer low water mark (or floor) */
 	PAIR    m_pc;           /* Program counter */
 	PAIR    m_s;            /* Stack pointer */
-	UINT8   m_a;            /* Accumulator */
-	UINT8   m_x;            /* Index register */
-	UINT8   m_cc;           /* Condition codes */
+	uint8_t   m_a;            /* Accumulator */
+	uint8_t   m_x;            /* Index register */
+	uint8_t   m_cc;           /* Condition codes */
 
-	UINT16  m_pending_interrupts; /* MB */
+	uint16_t  m_pending_interrupts; /* MB */
 
 	int     m_irq_state[9]; /* KW Additional lines for HD63705 */
 	int     m_nmi_state;
@@ -294,7 +294,7 @@ class m6805_device : public m6805_base_device
 {
 public:
 	// construction/destruction
-	m6805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	m6805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: m6805_base_device(mconfig, tag, owner, clock, M6805, "M6805", 12, "m6805", __FILE__) { }
 
 protected:
@@ -307,7 +307,7 @@ class m68hc05eg_device : public m6805_base_device
 {
 public:
 	// construction/destruction
-	m68hc05eg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	m68hc05eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: m6805_base_device(mconfig, tag, owner, clock, M68HC05EG, "M68HC05EG", 13, "m68hc05eg", __FILE__) { }
 
 protected:
@@ -325,7 +325,7 @@ class m68705_device : public m6805_base_device
 {
 public:
 	// construction/destruction
-	m68705_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	m68705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: m6805_base_device(mconfig, tag, owner, clock, M68705, "M68705", 12, "m68705", __FILE__) { }
 
 protected:
@@ -343,7 +343,7 @@ class hd63705_device : public m6805_base_device
 {
 public:
 	// construction/destruction
-	hd63705_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	hd63705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: m6805_base_device(mconfig, tag, owner, clock, HD63705, "HD63705", 16, "hd63705", __FILE__) { }
 
 protected:

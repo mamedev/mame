@@ -47,9 +47,9 @@ class naomi_state : public dc_state
 		m_eeprom(*this, "main_eeprom")  { }
 
 	/* Naomi 2 specific (To be moved) */
-	optional_shared_ptr<UINT64> pvr2_texture_ram;
-	optional_shared_ptr<UINT64> pvr2_framebuffer_ram;
-	optional_shared_ptr<UINT64> elan_ram;
+	optional_shared_ptr<uint64_t> pvr2_texture_ram;
+	optional_shared_ptr<uint64_t> pvr2_framebuffer_ram;
+	optional_shared_ptr<uint64_t> elan_ram;
 	optional_device<macronix_29l001mc_device> m_awflash;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
@@ -80,15 +80,15 @@ class naomi_state : public dc_state
 	DECLARE_READ64_MEMBER( aw_modem_r );
 	DECLARE_WRITE64_MEMBER( aw_modem_w );
 
-	UINT8 m_mp_mux;
+	uint8_t m_mp_mux;
 	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
 	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
 
-	inline int decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
+	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 
-	UINT8 aw_ctrl_type;
+	uint8_t aw_ctrl_type;
 
-	UINT8 asciihex_to_dec(UINT8 in);
+	uint8_t asciihex_to_dec(uint8_t in);
 	void create_pic_from_retdat();
 
 	DECLARE_READ64_MEMBER( naomi_biose_idle_skip_r );

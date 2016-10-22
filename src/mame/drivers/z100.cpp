@@ -198,15 +198,15 @@ public:
 	DECLARE_WRITE8_MEMBER(video_pia_B_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CB2_w);
-	std::unique_ptr<UINT8[]> m_gvram;
-	UINT8 m_keyb_press,m_keyb_status;
-	UINT8 m_vram_enable;
-	UINT8 m_gbank;
-	UINT8 m_display_mask;
-	UINT8 m_flash;
-	UINT8 m_clr_val;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-	UINT16 m_start_addr;
+	std::unique_ptr<uint8_t[]> m_gvram;
+	uint8_t m_keyb_press,m_keyb_status;
+	uint8_t m_vram_enable;
+	uint8_t m_gbank;
+	uint8_t m_display_mask;
+	uint8_t m_flash;
+	uint8_t m_clr_val;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	uint16_t m_start_addr;
 
 	floppy_image_device *m_floppy;
 
@@ -215,7 +215,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 };
 
@@ -239,10 +239,10 @@ public:
 
 void z100_state::video_start()
 {
-	m_gvram = make_unique_clear<UINT8[]>(0x30000);
+	m_gvram = make_unique_clear<uint8_t[]>(0x30000);
 }
 
-UINT32 z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,xi,yi;
 	int dot;
@@ -254,7 +254,7 @@ UINT32 z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bitma
 	{
 		for(x=0;x<mc6845_h_display;x++)
 		{
-			UINT32 base_offs;
+			uint32_t base_offs;
 
 			for(yi=0;yi<mc6845_tile_height;yi++)
 			{
@@ -318,7 +318,7 @@ READ8_MEMBER( z100_state::keyb_data_r )
 {
 	if(m_keyb_press)
 	{
-		UINT8 res;
+		uint8_t res;
 
 		res = m_keyb_press;
 
@@ -422,7 +422,7 @@ INPUT_CHANGED_MEMBER(z100_state::key_stroke)
 	if(newval && !oldval)
 	{
 		/* TODO: table */
-		m_keyb_press = (UINT8)(FPTR)(param) & 0xff;
+		m_keyb_press = (uint8_t)(uintptr_t)(param) & 0xff;
 		//pic8259_ir6_w(m_picm, 1);
 		m_keyb_status = 1;
 	}
@@ -716,7 +716,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(z100_state,z100)
 {
-	UINT8 *ROM = memregion("ipl")->base();
+	uint8_t *ROM = memregion("ipl")->base();
 
 	ROM[0xfc116 & 0x3fff] = 0x90; // patch parity IRQ check
 	ROM[0xfc117 & 0x3fff] = 0x90;

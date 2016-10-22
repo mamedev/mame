@@ -195,8 +195,8 @@ public:
 	UPD7002_GET_ANALOGUE(BBC_get_analogue_input);
 	UPD7002_EOC(BBC_uPD7002_EOC);
 
-	void bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size);
-	void bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size);
+	void bbc_setup_banks(memory_bank *membank, int banks, uint32_t shift, uint32_t size);
+	void bbcm_setup_banks(memory_bank *membank, int banks, uint32_t shift, uint32_t size);
 
 	image_init_result bbc_load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp1_load) { return bbc_load_rom(image, m_exp1); }
@@ -360,7 +360,7 @@ public: // HACK FOR MC6845
 	int m_len2;
 	int m_len3;
 	int m_mc6850_clock;
-	UINT8 m_serproc_data;
+	uint8_t m_serproc_data;
 	int m_rxd_serial;
 	int m_dcd_serial;
 	int m_cts_serial;
@@ -368,7 +368,7 @@ public: // HACK FOR MC6845
 	int m_rxd_cass;
 	int m_cass_out_enabled;
 	int m_txd;
-	UINT32 m_nr_high_tones;
+	uint32_t m_nr_high_tones;
 	int m_cass_out_samples_to_go;
 	int m_cass_out_bit;
 	int m_cass_out_phase;
@@ -401,9 +401,9 @@ public: // HACK FOR MC6845
 
 
 	unsigned char *m_BBC_Video_RAM;
-	UINT16 *m_BBC_display;
-	UINT16 *m_BBC_display_left;
-	UINT16 *m_BBC_display_right;
+	uint16_t *m_BBC_display;
+	uint16_t *m_BBC_display_left;
+	uint16_t *m_BBC_display_right;
 	bitmap_ind16 *m_BBC_bitmap;
 	int m_y_screen_pos;
 	unsigned char m_pixel_bits[256];

@@ -21,7 +21,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
 	AM_RANGE(0x9, 0x9) AM_WRITE(clock_w)
 ADDRESS_MAP_END
 
-ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: nscsi_device(mconfig, NCR5390, "5390 SCSI", tag, owner, clock, "ncr5390", __FILE__), tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0),
 	select_timeout(0), seq(0), tcount(0), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false),
 	m_irq_handler(*this),
@@ -103,7 +103,7 @@ void ncr5390_device::reset_disconnect()
 
 void ncr5390_device::scsi_ctrl_changed()
 {
-	UINT32 ctrl = scsi_bus->ctrl_r();
+	uint32_t ctrl = scsi_bus->ctrl_r();
 	if(ctrl & S_RST) {
 		logerror("%s: scsi bus reset\n", tag());
 		return;
@@ -119,9 +119,9 @@ void ncr5390_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void ncr5390_device::step(bool timeout)
 {
-	UINT32 ctrl = scsi_bus->ctrl_r();
-	UINT32 data = scsi_bus->data_r();
-	UINT8 c     = command[0] & 0x7f;
+	uint32_t ctrl = scsi_bus->ctrl_r();
+	uint32_t data = scsi_bus->data_r();
+	uint8_t c     = command[0] & 0x7f;
 
 	if(0)
 		logerror("%s: state=%d.%d %s\n",
@@ -569,9 +569,9 @@ WRITE8_MEMBER(ncr5390_device::tcount_hi_w)
 	logerror("%s: tcount_hi_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 }
 
-UINT8 ncr5390_device::fifo_pop()
+uint8_t ncr5390_device::fifo_pop()
 {
-	UINT8 r = fifo[0];
+	uint8_t r = fifo[0];
 	fifo_pos--;
 	memmove(fifo, fifo+1, fifo_pos);
 	if((!fifo_pos) && tcount && dma_dir == DMA_OUT)
@@ -579,7 +579,7 @@ UINT8 ncr5390_device::fifo_pop()
 	return r;
 }
 
-void ncr5390_device::fifo_push(UINT8 val)
+void ncr5390_device::fifo_push(uint8_t val)
 {
 	fifo[fifo_pos++] = val;
 	if(!drq && dma_dir == DMA_IN)
@@ -588,7 +588,7 @@ void ncr5390_device::fifo_push(UINT8 val)
 
 READ8_MEMBER(ncr5390_device::fifo_r)
 {
-	UINT8 r;
+	uint8_t r;
 	if(fifo_pos) {
 		r = fifo[0];
 		fifo_pos--;
@@ -636,7 +636,7 @@ void ncr5390_device::command_pop_and_chain()
 
 void ncr5390_device::start_command()
 {
-	UINT8 c = command[0] & 0x7f;
+	uint8_t c = command[0] & 0x7f;
 	if(!check_valid_command(c)) {
 		logerror("%s: invalid command %02x\n", tag(), command[0]);
 		istatus |= I_ILLEGAL;
@@ -712,7 +712,7 @@ void ncr5390_device::start_command()
 	}
 }
 
-bool ncr5390_device::check_valid_command(UINT8 cmd)
+bool ncr5390_device::check_valid_command(uint8_t cmd)
 {
 	int subcmd = cmd & 15;
 	switch((cmd >> 4) & 7) {
@@ -724,7 +724,7 @@ bool ncr5390_device::check_valid_command(UINT8 cmd)
 	return false;
 }
 
-int ncr5390_device::derive_msg_size(UINT8 msg_id)
+int ncr5390_device::derive_msg_size(uint8_t msg_id)
 {
 	const static int sizes[8] = { 6, 10, 6, 6, 6, 12, 6, 10 };
 	return sizes[msg_id >> 5];
@@ -749,8 +749,8 @@ void ncr5390_device::check_irq()
 
 READ8_MEMBER(ncr5390_device::status_r)
 {
-	UINT32 ctrl = scsi_bus->ctrl_r();
-	UINT8 res = status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
+	uint32_t ctrl = scsi_bus->ctrl_r();
+	uint8_t res = status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
 	logerror("%s: status_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
 	if(irq)
 		status &= ~(S_GROSS_ERROR|S_PARITY|S_TCC);
@@ -765,7 +765,7 @@ WRITE8_MEMBER(ncr5390_device::bus_id_w)
 
 READ8_MEMBER(ncr5390_device::istatus_r)
 {
-	UINT8 res = istatus;
+	uint8_t res = istatus;
 	istatus = 0;
 	seq = 0;
 	check_irq();
@@ -825,7 +825,7 @@ void ncr5390_device::dma_set(int dir)
 		drq_set();
 }
 
-void ncr5390_device::dma_w(UINT8 val)
+void ncr5390_device::dma_w(uint8_t val)
 {
 	fifo_push(val);
 	tcount--;
@@ -833,9 +833,9 @@ void ncr5390_device::dma_w(UINT8 val)
 		drq_clear();
 }
 
-UINT8 ncr5390_device::dma_r()
+uint8_t ncr5390_device::dma_r()
 {
-	UINT8 r = fifo_pop();
+	uint8_t r = fifo_pop();
 	if(!fifo_pos)
 		drq_clear();
 	tcount--;

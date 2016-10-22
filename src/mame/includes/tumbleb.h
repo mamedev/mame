@@ -25,11 +25,11 @@ public:
 	{ }
 
 	/* memory pointers */
-	optional_shared_ptr<UINT16> m_mainram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_pf1_data;
-	required_shared_ptr<UINT16> m_pf2_data;
-	optional_shared_ptr<UINT16> m_control;
+	optional_shared_ptr<uint16_t> m_mainram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_pf1_data;
+	required_shared_ptr<uint16_t> m_pf2_data;
+	optional_shared_ptr<uint16_t> m_control;
 
 	/* misc */
 	int         m_music_command;
@@ -41,8 +41,8 @@ public:
 	tilemap_t   *m_pf1_alt_tilemap;
 	tilemap_t   *m_pf2_tilemap;
 	tilemap_t   *m_pf2_alt_tilemap;
-	UINT16      m_control_0[8];
-	UINT16      m_tilebank;
+	uint16_t      m_control_0[8];
+	uint16_t      m_tilebank;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -53,8 +53,8 @@ public:
 	optional_device<decospr_device> m_sprgen;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	UINT8 m_semicom_prot_offset;
-	UINT16 m_protbase;
+	uint8_t m_semicom_prot_offset;
+	uint16_t m_protbase;
 	DECLARE_WRITE16_MEMBER(tumblepb_oki_w);
 	DECLARE_READ16_MEMBER(tumblepb_prot_r);
 	DECLARE_READ16_MEMBER(tumblepopb_controls_r);
@@ -109,22 +109,22 @@ public:
 	DECLARE_VIDEO_START(suprtrio);
 	DECLARE_VIDEO_START(pangpang);
 	DECLARE_VIDEO_START(sdfight);
-	UINT32 screen_update_tumblepb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_jumpkids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_fncywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_semicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_suprtrio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_pangpang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_semicom_altoffsets(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bcstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_semibase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_sdfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tumblepb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jumpkids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fncywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_semicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_suprtrio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pangpang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_semicom_altoffsets(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bcstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_semibase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sdfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tumbleb2_interrupt);
 	void tumbleb_tilemap_redraw();
-	inline void get_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base);
-	inline void get_fncywld_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base);
-	inline void pangpang_get_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base );
-	inline void pangpang_get_bg2x_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base );
+	inline void get_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, uint16_t *gfx_base);
+	inline void get_fncywld_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, uint16_t *gfx_base);
+	inline void pangpang_get_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, uint16_t *gfx_base );
+	inline void pangpang_get_bg2x_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, uint16_t *gfx_base );
 	void tumbleb_draw_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pf1x_offs, int pf1y_offs, int pf2x_offs, int pf2y_offs);
 	void tumbleb2_set_music_bank( int bank );
 	void tumbleb2_play_sound( okim6295_device *oki, int data );

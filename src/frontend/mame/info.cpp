@@ -692,7 +692,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 	// iterate over sound devices
 	for (device_sound_interface &sound : sound_interface_iterator(device))
 	{
-		if (strcmp(sound.device().tag(), device.tag()))
+		if (strcmp(sound.device().tag(), device.tag()) != 0 && sound.issound())
 		{
 			std::string newtag(sound.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -861,10 +861,10 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	};
 
 	// directions
-	const UINT8 DIR_UP = 0x01;
-	const UINT8 DIR_DOWN = 0x02;
-	const UINT8 DIR_LEFT = 0x04;
-	const UINT8 DIR_RIGHT = 0x08;
+	const uint8_t DIR_UP = 0x01;
+	const uint8_t DIR_DOWN = 0x02;
+	const uint8_t DIR_LEFT = 0x04;
+	const uint8_t DIR_RIGHT = 0x08;
 
 	// initialize the list of control types
 	struct
@@ -876,11 +876,11 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 		int             maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
 		int             ways;           // directions for joystick
 		bool            analog;         // is analog input?
-		UINT8           helper[3];      // for dual joysticks [possibly to be removed soonish]
-		INT32           min;            // analog minimum value
-		INT32           max;            // analog maximum value
-		INT32           sensitivity;    // default analog sensitivity
-		INT32           keydelta;       // default analog keydelta
+		uint8_t           helper[3];      // for dual joysticks [possibly to be removed soonish]
+		int32_t           min;            // analog minimum value
+		int32_t           max;            // analog maximum value
+		int32_t           sensitivity;    // default analog sensitivity
+		int32_t           keydelta;       // default analog keydelta
 		bool            reverse;        // default analog reverse setting
 	} control_info[CTRL_COUNT * CTRL_PCOUNT];
 

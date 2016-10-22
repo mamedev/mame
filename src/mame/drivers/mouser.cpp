@@ -288,8 +288,8 @@ DRIVER_INIT_MEMBER(mouser_state,mouser)
 	/* Decode the opcodes */
 
 	offs_t i;
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *table = memregion("user1")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *table = memregion("user1")->base();
 
 	for (i = 0; i < 0x6000; i++)
 	{

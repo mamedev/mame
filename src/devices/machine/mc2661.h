@@ -79,7 +79,7 @@ class mc2661_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_rxc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_rxc = clock; }
 	static void static_set_txc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_txc = clock; }
@@ -129,12 +129,12 @@ private:
 	int m_rxc;
 	int m_txc;
 
-	UINT8 m_rhr;
-	UINT8 m_thr;
-	UINT8 m_cr;
-	UINT8 m_sr;
-	UINT8 m_mr[2];
-	UINT8 m_sync[3];
+	uint8_t m_rhr;
+	uint8_t m_thr;
+	uint8_t m_cr;
+	uint8_t m_sr;
+	uint8_t m_mr[2];
+	uint8_t m_sync[3];
 
 	int m_mode_index;
 	int m_sync_index;

@@ -160,7 +160,7 @@ ioport_constructor nes_suborkey_device::device_input_ports() const
 //  nes_suborkey_device - constructor
 //-------------------------------------------------
 
-nes_suborkey_device::nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_suborkey_device::nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_SUBORKEYBOARD, "Subor FC Keyboard", tag, owner, clock, "nes_suborkey", __FILE__)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_kbd(*this, "SUBOR.%u", 0)
@@ -196,9 +196,9 @@ void nes_suborkey_device::device_reset()
 //  read
 //-------------------------------------------------
 
-UINT8 nes_suborkey_device::read_exp(offs_t offset)
+uint8_t nes_suborkey_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (offset == 1)    //$4017
 	{
 		// Subor Keyboard: rows of the keyboard matrix are read 4-bits at time and returned as bit1->bit4
@@ -215,11 +215,11 @@ UINT8 nes_suborkey_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_suborkey_device::write(UINT8 data)
+void nes_suborkey_device::write(uint8_t data)
 {
 	if (BIT(data, 2))   // keyboard active
 	{
-		UINT8 out = BIT(data, 1);   // scan
+		uint8_t out = BIT(data, 1);   // scan
 		if (m_fck_mode && !out && ++m_fck_scan > 12)
 			m_fck_scan = 0;
 

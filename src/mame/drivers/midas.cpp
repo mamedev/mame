@@ -86,14 +86,14 @@ public:
 	virtual void machine_reset() override;
 
 
-	UINT32 screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<neosprite_midas_device> m_sprgen;
 	required_device<screen_device> m_screen;
-	required_shared_ptr<UINT16> m_zoomram;
+	required_shared_ptr<uint16_t> m_zoomram;
 
 	void screen_eof_midas(screen_device &screen, bool state);
 
@@ -108,7 +108,7 @@ void midas_state::video_start()
 {
 }
 
-UINT32 midas_state::screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t midas_state::screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
 	bitmap.fill(0x0, cliprect);
@@ -161,7 +161,7 @@ WRITE16_MEMBER(midas_state::midas_gfxregs_w)
 WRITE16_MEMBER(midas_state::midas_zoomtable_w)
 {
 	COMBINE_DATA(&m_zoomram[offset]);
-	UINT8 *rgn          =   memregion("zoomy")->base();
+	uint8_t *rgn          =   memregion("zoomy")->base();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -791,7 +791,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(midas_state,livequiz)
 {
-	UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	// PROTECTION CHECKS
 	rom[0x13345a/2] =   0x4e75;

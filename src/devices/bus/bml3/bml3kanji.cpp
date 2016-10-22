@@ -58,7 +58,7 @@ const tiny_rom_entry *bml3bus_kanji_device::device_rom_region() const
 
 READ8_MEMBER( bml3bus_kanji_device::bml3_kanji_r )
 {
-	return m_rom[((UINT32)m_kanji_addr << 1) + offset];
+	return m_rom[((uint32_t)m_kanji_addr << 1) + offset];
 }
 
 WRITE8_MEMBER( bml3bus_kanji_device::bml3_kanji_w )
@@ -72,7 +72,7 @@ WRITE8_MEMBER( bml3bus_kanji_device::bml3_kanji_w )
 //  LIVE DEVICE
 //**************************************************************************
 
-bml3bus_kanji_device::bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bml3bus_kanji_device::bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BML3BUS_KANJI, "Hitachi MP-9740 Kanji Character ROM Card", tag, owner, clock, "bml3kanji", __FILE__),
 	device_bml3bus_card_interface(mconfig, *this), m_kanji_addr(0), m_rom(nullptr)
 {

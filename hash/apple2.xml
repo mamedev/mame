@@ -5290,6 +5290,18 @@
 		</part>
 	</software>
 
+	<software name="masterlamp">
+		<description>Master of the Lamps (clean crack)</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="master of the lamps (1985)(activision)(trex crack).dsk" size="143360" crc="59c4b8d3" sha1="f48b13d0c8d7129983ad4d78e0f50458fe124b91" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="midi8pl1">
 		<description>MIDI/8 Plus</description>
 		<year>1984</year>
@@ -5581,6 +5593,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="paperboy (4am crack).dsk" size="143360" crc="e0914bc0" sha1="37da2f836f9182c53931a8f08827f72826f844ac" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="papermodels">
+		<description>Paper Models - The Christmas Kit (clean crack)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="paper models - the christmas kit (1986)(activision)(trex crack).dsk" size="143360" crc="22dd3174" sha1="01653481820b5a14374e21af182c766ee87b7861" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5933,6 +5957,18 @@
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="sevencities2.dsk" size="143360" crc="5770b9e1" sha1="0ca92d8886d613720fc2fdfd40c98555d6d60fa9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shanghai">
+		<description>Shanghai (clean crack)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="shanghai (1986)(activision)(trex crack).dsk" size="143360" crc="19ea813b" sha1="f0cafa24a30b7fdf2ee24d8a39485d71779e7aab" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

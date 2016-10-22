@@ -13,7 +13,7 @@
 
 const device_type TRACKFLD_AUDIO = &device_creator<trackfld_audio_device>;
 
-trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TRACKFLD_AUDIO, "Track And Field Audio", tag, owner, clock, "trackfld_audio", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_last_addr(0),
@@ -68,7 +68,7 @@ void trackfld_audio_device::device_reset()
 
 READ8_MEMBER( trackfld_audio_device::trackfld_sh_timer_r )
 {
-	UINT32 clock = space.machine().device<cpu_device>("audiocpu")->total_cycles() / TIMER_RATE;
+	uint32_t clock = space.machine().device<cpu_device>("audiocpu")->total_cycles() / TIMER_RATE;
 
 	return clock & 0xF;
 }
@@ -99,7 +99,7 @@ WRITE8_MEMBER( trackfld_audio_device::trackfld_sound_w )
 
 READ8_MEMBER( trackfld_audio_device::hyperspt_sh_timer_r )
 {
-	UINT32 clock = m_audiocpu->total_cycles() / TIMER_RATE;
+	uint32_t clock = m_audiocpu->total_cycles() / TIMER_RATE;
 
 	if (m_vlm != nullptr)
 		return (clock & 0x3) | (m_vlm->bsy() ? 0x04 : 0);

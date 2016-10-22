@@ -28,8 +28,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT16> m_nvram;
-	required_shared_ptr<UINT16> m_vectorram;
+	required_shared_ptr<uint16_t> m_nvram;
+	required_shared_ptr<uint16_t> m_vectorram;
 
 	int m_sound_status;
 	int m_xcenter;
@@ -50,5 +50,5 @@ public:
 	INTERRUPT_GEN_MEMBER(snd_timed_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	inline void read_vectorram(UINT16 *vectorram, int addr, int *x, int *y, int *c);
+	inline void read_vectorram(uint16_t *vectorram, int addr, int *x, int *y, int *c);
 };

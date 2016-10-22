@@ -51,7 +51,7 @@ class i80130_device :  public device_t
 {
 public:
 	// construction/destruction
-	i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_ack_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_ack.set_callback(object); }
@@ -67,7 +67,7 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	UINT8 inta_r() { return m_pic->acknowledge(); }
+	uint8_t inta_r() { return m_pic->acknowledge(); }
 
 	DECLARE_WRITE_LINE_MEMBER( ir0_w ) { m_pic->ir0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( ir1_w ) { m_pic->ir1_w(state); }

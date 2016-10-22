@@ -20,15 +20,15 @@
 class device_rom_interface : public device_memory_interface
 {
 public:
-	device_rom_interface(const machine_config &mconfig, device_t &device, UINT8 addrwidth, endianness_t endian = ENDIANNESS_LITTLE, UINT8 datawidth = 8);
+	device_rom_interface(const machine_config &mconfig, device_t &device, uint8_t addrwidth, endianness_t endian = ENDIANNESS_LITTLE, uint8_t datawidth = 8);
 	virtual ~device_rom_interface();
 
-	inline UINT8 read_byte(offs_t byteaddress) { return m_rom_direct->read_byte(byteaddress); }
-	inline UINT16 read_word(offs_t byteaddress) { return m_rom_direct->read_word(byteaddress); }
-	inline UINT32 read_dword(offs_t byteaddress) { return m_rom_direct->read_dword(byteaddress); }
-	inline UINT64 read_qword(offs_t byteaddress) { return m_rom_direct->read_qword(byteaddress); }
+	inline uint8_t read_byte(offs_t byteaddress) { return m_rom_direct->read_byte(byteaddress); }
+	inline uint16_t read_word(offs_t byteaddress) { return m_rom_direct->read_word(byteaddress); }
+	inline uint32_t read_dword(offs_t byteaddress) { return m_rom_direct->read_dword(byteaddress); }
+	inline uint64_t read_qword(offs_t byteaddress) { return m_rom_direct->read_qword(byteaddress); }
 
-	void set_rom(const void *base, UINT32 size);
+	void set_rom(const void *base, uint32_t size);
 	void set_rom_bank(int bank);
 
 protected:

@@ -44,7 +44,7 @@ class seibu_crtc_device : public device_t,
 {
 public:
 	// construction/destruction
-	seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_decrypt_key_callback(device_t &device, _Object object) { return downcast<seibu_crtc_device &>(device).m_decrypt_key_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_layer_en_callback(device_t &device, _Object object) { return downcast<seibu_crtc_device &>(device).m_layer_en_cb.set_callback(object); }
@@ -80,10 +80,10 @@ private:
 	devcb_write16       m_reg_1a_cb;
 	devcb_write16       m_layer_scroll_base_cb;
 	const address_space_config      m_space_config;
-	inline UINT16 read_word(offs_t address);
-	inline void write_word(offs_t address, UINT16 data);
+	inline uint16_t read_word(offs_t address);
+	inline void write_word(offs_t address, uint16_t data);
 
-	UINT16 m_reg_1a;
+	uint16_t m_reg_1a;
 };
 
 

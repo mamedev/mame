@@ -141,7 +141,7 @@ machine_config_constructor duscc_device::device_mconfig_additions() const
 //-------------------------------------------------
 //  duscc_device - constructor
 //-------------------------------------------------
-duscc_device::duscc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+duscc_device::duscc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_z80daisy_interface(mconfig, *this),
 		m_chanA(*this, CHANA_TAG),
@@ -175,7 +175,7 @@ duscc_device::duscc_device(const machine_config &mconfig, device_type type, cons
 		elem = 0;
 }
 
-duscc_device::duscc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+duscc_device::duscc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DUSCC, "DUSCC", tag, owner, clock, "duscc", __FILE__),
 		device_z80daisy_interface(mconfig, *this),
 		m_chanA(*this, CHANA_TAG),
@@ -203,16 +203,16 @@ duscc_device::duscc_device(const machine_config &mconfig, const char *tag, devic
 		elem = 0;
 }
 
-duscc26562_device::duscc26562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+duscc26562_device::duscc26562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: duscc_device(mconfig, DUSCC26562, "DUSCC 26562", tag, owner, clock, TYPE_DUSCC26562, "duscc26562", __FILE__){ }
 
-duscc26C562_device::duscc26C562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+duscc26C562_device::duscc26C562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: duscc_device(mconfig, DUSCC26C562, "DUSCC 26C562", tag, owner, clock, TYPE_DUSCC26C562, "duscc26C562", __FILE__){ }
 
-duscc68562_device::duscc68562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+duscc68562_device::duscc68562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: duscc_device(mconfig, DUSCC68562, "DUSCC 68562", tag, owner, clock, TYPE_DUSCC68562, "duscc68562", __FILE__){ }
 
-duscc68C562_device::duscc68C562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+duscc68C562_device::duscc68C562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: duscc_device(mconfig, DUSCC68C562, "DUSCC 68C562", tag, owner, clock, TYPE_DUSCC68C562, "duscc68C562", __FILE__){ }
 
 //-------------------------------------------------
@@ -434,7 +434,7 @@ void duscc_device::reset_interrupts()
 	check_interrupts();
 }
 
-UINT8 duscc_device::modify_vector(UINT8 vec, int index, UINT8 src)
+uint8_t duscc_device::modify_vector(uint8_t vec, int index, uint8_t src)
 {
 		/*
 		  Interrupt Vector Modification
@@ -494,8 +494,8 @@ UINT8 duscc_device::modify_vector(UINT8 vec, int index, UINT8 src)
 //-------------------------------------------------
 void duscc_device::trigger_interrupt(int index, int state)
 {
-	UINT8 vector = m_ivr;
-	UINT8 source = 0;
+	uint8_t vector = m_ivr;
+	uint8_t source = 0;
 	int priority_level = 0;
 
 	LOGINT(("%s %s:%c %02x \n",FUNCNAME, tag(), 'A' + index, state));
@@ -550,7 +550,7 @@ WRITE8_MEMBER( duscc_device::write )
 //**************************************************************************
 //  DUSCC CHANNEL
 //**************************************************************************
-duscc_channel::duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+duscc_channel::duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DUSCC_CHANNEL, "DUSCC channel", tag, owner, clock, "duscc_channel", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_brg_rx_rate(0),
@@ -871,13 +871,13 @@ void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param
          mode, and if the TEOM on zero count or done control bit (TPR[4)) is asserted, the FIFOed send EOM command will
          be automatically asserted when the character which causes the count to go to zero is loaded into the transmit FIFO.
 */
-UINT8 duscc_channel::do_dusccreg_ctcr_r()
+uint8_t duscc_channel::do_dusccreg_ctcr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_ctcr));
 	return m_ctcr;
 }
 
-void duscc_channel::do_dusccreg_ctcr_w(UINT8 data)
+void duscc_channel::do_dusccreg_ctcr_w(uint8_t data)
 {
 	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
 	m_ctcr = data;
@@ -889,16 +889,16 @@ void duscc_channel::do_dusccreg_ctcr_w(UINT8 data)
     from preset regsiter command or when.the counter/timer reaches zero count and the zero detect control bit (CTCR[6]) is negated.
     The minimum 16-bit counter/timer preset value is H'0002'.
 */
-UINT8 duscc_channel::do_dusccreg_ctprh_r()
+uint8_t duscc_channel::do_dusccreg_ctprh_r()
 {
-	UINT8 ret = ((m_ctpr >> 8) & 0xff );
+	uint8_t ret = ((m_ctpr >> 8) & 0xff );
 	LOG(("%s(%02x)\n", FUNCNAME, ret));
 
 	//  return m_ctprh;
 	return ret;
 }
 
-void duscc_channel::do_dusccreg_ctprh_w(UINT8 data)
+void duscc_channel::do_dusccreg_ctprh_w(uint8_t data)
 {
 	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
 	//  m_ctprh = data;
@@ -912,15 +912,15 @@ void duscc_channel::do_dusccreg_ctprh_w(UINT8 data)
     from preset register command or when the counter/timer reaches zero count and the zero detect control bit (CTCR[6]) is negated.
     The minimum 16-bit counter/timer preset value is H'0002'.
 */
-UINT8 duscc_channel::do_dusccreg_ctprl_r()
+uint8_t duscc_channel::do_dusccreg_ctprl_r()
 {
-	UINT8 ret = (m_ctpr & 0xff);
+	uint8_t ret = (m_ctpr & 0xff);
 	LOG(("%s(%02x)\n", FUNCNAME, ret));
 	//  return m_ctprl;
 	return ret;
 }
 
-void duscc_channel::do_dusccreg_ctprl_w(UINT8 data)
+void duscc_channel::do_dusccreg_ctprl_w(uint8_t data)
 {
 	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
 	//  m_ctprl = data;
@@ -935,9 +935,9 @@ void duscc_channel::do_dusccreg_ctprl_w(UINT8 data)
     the read being performed while the CIT is changing. This count may be continued after the register is read.
 */
 
-UINT8 duscc_channel::do_dusccreg_cth_r()
+uint8_t duscc_channel::do_dusccreg_cth_r()
 {
-	UINT8 ret = ((m_ct >> 8) & 0xff );
+	uint8_t ret = ((m_ct >> 8) & 0xff );
 	LOG(("%s(%02x)\n", FUNCNAME, ret));
 
 	return ret;
@@ -949,9 +949,9 @@ UINT8 duscc_channel::do_dusccreg_cth_r()
     recommended that the CIT be stopped via a stop counter command before it is read, in order to prevent errors which may occur due to
     the read being performed while the CIT is changing. This count may be continued after the register is read.
 */
-UINT8 duscc_channel::do_dusccreg_ctl_r()
+uint8_t duscc_channel::do_dusccreg_ctl_r()
 {
-	UINT8 ret = (m_ct & 0xff);
+	uint8_t ret = (m_ct & 0xff);
 	LOG(("%s(%02x)\n", FUNCNAME, ret));
 	//  return m_ctl;
 	return ret;
@@ -1029,7 +1029,7 @@ void duscc_channel::rcv_callback()
 
 void duscc_channel::rcv_complete()
 {
-	UINT8 data;
+	uint8_t data;
 
 	receive_register_extract();
 	data = get_received_char();
@@ -1166,61 +1166,61 @@ int duscc_channel::get_tx_word_length()
 
 // register read methods - see correspondning write method for details on each register
 
-UINT8 duscc_channel::do_dusccreg_cmr1_r()
+uint8_t duscc_channel::do_dusccreg_cmr1_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_cmr1));
 	return m_cmr1;
 }
 
-UINT8 duscc_channel::do_dusccreg_cmr2_r()
+uint8_t duscc_channel::do_dusccreg_cmr2_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_cmr2));
 	return m_cmr2;
 }
 
-UINT8 duscc_channel::do_dusccreg_s1r_r()
+uint8_t duscc_channel::do_dusccreg_s1r_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_s1r));
 	return m_s1r;
 }
 
-UINT8 duscc_channel::do_dusccreg_s2r_r()
+uint8_t duscc_channel::do_dusccreg_s2r_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_s2r));
 	return m_s2r;
 }
 
-UINT8 duscc_channel::do_dusccreg_tpr_r()
+uint8_t duscc_channel::do_dusccreg_tpr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_tpr));
 	return m_tpr;
 }
 
-UINT8 duscc_channel::do_dusccreg_ttr_r()
+uint8_t duscc_channel::do_dusccreg_ttr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_ttr));
 	return m_ttr;
 }
 
-UINT8 duscc_channel::do_dusccreg_rpr_r()
+uint8_t duscc_channel::do_dusccreg_rpr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_rpr));
 	return m_rpr;
 }
 
-UINT8 duscc_channel::do_dusccreg_rtr_r()
+uint8_t duscc_channel::do_dusccreg_rtr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_rtr));
 	return m_rtr;
 }
 
-UINT8 duscc_channel::do_dusccreg_omr_r()
+uint8_t duscc_channel::do_dusccreg_omr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_omr));
 	return m_omr;
 }
 
-UINT8 duscc_channel::do_dusccreg_pcr_r()
+uint8_t duscc_channel::do_dusccreg_pcr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_pcr));
 	return m_pcr;
@@ -1228,15 +1228,15 @@ UINT8 duscc_channel::do_dusccreg_pcr_r()
 
 /* Commands to the DUSCC are entered through the channel command register.A read of this
    register returns the last invoked command (with bits 4 and 5 set to 1). */
-UINT8 duscc_channel::do_dusccreg_ccr_r()
+uint8_t duscc_channel::do_dusccreg_ccr_r()
 {
 	LOG(("%s\n", FUNCNAME));
-	return (UINT8) m_ccr | 1 << 4 | 1 << 5;
+	return (uint8_t) m_ccr | 1 << 4 | 1 << 5;
 }
 
-UINT8 duscc_channel::do_dusccreg_rxfifo_r()
+uint8_t duscc_channel::do_dusccreg_rxfifo_r()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	LOGINT(("%s\n", FUNCNAME));
 	LOGRX((" - RX rp:%d wp:%d sz:%d\n", m_rx_fifo_rp, m_rx_fifo_wp, m_rx_fifo_sz));
@@ -1256,25 +1256,25 @@ UINT8 duscc_channel::do_dusccreg_rxfifo_r()
 		LOGINT(("- RX FIFO empty despite RxREADY\n"));
 	}
 
-	return (UINT8) data;
+	return (uint8_t) data;
 }
 
-UINT8 duscc_channel::do_dusccreg_rsr_r()
+uint8_t duscc_channel::do_dusccreg_rsr_r()
 {
 	LOG(("%s: %02x\n", FUNCNAME, m_rsr));
-	return (UINT8) m_rsr;
+	return (uint8_t) m_rsr;
 }
 
-UINT8 duscc_channel::do_dusccreg_trsr_r()
+uint8_t duscc_channel::do_dusccreg_trsr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_trsr));
 	return m_trsr;
 }
 
-UINT8 duscc_channel::do_dusccreg_ictsr_r()
+uint8_t duscc_channel::do_dusccreg_ictsr_r()
 {
 	logerror("%s is not implemented yet\n", FUNCNAME);
-	return (UINT8) m_ictsr;
+	return (uint8_t) m_ictsr;
 }
 
 /* General Status Register (GSR)
@@ -1298,21 +1298,21 @@ UINT8 duscc_channel::do_dusccreg_ictsr_r()
     FIFO to be read by the CPU. See description of OMR[3]. RxRDY is initially reset (negated) by a chip reset or when a 'reset Channel A
     receiver' command is invoked.
 */
-UINT8 duscc_channel::do_dusccreg_gsr_r()
+uint8_t duscc_channel::do_dusccreg_gsr_r()
 {
-	static UINT8 old_gsr = 0;
+	static uint8_t old_gsr = 0;
 	if (m_uart->m_gsr != old_gsr) LOG(("%s <- %02x\n", FUNCNAME, m_uart->m_gsr));
 	old_gsr = m_uart->m_gsr;
 	return m_uart->m_gsr;
 }
 
-UINT8 duscc_channel::do_dusccreg_ier_r()
+uint8_t duscc_channel::do_dusccreg_ier_r()
 {
 	LOGINT(("%s <- %02x\n", FUNCNAME, m_ier));
-	return (UINT8) m_ier;
+	return (uint8_t) m_ier;
 }
 
-UINT8 duscc_channel::do_dusccreg_cid_r()
+uint8_t duscc_channel::do_dusccreg_cid_r()
 {
 	LOG(("%s\n", FUNCNAME));
 	if ( m_uart->m_variant != SET_CMOS )
@@ -1329,7 +1329,7 @@ UINT8 duscc_channel::do_dusccreg_cid_r()
 		return m_cid;
 }
 
-UINT8 duscc_channel::do_dusccreg_ivr_ivrm_r()
+uint8_t duscc_channel::do_dusccreg_ivr_ivrm_r()
 {
 	LOG(("%s", FUNCNAME));
 	if ( m_index == duscc_device::CHANNEL_A )
@@ -1344,61 +1344,61 @@ UINT8 duscc_channel::do_dusccreg_ivr_ivrm_r()
 	}
 }
 
-UINT8 duscc_channel::do_dusccreg_icr_r()
+uint8_t duscc_channel::do_dusccreg_icr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_uart->m_icr));
 	return m_uart->m_icr;
 }
 
-UINT8 duscc_channel::do_dusccreg_mrr_r()
+uint8_t duscc_channel::do_dusccreg_mrr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_mrr));
 	return m_mrr;
 }
 
-UINT8 duscc_channel::do_dusccreg_ier1_r()
+uint8_t duscc_channel::do_dusccreg_ier1_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_ier1));
 	return m_ier1;
 }
 
-UINT8 duscc_channel::do_dusccreg_ier2_r()
+uint8_t duscc_channel::do_dusccreg_ier2_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_ier2));
 	return m_ier2;
 }
 
-UINT8 duscc_channel::do_dusccreg_ier3_r()
+uint8_t duscc_channel::do_dusccreg_ier3_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_ier3));
 	return m_ier3;
 }
 
-UINT8 duscc_channel::do_dusccreg_trcr_r()
+uint8_t duscc_channel::do_dusccreg_trcr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_trcr));
 	return m_trcr;
 }
 
-UINT8 duscc_channel::do_dusccreg_rflr_r()
+uint8_t duscc_channel::do_dusccreg_rflr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_rflr));
 	return m_rflr;
 }
 
-UINT8 duscc_channel::do_dusccreg_ftlr_r()
+uint8_t duscc_channel::do_dusccreg_ftlr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_ftlr));
 	return m_ftlr;
 }
 
-UINT8 duscc_channel::do_dusccreg_trmsr_r()
+uint8_t duscc_channel::do_dusccreg_trmsr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_trmsr));
 	return m_trmsr;
 }
 
-UINT8 duscc_channel::do_dusccreg_telr_r()
+uint8_t duscc_channel::do_dusccreg_telr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_telr));
 	return m_telr;
@@ -1462,7 +1462,7 @@ UINT8 duscc_channel::do_dusccreg_telr_r()
         This mode is required when the external sync mode is selected.
     111 Asynchronous. Start/stop format.
 */
-void duscc_channel::do_dusccreg_cmr1_w(UINT8 data)
+void duscc_channel::do_dusccreg_cmr1_w(uint8_t data)
 {
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 	m_cmr1 = data;
@@ -1540,7 +1540,7 @@ void duscc_channel::do_dusccreg_cmr1_w(UINT8 data)
      111 CRC-CCITT: Divisor ~ x16+x12+x5+1, dividend preset to ones. The TX sends the calculated CRC inverted. The RX indicates an error if the computed
            CRC is not equal to H' FOB8'. Not valid for ASYNC mode.
 */
-void duscc_channel::do_dusccreg_cmr2_w(UINT8 data)
+void duscc_channel::do_dusccreg_cmr2_w(uint8_t data)
 {
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 	m_cmr2 = data;
@@ -1560,7 +1560,7 @@ void duscc_channel::do_dusccreg_cmr2_w(UINT8 data)
    BOP primary mode or secondary modes where address comparisons are not made, such as when extended addressing is specified.
    TODO: Add check in receive_data and set status bits accordingly
 */
-void duscc_channel::do_dusccreg_s1r_w(UINT8 data)
+void duscc_channel::do_dusccreg_s1r_w(uint8_t data)
 {
 	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
 	m_s1r = data;
@@ -1574,7 +1574,7 @@ void duscc_channel::do_dusccreg_s1r_w(UINT8 data)
    the register even if parity is specified in CMR1[4:3J. However, a character received w~ parity error, when parity is specified, will not
    match. If parity Is specified, then any unused bits in this register must be programmed to zeros. In BOP secondary mode using two
    address octets, it contains the partial address used to compare the second received address octet.*/
-void duscc_channel::do_dusccreg_s2r_w(UINT8 data)
+void duscc_channel::do_dusccreg_s2r_w(uint8_t data)
 {
 	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
 	m_s2r = data;
@@ -1620,7 +1620,7 @@ void duscc_channel::do_dusccreg_s2r_w(UINT8 data)
           fields is always 8 bits, and the value of this field only applies to the information (I) field, except for the last character of the I field,
           whose length is specified by OMR[7:5).
 */
-void duscc_channel::do_dusccreg_tpr_w(UINT8 data)
+void duscc_channel::do_dusccreg_tpr_w(uint8_t data)
 {
 	LOG(("%s(%02x) Setting up Transmit Parameters\n", FUNCNAME, data));
 	m_tpr = data;
@@ -1664,7 +1664,7 @@ void duscc_channel::do_dusccreg_tpr_w(UINT8 data)
           0110  300         1110    19.2K
           0111  600         1111    38.4K
 */
-void duscc_channel::do_dusccreg_ttr_w(UINT8 data)
+void duscc_channel::do_dusccreg_ttr_w(uint8_t data)
 {
 	LOG(("%s(%02x) Setting up Transmit Timing\n", FUNCNAME, data));
 	m_ttr = data;
@@ -1763,7 +1763,7 @@ void duscc_channel::do_dusccreg_ttr_w(UINT8 data)
     of bits assembled for the last character of the l-field is less than the value programmed in this field, RCL not zero (RSR[O]) is asserted
     and the actual number of bits received is given in TRSR[2:0].
 */
-void duscc_channel::do_dusccreg_rpr_w(UINT8 data)
+void duscc_channel::do_dusccreg_rpr_w(uint8_t data)
 {
 	LOG(("%s(%02x) Setting up Receiver Parameters\n", FUNCNAME, data));
 	m_rpr = data;
@@ -1800,7 +1800,7 @@ void duscc_channel::do_dusccreg_rpr_w(UINT8 data)
     [3:0] Bit Rate Select- This field selects an output from the bit rate generator to be used by the receiver circuits. The actual frequency
           output from the BRG is 32X the bit rate shown in Table 5.*/
 
-void duscc_channel::do_dusccreg_rtr_w(UINT8 data)
+void duscc_channel::do_dusccreg_rtr_w(uint8_t data)
 {
 	LOG(("%s(%02x) Setting up Receiver Timing\n", FUNCNAME, data));
 	m_rtr = data;
@@ -1866,7 +1866,7 @@ void duscc_channel::do_dusccreg_rtr_w(UINT8 data)
     [0] Request-to-Send Output - This bit controls the TxDRQN/GP02N/RTSN and SYNOUTN/RTSN pin, when either is
      used as a RTS output. The output is High when the bit is a 0 and is Low when the bit is a 1.
 */
-void duscc_channel::do_dusccreg_omr_w(UINT8 data)
+void duscc_channel::do_dusccreg_omr_w(uint8_t data)
 {
 	LOG(("%s(%02x) Output and Miscellaneous Register\n", FUNCNAME, data));
 	m_omr = data;
@@ -1910,7 +1910,7 @@ void duscc_channel::do_dusccreg_omr_w(UINT8 data)
      110 The pin is an output for the transmitter shift register clock.
      111 The pin is an output for the receiver shift register clock.
 */
-void duscc_channel::do_dusccreg_pcr_w(UINT8 data)
+void duscc_channel::do_dusccreg_pcr_w(uint8_t data)
 {
 	LOG(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));
 	m_pcr = data;
@@ -1951,7 +1951,7 @@ void duscc_channel::do_dusccreg_pcr_w(UINT8 data)
  * TODO:
  * - support enable/disable of Tx/Rx using m_tra/m_rcv respectivelly
  */
-void duscc_channel::do_dusccreg_ccr_w(UINT8 data)
+void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 {
 	int rate;
 
@@ -2053,7 +2053,7 @@ void duscc_channel::do_dusccreg_ccr_w(UINT8 data)
 	return;
 }
 
-void duscc_channel::do_dusccreg_txfifo_w(UINT8 data)
+void duscc_channel::do_dusccreg_txfifo_w(uint8_t data)
 {
 	LOGTX((" - TX %s(%02x)'%c'\n", FUNCNAME,data, isalnum(data) ? data : ' '));
 
@@ -2112,21 +2112,21 @@ void duscc_channel::do_dusccreg_txfifo_w(UINT8 data)
    character by character or on a block basis. For character by character status, the SR bits should be read and then cleared
    before reading the character data from RxFIFO. For block status, the status register is initially cleared and then read after the
    message is received. Asserted status bits can be programmed to generate an interrupt (see Interrupt Enable Register).*/
-void duscc_channel::do_dusccreg_rsr_w(UINT8 data)
+void duscc_channel::do_dusccreg_rsr_w(uint8_t data)
 {
 	LOG(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));
 	m_rsr &= ~data; // Clear only bits which are 1:s
 	return;
 }
 
-void duscc_channel::do_dusccreg_trsr_w(UINT8 data)
+void duscc_channel::do_dusccreg_trsr_w(uint8_t data)
 {
 	LOG(("%s: %02x - not supported yet\n", FUNCNAME, data));
 	m_trsr = data;
 	return;
 }
 
-void duscc_channel::do_dusccreg_ictsr_w(UINT8 data)
+void duscc_channel::do_dusccreg_ictsr_w(uint8_t data)
 {
 	LOG(("%s: %02x - not supported yet\n", FUNCNAME, data));
 	m_ictsr = data;
@@ -2152,7 +2152,7 @@ void duscc_channel::do_dusccreg_ictsr_w(UINT8 data)
    [0) Channel A Receiver Ready - The assertion of this bit indicates that one or more characters are available in the Channel A receiver
        FIFO to be read by the CPU. See description of OMR[3]. RxRDY is initially reset (negated) by a chip reset or when a 'reset Channel A
        receiver' command is invoked.*/
-void duscc_channel::do_dusccreg_gsr_w(UINT8 data)
+void duscc_channel::do_dusccreg_gsr_w(uint8_t data)
 {
 	LOG(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));
 	m_uart->m_gsr &= (data & REG_GSR_XXREADY_MASK); // Reset only XXREADY bits, the rest needs to be reset by the source
@@ -2162,7 +2162,7 @@ void duscc_channel::do_dusccreg_gsr_w(UINT8 data)
 /* Interrupt Enable Register (IERA, IERB)
    This register controls whether the assertion of bits in the channel's status registers causes an interrupt to be generated. An additional
    condition for an interrupt to be generated is that the channel's master interrupt enabled bit, ICR[O] or ICR[1], be asserted.*/
-void duscc_channel::do_dusccreg_ier_w(UINT8 data)
+void duscc_channel::do_dusccreg_ier_w(uint8_t data)
 {
 	LOGINT(("%c %s(%02x)\n", 'A' + m_index, FUNCNAME, data));
 	if (REG_IER_DCD_CTS & (data ^ m_ier)) LOGINT(("- DCD/CTS interrups %s\n", (data & REG_IER_DCD_CTS) ? "enabled" : "disabled" ));
@@ -2178,14 +2178,14 @@ void duscc_channel::do_dusccreg_ier_w(UINT8 data)
 	return;
 }
 
-void duscc_channel::do_dusccreg_ivr_w(UINT8 data)
+void duscc_channel::do_dusccreg_ivr_w(uint8_t data)
 {
 	m_uart->m_ivr = data;
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 	return;
 }
 
-void duscc_channel::do_dusccreg_icr_w(UINT8 data)
+void duscc_channel::do_dusccreg_icr_w(uint8_t data)
 {
 	m_uart->m_icr = data;
 	LOG(("%s(%02x)\n", FUNCNAME, data));
@@ -2198,7 +2198,7 @@ void duscc_channel::do_dusccreg_icr_w(UINT8 data)
 	return;
 }
 
-void duscc_channel::do_dusccreg_sea_rea_w(UINT8 data)
+void duscc_channel::do_dusccreg_sea_rea_w(uint8_t data)
 {
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 	if ( m_uart->m_variant != SET_CMOS )
@@ -2214,20 +2214,20 @@ void duscc_channel::do_dusccreg_sea_rea_w(UINT8 data)
 	return;
 }
 
-void duscc_channel::do_dusccreg_mrr_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ier1_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ier2_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ier3_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_trcr_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ftlr_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_trmsr_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_mrr_w(uint8_t data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_ier1_w(uint8_t data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_ier2_w(uint8_t data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_ier3_w(uint8_t data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_trcr_w(uint8_t data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_ftlr_w(uint8_t data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_trmsr_w(uint8_t data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
 
 //-------------------------------------------------
 //  control_read - read register
 //-------------------------------------------------
-UINT8 duscc_channel::read(offs_t &offset)
+uint8_t duscc_channel::read(offs_t &offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	int reg = (offset | m_a7) & ~0x20; // Add extended rgisters and remove the channel B bit from offset
 	LOG(("\"%s\" %s: %c : Register read '%02x' <- [%02x]", m_owner->tag(), FUNCNAME, 'A' + m_index, data, reg ));
 	LOGR((" *  %c Reg %02x -> %02x  \n", 'A' + m_index, reg, data));
@@ -2275,7 +2275,7 @@ UINT8 duscc_channel::read(offs_t &offset)
 //  write - write register
 //-------------------------------------------------
 
-void duscc_channel::write(UINT8 data, offs_t &offset)
+void duscc_channel::write(uint8_t data, offs_t &offset)
 {
 	int reg = (offset | m_a7) & ~0x20; // Add extended rgisters and remove the channel B bit from offset
 
@@ -2328,10 +2328,10 @@ void duscc_channel::write(UINT8 data, offs_t &offset)
 }
 
 /* Get data from top of fifo data but restore read pointer in case of exit latch lock */
-UINT8 duscc_channel::m_rx_fifo_rp_data()
+uint8_t duscc_channel::m_rx_fifo_rp_data()
 {
-		UINT8 data;
-		UINT8 old_rp = m_rx_fifo_rp;
+		uint8_t data;
+		uint8_t old_rp = m_rx_fifo_rp;
 		m_rx_fifo_rp_step();
 		data = m_rx_data_fifo[m_rx_fifo_rp];
 		m_rx_fifo_rp = old_rp;
@@ -2370,7 +2370,7 @@ void duscc_channel::m_tx_fifo_rp_step()
 //  receive_data - receive data word into fifo
 //-------------------------------------------------
 
-void duscc_channel::receive_data(UINT8 data)
+void duscc_channel::receive_data(uint8_t data)
 {
 	LOG(("\"%s\": %c : Receive Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 

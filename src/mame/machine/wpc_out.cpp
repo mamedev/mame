@@ -6,7 +6,7 @@
 
 const device_type WPC_OUT = &device_creator<wpc_out_device>;
 
-wpc_out_device::wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wpc_out_device::wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_OUT, "Williams Pinball Controller Output Control", tag, owner, clock, "wpc_out", __FILE__)
 {
 	names = nullptr;
@@ -35,7 +35,7 @@ void wpc_out_device::gi_update()
 {
 	attotime now = machine().time();
 	attotime delta = now - previous_gi_update;
-	UINT32 delta_us = delta.as_ticks(1e6);
+	uint32_t delta_us = delta.as_ticks(1e6);
 	for(int i=0; i<gi_count; i++)
 		if(gi & (1 <<i))
 			gi_time[i] += delta_us;
@@ -64,7 +64,7 @@ void wpc_out_device::send_output(int sid, int state)
 WRITE8_MEMBER(wpc_out_device::out_w)
 {
 	first_after_led = false;
-	UINT8 diff = state[offset] ^ data;
+	uint8_t diff = state[offset] ^ data;
 	state[offset] = data;
 	if(diff)
 		for(int i=0; i<8; i++)

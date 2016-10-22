@@ -53,10 +53,10 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
     DPLL clock recov         Y             Y          Y         Y
     -- Additional features CMOS versions -----------------------------------
  x  Status FIFO              N             Y          Y         Y
-    SWI ack feat             N             Y          Y         Y
+ x  SWI ack feat             N             Y          Y         Y
     higher bps w ext DPLL    N           32Mbps     32Mbps    32Mbps
     -- Additional features 85C30 -------------------------------------------
-    New WR7 feat             N           85C30        Y         Y
+ x  New WR7 feat             N           85C30        Y         Y
     Improved SDLC            N           85C30        Y         Y
     Improved reg handl       N           85C30        Y         Y
     Improved auto feat       N           85C30        Y         Y
@@ -81,9 +81,11 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define VERBOSE 0
 #define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG(x) LOGPRINT(x)
-#define LOGR(x)
+#define LOGR(x)  LOGPRINT(x)
 #define LOGSETUP(x) LOGPRINT(x)
-#define LOGRCV(x) LOGPRINT(x)
+#define LOGINT(x) {} LOGPRINT(x)
+#define LOGTX(x) {} LOGPRINT(x)
+#define LOGRCV(x){}
 #if VERBOSE == 2
 #define logerror printf
 #endif
@@ -144,7 +146,7 @@ machine_config_constructor z80scc_device::device_mconfig_additions() const
 //  z80scc_device - constructor
 //-------------------------------------------------
 
-z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_z80daisy_interface(mconfig, *this),
 	m_chanA(*this, CHANA_TAG),
@@ -174,7 +176,7 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 		elem = 0;
 }
 
-z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80SCC, "Z80 SCC", tag, owner, clock, "z80scc", __FILE__),
 		device_z80daisy_interface(mconfig, *this),
 		m_chanA(*this, CHANA_TAG),
@@ -200,28 +202,28 @@ z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, dev
 		elem = 0;
 }
 
-scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC8030, "SCC 8030", tag, owner, clock, TYPE_SCC8030, "scc8030", __FILE__){ }
 
-scc80C30_device::scc80C30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scc80C30_device::scc80C30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC80C30, "SCC 80C30", tag, owner, clock, TYPE_SCC80C30, "scc80C30", __FILE__){ }
 
-scc80230_device::scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scc80230_device::scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC80230, "SCC 80230", tag, owner, clock, TYPE_SCC80230, "scc80230", __FILE__){ }
 
-scc8530_device::scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scc8530_device::scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC8530N, "SCC 8530", tag, owner, clock, TYPE_SCC8530, "scc8530", __FILE__){ }
 
-scc85C30_device::scc85C30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scc85C30_device::scc85C30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC85C30, "SCC 85C30", tag, owner, clock, TYPE_SCC85C30, "scc85C30", __FILE__){ }
 
-scc85230_device::scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scc85230_device::scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC85230, "SCC 85230", tag, owner, clock, TYPE_SCC85230, "scc85230", __FILE__){ }
 
-scc85233_device::scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scc85233_device::scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC85233, "SCC 85233", tag, owner, clock, TYPE_SCC85233, "scc85233", __FILE__){ }
 
-scc8523L_device::scc8523L_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scc8523L_device::scc8523L_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC8523L, "SCC 8523L", tag, owner, clock, TYPE_SCC8523L, "scc8523L", __FILE__){ }
 
 //-------------------------------------------------
@@ -250,6 +252,8 @@ void z80scc_device::device_start()
 
 	// state saving
 	save_item(NAME(m_int_state));
+	save_item(NAME(m_int_source));
+	save_item(NAME(m_wr9));
 	save_item(NAME(m_wr0_ptrbits));
 	LOG((" - SCC variant %02x\n", m_variant));
 }
@@ -263,39 +267,57 @@ void z80scc_device::device_reset()
 {
 	LOG(("%s %s \n",tag(), FUNCNAME));
 
+	// Do channel reset on both channels
 	m_chanA->reset();
 	m_chanB->reset();
+
+	// Fix hardware reset values for registers where it differs from channel reset values
+	m_wr9  &= 0x3c;
+	m_wr9  |= 0xc0;
+	m_chanA->m_wr10  = 0x00;
+	m_chanB->m_wr10  = 0x00;
+	m_chanA->m_wr11  = 0x08;
+	m_chanB->m_wr11  = 0x08;
+	m_chanA->m_wr14 &= 0xf0;
+	m_chanA->m_wr14 |= 0x30;
+	m_chanB->m_wr14 &= 0xf0;
+	m_chanB->m_wr14 |= 0x30;
 }
 
 /*
  * Interrupts
 Each of the SCC's two channels contain three sources of interrupts, making a total of six interrupt
 sources. These three sources of interrupts are: 1) Receiver, 2) Transmitter, and 3) External/Status
-conditions. In addition, there are several conditions that may cause these interrupts.*/
+conditions. In addition, there are several conditions that may cause these interrupts.
+
+To allow for control over the daisy chain, the SCC has a Disable Lower Chain (DLC) software command (WR9 bit 2)
+that pulls IEO Low. This selectively deactivates parts of the daisy chain regardless of the interrupt status.
+*/
 //-------------------------------------------------
 //  z80daisy_irq_state - get interrupt status
 //-------------------------------------------------
-
 int z80scc_device::z80daisy_irq_state()
 {
 	int state = 0;
-	int i;
 
 	LOG(("%s %s A:%d%d%d B:%d%d%d ",tag(), FUNCNAME,
 			m_int_state[0], m_int_state[1], m_int_state[2],
 			m_int_state[3], m_int_state[4], m_int_state[5]));
 
 	// loop over all interrupt sources
-	for (i = 0; i < 6; i++)
+	for (auto & elem : m_int_state)
 	{
 		// if we're servicing a request, don't indicate more interrupts
-		if (m_int_state[i] & Z80_DAISY_IEO)
+		if (elem & Z80_DAISY_IEO)
 		{
 			state |= Z80_DAISY_IEO;
 			break;
 		}
-		state |= m_int_state[i];
+		state |= elem;
 	}
+
+	// Last chance to keep the control of the interrupt line
+	state |= (m_wr9 & z80scc_channel::WR9_BIT_DLC) ? Z80_DAISY_IEO : 0;
 
 	LOG(("Interrupt State %u\n", state));
 
@@ -309,57 +331,46 @@ int z80scc_device::z80daisy_irq_state()
 
 int z80scc_device::z80daisy_irq_ack()
 {
-	int i;
-
-	LOG(("%s %s - needs fixing for SCC\n",tag(), FUNCNAME));
-
 	// loop over all interrupt sources
-	for (i = 0; i < 6; i++)
+	for (auto & elem : m_int_state)
 	{
 		// find the first channel with an interrupt requested
-		if (m_int_state[i] & Z80_DAISY_INT)
+		if (elem & Z80_DAISY_INT)
 		{
-			// clear interrupt, switch to the IEO state, and update the IRQs
-			m_int_state[i] = Z80_DAISY_IEO;
-			//m_chanA->m_rr0 &= ~z80scc_channel::RR0_INTERRUPT_PENDING;
+			elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
 			check_interrupts();
-
-			//LOG(("%s %s : Interrupt Acknowledge Vector %02x\n",tag(), FUNCNAME, m_chanB->m_rr2));
-
-			return m_chanB->m_rr2;
+			LOGINT((" - Found an INT request, "));
+			if (m_wr9 & z80scc_channel::WR9_BIT_VIS)
+			{
+				LOGINT(("but WR9 D1 set to use autovector, returning -1\n"));
+				return -1;
+			}
+			else
+			{
+				LOGINT(("returning RR2: %02x\n", m_chanB->m_rr2 ));
+				return m_chanB->m_rr2;
+			}
 		}
 	}
 
 	//logerror("z80scc_irq_ack: failed to find an interrupt to ack!\n");
 
-	return m_chanB->m_rr2;
+	return -1;
 }
 
 
 //-------------------------------------------------
 //  z80daisy_irq_reti - return from interrupt
 //-------------------------------------------------
-
+/*
+"SCC Interrupt Daisy-Chain Operation
+In the SCC, the IUS bit normally controls the state of the IEO line. The IP bit affects the daisy
+chain only during an Interrupt Acknowledge cycle. Since the IP bit is normally not part of the SCC
+interrupt daisy chain, there is no need to decode the RETI instruction. To allow for control over the
+daisy chain, the SCC has a Disable Lower Chain (DLC) software command (WR9 bit 2) that pulls IEO Low."
+*/
 void z80scc_device::z80daisy_irq_reti()
 {
-	int i;
-
-	LOG(("%s %s \n",tag(), FUNCNAME));
-
-	// loop over all interrupt sources
-	for (i = 0; i < 6; i++)
-	{
-		// find the first channel with an IEO pending
-		if (m_int_state[i] & Z80_DAISY_IEO)
-		{
-			// clear the IEO state and update the IRQs
-			m_int_state[i] &= ~Z80_DAISY_IEO;
-			check_interrupts();
-			return;
-		}
-	}
-
-	//logerror("z80scc_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
 
 
@@ -392,31 +403,35 @@ void z80scc_device::reset_interrupts()
 	check_interrupts();
 }
 
-UINT8 z80scc_device::modify_vector(UINT8 vec, int i, UINT8 src)
+uint8_t z80scc_device::modify_vector(uint8_t vec, int i, uint8_t src)
 {
-		/*
-		  Interrupt Vector Modification
-		  V3 V2 V1 Status High/Status Low =0
-		  V4 V5 V6 Status High/Status Low =1
-		  0  0  0 Ch B Transmit Buffer Empty
-		  0  0  1 Ch B External/Status Change
-		  0  1  0 Ch B Receive Char. Available
-		  0  1  1 Ch B Special Receive Condition
-		  1  0  0 Ch A Transmit Buffer Empty
-		  1  0  1 Ch A External/Status Change
-		  1  1  0 Ch A Receive Char. Available
-		  1  1  1 Ch A Special Receive Condition
-		*/
-		// Add channel offset according to table above
+	/*
+	  Interrupt Vector Modification
+	  V3 V2 V1 Status High/Status Low =0
+	  V4 V5 V6 Status High/Status Low =1
+	  0  0  0 Ch B Transmit Buffer Empty
+	  0  0  1 Ch B External/Status Change
+	  0  1  0 Ch B Receive Char. Available
+	  0  1  1 Ch B Special Receive Condition
+	  1  0  0 Ch A Transmit Buffer Empty
+	  1  0  1 Ch A External/Status Change
+	  1  1  0 Ch A Receive Char. Available
+	  1  1  1 Ch A Special Receive Condition
+	*/
+
+	// Add channel offset according to table above
+	src &= 3;
 	src |= (i == CHANNEL_A ? 0x04 : 0x00 );
 
 	// Modify vector according to Hi/lo bit of WR9
-	if (m_chanA->m_wr9 & z80scc_channel::WR9_BIT_SHSL) // Affect V4-V6
+	if (m_wr9 & z80scc_channel::WR9_BIT_SHSL) // Affect V4-V6
 	{
+		vec &= 0x8f;
 		vec |= src << 4;
 	}
 	else              // Affect V1-V3
 	{
+		vec &= 0xf1;
 		vec |= src << 1;
 	}
 	return vec;
@@ -428,8 +443,8 @@ UINT8 z80scc_device::modify_vector(UINT8 vec, int i, UINT8 src)
 //-------------------------------------------------
 void z80scc_device::trigger_interrupt(int index, int state)
 {
-	UINT8 vector = m_chanB->m_wr2;
-	UINT8 source = 0;
+	uint8_t vector = m_chanA->m_rr2;
+	uint8_t source = 0;
 	int priority;
 
 	int prio_level = 0;
@@ -437,7 +452,7 @@ void z80scc_device::trigger_interrupt(int index, int state)
 	LOG(("%s %s:%c %02x \n",FUNCNAME, tag(), 'A' + index, state));
 
 	/* The Master Interrupt Enable (MIE) bit, WR9 D3, must be set to enable the SCC to generate interrupts.*/
-	if (!(m_chanA->m_wr9 & z80scc_channel::WR9_BIT_MIE))
+	if (!(m_wr9 & z80scc_channel::WR9_BIT_MIE))
 	{
 		LOG(("Master Interrupt Enable is not set, blocking attempt to interrupt\n"));
 		return;
@@ -451,6 +466,12 @@ void z80scc_device::trigger_interrupt(int index, int state)
 		  End of Frame (SDLC). In addition, a parity error can be a special receive condition by programming*/
 		source = 2;
 		prio_level = 2;
+		break;
+	case z80scc_channel::INT_EXTERNAL:
+		/* The External/status interrupts have several sources which may be individually enabled in WR15.
+		   The sources are zero count, /DCD, Sync/Hunt, /CTS, transmitter under-run/EOM and Break/Abort.*/
+		source = 1;
+		prio_level = 0;
 		break;
 	case z80scc_channel::INT_TRANSMIT:
 		/*The NMOS/CMOS version of the SCC only has a one byte deep transmit buffer. The status of the
@@ -483,15 +504,15 @@ void z80scc_device::trigger_interrupt(int index, int state)
 	}
 
 	// Vector modification requested?
-	if (m_chanA->m_wr9 & z80scc_channel::WR9_BIT_VIS)
+	if (m_wr9 & z80scc_channel::WR9_BIT_VIS)
 	{
 		vector = modify_vector(vector, index, source);
 	}
 
 	LOG(("   Interrupt Request fired of type %u and vector %02x\n", state, vector));
 
-	// update vector register // TODO: What if interrupts are nested? May we loose the modified vector or even get the wrong one?
-	m_chanB->m_wr2 = vector;
+	// update vector register
+	m_chanB->m_rr2 = vector;
 
 	/* Check the interrupt source and build the vector modification */
 	/*Interrupt Source Priority order
@@ -508,8 +529,12 @@ void z80scc_device::trigger_interrupt(int index, int state)
 	// trigger interrupt
 	m_int_state[priority] |= Z80_DAISY_INT;
 
-	// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this... TODO: field needs blanking?
-	m_chanA->m_rr3 |= (prio_level << (index == CHANNEL_A ? 3 : 0 ));
+	// remember the source
+	m_int_source[priority] = source;
+
+	// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
+	m_chanA->m_rr3 &= ~(      0x07 << (index == CHANNEL_A ? 3 : 0 ));
+	m_chanA->m_rr3 |=  (prio_level << (index == CHANNEL_A ? 3 : 0 ));
 
 	// check for interrupt
 	check_interrupts();
@@ -525,6 +550,72 @@ int z80scc_device::m1_r()
 	return z80daisy_irq_ack();
 }
 
+
+//-------------------------------------------------
+//  zbus_r - Z-Bus read
+//-------------------------------------------------
+READ8_MEMBER( z80scc_device::zbus_r )
+{
+	int ba = 0;
+	int reg = 0x20; // Default point to a non register number
+	uint8_t data = 0;
+
+	/* Expell non- Z-Bus variants */
+	if ( !(m_variant & SET_Z80X30))
+	{
+		logerror(" zbus_r not supported by this device variant, you should probably use the universal bus variants  c*_r/w and d*_r/w (see z80scc.h)\n");
+		return data;
+	}
+
+    switch ((m_chanB->m_wr0) & 7)
+	{
+	case z80scc_channel::WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
+	case z80scc_channel::WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
+	default:
+		logerror("Malformed Z-bus SCC read: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
+		LOG(("Malformed Z-bus SCC read: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0));
+		return data;
+	}
+
+	if (ba == 0)
+		data = m_chanB->scc_register_read(reg);
+	else
+		data = m_chanA->scc_register_read(reg);
+
+	return data;
+}
+
+//-------------------------------------------------
+//  zbus_w - Z-Bus write
+//-------------------------------------------------
+WRITE8_MEMBER( z80scc_device::zbus_w )
+{
+	int ba = 0;
+	int reg = 0x20; // Default point to a non register number
+
+	/* Expell non- Z-Bus variants */
+	if ( !(m_variant & SET_Z80X30))
+	{
+		logerror(" zbus_w not supported by this device variant, you should probably use the universal bus variants  c*_r/w and d*_r/w (see z80scc.h)\n");
+		return;
+	}
+
+    switch ((m_chanB->m_wr0) & 7)
+	{
+	case z80scc_channel::WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
+	case z80scc_channel::WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
+	default:
+		logerror("Malformed Z-bus SCC write: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
+		LOG(("Malformed Z-bus SCC write: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0));
+	}
+
+	if (ba == 0)
+		m_chanB->scc_register_write(reg, data);
+	else
+		m_chanA->scc_register_write(reg, data);
+
+	return;
+}
 
 //-------------------------------------------------
 //  cd_ba_r - Universal Bus read
@@ -593,7 +684,7 @@ READ8_MEMBER( z80scc_device::ba_cd_r )
 
 
 //-------------------------------------------------
-//  ba_cd_w -
+//  ba_cd_w - Universal Bus write
 //-------------------------------------------------
 
 WRITE8_MEMBER( z80scc_device::ba_cd_w )
@@ -618,7 +709,7 @@ WRITE8_MEMBER( z80scc_device::ba_cd_w )
 }
 
 //-------------------------------------------------
-//  ba_cd_r - Universal Bus read
+//  ba_cd_inv_r - Universal Bus read
 //-------------------------------------------------
 
 READ8_MEMBER( z80scc_device::ba_cd_inv_r )
@@ -640,7 +731,7 @@ READ8_MEMBER( z80scc_device::ba_cd_inv_r )
 
 
 //-------------------------------------------------
-//  ba_cd_w -
+//  ba_cd_inv_w - Universal Bus read
 //-------------------------------------------------
 
 WRITE8_MEMBER( z80scc_device::ba_cd_inv_w )
@@ -672,7 +763,7 @@ WRITE8_MEMBER( z80scc_device::ba_cd_inv_w )
 //  SCC_channel - constructor
 //-------------------------------------------------
 
-z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80SCC_CHANNEL, "Z80 SCC channel", tag, owner, clock, "z80scc_channel", __FILE__),
 		device_serial_interface(mconfig, *this),
 #if LOCAL_BRG
@@ -690,7 +781,6 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 		m_rxd(0),
 		m_cts(0),
 		m_dcd(0),
-		m_tx_data(0),
 		m_tx_clock(0),
 		m_dtr(0),
 		m_rts(0),
@@ -702,16 +792,19 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 	LOG(("%s\n",FUNCNAME));
 
 	// Reset all registers
-	m_rr0 = m_rr1 = m_rr2 = m_rr3  = m_rr4  = m_rr5  = m_rr6  = m_rr7 = m_rr8
+	m_rr0 = m_rr1 = m_rr2 = m_rr3  = m_rr4  = m_rr5  = m_rr6  = m_rr7 = m_rr7p = m_rr8
 		= m_rr9 = m_rr10 = m_rr11 = m_rr12 = m_rr13 = m_rr14 = m_rr15 = 0;
-	m_wr0 = m_wr1 = m_wr2 = m_wr3  = m_wr4  = m_wr5  = m_wr6  = m_wr7 = m_wr8
-		= m_wr9 = m_wr10 = m_wr11 = m_wr12 = m_wr13 = m_wr14 = m_wr15 = 0;
+	m_wr0 = m_wr1 = m_wr2 = m_wr3  = m_wr4  = m_wr5  = m_wr6  = m_wr7 = m_wr7p = m_wr8
+		= m_wr10 = m_wr11 = m_wr12 = m_wr13 = m_wr14 = m_wr15 = 0;
 
-	for (int i = 0; i < 3; i++) // TODO adapt to SCC fifos
-	{
-		m_rx_data_fifo[i] = 0;
-		m_rx_error_fifo[i] = 0;
-	}
+	for (auto & elem : m_rx_data_fifo)
+		elem = 0;
+	for (auto & elem : m_rx_error_fifo)  // TODO: Status FIFO needs to be fixed
+		elem = 0;
+	for (auto & elem : m_tx_data_fifo)
+		elem = 0;
+	for (auto & elem : m_tx_error_fifo) //  TODO: Status FIFO needs to be fixed
+		elem = 0;
 }
 
 
@@ -730,6 +823,9 @@ void z80scc_channel::device_start()
 	m_rx_fifo_sz = (m_uart->m_variant & SET_ESCC) ? 8 : 3;
 	m_rx_fifo_wp = m_rx_fifo_rp = 0;
 
+	m_tx_fifo_sz = (m_uart->m_variant & SET_ESCC) ? 4 : 1;
+	m_tx_fifo_wp = m_tx_fifo_rp = 0;
+
 #if LOCAL_BRG
 	// baudrate clocks and timers
 	baudtimer = timer_alloc(TIMER_ID_BAUD);
@@ -744,6 +840,7 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_rr5));
 	save_item(NAME(m_rr6));
 	save_item(NAME(m_rr7));
+	save_item(NAME(m_rr7p));
 	save_item(NAME(m_rr8));
 	save_item(NAME(m_rr9));
 	save_item(NAME(m_rr10));
@@ -760,16 +857,21 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_wr5));
 	save_item(NAME(m_wr6));
 	save_item(NAME(m_wr7));
+	save_item(NAME(m_wr7p));
 	save_item(NAME(m_wr8));
-	save_item(NAME(m_wr9));
 	save_item(NAME(m_wr10));
 	save_item(NAME(m_wr11));
 	save_item(NAME(m_wr12));
 	save_item(NAME(m_wr13));
 	save_item(NAME(m_wr14));
 	save_item(NAME(m_wr15));
+	save_item(NAME(m_tx_data_fifo));
+	save_item(NAME(m_tx_error_fifo)); //  TODO: Status FIFO needs to be fixed
+	save_item(NAME(m_tx_fifo_rp));
+	save_item(NAME(m_tx_fifo_wp));
+	save_item(NAME(m_tx_fifo_sz));
 	save_item(NAME(m_rx_data_fifo));
-	save_item(NAME(m_rx_error_fifo));
+	save_item(NAME(m_rx_error_fifo)); //  TODO: Status FIFO needs to be fixed
 	save_item(NAME(m_rx_fifo_rp));
 	save_item(NAME(m_rx_fifo_wp));
 	save_item(NAME(m_rx_fifo_sz));
@@ -780,7 +882,6 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_ri));
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dcd));
-	save_item(NAME(m_tx_data));
 	save_item(NAME(m_tx_clock));
 	save_item(NAME(m_dtr));
 	save_item(NAME(m_rts));
@@ -802,41 +903,32 @@ void z80scc_channel::device_reset()
 	receive_register_reset();
 	transmit_register_reset();
 
-	// Soft/Channel Reset values according to SCC users manual
+	// Soft/Channel Reset values (mostly) according to SCC users manual
 	m_wr0   = 0x00;
 	m_wr1  &= 0x24;
 	m_wr3  &= 0x01;
-	m_wr4  |= 0x04;
-	m_wr5  &= 0x61;
+	m_wr4   = 0x04;
+	m_wr5   = 0x00;
 	if (m_uart->m_variant & (z80scc_device::TYPE_SCC85C30 | SET_ESCC))
 		m_wr7 = 0x20;
-	m_wr9  &= 0xdf; //  WR9 has a different hard reset value
-	m_wr10 &= 0x60; // WR10 has a different hard reset value
-	m_wr11 &= 0xff; // WR11 has a different hard reset value
-	m_wr14 &= 0xc3; // WR14 has a different hard reset value
+	//  WR9,WR10,WR11 and WR14 has a different hard reset (see z80scc_device::device_reset()) values
+	m_uart->m_wr9 &= 0xdf;
+	m_wr10 &= 0x60;
+	m_wr11 &= 0xff;
+	m_wr14 &= 0xc3;
 	m_wr14 |= 0x20;
 	m_wr15  = 0xf8;
 	m_rr0  &= 0xfc;
 	m_rr0  |= 0x44;
 	m_rr1  &= 0x07;
-	m_rr1  |= 0x06;
+	m_rr1  |= 0x06;         //  Required reset value
+	m_rr1  |= RR1_ALL_SENT; // It is a don't care in the SCC user manual but drivers hangs without it set
 	m_rr3   = 0x00;
 	m_rr10 &= 0x40;
 
-#if 1 // old reset code
-	// disable receiver
-	m_wr3 &= ~WR3_RX_ENABLE;
-
-	// disable transmitter
-	m_wr5 &= ~WR5_TX_ENABLE;
-	m_rr0 |= RR0_TX_BUFFER_EMPTY;
-#endif
-	// TODO: check dependencies on RR1_ALL_SENT and (re)move this setting
-	m_rr1 |= RR1_ALL_SENT; // It is a don't care in the SCC user manual
-
-	// reset external lines TODO: check relation to control bits and reset
-	set_rts(1);
-	set_dtr(1);
+	// reset external lines 
+	set_rts(m_wr5 & WR5_RTS ? 0 : 1);
+	set_dtr(m_wr14 & WR14_DTR_REQ_FUNC ? 0 : (m_wr5 & WR5_DTR ? 0 : 1));
 
 	// reset interrupts
 	if (m_index == z80scc_device::CHANNEL_A)
@@ -931,23 +1023,48 @@ void z80scc_channel::tra_callback()
 
 void z80scc_channel::tra_complete()
 {
+	// Delayed baudrate change according to SCC specs
 	if ( m_delayed_tx_brg_change == 1)
 	{
 		m_delayed_tx_brg_change = 0;
 		set_tra_rate(m_brg_rate);
 		LOG(("Delayed setup - Baud Rate Generator: %d mode: %dx\n", m_brg_rate, get_clock_mode() ));
 	}
-	if ((m_wr5 & WR5_TX_ENABLE) && !(m_wr5 & WR5_SEND_BREAK) && !(m_rr0 & RR0_TX_BUFFER_EMPTY))
+
+	if ((m_wr5 & WR5_TX_ENABLE) && !(m_wr5 & WR5_SEND_BREAK))
 	{
-		LOG((LLFORMAT " %s() \"%s \"Channel %c Transmit Data Byte '%02x' m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_tx_data, m_wr5));
+		if ( (m_rr0 & RR0_TX_BUFFER_EMPTY) == 0 || // Takes care of the NMOS/CMOS 1 slot TX FIFO
+			 m_tx_fifo_rp != m_tx_fifo_wp) // or there are more characters to send in a longer FIFO.
+		{
+			LOGTX((" %s() %s %c done sending, loading data from fifo:%02x '%c'\n", FUNCNAME, m_owner->tag(), 'A' + m_index, 
+				   m_tx_data_fifo[m_tx_fifo_rp], isascii(m_tx_data_fifo[m_tx_fifo_rp]) ? m_tx_data_fifo[m_tx_fifo_rp] : ' '));
+			transmit_register_setup(m_tx_data_fifo[m_tx_fifo_rp]); // Reload the shift register
+			m_tx_fifo_rp_step();
+			m_rr0 |= RR0_TX_BUFFER_EMPTY; // Now here is room in the tx fifo again
+		}
+		else
+		{
+			LOGTX((" %s() %s %c done sending, setting all sent bit\n", FUNCNAME, m_owner->tag(), 'A' + m_index));
+			m_rr1 |= RR1_ALL_SENT;
 
-		transmit_register_setup(m_tx_data);
-
-		// empty transmit buffer
-		m_rr0 |= RR0_TX_BUFFER_EMPTY;
+			// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
+			if (!m_rts) // TODO: Clean up RTS handling
+				set_rts(1);
+		}
 
 		if (m_wr1 & WR1_TX_INT_ENABLE)
-			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+		{
+			if ((m_uart->m_variant & SET_ESCC) && 
+				(m_wr7p & WR7P_TX_FIFO_EMPTY)  &&
+				m_tx_fifo_wp == m_tx_fifo_rp)  // ESCC and fifo empty bit set and fifo is completelly empty?
+			{
+				m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
+			}
+			else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots availble
+			{
+				m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
+			}
+		}
 	}
 	else if (m_wr5 & WR5_SEND_BREAK)
 	{
@@ -966,18 +1083,6 @@ void z80scc_channel::tra_complete()
 			m_uart->m_out_txda_cb(1);
 		else
 			m_uart->m_out_txdb_cb(1);
-	}
-
-	// if transmit buffer is empty
-	if (m_rr0 & RR0_TX_BUFFER_EMPTY)
-	{
-		LOG((LLFORMAT " %s() \"%s \"Channel %c Transmit buffer empty m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5));
-		// then all characters have been sent
-		m_rr1 |= RR1_ALL_SENT;
-
-		// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
-		if (!m_rts)
-			set_rts(1);
 	}
 }
 
@@ -1009,7 +1114,7 @@ void z80scc_channel::rcv_callback()
 
 void z80scc_channel::rcv_complete()
 {
-	UINT8 data;
+	uint8_t data;
 
 	receive_register_extract();
 	data = get_received_char();
@@ -1139,7 +1244,7 @@ int z80scc_channel::get_tx_word_length()
  * This register contains the status of the receive and transmit buffers; the
  * DCD, CTS, and SYNC inputs; the Transmit Underrun/EOM latch; and the
  * Break/Abort latch. */
-UINT8 z80scc_channel::do_sccreg_rr0()
+uint8_t z80scc_channel::do_sccreg_rr0()
 {
 	LOGR(("%s %s <- %02x\n",tag(), FUNCNAME, m_rr0));
 	return m_rr0;
@@ -1148,7 +1253,7 @@ UINT8 z80scc_channel::do_sccreg_rr0()
 /*
  * This register contains the Special Receive condition status bits and Residue
  * codes for the I-Field in the SDLC Receive Mode. */
-UINT8 z80scc_channel::do_sccreg_rr1()
+uint8_t z80scc_channel::do_sccreg_rr1()
 {
 	LOGR(("%s %s <- %02x\n",tag(), FUNCNAME, m_rr1));
 	return m_rr1;
@@ -1160,7 +1265,7 @@ the vector returned is the vector actually stored in WR2. When this register is 
 B, the vector returned includes status information in bits 1, 2 and 3 or in bits 6, 5 and 4, depending
 on the state of the Status High/Status Low bit in WR9 and independent of the state of the VIS bit
 in WR9."*/
-UINT8 z80scc_channel::do_sccreg_rr2()
+uint8_t z80scc_channel::do_sccreg_rr2()
 {
 	LOGR(("%s\n", FUNCNAME));
 
@@ -1170,15 +1275,24 @@ UINT8 z80scc_channel::do_sccreg_rr2()
 	// If we are chan B we have to modify the vector regardless of the VIS bit
 	if (m_index == z80scc_device::CHANNEL_B)
 	{
+		int i = 0;
+
 		// loop over all interrupt sources
-		for (int i = 0; i < 6; i++)
+		for (auto & elem : m_uart->m_int_state)
 		{
 			// find the first channel with an interrupt requested
-			if (m_uart->m_int_state[i] & Z80_DAISY_INT)
+			if (elem & Z80_DAISY_INT)
 			{
-				m_rr2 = m_uart->modify_vector(m_rr2, i < 3 ? z80scc_device::CHANNEL_A : z80scc_device::CHANNEL_B, i & 3);
+				m_rr2 = m_uart->modify_vector(m_rr2, i < 3 ? z80scc_device::CHANNEL_A : z80scc_device::CHANNEL_B, m_uart->m_int_source[i] & 3);
+				if ((m_uart->m_variant & (SET_ESCC | SET_CMOS)) && (m_uart->m_wr9 & WR9_BIT_IACK))
+				{
+					LOGINT((" - Found an INT request to ack while reading RR2\n"));
+					elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
+					m_uart->check_interrupts();
+				}
 				break;
 			}
+			i++;
 		}
 	}
 	return m_rr2;
@@ -1189,7 +1303,7 @@ RR3 is the interrupt Pending register. The status of each of the interrupt Pendi
 reported in this register. This register exists only in Channel A. If this register is accessed in Channel
 B, all 0s are returned. The two unused bits are always returned as 0. Figure displays the bit positions for RR3."
 */
-UINT8 z80scc_channel::do_sccreg_rr3()
+uint8_t z80scc_channel::do_sccreg_rr3()
 {
 	LOGR(("%s\n", FUNCNAME));
 	return m_rr3; // TODO Update all bits of this status register
@@ -1200,7 +1314,7 @@ UINT8 z80scc_channel::do_sccreg_rr3()
 /*On the ESCC, Read Register 4 reflects the contents of Write Register 4 provided the Extended
   Read option is enabled. Otherwise, this register returns an image of RR0. On the NMOS/CMOS version,
   a read to this location returns an image of RR0.*/
-UINT8 z80scc_channel::do_sccreg_rr4()
+uint8_t z80scc_channel::do_sccreg_rr4()
 {
 	LOGR(("%s\n", FUNCNAME));
 	if (m_uart->m_variant & (SET_ESCC | z80scc_device::TYPE_SCC85C30))
@@ -1213,7 +1327,7 @@ UINT8 z80scc_channel::do_sccreg_rr4()
 /*On the ESCC, Read Register 5 reflects the contents of Write Register 5 provided the Extended
   Read option is enabled. Otherwise, this register returns an image of RR1. On the NMOS/CMOS version,
   a read to this register returns an image of RR1.*/
-UINT8 z80scc_channel::do_sccreg_rr5()
+uint8_t z80scc_channel::do_sccreg_rr5()
 {
 	LOGR(("%s\n", FUNCNAME));
 	if (m_uart->m_variant & (SET_ESCC | z80scc_device::TYPE_SCC85C30))
@@ -1228,15 +1342,15 @@ UINT8 z80scc_channel::do_sccreg_rr5()
  register is readable only if the FIFO is enabled (refer to the description Write Register 15, bit D2,
  and SDLC Frame Status FIFO on page 126). Otherwise, this register is an image of RR2.
  On the NMOS version, a read to this register location returns an image of RR2.*/
-UINT8 z80scc_channel::do_sccreg_rr6()
+uint8_t z80scc_channel::do_sccreg_rr6()
 {
 	LOGR(("%s\n", FUNCNAME));
-	if (!(m_uart->m_variant & (SET_NMOS)))
+	if (m_wr15 & WR15_STATUS_FIFO)
 	{
-		logerror(" %s() not implemented feature\n", FUNCNAME);
+		logerror(" - Status FIFO for synchronous mode - not implemented\n");
 		return 0;
 	}
-	return m_rr2;
+	return m_rr2; /* Note that NMOS calls are redirected to do_sccreg_rr2() before getting here */
 }
 
 /* (not on NMOS)
@@ -1247,7 +1361,7 @@ UINT8 z80scc_channel::do_sccreg_rr6()
  description Write Register 15, bit D2). Otherwise this register is an image of RR3. Note, for proper
  operation of the FIFO and byte count logic, the registers should be read in the following order:
  RR7, RR6, RR1.*/
-UINT8 z80scc_channel::do_sccreg_rr7()
+uint8_t z80scc_channel::do_sccreg_rr7()
 {
 	LOGR(("%s\n", FUNCNAME));
 	if (!(m_uart->m_variant & (SET_NMOS)))
@@ -1260,7 +1374,7 @@ UINT8 z80scc_channel::do_sccreg_rr7()
 
 #if 0 // Short cutted in control_read()
 /* RR8 is the Receive Data register. */
-UINT8 z80scc_channel::do_sccreg_rr8()
+uint8_t z80scc_channel::do_sccreg_rr8()
 {
 	return data_read():
 }
@@ -1270,7 +1384,7 @@ UINT8 z80scc_channel::do_sccreg_rr8()
  On the ESCC, Read Register 9 reflects the contents of Write Register 3 provided the Extended
  Read option has been enabled. On the NMOS/CMOS version, a read to this location returns an image
  of RR13. TODO: Check what is returned if Extended Read option is turned off */
-UINT8 z80scc_channel::do_sccreg_rr9()
+uint8_t z80scc_channel::do_sccreg_rr9()
 {
 	LOGR(("%s\n", FUNCNAME));
 	if (m_uart->m_variant & (SET_ESCC | z80scc_device::TYPE_SCC85C30))
@@ -1280,7 +1394,7 @@ UINT8 z80scc_channel::do_sccreg_rr9()
 }
 
 /* RR10 contains some SDLC related miscellaneous status bits. Unused bits are always 0. */
-UINT8 z80scc_channel::do_sccreg_rr10()
+uint8_t z80scc_channel::do_sccreg_rr10()
 {
 	LOGR(("%s\n", FUNCNAME));
 	logerror("%s() not implemented feature\n", FUNCNAME);
@@ -1291,7 +1405,7 @@ UINT8 z80scc_channel::do_sccreg_rr10()
  On the ESCC, Read Register 11 reflects the contents of Write Register 10 provided the Extended
  Read option has been enabled. Otherwise, this register returns an image of RR15.
  On the NMOS/CMOS version, a read to this location returns an image of RR15.*/
-UINT8 z80scc_channel::do_sccreg_rr11()
+uint8_t z80scc_channel::do_sccreg_rr11()
 {
 	LOGR(("%s\n", FUNCNAME));
 	if (m_uart->m_variant & (SET_ESCC | z80scc_device::TYPE_SCC85C30))
@@ -1302,15 +1416,17 @@ UINT8 z80scc_channel::do_sccreg_rr11()
 
 /*
  RR12 returns the value stored in WR12, the lower byte of the time constant, for the BRG.*/
-UINT8 z80scc_channel::do_sccreg_rr12()
+uint8_t z80scc_channel::do_sccreg_rr12()
 {
+	LOGR(("%s\n", FUNCNAME));
 	return m_wr12;
 }
 
 /*
   RR13 returns the value stored in WR13, the upper byte of the time constant for the BRG. */
-UINT8 z80scc_channel::do_sccreg_rr13()
+uint8_t z80scc_channel::do_sccreg_rr13()
 {
+	LOGR(("%s\n", FUNCNAME));
 	return m_wr13;
 }
 
@@ -1318,7 +1434,7 @@ UINT8 z80scc_channel::do_sccreg_rr13()
 On the ESCC, Read Register 14 reflects the contents of Write Register 7 Prime provided the
 Extended Read option has been enabled. Otherwise, this register returns an image of RR10.
 On the NMOS/CMOS version, a read to this location returns an image of RR10.*/
-UINT8 z80scc_channel::do_sccreg_rr14()
+uint8_t z80scc_channel::do_sccreg_rr14()
 {
 	LOGR(("%s\n", FUNCNAME));
 	if (m_uart->m_variant & (SET_ESCC | z80scc_device::TYPE_SCC85C30))
@@ -1330,7 +1446,7 @@ UINT8 z80scc_channel::do_sccreg_rr14()
 /*
  RR15 reflects the value stored in WR15, the External/Status IE bits. The two unused bits are
  always returned as Os. */
-UINT8 z80scc_channel::do_sccreg_rr15()
+uint8_t z80scc_channel::do_sccreg_rr15()
 {
 	LOGR(("%s\n", FUNCNAME));
 	logerror("%s() not implemented feature\n", FUNCNAME);
@@ -1338,11 +1454,72 @@ UINT8 z80scc_channel::do_sccreg_rr15()
 }
 
 //-------------------------------------------------
+//  scc_register_read - read a SCC register
+//-------------------------------------------------
+uint8_t z80scc_channel::scc_register_read( uint8_t reg)
+{
+	if (reg > 1) 
+		LOG(("%s %02x\n", FUNCNAME, reg));
+	uint8_t data = 0;
+	uint8_t wreg = 0;
+
+	/* Sort out 80X30 limitations in register access */
+//	if ((BIT(m_wr15, 2) == 0) || m_uart->m_variant == z80scc_device::TYPE_SCC8030)
+	if (BIT(m_wr15, 2) == 0 || m_uart->m_variant & SET_NMOS)
+	{
+		if (reg > 3 && reg < 8) reg &= 0x03;
+		else if (reg == 9) reg = 13;
+		else if (reg == 11) reg = 15;
+	}
+	else if (BIT(m_wr15, 2) != 0) 
+	{
+//		if (m_uart->variant == z80scc_device::TYPE_SCC80230 && BIT(m_wr7p, 6) != 0)
+		if (m_uart->m_variant & SET_ESCC && BIT(m_wr7p, 6) != 0)
+		{
+			if (reg > 3 && reg < 6) wreg = 1;
+			else if (reg == 9)  { reg = 3;  wreg = 1; }
+			else if (reg == 11) { reg = 10; wreg = 1; }
+			else if (reg == 14) { reg = 7;  wreg = 1; }
+		}
+		else
+		{
+			if (reg > 3 && reg < 6) reg &= 3;
+			else if (reg == 9)  { reg = 13; }
+			else if (reg == 11) { reg = 15; }
+		}
+	}
+	switch (reg)
+	{
+	case REG_RR0_STATUS:         data = do_sccreg_rr0(); break; // TODO: verify handling of SCC specific bits: D6 and D1
+	case REG_RR1_SPEC_RCV_COND:  data = do_sccreg_rr1(); break;
+	case REG_RR2_INTERRUPT_VECT: data = do_sccreg_rr2(); break; // Channel dependent and SCC specific handling compared to SIO
+		/* registers 3-7 are specific to SCC. TODO: Check variant and log/stop misuse */
+	case REG_RR3_INTERUPPT_PEND: data = wreg ? m_wr3 : do_sccreg_rr3(); break;
+	case REG_RR4_WR4_OR_RR0:     data = wreg ? m_wr4 : do_sccreg_rr4(); break;
+	case REG_RR5_WR5_OR_RR0:     data = wreg ? m_wr5 : do_sccreg_rr5(); break;
+	case REG_RR6_LSB_OR_RR2:     data = do_sccreg_rr6(); break;
+	case REG_RR7_MSB_OR_RR3:     data = wreg ? m_wr7p : do_sccreg_rr7(); break;
+		/* registers 8-15 are specific to SCC */
+	case REG_RR8_RECEIVE_DATA:   data = data_read(); break;
+	case REG_RR9_WR3_OR_RR13:    data = do_sccreg_rr9(); break;
+	case REG_RR10_MISC_STATUS:   data = wreg ? m_wr10 : do_sccreg_rr10(); break;
+	case REG_RR11_WR10_OR_RR15:  data = do_sccreg_rr11(); break;
+	case REG_RR12_LO_TIME_CONST: data = do_sccreg_rr12(); break;
+	case REG_RR13_HI_TIME_CONST: data = do_sccreg_rr13(); break;
+	case REG_RR14_WR7_OR_R10:    data = do_sccreg_rr14(); break;
+	case REG_RR15_WR15_EXT_STAT: data = do_sccreg_rr15(); break;
+	default:
+		logerror(" \"%s\" %s: %c : Unsupported RRx register:%02x\n", m_owner->tag(), FUNCNAME, 'A' + m_index, reg);
+	}
+	return data;
+}
+
+//-------------------------------------------------
 //  control_read - read control register
 //-------------------------------------------------
-UINT8 z80scc_channel::control_read()
+uint8_t z80scc_channel::control_read()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	int reg = m_uart->m_wr0_ptrbits; //m_wr0;
 	int regmask = (WR0_REGISTER_MASK | (m_uart->m_wr0_ptrbits & WR0_POINT_HIGH));
 
@@ -1357,30 +1534,7 @@ UINT8 z80scc_channel::control_read()
 		m_wr0 &= ~regmask;
 	}
 
-	/* TODO. Sort out 80X30 limitations in register access */
-	switch (reg)
-	{
-	case REG_RR0_STATUS:     data = do_sccreg_rr0(); break; // TODO: verify handling of SCC specific bits: D6 and D1
-	case REG_RR1_SPEC_RCV_COND:  data = do_sccreg_rr1(); break;
-	case REG_RR2_INTERRUPT_VECT: data = do_sccreg_rr2(); break; // Channel dependent and SCC specific handling compared to SIO
-		/* registers 3-7 are specific to SCC. TODO: Check variant and log/stop misuse */
-	case REG_RR3_INTERUPPT_PEND: data = do_sccreg_rr3(); break;
-	case REG_RR4_WR4_OR_RR0:     data = do_sccreg_rr4(); break;
-	case REG_RR5_WR5_OR_RR0:     data = do_sccreg_rr5(); break;
-	case REG_RR6_LSB_OR_RR2:     data = do_sccreg_rr6(); break;
-	case REG_RR7_MSB_OR_RR3:     data = do_sccreg_rr7(); break;
-		/* registers 8-15 are specific to SCC */
-	case REG_RR8_RECEIVE_DATA:   data = data_read(); break;
-	case REG_RR9_WR3_OR_RR13:    data = do_sccreg_rr9(); break;
-	case REG_RR10_MISC_STATUS:   data = do_sccreg_rr10(); break;
-	case REG_RR11_WR10_OR_RR15:  data = do_sccreg_rr11(); break;
-	case REG_RR12_LO_TIME_CONST: data = do_sccreg_rr12(); break;
-	case REG_RR13_HI_TIME_CONST: data = do_sccreg_rr13(); break;
-	case REG_RR14_WR7_OR_R10:    data = do_sccreg_rr14(); break;
-	case REG_RR15_WR15_EXT_STAT: data = do_sccreg_rr15(); break;
-	default:
-		logerror(" \"%s\" %s: %c : Unsupported RRx register:%02x\n", m_owner->tag(), FUNCNAME, 'A' + m_index, reg);
-	}
+	data = scc_register_read(reg);
 
 	//LOG(("%s \"%s\": %c : Register R%d read '%02x'\n", FUNCNAME, m_owner->tag(), 'A' + m_index, reg, data));
 	return data;
@@ -1388,7 +1542,7 @@ UINT8 z80scc_channel::control_read()
 
 /* CRC Initialization Code handling - candidate for breaking out in a z80sio_base class
  Handle the WR0 CRC Reset/Init bits separatelly, needed by derived devices separatelly from the commands */
-void z80scc_channel::do_sccreg_wr0_resets(UINT8 data)
+void z80scc_channel::do_sccreg_wr0_resets(uint8_t data)
 {
 	LOG(("%s(%02x) %s",FUNCNAME, data, tag()));
 	switch (data & WR0_CRC_RESET_CODE_MASK)
@@ -1411,10 +1565,12 @@ void z80scc_channel::do_sccreg_wr0_resets(UINT8 data)
 }
 
 /**/
-void z80scc_channel::do_sccreg_wr0(UINT8 data)
+void z80scc_channel::do_sccreg_wr0(uint8_t data)
 {
 	m_wr0 = data;
-	m_uart->m_wr0_ptrbits = data & WR0_REGISTER_MASK;
+
+	if (m_uart->m_variant & SET_Z85X3X)
+		m_uart->m_wr0_ptrbits = data & WR0_REGISTER_MASK;
 
 	/* Sort out SCC specific behaviours  from legacy SIO behaviour */
 	/* WR0_Z_* are Z80X30 specific commands */
@@ -1430,7 +1586,6 @@ void z80scc_channel::do_sccreg_wr0(UINT8 data)
 		if (m_uart->m_variant & SET_Z85X3X)
 		{
 			LOG(("%s %s: %c : - Point High command\n", FUNCNAME, m_owner->tag(), 'A' + m_index));
-			//m_ph = 8;
 			m_uart->m_wr0_ptrbits |= 8;
 		}
 		else
@@ -1459,8 +1614,17 @@ void z80scc_channel::do_sccreg_wr0(UINT8 data)
 		/* This command resets the highest priority Interrupt Under Service (IUS) bit, allowing lower
 		   priority conditions to request interrupts. This command allows the use of the internal
 		   daisy chain (even in systems without an external daisy chain) and is the last operation in
-		   an interrupt service routine.TODO: Implement internal Daisychain */
-		LOG(("\"%s\" %s: %c : Reset Highest IUS\n", m_owner->tag(), FUNCNAME, 'A' + m_index));
+		   an interrupt service routine. */
+		if (m_uart->m_variant & (SET_NMOS))
+		{
+			logerror("WR0 SWI ack command not supported on NMOS\n");
+			LOG(("\"%s\" %s: %c : Reset Highest IUS command not available on NMOS!\n", m_owner->tag(), FUNCNAME, 'A' + m_index));
+		}
+		else
+		{
+			m_uart->z80daisy_irq_ack();
+			LOG(("\"%s\" %s: %c : Reset Highest IUS\n", m_owner->tag(), FUNCNAME, 'A' + m_index));
+		}
 		break;
 	case WR0_ERROR_RESET:
 		/*Error Reset Command (110). This command resets the error bits in RR1. If interrupt on first Rx
@@ -1499,45 +1663,10 @@ void z80scc_channel::do_sccreg_wr0(UINT8 data)
 		m_uart->m_wr0_ptrbits &= ~WR0_REGISTER_MASK;
 		m_uart->m_wr0_ptrbits |= (m_wr0 & (WR0_REGISTER_MASK));
 	}
-	else if ( m_uart->m_variant & SET_Z80X30) // TODO: Implement adress decoding for Z80X30 using the shift logic described below
-	{
-		/*The registers in the Z80X30 are addressed via the address on AD7-AD0 and are latched by the rising
-		  edge of /AS. The Shift Right/Shift Left bit in the Channel B WR0 controls which bits are
-		  decoded to form the register address. It is placed in this register to simplify programming when the
-		  current state of the Shift Right/Shift Left bit is not known.
-		  A hardware reset forces Shift Left mode where the address is decoded from AD5-AD1. In Shift
-		  Right mode, the address is decoded from AD4-AD0. The Shift Right/Shift Left bit is written via a
-		  command to make the software writing to WR0 independent of the state of the Shift Right/Shift
-		  Left bit.
-		  While in the Shift Left mode, the register address is placed on AD4-AD1 and the Channel Select
-		  bit, A/B, is decoded from AD5. The register map for this case is listed in Table on page 21. In
-		  Shift Right mode, the register address is again placed on AD4-AD1 but the channel select A/B is
-		  decoded from AD0. The register map for this case is listed in Table on page 23.
-		  Because the Z80X30 does not contain 16 read registers, the decoding of the read registers is not
-		  complete; this is listed in Table on page 21 and Table on page 23 by parentheses around the register
-		  name. These addresses may also be used to access the read registers. Also, note that the
-		  Z80X30 contains only one WR2 and WR9; these registers may be written from either channel.
-		  Shift Left Mode is used when Channel A and B are to be programmed differently. This allows the
-		  software to sequence through the registers of one channel at a time. The Shift Right Mode is used
-		  when the channels are programmed the same. By incrementing the address, the user can program
-		  the same data value into both the Channel A and Channel B register.*/
-		switch(data & WR0_Z_SHIFT_MASK)
-		{
-		case WR0_Z_SEL_SHFT_LEFT:
-			LOG(("\"%s\": %c : %s - Shift Left Addressing Mode - not implemented\n", m_owner->tag(), 'A' + m_index, FUNCNAME));
-			break;
-		case WR0_Z_SEL_SHFT_RIGHT:
-			LOG(("\"%s\": %c : %s - Shift Right Addressing Mode - not implemented\n", m_owner->tag(), 'A' + m_index, FUNCNAME));
-			break;
-		default:
-			break;
-			// LOG(("\"%s\": %c : %s - Null commands\n", m_owner->tag(), 'A' + m_index, FUNCNAME));
-		}
-	}
 }
 
 /* Write Register 1 is the control register for the various SCC interrupt and Wait/Request modes.*/
-void z80scc_channel::do_sccreg_wr1(UINT8 data)
+void z80scc_channel::do_sccreg_wr1(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": %c : %s - %02x\n", FUNCNAME, data, m_owner->tag(), 'A' + m_index, FUNCNAME, data));
 	/* TODO: Sort out SCC specific behaviours  from legacy SIO behaviours:
@@ -1575,7 +1704,7 @@ void z80scc_channel::do_sccreg_wr1(UINT8 data)
 /*WR2 is the interrupt vector register. Only one vector register exists in the SCC, and it can be
 accessed through either channel. The interrupt vector can be modified by status information. This
 is controlled by the Vector Includes Status (VIS) and the Status High/Status Low bits in WR9.*/
-void z80scc_channel::do_sccreg_wr2(UINT8 data)
+void z80scc_channel::do_sccreg_wr2(uint8_t data)
 {
 	LOG(("%s(%02x) Setting the interrupt vector\n", FUNCNAME, data));
 	m_wr2 = data;
@@ -1585,7 +1714,7 @@ void z80scc_channel::do_sccreg_wr2(UINT8 data)
 	m_uart->check_interrupts();
 }
 
-void z80scc_channel::do_sccreg_wr3(UINT8 data)
+void z80scc_channel::do_sccreg_wr3(uint8_t data)
 {
 	LOG(("%s(%02x) Setting up the receiver\n", FUNCNAME, data));
 	m_wr3 = data;
@@ -1596,7 +1725,7 @@ void z80scc_channel::do_sccreg_wr3(UINT8 data)
 	receive_register_reset();
 }
 
-void z80scc_channel::do_sccreg_wr4(UINT8 data)
+void z80scc_channel::do_sccreg_wr4(uint8_t data)
 {
 	LOG(("%s(%02x) Setting up asynchronous frame format and clock\n", FUNCNAME, data));
 	if (data == m_wr4)
@@ -1616,7 +1745,7 @@ void z80scc_channel::do_sccreg_wr4(UINT8 data)
 	}
 }
 
-void z80scc_channel::do_sccreg_wr5(UINT8 data)
+void z80scc_channel::do_sccreg_wr5(uint8_t data)
 {
 	LOG(("%s(%02x) Setting up the transmitter\n", FUNCNAME, data));
 	if (data == m_wr5)
@@ -1625,6 +1754,7 @@ void z80scc_channel::do_sccreg_wr5(UINT8 data)
 	}
 	else
 	{
+		//		uint8_t old_wr5 = m_wr5;
 		m_wr5 = data;
 		LOG(("- Transmitter Enable %u\n", (data & WR5_TX_ENABLE) ? 1 : 0));
 		LOG(("- Transmitter Bits/Character %u\n", get_tx_word_length()));
@@ -1634,26 +1764,30 @@ void z80scc_channel::do_sccreg_wr5(UINT8 data)
 		update_serial();
 		safe_transmit_register_reset();
 		update_rts();
+#if 0
+		if ( !(old_wr5 & WR5_TX_ENABLE) && m_wr5 & WR5_TX_ENABLE )
+			write_data(m_tx_data);
+#endif
 		m_rr0 |= RR0_TX_BUFFER_EMPTY;
 	}
 }
 
-void z80scc_channel::do_sccreg_wr6(UINT8 data)
+void z80scc_channel::do_sccreg_wr6(uint8_t data)
 {
 	LOG(("%s(%02x) Transmit sync\n", FUNCNAME, data));
 	m_sync = (m_sync & 0xff00) | data;
 }
 
-void z80scc_channel::do_sccreg_wr7(UINT8 data)
+void z80scc_channel::do_sccreg_wr7(uint8_t data)
 {
 	LOG(("%s(%02x) Receive sync\n", FUNCNAME, data));
 	m_sync = (data << 8) | (m_sync & 0xff);
 }
 
 /* WR8 is the transmit buffer register */
-void z80scc_channel::do_sccreg_wr8(UINT8 data)
+void z80scc_channel::do_sccreg_wr8(uint8_t data)
 {
-	LOG(("%s(%02x) \"%s\": %c : Transmit Buffer read %02x\n", FUNCNAME, data, m_owner->tag(), 'A' + m_index, data));
+	LOG(("%s(%02x) \"%s\": %c : Transmit Buffer write %02x\n", FUNCNAME, data, m_owner->tag(), 'A' + m_index, data));
 	data_write(data);
 }
 
@@ -1661,15 +1795,9 @@ void z80scc_channel::do_sccreg_wr8(UINT8 data)
 exists in the SCC and is accessed from either channel. The Interrupt control bits are programmed
 at the same time as the Reset command, because these bits are only reset by a hardware reset
 note that the Z80X30 contains only one WR2 and WR9; these registers may be written from either channel.*/
-void z80scc_channel::do_sccreg_wr9(UINT8 data)
+void z80scc_channel::do_sccreg_wr9(uint8_t data)
 {
-	if (m_uart->m_variant & SET_Z80X30)
-	{
-		m_uart->m_chanA->m_wr9 = data;
-		m_uart->m_chanB->m_wr9 = data;
-	}
-	else
-		m_wr9 = data;
+	m_uart->m_wr9 = data; // There is only one WR9 register and is written from both channels A and B (if exists)
 
 	switch (data & WR9_CMD_MASK)
 	{
@@ -1688,10 +1816,22 @@ void z80scc_channel::do_sccreg_wr9(UINT8 data)
 		LOG(("\"%s\": %c : Master Interrupt Control - Device reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
 		/*"The effects of this command are identical to those of a hardware reset, except that the Shift Right/Shift Left bit is
 		  not changed and the MIE, Status High/Status Low and DLC bits take the programmed values that accompany this command."
-		  The Shift Right/Shift Left bits of the WR0 is only valid on SCC8030 device hence not implemented yet, just the SCC8530 */
-		if (data & (WR9_BIT_MIE | WR9_BIT_IACK | WR9_BIT_SHSL | WR9_BIT_DLC | WR9_BIT_NV))
-			logerror(" SCC Interrupt system not yet implemented, please be patient.\n");
-		m_uart->device_reset();
+		*/
+		if (m_uart->m_variant & SET_Z80X30)
+		{
+			uint8_t tmp_wr0 = m_wr0; // Save the Shift Left/Shift Right bits
+			m_uart->device_reset();
+			// Restore the Shift Left/Shift Right bits
+			m_wr0 &= 0xfc;
+			m_wr0 |= (tmp_wr0 & 0x03);
+		}
+		else
+		{
+			m_uart->device_reset();
+		}
+		// Set the MIE, Status High/Status Low and DLC bits as given in this command
+		m_uart->m_wr9 &=        ~(WR9_BIT_MIE | WR9_BIT_SHSL | WR9_BIT_DLC );
+		m_uart->m_wr9 |= (data & (WR9_BIT_MIE | WR9_BIT_SHSL | WR9_BIT_DLC ));
 		break;
 	default:
 		logerror("Code is broken in WR9, please report!\n");
@@ -1701,7 +1841,7 @@ void z80scc_channel::do_sccreg_wr9(UINT8 data)
 /* WR10 contains miscellaneous control bits for both the receiver and the transmitter. Bit positions
 for WR10 are displayed in Figure . On the ESCC and 85C30 with the Extended Read option
 enabled, this register may be read as RR11.*/
-void z80scc_channel::do_sccreg_wr10(UINT8 data)
+void z80scc_channel::do_sccreg_wr10(uint8_t data)
 {
 	m_wr10 = data;
 	LOG(("\"%s\": %c : %s Misc Tx/Rx Control %02x - not implemented \n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
@@ -1710,7 +1850,7 @@ void z80scc_channel::do_sccreg_wr10(UINT8 data)
 /* WR11 is the Clock Mode Control register. The bits in this register control the sources of both the
 receive and transmit clocks, the type of signal on the /SYNC and /RTxC pins, and the direction of
 the /TRxC pin.*/
-void z80scc_channel::do_sccreg_wr11(UINT8 data)
+void z80scc_channel::do_sccreg_wr11(uint8_t data)
 {
 	LOG(("\"%s\": %c : %s Clock Mode Control %02x\n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
 	m_wr11 = data;
@@ -1793,18 +1933,16 @@ void z80scc_channel::do_sccreg_wr11(UINT8 data)
   Time Constant = Clock Frequency / (2 * Desired Rate * Baud Rate Clock Period) - 2
 
 */
-void z80scc_channel::do_sccreg_wr12(UINT8 data)
+void z80scc_channel::do_sccreg_wr12(uint8_t data)
 {
-	// TODO: Check if BRG enabled already and restart timer with new value in case advice above is not followed by ROM
 	m_wr12 = data;
 	update_serial();
 	LOG(("\"%s\": %c : %s  %02x Low byte of Time Constant for Baudrate generator\n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
 }
 
 /* WR13 contains the upper byte of the time constant for the baud rate generator. */
-void z80scc_channel::do_sccreg_wr13(UINT8 data)
+void z80scc_channel::do_sccreg_wr13(uint8_t data)
 {
-	// TODO: Check if BRG enabled already and restart timer with new value in case advice above is not followed by ROM
 	m_wr13 = data;
 	update_serial();
 	LOG(("\"%s\": %c : %s  %02x  High byte of Time Constant for Baudrate generator\n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
@@ -1812,7 +1950,7 @@ void z80scc_channel::do_sccreg_wr13(UINT8 data)
 
 /*
  WR14 contains some miscellaneous control bits */
-void z80scc_channel::do_sccreg_wr14(UINT8 data)
+void z80scc_channel::do_sccreg_wr14(uint8_t data)
 {
 	switch (data & WR14_DPLL_CMD_MASK)
 	{
@@ -1908,58 +2046,25 @@ void z80scc_channel::do_sccreg_wr14(UINT8 data)
    as a group via WR1, bits in this register control which External/Status conditions cause an interrupt.
    Only the External/Status conditions that occur after the controlling bit is set to 1 cause an
    interrupt. This is true, even if an External/Status condition is pending at the time the bit is set*/
-void z80scc_channel::do_sccreg_wr15(UINT8 data)
+#define WR15EN "enabled"
+#define WR15NO "not implemented"
+void z80scc_channel::do_sccreg_wr15(uint8_t data)
 {
-	LOG(("%s(%02x) \"%s\": %c : External/Status Control Bits - not implemented\n",
+	LOGINT(("%s(%02x) \"%s\": %c : External/Status Control Bits\n",
 			FUNCNAME, data, m_owner->tag(), 'A' + m_index));
+	LOGINT(("WR7 prime ints     : %s\n", data & WR15_WR7PRIME    ? WR15NO : "disabled"));
+	LOGINT(("Zero count ints    : %s\n", data & WR15_ZEROCOUNT   ? WR15NO : "disabled"));
+	LOGINT(("14 bit Status FIFO : %s\n", data & WR15_STATUS_FIFO ? WR15NO : "disabled"));
+	LOGINT(("DCD ints           : %s\n", data & WR15_DCD         ? WR15EN : "disabled"));
+	LOGINT(("SYNC/Hunt ints     : %s\n", data & WR15_SYNC        ? WR15NO : "disabled"));
+	LOGINT(("CTS ints           : %s\n", data & WR15_CTS         ? WR15EN : "disabled"));
+	LOGINT(("Tx underr./EOM ints: %s\n", data & WR15_TX_EOM      ? WR15NO : "disabled"));
+	LOGINT(("Break/Abort ints   : %s\n", data & WR15_BREAK_ABORT ? WR15NO : "disabled"));
 	m_wr15 = data;
 }
 
-/*TODO: Z80X30 Register Access
-  ----------------------------
-The Shift Right/Shift Left bit in the Channel B WR0 controls which bits are decoded to form the register
-address. See do_sccreg_wr0() for details */
-
-/*Z85X30 Register Access
- -----------------------
-The registers in the Z85X30 are accessed in a two step process, using a Register Pointer to perform
-the addressing. To access a particular register, the pointer bits are set by writing to WR0. The
-pointer bits may be written in either channel because only one set exists in the Z85X30. After the
-pointer bits are set, the next read or write cycle of the Z85X30 having D//C Low will access the
-desired register. At the conclusion of this read or write cycle the pointer bits are reset to 0s, so that
-the next control write is to the pointers in WR0.
-
-A read to RR8 (the receive data FIFO) or a write to WR8 (the transmit data FIFO) is either done in
-this fashion or by accessing the Z85X30 having D//C pin High. A read or write with D//C High
-accesses the data registers directly, and independently of the state of the pointer bits. This allows
-single-cycle access to the data registers and does not disturb the pointer bits.
-
-The fact that the pointer bits are reset to 0, unless explicitly set otherwise, means that WR0 and
-RR0 may also be accessed in a single cycle. That is, it is not necessary to write the pointer bits
-with 0 before accessing WR0 or RR0.*/
-//-------------------------------------------------
-//  control_write - write control register
-//-------------------------------------------------
-
-void z80scc_channel::control_write(UINT8 data)
+void z80scc_channel::scc_register_write(uint8_t reg, uint8_t data)
 {
-	UINT8 reg = m_uart->m_wr0_ptrbits; //m_wr0;
-	UINT8 regmask = (WR0_REGISTER_MASK | (m_uart->m_wr0_ptrbits & WR0_POINT_HIGH));
-
-	m_uart->m_wr0_ptrbits = 0; // The "Point High" command is only valid for one access
-
-	reg &= regmask;
-
-	if (reg != 0)
-	{
-		// mask out register index
-		m_wr0 &= ~regmask;
-	}
-
-	//LOG(("\n%s(%02x) reg %02x, regmask %02x\n", FUNCNAME, data, reg, regmask));
-	LOGSETUP((" * %s %c Reg %02x <- %02x  \n", m_owner->tag(), 'A' + m_index, reg, data));
-
-	/* TODO. Sort out 80X30 & other SCC variants limitations in register access */
 	switch (reg)
 	{
 	case REG_WR0_COMMAND_REGPT:     do_sccreg_wr0(data); break;
@@ -1983,14 +2088,56 @@ void z80scc_channel::control_write(UINT8 data)
 	}
 }
 
+/*Z85X30 Register Access
+ -----------------------
+The registers in the Z85X30 are accessed in a two step process, using a Register Pointer to perform
+the addressing. To access a particular register, the pointer bits are set by writing to WR0. The
+pointer bits may be written in either channel because only one set exists in the Z85X30. After the
+pointer bits are set, the next read or write cycle of the Z85X30 having D//C Low will access the
+desired register. At the conclusion of this read or write cycle the pointer bits are reset to 0s, so that
+the next control write is to the pointers in WR0.
+
+A read to RR8 (the receive data FIFO) or a write to WR8 (the transmit data FIFO) is either done in
+this fashion or by accessing the Z85X30 having D//C pin High. A read or write with D//C High
+accesses the data registers directly, and independently of the state of the pointer bits. This allows
+single-cycle access to the data registers and does not disturb the pointer bits.
+
+The fact that the pointer bits are reset to 0, unless explicitly set otherwise, means that WR0 and
+RR0 may also be accessed in a single cycle. That is, it is not necessary to write the pointer bits
+with 0 before accessing WR0 or RR0.*/
+//-------------------------------------------------
+//  control_write - write control register
+//-------------------------------------------------
+
+void z80scc_channel::control_write(uint8_t data)
+{
+	uint8_t reg = m_uart->m_wr0_ptrbits; //m_wr0;
+	uint8_t regmask = (WR0_REGISTER_MASK | (m_uart->m_wr0_ptrbits & WR0_POINT_HIGH));
+
+	m_uart->m_wr0_ptrbits = 0; // The "Point High" command is only valid for one access
+
+	reg &= regmask;
+
+	if (reg != 0)
+	{
+		// mask out register index
+		m_wr0 &= ~regmask;
+	}
+
+	//LOG(("\n%s(%02x) reg %02x, regmask %02x\n", FUNCNAME, data, reg, regmask));
+	LOGSETUP((" * %s %c Reg %02x <- %02x  \n", m_owner->tag(), 'A' + m_index, reg, data));
+
+	scc_register_write(reg, data);
+}
+
 
 //-------------------------------------------------
 //  data_read - read data register from fifo
 //-------------------------------------------------
 
-UINT8 z80scc_channel::data_read()
+uint8_t z80scc_channel::data_read()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	LOG(("%s \"%s\": %c : Data Register Read: ", FUNCNAME, m_owner->tag(), 'A' + m_index));
 
@@ -2014,7 +2161,7 @@ UINT8 z80scc_channel::data_read()
 		data = m_rx_fifo_rp_data();
 
 		// load error status from the FIFO
-		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp];
+		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp]; //  TODO: Status FIFO needs to be fixed
 
 		// trigger interrup and lock the fifo if an error is present
 		if (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR))
@@ -2052,10 +2199,10 @@ UINT8 z80scc_channel::data_read()
 }
 
 /* Get data from top of fifo data but restore read pointer in case of exit latch lock */
-UINT8 z80scc_channel::m_rx_fifo_rp_data()
+uint8_t z80scc_channel::m_rx_fifo_rp_data()
 {
-		UINT8 data;
-		UINT8 old_rp = m_rx_fifo_rp;
+		uint8_t data;
+		uint8_t old_rp = m_rx_fifo_rp;
 		m_rx_fifo_rp_step();
 		data = m_rx_data_fifo[m_rx_fifo_rp];
 		m_rx_fifo_rp = old_rp;
@@ -2072,11 +2219,21 @@ void z80scc_channel::m_rx_fifo_rp_step()
 				m_rx_fifo_rp = 0;
 		}
 
-		// check if FIFO is empty
+		// check if RX FIFO is empty
 		if (m_rx_fifo_rp == m_rx_fifo_wp)
 		{
 				// no more characters available in the FIFO
 				m_rr0 &= ~ RR0_RX_CHAR_AVAILABLE;
+		}
+}
+
+/* Step TX read pointer */
+void z80scc_channel::m_tx_fifo_rp_step()
+{
+		m_tx_fifo_rp++;
+		if (m_tx_fifo_rp >= m_tx_fifo_sz)
+		{
+				m_tx_fifo_rp = 0;
 		}
 }
 
@@ -2088,30 +2245,67 @@ WRITE8_MEMBER (z80scc_device::db_w) { m_chanB->data_write(data); }
 //-------------------------------------------------
 //  data_write - write data register
 //-------------------------------------------------
-void z80scc_channel::data_write(UINT8 data)
+void z80scc_channel::data_write(uint8_t data)
 {
-	m_tx_data = data;
-
-	if ((m_wr5 & WR5_TX_ENABLE) && is_transmit_register_empty())
+	/* Tx FIFO is full or...? */
+	if ( !(m_rr0 & RR0_TX_BUFFER_EMPTY) && // NMOS/CMOS 1 slot "FIFO" is controlled by the TBE bit instead of fifo logic
+		( (m_tx_fifo_wp + 1 == m_tx_fifo_rp) || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) )))
 	{
-		LOG(("%s(%02x) \"%s\": %c : Transmit Data Byte '%02x' %c\n", FUNCNAME, data, m_owner->tag(), 'A' + m_index, m_tx_data, m_tx_data));
-		transmit_register_setup(m_tx_data);
-
-		// empty transmit buffer
-		m_rr0 |= RR0_TX_BUFFER_EMPTY;
-
-		if (m_wr1 & WR1_TX_INT_ENABLE)
+		logerror("- TX FIFO is full, discarding data\n");
+		LOG(("- TX FIFO is full, discarding data\n"));
+	}
+	else // ..there is still room
+	{
+		m_tx_data_fifo[m_tx_fifo_wp++] = data;
+		if (m_tx_fifo_wp >= m_tx_fifo_sz)
 		{
-			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+			m_tx_fifo_wp = 0;
+		}
+
+		// Check FIFO fullness and set TBE bit accordingly
+		if (m_tx_fifo_sz == 1)
+		{
+			m_rr0 &= ~RR0_TX_BUFFER_EMPTY; // If only one FIFO position it is full now! 
+		}
+		else if (m_tx_fifo_wp + 1 == m_tx_fifo_rp || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) ))
+		{
+			m_rr0 &= ~RR0_TX_BUFFER_EMPTY; // Indicate that the TX fifo is full
+		}else
+			m_rr0 |= RR0_TX_BUFFER_EMPTY; // or there is a slot in the FIFO available
+
+		m_rr1 &= ~RR1_ALL_SENT; // All is definitelly not sent anymore
+	}
+
+	/* Transmitter enabled?  */
+	if (m_wr5 & WR5_TX_ENABLE)
+	{
+		if (is_transmit_register_empty()) // Is the shift register loaded?
+		{
+			LOG(("- Setting up transmitter\n"));
+			transmit_register_setup(m_tx_data_fifo[m_tx_fifo_rp]); // Load the shift register, reload is done in tra_complete()
+			m_tx_fifo_rp_step();
+			m_rr1 |= RR1_ALL_SENT; // Now stuff is on its way again
+			m_rr0 |= RR0_TX_BUFFER_EMPTY; // And there is a slot in the FIFO available
 		}
 	}
-	else
+	/* "While transmit interrupts are enabled, the nmos/cmos version sets the transmit interrupt pending
+	   (TxIP) bit whenever the transmit buffer becomes empty. this means that the transmit buffer
+	   must be full before the TxIP can be set. thus, when transmit interrupts are first enabled, the TxIP
+	   will not be set until after the first character is written to the nmos/cmos." */
+	// check if to fire interrupt
+	if (m_wr1 & WR1_TX_INT_ENABLE)
 	{
-		m_rr0 &= ~RR0_TX_BUFFER_EMPTY;
-		//LOG(("%s(%02x) \"%s\": %c : failed to send %c,(%02x)\n", FUNCNAME, data, m_owner->tag(), 'A' + m_index, isascii(data) ? data : ' ', data));
+		if ((m_uart->m_variant & SET_ESCC) && 
+			(m_wr7p & WR7P_TX_FIFO_EMPTY)  &&
+			m_tx_fifo_wp == m_tx_fifo_rp)  // ESCC and fifo empty bit set and fifo is completelly empty?
+		{
+			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
+		}
+		else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots availble
+		{
+			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
+		}
 	}
-
-	m_rr1 &= ~RR1_ALL_SENT;
 }
 
 
@@ -2119,19 +2313,19 @@ void z80scc_channel::data_write(UINT8 data)
 //  receive_data - receive data word into fifo
 //-------------------------------------------------
 
-void z80scc_channel::receive_data(UINT8 data)
+void z80scc_channel::receive_data(uint8_t data)
 {
 	LOG(("\"%s\": %c : Receive Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 
 	if (m_rx_fifo_wp + 1 == m_rx_fifo_rp || ( (m_rx_fifo_wp + 1 == m_rx_fifo_sz) && (m_rx_fifo_rp == 0) ))
 	{
 		// receive overrun error detected
-		m_rx_error_fifo[m_rx_fifo_wp] |= RR1_RX_OVERRUN_ERROR; // = m_rx_error;
+		m_rx_error_fifo[m_rx_fifo_wp] |= RR1_RX_OVERRUN_ERROR; // = m_rx_error;  TODO: Status FIFO needs to be fixed
 		logerror("Receive_data() Error %02x\n", m_rx_error_fifo[m_rx_fifo_wp] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
 	}
 	else
 	{
-		m_rx_error_fifo[m_rx_fifo_wp] &= ~RR1_RX_OVERRUN_ERROR; // = m_rx_error;
+		m_rx_error_fifo[m_rx_fifo_wp] &= ~RR1_RX_OVERRUN_ERROR; // = m_rx_error;  TODO: Status FIFO needs to be fixed
 		m_rx_fifo_wp++;
 		if (m_rx_fifo_wp >= m_rx_fifo_sz)
 		{
@@ -2191,8 +2385,13 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 			else
 				m_rr0 &= ~RR0_CTS;
 
-			// trigger interrupt
-			if (m_wr1 & WR1_EXT_INT_ENABLE)
+			/* If the CTS IE bit in WR15 is set, this bit indicates the state of the /CTS pin while no interrupt is
+			   pending, latches the state of the /CTS pin and generates an External/Status interrupt. Any odd
+			   number of transitions on the /CTS pin causes another External/Status interrupt condition. If the
+			   CTS IE bit is reset, it merely reports the current unlatched state of the /CTS pin.
+
+			   Check that external interrupts are enabled and this one in particular and generate an interrupt on any change */
+			if ((m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_CTS))
 			{
 				// trigger interrupt
 				m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
@@ -2235,7 +2434,14 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 			else
 				m_rr0 &= ~RR0_DCD;
 
-			if (m_wr1 & WR1_EXT_INT_ENABLE)
+			/* If the DCD IE bit in WR15 is set, this bit indicates the state of the /DCD pin the last time the
+			   Enabled External/Status bits changed. Any transition on the /DCD pin, while no interrupt is pending,
+			   latches the state of the /DCD pin and generates an External/Status interrupt. Any odd number
+			   of transitions on the /DCD pin while another External/Status interrupt condition. If the DCD IE is
+			   reset, this bit merely reports the current, unlatched state of the /DCD pin.
+
+			   Check that external interrupts are enabled and this one in particular and generate an interrupt on any change */
+			if ((m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_DCD))
 			{
 				// trigger interrupt
 				m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
@@ -2333,7 +2539,9 @@ WRITE_LINE_MEMBER( z80scc_channel::rxc_w )
 
 			m_rx_clock++;
 			if (m_rx_clock == clocks)
+			{
 				m_rx_clock = 0;
+			}
 		}
 	}
 }
@@ -2461,8 +2669,6 @@ void z80scc_channel::set_dtr(int state)
 	else
 		m_uart->m_out_dtrb_cb(m_dtr);
 }
-
-
 
 //-------------------------------------------------
 //  write_rx - called by terminal through rs232/diserial

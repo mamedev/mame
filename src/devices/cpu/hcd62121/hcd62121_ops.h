@@ -4,7 +4,7 @@
 #define HCD62121_MSK                                                                        \
 		{                                                                                   \
 			int i;                                                                          \
-			UINT8 mskres = 1;                                                               \
+			uint8_t mskres = 1;                                                               \
 																							\
 			for ( i = 0; i < size; i++ )                                                    \
 			{                                                                               \
@@ -21,8 +21,8 @@
 #define HCD62121_IMSK                                                                       \
 		{                                                                                   \
 			int i;                                                                          \
-			UINT8 mskres = 1;                                                               \
-			UINT8 set_zero = 0;                                                             \
+			uint8_t mskres = 1;                                                               \
+			uint8_t set_zero = 0;                                                             \
 																							\
 			for ( i = 0; i < size; i++ )                                                    \
 			{                                                                               \
@@ -47,7 +47,7 @@
 #define HCD62121_AND                                                            \
 		{                                                                       \
 			int i;                                                              \
-			UINT8 is_zero = 1;                                                  \
+			uint8_t is_zero = 1;                                                  \
 																				\
 			for ( i = 0; i < size; i++ )                                        \
 			{                                                                   \
@@ -75,7 +75,7 @@
 #define HCD62121_OR                                                             \
 		{                                                                       \
 			int i;                                                              \
-			UINT8 is_zero = 1;                                                  \
+			uint8_t is_zero = 1;                                                  \
 																				\
 			for ( i = 0; i < size; i++ )                                        \
 			{                                                                   \
@@ -103,7 +103,7 @@
 #define HCD62121_XOR                                                            \
 		{                                                                       \
 			int i;                                                              \
-			UINT8 is_zero = 1;                                                  \
+			uint8_t is_zero = 1;                                                  \
 																				\
 			for ( i = 0; i < size; i++ )                                        \
 			{                                                                   \
@@ -131,7 +131,7 @@
 #define HCD62121_ADD                                                                    \
 		{                                                                               \
 			int i;                                                                      \
-			UINT8 is_zero = 1, carry = 0;                                               \
+			uint8_t is_zero = 1, carry = 0;                                               \
 																						\
 			if ( ( m_temp1[0] & 0x0f ) + ( m_temp2[0] & 0x0f ) > 15 )   \
 				m_f |= _FLAG_CL;                                                \
@@ -140,7 +140,7 @@
 																						\
 			for ( i = 0; i < size; i++ )                                                \
 			{                                                                           \
-				UINT16 res = m_temp1[i] + m_temp2[i] + carry;           \
+				uint16_t res = m_temp1[i] + m_temp2[i] + carry;           \
 																						\
 				m_temp1[i] = res & 0xff;                                        \
 				if ( m_temp1[i] )                                               \
@@ -174,7 +174,7 @@
 #define HCD62121_ADDB                                                                   \
 		{                                                                               \
 			int i;                                                                      \
-			UINT8 is_zero = 1, carry = 0;                                               \
+			uint8_t is_zero = 1, carry = 0;                                               \
 																						\
 			if ( ( m_temp1[0] & 0x0f ) + ( m_temp2[0] & 0x0f ) > 9 )    \
 				m_f |= _FLAG_CL;                                                \
@@ -183,7 +183,7 @@
 																						\
 			for ( i = 0; i < size; i++ )                                                \
 			{                                                                           \
-				UINT16 res = ( m_temp1[i] & 0x0f ) + ( m_temp2[i] & 0x0f ) + carry; \
+				uint16_t res = ( m_temp1[i] & 0x0f ) + ( m_temp2[i] & 0x0f ) + carry; \
 																						\
 				if ( res > 9 )                                                          \
 				{                                                                       \
@@ -225,7 +225,7 @@
 #define HCD62121_SUB                                                            \
 		{                                                                       \
 			int i;                                                              \
-			UINT8 is_zero = 1, carry = 0;                                       \
+			uint8_t is_zero = 1, carry = 0;                                       \
 																				\
 			if ( ( m_temp1[0] & 0x0f ) < ( m_temp2[0] & 0x0f ) )    \
 				m_f |= _FLAG_CL;                                        \
@@ -234,7 +234,7 @@
 																				\
 			for ( i = 0; i < size; i++ )                                        \
 			{                                                                   \
-				UINT16 res = m_temp1[i] - m_temp2[i] - carry;   \
+				uint16_t res = m_temp1[i] - m_temp2[i] - carry;   \
 																				\
 				m_temp1[i] = res & 0xff;                                \
 				if ( m_temp1[i] )                                       \
@@ -266,7 +266,7 @@
 
 #define HCD62121_PUSHW(source)                                                                      \
 		{                                                                                           \
-			UINT16 address = source;                                                                \
+			uint16_t address = source;                                                                \
 			m_program->write_byte( ( m_sseg << 16 ) | m_sp, ( address ) & 0xff ); \
 			m_sp--;                                                                         \
 			m_program->write_byte( ( m_sseg << 16 ) | m_sp, ( address ) >> 8 );   \
@@ -275,7 +275,7 @@
 
 #define HCD62121_POPW(dest)                                                                         \
 		{                                                                                           \
-			UINT16 res;                                                                             \
+			uint16_t res;                                                                             \
 			m_sp++;                                                                         \
 			res = m_program->read_byte( ( m_sseg << 16 ) | m_sp ) << 8;           \
 			m_sp++;                                                                         \
@@ -289,8 +289,8 @@ case 0x06:      /* mskq r1,r2 */
 case 0x07:      /* mskt r1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, false );
 
@@ -306,8 +306,8 @@ case 0x0B:      /* sht r1,4 */
 	{
 		int i;
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 d1 = 0, d2 = 0;
+		uint8_t reg1 = read_op();
+		uint8_t d1 = 0, d2 = 0;
 
 		read_reg( size, reg1 );
 
@@ -336,8 +336,8 @@ case 0x0E:      /* testq r1,r2 */
 case 0x0F:      /* testt r1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, false );
 
@@ -351,8 +351,8 @@ case 0x12:      /* xorq r1,r2 */
 case 0x13:      /* xort r1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, false );
 
@@ -368,8 +368,8 @@ case 0x16:      /* cmpq r1,r2 */
 case 0x17:      /* cmpt r1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, false );
 
@@ -384,8 +384,8 @@ case 0x1B:      /* movt r1,r2 */
 	{
 		int i;
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, false );
 
@@ -402,8 +402,8 @@ case 0x1E:      /* imskq r1,r2 */
 case 0x1F:      /* imskt r1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, false );
 
@@ -419,8 +419,8 @@ case 0x23:      /* shrt r1 */
 	{
 		int i;
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 d1 = 0, d2 = 0;
+		uint8_t reg1 = read_op();
+		uint8_t d1 = 0, d2 = 0;
 
 		read_reg( size, reg1 );
 
@@ -441,8 +441,8 @@ case 0x26:      /* orq r1,r2 */
 case 0x27:      /* ort r1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, false );
 
@@ -460,8 +460,8 @@ case 0x2B:      /* shlt r1 */
 	{
 		int i;
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 d1 = 0, d2 = 0;
+		uint8_t reg1 = read_op();
+		uint8_t d1 = 0, d2 = 0;
 
 		read_reg( size, reg1 );
 
@@ -482,8 +482,8 @@ case 0x2E:      /* andq r1,r2 */
 case 0x2F:      /* andt r1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, true );
 
@@ -499,8 +499,8 @@ case 0x36:      /* subq r1,r2 */
 case 0x37:      /* subt r1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, false );
 
@@ -516,8 +516,8 @@ case 0x3A:      /* adbq r1,r2 */
 case 0x3B:      /* adbt r1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, false );
 
@@ -533,8 +533,8 @@ case 0x3E:      /* addq r1,r2 */
 case 0x3F:      /* addt r1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_regreg( size, reg1, reg2, false );
 
@@ -550,8 +550,8 @@ case 0x4E:      /* testq ir1,r2 */
 case 0x4F:      /* testt ir1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_iregreg( size, reg1, reg2 );
 
@@ -565,8 +565,8 @@ case 0x56:      /* cmpq ir1,r2 */
 case 0x57:      /* cmpt ir1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_iregreg( size, reg1, reg2 );
 
@@ -581,8 +581,8 @@ case 0x5B:      /* movt ir1,r2 */
 	{
 		int i;
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_iregreg( size, reg1, reg2 );
 
@@ -599,8 +599,8 @@ case 0x66:      /* orb ir1,r2 */
 case 0x67:      /* orb ir1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_iregreg( size, reg1, reg2 );
 
@@ -616,8 +616,8 @@ case 0x6E:      /* andq ir1,r2 */
 case 0x6F:      /* andt ir1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_iregreg( size, reg1, reg2 );
 
@@ -633,8 +633,8 @@ case 0x7E:      /* addq ir1,r2 */
 case 0x7F:      /* addt ir1,r2 */
 	{
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_iregreg( size, reg1, reg2 );
 
@@ -650,9 +650,9 @@ case 0x88:      /* jump _a16 */
 
 case 0x89:      /* jumpf cs:a16 */
 	{
-		UINT8 cs = read_op();
-		UINT8 a1 = read_op();
-		UINT8 a2 = read_op();
+		uint8_t cs = read_op();
+		uint8_t a1 = read_op();
+		uint8_t a2 = read_op();
 
 		m_cseg = cs;
 		m_ip = ( a1 << 8 ) | a2;
@@ -661,8 +661,8 @@ case 0x89:      /* jumpf cs:a16 */
 
 case 0x8A:      /* call a16 */
 	{
-		UINT8 a1 = read_op();
-		UINT8 a2 = read_op();
+		uint8_t a1 = read_op();
+		uint8_t a2 = read_op();
 
 		HCD62121_PUSHW( m_ip );
 
@@ -690,8 +690,8 @@ case 0x97:      /* retnz */
 
 case 0x98:      /* jump (r1) */
 	{
-		UINT8 reg1 = read_op();
-		UINT16 ad = m_reg[ ( reg1 | 0x40 ) & 0x7f ] << 8;
+		uint8_t reg1 = read_op();
+		uint16_t ad = m_reg[ ( reg1 | 0x40 ) & 0x7f ] << 8;
 
 		if ( reg1 & 0x40 )
 			ad |= m_reg[ ( ( reg1 - 1 ) | 0x40 ) & 0x7f ];
@@ -715,8 +715,8 @@ case 0xA5:      /* jmpcl a16 */
 case 0xA6:      /* jmpnc a16 */
 case 0xA7:      /* jmpnz a16 */
 	{
-		UINT8 a1 = read_op();
-		UINT8 a2 = read_op();
+		uint8_t a1 = read_op();
+		uint8_t a2 = read_op();
 
 		if ( check_cond( op ) )
 			m_ip = ( a1 << 8 ) | a2;
@@ -732,8 +732,8 @@ case 0xAD:      /* callcl a16 */
 case 0xAE:      /* callnc a16 */
 case 0xAF:      /* callnz a16 */
 	{
-		UINT8 a1 = read_op();
-		UINT8 a2 = read_op();
+		uint8_t a1 = read_op();
+		uint8_t a2 = read_op();
 
 		if ( check_cond( op ) )
 		{
@@ -774,8 +774,8 @@ case 0xB9:      /* unk_B9 reg/i8 */
 case 0xBB:      /* jmpcl? a16 */
 	logerror( "%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op );
 	{
-		UINT8 a1 = read_op();
-		UINT8 a2 = read_op();
+		uint8_t a1 = read_op();
+		uint8_t a2 = read_op();
 
 		if ( m_f & _FLAG_CL )
 			m_ip = ( a1 << 8 ) | a2;
@@ -785,8 +785,8 @@ case 0xBB:      /* jmpcl? a16 */
 case 0xBF:      /* jmpncl? a16 */
 	logerror( "%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op );
 	{
-		UINT8 a1 = read_op();
-		UINT8 a2 = read_op();
+		uint8_t a1 = read_op();
+		uint8_t a2 = read_op();
 
 		if ( ! ( m_f & _FLAG_CL ) )
 			m_ip = ( a1 << 8 ) | a2;
@@ -800,7 +800,7 @@ case 0xC3:      /* movw reg,i80 */
 	{
 		int i;
 		int size = datasize( op );
-		UINT8 reg = read_op();
+		uint8_t reg = read_op();
 
 		for( i = 0; i < size; i++ )
 		{
@@ -816,8 +816,8 @@ case 0xC7:      /* movt (lar),r1 / r1,(lar) */
 	{
 		int i;
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 		int pre_inc = 0;
 		int post_inc = 1;
 
@@ -871,14 +871,14 @@ case 0xCF:      /* swapt ir1,r2? */
 	{
 		int i;
 		int size = datasize( op );
-		UINT8 reg1 = read_op();
-		UINT8 reg2 = read_op();
+		uint8_t reg1 = read_op();
+		uint8_t reg2 = read_op();
 
 		read_iregreg( size, reg1, reg2 );
 
 		for ( i = 0; i < size; i++ )
 		{
-			UINT8 d = m_temp1[i];
+			uint8_t d = m_temp1[i];
 			m_temp1[i] = m_temp2[i];
 			m_temp2[i] = d;
 		}
@@ -914,7 +914,7 @@ case 0xD5:      /* movb ss,i8 */
 
 case 0xD6:      /* movw sp,reg */
 	{
-		UINT8 reg1 = read_op();
+		uint8_t reg1 = read_op();
 
 		m_sp = m_reg[ reg1 & 0x7f ] | ( m_reg[ ( reg1 + 1 ) & 0x7f ] << 8 );
 	}
@@ -943,7 +943,7 @@ case 0xDD:      /* movb ds,i8 */
 
 case 0xDE:      /* movw lar,reg */
 	{
-		UINT8 reg1 = read_op();
+		uint8_t reg1 = read_op();
 
 		m_lar = m_reg[ reg1 & 0x7f ] | ( m_reg[ ( reg1 + 1 ) & 0x7f ] << 8 );
 	}
@@ -951,7 +951,7 @@ case 0xDE:      /* movw lar,reg */
 
 case 0xE0:      /* in0 reg */
 	{
-		UINT8 reg1 = read_op();
+		uint8_t reg1 = read_op();
 
 		m_reg[ reg1 & 0x7f ] = m_io->read_byte( HCD62121_IN0 );
 	}
@@ -977,7 +977,7 @@ case 0xE7:      /* unk_e7 reg/i8 (in?) */
 
 case 0xE8:      /* movw r1,lar */
 	{
-		UINT8 reg1 = read_op();
+		uint8_t reg1 = read_op();
 
 		m_reg[ reg1 & 0x7f ] = m_lar & 0xff;
 		m_reg[ ( reg1 + 1 ) & 0x7f ] = m_lar >> 8;
@@ -986,7 +986,7 @@ case 0xE8:      /* movw r1,lar */
 
 case 0xEB:      /* movw reg,ss */
 	{
-		UINT8 reg1 = read_op();
+		uint8_t reg1 = read_op();
 
 		m_reg[ reg1 & 0x7f ] = m_sp & 0xff;
 		m_reg[ ( reg1 + 1 ) & 0x7f ] = m_sp >> 8;

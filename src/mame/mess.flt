@@ -34,6 +34,7 @@ ampro.cpp
 amstr_pc.cpp
 amstrad.cpp
 amust.cpp
+anzterm.cpp
 apc.cpp
 apexc.cpp
 apf.cpp
@@ -616,6 +617,7 @@ tmc1800.cpp
 tmc2000e.cpp
 tmc600.cpp
 tr606.cpp
+tranz330.cpp
 tricep.cpp
 trs80.cpp
 trs80m2.cpp

@@ -92,17 +92,17 @@ void avgdvg_device::vg_flush()
 				continue;
 
 			if(x0 < cx0) {
-				y0 += INT64(cx0-x0)*INT64(y1-y0)/(x1-x0);
+				y0 += int64_t(cx0-x0)*int64_t(y1-y0)/(x1-x0);
 				x0 = cx0;
 			} else if(x0 > cx1) {
-				y0 += INT64(cx1-x0)*INT64(y1-y0)/(x1-x0);
+				y0 += int64_t(cx1-x0)*int64_t(y1-y0)/(x1-x0);
 				x0 = cx1;
 			}
 			if(x1 < cx0) {
-				y1 += INT64(cx0-x1)*INT64(y1-y0)/(x1-x0);
+				y1 += int64_t(cx0-x1)*int64_t(y1-y0)/(x1-x0);
 				x1 = cx0;
 			} else if(x1 > cx1) {
-				y1 += INT64(cx1-x1)*INT64(y1-y0)/(x1-x0);
+				y1 += int64_t(cx1-x1)*int64_t(y1-y0)/(x1-x0);
 				x1 = cx1;
 			}
 
@@ -110,17 +110,17 @@ void avgdvg_device::vg_flush()
 				continue;
 
 			if(y0 < cy0) {
-				x0 += INT64(cy0-y0)*INT64(x1-x0)/(y1-y0);
+				x0 += int64_t(cy0-y0)*int64_t(x1-x0)/(y1-y0);
 				y0 = cy0;
 			} else if(y0 > cy1) {
-				x0 += INT64(cy1-y0)*INT64(x1-x0)/(y1-y0);
+				x0 += int64_t(cy1-y0)*int64_t(x1-x0)/(y1-y0);
 				y0 = cy1;
 			}
 			if(y1 < cy0) {
-				x1 += INT64(cy0-y1)*INT64(x1-x0)/(y1-y0);
+				x1 += int64_t(cy0-y1)*int64_t(x1-x0)/(y1-y0);
 				y1 = cy0;
 			} else if(y1 > cy1) {
-				x1 += INT64(cy1-y1)*INT64(x1-x0)/(y1-y0);
+				x1 += int64_t(cy1-y1)*int64_t(x1-x0)/(y1-y0);
 				y1 = cy1;
 			}
 
@@ -190,9 +190,9 @@ void dvg_device::update_databus() // dvg_data
 	m_data = avgdvg_vectorram[(m_pc << 1) | (m_state_latch & 1)];
 }
 
-UINT8 dvg_device::state_addr() // dvg_state_addr
+uint8_t dvg_device::state_addr() // dvg_state_addr
 {
-	UINT8 addr;
+	uint8_t addr;
 
 	addr =((((m_state_latch >> 4) ^ 1) & 1) << 7) | (m_state_latch & 0xf);
 
@@ -431,7 +431,7 @@ void dvg_device::vgrst() // dvg_vgrst
  *
  *******************************************************************/
 
-UINT8 avg_device::state_addr() // avg_state_addr
+uint8_t avg_device::state_addr() // avg_state_addr
 {
 	return (((m_state_latch >> 4) ^ 1) << 7)
 		| (m_op << 4)
@@ -704,7 +704,7 @@ int avg_tempest_device::handler_6() // tempest_strobe2
 int avg_tempest_device::handler_7() // tempest_strobe3
 {
 	int cycles, r, g, b, bit0, bit1, bit2, bit3, x, y;
-	UINT8 data;
+	uint8_t data;
 
 	cycles = avg_common_strobe3();
 
@@ -813,7 +813,7 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 {
 	int cycles, r, g, b, bit0, bit1, bit2, bit3, dx, dy, i;
 
-	UINT8 data;
+	uint8_t data;
 
 	m_halt = OP0;
 	cycles = 0;
@@ -895,7 +895,7 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 
 void avg_mhavoc_device::update_databus() // mhavoc_data
 {
-	UINT8 *bank;
+	uint8_t *bank;
 
 	if (m_pc & 0x2000)
 	{
@@ -960,7 +960,7 @@ int avg_starwars_device::handler_7() // starwars_strobe3
 	*************************************/
 void avg_quantum_device::update_databus() // quantum_data
 {
-	m_data = ((UINT16 *)avgdvg_vectorram)[m_pc >> 1];
+	m_data = ((uint16_t *)avgdvg_vectorram)[m_pc >> 1];
 }
 
 void avg_quantum_device::vggo() // tempest_vggo
@@ -1076,13 +1076,13 @@ int avg_quantum_device::handler_7() // quantum_strobe3
 {
 	int cycles=0, r, g, b, bit0, bit1, bit2, bit3, x, y;
 
-	UINT16 data;
+	uint16_t data;
 
 	m_halt = OP0;
 
 	if ((m_op & 5) == 0)
 	{
-		data = ((UINT16 *)avgdvg_colorram)[m_color];
+		data = ((uint16_t *)avgdvg_colorram)[m_color];
 		bit3 = (~data >> 3) & 1;
 		bit2 = (~data >> 2) & 1;
 		bit1 = (~data >> 1) & 1;
@@ -1260,7 +1260,7 @@ TIMER_CALLBACK_MEMBER( avgdvg_device::vg_set_halt_callback )
 TIMER_CALLBACK_MEMBER( avgdvg_device::run_state_machine )
 {
 	int cycles = 0;
-	UINT8 *state_prom = machine().root_device().memregion("user1")->base();
+	uint8_t *state_prom = machine().root_device().memregion("user1")->base();
 
 	while (cycles < VGSLICE)
 	{
@@ -1403,13 +1403,13 @@ void avg_device::device_start()
 
 	const rectangle &visarea = machine().first_screen()->visible_area();
 
-	avgdvg_vectorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("vectorram")->ptr());
+	avgdvg_vectorram = reinterpret_cast<uint8_t *>(machine().root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
 
 	memory_share *colorram = machine().root_device().memshare("colorram");
 	if (colorram != nullptr)
 	{
-		avgdvg_colorram = reinterpret_cast<UINT8 *>(colorram->ptr());
+		avgdvg_colorram = reinterpret_cast<uint8_t *>(colorram->ptr());
 	}
 
 	xmin = visarea.min_x;
@@ -1443,13 +1443,13 @@ void dvg_device::device_start()
 
 	const rectangle &visarea = machine().first_screen()->visible_area();
 
-	avgdvg_vectorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("vectorram")->ptr());
+	avgdvg_vectorram = reinterpret_cast<uint8_t *>(machine().root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
 
 	memory_share *colorram = machine().root_device().memshare("colorram");
 	if (colorram != nullptr)
 	{
-		avgdvg_colorram = reinterpret_cast<UINT8 *>(colorram->ptr());
+		avgdvg_colorram = reinterpret_cast<uint8_t *>(colorram->ptr());
 	}
 
 	xmin = visarea.min_x;
@@ -1466,7 +1466,7 @@ void avgdvg_device::static_set_vector_tag(device_t &device, const char *tag)
 	downcast<avgdvg_device &>(device).m_vector.set_tag(tag);
 }
 
-avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_vector(*this, finder_base::DUMMY_TAG)
 {
@@ -1522,47 +1522,47 @@ avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, co
 	nvect = 0;
 }
 
-dvg_device::dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dvg_device::dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		avgdvg_device(mconfig, DVG, "Atari DVG", tag, owner, clock, "dvg", __FILE__)
 {
 }
 
-avg_device::avg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+avg_device::avg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		avgdvg_device(mconfig, AVG, "Atari AVG", tag, owner, clock, "avg", __FILE__)
 {
 }
 
-avg_device::avg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+avg_device::avg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		avgdvg_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
 
-avg_tempest_device::avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+avg_tempest_device::avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		avg_device(mconfig, AVG_TEMPEST, "Atari AVG (Tempest)", tag, owner, clock, "avg_tempest", __FILE__)
 {
 }
-avg_mhavoc_device::avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+avg_mhavoc_device::avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		avg_device(mconfig, AVG_MHAVOC, "Atari AVG (Major Havoc)", tag, owner, clock, "avg_mhavoc", __FILE__)
 {
 }
 
-avg_starwars_device::avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+avg_starwars_device::avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		avg_device(mconfig, AVG_STARWARS, "Atari AVG (Star Wars)", tag, owner, clock, "avg_starwars", __FILE__)
 {
 }
 
-avg_quantum_device::avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+avg_quantum_device::avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		avg_device(mconfig, AVG_QUANTUM, "Atari AVG (Quantum)", tag, owner, clock, "avg_quantum", __FILE__)
 {
 }
 
-avg_bzone_device::avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+avg_bzone_device::avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		avg_device(mconfig, AVG_BZONE, "Atari AVG (Battle Zone)", tag, owner, clock, "avg_bzone", __FILE__)
 {
 }
 
-avg_tomcat_device::avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+avg_tomcat_device::avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		avg_device(mconfig, AVG_TOMCAT, "Atari AVG (TomCat)", tag, owner, clock, "avg_tomcat", __FILE__)
 {
 }

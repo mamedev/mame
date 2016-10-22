@@ -20,7 +20,7 @@
 
 TILE_GET_INFO_MEMBER(atarig1_state::get_alpha_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 	int opaque = data & 0x8000;
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(atarig1_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(atarig1_state::get_playfield_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = (m_playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (data >> 12) & 7;
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
@@ -82,7 +82,7 @@ void atarig1_state::scanline_update(screen_device &screen, int scanline)
 	/* update the playfield scrolls */
 	for (i = 0; i < 8; i++)
 	{
-		UINT16 word;
+		uint16_t word;
 
 		/* first word controls horizontal scroll */
 		word = m_alpha_tilemap->basemem_read(offset++);
@@ -127,7 +127,7 @@ void atarig1_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-UINT32 atarig1_state::screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atarig1_state::screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* draw the playfield */
 	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);

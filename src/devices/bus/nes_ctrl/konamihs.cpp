@@ -42,7 +42,7 @@ ioport_constructor nes_konamihs_device::device_input_ports() const
 //  nes_konamihs_device - constructor
 //-------------------------------------------------
 
-nes_konamihs_device::nes_konamihs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_konamihs_device::nes_konamihs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, NES_KONAMIHS, "Konami Hyper Shot Controller", tag, owner, clock, "nes_konamihs", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_ipt_p1(*this, "P1"),
@@ -77,9 +77,9 @@ void nes_konamihs_device::device_reset()
 //  read
 //-------------------------------------------------
 
-UINT8 nes_konamihs_device::read_exp(offs_t offset)
+uint8_t nes_konamihs_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (offset == 1)    //$4017
 	{
 		ret |= m_latch_p1 << 1;
@@ -92,7 +92,7 @@ UINT8 nes_konamihs_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_konamihs_device::write(UINT8 data)
+void nes_konamihs_device::write(uint8_t data)
 {
 	if ((data & 0x02) == 0)
 		m_latch_p1 = m_ipt_p1->read();

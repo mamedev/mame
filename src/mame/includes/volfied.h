@@ -24,18 +24,18 @@ public:
 		m_screen(*this, "screen") { }
 
 	/* memory pointers */
-	std::unique_ptr<UINT16[]>    m_video_ram;
-	std::unique_ptr<UINT8[]>    m_cchip_ram;
+	std::unique_ptr<uint16_t[]>    m_video_ram;
+	std::unique_ptr<uint8_t[]>    m_cchip_ram;
 
 	/* video-related */
-	UINT16      m_video_ctrl;
-	UINT16      m_video_mask;
+	uint16_t      m_video_ctrl;
+	uint16_t      m_video_mask;
 
 	/* c-chip */
-	UINT8       m_current_bank;
-	UINT8       m_current_flag;
-	UINT8       m_cc_port;
-	UINT8       m_current_cmd;
+	uint8_t       m_current_bank;
+	uint8_t       m_current_flag;
+	uint8_t       m_cc_port;
+	uint8_t       m_current_cmd;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -57,7 +57,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(volfied_timer_callback);
 	void refresh_pixel_layer( bitmap_ind16 &bitmap );
 	void volfied_cchip_init();

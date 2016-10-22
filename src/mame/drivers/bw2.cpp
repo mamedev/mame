@@ -61,7 +61,7 @@ READ8_MEMBER( bw2_state::read )
 {
 	int rom = 1, vram = 1, ram1 = 1, ram2 = 1, ram3 = 1, ram4 = 1, ram5 = 1, ram6 = 1;
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_bank)
 	{
@@ -441,7 +441,7 @@ READ8_MEMBER( bw2_state::ppi_pb_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_kb < 10)
 	{
@@ -476,7 +476,7 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// centronics busy
 	data |= m_centronics_busy << 4;

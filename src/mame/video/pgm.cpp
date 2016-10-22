@@ -18,7 +18,7 @@
 // bg pri is 2
 // sprite already here is 1 / 3
 
-inline void pgm_state::pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8* destpri, UINT16 srcdat)
+inline void pgm_state::pgm_draw_pix( int xdrawpos, int pri, uint16_t* dest, uint8_t* destpri, uint16_t srcdat)
 {
 	if ((xdrawpos >= 0) && (xdrawpos < 448))
 	{
@@ -41,7 +41,7 @@ inline void pgm_state::pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8*
 	}
 }
 
-inline void pgm_state::pgm_draw_pix_nopri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat)
+inline void pgm_state::pgm_draw_pix_nopri( int xdrawpos, uint16_t* dest, uint8_t* destpri, uint16_t srcdat)
 {
 	if ((xdrawpos >= 0) && (xdrawpos < 448))
 	{
@@ -53,7 +53,7 @@ inline void pgm_state::pgm_draw_pix_nopri( int xdrawpos, UINT16* dest, UINT8* de
 	}
 }
 
-inline void pgm_state::pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat)
+inline void pgm_state::pgm_draw_pix_pri( int xdrawpos, uint16_t* dest, uint8_t* destpri, uint16_t srcdat)
 {
 	if ((xdrawpos >= 0) && (xdrawpos < 448))
 	{
@@ -73,18 +73,18 @@ inline void pgm_state::pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* dest
   for complex zoomed cases
 *************************************************************************/
 
-void pgm_state::draw_sprite_line( int wide, UINT16* dest, UINT8* destpri, int xzoom, int xgrow, int flip, int xpos, int pri, int realxsize, int palt, int draw )
+void pgm_state::draw_sprite_line( int wide, uint16_t* dest, uint8_t* destpri, int xzoom, int xgrow, int flip, int xpos, int pri, int realxsize, int palt, int draw )
 {
 	int xcnt,xcntdraw;
 	int xzoombit;
 	int xoffset = 0;
 	int xdrawpos = 0;
 
-	UINT8 *adata = m_sprite_a_region.get();
+	uint8_t *adata = m_sprite_a_region.get();
 	size_t  adatasize = m_sprite_a_region_size - 1;
 
-	UINT16 msk;
-	UINT16 srcdat;
+	uint16_t msk;
+	uint16_t srcdat;
 
 	xcnt = 0;
 	xcntdraw = 0;
@@ -164,12 +164,12 @@ void pgm_state::draw_sprite_line( int wide, UINT16* dest, UINT8* destpri, int xz
 	}
 }
 
-void pgm_state::draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
+void pgm_state::draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, uint32_t xzoom, int xgrow, uint32_t yzoom, int ygrow, int pri )
 {
 	int ycnt;
 	int ydrawpos;
-	UINT16 *dest;
-	UINT8* destpri;
+	uint16_t *dest;
+	uint8_t* destpri;
 	int ycntdraw;
 	int yzoombit;
 	int xzoombit;
@@ -323,16 +323,16 @@ void pgm_state::draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, 
 }
 
 
-void pgm_state::draw_sprite_line_basic( int wide, UINT16* dest, UINT8* destpri, int flip, int xpos, int pri, int realxsize, int palt, int draw )
+void pgm_state::draw_sprite_line_basic( int wide, uint16_t* dest, uint8_t* destpri, int flip, int xpos, int pri, int realxsize, int palt, int draw )
 {
 	int xcnt,xcntdraw;
 	int xoffset = 0;
 	int xdrawpos = 0;
-	UINT8 *adata = m_sprite_a_region.get();
+	uint8_t *adata = m_sprite_a_region.get();
 	size_t  adatasize = m_sprite_a_region_size - 1;
 
-	UINT16 msk;
-	UINT16 srcdat;
+	uint16_t msk;
+	uint16_t srcdat;
 
 	xcnt = 0;
 	xcntdraw = 0;
@@ -432,8 +432,8 @@ void pgm_state::draw_sprite_new_basic( int wide, int high, int xpos, int ypos, i
 {
 	int ycnt;
 	int ydrawpos;
-	UINT16 *dest;
-	UINT8* destpri;
+	uint16_t *dest;
+	uint8_t* destpri;
 	int ycntdraw;
 
 	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdatasize] << 24) | (m_bdata[(m_boffset + 2) & m_bdatasize] << 16) |
@@ -484,7 +484,7 @@ void pgm_state::draw_sprite_new_basic( int wide, int high, int xpos, int ypos, i
 }
 
 
-void pgm_state::draw_sprites( bitmap_ind16& spritebitmap, UINT16 *sprite_source, bitmap_ind8& priority_bitmap )
+void pgm_state::draw_sprites( bitmap_ind16& spritebitmap, uint16_t *sprite_source, bitmap_ind8& priority_bitmap )
 {
 	/* ZZZZ Zxxx xxxx xxxx
 	   zzzz z-yy yyyy yyyy
@@ -493,9 +493,9 @@ void pgm_state::draw_sprites( bitmap_ind16& spritebitmap, UINT16 *sprite_source,
 	   wwww wwwh hhhh hhhh
 	*/
 
-	const UINT16 *finish = m_spritebufferram.get() + (0xa00 / 2);
+	const uint16_t *finish = m_spritebufferram.get() + (0xa00 / 2);
 
-	UINT16* start = sprite_source;
+	uint16_t* start = sprite_source;
 
 	while (sprite_source < finish)
 	{
@@ -519,9 +519,9 @@ void pgm_state::draw_sprites( bitmap_ind16& spritebitmap, UINT16 *sprite_source,
 		int high = sprite_source[4] & 0x01ff;
 		int pri = (sprite_source[2] & 0x0080) >>  7;
 
-		UINT32 xzoom, yzoom;
+		uint32_t xzoom, yzoom;
 
-		UINT16* sprite_zoomtable = &m_videoregs[0x1000 / 2];
+		uint16_t* sprite_zoomtable = &m_videoregs[0x1000 / 2];
 
 		if (xgrow)
 		{
@@ -629,12 +629,12 @@ VIDEO_START_MEMBER(pgm_state,pgm)
 	for (i = 0; i < 0x1200 / 2; i++)
 		m_palette->set_pen_color(i, rgb_t(0, 0, 0));
 
-	m_spritebufferram = make_unique_clear<UINT16[]>(0xa00/2);
+	m_spritebufferram = make_unique_clear<uint16_t[]>(0xa00/2);
 
 	save_pointer(NAME(m_spritebufferram.get()), 0xa00/2);
 }
 
-UINT32 pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y;
 

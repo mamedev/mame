@@ -120,7 +120,7 @@ READ16_MEMBER(tetrisp2_state::rockn_adpcmbank_r)
 
 WRITE16_MEMBER(tetrisp2_state::rockn_adpcmbank_w)
 {
-	UINT8 *SNDROM = memregion("ymz")->base();
+	uint8_t *SNDROM = memregion("ymz")->base();
 	int bank;
 
 	m_rockn_adpcmbank = data;
@@ -137,7 +137,7 @@ WRITE16_MEMBER(tetrisp2_state::rockn_adpcmbank_w)
 
 WRITE16_MEMBER(tetrisp2_state::rockn2_adpcmbank_w)
 {
-	UINT8 *SNDROM = memregion("ymz")->base();
+	uint8_t *SNDROM = memregion("ymz")->base();
 	int bank;
 
 	char banktable[9][3]=
@@ -183,7 +183,7 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = memregion("okisource")->base();
+		uint8_t *rom = memregion("okisource")->base();
 
 		if (data & 0x04)
 		{

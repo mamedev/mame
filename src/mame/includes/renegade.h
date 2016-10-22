@@ -30,16 +30,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	required_memory_bank m_rombank;
 
-	required_region_ptr<UINT8> m_adpcmrom;
+	required_region_ptr<uint8_t> m_adpcmrom;
 
-	UINT32 m_adpcm_pos;
-	UINT32 m_adpcm_end;
+	uint32_t m_adpcm_pos;
+	uint32_t m_adpcm_end;
 	bool m_adpcm_playing;
 
 	bool m_mcu_sim;
@@ -47,23 +47,23 @@ public:
 	int m_from_mcu;
 	int m_main_sent;
 	int m_mcu_sent;
-	UINT8 m_ddr_a;
-	UINT8 m_ddr_b;
-	UINT8 m_ddr_c;
-	UINT8 m_port_a_out;
-	UINT8 m_port_b_out;
-	UINT8 m_port_c_out;
-	UINT8 m_port_a_in;
-	UINT8 m_port_b_in;
-	UINT8 m_port_c_in;
-	UINT8 m_mcu_buffer[MCU_BUFFER_MAX];
-	UINT8 m_mcu_input_size;
-	UINT8 m_mcu_output_byte;
-	INT8 m_mcu_key;
+	uint8_t m_ddr_a;
+	uint8_t m_ddr_b;
+	uint8_t m_ddr_c;
+	uint8_t m_port_a_out;
+	uint8_t m_port_b_out;
+	uint8_t m_port_c_out;
+	uint8_t m_port_a_in;
+	uint8_t m_port_b_in;
+	uint8_t m_port_c_in;
+	uint8_t m_mcu_buffer[MCU_BUFFER_MAX];
+	uint8_t m_mcu_input_size;
+	uint8_t m_mcu_output_byte;
+	int8_t m_mcu_key;
 	int m_mcu_checksum;
-	const UINT8 *m_mcu_encrypt_table;
+	const uint8_t *m_mcu_encrypt_table;
 	int m_mcu_encrypt_table_len;
-	INT32 m_scrollx;
+	int32_t m_scrollx;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
@@ -106,6 +106,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

@@ -56,7 +56,7 @@ const address_space_config *tms3556_device::memory_space_config(address_spacenum
 //  readbyte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT8 tms3556_device::readbyte(offs_t address)
+inline uint8_t tms3556_device::readbyte(offs_t address)
 {
 	return space().read_byte(address&0xFFFF);
 }
@@ -66,7 +66,7 @@ inline UINT8 tms3556_device::readbyte(offs_t address)
 //  writebyte - write a byte at the given address
 //-------------------------------------------------
 
-inline void tms3556_device::writebyte(offs_t address, UINT8 data)
+inline void tms3556_device::writebyte(offs_t address, uint8_t data)
 {
 	space().write_byte(address&0xFFFF, data);
 }
@@ -80,7 +80,7 @@ inline void tms3556_device::writebyte(offs_t address, UINT8 data)
 //  tms3556_device - constructor
 //-------------------------------------------------
 
-tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMS3556, "Texas Instruments VDP TMS3556", tag, owner, clock, "tms3556", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(tms3556)),
@@ -137,7 +137,7 @@ void tms3556_device::device_start()
 /*static const char *const tms3556_mode_names[] = { "DISPLAY OFF", "TEXT", "GRAPHIC", "MIXED" };*/
 
 
-UINT32 tms3556_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tms3556_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -150,7 +150,7 @@ UINT32 tms3556_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 READ8_MEMBER( tms3556_device::vram_r )
 {
-	UINT8 ret;
+	uint8_t ret;
 	if (m_bamp_written) {
 		m_bamp_written=false;
 		m_vdp_acmpxy_mode=dma_write;
@@ -324,7 +324,7 @@ READ8_MEMBER( tms3556_device::initptr_r )
 //  top and bottom borders, and screen off mode)
 //-------------------------------------------------
 
-void tms3556_device::draw_line_empty(UINT16 *ln)
+void tms3556_device::draw_line_empty(uint16_t *ln)
 {
 	int i;
 
@@ -341,10 +341,10 @@ void tms3556_device::draw_line_empty(UINT16 *ln)
 //  (called by draw_line_text and draw_line_mixed)
 //-------------------------------------------------
 
-void tms3556_device::draw_line_text_common(UINT16 *ln)
+void tms3556_device::draw_line_text_common(uint16_t *ln)
 {
 	int pattern, x, xx, i, name_offset;
-	UINT16 fg, bg;
+	uint16_t fg, bg;
 	offs_t nametbl_base;
 	offs_t patterntbl_base[4];
 	int name_hi, name_lo;
@@ -411,7 +411,7 @@ void tms3556_device::draw_line_text_common(UINT16 *ln)
 		{   /* single width */
 			for (xx = 0; xx < 8; xx++)
 			{
-				UINT16 color = (pattern & 0x80) ? fg : bg;
+				uint16_t color = (pattern & 0x80) ? fg : bg;
 #if TMS3556_DOUBLE_WIDTH
 				*ln++ = color;
 #endif
@@ -427,7 +427,7 @@ void tms3556_device::draw_line_text_common(UINT16 *ln)
 				pattern <<= 4;
 			for (xx = 0; xx < 4; xx++)
 			{
-				UINT16 color = (pattern & 0x80) ? fg : bg;
+				uint16_t color = (pattern & 0x80) ? fg : bg;
 #if TMS3556_DOUBLE_WIDTH
 				*ln++ = color; *ln++ = color;
 #endif
@@ -455,7 +455,7 @@ void tms3556_device::draw_line_text_common(UINT16 *ln)
 //  (called by draw_line_bitmap and draw_line_mixed)
 //-------------------------------------------------
 
-void tms3556_device::draw_line_bitmap_common(UINT16 *ln)
+void tms3556_device::draw_line_bitmap_common(uint16_t *ln)
 {
 	int x, xx;
 	offs_t nametbl_base;
@@ -476,7 +476,7 @@ void tms3556_device::draw_line_bitmap_common(UINT16 *ln)
 		name_r = readbyte(nametbl_base + m_name_offset + 2);
 		for (xx = 0; xx < 8; xx++)
 		{
-			UINT16 color = ((name_b >> 5) & 0x4) | ((name_g >> 6) & 0x2) | ((name_r >> 7) & 0x1);
+			uint16_t color = ((name_b >> 5) & 0x4) | ((name_g >> 6) & 0x2) | ((name_r >> 7) & 0x1);
 #if TMS3556_DOUBLE_WIDTH
 			*ln++ = color;
 #endif
@@ -500,7 +500,7 @@ void tms3556_device::draw_line_bitmap_common(UINT16 *ln)
 //  draw_line_text - draw a line in text mode
 //-------------------------------------------------
 
-void tms3556_device::draw_line_text(UINT16 *ln)
+void tms3556_device::draw_line_text(uint16_t *ln)
 {
 	if (m_char_line_counter == 0)
 		m_char_line_counter = 10;
@@ -513,7 +513,7 @@ void tms3556_device::draw_line_text(UINT16 *ln)
 //  draw_line_bitmap - draw a line in bitmap mode
 //-------------------------------------------------
 
-void tms3556_device::draw_line_bitmap(UINT16 *ln)
+void tms3556_device::draw_line_bitmap(uint16_t *ln)
 {
 	draw_line_bitmap_common(ln);
 	m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
@@ -525,7 +525,7 @@ void tms3556_device::draw_line_bitmap(UINT16 *ln)
 //  draw_line_mixed - draw a line in mixed mode
 //-------------------------------------------------
 
-void tms3556_device::draw_line_mixed(UINT16 *ln)
+void tms3556_device::draw_line_mixed(uint16_t *ln)
 {
 	if (m_cg_flag)
 	{   /* bitmap line */
@@ -558,7 +558,7 @@ void tms3556_device::draw_line_mixed(UINT16 *ln)
 void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 {
 	int double_lines;
-	UINT16 *ln, *ln2;
+	uint16_t *ln, *ln2;
 
 //  if (m_control_regs[4] & 0x??)
 //  {   // interlaced mode

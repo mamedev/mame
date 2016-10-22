@@ -127,7 +127,7 @@ machine_config_constructor southbridge_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( southbridge );
 }
 
-southbridge_device::southbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+southbridge_device::southbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_maincpu(*this, ":maincpu"),
 	m_pic8259_master(*this, "pic8259_master"),
@@ -153,22 +153,22 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 /// HACK: the memory system cannot cope with mixing the  8 bit device map from the fdc with a 32 bit handler
 READ8_MEMBER(southbridge_device::ide_read_cs1_r)
 {
-	return m_ide->read_cs1(space, 1, (UINT32) 0xff0000) >> 16;
+	return m_ide->read_cs1(space, 1, (uint32_t) 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(southbridge_device::ide_write_cs1_w)
 {
-	m_ide->write_cs1(space, 1, (UINT32) data << 16, (UINT32) 0xff0000);
+	m_ide->write_cs1(space, 1, (uint32_t) data << 16, (uint32_t) 0xff0000);
 }
 
 READ8_MEMBER(southbridge_device::ide2_read_cs1_r)
 {
-	return m_ide2->read_cs1(space, 1, (UINT32) 0xff0000) >> 16;
+	return m_ide2->read_cs1(space, 1, (uint32_t) 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(southbridge_device::ide2_write_cs1_w)
 {
-	m_ide2->write_cs1(space, 1, (UINT32) data << 16, (UINT32) 0xff0000);
+	m_ide2->write_cs1(space, 1, (uint32_t) data << 16, (uint32_t) 0xff0000);
 }
 
 //-------------------------------------------------
@@ -232,7 +232,7 @@ READ8_MEMBER( southbridge_device::get_slave_ack )
  *
  *************************************************************************/
 
-void southbridge_device::at_speaker_set_spkrdata(UINT8 data)
+void southbridge_device::at_speaker_set_spkrdata(uint8_t data)
 {
 	m_at_spkrdata = data ? 1 : 0;
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
@@ -272,7 +272,7 @@ WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out2_changed )
 
 READ8_MEMBER( southbridge_device::at_page8_r )
 {
-	UINT8 data = m_at_pages[offset % 0x10];
+	uint8_t data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
@@ -328,7 +328,7 @@ READ8_MEMBER(southbridge_device::pc_dma_read_byte)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return 0xff;
-	UINT8 result;
+	uint8_t result;
 	offs_t page_offset = ((offs_t) m_dma_offset[0][m_dma_channel]) << 16;
 
 	result = prog_space.read_byte(page_offset + offset);
@@ -352,7 +352,7 @@ READ8_MEMBER(southbridge_device::pc_dma_read_word)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return 0xff;
-	UINT16 result;
+	uint16_t result;
 	offs_t page_offset = ((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16;
 
 	result = prog_space.read_word((page_offset & 0xfe0000) | (offset << 1));
@@ -423,7 +423,7 @@ WRITE_LINE_MEMBER( southbridge_device::pc_dack7_w ) { pc_select_dma_channel(7, s
 
 READ8_MEMBER( southbridge_device::at_portb_r )
 {
-	UINT8 data = m_at_speaker;
+	uint8_t data = m_at_speaker;
 	data &= ~0xd0; /* AT BIOS don't likes this being set */
 
 	/* 0x10 is the dram refresh line bit on the 5170, just a timer here, 15.085us. */

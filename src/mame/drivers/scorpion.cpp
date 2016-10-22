@@ -40,7 +40,7 @@ protected:
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
 private:
-	UINT8 *m_p_ram;
+	uint8_t *m_p_ram;
 	void scorpion_update_memory();
 
 };
@@ -75,7 +75,7 @@ D6-D7 - not used. ( yet ? )
 
 void scorpion_state::scorpion_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
@@ -113,7 +113,7 @@ WRITE8_MEMBER(scorpion_state::scorpion_0000_w)
 
 DIRECT_UPDATE_MEMBER(scorpion_state::scorpion_direct)
 {
-	UINT16 pc = m_maincpu->device_t::safe_pcbase(); // works, but...
+	uint16_t pc = m_maincpu->device_t::safe_pcbase(); // works, but...
 
 	m_ram_disabled_by_beta = 0;
 	if (m_beta->is_active() && (pc >= 0x4000))
@@ -187,7 +187,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 

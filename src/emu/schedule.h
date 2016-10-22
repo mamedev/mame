@@ -39,7 +39,7 @@
 //**************************************************************************
 
 // timer callbacks look like this
-typedef delegate<void (void *, INT32)> timer_expired_delegate;
+typedef delegate<void (void *, int32_t)> timer_expired_delegate;
 
 // ======================> emu_timer
 
@@ -74,7 +74,7 @@ public:
 
 	// control
 	void reset(const attotime &duration = attotime::never) { adjust(duration, m_param, m_period); }
-	void adjust(attotime start_delay, INT32 param = 0, const attotime &periodicity = attotime::never);
+	void adjust(attotime start_delay, int32_t param = 0, const attotime &periodicity = attotime::never);
 
 	// timing queries
 	attotime elapsed() const;
@@ -93,7 +93,7 @@ private:
 	emu_timer *         m_next;         // next timer in order in the list
 	emu_timer *         m_prev;         // previous timer in order in the list
 	timer_expired_delegate m_callback;  // callback function
-	INT32               m_param;        // integer parameter
+	int32_t               m_param;        // integer parameter
 	void *              m_ptr;          // pointer parameter
 	bool                m_enabled;      // is the timer enabled?
 	bool                m_temporary;    // is the timer temporary?
@@ -149,7 +149,7 @@ public:
 
 private:
 	// callbacks
-	void timed_trigger(void *ptr, INT32 param);
+	void timed_trigger(void *ptr, int32_t param);
 	void presave();
 	void postload();
 

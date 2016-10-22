@@ -30,7 +30,7 @@ class adam_fdc_device :  public device_t,
 {
 public:
 	// construction/destruction
-	adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -57,7 +57,7 @@ protected:
 	required_device<wd2793_t> m_fdc;
 	required_device<floppy_image_device> m_floppy0;
 	floppy_image_device *m_floppy;
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	required_ioport m_sw3;
 };
 

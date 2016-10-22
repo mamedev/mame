@@ -58,15 +58,15 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
 private:
-	UINT8 m_porta;
-	UINT8 m_portb;
-	UINT8 m_t_c;
-	UINT8 m_out_offs;
+	uint8_t m_porta;
+	uint8_t m_portb;
+	uint8_t m_t_c;
+	uint8_t m_out_offs;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76477_device> m_snsnd;
 	required_ioport_array<4> m_switch;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 };
 
 
@@ -127,9 +127,9 @@ void spectra_state::machine_reset()
 
 READ8_MEMBER( spectra_state::porta_r )
 {
-	UINT8 row = (m_porta & 0x18) >> 3;
-	UINT8 key = m_switch[row]->read();
-	UINT8 ret = ((BIT(key, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
+	uint8_t row = (m_porta & 0x18) >> 3;
+	uint8_t key = m_switch[row]->read();
+	uint8_t ret = ((BIT(key, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
 
 	if (ret == 0x1b && m_p_ram[0x7b] < 0x1E)
 		m_samples->start(3, 8); // coin
@@ -181,13 +181,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::nmitimer)
 // 70-7F solenoids - no knocker
 TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x5c, 0x63, 0x01, 0x40, 0x08, 0 }; // 74C912
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x5c, 0x63, 0x01, 0x40, 0x08, 0 }; // 74C912
 	m_out_offs++;
 
 	if (m_out_offs < 0x28)
 	{
-		UINT8 data = m_p_ram[m_out_offs];
-		UINT8 segments = patterns[data&15] | (BIT(data, 4) ? 0x80 : 0);
+		uint8_t data = m_p_ram[m_out_offs];
+		uint8_t segments = patterns[data&15] | (BIT(data, 4) ? 0x80 : 0);
 		output().set_digit_value(m_out_offs, segments);
 	}
 	else

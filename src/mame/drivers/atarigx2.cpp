@@ -192,9 +192,9 @@ int parameters3[16][2] = {
 
 // every output bit is a linear function on the input bits except by
 // a quadratic term always involving bit #0 of the input
-UINT32 ftest4(UINT32 num)
+uint32_t ftest4(uint32_t num)
 {
-    UINT32 accum = 0;
+    uint32_t accum = 0;
 
     for (int i=0; i<16; ++i)
     {
@@ -213,7 +213,7 @@ UINT32 ftest4(UINT32 num)
 
 READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 {
-	static const UINT32 lookup_table[][2] =
+	static const uint32_t lookup_table[][2] =
 	{
 		// sprite flipping
 		{ 0x0000e54f, 0<<11 },
@@ -1142,13 +1142,13 @@ READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 		{ 0xffffffff, 0xffff }
 	};
 
-	UINT32 result = m_protection_ram[offset];
+	uint32_t result = m_protection_ram[offset];
 
 	if (offset == 0x300)
 		result |= 0x80000000;
 	if (offset == 0x3f0)
 	{
-		UINT32 tag = (m_last_write_offset << 17) | m_last_write;
+		uint32_t tag = (m_last_write_offset << 17) | m_last_write;
 		int i = 0;
 
 		while (lookup_table[i][0] != 0xffffffff)

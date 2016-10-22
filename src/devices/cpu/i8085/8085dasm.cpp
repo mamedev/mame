@@ -20,8 +20,8 @@
 
 CPU_DISASSEMBLE( i8085 )
 {
-	UINT32 flags = 0;
-	UINT8 op;
+	uint32_t flags = 0;
+	uint8_t op;
 	unsigned PC = pc;
 	switch (op = OP(pc++))
 	{

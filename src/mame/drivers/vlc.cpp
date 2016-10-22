@@ -172,20 +172,20 @@ public:
 	optional_device<microtouch_device> m_microtouch;
 	required_device<nvram_device> m_nvram;
 
-	required_shared_ptr<UINT16> m_ram62256;
-	required_shared_ptr<UINT16> m_backup;
+	required_shared_ptr<uint16_t> m_ram62256;
+	required_shared_ptr<uint16_t> m_backup;
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	UINT16  m_datA40000;
+	uint16_t  m_datA40000;
 
-		//UINT8* m_videoram;
-		//UINT8* m_colorram;
+		//uint8_t* m_videoram;
+		//uint8_t* m_colorram;
 
-	UINT16* m_videoram;
+	uint16_t* m_videoram;
 	tilemap_t *m_bg_tilemap;
 	virtual void video_start() override;
-	UINT32 screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(nevada);
 
 	DECLARE_WRITE_LINE_MEMBER(duart18_irq_handler);
@@ -214,7 +214,7 @@ there is a 74LS173 on the LOWER byte that used bit D3..D0
 funny thing , the DOOR ACCESS Switch is connected on the CLEAR  PIN of this 4bits register
 so when D3..D0 are LOW , DOOR is OPEN
 */
-static const UINT8 pal35[256] = {
+static const uint8_t pal35[256] = {
 0x11, 0x42, 0x5B, 0xCA, 0x19, 0x42, 0x5B, 0xCA, 0x38, 0x63, 0x3A, 0x63, 0x3A, 0x63, 0x3A, 0x63,
 0xD3, 0x08, 0x5B, 0xCA, 0x19, 0xCA, 0x19, 0xCA, 0x18, 0xEB, 0x18, 0xEB, 0x18, 0xEB, 0x18, 0xEB,
 0xD3, 0xCA, 0x5B, 0xCC, 0x5B, 0xCC, 0x5B, 0xCC, 0xBA, 0x63, 0x38, 0x65, 0x38, 0x65, 0x38, 0x65,
@@ -293,7 +293,7 @@ void nevada_state::video_start()
 }
 
 /***************************************************************************/
-UINT32 nevada_state::screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nevada_state::screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Todo
 /*
@@ -409,7 +409,7 @@ WRITE16_MEMBER(nevada_state::io_board_x)
 READ16_MEMBER(nevada_state::nevada_sec_r )
 {
 //  D3..D0 = DOOR OPEN or Track STATE of PAL35
-	UINT16 res;
+	uint16_t res;
 		/* UPPER byte is use for input in PAL35 */
 			// 74LS173 $bits Register used LOWER bits D3..D0 for PAL35 state and DOOR LOGIC SWITCH
 			res = pal35[m_datA40000 >> 8];
@@ -675,7 +675,7 @@ ROM_END
 *************************/
 DRIVER_INIT_MEMBER(nevada_state,nevada)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	memset(m_backup,0x00,m_backup.bytes()); // temp
 

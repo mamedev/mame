@@ -25,7 +25,7 @@ static const gfx_layout taitojc_char_layout =
 
 TILE_GET_INFO_MEMBER(taitojc_state::taitojc_tile_info)
 {
-	UINT32 val = m_tile_ram[tile_index];
+	uint32_t val = m_tile_ram[tile_index];
 	int color = (val >> 22) & 0xff;
 	int tile = (val >> 2) & 0x7f;
 	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, 0);
@@ -39,7 +39,7 @@ READ32_MEMBER(taitojc_state::taitojc_palette_r)
 WRITE32_MEMBER(taitojc_state::taitojc_palette_w)
 {
 	int r, g, b;
-	UINT32 color;
+	uint32_t color;
 
 	COMBINE_DATA( m_palette_ram + offset );
 
@@ -120,16 +120,16 @@ WRITE32_MEMBER(taitojc_state::taitojc_char_w)
 
 */
 
-void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 w1, UINT32 w2, UINT8 bank_type)
+void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t w1, uint32_t w2, uint8_t bank_type)
 {
 	int x, y, width, height, palette;
 	int i, j;
 	int x1, x2, y1, y2;
 	int ix, iy;
-	UINT32 address;
-	UINT8 *v;
-	UINT8 color_depth;
-	UINT8 mask_screen;
+	uint32_t address;
+	uint8_t *v;
+	uint8_t color_depth;
+	uint8_t mask_screen;
 
 	color_depth = (w2 & 0x10000) >> 16;
 	mask_screen = (w2 & 0x20000) >> 17;
@@ -152,13 +152,13 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 	/* TODO: untangle this! */
 	if(address >= 0xff000)
-		v = (UINT8*)&m_objlist[(address-0xff000)/4];
+		v = (uint8_t*)&m_objlist[(address-0xff000)/4];
 	if(address >= 0xfc000)
-		v = (UINT8*)&m_char_ram[(address-0xfc000)/4];
+		v = (uint8_t*)&m_char_ram[(address-0xfc000)/4];
 	else if(address >= 0xf8000)
-		v = (UINT8*)&m_tile_ram[(address-0xf8000)/4];
+		v = (uint8_t*)&m_tile_ram[(address-0xf8000)/4];
 	else
-		v = (UINT8*)&m_vram[address/4];
+		v = (uint8_t*)&m_vram[address/4];
 
 	/* guess, but it's probably doable via a vreg ... */
 	if ((width == 0 || height == 0) && bank_type == 2)
@@ -214,7 +214,7 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 		for (j=y1; j < y2; j++)
 		{
-			UINT16 *d = &bitmap.pix16(j);
+			uint16_t *d = &bitmap.pix16(j);
 
 			for (i=x1; i < x2; i++)
 			{
@@ -230,12 +230,12 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	{
 		for (j=y1; j < y2; j++)
 		{
-			UINT16 *d = &bitmap.pix16(j);
+			uint16_t *d = &bitmap.pix16(j);
 			int index = (iy * (width / 2)) + ix;
 
 			for (i=x1; i < x2; i+=2)
 			{
-				UINT8 pen = (v[BYTE4_XOR_BE(index)] & 0xf0) >> 4;
+				uint8_t pen = (v[BYTE4_XOR_BE(index)] & 0xf0) >> 4;
 				if (pen != 0)
 					d[i] = palette + pen;
 
@@ -254,12 +254,12 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		{
 			for (j=y1; j < y2; j++)
 			{
-				UINT16 *d = &bitmap.pix16(j);
+				uint16_t *d = &bitmap.pix16(j);
 				int index = (iy * width) + ix;
 
 				for (i=x1; i < x2; i++)
 				{
-					UINT8 pen = v[BYTE4_XOR_BE(index)];
+					uint8_t pen = v[BYTE4_XOR_BE(index)];
 					if (pen != 0)
 					{
 						d[i] = palette + pen;
@@ -274,10 +274,10 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	}
 }
 
-void taitojc_state::draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri)
+void taitojc_state::draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri)
 {
-	UINT16 start_offs;
-//  UINT8 double_xy;
+	uint16_t start_offs;
+//  uint8_t double_xy;
 	int i;
 
 	start_offs = ((bank_type+1)*0x400)/4;
@@ -289,8 +289,8 @@ void taitojc_state::draw_object_bank(bitmap_ind16 &bitmap, const rectangle &clip
 
 	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
 	{
-		UINT32 w1 = m_objlist[i + 0];
-		UINT32 w2 = m_objlist[i + 1];
+		uint32_t w1 = m_objlist[i + 0];
+		uint32_t w2 = m_objlist[i + 1];
 
 		if (((w2 & 0x200000) >> 21) == pri)
 		{
@@ -313,14 +313,14 @@ void taitojc_state::video_start()
 
 	m_tilemap->set_transparent_pen(0);
 
-	m_char_ram = make_unique_clear<UINT32[]>(0x4000/4);
-	m_tile_ram = make_unique_clear<UINT32[]>(0x4000/4);
+	m_char_ram = make_unique_clear<uint32_t[]>(0x4000/4);
+	m_tile_ram = make_unique_clear<uint32_t[]>(0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(*m_palette, taitojc_char_layout, (UINT8 *)m_char_ram.get(), 0, m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(*m_palette, taitojc_char_layout, (uint8_t *)m_char_ram.get(), 0, m_palette->entries() / 16, 0));
 }
 
-UINT32 taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -344,13 +344,13 @@ UINT32 taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 taitojc_state::screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitojc_state::screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// update controller state in artwork
-	static const UINT8 dendego_mascon_table[6] = { 0x76, 0x67, 0x75, 0x57, 0x73, 0x37 };
-	static const UINT8 dendego_brake_table[11] = { 0x00, 0x05, 0x1d, 0x35, 0x4d, 0x65, 0x7d, 0x95, 0xad, 0xc5, 0xd4 };
+	static const uint8_t dendego_mascon_table[6] = { 0x76, 0x67, 0x75, 0x57, 0x73, 0x37 };
+	static const uint8_t dendego_brake_table[11] = { 0x00, 0x05, 0x1d, 0x35, 0x4d, 0x65, 0x7d, 0x95, 0xad, 0xc5, 0xd4 };
 
-	UINT8 btn = (ioport("BUTTONS")->read() & 0x77);
+	uint8_t btn = (ioport("BUTTONS")->read() & 0x77);
 	int level;
 	for (level = 5; level > 0; level--)
 		if (btn == dendego_mascon_table[level]) break;

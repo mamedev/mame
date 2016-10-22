@@ -31,7 +31,7 @@ class sh7604_bus_device : public device_t,
 {
 public:
 	// construction/destruction
-	sh7604_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh7604_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );
@@ -62,12 +62,12 @@ private:
 	bool m_is_slave;
 	const address_space_config      m_space_config;
 	
-	UINT16 m_bcr1;
-	UINT16 m_bcr2;
-	UINT16 m_wcr;
-	UINT16 m_mcr;
- 	UINT16 m_rtcsr;
-	UINT16 m_rtcor;
+	uint16_t m_bcr1;
+	uint16_t m_bcr2;
+	uint16_t m_wcr;
+	uint16_t m_mcr;
+ 	uint16_t m_rtcsr;
+	uint16_t m_rtcor;
 };
 
 

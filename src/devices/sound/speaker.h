@@ -26,11 +26,11 @@ class speaker_sound_device : public device_t,
 								public device_sound_interface
 {
 public:
-	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~speaker_sound_device() {}
 
 	// static configuration
-	static void static_set_levels(device_t &device, int num_levels, const INT16 *levels) { downcast<speaker_sound_device &>(device).m_num_levels = num_levels; downcast<speaker_sound_device &>(device).m_levels = levels;}
+	static void static_set_levels(device_t &device, int num_levels, const int16_t *levels) { downcast<speaker_sound_device &>(device).m_num_levels = num_levels; downcast<speaker_sound_device &>(device).m_levels = levels;}
 
 	void level_w(int new_level);
 
@@ -84,7 +84,7 @@ private:
 	double  m_prevx, m_prevy;
 
 	int          m_num_levels;  /* optional: number of levels (if not two) */
-	const INT16  *m_levels;     /* optional: pointer to level lookup table */
+	const int16_t  *m_levels;     /* optional: pointer to level lookup table */
 };
 
 extern const device_type SPEAKER_SOUND;

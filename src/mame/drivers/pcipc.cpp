@@ -30,7 +30,7 @@ class pcipc_state : public driver_device
 {
 public:
 	struct boot_state_info {
-		UINT8 val;
+		uint8_t val;
 		const char *const message;
 	};
 

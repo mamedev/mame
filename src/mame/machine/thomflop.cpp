@@ -82,7 +82,7 @@ static int motor_on;
 
 
 /* build an identifier, with header & space */
-int thomson_state::thom_floppy_make_addr( chrn_id id, UINT8* dst, int sector_size )
+int thomson_state::thom_floppy_make_addr( chrn_id id, uint8_t* dst, int sector_size )
 {
 	if ( sector_size == 128 )
 	{
@@ -117,7 +117,7 @@ int thomson_state::thom_floppy_make_addr( chrn_id id, UINT8* dst, int sector_siz
 
 
 /* build a sector, with header & space */
-int thomson_state::thom_floppy_make_sector( legacy_floppy_image_device* img, chrn_id id, UINT8* dst, int sector_size )
+int thomson_state::thom_floppy_make_sector( legacy_floppy_image_device* img, chrn_id id, uint8_t* dst, int sector_size )
 {
 	if ( sector_size == 128 )
 	{
@@ -148,10 +148,10 @@ int thomson_state::thom_floppy_make_sector( legacy_floppy_image_device* img, chr
 
 
 /* build a whole track */
-int thomson_state::thom_floppy_make_track( legacy_floppy_image_device* img, UINT8* dst, int sector_size, int side )
+int thomson_state::thom_floppy_make_track( legacy_floppy_image_device* img, uint8_t* dst, int sector_size, int side )
 {
-	UINT8 space = ( sector_size == 128 ) ? 0xff : 0;
-	UINT8* org = dst;
+	uint8_t space = ( sector_size == 128 ) ? 0xff : 0;
+	uint8_t* org = dst;
 	chrn_id id;
 	int nb;
 
@@ -212,7 +212,7 @@ int thomson_state::thom_floppy_make_track( legacy_floppy_image_device* img, UINT
 
 
 /* build an identifier, with header */
-int thomson_state::thom_qdd_make_addr( int sector, UINT8* dst )
+int thomson_state::thom_qdd_make_addr( int sector, uint8_t* dst )
 {
 	dst[  0 ] = 0xa5;
 	dst[  1 ] = sector >> 8;
@@ -224,7 +224,7 @@ int thomson_state::thom_qdd_make_addr( int sector, UINT8* dst )
 
 
 /* build a sector, with header */
-int thomson_state::thom_qdd_make_sector( legacy_floppy_image_device* img, int sector, UINT8* dst )
+int thomson_state::thom_qdd_make_sector( legacy_floppy_image_device* img, int sector, uint8_t* dst )
 {
 	int i;
 	dst[ 0 ] = 0x5a;
@@ -238,9 +238,9 @@ int thomson_state::thom_qdd_make_sector( legacy_floppy_image_device* img, int se
 
 
 /* build a whole disk */
-int thomson_state::thom_qdd_make_disk ( legacy_floppy_image_device* img, UINT8* dst )
+int thomson_state::thom_qdd_make_disk ( legacy_floppy_image_device* img, uint8_t* dst )
 {
-	UINT8* org = dst;
+	uint8_t* org = dst;
 	int i;
 
 	memset( dst, 0x16, THOM_QDD_SYNCH_DISK ); dst += THOM_QDD_SYNCH_DISK;
@@ -269,7 +269,7 @@ int thomson_state::thom_qdd_make_disk ( legacy_floppy_image_device* img, UINT8* 
 
 
 
-static UINT8 to7_5p14_select;
+static uint8_t to7_5p14_select;
 
 
 
@@ -344,7 +344,7 @@ void thomson_state::to7_5p14_init()
 
 
 
-static UINT8 to7_5p14sd_select;
+static uint8_t to7_5p14sd_select;
 
 
 
@@ -482,21 +482,21 @@ void thomson_state::to7_5p14sd_init()
 struct to7qdd_t
 {
 	/* MC6852 registers */
-	UINT8 status;
-	UINT8 ctrl1;
-	UINT8 ctrl2;
-	UINT8 ctrl3;
+	uint8_t status;
+	uint8_t ctrl1;
+	uint8_t ctrl2;
+	uint8_t ctrl3;
 
 	/* extra registers */
-	UINT8 drive;
+	uint8_t drive;
 
 	/* internal state */
-	UINT8  data[QDD_MAXBUF];  /* enough for a whole track */
-	UINT32 data_idx;          /* byte position in track */
-	UINT32 start_idx;         /* start of write position */
-	UINT32 data_size;         /* track length */
-	UINT8  data_crc;          /* checksum when writing */
-	UINT8  index_pulse;       /* one pulse per track */
+	uint8_t  data[QDD_MAXBUF];  /* enough for a whole track */
+	uint32_t data_idx;          /* byte position in track */
+	uint32_t start_idx;         /* start of write position */
+	uint32_t data_size;         /* track length */
+	uint8_t  data_crc;          /* checksum when writing */
+	uint8_t  index_pulse;       /* one pulse per track */
 
 };
 
@@ -561,9 +561,9 @@ void thomson_state::to7_qdd_stat_update()
 
 
 
-UINT8 thomson_state::to7_qdd_read_byte()
+uint8_t thomson_state::to7_qdd_read_byte()
 {
-	UINT8 data;
+	uint8_t data;
 
 	/* rebuild disk if needed */
 	if ( !to7qdd->data_size )
@@ -594,7 +594,7 @@ UINT8 thomson_state::to7_qdd_read_byte()
    * CPU write id field and data field => format
    * CPU write data field after it has read an id field => sector write
    */
-void thomson_state::to7_qdd_write_byte( UINT8 data )
+void thomson_state::to7_qdd_write_byte( uint8_t data )
 {
 	int i;
 
@@ -628,7 +628,7 @@ void thomson_state::to7_qdd_write_byte( UINT8 data )
 		{
 			/* got an id field => format */
 			int sector = (int) to7qdd->data[ to7qdd->start_idx + 1 ] * 256 + (int) to7qdd->data[ to7qdd->start_idx + 2 ];
-			UINT8 filler = 0xff;
+			uint8_t filler = 0xff;
 
 			LOG(( "%f $%04x to7_qdd_write_byte: got id field for sector=%i\n",
 					machine().time().as_double(), m_maincpu->pc(), sector ));
@@ -699,7 +699,7 @@ READ8_MEMBER( thomson_state::to7_qdd_r )
 
 	case 8: /* floppy status */
 	{
-		UINT8 data = 0;
+		uint8_t data = 0;
 		device_image_interface* img = dynamic_cast<device_image_interface *>(to7_qdd_image());
 		if ( ! img->exists() )
 			data |= 0x40; /* disk present */
@@ -886,26 +886,26 @@ void thomson_state::to7_qdd_init()
 
 struct thmfc1_t
 {
-	UINT8   op;
-	UINT8   sector;            /* target sector, in [1,16] */
-		UINT32  sector_id;
-	UINT8   track;             /* current track, in [0,79] */
-	UINT8   side;              /* current side, 0 or 1 */
-	UINT8   drive;             /* 0 to 3 */
-	UINT16  sector_size;       /* 128 or 256 (512, 1024 not supported) */
-	UINT8   formatting;
-	UINT8   ipl;               /* index pulse / QDD start */
-	UINT8   wsync;             /* synchronization word */
+	uint8_t   op;
+	uint8_t   sector;            /* target sector, in [1,16] */
+		uint32_t  sector_id;
+	uint8_t   track;             /* current track, in [0,79] */
+	uint8_t   side;              /* current side, 0 or 1 */
+	uint8_t   drive;             /* 0 to 3 */
+	uint16_t  sector_size;       /* 128 or 256 (512, 1024 not supported) */
+	uint8_t   formatting;
+	uint8_t   ipl;               /* index pulse / QDD start */
+	uint8_t   wsync;             /* synchronization word */
 
-	UINT8   data[THOM_MAXBUF]; /* enough for a whole track */
-	UINT32  data_idx;          /* reading / writing / formatting pos */
-	UINT32  data_size;         /* bytes to read / write */
-	UINT32  data_finish;       /* when to raise the finished flag */
-	UINT32  data_raw_idx;      /* byte index for raw track reading */
-	UINT32  data_raw_size;     /* size of track already cached in data */
-	UINT8   data_crc;          /* check-sum of written data */
+	uint8_t   data[THOM_MAXBUF]; /* enough for a whole track */
+	uint32_t  data_idx;          /* reading / writing / formatting pos */
+	uint32_t  data_size;         /* bytes to read / write */
+	uint32_t  data_finish;       /* when to raise the finished flag */
+	uint32_t  data_raw_idx;      /* byte index for raw track reading */
+	uint32_t  data_raw_size;     /* size of track already cached in data */
+	uint8_t   data_crc;          /* check-sum of written data */
 
-	UINT8   stat0;             /* status register */
+	uint8_t   stat0;             /* status register */
 
 };
 
@@ -1027,9 +1027,9 @@ TIMER_CALLBACK_MEMBER( thomson_state::thmfc_floppy_cmd_complete_cb )
 
 
 /* intelligent read: show just one field, skip header */
-UINT8 thomson_state::thmfc_floppy_read_byte()
+uint8_t thomson_state::thmfc_floppy_read_byte()
 {
-	UINT8 data = thmfc1->data[ thmfc1->data_idx ];
+	uint8_t data = thmfc1->data[ thmfc1->data_idx ];
 
 	VLOG(( "%f $%04x thmfc_floppy_read_byte: off=%i/%i/%i data=$%02X\n",
 			machine().time().as_double(), m_maincpu->pc(),
@@ -1050,9 +1050,9 @@ UINT8 thomson_state::thmfc_floppy_read_byte()
 
 
 /* dumb read: show whole track with field headers and gaps  */
-UINT8 thomson_state::thmfc_floppy_raw_read_byte()
+uint8_t thomson_state::thmfc_floppy_raw_read_byte()
 {
-	UINT8 data;
+	uint8_t data;
 
 	/* rebuild track if needed */
 	if ( ! thmfc1->data_raw_size )
@@ -1086,7 +1086,7 @@ UINT8 thomson_state::thmfc_floppy_raw_read_byte()
 
 
 /* QDD writing / formating */
-void thomson_state::thmfc_floppy_qdd_write_byte( UINT8 data )
+void thomson_state::thmfc_floppy_qdd_write_byte( uint8_t data )
 {
 	int i;
 
@@ -1121,7 +1121,7 @@ void thomson_state::thmfc_floppy_qdd_write_byte( UINT8 data )
 		{
 			/* got an id field => format */
 			int sector = (int) thmfc1->data[ thmfc1->data_idx ] * 256 + (int) thmfc1->data[ thmfc1->data_idx + 1 ];
-			UINT8 filler = 0xff;
+			uint8_t filler = 0xff;
 
 			LOG(( "%f $%04x thmfc_floppy_qdd_write_byte: id field, sector=%i\n", machine().time().as_double(), m_maincpu->pc(), sector ));
 
@@ -1175,7 +1175,7 @@ void thomson_state::thmfc_floppy_qdd_write_byte( UINT8 data )
 
 
 /* intelligent writing */
-void thomson_state::thmfc_floppy_write_byte( UINT8 data )
+void thomson_state::thmfc_floppy_write_byte( uint8_t data )
 {
 	VLOG (( "%f $%04x thmfc_floppy_write_byte: off=%i/%i data=$%02X\n",
 		machine().time().as_double(), m_maincpu->pc(),
@@ -1190,7 +1190,7 @@ void thomson_state::thmfc_floppy_write_byte( UINT8 data )
 }
 
 /* intelligent formatting */
-void thomson_state::thmfc_floppy_format_byte( UINT8 data )
+void thomson_state::thmfc_floppy_format_byte( uint8_t data )
 {
 	VLOG (( "%f $%04x thmfc_floppy_format_byte: $%02X\n", machine().time().as_double(), m_maincpu->pc(), data ));
 
@@ -1199,7 +1199,7 @@ void thomson_state::thmfc_floppy_format_byte( UINT8 data )
 	/* accumulate bytes to form an id field */
 	if ( thmfc1->data_idx || data==0xA1 )
 	{
-		static const UINT8 header[] = { 0xa1, 0xa1, 0xa1, 0xfe };
+		static const uint8_t header[] = { 0xa1, 0xa1, 0xa1, 0xfe };
 		thmfc1->data[ thmfc1->data_idx ] = data;
 		thmfc1->data_idx++;
 		if ( thmfc1->data_idx > 11 )
@@ -1208,11 +1208,11 @@ void thomson_state::thmfc_floppy_format_byte( UINT8 data )
 			{
 				/* got id field => format */
 				legacy_floppy_image_device * img = thmfc_floppy_image();
-				UINT8 track  = thmfc1->data[4];
-				UINT8 side   = thmfc1->data[5];
-				UINT8 sector = thmfc1->data[6];
-				UINT8 length = thmfc1->data[7]; /* actually, log length */
-				UINT8 filler = 0xe5;            /* standard Thomson filler */
+				uint8_t track  = thmfc1->data[4];
+				uint8_t side   = thmfc1->data[5];
+				uint8_t sector = thmfc1->data[6];
+				uint8_t length = thmfc1->data[7]; /* actually, log length */
+				uint8_t filler = 0xe5;            /* standard Thomson filler */
 								chrn_id id;
 								if ( thmfc_floppy_find_sector( &id ) )
 								{
@@ -1240,7 +1240,7 @@ READ8_MEMBER( thomson_state::thmfc_floppy_r )
 
 	case 1: /* STAT1 */
 	{
-		UINT8 data = 0;
+		uint8_t data = 0;
 		legacy_floppy_image_device * img = thmfc_floppy_image();
 		int flags = img->floppy_drive_get_flag_state(-1 );
 		if ( thmfc_floppy_is_qdd(img) )
@@ -1284,7 +1284,7 @@ READ8_MEMBER( thomson_state::thmfc_floppy_r )
 	case 8:
 	{
 		/* undocumented => emulate TO7 QDD controller ? */
-		UINT8 data = thmfc1->ipl << 7;
+		uint8_t data = thmfc1->ipl << 7;
 		VLOG(( "%f $%04x thmfc_floppy_r: STAT8=$%02X\n", machine().time().as_double(), m_maincpu->pc(), data ));
 		return data;
 	}
@@ -1683,7 +1683,7 @@ READ8_MEMBER( thomson_state::to7_network_r )
 	if ( offset == 8 )
 	{
 		/* network ID of the computer */
-		UINT8 id = m_io_fconfig->read() >> 3;
+		uint8_t id = m_io_fconfig->read() >> 3;
 		VLOG(( "%f $%04x to7_network_r: read id $%02X\n", machine().time().as_double(), m_maincpu->pc(), id ));
 		return id;
 	}
@@ -1721,8 +1721,8 @@ WRITE8_MEMBER( thomson_state::to7_network_w )
 
 
 
-UINT8 to7_controller_type;
-UINT8 to7_floppy_bank;
+uint8_t to7_controller_type;
+uint8_t to7_floppy_bank;
 
 
 void thomson_state::to7_floppy_init( void* base )

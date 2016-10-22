@@ -26,7 +26,7 @@ const device_type QL_STANDARD_ROM_CARTRIDGE = &device_creator<ql_standard_rom_ca
 //  ql_standard_rom_cartridge_t - constructor
 //-------------------------------------------------
 
-ql_standard_rom_cartridge_t::ql_standard_rom_cartridge_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ql_standard_rom_cartridge_t::ql_standard_rom_cartridge_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, QL_STANDARD_ROM_CARTRIDGE, "QL standard ROM cartridge", tag, owner, clock, "ql_standard", __FILE__),
 	device_ql_rom_cartridge_card_interface(mconfig, *this)
 {
@@ -46,7 +46,7 @@ void ql_standard_rom_cartridge_t::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-UINT8 ql_standard_rom_cartridge_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t ql_standard_rom_cartridge_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	if (m_romoeh && m_rom.bytes())
 	{

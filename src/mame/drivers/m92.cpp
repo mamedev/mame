@@ -290,14 +290,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
 
 READ16_MEMBER(m92_state::m92_eeprom_r)
 {
-	UINT8 *RAM = memregion("eeprom")->base();
+	uint8_t *RAM = memregion("eeprom")->base();
 //  logerror("%05x: EEPROM RE %04x\n",space.device().safe_pc(),offset);
 	return RAM[offset] | 0xff00;
 }
 
 WRITE16_MEMBER(m92_state::m92_eeprom_w)
 {
-	UINT8 *RAM = memregion("eeprom")->base();
+	uint8_t *RAM = memregion("eeprom")->base();
 //  logerror("%05x: EEPROM WR %04x\n",space.device().safe_pc(),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
@@ -2240,7 +2240,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(m92_state,m92)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->set_base(&ROM[0xa0000]);
 
@@ -2256,7 +2256,7 @@ DRIVER_INIT_MEMBER(m92_state,lethalth)
 /* has bankswitching */
 DRIVER_INIT_MEMBER(m92_state,m92_bank)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
@@ -2267,7 +2267,7 @@ DRIVER_INIT_MEMBER(m92_state,m92_bank)
 /* has bankswitching, has eeprom, needs sprite kludge */
 DRIVER_INIT_MEMBER(m92_state,majtitl2)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
@@ -2281,7 +2281,7 @@ DRIVER_INIT_MEMBER(m92_state,majtitl2)
 /* TODO: figure out actual address map and other differences from real Irem h/w */
 DRIVER_INIT_MEMBER(m92_state,ppan)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0xa0000]);
 
 	m_game_kludge = 0;

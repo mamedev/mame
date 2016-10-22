@@ -25,9 +25,9 @@
 
 struct SoundDMA
 {
-	UINT32  source;     /* Source address */
-	UINT16  size;       /* Size */
-	UINT8   enable;     /* Enabled */
+	uint32_t  source;     /* Source address */
+	uint16_t  size;       /* Size */
+	uint8_t   enable;     /* Enabled */
 };
 
 
@@ -53,13 +53,13 @@ public:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 
-	UINT8 m_ws_portram[256];
-	UINT8 m_internal_eeprom[INTERNAL_EEPROM_SIZE];
-	UINT8 m_system_type;
+	uint8_t m_ws_portram[256];
+	uint8_t m_internal_eeprom[INTERNAL_EEPROM_SIZE];
+	uint8_t m_system_type;
 	SoundDMA m_sound_dma;
-	std::unique_ptr<UINT8[]> m_ws_bios_bank;
-	UINT8 m_bios_disabled;
-	UINT8 m_rotate;
+	std::unique_ptr<uint8_t[]> m_ws_bios_bank;
+	uint8_t m_bios_disabled;
+	uint8_t m_rotate;
 
 	void set_irq_line(int irq);
 	void dma_sound_cb();
@@ -72,24 +72,24 @@ public:
 
 protected:
 	/* Interrupt flags */
-	static const UINT8 WSWAN_IFLAG_STX    = 0x01;
-	static const UINT8 WSWAN_IFLAG_KEY    = 0x02;
-	static const UINT8 WSWAN_IFLAG_RTC    = 0x04;
-	static const UINT8 WSWAN_IFLAG_SRX    = 0x08;
-	static const UINT8 WSWAN_IFLAG_LCMP   = 0x10;
-	static const UINT8 WSWAN_IFLAG_VBLTMR = 0x20;
-	static const UINT8 WSWAN_IFLAG_VBL    = 0x40;
-	static const UINT8 WSWAN_IFLAG_HBLTMR = 0x80;
+	static const uint8_t WSWAN_IFLAG_STX    = 0x01;
+	static const uint8_t WSWAN_IFLAG_KEY    = 0x02;
+	static const uint8_t WSWAN_IFLAG_RTC    = 0x04;
+	static const uint8_t WSWAN_IFLAG_SRX    = 0x08;
+	static const uint8_t WSWAN_IFLAG_LCMP   = 0x10;
+	static const uint8_t WSWAN_IFLAG_VBLTMR = 0x20;
+	static const uint8_t WSWAN_IFLAG_VBL    = 0x40;
+	static const uint8_t WSWAN_IFLAG_HBLTMR = 0x80;
 
 	/* Interrupts */
-	static const UINT8 WSWAN_INT_STX    = 0;
-	static const UINT8 WSWAN_INT_KEY    = 1;
-	static const UINT8 WSWAN_INT_RTC    = 2;
-	static const UINT8 WSWAN_INT_SRX    = 3;
-	static const UINT8 WSWAN_INT_LCMP   = 4;
-	static const UINT8 WSWAN_INT_VBLTMR = 5;
-	static const UINT8 WSWAN_INT_VBL    = 6;
-	static const UINT8 WSWAN_INT_HBLTMR = 7;
+	static const uint8_t WSWAN_INT_STX    = 0;
+	static const uint8_t WSWAN_INT_KEY    = 1;
+	static const uint8_t WSWAN_INT_RTC    = 2;
+	static const uint8_t WSWAN_INT_SRX    = 3;
+	static const uint8_t WSWAN_INT_LCMP   = 4;
+	static const uint8_t WSWAN_INT_VBLTMR = 5;
+	static const uint8_t WSWAN_INT_VBL    = 6;
+	static const uint8_t WSWAN_INT_HBLTMR = 7;
 
 	required_ioport m_cursx;
 	required_ioport m_cursy;

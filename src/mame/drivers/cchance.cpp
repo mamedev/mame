@@ -45,8 +45,8 @@ public:
 	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tnzs_state(mconfig, type, tag) { }
 
-	UINT8 m_hop_io;
-	UINT8 m_bell_io;
+	uint8_t m_hop_io;
+	uint8_t m_bell_io;
 	DECLARE_WRITE8_MEMBER(output_0_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_WRITE8_MEMBER(output_1_w);

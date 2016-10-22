@@ -28,7 +28,7 @@
 // image size
 static int pmd85_image_size;
 
-static int pmd85_emit_level(INT16 *buffer, int sample_pos, int count, int level)
+static int pmd85_emit_level(int16_t *buffer, int sample_pos, int count, int level)
 {
 	if (buffer)
 	{
@@ -39,7 +39,7 @@ static int pmd85_emit_level(INT16 *buffer, int sample_pos, int count, int level)
 	return count;
 }
 
-static int pmd85_output_bit(INT16 *buffer, int sample_pos, UINT8 bit)
+static int pmd85_output_bit(int16_t *buffer, int sample_pos, uint8_t bit)
 {
 	int samples = 0;
 
@@ -57,7 +57,7 @@ static int pmd85_output_bit(INT16 *buffer, int sample_pos, UINT8 bit)
 	return samples;
 }
 
-static int pmd85_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
+static int pmd85_output_byte(int16_t *buffer, int sample_pos, uint8_t byte)
 {
 	int samples = 0;
 
@@ -75,7 +75,7 @@ static int pmd85_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
 	return samples;
 }
 
-static bool pmd85_is_header_block(const UINT8 *bytes)
+static bool pmd85_is_header_block(const uint8_t *bytes)
 {
 	for (int i=0; i<0x10; i++)
 	{
@@ -86,12 +86,12 @@ static bool pmd85_is_header_block(const UINT8 *bytes)
 	return true;
 }
 
-static void pmd85_printf_image_info(const UINT8 *bytes, int sample_count)
+static void pmd85_printf_image_info(const uint8_t *bytes, int sample_count)
 {
 #if 0
 	char track_name[9];
-	UINT32 sec = (UINT32)(sample_count/PMD85_WAV_FREQUENCY);
-	UINT16 addr = (bytes[0x33]<<8) | bytes[0x32];
+	uint32_t sec = (uint32_t)(sample_count/PMD85_WAV_FREQUENCY);
+	uint16_t addr = (bytes[0x33]<<8) | bytes[0x32];
 	strncpy(track_name, (char*)&bytes[0x36], 8);
 	track_name[8] = '\0';
 
@@ -99,7 +99,7 @@ static void pmd85_printf_image_info(const UINT8 *bytes, int sample_count)
 #endif
 }
 
-static int pmd85_handle_cassette(INT16 *buffer, const UINT8 *bytes)
+static int pmd85_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 {
 	int sample_count = 0;
 
@@ -137,7 +137,7 @@ static int pmd85_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 		int data_pos = 0;
 		while (data_pos < pmd85_image_size)
 		{
-			UINT16 block_size = (bytes[data_pos + 1]<<8) | bytes[data_pos];
+			uint16_t block_size = (bytes[data_pos + 1]<<8) | bytes[data_pos];
 			int pause_len = PMD85_PAUSE_BITS;
 
 			data_pos += 2;
@@ -168,7 +168,7 @@ static int pmd85_handle_cassette(INT16 *buffer, const UINT8 *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int pmd85_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int pmd85_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	return pmd85_handle_cassette(buffer, bytes);
 }
@@ -177,7 +177,7 @@ static int pmd85_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
    Calculate the number of samples needed for this tape image
 ********************************************************************/
 
-static int pmd85_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int pmd85_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	pmd85_image_size = length;
 

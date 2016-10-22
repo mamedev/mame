@@ -65,7 +65,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 public:
-	UINT32 screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -73,13 +73,13 @@ public:
 
 void destiny_state::video_start()
 {
-	UINT8 i;
+	uint8_t i;
 	for(i=0;i<20;i++)
 		m_led_array[i] = 0x20;
 	m_led_array[20] = 0;
 }
 
-UINT32 destiny_state::screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t destiny_state::screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	popmessage("%s",m_led_array);
 	return 0;
@@ -156,7 +156,7 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// coincounter on coin insert
-	if (((int)(FPTR)param) == 0)
+	if (((int)(uintptr_t)param) == 0)
 		machine().bookkeeping().coin_counter_w(0, newval);
 }
 

@@ -205,7 +205,7 @@ inline item_layer get_layer_and_blendmode(const layout_view &view, int index, in
 void render_primitive::reset()
 {
 	// do not clear m_next!
-	memset(&type, 0, FPTR(&texcoords + 1) - FPTR(&type));
+	memset(&type, 0, uintptr_t(&texcoords + 1) - uintptr_t(&type));
 }
 
 
@@ -434,7 +434,7 @@ void render_texture::hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 //  get_scaled - get a scaled bitmap (if we can)
 //-------------------------------------------------
 
-void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, UINT32 flags)
+void render_texture::get_scaled(uint32_t dwidth, uint32_t dheight, render_texinfo &texinfo, render_primitive_list &primlist, uint32_t flags)
 {
 	// source width/height come from the source bounds
 	int swidth = m_sbounds.width();
@@ -636,7 +636,7 @@ void render_container::set_user_settings(const user_settings &settings)
 //  add_line - add a line item to this container
 //-------------------------------------------------
 
-void render_container::add_line(float x0, float y0, float x1, float y1, float width, rgb_t argb, UINT32 flags)
+void render_container::add_line(float x0, float y0, float x1, float y1, float width, rgb_t argb, uint32_t flags)
 {
 	item &newitem = add_generic(CONTAINER_ITEM_LINE, x0, y0, x1, y1, argb);
 	newitem.m_width = width;
@@ -648,7 +648,7 @@ void render_container::add_line(float x0, float y0, float x1, float y1, float wi
 //  add_quad - add a quad item to this container
 //-------------------------------------------------
 
-void render_container::add_quad(float x0, float y0, float x1, float y1, rgb_t argb, render_texture *texture, UINT32 flags)
+void render_container::add_quad(float x0, float y0, float x1, float y1, rgb_t argb, render_texture *texture, uint32_t flags)
 {
 	item &newitem = add_generic(CONTAINER_ITEM_QUAD, x0, y0, x1, y1, argb);
 	newitem.m_texture = texture;
@@ -660,7 +660,7 @@ void render_container::add_quad(float x0, float y0, float x1, float y1, rgb_t ar
 //  add_char - add a char item to this container
 //-------------------------------------------------
 
-void render_container::add_char(float x0, float y0, float height, float aspect, rgb_t argb, render_font &font, UINT16 ch)
+void render_container::add_char(float x0, float y0, float height, float aspect, rgb_t argb, render_font &font, uint16_t ch)
 {
 	// compute the bounds of the character cell and get the texture
 	render_bounds bounds;
@@ -682,7 +682,7 @@ void render_container::add_char(float x0, float y0, float height, float aspect, 
 //  an 8-bit value
 //-------------------------------------------------
 
-UINT8 render_container::apply_brightness_contrast_gamma(UINT8 value)
+uint8_t render_container::apply_brightness_contrast_gamma(uint8_t value)
 {
 	return ::apply_brightness_contrast_gamma(value, m_user.m_brightness, m_user.m_contrast, m_user.m_gamma);
 }
@@ -741,8 +741,8 @@ void render_container::overlay_scale(bitmap_argb32 &dest, bitmap_argb32 &source,
 	// simply replicate the source bitmap over the target
 	for (int y = 0; y < dest.height(); y++)
 	{
-		UINT32 *src = &source.pix32(y % source.height());
-		UINT32 *dst = &dest.pix32(y);
+		uint32_t *src = &source.pix32(y % source.height());
+		uint32_t *dst = &dest.pix32(y);
 		int sx = 0;
 
 		// loop over columns
@@ -761,7 +761,7 @@ void render_container::overlay_scale(bitmap_argb32 &dest, bitmap_argb32 &source,
 //  container
 //-------------------------------------------------
 
-render_container::item &render_container::add_generic(UINT8 type, float x0, float y0, float x1, float y1, rgb_t argb)
+render_container::item &render_container::add_generic(uint8_t type, float x0, float y0, float x1, float y1, rgb_t argb)
 {
 	item *newitem = m_item_allocator.alloc();
 
@@ -800,7 +800,7 @@ void render_container::recompute_lookups()
 	// recompute the 256 entry lookup table
 	for (int i = 0; i < 0x100; i++)
 	{
-		UINT8 adjustedval = apply_brightness_contrast_gamma(i);
+		uint8_t adjustedval = apply_brightness_contrast_gamma(i);
 		m_bcglookup256[i + 0x000] = adjustedval << 0;
 		m_bcglookup256[i + 0x100] = adjustedval << 8;
 		m_bcglookup256[i + 0x200] = adjustedval << 16;
@@ -843,8 +843,8 @@ void render_container::update_palette()
 		return;
 
 	// get the dirty list
-	UINT32 mindirty, maxdirty;
-	const UINT32 *dirty = m_palclient->dirty_list(mindirty, maxdirty);
+	uint32_t mindirty, maxdirty;
+	const uint32_t *dirty = m_palclient->dirty_list(mindirty, maxdirty);
 
 	// iterate over dirty items and update them
 	if (dirty != nullptr)
@@ -855,16 +855,16 @@ void render_container::update_palette()
 		if (has_brightness_contrast_gamma_changes())
 		{
 			// loop over chunks of 32 entries, since we can quickly examine 32 at a time
-			for (UINT32 entry32 = mindirty / 32; entry32 <= maxdirty / 32; entry32++)
+			for (uint32_t entry32 = mindirty / 32; entry32 <= maxdirty / 32; entry32++)
 			{
-				UINT32 dirtybits = dirty[entry32];
+				uint32_t dirtybits = dirty[entry32];
 				if (dirtybits != 0)
 
 					// this chunk of 32 has dirty entries; fix them up
-					for (UINT32 entry = 0; entry < 32; entry++)
+					for (uint32_t entry = 0; entry < 32; entry++)
 						if (dirtybits & (1 << entry))
 						{
-							UINT32 finalentry = entry32 * 32 + entry;
+							uint32_t finalentry = entry32 * 32 + entry;
 							rgb_t newval = adjusted_palette[finalentry];
 							m_bcglookup[finalentry] = (newval & 0xff000000) |
 														m_bcglookup256[0x200 + newval.r()] |
@@ -905,7 +905,7 @@ render_container::user_settings::user_settings()
 //  render_target - constructor
 //-------------------------------------------------
 
-render_target::render_target(render_manager &manager, const internal_layout *layoutfile, UINT32 flags)
+render_target::render_target(render_manager &manager, const internal_layout *layoutfile, uint32_t flags)
 	: m_next(nullptr),
 		m_manager(manager),
 		m_curview(nullptr),
@@ -967,7 +967,7 @@ render_target::render_target(render_manager &manager, const internal_layout *lay
 	m_layerconfig = m_base_layerconfig;
 
 	// load the layout files
-	load_layout_files(layoutfile, flags & RENDER_CREATE_SINGLE_FILE);
+	load_layout_files(layoutfile, (flags & RENDER_CREATE_SINGLE_FILE)!=0);
 
 	// set the current view to the first one
 	set_view(0);
@@ -1013,7 +1013,7 @@ int render_target::index() const
 //  of a target
 //-------------------------------------------------
 
-void render_target::set_bounds(INT32 width, INT32 height, float pixel_aspect)
+void render_target::set_bounds(int32_t width, int32_t height, float pixel_aspect)
 {
 	m_width = width;
 	m_height = height;
@@ -1156,7 +1156,7 @@ const render_screen_list &render_target::view_screens(int viewindex)
 //  layout and proposed new parameters
 //-------------------------------------------------
 
-void render_target::compute_visible_area(INT32 target_width, INT32 target_height, float target_pixel_aspect, int target_orientation, INT32 &visible_width, INT32 &visible_height)
+void render_target::compute_visible_area(int32_t target_width, int32_t target_height, float target_pixel_aspect, int target_orientation, int32_t &visible_width, int32_t &visible_height)
 {
 	switch (m_scale_mode)
 	{
@@ -1203,7 +1203,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 		default:
 		{
 			// get source size and aspect
-			INT32 src_width, src_height;
+			int32_t src_width, src_height;
 			compute_minimum_size(src_width, src_height);
 			float src_aspect = m_curview->effective_aspect(m_layerconfig);
 
@@ -1219,7 +1219,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			int scale_mode = m_scale_mode;
 			if (m_scale_mode == SCALE_FRACTIONAL_AUTO)
 			{
-				bool is_rotated = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY);
+				bool is_rotated = ((m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY))!=0;
 				scale_mode = is_rotated ^ target_is_portrait ? SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
 			}
 
@@ -1261,7 +1261,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 //  source pixel for all included screens
 //-------------------------------------------------
 
-void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
+void render_target::compute_minimum_size(int32_t &minwidth, int32_t &minheight)
 {
 	float maxxscale = 1.0f, maxyscale = 1.0f;
 	int screens_considered = 0;
@@ -1346,7 +1346,7 @@ render_primitive_list &render_target::get_primitives()
 	list.release_all();
 
 	// compute the visible width/height
-	INT32 viswidth, visheight;
+	int32_t viswidth, visheight;
 	compute_visible_area(m_width, m_height, m_pixel_aspect, m_orientation, viswidth, visheight);
 
 	// create a root transform for the target
@@ -1467,7 +1467,7 @@ render_primitive_list &render_target::get_primitives()
 //  specified container, if possible
 //-------------------------------------------------
 
-bool render_target::map_point_container(INT32 target_x, INT32 target_y, render_container &container, float &container_x, float &container_y)
+bool render_target::map_point_container(int32_t target_x, int32_t target_y, render_container &container, float &container_x, float &container_y)
 {
 	ioport_port *input_port;
 	ioport_value input_mask;
@@ -1481,7 +1481,7 @@ bool render_target::map_point_container(INT32 target_x, INT32 target_y, render_c
 //  container, if possible
 //-------------------------------------------------
 
-bool render_target::map_point_input(INT32 target_x, INT32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
+bool render_target::map_point_input(int32_t target_x, int32_t target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
 {
 	return map_point_internal(target_x, target_y, nullptr, input_x, input_y, input_port, input_mask);;
 }
@@ -1653,7 +1653,7 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 bool render_target::load_layout_file(const char *dirname, const internal_layout *layout_data)
 {
 	// +1 to ensure data is terminated for XML parser
-	auto tempout = make_unique_clear<UINT8[]>(layout_data->decompressed_size+1);
+	auto tempout = make_unique_clear<uint8_t[]>(layout_data->decompressed_size+1);
 
 	z_stream stream;
 	int zerr;
@@ -2008,7 +2008,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	// add the overlay if it exists
 	if (container.overlay() != nullptr && m_layerconfig.screen_overlay_enabled())
 	{
-		INT32 width, height;
+		int32_t width, height;
 
 		// allocate a primitive
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
@@ -2060,8 +2060,8 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		prim->flags = PRIMFLAG_TEXORIENT(xform.orientation) | PRIMFLAG_BLENDMODE(blendmode) | PRIMFLAG_TEXFORMAT(texture->format());
 
 		// compute the bounds
-		INT32 width = render_round_nearest(xform.xscale);
-		INT32 height = render_round_nearest(xform.yscale);
+		int32_t width = render_round_nearest(xform.xscale);
+		int32_t height = render_round_nearest(xform.yscale);
 		set_render_bounds_wh(&prim->bounds, render_round_nearest(xform.xoffs), render_round_nearest(xform.yoffs), (float) width, (float) height);
 		prim->full_bounds = prim->bounds;
 		if (xform.orientation & ORIENTATION_SWAP_XY)
@@ -2096,10 +2096,10 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 //  mapping points
 //-------------------------------------------------
 
-bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask)
+bool render_target::map_point_internal(int32_t target_x, int32_t target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask)
 {
 	// compute the visible width/height
-	INT32 viswidth, visheight;
+	int32_t viswidth, visheight;
 	compute_visible_area(m_width, m_height, m_pixel_aspect, m_orientation, viswidth, visheight);
 
 	// create a root transform for the target
@@ -2235,27 +2235,27 @@ void render_target::config_load(xml_data_node &targetnode)
 	// modify the artwork config
 	int tmpint = xml_get_attribute_int(&targetnode, "backdrops", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_backdrops_enabled(tmpint);
+		set_backdrops_enabled(tmpint != 0);
 
 	tmpint = xml_get_attribute_int(&targetnode, "overlays", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_overlays_enabled(tmpint);
+		set_overlays_enabled(tmpint != 0);
 
 	tmpint = xml_get_attribute_int(&targetnode, "bezels", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_bezels_enabled(tmpint);
+		set_bezels_enabled(tmpint != 0);
 
 	tmpint = xml_get_attribute_int(&targetnode, "cpanels", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_cpanels_enabled(tmpint);
+		set_cpanels_enabled(tmpint != 0);
 
 	tmpint = xml_get_attribute_int(&targetnode, "marquees", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_marquees_enabled(tmpint);
+		set_marquees_enabled(tmpint != 0);
 
 	tmpint = xml_get_attribute_int(&targetnode, "zoom", -1);
 	if (tmpint == 0 || tmpint == 1)
-		set_zoom_to_screen(tmpint);
+		set_zoom_to_screen(tmpint != 0);
 
 	// apply orientation
 	tmpint = xml_get_attribute_int(&targetnode, "rotate", -1);
@@ -2356,19 +2356,19 @@ void render_target::init_clear_extents()
 
 bool render_target::remove_clear_extent(const render_bounds &bounds)
 {
-	INT32 *max = &m_clear_extents[MAX_CLEAR_EXTENTS];
-	INT32 *last = &m_clear_extents[m_clear_extent_count];
-	INT32 *ext = &m_clear_extents[0];
-	INT32 boundsx0 = ceil(bounds.x0);
-	INT32 boundsx1 = floor(bounds.x1);
-	INT32 boundsy0 = ceil(bounds.y0);
-	INT32 boundsy1 = floor(bounds.y1);
-	INT32 y0, y1 = 0;
+	int32_t *max = &m_clear_extents[MAX_CLEAR_EXTENTS];
+	int32_t *last = &m_clear_extents[m_clear_extent_count];
+	int32_t *ext = &m_clear_extents[0];
+	int32_t boundsx0 = ceil(bounds.x0);
+	int32_t boundsx1 = floor(bounds.x1);
+	int32_t boundsy0 = ceil(bounds.y0);
+	int32_t boundsy1 = floor(bounds.y1);
+	int32_t y0, y1 = 0;
 
 	// loop over Y extents
 	while (ext < last)
 	{
-		INT32 *linelast;
+		int32_t *linelast;
 
 		// first entry of each line should always be negative
 		assert(ext[0] < 0.0f);
@@ -2378,8 +2378,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 		// do we intersect this extent?
 		if (boundsy0 < y1 && boundsy1 > y0)
 		{
-			INT32 *xext;
-			INT32 x0, x1 = 0;
+			int32_t *xext;
+			int32_t x0, x1 = 0;
 
 			// split the top
 			if (y0 < boundsy0)
@@ -2491,16 +2491,16 @@ abort:
 void render_target::add_clear_extents(render_primitive_list &list)
 {
 	simple_list<render_primitive> clearlist;
-	INT32 *last = &m_clear_extents[m_clear_extent_count];
-	INT32 *ext = &m_clear_extents[0];
-	INT32 y0, y1 = 0;
+	int32_t *last = &m_clear_extents[m_clear_extent_count];
+	int32_t *ext = &m_clear_extents[0];
+	int32_t y0, y1 = 0;
 
 	// loop over all extents
 	while (ext < last)
 	{
-		INT32 *linelast = &ext[ext[1] + 2];
-		INT32 *xext = &ext[2];
-		INT32 x0, x1 = 0;
+		int32_t *linelast = &ext[ext[1] + 2];
+		int32_t *xext = &ext[2];
+		int32_t x0, x1 = 0;
 
 		// first entry should always be negative
 		assert(ext[0] < 0);
@@ -2681,7 +2681,7 @@ float render_manager::max_update_rate() const
 //  target_alloc - allocate a new target
 //-------------------------------------------------
 
-render_target *render_manager::target_alloc(const internal_layout *layoutfile, UINT32 flags)
+render_target *render_manager::target_alloc(const internal_layout *layoutfile, uint32_t flags)
 {
 	return &m_targetlist.append(*global_alloc(render_target(*this, layoutfile, flags)));
 }

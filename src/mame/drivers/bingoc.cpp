@@ -47,12 +47,12 @@ public:
 		m_upd7759(*this, "upd"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	UINT8 m_x;
+	uint8_t m_x;
 	DECLARE_READ16_MEMBER(unknown_r);
 	DECLARE_WRITE16_MEMBER(main_sound_latch_w);
 	DECLARE_WRITE8_MEMBER(sound_play_w);
 	virtual void video_start() override;
-	UINT32 screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
@@ -66,7 +66,7 @@ void bingoc_state::video_start()
 {
 }
 
-UINT32 bingoc_state::screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bingoc_state::screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -111,7 +111,7 @@ WRITE8_MEMBER(bingoc_state::sound_play_w)
 	---- --x- sound rom banking
 	---- ---x start-stop sample
 	*/
-	UINT8 *upd = memregion("upd")->base();
+	uint8_t *upd = memregion("upd")->base();
 	memcpy(&upd[0x00000], &upd[0x20000 + (((data & 2)>>1) * 0x20000)], 0x20000);
 	m_upd7759->start_w(data & 1);
 //  printf("%02x\n",data);

@@ -40,7 +40,7 @@
 const device_type A26_ROM_SUPERCHARGER = &device_creator<a26_rom_ss_device>;
 
 
-a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 						: a26_rom_f6_device(mconfig, A26_ROM_SUPERCHARGER, "Atari 2600 ROM Cart Supercharger", tag, owner, clock, "a2600_ss", __FILE__),
 							m_cassette(*this, "cassette"),
 	m_maincpu(nullptr),
@@ -102,7 +102,7 @@ machine_config_constructor a26_rom_ss_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( a26_ss );
 }
 
-inline UINT8 a26_rom_ss_device::read_byte(UINT32 offset)
+inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 {
 	if (offset < 0x800)
 		return m_ram[(offset & 0x7ff) + (m_base_banks[0] * 0x800)];

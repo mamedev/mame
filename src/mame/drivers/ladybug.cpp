@@ -111,7 +111,7 @@ CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
 
 CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	/* upright cabinet only uses a single set of controls */
 	if (m_port_dsw0->read() & 0x20)
@@ -725,8 +725,8 @@ DRIVER_INIT_MEMBER(ladybug_state,dorodon)
 	/* decode the opcodes */
 
 	offs_t i;
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *table = memregion("user1")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *table = memregion("user1")->base();
 
 	for (i = 0; i < 0x6000; i++)
 		m_decrypted_opcodes[i] = table[rom[i]];

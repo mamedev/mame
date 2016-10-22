@@ -24,8 +24,8 @@ class sun_keyboard_port_device : public device_t, public device_slot_interface
 	friend class device_sun_keyboard_port_interface;
 
 public:
-	sun_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
-	sun_keyboard_port_device(machine_config const &mconfig, device_type type, char const *name, char const *tag, device_t *owner, UINT32 clock, char const *shortname, char const *source);
+	sun_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	sun_keyboard_port_device(machine_config const &mconfig, device_type type, char const *name, char const *tag, device_t *owner, uint32_t clock, char const *shortname, char const *source);
 	virtual ~sun_keyboard_port_device();
 
 	// static configuration helpers

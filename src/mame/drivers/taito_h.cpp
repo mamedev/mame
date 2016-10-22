@@ -166,7 +166,7 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8   port = m_tc0220ioc->port_r(space, 0); /* read port number */
+	uint8_t   port = m_tc0220ioc->port_r(space, 0); /* read port number */
 
 	switch( port )
 	{

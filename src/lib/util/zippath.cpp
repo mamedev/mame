@@ -363,7 +363,7 @@ done:
 // -------------------------------------------------
 
 /**
- * @fn  osd_file::error zippath_fopen(const std::string &filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
+ * @fn  osd_file::error zippath_fopen(const std::string &filename, uint32_t openflags, util::core_file::ptr &file, std::string &revised_path)
  *
  * @brief   Zippath fopen.
  *
@@ -375,7 +375,7 @@ done:
  * @return  A osd_file::error.
  */
 
-osd_file::error zippath_fopen(const std::string &filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
+osd_file::error zippath_fopen(const std::string &filename, uint32_t openflags, util::core_file::ptr &file, std::string &revised_path)
 {
 	osd_file::error filerr = osd_file::error::NOT_FOUND;
 	archive_file::error ziperr;

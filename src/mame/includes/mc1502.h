@@ -56,14 +56,14 @@ public:
 	TIMER_CALLBACK_MEMBER(keyb_signal_callback);
 
 	struct {
-		UINT8       pulsing;
-		UINT16      mask;       /* input lines */
+		uint8_t       pulsing;
+		uint16_t      mask;       /* input lines */
 		emu_timer   *keyb_signal_timer;
 	} m_kbd;
 
-	UINT8 m_ppi_portb;
-	UINT8 m_ppi_portc;
-	UINT8 m_spkrdata;
+	uint8_t m_ppi_portb;
+	uint8_t m_ppi_portc;
+	uint8_t m_spkrdata;
 
 	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out2_changed);

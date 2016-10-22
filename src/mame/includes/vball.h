@@ -26,10 +26,10 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_attribram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_scrolly_lo;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_attribram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_scrolly_lo;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	int m_scrollx_hi;
 	int m_scrolly_hi;
@@ -54,7 +54,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(vball_scanline);
 	void bgprombank_w(int bank);
 	void spprombank_w(int bank);

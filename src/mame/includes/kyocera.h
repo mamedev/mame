@@ -107,7 +107,7 @@ public:
 	virtual void machine_start() override;
 	memory_region *m_opt_region;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( uart_status_r );
 	DECLARE_WRITE8_MEMBER( uart_ctrl_w );
@@ -124,10 +124,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
 	/* memory state */
-	UINT8 m_bank;           /* memory bank selection */
+	uint8_t m_bank;           /* memory bank selection */
 
 	/* keyboard state */
-	UINT16 m_keylatch;      /* keyboard latch */
+	uint16_t m_keylatch;      /* keyboard latch */
 
 	/* sound state */
 	int m_buzzer;               /* buzzer select */
@@ -170,11 +170,11 @@ public:
 	DECLARE_WRITE8_MEMBER( romam_w );
 	DECLARE_READ8_MEMBER( romrd_r );
 
-	void bankswitch(UINT8 data);
+	void bankswitch(uint8_t data);
 
 	// ROM cassette
 	int m_rom_sel;
-	UINT32 m_rom_addr;
+	uint32_t m_rom_addr;
 
 	/* peripheral state */
 	int m_iosel;                /* serial interface select */
@@ -215,7 +215,7 @@ public:
 	virtual void machine_start() override;
 	memory_region *m_opt_region;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( bank_r );
 	DECLARE_WRITE8_MEMBER( bank_w );
@@ -234,13 +234,13 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tandy200_tp_tick);
 
-	void bankswitch(UINT8 data);
+	void bankswitch(uint8_t data);
 
 	/* memory state */
-	UINT8 m_bank;           /* memory bank selection */
+	uint8_t m_bank;           /* memory bank selection */
 
 	/* keyboard state */
-	UINT16 m_keylatch;      /* keyboard latch */
+	uint16_t m_keylatch;      /* keyboard latch */
 	int m_tp;               /* timing pulse */
 
 	/* sound state */

@@ -59,7 +59,7 @@ machine_config_constructor sv603_device::device_mconfig_additions() const
 
 DEVICE_IMAGE_LOAD_MEMBER( sv603_device, cartridge )
 {
-	UINT32 size = m_cart_rom->common_get_size("rom");
+	uint32_t size = m_cart_rom->common_get_size("rom");
 
 	m_cart_rom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart_rom->common_load_rom(m_cart_rom->get_rom_base(), size, "rom");
@@ -76,7 +76,7 @@ DEVICE_IMAGE_LOAD_MEMBER( sv603_device, cartridge )
 //  sv603_device - constructor
 //-------------------------------------------------
 
-sv603_device::sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sv603_device::sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SV603, "SV-603 Coleco Game Adapter", tag, owner, clock, "sv603", __FILE__),
 	device_svi_expander_interface(mconfig, *this),
 	m_bios(*this, "bios"),

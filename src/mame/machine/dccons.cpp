@@ -40,7 +40,7 @@ WRITE_LINE_MEMBER(dc_cons_state::ata_interrupt)
 
 TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 {
-	UINT8 sector_buffer[ 4096 ];
+	uint8_t sector_buffer[ 4096 ];
 
 	atapi_timer->adjust(attotime::never);
 

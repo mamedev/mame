@@ -31,10 +31,10 @@ public:
 		{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_videoram2;
-	required_shared_ptr<UINT16> m_videoram3;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint16_t> m_videoram3;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t   *m_text_layer;
@@ -43,16 +43,16 @@ public:
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tile_bitmap_bg;
 	bitmap_ind16 m_tile_bitmap_fg;
-	UINT16      m_tx_scroll_x;
-	UINT16      m_tx_scroll_y;
-	UINT16      m_bg_scroll_x;
-	UINT16      m_bg_scroll_y;
-	UINT16      m_fg_scroll_x;
-	UINT16      m_fg_scroll_y;
-	INT8        m_tx_offset_y;
-	INT8        m_bg_offset_y;
-	INT8        m_fg_offset_y;
-	INT8        m_spr_offset_y;
+	uint16_t      m_tx_scroll_x;
+	uint16_t      m_tx_scroll_y;
+	uint16_t      m_bg_scroll_x;
+	uint16_t      m_bg_scroll_y;
+	uint16_t      m_fg_scroll_x;
+	uint16_t      m_fg_scroll_y;
+	int8_t        m_tx_offset_y;
+	int8_t        m_bg_offset_y;
+	int8_t        m_fg_offset_y;
+	int8_t        m_spr_offset_y;
 
 	/* misc */
 	int         m_sprite_sizey;
@@ -105,10 +105,10 @@ public:
 	DECLARE_VIDEO_START(gaiden);
 	DECLARE_VIDEO_START(drgnbowl);
 	DECLARE_VIDEO_START(raiga);
-	UINT32 screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void descramble_drgnbowl(int descramble_cpu);
-	void descramble_mastninj_gfx(UINT8* src);
+	void descramble_mastninj_gfx(uint8_t* src);
 };

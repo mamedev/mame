@@ -30,20 +30,20 @@ public:
 	required_device<msm5205_device> m_msm;
 	required_device<palette_device> m_palette;
 
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	optional_device<stfight_video_device> m_stfight_video;
 	optional_device<airraid_video_device> m_airraid_video;
 
-	UINT8 *m_decrypt;
-	UINT8 m_fm_data;
-	UINT8 m_cpu_to_mcu_data;
-	UINT8 m_cpu_to_mcu_empty;
+	uint8_t *m_decrypt;
+	uint8_t m_fm_data;
+	uint8_t m_cpu_to_mcu_data;
+	uint8_t m_cpu_to_mcu_empty;
 
-	UINT16 m_adpcm_data_offs;
-	UINT8 m_adpcm_nibble;
-	UINT8 m_adpcm_reset;
+	uint16_t m_adpcm_data_offs;
+	uint8_t m_adpcm_nibble;
+	uint8_t m_adpcm_reset;
 
-	UINT8 m_coin_state;
+	uint8_t m_coin_state;
 
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 
@@ -83,10 +83,10 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_68705_ddr_b_w);
 	DECLARE_WRITE8_MEMBER(stfight_68705_ddr_c_w);
 
-	UINT8 m_portA_out, m_portA_in;
-	UINT8 m_portB_out, m_portB_in;
-	UINT8 m_portC_out, m_portC_in;
-	UINT8 m_ddrA, m_ddrB, m_ddrC;
+	uint8_t m_portA_out, m_portA_in;
+	uint8_t m_portB_out, m_portB_in;
+	uint8_t m_portC_out, m_portC_in;
+	uint8_t m_ddrA, m_ddrB, m_ddrC;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

@@ -35,7 +35,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
 	required_device<cassette_image_device> m_cassette;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_colorram;
 	required_ioport_array<8> m_key_row;
 	required_ioport m_run;
 
@@ -62,7 +62,7 @@ public:
 
 	/* video state */
 	int m_cdp1864_efx;      /* EFx */
-	UINT8 m_color;
+	uint8_t m_color;
 
 	/* keyboard state */
 	int m_keylatch;         /* key latch */

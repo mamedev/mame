@@ -19,7 +19,7 @@
 const device_type NEOGEO_KOF10TH_CART = &device_creator<neogeo_kof10th_cart>;
 
 
-neogeo_kof10th_cart::neogeo_kof10th_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
+neogeo_kof10th_cart::neogeo_kof10th_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_KOF10TH_CART, "Neo Geo KOF 10th Ann Bootleg Cart", tag, owner, clock, "neocart_kof10th", __FILE__)
 {}
 
@@ -61,7 +61,7 @@ machine_config_constructor neogeo_kof10th_cart::device_mconfig_additions() const
 void neogeo_kof10th_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_prot->kof10th_decrypt(cpuregion, cpuregion_size);
-	memcpy(m_cart_ram2, (UINT8 *)cpuregion + 0xe0000, 0x20000);
+	memcpy(m_cart_ram2, (uint8_t *)cpuregion + 0xe0000, 0x20000);
 	m_fixed = (get_fixed_size()) ? get_fixed_base() : get_region_fixed_base();
 }
 
@@ -70,20 +70,20 @@ void neogeo_kof10th_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  is incomplete, at the moment the S data is copied from the program rom on
  start-up instead */
 
-UINT32 neogeo_kof10th_cart::get_bank_base(UINT16 sel)
+uint32_t neogeo_kof10th_cart::get_bank_base(uint16_t sel)
 {
-	UINT32 bank = 0x100000 + ((sel & 7) << 20);
+	uint32_t bank = 0x100000 + ((sel & 7) << 20);
 	if (bank >= 0x700000)
 		bank = 0x100000;
 	return bank;
 }
 
-UINT16 neogeo_kof10th_cart::get_helper()
+uint16_t neogeo_kof10th_cart::get_helper()
 {
 	return m_cart_ram[0xffc];
 }
 
-UINT32 neogeo_kof10th_cart::get_special_bank()
+uint32_t neogeo_kof10th_cart::get_special_bank()
 {
 	return m_special_bank;
 }

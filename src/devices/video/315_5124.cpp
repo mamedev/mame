@@ -97,12 +97,12 @@ PAL frame timing
 #define BOTTOM_BORDER         4
 #define BOTTOM_BLANKING       5
 
-static const UINT8 ntsc_192[6] = { 3, 13, 27, 192, 24, 3 };
-static const UINT8 ntsc_224[6] = { 3, 13, 11, 224,  8, 3 };
-static const UINT8 ntsc_240[6] = { 3, 13,  3, 240,  0, 3 };
-static const UINT8 pal_192[6]  = { 3, 13, 54, 192, 48, 3 };
-static const UINT8 pal_224[6]  = { 3, 13, 38, 224, 32, 3 };
-static const UINT8 pal_240[6]  = { 3, 13, 30, 240, 24, 3 };
+static const uint8_t ntsc_192[6] = { 3, 13, 27, 192, 24, 3 };
+static const uint8_t ntsc_224[6] = { 3, 13, 11, 224,  8, 3 };
+static const uint8_t ntsc_240[6] = { 3, 13,  3, 240,  0, 3 };
+static const uint8_t pal_192[6]  = { 3, 13, 54, 192, 48, 3 };
+static const uint8_t pal_224[6]  = { 3, 13, 38, 224, 32, 3 };
+static const uint8_t pal_240[6]  = { 3, 13, 30, 240, 24, 3 };
 
 
 const device_type SEGA315_5124 = &device_creator<sega315_5124_device>;
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( sega315_5124, AS_0, 8, sega315_5124_device )
 ADDRESS_MAP_END
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t( mconfig, SEGA315_5124, "Sega 315-5124 VDP", tag, owner, clock, "sega315_5124", __FILE__)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -177,7 +177,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 }
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, bool supports_224_240, const char *shortname, const char *source)
 	: device_t( mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -194,13 +194,13 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 }
 
 
-sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5246 VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5246", __FILE__)
 {
 }
 
 
-sega315_5378_device::sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega315_5378_device::sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega315_5124_device( mconfig, SEGA315_5378, "Sega 315-5378 VDP", tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10, true, "sega315_5378", __FILE__)
 {
 }
@@ -554,7 +554,7 @@ void sega315_5124_device::process_line_timer()
 
 READ8_MEMBER( sega315_5124_device::vram_read )
 {
-	UINT8 temp;
+	uint8_t temp;
 
 	/* SMS 2 & GG behaviour. Seems like the latched data is passed straight through */
 	/* to the address register when in the middle of doing a command.               */
@@ -627,7 +627,7 @@ void sega315_5124_device::check_pending_flags()
 
 READ8_MEMBER( sega315_5124_device::register_read )
 {
-	UINT8 temp;
+	uint8_t temp;
 
 	check_pending_flags();
 	temp = m_status;
@@ -780,19 +780,19 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 }
 
 
-UINT16 sega315_5124_device::get_name_table_row(int row)
+uint16_t sega315_5124_device::get_name_table_row(int row)
 {
 	return ((row >> 3) << 6) & (((m_reg[0x02] & 0x01) << 10) | 0x3bff);
 }
 
 
-UINT16 sega315_5246_device::get_name_table_row(int row)
+uint16_t sega315_5246_device::get_name_table_row(int row)
 {
 	return (row >> 3) << 6;
 }
 
 
-UINT16 sega315_5378_device::get_name_table_row(int row)
+uint16_t sega315_5378_device::get_name_table_row(int row)
 {
 	return (row >> 3) << 6;
 }
@@ -804,7 +804,7 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 	int y_scroll, scroll_mod;
 	int pixel_x, pixel_plot_x;
 	int bit_plane_0, bit_plane_1, bit_plane_2, bit_plane_3;
-	UINT16 name_table_address;
+	uint16_t name_table_address;
 
 	/* if top 2 rows of screen not affected by horizontal scrolling, then x_scroll = 0 */
 	/* else x_scroll = m_reg8copy                                                      */
@@ -826,7 +826,7 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 	/* Draw background layer */
 	for (tile_column = 0; tile_column < 33; tile_column++)
 	{
-		UINT16 tile_data;
+		uint16_t tile_data;
 		int tile_selected, palette_selected, horiz_selected, vert_selected, priority_select;
 		int tile_line;
 
@@ -854,8 +854,8 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 
 		for (pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
-			UINT8 pen_bit_0, pen_bit_1, pen_bit_2, pen_bit_3;
-			UINT8 pen_selected;
+			uint8_t pen_bit_0, pen_bit_1, pen_bit_2, pen_bit_3;
+			uint8_t pen_selected;
 
 			pen_bit_0 = (bit_plane_0 >> (7 - pixel_x)) & 0x01;
 			pen_bit_1 = (bit_plane_1 >> (7 - pixel_x)) & 0x01;
@@ -949,7 +949,7 @@ void sega315_5124_device::select_sprites( int line )
 				{
 					int sprite_x = space().read_byte( m_sprite_base + sprite_index + 1 );
 					int sprite_tile_selected = space().read_byte( m_sprite_base + sprite_index + 2 );
-					UINT8 flags = space().read_byte( m_sprite_base + sprite_index + 3 );
+					uint8_t flags = space().read_byte( m_sprite_base + sprite_index + 3 );
 
 					int sprite_line = parse_line - sprite_y;
 
@@ -1054,7 +1054,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 {
 	bool sprite_col_occurred = false;
 	int sprite_col_x = 255;
-	UINT8 collision_buffer[256];
+	uint8_t collision_buffer[256];
 	int plot_min_x = 0;
 
 	if (m_display_disabled || m_sprite_count == 0)
@@ -1072,21 +1072,21 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 	{
 		int sprite_x = m_sprite_x[sprite_buffer_index];
 		int sprite_tile_selected = m_sprite_tile_selected[sprite_buffer_index];
-		UINT16 sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
+		uint16_t sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
 
-		UINT8 bit_plane_0 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x00);
-		UINT8 bit_plane_1 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x01);
-		UINT8 bit_plane_2 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x02);
-		UINT8 bit_plane_3 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x03);
+		uint8_t bit_plane_0 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x00);
+		uint8_t bit_plane_1 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x01);
+		uint8_t bit_plane_2 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x02);
+		uint8_t bit_plane_3 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x03);
 
 		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
 			int pixel_plot_x;
-			UINT8 pen_bit_0 = (bit_plane_0 >> (7 - pixel_x)) & 0x01;
-			UINT8 pen_bit_1 = (bit_plane_1 >> (7 - pixel_x)) & 0x01;
-			UINT8 pen_bit_2 = (bit_plane_2 >> (7 - pixel_x)) & 0x01;
-			UINT8 pen_bit_3 = (bit_plane_3 >> (7 - pixel_x)) & 0x01;
-			UINT8 pen_selected = (pen_bit_3 << 3 | pen_bit_2 << 2 | pen_bit_1 << 1 | pen_bit_0) | 0x10;
+			uint8_t pen_bit_0 = (bit_plane_0 >> (7 - pixel_x)) & 0x01;
+			uint8_t pen_bit_1 = (bit_plane_1 >> (7 - pixel_x)) & 0x01;
+			uint8_t pen_bit_2 = (bit_plane_2 >> (7 - pixel_x)) & 0x01;
+			uint8_t pen_bit_3 = (bit_plane_3 >> (7 - pixel_x)) & 0x01;
+			uint8_t pen_selected = (pen_bit_3 << 3 | pen_bit_2 << 2 | pen_bit_1 << 1 | pen_bit_0) | 0x10;
 
 			if (pen_selected == 0x10)
 			{
@@ -1155,7 +1155,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 {
 	bool sprite_col_occurred = false;
 	int sprite_col_x = 255;
-	UINT8 collision_buffer[256];
+	uint8_t collision_buffer[256];
 
 	if (m_display_disabled || m_sprite_count == 0)
 		return;
@@ -1167,8 +1167,8 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 	{
 		int sprite_x = m_sprite_x[sprite_buffer_index];
 		int sprite_tile_selected = m_sprite_tile_selected[sprite_buffer_index];
-		UINT16 sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
-		UINT8 flags = m_sprite_flags[sprite_buffer_index];
+		uint16_t sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
+		uint8_t flags = m_sprite_flags[sprite_buffer_index];
 		int pen_selected = m_palette_offset + ( flags & 0x0f );
 
 		if (flags & 0x80)
@@ -1182,7 +1182,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 				sprite_x += (m_sprite_zoom > 1 ? 16 : 8);
 			}
 
-			UINT8 pattern = space().read_byte( sprite_pattern_line + sprite_tile_selected * 8 );
+			uint8_t pattern = space().read_byte( sprite_pattern_line + sprite_tile_selected * 8 );
 
 			for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 			{
@@ -1237,7 +1237,7 @@ void sega315_5124_device::draw_scanline_mode2( int *line_buffer, int line )
 {
 	int tile_column;
 	int pixel_x, pixel_plot_x;
-	UINT16 name_table_base, color_base, pattern_base;
+	uint16_t name_table_base, color_base, pattern_base;
 	int pattern_mask, color_mask, pattern_offset;
 
 	name_table_base =  ((m_reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
@@ -1250,16 +1250,16 @@ void sega315_5124_device::draw_scanline_mode2( int *line_buffer, int line )
 	/* Draw background layer */
 	for (tile_column = 0; tile_column < 32; tile_column++)
 	{
-		UINT8 name = space().read_byte( name_table_base + tile_column );
-		UINT8 pattern;
-		UINT8 colors;
+		uint8_t name = space().read_byte( name_table_base + tile_column );
+		uint8_t pattern;
+		uint8_t colors;
 
 		pattern = space().read_byte(pattern_base + (((pattern_offset + name) & pattern_mask) * 8) + (line & 0x07) );
 		colors = space().read_byte(color_base + (((pattern_offset + name) & color_mask) * 8) + (line & 0x07) );
 
 		for (pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
-			UINT8 pen_selected;
+			uint8_t pen_selected;
 
 			if (pattern & (1 << (7 - pixel_x)))
 			{
@@ -1287,7 +1287,7 @@ void sega315_5124_device::draw_scanline_mode0( int *line_buffer, int line )
 {
 	int tile_column;
 	int pixel_x, pixel_plot_x;
-	UINT16 name_base, color_base, pattern_base;
+	uint16_t name_base, color_base, pattern_base;
 
 	name_base = ((m_reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
 	color_base = ((m_reg[0x03] << 6) & (VRAM_SIZE - 1));
@@ -1296,9 +1296,9 @@ void sega315_5124_device::draw_scanline_mode0( int *line_buffer, int line )
 	/* Draw background layer */
 	for (tile_column = 0; tile_column < 32; tile_column++)
 	{
-		UINT8 name = space().read_byte( name_base + tile_column );
-		UINT8 pattern;
-		UINT8 colors;
+		uint8_t name = space().read_byte( name_base + tile_column );
+		uint8_t pattern;
+		uint8_t colors;
 
 		pattern = space().read_byte( pattern_base + (name * 8) + (line & 0x07) );
 		colors = space().read_byte( color_base + ( name >> 3 ) );
@@ -1391,8 +1391,8 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 
 void sega315_5124_device::blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line )
 {
-	UINT32 *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
-	UINT8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
+	uint32_t *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
+	uint8_t  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
 	int x = 0;
 
 	if (m_vdp_mode == 4 && (m_reg[0x00] & 0x20))
@@ -1423,8 +1423,8 @@ void sega315_5378_device::blit_scanline( int *line_buffer, int *priority_selecte
 	}
 	else
 	{
-		UINT32 *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
-		UINT8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
+		uint32_t *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
+		uint8_t  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
 		int x = 0;
 
 		/* border on left side of the GG active screen */
@@ -1521,9 +1521,9 @@ void sega315_5378_device::update_palette()
 }
 
 
-void sega315_5124_device::cram_write(UINT8 data)
+void sega315_5124_device::cram_write(uint8_t data)
 {
-	UINT16 address = m_addr & m_cram_mask;
+	uint16_t address = m_addr & m_cram_mask;
 	if (data != m_CRAM[address])
 	{
 		m_CRAM[address] = data;
@@ -1532,7 +1532,7 @@ void sega315_5124_device::cram_write(UINT8 data)
 }
 
 
-void sega315_5378_device::cram_write(UINT8 data)
+void sega315_5378_device::cram_write(uint8_t data)
 {
 	if (m_sega315_5124_compatibility_mode)
 	{
@@ -1542,7 +1542,7 @@ void sega315_5378_device::cram_write(UINT8 data)
 	{
 		if (m_addr & 1)
 		{
-			UINT16 address = (m_addr & m_cram_mask) & ~1;
+			uint16_t address = (m_addr & m_cram_mask) & ~1;
 			if (m_buffer != m_CRAM[address] || data != m_CRAM[address + 1])
 			{
 				m_CRAM[address] = m_buffer;
@@ -1554,7 +1554,7 @@ void sega315_5378_device::cram_write(UINT8 data)
 }
 
 
-UINT32 sega315_5124_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t sega315_5124_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;

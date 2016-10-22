@@ -211,8 +211,8 @@ class mos6566_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<mos6566_device &>(device).m_cpu.set_tag(tag); }
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_irq.set_callback(object); }
@@ -231,9 +231,9 @@ public:
 	DECLARE_READ_LINE_MEMBER( ba_r )   { return m_ba; }   // bus available
 	DECLARE_READ_LINE_MEMBER( aec_r )  { return m_aec; }  // address enable control
 
-	UINT8 bus_r() { return m_last_data; }
+	uint8_t bus_r() { return m_last_data; }
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	enum
@@ -267,8 +267,8 @@ protected:
 	inline void set_ba(int state);
 	inline void set_aec(int state);
 	inline void bad_line_ba();
-	inline UINT8 read_videoram(offs_t offset);
-	inline UINT8 read_colorram(offs_t offset);
+	inline uint8_t read_videoram(offs_t offset);
+	inline uint8_t read_colorram(offs_t offset);
 	inline void idle_access();
 	inline void spr_ba(int num);
 	inline void spr_ptr_access( int num );
@@ -282,8 +282,8 @@ protected:
 	inline void matrix_access();
 	inline void graphics_access();
 	inline void draw_background();
-	inline void draw_mono( UINT16 p, UINT8 c0, UINT8 c1 );
-	inline void draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, UINT8 c3 );
+	inline void draw_mono( uint16_t p, uint8_t c0, uint8_t c1 );
+	inline void draw_multi( uint16_t p, uint8_t c0, uint8_t c1, uint8_t c2, uint8_t c3 );
 	void draw_graphics();
 	void draw_sprites();
 
@@ -297,74 +297,74 @@ protected:
 	int m_phi0;
 	int m_ba;
 	int m_aec;
-	UINT8 m_aec_delay;
+	uint8_t m_aec_delay;
 	int m_rdy_cycles;
 
-	UINT8 m_reg[0x80];
+	uint8_t m_reg[0x80];
 
 	int m_on;                               /* rastering of the screen */
 
-	UINT16 m_chargenaddr, m_videoaddr, m_bitmapaddr;
+	uint16_t m_chargenaddr, m_videoaddr, m_bitmapaddr;
 
 	bitmap_rgb32 m_bitmap;
 
-	UINT16 m_colors[4], m_spritemulti[4];
+	uint16_t m_colors[4], m_spritemulti[4];
 
 	int m_rasterline;
-	UINT8 m_cycle;
-	UINT16 m_raster_x;
-	UINT16 m_graphic_x;
-	UINT8 m_last_data;
+	uint8_t m_cycle;
+	uint16_t m_raster_x;
+	uint16_t m_graphic_x;
+	uint8_t m_last_data;
 	int m_lp;
 
 	/* convert multicolor byte to background/foreground for sprite collision */
-	UINT16 m_expandx[256];
-	UINT16 m_expandx_multi[256];
+	uint16_t m_expandx[256];
+	uint16_t m_expandx_multi[256];
 
 	/* Display */
-	UINT16 m_dy_start;
-	UINT16 m_dy_stop;
+	uint16_t m_dy_start;
+	uint16_t m_dy_stop;
 
 	/* GFX */
-	UINT8 m_draw_this_line;
-	UINT8 m_is_bad_line;
-	UINT8 m_bad_lines_enabled;
-	UINT8 m_display_state;
-	UINT8 m_char_data;
-	UINT8 m_gfx_data;
-	UINT8 m_color_data;
-	UINT8 m_last_char_data;
-	UINT8 m_matrix_line[40];                        // Buffer for video line, read in Bad Lines
-	UINT8 m_color_line[40];                     // Buffer for color line, read in Bad Lines
-	UINT8 m_vblanking;
-	UINT16 m_ml_index;
-	UINT8 m_rc;
-	UINT16 m_vc;
-	UINT16 m_vc_base;
-	UINT8 m_ref_cnt;
+	uint8_t m_draw_this_line;
+	uint8_t m_is_bad_line;
+	uint8_t m_bad_lines_enabled;
+	uint8_t m_display_state;
+	uint8_t m_char_data;
+	uint8_t m_gfx_data;
+	uint8_t m_color_data;
+	uint8_t m_last_char_data;
+	uint8_t m_matrix_line[40];                        // Buffer for video line, read in Bad Lines
+	uint8_t m_color_line[40];                     // Buffer for color line, read in Bad Lines
+	uint8_t m_vblanking;
+	uint16_t m_ml_index;
+	uint8_t m_rc;
+	uint16_t m_vc;
+	uint16_t m_vc_base;
+	uint8_t m_ref_cnt;
 
 	/* Sprites */
-	UINT8 m_spr_coll_buf[0x400];                    // Buffer for sprite-sprite collisions and priorities
-	UINT8 m_fore_coll_buf[0x400];                   // Buffer for foreground-sprite collisions and priorities
-	UINT8 m_spr_draw_data[8][4];                    // Sprite data for drawing
-	UINT8 m_spr_exp_y;
-	UINT8 m_spr_dma_on;
-	UINT8 m_spr_draw;
-	UINT8 m_spr_disp_on;
-	UINT16 m_spr_ptr[8];
-	UINT8 m_spr_data[8][4];
-	UINT16 m_mc_base[8];                        // Sprite data counter bases
-	UINT16 m_mc[8];                         // Sprite data counters
+	uint8_t m_spr_coll_buf[0x400];                    // Buffer for sprite-sprite collisions and priorities
+	uint8_t m_fore_coll_buf[0x400];                   // Buffer for foreground-sprite collisions and priorities
+	uint8_t m_spr_draw_data[8][4];                    // Sprite data for drawing
+	uint8_t m_spr_exp_y;
+	uint8_t m_spr_dma_on;
+	uint8_t m_spr_draw;
+	uint8_t m_spr_disp_on;
+	uint16_t m_spr_ptr[8];
+	uint8_t m_spr_data[8][4];
+	uint16_t m_mc_base[8];                        // Sprite data counter bases
+	uint16_t m_mc[8];                         // Sprite data counters
 
 	/* Border */
-	UINT8 m_border_on;
-	UINT8 m_ud_border_on;
-	UINT8 m_border_on_sample[5];
-	UINT8 m_border_color_sample[0x400 / 8];         // Samples of border color at each "displayed" cycle
+	uint8_t m_border_on;
+	uint8_t m_ud_border_on;
+	uint8_t m_border_on_sample[5];
+	uint8_t m_border_color_sample[0x400 / 8];         // Samples of border color at each "displayed" cycle
 
 	/* Cycles */
-	UINT64 m_first_ba_cycle;
-	UINT8 m_device_suspended;
+	uint64_t m_first_ba_cycle;
+	uint8_t m_device_suspended;
 };
 
 
@@ -374,8 +374,8 @@ class mos6567_device :  public mos6566_device
 {
 public:
 	// construction/destruction
-	mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 };
 
 
@@ -385,7 +385,7 @@ class mos8562_device :  public mos6567_device
 {
 public:
 	// construction/destruction
-	mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -395,11 +395,11 @@ class mos8564_device :  public mos6567_device
 {
 public:
 	// construction/destruction
-	mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks / 8); }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 8); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks / 8); }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 8); }
 };
 
 
@@ -409,8 +409,8 @@ class mos6569_device :  public mos6566_device
 {
 public:
 	// construction/destruction
-	mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void execute_run() override;
@@ -423,7 +423,7 @@ class mos8565_device :  public mos6569_device
 {
 public:
 	// construction/destruction
-	mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -433,11 +433,11 @@ class mos8566_device :  public mos6569_device
 {
 public:
 	// construction/destruction
-	mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks / 8); }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 8); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks / 8); }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 8); }
 };
 
 

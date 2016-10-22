@@ -78,7 +78,7 @@ const device_type NCR5380 = &device_creator<ncr5380_device>;
 //  ncr5380_device - constructor/destructor
 //-------------------------------------------------
 
-ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	legacy_scsi_host_adapter(mconfig, NCR5380, "5380 SCSI", tag, owner, clock, "ncr5380", __FILE__),
 	m_irq_cb(*this)
 {
@@ -134,10 +134,10 @@ void ncr5380_device::device_stop()
 //-------------------------------------------------
 //  Public API
 //-------------------------------------------------
-UINT8 ncr5380_device::ncr5380_read_reg(UINT32 offset)
+uint8_t ncr5380_device::ncr5380_read_reg(uint32_t offset)
 {
 	int reg = offset & 7;
-	UINT8 rv;
+	uint8_t rv;
 
 	switch( reg )
 	{
@@ -218,7 +218,7 @@ UINT8 ncr5380_device::ncr5380_read_reg(UINT32 offset)
 	return rv;
 }
 
-void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
+void ncr5380_device::ncr5380_write_reg(uint32_t offset, uint8_t data)
 {
 	int reg = offset & 7;
 

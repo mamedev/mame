@@ -170,8 +170,8 @@ TODO: - Distinguish door switches using manual
 
 struct mpu3_chr_table
 {
-	UINT8 call;
-	UINT8 response;
+	uint8_t call;
+	uint8_t response;
 };
 
 class mpu3_state : public driver_device
@@ -208,8 +208,8 @@ public:
 	int m_aux1_input;
 	int m_aux2_input;
 	int m_input_strobe;   /* IC11 74LS138 A = CA2 IC3, B = CA2 IC4, C = CA2 IC5 */
-	UINT8 m_lamp_strobe;
-	UINT8 m_led_strobe;
+	uint8_t m_lamp_strobe;
+	uint8_t m_led_strobe;
 	int m_signal_50hz;
 
 	const mpu3_chr_table* m_current_chr_table;

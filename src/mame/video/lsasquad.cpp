@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/lsasquad.h"
 
-void lsasquad_state::draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *scrollram )
+void lsasquad_state::draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *scrollram )
 {
 	int offs, scrollx, scrolly;
 
@@ -159,7 +159,7 @@ void lsasquad_state::drawbg( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 
 void lsasquad_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
@@ -196,7 +196,7 @@ void lsasquad_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 lsasquad_state::screen_update_lsasquad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lsasquad_state::screen_update_lsasquad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(511, cliprect);
 
@@ -208,7 +208,7 @@ UINT32 lsasquad_state::screen_update_lsasquad(screen_device &screen, bitmap_ind1
 }
 
 
-UINT32 lsasquad_state::screen_update_daikaiju(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lsasquad_state::screen_update_daikaiju(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(511, cliprect);
 	drawbg(bitmap, cliprect, 0); // bottom

@@ -47,7 +47,7 @@ public:
 	DECLARE_DRIVER_INIT(ec1841);
 
 	struct {
-		UINT8 enable[4];
+		uint8_t enable[4];
 		int boards;
 	} m_memory;
 
@@ -76,7 +76,7 @@ public:
 
 READ8_MEMBER(ec184x_state::memboard_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = offset % 4;
 	if (data >= m_memory.boards)
@@ -92,7 +92,7 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
-	UINT8 current;
+	uint8_t current;
 
 	current = m_memory.enable[offset];
 

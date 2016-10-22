@@ -128,7 +128,7 @@ const device_type KC_D004_GIDE = &device_creator<kc_d004_gide_device>;
 //  kc_d004_device - constructor
 //-------------------------------------------------
 
-kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, KC_D004, "D004 Floppy Disk Interface", tag, owner, clock, "kc_d004", __FILE__),
 		device_kcexp_interface( mconfig, *this ),
 		m_cpu(*this, Z80_TAG),
@@ -141,7 +141,7 @@ kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, d
 	{
 }
 
-kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_kcexp_interface( mconfig, *this ),
 		m_cpu(*this, Z80_TAG),
@@ -215,7 +215,7 @@ void kc_d004_device::device_timer(emu_timer &timer, device_timer_id id, int para
     set module status
 -------------------------------------------------*/
 
-void kc_d004_device::control_w(UINT8 data)
+void kc_d004_device::control_w(uint8_t data)
 {
 	m_enabled = BIT(data, 0);
 	m_connected = BIT(data, 2);
@@ -226,7 +226,7 @@ void kc_d004_device::control_w(UINT8 data)
     read
 -------------------------------------------------*/
 
-void kc_d004_device::read(offs_t offset, UINT8 &data)
+void kc_d004_device::read(offs_t offset, uint8_t &data)
 {
 	if (offset >= m_rom_base && offset < (m_rom_base + 0x2000) && m_enabled)
 		data = m_rom[offset & 0x1fff];
@@ -236,11 +236,11 @@ void kc_d004_device::read(offs_t offset, UINT8 &data)
 //  IO read
 //-------------------------------------------------
 
-void kc_d004_device::io_read(offs_t offset, UINT8 &data)
+void kc_d004_device::io_read(offs_t offset, uint8_t &data)
 {
 	if ((offset & 0xff) == 0x80)
 	{
-		UINT8 slot_id = (offset>>8) & 0xff;
+		uint8_t slot_id = (offset>>8) & 0xff;
 
 		if (slot_id == 0xfc)
 			data = module_id_r();
@@ -266,11 +266,11 @@ void kc_d004_device::io_read(offs_t offset, UINT8 &data)
 //  IO write
 //-------------------------------------------------
 
-void kc_d004_device::io_write(offs_t offset, UINT8 data)
+void kc_d004_device::io_write(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff) == 0x80)
 	{
-		UINT8 slot_id = (offset>>8) & 0xff;
+		uint8_t slot_id = (offset>>8) & 0xff;
 
 		if (slot_id == 0xfc)
 			control_w(data);
@@ -325,7 +325,7 @@ READ8_MEMBER(kc_d004_device::hw_input_gate_r)
 	    bit 4: Index pulse from disc
 	*/
 
-	UINT8 hw_input_gate = 0x0f;
+	uint8_t hw_input_gate = 0x0f;
 
 	if (m_floppy && !m_floppy->idx_r())
 		hw_input_gate |= 0x10;
@@ -382,7 +382,7 @@ WRITE_LINE_MEMBER(kc_d004_device::fdc_irq)
 //  kc_d004_gide_device - constructor
 //-------------------------------------------------
 
-kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: kc_d004_device(mconfig, KC_D004, "D004 Floppy Disk + GIDE Interface", tag, owner, clock, "kc_d004gide", __FILE__),
 		m_ata(*this, ATA_TAG), m_ata_data(0), m_lh(0)
 	{
@@ -425,12 +425,12 @@ void kc_d004_gide_device::device_reset()
 
 READ8_MEMBER(kc_d004_gide_device::gide_r)
 {
-	UINT8 data = 0xff;
-	UINT8 io_addr = offset & 0x0f;
+	uint8_t data = 0xff;
+	uint8_t io_addr = offset & 0x0f;
 
 	if (io_addr == 0x05)
 	{
-		UINT8 rtc_addr = (offset >> 8) & 0x0f;
+		uint8_t rtc_addr = (offset >> 8) & 0x0f;
 
 		// TODO RTC-72421
 		logerror("GIDE %s read RTC 0x%02x\n", tag(), rtc_addr);
@@ -474,11 +474,11 @@ READ8_MEMBER(kc_d004_gide_device::gide_r)
 
 WRITE8_MEMBER(kc_d004_gide_device::gide_w)
 {
-	UINT8 io_addr = offset & 0x0f;
+	uint8_t io_addr = offset & 0x0f;
 
 	if (io_addr == 0x05)
 	{
-		UINT8 rtc_addr = (offset >> 8) & 0x0f;
+		uint8_t rtc_addr = (offset >> 8) & 0x0f;
 
 		// TODO RTC-72421
 		logerror("GIDE %s wrire RTC 0x%02x 0x%02x\n", tag(), rtc_addr, data);

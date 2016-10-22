@@ -56,7 +56,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( write_usart_clock );
 
-	UINT8 m_digit;
+	uint8_t m_digit;
 };
 
 static ADDRESS_MAP_START(sdk86_mem, AS_PROGRAM, 16, sdk86_state)
@@ -120,7 +120,7 @@ WRITE8_MEMBER( sdk86_state::digit_w )
 
 READ8_MEMBER( sdk86_state::kbd_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_digit < 3)
 	{

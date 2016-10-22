@@ -43,8 +43,8 @@ public:
 	DECLARE_READ8_MEMBER( mpcc_reg_r );
 	DECLARE_WRITE8_MEMBER( mpcc_reg_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 m_term_data;
-	UINT8 m_mpcc_regs[32];
+	uint8_t m_term_data;
+	uint8_t m_mpcc_regs[32];
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit68230_device> m_pit1;
@@ -52,12 +52,12 @@ public:
 	virtual void machine_reset() override;
 
 	required_device<generic_terminal_device> m_terminal;
-	required_shared_ptr<UINT32> m_p_ram;
+	required_shared_ptr<uint32_t> m_p_ram;
 };
 
 READ8_MEMBER( besta_state::mpcc_reg_r )
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	if (!(offset == 0 && !m_mpcc_regs[0])) {
 	DBG_LOG(1,"mpcc_reg_r",("(%d) = %02X at %s\n", offset,
@@ -122,9 +122,9 @@ INPUT_PORTS_END
 
 void besta_state::machine_reset()
 {
-	UINT8* user1 = memregion("user1")->base();
+	uint8_t* user1 = memregion("user1")->base();
 
-	memcpy((UINT8*)m_p_ram.target(),user1,0x10000); // not really what happens but...
+	memcpy((uint8_t*)m_p_ram.target(),user1,0x10000); // not really what happens but...
 	memset(m_mpcc_regs, 0, sizeof(m_mpcc_regs));    // should initialize to defined values
 	m_mpcc_regs[8] = 0x80;              // always ready to transmit
 

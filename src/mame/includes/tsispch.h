@@ -36,7 +36,7 @@ public:
 	required_device<i8251_device> m_uart;
 	required_device<pic8259_device> m_pic;
 
-	UINT8 m_paramReg;           // status leds and resets and etc
+	uint8_t m_paramReg;           // status leds and resets and etc
 
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(i8251_rxd);

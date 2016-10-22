@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE16_MEMBER( vram_fg_draw_w );
 	DECLARE_READ16_MEMBER( vram_fg_display_r );
 	DECLARE_READ16_MEMBER( vram_fg_draw_r );
-	void render_sprite_row(UINT16 *sprite_source, UINT32 address);
+	void render_sprite_row(uint16_t *sprite_source, uint32_t address);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
@@ -86,31 +86,31 @@ protected:
 	required_device<tlc34076_device> m_tlc34076;
 
 	// shared pointers
-	required_shared_ptr<UINT8> m_vram_fg0;
-	required_shared_ptr<UINT8> m_vram_fg1;
-	required_shared_ptr<UINT16> m_vram_fg_data;
-	required_shared_ptr<UINT16> m_vram_bg0;
-	required_shared_ptr<UINT16> m_vram_bg1;
-	required_shared_ptr<UINT16> m_sprite_scale;
-	required_shared_ptr<UINT16> m_sprite_control;
+	required_shared_ptr<uint8_t> m_vram_fg0;
+	required_shared_ptr<uint8_t> m_vram_fg1;
+	required_shared_ptr<uint16_t> m_vram_fg_data;
+	required_shared_ptr<uint16_t> m_vram_bg0;
+	required_shared_ptr<uint16_t> m_vram_bg1;
+	required_shared_ptr<uint16_t> m_sprite_scale;
+	required_shared_ptr<uint16_t> m_sprite_control;
 
 	// state
-	UINT8 m_main_to_sound_data;
-	UINT8 m_main_to_sound_ready;
-	UINT8 m_sound_to_main_data;
-	UINT8 m_sound_to_main_ready;
-	UINT8 m_sound_int_state;
-	UINT8 *m_vram_fg_draw;
-	UINT8 *m_vram_fg_display;
-	INT32 m_xscroll0;
-	INT32 m_yscroll0;
-	INT32 m_xscroll1;
-	INT32 m_yscroll1;
-	UINT8 m_screen_control;
-	UINT16 m_sprite_source_offs;
-	UINT8 *m_sprite_dest_base;
-	UINT16 m_sprite_dest_offs;
-	UINT16 m_misc_control;
+	uint8_t m_main_to_sound_data;
+	uint8_t m_main_to_sound_ready;
+	uint8_t m_sound_to_main_data;
+	uint8_t m_sound_to_main_ready;
+	uint8_t m_sound_int_state;
+	uint8_t *m_vram_fg_draw;
+	uint8_t *m_vram_fg_display;
+	int32_t m_xscroll0;
+	int32_t m_yscroll0;
+	int32_t m_xscroll1;
+	int32_t m_yscroll1;
+	uint8_t m_screen_control;
+	uint16_t m_sprite_source_offs;
+	uint8_t *m_sprite_dest_base;
+	uint16_t m_sprite_dest_offs;
+	uint16_t m_misc_control;
 	int m_xcount;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

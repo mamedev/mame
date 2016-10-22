@@ -105,8 +105,8 @@ public:
 		m_generic_paletteram_8(*this, "paletteram") { }
 
 	tilemap_t *m_bg_tilemap;
-	required_shared_ptr<UINT8> m_gfxram;
-	required_shared_ptr<UINT8> m_tileram;
+	required_shared_ptr<uint8_t> m_gfxram;
+	required_shared_ptr<uint8_t> m_tileram;
 	int m_old_data;
 	DECLARE_WRITE8_MEMBER(trvmadns_banking_w);
 	DECLARE_WRITE8_MEMBER(trvmadns_gfxram_w);
@@ -117,17 +117,17 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 };
 
 
 WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 {
-	UINT8 *rom;
+	uint8_t *rom;
 	int address = 0;
 
 	if((data & 0xf0) == 0xa0)
@@ -326,7 +326,7 @@ void trvmadns_state::video_start()
 	m_gfxdecode->gfx(0)->set_source(m_gfxram);
 }
 
-UINT32 trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 	gfx_element *gfx = m_gfxdecode->gfx(0);

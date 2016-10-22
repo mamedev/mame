@@ -13,7 +13,7 @@
 
 PALETTE_INIT_MEMBER(tryout_state, tryout)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0;i < palette.entries();i++)
 	{
@@ -80,7 +80,7 @@ WRITE8_MEMBER(tryout_state::vram_w)
 	gfx data and then set high from that point onwards.
 
 	*/
-	const UINT8 bank=(m_vram_bank>>1)&0x7;
+	const uint8_t bank=(m_vram_bank>>1)&0x7;
 
 
 	if ((bank==0 || bank==2 || bank==4 || bank==6) && (offset&0x7ff)<0x400) {
@@ -165,8 +165,8 @@ void tryout_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tryout_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(tryout_state::get_fg_memory_offset),this),8,8,32,32);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tryout_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(tryout_state::get_bg_memory_offset),this),16,16,64,16);
 
-	m_vram=std::make_unique<UINT8[]>(8 * 0x800);
-	m_vram_gfx=std::make_unique<UINT8[]>(0x6000);
+	m_vram=std::make_unique<uint8_t[]>(8 * 0x800);
+	m_vram_gfx=std::make_unique<uint8_t[]>(0x6000);
 
 	m_gfxdecode->gfx(2)->set_source(m_vram_gfx.get());
 
@@ -225,7 +225,7 @@ void tryout_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	}
 }
 
-UINT32 tryout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tryout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int scrollx = 0;
 

@@ -53,7 +53,7 @@ READ64_MEMBER( macpci_state::unk1_r )
 READ64_MEMBER( macpci_state::unk2_r )
 {
 	if (ACCESSING_BITS_32_47)
-		return (UINT64)0xe1 << 32; //PC=fff04810
+		return (uint64_t)0xe1 << 32; //PC=fff04810
 
 	return 0;
 }
@@ -82,7 +82,7 @@ static INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
 
 
-UINT32 macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

@@ -35,7 +35,7 @@
 TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
 {
 	/* the code is the low 6 bits */
-	UINT8 code = m_videoram[tile_index] & 0x3f;
+	uint8_t code = m_videoram[tile_index] & 0x3f;
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
@@ -67,7 +67,7 @@ VIDEO_START_MEMBER(hitme_state,barricad)
 }
 
 
-UINT32 hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* the card width resistor comes from an input port, scaled to the range 0-25 kOhms */
 	double width_resist = ioport("WIDTH")->read() * 25000 / 100;
@@ -96,7 +96,7 @@ UINT32 hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bit
 			/* invert pixels until we run out */
 			for (xx = 0; xx < 8 && inv; xx++, inv--)
 			{
-				UINT16 *dest = &bitmap.pix16(y * 10, x * 8 + xx);
+				uint16_t *dest = &bitmap.pix16(y * 10, x * 8 + xx);
 				dest[0 * dy] ^= 1;
 				dest[1 * dy] ^= 1;
 				dest[2 * dy] ^= 1;
@@ -114,7 +114,7 @@ UINT32 hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-UINT32 hitme_state::screen_update_barricad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hitme_state::screen_update_barricad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -128,20 +128,20 @@ UINT32 hitme_state::screen_update_barricad(screen_device &screen, bitmap_ind16 &
  *
  *************************************/
 
-UINT8 hitme_state::read_port_and_t0( int port )
+uint8_t hitme_state::read_port_and_t0( int port )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	UINT8 val = ioport(portnames[port])->read();
+	uint8_t val = ioport(portnames[port])->read();
 	if (machine().time() > m_timeout_time)
 		val ^= 0x80;
 	return val;
 }
 
 
-UINT8 hitme_state::read_port_and_t0_and_hblank( int port )
+uint8_t hitme_state::read_port_and_t0_and_hblank( int port )
 {
-	UINT8 val = read_port_and_t0(port);
+	uint8_t val = read_port_and_t0(port);
 	if (m_screen->hpos() < (m_screen->width() * 9 / 10))
 		val ^= 0x04;
 	return val;
@@ -187,7 +187,7 @@ WRITE8_MEMBER(hitme_state::output_port_0_w)
 	    In fact, it is very important that our timing calculation timeout AFTER the sound
 	    system's equivalent computation, or else we will hang notes.
 	*/
-	UINT8 raw_game_speed = ioport("R3")->read();
+	uint8_t raw_game_speed = ioport("R3")->read();
 	double resistance = raw_game_speed * 25000 / 100;
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
 	m_timeout_time = machine().time() + duration;

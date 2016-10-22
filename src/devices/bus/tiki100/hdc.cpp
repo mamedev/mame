@@ -63,7 +63,7 @@ machine_config_constructor tiki100_hdc_t::device_mconfig_additions() const
 //  tiki100_hdc_t - constructor
 //-------------------------------------------------
 
-tiki100_hdc_t::tiki100_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+tiki100_hdc_t::tiki100_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TIKI100_HDC, "TIKI-100 Winchester controller", tag, owner, clock, "tiki100_hdc", __FILE__),
 	device_tiki100bus_card_interface(mconfig, *this),
 	m_hdc(*this, WD1010_TAG)
@@ -94,7 +94,7 @@ void tiki100_hdc_t::device_reset()
 //  tiki100bus_iorq_r - I/O read
 //-------------------------------------------------
 
-UINT8 tiki100_hdc_t::iorq_r(address_space &space, offs_t offset, UINT8 data)
+uint8_t tiki100_hdc_t::iorq_r(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf8) == 0x20)
 	{
@@ -109,7 +109,7 @@ UINT8 tiki100_hdc_t::iorq_r(address_space &space, offs_t offset, UINT8 data)
 //  tiki100bus_iorq_w - I/O write
 //-------------------------------------------------
 
-void tiki100_hdc_t::iorq_w(address_space &space, offs_t offset, UINT8 data)
+void tiki100_hdc_t::iorq_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf8) == 0x20)
 	{

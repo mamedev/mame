@@ -45,7 +45,7 @@ const tiny_rom_entry *cpc_smartwatch_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_smartwatch_device::cpc_smartwatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_smartwatch_device::cpc_smartwatch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_SMARTWATCH, "Dobbertin Smartwatch", tag, owner, clock, "cpc_smartwatch", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_rtc(*this,"rtc"), m_bank(nullptr)
@@ -76,7 +76,7 @@ void cpc_smartwatch_device::device_reset()
 
 READ8_MEMBER(cpc_smartwatch_device::rtc_w)
 {
-	UINT8* bank = (UINT8*)m_bank->base();
+	uint8_t* bank = (uint8_t*)m_bank->base();
 	if(offset & 1)
 		m_rtc->read_1(space,0);
 	else
@@ -86,6 +86,6 @@ READ8_MEMBER(cpc_smartwatch_device::rtc_w)
 
 READ8_MEMBER(cpc_smartwatch_device::rtc_r)
 {
-	UINT8* bank = (UINT8*)m_bank->base();
+	uint8_t* bank = (uint8_t*)m_bank->base();
 	return ((bank[(offset & 1)+4]) & 0xfe) | (m_rtc->read_data(space,0) & 0x01);
 }

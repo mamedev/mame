@@ -1975,7 +1975,7 @@ ROM_END
 
 READ8_MEMBER(btime_state::wtennis_reset_hack_r)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	/* Otherwise the game goes into test mode and there is no way out that I
 	   can see.  I'm not sure how it can work, it probably somehow has to do
@@ -1993,7 +1993,7 @@ DRIVER_INIT_MEMBER(btime_state,btime)
 
 DRIVER_INIT_MEMBER(btime_state,zoar)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* At location 0xD50A is what looks like an undocumented opcode. I tried
 	   implementing it given what opcode 0x23 should do, but it still didn't
@@ -2006,7 +2006,7 @@ DRIVER_INIT_MEMBER(btime_state,zoar)
 
 DRIVER_INIT_MEMBER(btime_state,tisland)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
 	   unmapped area that causes the game to fail in several circumstances.On the Cassette

@@ -72,13 +72,13 @@ class vip_byteio_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _inst> void set_inst_callback(_inst inst) { m_write_inst.set_callback(inst); }
 
 	// computer interface
-	UINT8 in_r();
-	void out_w(UINT8 data);
+	uint8_t in_r();
+	void out_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
@@ -106,8 +106,8 @@ public:
 	// construction/destruction
 	device_vip_byteio_port_interface(const machine_config &mconfig, device_t &device);
 
-	virtual UINT8 vip_in_r() { return 0xff; };
-	virtual void vip_out_w(UINT8 data) { };
+	virtual uint8_t vip_in_r() { return 0xff; };
+	virtual void vip_out_w(uint8_t data) { };
 
 	virtual int vip_ef3_r() { return CLEAR_LINE; }
 	virtual int vip_ef4_r() { return CLEAR_LINE; }

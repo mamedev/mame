@@ -24,7 +24,7 @@ class cpc_amdrum_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_amdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_amdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -38,7 +38,7 @@ protected:
 private:
 	cpc_expansion_slot_device *m_slot;
 
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 };
 
 // device type definition

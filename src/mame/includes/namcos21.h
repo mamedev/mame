@@ -15,13 +15,13 @@
 struct dsp_state
 {
 	unsigned masterSourceAddr;
-	UINT16 slaveInputBuffer[DSP_BUF_MAX];
+	uint16_t slaveInputBuffer[DSP_BUF_MAX];
 	unsigned slaveBytesAvailable;
 	unsigned slaveBytesAdvertised;
 	unsigned slaveInputStart;
-	UINT16 slaveOutputBuffer[DSP_BUF_MAX];
+	uint16_t slaveOutputBuffer[DSP_BUF_MAX];
 	unsigned slaveOutputSize;
-	UINT16 masterDirectDrawBuffer[256];
+	uint16_t masterDirectDrawBuffer[256];
 	unsigned masterDirectDrawSize;
 	int masterFinished;
 	int slaveActive;
@@ -54,41 +54,41 @@ public:
 		m_ptrom16(*this,"point16"),
 		m_dsp(*this, "dsp") { }
 
-	optional_shared_ptr<UINT16> m_winrun_dspbios;
-	optional_shared_ptr<UINT16> m_winrun_polydata;
-	optional_shared_ptr<UINT16> m_dspram16;
-	required_shared_ptr<UINT8> m_mpDualPortRAM;
-	optional_shared_ptr<UINT16> m_master_dsp_code;
+	optional_shared_ptr<uint16_t> m_winrun_dspbios;
+	optional_shared_ptr<uint16_t> m_winrun_polydata;
+	optional_shared_ptr<uint16_t> m_dspram16;
+	required_shared_ptr<uint8_t> m_mpDualPortRAM;
+	optional_shared_ptr<uint16_t> m_master_dsp_code;
 
-	optional_region_ptr<INT32> m_ptrom24;
-	optional_region_ptr<UINT16> m_ptrom16;
+	optional_region_ptr<int32_t> m_ptrom24;
+	optional_region_ptr<uint16_t> m_ptrom16;
 
 	optional_device<cpu_device> m_dsp;
 
-	std::unique_ptr<UINT8[]> m_videoram;
-	std::unique_ptr<UINT16[]> m_winrun_dspcomram;
-	UINT16 m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM];
+	std::unique_ptr<uint8_t[]> m_videoram;
+	std::unique_ptr<uint16_t[]> m_winrun_dspcomram;
+	uint16_t m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM];
 	int m_winrun_poly_index;
-	UINT32 m_winrun_pointrom_addr;
+	uint32_t m_winrun_pointrom_addr;
 	int m_winrun_dsp_alive;
-	UINT16 m_winrun_dspcomram_control[8];
-	UINT16 m_video_enable;
-	std::unique_ptr<UINT8[]> m_pointram;
+	uint16_t m_winrun_dspcomram_control[8];
+	uint16_t m_video_enable;
+	std::unique_ptr<uint8_t[]> m_pointram;
 	int m_pointram_idx;
-	UINT16 m_pointram_control;
+	uint16_t m_pointram_control;
 	std::unique_ptr<dsp_state> m_mpDspState;
 	int m_mbNeedsKickstart;
-	UINT32 m_pointrom_idx;
-	UINT8 m_mPointRomMSB;
+	uint32_t m_pointrom_idx;
+	uint8_t m_mPointRomMSB;
 	int m_mbPointRomDataAvailable;
 	int m_irq_enable;
-	UINT8 m_depthcue[2][0x400];
-	std::unique_ptr<UINT16[]> m_mpPolyFrameBufferPens;
-	std::unique_ptr<UINT16[]> m_mpPolyFrameBufferZ;
-	std::unique_ptr<UINT16[]> m_mpPolyFrameBufferPens2;
-	std::unique_ptr<UINT16[]> m_mpPolyFrameBufferZ2;
-	UINT16 m_winrun_color;
-	UINT16 m_winrun_gpu_register[0x10/2];
+	uint8_t m_depthcue[2][0x400];
+	std::unique_ptr<uint16_t[]> m_mpPolyFrameBufferPens;
+	std::unique_ptr<uint16_t[]> m_mpPolyFrameBufferZ;
+	std::unique_ptr<uint16_t[]> m_mpPolyFrameBufferPens2;
+	std::unique_ptr<uint16_t[]> m_mpPolyFrameBufferZ2;
+	uint16_t m_winrun_color;
+	uint16_t m_winrun_gpu_register[0x10/2];
 	DECLARE_READ16_MEMBER(namcos21_video_enable_r);
 	DECLARE_WRITE16_MEMBER(namcos21_video_enable_w);
 	DECLARE_WRITE16_MEMBER(dspcuskey_w);
@@ -164,20 +164,20 @@ public:
 	DECLARE_DRIVER_INIT(aircomb);
 	DECLARE_MACHINE_START(namcos21);
 	DECLARE_VIDEO_START(namcos21);
-	UINT32 screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void allocate_poly_framebuffer();
 	void clear_poly_framebuffer();
 	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
 	void renderscanline_flat(const edge *e1, const edge *e2, int sy, unsigned color, int depthcueenable);
 	void rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, unsigned color, int depthcueenable);
 	void draw_quad(int sx[4], int sy[4], int zcode[4], int color);
-	INT32 read_pointrom_data(unsigned offset);
-	void transmit_word_to_slave(UINT16 data);
+	int32_t read_pointrom_data(unsigned offset);
+	void transmit_word_to_slave(uint16_t data);
 	void transfer_dsp_data();
-	UINT16 read_word_from_slave_input();
-	UINT16 get_input_bytes_advertised_for_slave();
+	uint16_t read_word_from_slave_input();
+	uint16_t get_input_bytes_advertised_for_slave();
 	int init_dsp();
-	void render_slave_output(UINT16 data);
+	void render_slave_output(uint16_t data);
 	void winrun_flush_poly();
 	void init(int game_type);
 };

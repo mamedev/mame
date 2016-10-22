@@ -63,10 +63,10 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_char_ram[(ma + column) & 0x7ff];
-		UINT16 address = code << 4;
-		UINT8 ra_latch = ra;
-		UINT8 data;
+		uint8_t code = m_char_ram[(ma + column) & 0x7ff];
+		uint16_t address = code << 4;
+		uint8_t ra_latch = ra;
+		uint8_t data;
 
 		int ri = (code & ABC802_INV) ? 1 : 0;
 
@@ -188,7 +188,7 @@ void abc802_state::video_start()
 //  SCREEN_UPDATE( abc802 )
 //-------------------------------------------------
 
-UINT32 abc802_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t abc802_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// draw text
 	m_crtc->screen_update(screen, bitmap, cliprect);

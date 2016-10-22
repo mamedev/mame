@@ -372,7 +372,7 @@ CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
 
 READ8_MEMBER(williams_state::williams_49way_port_0_r)
 {
-	static const UINT8 translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
+	static const uint8_t translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
 	return (translate49[ioport("49WAYX")->read() >> 4] << 4) | translate49[ioport("49WAYY")->read() >> 4];
 }
 
@@ -600,8 +600,8 @@ TIMER_CALLBACK_MEMBER(blaster_state::blaster_deferred_snd_cmd_w)
 {
 	pia6821_device *pia_2l = machine().device<pia6821_device>("pia_2");
 	pia6821_device *pia_2r = machine().device<pia6821_device>("pia_2b");
-	UINT8 l_data = param | 0x80;
-	UINT8 r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
+	uint8_t l_data = param | 0x80;
+	uint8_t r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
 
 	pia_2l->portb_w(l_data); pia_2l->cb1_w((l_data == 0xff) ? 0 : 1);
 	pia_2r->portb_w(r_data); pia_2r->cb1_w((r_data == 0xff) ? 0 : 1);

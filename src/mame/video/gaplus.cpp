@@ -27,7 +27,7 @@
 
 PALETTE_INIT_MEMBER(gaplus_state, gaplus)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < 256;i++)
@@ -96,7 +96,7 @@ TILEMAP_MAPPER_MEMBER(gaplus_state::tilemap_scan)
 
 TILE_GET_INFO_MEMBER(gaplus_state::get_tile_info)
 {
-	UINT8 attr = m_videoram[tile_index + 0x400];
+	uint8_t attr = m_videoram[tile_index + 0x400];
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
 	SET_TILE_INFO_MEMBER(0,
@@ -251,9 +251,9 @@ void gaplus_state::starfield_render(bitmap_ind16 &bitmap)
 
 void gaplus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram + 0x780;
-	UINT8 *spriteram_2 = spriteram + 0x800;
-	UINT8 *spriteram_3 = spriteram_2 + 0x800;
+	uint8_t *spriteram = m_spriteram + 0x780;
+	uint8_t *spriteram_2 = spriteram + 0x800;
+	uint8_t *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)
@@ -302,7 +302,7 @@ void gaplus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 	}
 }
 
-UINT32 gaplus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gaplus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);

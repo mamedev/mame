@@ -182,7 +182,7 @@ inline void rp5c15_device::check_alarm()
 //  rp5c15_device - constructor
 //-------------------------------------------------
 
-rp5c15_device::rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rp5c15_device::rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RP5C15, "RP5C15", tag, owner, clock, "rp5c15", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_out_alarm_cb(*this),
@@ -294,7 +294,7 @@ void rp5c15_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 
 READ8_MEMBER( rp5c15_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	offset &= 0x0f;
 
 	switch (offset)

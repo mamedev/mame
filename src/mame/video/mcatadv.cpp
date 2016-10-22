@@ -52,15 +52,15 @@ WRITE16_MEMBER(mcatadv_state::mcatadv_videoram2_w)
 
 void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *source = (m_spriteram_old.get() + (m_spriteram.bytes() / 2) /2);
+	uint16_t *source = (m_spriteram_old.get() + (m_spriteram.bytes() / 2) /2);
 	source -= 4;
-	UINT16 *finish = m_spriteram_old.get();
+	uint16_t *finish = m_spriteram_old.get();
 	int global_x = m_vidregs[0] - 0x184;
 	int global_y = m_vidregs[1] - 0x1f1;
 
-	UINT16 *destline;
-	UINT8 *priline;
-	UINT8 *sprdata = memregion("gfx1")->base();
+	uint16_t *destline;
+	uint8_t *priline;
+	uint8_t *sprdata = memregion("gfx1")->base();
 	int sprmask = memregion("gfx1")->bytes()-1;
 
 	int xstart, xend, xinc;
@@ -168,10 +168,10 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
-void mcatadv_state::mcatadv_draw_tilemap_part( screen_device &screen, UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mcatadv_state::mcatadv_draw_tilemap_part( screen_device &screen, uint16_t* current_scroll, uint16_t* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int flip;
-	UINT32 drawline;
+	uint32_t drawline;
 	rectangle clip;
 
 	clip.min_x = cliprect.min_x;
@@ -212,7 +212,7 @@ void mcatadv_state::mcatadv_draw_tilemap_part( screen_device &screen, UINT16* cu
 	}
 }
 
-UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -271,8 +271,8 @@ void mcatadv_state::video_start()
 	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tilemap2->set_transparent_pen(0);
 
-	m_spriteram_old = make_unique_clear<UINT16[]>(m_spriteram.bytes() / 2);
-	m_vidregs_old = std::make_unique<UINT16[]>((0x0f + 1) / 2);
+	m_spriteram_old = make_unique_clear<uint16_t[]>(m_spriteram.bytes() / 2);
+	m_vidregs_old = std::make_unique<uint16_t[]>((0x0f + 1) / 2);
 
 	m_palette_bank1 = 0;
 	m_palette_bank2 = 0;

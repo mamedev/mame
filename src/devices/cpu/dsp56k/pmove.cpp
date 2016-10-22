@@ -9,10 +9,10 @@ const reg_id& ParallelMove::opDestination() const { return m_oco->instDestinatio
 size_t ParallelMove::opAccumulatorBitsModified() const { return m_oco->instAccumulatorBitsModified(); }
 
 
-std::unique_ptr<ParallelMove> ParallelMove::decodeParallelMove(const Opcode* opc, const UINT16 word0, const UINT16 word1)
+std::unique_ptr<ParallelMove> ParallelMove::decodeParallelMove(const Opcode* opc, const uint16_t word0, const uint16_t word1)
 {
-	const UINT16 w0 = word0;
-	const UINT16 w1 = word1;
+	const uint16_t w0 = word0;
+	const uint16_t w1 = word1;
 
 	/* Dual X Memory Data Read : 011m mKKK .rr. .... : A-142*/
 	if ((w0 & 0xe000) == 0x6000)

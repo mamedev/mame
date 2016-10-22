@@ -14,7 +14,7 @@
 
 /* ----------------------------------------------------------------------- */
 
-INT64 filter_get_info_int(filter_getinfoproc get_info, UINT32 state)
+int64_t filter_get_info_int(filter_getinfoproc get_info, uint32_t state)
 {
 	union filterinfo info;
 	info.i = 0;
@@ -22,7 +22,7 @@ INT64 filter_get_info_int(filter_getinfoproc get_info, UINT32 state)
 	return info.i;
 }
 
-void *filter_get_info_ptr(filter_getinfoproc get_info, UINT32 state)
+void *filter_get_info_ptr(filter_getinfoproc get_info, uint32_t state)
 {
 	union filterinfo info;
 	info.p = nullptr;
@@ -30,7 +30,7 @@ void *filter_get_info_ptr(filter_getinfoproc get_info, UINT32 state)
 	return info.p;
 }
 
-void *filter_get_info_fct(filter_getinfoproc get_info, UINT32 state)
+void *filter_get_info_fct(filter_getinfoproc get_info, uint32_t state)
 {
 	union filterinfo info;
 	info.f = nullptr;
@@ -38,7 +38,7 @@ void *filter_get_info_fct(filter_getinfoproc get_info, UINT32 state)
 	return info.f;
 }
 
-const char *filter_get_info_string(filter_getinfoproc get_info, UINT32 state)
+const char *filter_get_info_string(filter_getinfoproc get_info, uint32_t state)
 {
 	union filterinfo info;
 	info.s = nullptr;

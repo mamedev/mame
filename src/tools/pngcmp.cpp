@@ -119,8 +119,8 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	/* compare scanline by scanline */
 	for (y = 0; y < bitmap2.height() && !bitmaps_differ; y++)
 	{
-		UINT32 *base = &bitmap1.pix32(y);
-		UINT32 *curr = &bitmap2.pix32(y);
+		uint32_t *base = &bitmap1.pix32(y);
+		uint32_t *curr = &bitmap2.pix32(y);
 
 		/* scan the scanline */
 		for (x = 0; x < bitmap2.width(); x++)
@@ -150,11 +150,11 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 		/* iterate over rows in these bitmaps */
 		for (y = 0; y < curheight; y++)
 		{
-			UINT32 *src1 = (y < bitmap1.height()) ? &bitmap1.pix32(y) : nullptr;
-			UINT32 *src2 = (y < bitmap2.height()) ? &bitmap2.pix32(y) : nullptr;
-			UINT32 *dst1 = &finalbitmap.pix32(y);
-			UINT32 *dst2 = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE);
-			UINT32 *dstdiff = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
+			uint32_t *src1 = (y < bitmap1.height()) ? &bitmap1.pix32(y) : nullptr;
+			uint32_t *src2 = (y < bitmap2.height()) ? &bitmap2.pix32(y) : nullptr;
+			uint32_t *dst1 = &finalbitmap.pix32(y);
+			uint32_t *dst2 = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE);
+			uint32_t *dstdiff = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
 
 			/* now iterate over columns */
 			for (x = 0; x < maxwidth; x++)

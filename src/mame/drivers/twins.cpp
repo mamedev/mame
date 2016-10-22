@@ -80,10 +80,10 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT16> m_paletteram;
+	optional_shared_ptr<uint16_t> m_paletteram;
 	required_device<palette_device> m_palette;
 	optional_device<i2cmem_device> m_i2cmem;
-	UINT16 m_paloff;
+	uint16_t m_paloff;
 	DECLARE_READ16_MEMBER(twins_port4_r);
 	DECLARE_WRITE16_MEMBER(twins_port4_w);
 	DECLARE_WRITE16_MEMBER(twins_pal_w);
@@ -101,25 +101,25 @@ public:
 	int m_spriteswidth;
 	int m_spritesaddr;
 
-	UINT16 m_mainram[0x10000 / 2];
-	UINT16 m_videoram[0x10000 / 2];
-	UINT16 m_videoram2[0x10000 / 2];
-	UINT16 m_videorambank;
+	uint16_t m_mainram[0x10000 / 2];
+	uint16_t m_videoram[0x10000 / 2];
+	uint16_t m_videoram2[0x10000 / 2];
+	uint16_t m_videorambank;
 
-	UINT32 screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT16* m_rom16;
-	UINT8* m_rom8;
+	uint16_t* m_rom16;
+	uint8_t* m_rom8;
 
 };
 
 
 void twins_state::machine_start()
 {
-	m_rom16 = (UINT16*)memregion("maincpu")->base();
+	m_rom16 = (uint16_t*)memregion("maincpu")->base();
 	m_rom8 = memregion("maincpu")->base();
 }
 
@@ -175,7 +175,7 @@ WRITE16_MEMBER(twins_state::porte_paloff0_w)
 
 READ16_MEMBER(twins_state::spider_blitter_r)
 {
-	UINT16* vram;
+	uint16_t* vram;
 	if (m_videorambank & 1)
 		vram = m_videoram2;
 	else
@@ -191,7 +191,7 @@ READ16_MEMBER(twins_state::spider_blitter_r)
 	}
 	else
 	{
-		UINT16 *src = m_rom16;
+		uint16_t *src = m_rom16;
 		return src[offset];
 	}
 }
@@ -201,7 +201,7 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 {
 	// this is very strange, we use the offset (address bits) not data bits to set values..
 	// I get the impression this might actually overlay the entire address range, including RAM and regular VRAM?
-	UINT16* vram;
+	uint16_t* vram;
 	if (m_videorambank & 1)
 		vram = m_videoram2;
 	else
@@ -236,14 +236,14 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 		}
 		else if (offset < 0x30000 / 2)
 		{
-			UINT8 *src = m_rom8;
+			uint8_t *src = m_rom8;
 
 		//  printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
 			offset &= 0x7fff;
 
 			for (int i = 0; i < m_spriteswidth; i++)
 			{
-				UINT8 data;
+				uint8_t data;
 
 				data = (src[(m_spritesaddr * 2) + 1]);
 
@@ -300,7 +300,7 @@ void twins_state::video_start()
 
 
 
-UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x,count;
 	static const int xxx=320,yyy=204;
@@ -308,7 +308,7 @@ UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bit
 	bitmap.fill(m_palette->black_pen());
 
 	count=0;
-	UINT8 *videoram = (UINT8*)m_videoram;
+	uint8_t *videoram = (uint8_t*)m_videoram;
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
@@ -320,7 +320,7 @@ UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-UINT32 twins_state::screen_update_spider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t twins_state::screen_update_spider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x,count;
 	static const int xxx=320,yyy=204;
@@ -328,7 +328,7 @@ UINT32 twins_state::screen_update_spider(screen_device &screen, bitmap_ind16 &bi
 	bitmap.fill(m_palette->black_pen());
 
 	count=0;
-	UINT8 *videoram = (UINT8*)m_videoram;
+	uint8_t *videoram = (uint8_t*)m_videoram;
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
@@ -339,12 +339,12 @@ UINT32 twins_state::screen_update_spider(screen_device &screen, bitmap_ind16 &bi
 	}
 
 	count = 0;
-	videoram = (UINT8*)m_videoram2;
+	videoram = (uint8_t*)m_videoram2;
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			UINT8 pixel = videoram[BYTE_XOR_LE(count)];
+			uint8_t pixel = videoram[BYTE_XOR_LE(count)];
 			if (pixel) bitmap.pix16(y, x) = pixel;
 			count++;
 		}
@@ -503,7 +503,7 @@ WRITE16_MEMBER(twins_state::spider_port_1c_w)
 //  data written is always 00, only seems to want the upper layer to be cleared
 //  otherwise you get garbage sprites between rounds and the bg incorrectly wiped
 
-	UINT16* vram;
+	uint16_t* vram;
 //  if (m_videorambank & 1)
 		vram = m_videoram2;
 //  else

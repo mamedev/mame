@@ -8,8 +8,9 @@
  */
 
 #include "emu.h"
-#include "magicsound.h"
 #include "includes/amstrad.h"
+#include "magicsound.h"
+#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -55,9 +56,10 @@ static MACHINE_CONFIG_FRAGMENT( al_magicsound )
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(al_magicsound_device,da0_w))
 	MCFG_PIT8253_CLK2(XTAL_4MHz)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	// no pass-through(?)
 MACHINE_CONFIG_END
 
@@ -70,10 +72,10 @@ machine_config_constructor al_magicsound_device::device_mconfig_additions() cons
 //  LIVE DEVICE
 //**************************************************************************
 
-al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AL_MAGICSOUND, "Magic Sound Board", tag, owner, clock, "al_magicsound", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
-	m_dac1(*this,"dac1"),
+	m_dac(*this,"dac"),
 	m_dmac(*this,"dmac"),
 	m_timer1(*this,"timer1"),
 	m_timer2(*this,"timer2"), m_current_channel(0), m_ramptr(nullptr), m_current_output(0)
@@ -140,15 +142,15 @@ WRITE8_MEMBER(al_magicsound_device::volume_w)
 
 WRITE8_MEMBER(al_magicsound_device::mapper_w)
 {
-	UINT8 channel = (offset & 0x0c) >> 2;
-	UINT8 page = offset & 0x03;
+	uint8_t channel = (offset & 0x0c) >> 2;
+	uint8_t page = offset & 0x03;
 	m_page[channel][page] = (~(data) & 0x3f) * 0x4000;
 	set_timer_gate(true);
 }
 
 WRITE_LINE_MEMBER(al_magicsound_device::da0_w)
 {
-	m_dac1->write_unsigned8(m_output[m_current_output++]);
+	m_dac->write(m_output[m_current_output++]);
 	if(m_current_output > 3)
 		m_current_output = 0;
 }
@@ -165,8 +167,8 @@ WRITE_LINE_MEMBER(al_magicsound_device::sam3_w) { m_current_channel = 3; if(m_da
 
 READ8_MEMBER(al_magicsound_device::dma_read_byte)
 {
-	UINT8 ret = 0xff;
-	UINT8 page = (offset & 0xc000) >> 14;
+	uint8_t ret = 0xff;
+	uint8_t page = (offset & 0xc000) >> 14;
 
 	if(m_current_channel != -1)
 		ret = m_ramptr->read(m_page[m_current_channel][page] + (offset & 0x3fff));

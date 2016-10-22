@@ -16821,6 +16821,21 @@
 		</part>
 	</software>
 
+	<software name="pokecock" cloneof="pokered">
+		<!-- Notes: SGB enhanced -->
+		<description>Pokémon - Cock Version (Bootleg)</description>
+		<year>20??</year>
+		<publisher>bootleg</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc3" />
+			<dataarea name="rom" size = "1048576">
+				<rom name="Pokemon - Cock Version (Bootleg).gb" size="1048576" crc="5716d623" sha1="cfe7ba33ae527d057c631ea27ad1b77b551ec480" offset="0"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pokeyell">
 		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Yellow Version (Euro, Aus, USA)</description>

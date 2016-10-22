@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pio_port_a_w );
 	DECLARE_READ8_MEMBER( pio_port_b_r );
 
-	UINT8 m_matrix;
+	uint8_t m_matrix;
 };
 
 /***************************************************************************
@@ -70,7 +70,7 @@ public:
 
 WRITE8_MEMBER( sc1_state::pio_port_a_w )
 {
-	UINT8 digit = BITSWAP8( data,3,4,6,0,1,2,7,5 );
+	uint8_t digit = BITSWAP8( data,3,4,6,0,1,2,7,5 );
 
 	if (m_matrix & 0x04)
 		output().set_digit_value(3, digit & 0x7f);
@@ -96,7 +96,7 @@ WRITE8_MEMBER( sc1_state::matrix_w )
 
 READ8_MEMBER( sc1_state::pio_port_b_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_matrix & 0x01)
 		data |= ioport("LINE1")->read();

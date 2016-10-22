@@ -67,7 +67,7 @@ device_plus4_expansion_card_interface::~device_plus4_expansion_card_interface()
 //  plus4_expansion_slot_device - constructor
 //-------------------------------------------------
 
-plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, PLUS4_EXPANSION_SLOT, "Expansion Port", tag, owner, clock, "plus4_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
@@ -155,7 +155,7 @@ std::string plus4_expansion_slot_device::get_default_card_software()
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+uint8_t plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
 	if (m_card != nullptr)
 	{
@@ -170,7 +170,7 @@ UINT8 plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, UIN
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
 	if (m_card != nullptr)
 	{

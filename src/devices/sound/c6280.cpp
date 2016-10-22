@@ -91,7 +91,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			if((ch >= 4) && (m_channel[ch].m_noise_control & 0x80))
 			{
 				/* Noise mode */
-				UINT32 step = m_noise_freq_tab[(m_channel[ch].m_noise_control & 0x1F) ^ 0x1F];
+				uint32_t step = m_noise_freq_tab[(m_channel[ch].m_noise_control & 0x1F) ^ 0x1F];
 				for (int i = 0; i < samples; i += 1)
 				{
 					static int data = 0;
@@ -101,8 +101,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 						data = (machine().rand() & 1) ? 0x1F : 0;
 					}
 					m_channel[ch].m_noise_counter &= 0x7FF;
-					outputs[0][i] += (INT16)(vll * (data - 16));
-					outputs[1][i] += (INT16)(vlr * (data - 16));
+					outputs[0][i] += (int16_t)(vll * (data - 16));
+					outputs[1][i] += (int16_t)(vlr * (data - 16));
 				}
 			}
 			else
@@ -111,24 +111,24 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 				/* DDA mode */
 				for (int i = 0; i < samples; i++)
 				{
-					outputs[0][i] += (INT16)(vll * (m_channel[ch].m_dda - 16));
-					outputs[1][i] += (INT16)(vlr * (m_channel[ch].m_dda - 16));
+					outputs[0][i] += (int16_t)(vll * (m_channel[ch].m_dda - 16));
+					outputs[1][i] += (int16_t)(vlr * (m_channel[ch].m_dda - 16));
 				}
 			}
 			else
 			{
 				/* Waveform mode */
-				UINT32 step = m_wave_freq_tab[m_channel[ch].m_frequency];
+				uint32_t step = m_wave_freq_tab[m_channel[ch].m_frequency];
 				for (int i = 0; i < samples; i += 1)
 				{
 					int offset;
-					INT16 data;
+					int16_t data;
 					offset = (m_channel[ch].m_counter >> 12) & 0x1F;
 					m_channel[ch].m_counter += step;
 					m_channel[ch].m_counter &= 0x1FFFF;
 					data = m_channel[ch].m_waveform[offset];
-					outputs[0][i] += (INT16)(vll * (data - 16));
-					outputs[1][i] += (INT16)(vlr * (data - 16));
+					outputs[0][i] += (int16_t)(vll * (data - 16));
+					outputs[1][i] += (int16_t)(vlr * (data - 16));
 				}
 			}
 		}
@@ -231,7 +231,7 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 
 const device_type C6280 = &device_creator<c6280_device>;
 
-c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C6280, "HuC6280", tag, owner, clock, "c6280", __FILE__)
 	, device_sound_interface(mconfig, *this)
 	, m_cpudevice(*this, finder_base::DUMMY_TAG)
@@ -251,14 +251,14 @@ void c6280_device::calculate_clocks()
 	for (int i = 0; i < 4096; i += 1)
 	{
 		double step = ((clock() / rate) * 4096) / (i + 1);
-		m_wave_freq_tab[(1 + i) & 0xFFF] = (UINT32)step;
+		m_wave_freq_tab[(1 + i) & 0xFFF] = (uint32_t)step;
 	}
 
 	/* Make noise frequency table */
 	for (int i = 0; i < 32; i += 1)
 	{
 		double step = ((clock() / rate) * 32) / (i+1);
-		m_noise_freq_tab[i] = (UINT32)step;
+		m_noise_freq_tab[i] = (uint32_t)step;
 	}
 
 	if (m_stream != nullptr)
@@ -295,7 +295,7 @@ void c6280_device::device_start()
 	double step = 48.0 / 32.0;
 	for (int i = 0; i < 31; i++)
 	{
-		m_volume_table[i] = (UINT16)level;
+		m_volume_table[i] = (uint16_t)level;
 		level /= pow(10.0, step / 20.0);
 	}
 	m_volume_table[31] = 0;

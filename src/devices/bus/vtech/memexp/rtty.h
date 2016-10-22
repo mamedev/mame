@@ -25,7 +25,7 @@ class rtty_interface_device : public device_t, public device_memexp_interface
 {
 public:
 	// construction/destruction
-	rtty_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rtty_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( receive_data_r );
 	DECLARE_WRITE8_MEMBER( transmit_data_w );

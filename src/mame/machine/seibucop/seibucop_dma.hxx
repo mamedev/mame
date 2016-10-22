@@ -7,7 +7,7 @@ void raiden2cop_device::dma_tilemap_buffer()
 
 	for (int i = 0; i < 0x2800 / 2; i++)
 	{
-		UINT16 tileval = m_host_space->read_word(src);
+		uint16_t tileval = m_host_space->read_word(src);
 		src += 2;
 		m_videoramout_cb(i, tileval, 0xffff);
 	}
@@ -20,7 +20,7 @@ void raiden2cop_device::dma_palette_buffer()
 
 	for (int i = 0; i < 0x1000 / 2; i++) // todo, use length register
 	{
-		UINT16 palval = m_host_space->read_word(src);
+		uint16_t palval = m_host_space->read_word(src);
 		src += 2;
 		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
 	}
@@ -29,7 +29,7 @@ void raiden2cop_device::dma_palette_buffer()
 // these are typically used to transfer palette data from one RAM buffer to another, applying fade values to it prior to the 0x15 transfer
 void raiden2cop_device::dma_palette_brightness()
 {
-	UINT32 src, dst, size, i;
+	uint32_t src, dst, size, i;
 
 	/*
 	Apparently all of those are just different DMA channels, brightness effects are done through a RAM table and the pal_brightness_val / mode
@@ -54,7 +54,7 @@ void raiden2cop_device::dma_palette_brightness()
 
 	for (i = 0; i < size; i++)
 	{
-		UINT16 pal_val;
+		uint16_t pal_val;
 		int r, g, b;
 		int rt, gt, bt;
 
@@ -80,8 +80,8 @@ void raiden2cop_device::dma_palette_brightness()
 		{
 			// mode 4 swaps endianness between two words, likely that DMA works in dword steps and bit 0.
 			// TODO: check on V30 flavour
-			UINT16 targetpaldata = m_host_space->read_word((src + (cop_dma_adr_rel * 0x400)) ^ 2);
-			UINT16 paldata = m_host_space->read_word(src ^ 2);
+			uint16_t targetpaldata = m_host_space->read_word((src + (cop_dma_adr_rel * 0x400)) ^ 2);
+			uint16_t paldata = m_host_space->read_word(src ^ 2);
 
 			bt = (targetpaldata & 0x7c00) >> 10;
 			b = (paldata & 0x7c00) >> 10;
@@ -121,7 +121,7 @@ void raiden2cop_device::dma_palette_brightness()
 
 void raiden2cop_device::dma_fill()
 {
-	UINT32 length, address;
+	uint32_t length, address;
 	int i;
 	if (cop_dma_dst[cop_dma_mode] != 0x0000) // Invalid?
 		return;
@@ -135,7 +135,7 @@ void raiden2cop_device::dma_fill()
 		m_host_space->write_dword(i, (cop_dma_v1) | (cop_dma_v2 << 16));
 
 	/*
-	UINT32 length, address;
+	uint32_t length, address;
 	int i;
 	if(cop_dma_dst[cop_dma_mode] != 0x0000) // Invalid?
 	return;
@@ -152,11 +152,11 @@ void raiden2cop_device::dma_fill()
 	*/
 }
 
-void raiden2cop_device::dma_zsorting(UINT16 data)
+void raiden2cop_device::dma_zsorting(uint16_t data)
 {
 	struct sort_entry {
-		INT32 sorting_key;
-		UINT16 val;
+		int32_t sorting_key;
+		uint16_t val;
 	};
 
 	std::vector<sort_entry> entries(data);

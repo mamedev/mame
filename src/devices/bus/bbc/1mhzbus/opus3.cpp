@@ -114,7 +114,7 @@ const tiny_rom_entry *bbc_opus3_device::device_rom_region() const
 //  bbc_opus3_device - constructor
 //-------------------------------------------------
 
-bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BBC_OPUS3, "Opus Challenger 3-in-1", tag, owner, clock, "bbc_opus3", __FILE__),
 		device_bbc_1mhzbus_interface(mconfig, *this),
 		m_dfs_rom(*this, "dfs_rom"),

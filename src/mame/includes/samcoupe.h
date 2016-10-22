@@ -89,28 +89,28 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	bitmap_ind16 m_bitmap;
 
 	emu_timer *m_video_update_timer;
 
-	UINT8 m_lmpr, m_hmpr, m_vmpr; /* memory pages */
-	UINT8 m_lext, m_hext;       /* extended memory page */
-	UINT8 m_border;           /* border */
-	UINT8 m_clut[16];         /* color lookup table, 16 entries */
-	UINT8 m_line_int;         /* line interrupt */
-	UINT8 m_status;           /* status register */
+	uint8_t m_lmpr, m_hmpr, m_vmpr; /* memory pages */
+	uint8_t m_lext, m_hext;       /* extended memory page */
+	uint8_t m_border;           /* border */
+	uint8_t m_clut[16];         /* color lookup table, 16 entries */
+	uint8_t m_line_int;         /* line interrupt */
+	uint8_t m_status;           /* status register */
 
 	/* attribute */
-	UINT8 m_attribute;
+	uint8_t m_attribute;
 
 	/* mouse */
 	int m_mouse_index;
 	emu_timer *m_mouse_reset;
-	UINT8 m_mouse_data[9];
+	uint8_t m_mouse_data[9];
 	int m_mouse_x, m_mouse_y;
-	UINT8 *m_videoram;
+	uint8_t *m_videoram;
 	DECLARE_WRITE8_MEMBER(samcoupe_ext_mem_w);
 	DECLARE_READ8_MEMBER(samcoupe_disk_r);
 	DECLARE_WRITE8_MEMBER(samcoupe_disk_w);
@@ -152,8 +152,8 @@ public:
 	DECLARE_READ8_MEMBER(sam_bank4_r);
 	DECLARE_WRITE8_MEMBER(sam_bank4_w);
 
-	UINT8* sam_bank_read_ptr[4];
-	UINT8* sam_bank_write_ptr[4];
+	uint8_t* sam_bank_read_ptr[4];
+	uint8_t* sam_bank_write_ptr[4];
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -182,14 +182,14 @@ public:
 
 	void draw_mode4_line(int y, int hpos);
 	void draw_mode3_line(int y, int hpos);
-	void draw_mode12_block(bitmap_ind16 &bitmap, int vpos, int hpos, UINT8 mask);
+	void draw_mode12_block(bitmap_ind16 &bitmap, int vpos, int hpos, uint8_t mask);
 	void draw_mode2_line(int y, int hpos);
 	void draw_mode1_line(int y, int hpos);
-	void samcoupe_update_bank(address_space &space, int bank_num, UINT8 *memory, int is_readonly);
+	void samcoupe_update_bank(address_space &space, int bank_num, uint8_t *memory, int is_readonly);
 	void samcoupe_install_ext_mem(address_space &space);
 	void samcoupe_update_memory(address_space &space);
-	UINT8 samcoupe_mouse_r();
-	void samcoupe_irq(UINT8 src);
+	uint8_t samcoupe_mouse_r();
+	void samcoupe_irq(uint8_t src);
 
 	DECLARE_WRITE_LINE_MEMBER(write_lpt1_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_lpt2_busy);

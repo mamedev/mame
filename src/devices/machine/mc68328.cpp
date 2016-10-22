@@ -31,7 +31,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 const device_type MC68328 = &device_creator<mc68328_device>;
 
 
-mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, MC68328, "MC68328 (DragonBall) Integrated Processor", tag, owner, clock, "mc68328", __FILE__), m_rtc(nullptr), m_pwm(nullptr),
 				m_out_port_a_cb(*this),
 				m_out_port_b_cb(*this),
@@ -243,7 +243,7 @@ void mc68328_device::device_reset()
 }
 
 
-void mc68328_device::set_interrupt_line(UINT32 line, UINT32 active)
+void mc68328_device::set_interrupt_line(uint32_t line, uint32_t active)
 {
 	if (active)
 	{
@@ -320,9 +320,9 @@ void mc68328_device::set_interrupt_line(UINT32 line, UINT32 active)
 
 void mc68328_device::poll_port_d_interrupts()
 {
-	UINT8 line_transitions = m_regs.pddataedge & m_regs.pdirqedge;
-	UINT8 line_holds = m_regs.pddata &~ m_regs.pdirqedge;
-	UINT8 line_interrupts = (line_transitions | line_holds) & m_regs.pdirqen;
+	uint8_t line_transitions = m_regs.pddataedge & m_regs.pdirqedge;
+	uint8_t line_holds = m_regs.pddata &~ m_regs.pdirqedge;
+	uint8_t line_interrupts = (line_transitions | line_holds) & m_regs.pdirqen;
 
 	if (line_interrupts)
 	{
@@ -347,9 +347,9 @@ WRITE_LINE_MEMBER( mc68328_device::set_penirq_line )
 	}
 }
 
-void mc68328_device::set_port_d_lines(UINT8 state, int bit)
+void mc68328_device::set_port_d_lines(uint8_t state, int bit)
 {
-	UINT8 old_button_state = m_regs.pddata;
+	uint8_t old_button_state = m_regs.pddata;
 
 	if (state & (1 << bit))
 	{
@@ -365,9 +365,9 @@ void mc68328_device::set_port_d_lines(UINT8 state, int bit)
 	poll_port_d_interrupts();
 }
 
-UINT32 mc68328_device::get_timer_frequency(UINT32 index)
+uint32_t mc68328_device::get_timer_frequency(uint32_t index)
 {
-	UINT32 frequency = 0;
+	uint32_t frequency = 0;
 
 	switch (m_regs.tctl[index] & TCTL_CLKSOURCE)
 	{
@@ -391,7 +391,7 @@ UINT32 mc68328_device::get_timer_frequency(UINT32 index)
 	return frequency;
 }
 
-void mc68328_device::maybe_start_timer(UINT32 index, UINT32 new_enable)
+void mc68328_device::maybe_start_timer(uint32_t index, uint32_t new_enable)
 {
 	if ((m_regs.tctl[index] & TCTL_TEN) == TCTL_TEN_ENABLE && (m_regs.tctl[index] & TCTL_CLKSOURCE) > TCTL_CLKSOURCE_STOP)
 	{
@@ -405,7 +405,7 @@ void mc68328_device::maybe_start_timer(UINT32 index, UINT32 new_enable)
 		}
 		else
 		{
-			UINT32 frequency = get_timer_frequency(index);
+			uint32_t frequency = get_timer_frequency(index);
 			attotime period = (attotime::from_hz(frequency) *  m_regs.tcmp[index]);
 
 			if (new_enable)
@@ -422,14 +422,14 @@ void mc68328_device::maybe_start_timer(UINT32 index, UINT32 new_enable)
 	}
 }
 
-void mc68328_device::timer_compare_event(UINT32 index)
+void mc68328_device::timer_compare_event(uint32_t index)
 {
 	m_regs.tcn[index] = m_regs.tcmp[index];
 	m_regs.tstat[index] |= TSTAT_COMP;
 
 	if ((m_regs.tctl[index] & TCTL_FRR) == TCTL_FRR_RESTART)
 	{
-		UINT32 frequency = get_timer_frequency(index);
+		uint32_t frequency = get_timer_frequency(index);
 
 		if (frequency > 0)
 		{
@@ -446,7 +446,7 @@ void mc68328_device::timer_compare_event(UINT32 index)
 	}
 	else
 	{
-		UINT32 frequency = get_timer_frequency(index);
+		uint32_t frequency = get_timer_frequency(index);
 
 		if (frequency > 0)
 		{
@@ -486,8 +486,8 @@ TIMER_CALLBACK_MEMBER( mc68328_device::pwm_transition )
 	if (((m_regs.pwmc & PWMC_POL) == 0 && (m_regs.pwmc & PWMC_PIN) != 0) ||
 		((m_regs.pwmc & PWMC_POL) != 0 && (m_regs.pwmc & PWMC_PIN) == 0))
 	{
-		UINT32 frequency = 32768 * 506;
-		UINT32 divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+		uint32_t frequency = 32768 * 506;
+		uint32_t divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
 		attotime period;
 
 		frequency /= divisor;
@@ -502,8 +502,8 @@ TIMER_CALLBACK_MEMBER( mc68328_device::pwm_transition )
 	}
 	else
 	{
-		UINT32 frequency = 32768 * 506;
-		UINT32 divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+		uint32_t frequency = 32768 * 506;
+		uint32_t divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
 		attotime period;
 
 		frequency /= divisor;
@@ -524,7 +524,7 @@ TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
 {
 	if (m_regs.rtcctl & RTCCTL_ENABLE)
 	{
-		UINT32 set_int = 0;
+		uint32_t set_int = 0;
 
 		m_regs.hmsr++;
 
@@ -600,9 +600,9 @@ TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
 
 WRITE16_MEMBER( mc68328_device::write )
 {
-	UINT32 address = offset << 1;
-	UINT16 temp16[4] = { 0 };
-	UINT32 imr_old = m_regs.imr, imr_diff;
+	uint32_t address = offset << 1;
+	uint16_t temp16[4] = { 0 };
+	uint32_t imr_old = m_regs.imr, imr_diff;
 
 	switch (address)
 	{
@@ -1300,8 +1300,8 @@ WRITE16_MEMBER( mc68328_device::write )
 
 			if ((m_regs.pwmc & PWMC_PWMEN) != 0 && m_regs.pwmw != 0 && m_regs.pwmp != 0)
 			{
-				UINT32 frequency = 32768 * 506;
-				UINT32 divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+				uint32_t frequency = 32768 * 506;
+				uint32_t divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
 				attotime period;
 				frequency /= divisor;
 				period = attotime::from_hz(frequency) * m_regs.pwmw;
@@ -1794,8 +1794,8 @@ WRITE16_MEMBER( mc68328_device::write )
 
 READ16_MEMBER( mc68328_device::read )
 {
-	UINT16 temp16;
-	UINT32 address = offset << 1;
+	uint16_t temp16;
+	uint32_t address = offset << 1;
 
 	switch (address)
 	{
@@ -2692,11 +2692,11 @@ READ16_MEMBER( mc68328_device::read )
 }
 
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-UINT32 mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *video_ram = (UINT16 *)(machine().device<ram_device>(RAM_TAG)->pointer() + (m_regs.lssa & 0x00ffffff));
-	UINT16 word;
-	UINT16 *line;
+	uint16_t *video_ram = (uint16_t *)(machine().device<ram_device>(RAM_TAG)->pointer() + (m_regs.lssa & 0x00ffffff));
+	uint16_t word;
+	uint16_t *line;
 	int y, x, b;
 
 	if (m_regs.lckcon & LCKCON_LCDC_EN)

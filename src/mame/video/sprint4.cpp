@@ -36,8 +36,8 @@ PALETTE_INIT_MEMBER(sprint4_state, sprint4)
 
 TILE_GET_INFO_MEMBER(sprint4_state::sprint4_tile_info)
 {
-	UINT8 *videoram = m_videoram;
-	UINT8 code = videoram[tile_index];
+	uint8_t *videoram = m_videoram;
+	uint8_t code = videoram[tile_index];
 
 	if ((code & 0x30) == 0x30)
 		SET_TILE_INFO_MEMBER(0, code & ~0x40, (code >> 6) ^ 3, 0);
@@ -54,9 +54,9 @@ void sprint4_state::video_start()
 }
 
 
-UINT32 sprint4_state::screen_update_sprint4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sprint4_state::screen_update_sprint4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int i;
 
 	m_playfield->draw(screen, bitmap, cliprect, 0, 0);
@@ -65,10 +65,10 @@ UINT32 sprint4_state::screen_update_sprint4(screen_device &screen, bitmap_ind16 
 	{
 		int bank = 0;
 
-		UINT8 horz = videoram[0x390 + 2 * i + 0];
-		UINT8 attr = videoram[0x390 + 2 * i + 1];
-		UINT8 vert = videoram[0x398 + 2 * i + 0];
-		UINT8 code = videoram[0x398 + 2 * i + 1];
+		uint8_t horz = videoram[0x390 + 2 * i + 0];
+		uint8_t attr = videoram[0x390 + 2 * i + 1];
+		uint8_t vert = videoram[0x398 + 2 * i + 0];
+		uint8_t code = videoram[0x398 + 2 * i + 1];
 
 		if (i & 1)
 			bank = 32;
@@ -89,7 +89,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		UINT8 *videoram = m_videoram;
+		uint8_t *videoram = m_videoram;
 		int i;
 
 		/* check for sprite-playfield collisions */
@@ -103,9 +103,9 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 
 			int bank = 0;
 
-			UINT8 horz = videoram[0x390 + 2 * i + 0];
-			UINT8 vert = videoram[0x398 + 2 * i + 0];
-			UINT8 code = videoram[0x398 + 2 * i + 1];
+			uint8_t horz = videoram[0x390 + 2 * i + 0];
+			uint8_t vert = videoram[0x398 + 2 * i + 0];
+			uint8_t code = videoram[0x398 + 2 * i + 1];
 
 			rect.min_x = horz - 15;
 			rect.min_y = vert - 15;
@@ -145,7 +145,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 
 WRITE8_MEMBER(sprint4_state::sprint4_video_ram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_playfield->mark_tile_dirty(offset);
 }

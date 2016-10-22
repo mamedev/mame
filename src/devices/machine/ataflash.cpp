@@ -8,7 +8,7 @@
 
 const device_type ATA_FLASH_PCCARD = &device_creator<ata_flash_pccard_device>;
 
-ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ide_hdd_device(mconfig, ATA_FLASH_PCCARD, "ATA Flash PCCARD", tag, owner, clock, "ataflash", __FILE__), m_gnetreadlock(0), m_locked(0)
 {
 }
@@ -25,7 +25,7 @@ void ata_flash_pccard_device::device_reset()
 {
 	ide_hdd_device::device_reset();
 
-	UINT32 metalength;
+	uint32_t metalength;
 	memset(m_key, 0, sizeof(m_key));
 	memset(m_cis, 0xff, 512);
 
@@ -99,9 +99,9 @@ WRITE16_MEMBER( ata_flash_pccard_device::write_reg )
 {
 	if(offset >= 0x280 && offset <= 0x288 && m_handle != nullptr)
 	{
-		UINT8 v = data;
+		uint8_t v = data;
 		int pos = offset - 0x280;
-		UINT8 k = pos < sizeof(m_key) ? m_key[pos] : 0;
+		uint8_t k = pos < sizeof(m_key) ? m_key[pos] : 0;
 
 		if(v == k)
 		{

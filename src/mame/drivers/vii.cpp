@@ -118,36 +118,36 @@ public:
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(rom_r);
-	required_shared_ptr<UINT16> m_p_ram;
-	required_shared_ptr<UINT16> m_p_rowscroll;
-	required_shared_ptr<UINT16> m_p_palette;
-	required_shared_ptr<UINT16> m_p_spriteram;
+	required_shared_ptr<uint16_t> m_p_ram;
+	required_shared_ptr<uint16_t> m_p_rowscroll;
+	required_shared_ptr<uint16_t> m_p_palette;
+	required_shared_ptr<uint16_t> m_p_spriteram;
 	required_memory_bank m_bank;
 
-	UINT32 m_current_bank;
+	uint32_t m_current_bank;
 
-	UINT16 m_video_regs[0x100];
-	UINT32 m_centered_coordinates;
-	void test_centered(UINT8 *ROM);
+	uint16_t m_video_regs[0x100];
+	uint32_t m_centered_coordinates;
+	void test_centered(uint8_t *ROM);
 
 	struct
 	{
-		UINT8 r, g, b;
+		uint8_t r, g, b;
 	}
 	m_screenram[320*240];
 
-	UINT16 m_io_regs[0x200];
-	UINT16 m_uart_rx_count;
-	UINT8 m_controller_input[8];
-	UINT32 m_spg243_mode;
+	uint16_t m_io_regs[0x200];
+	uint16_t m_uart_rx_count;
+	uint8_t m_controller_input[8];
+	uint32_t m_spg243_mode;
 
 	emu_timer *m_tmb1;
 	emu_timer *m_tmb2;
-	void do_dma(UINT32 len);
-	void do_gpio(UINT32 offset);
-	void switch_bank(UINT32 bank);
+	void do_dma(uint32_t len);
+	void do_gpio(uint32_t offset);
+	void switch_bank(uint32_t bank);
 	void do_i2c();
-	void spg_do_dma(UINT32 len);
+	void spg_do_dma(uint32_t len);
 	DECLARE_DRIVER_INIT(vsmile);
 	DECLARE_DRIVER_INIT(walle);
 	DECLARE_DRIVER_INIT(vii);
@@ -155,7 +155,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vii_vblank);
 	TIMER_CALLBACK_MEMBER(tmb1_tick);
 	TIMER_CALLBACK_MEMBER(tmb2_tick);
@@ -168,15 +168,15 @@ protected:
 
 	memory_region *m_cart_rom;
 
-	void blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile);
-	void blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs);
-	void blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr);
+	void blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
+	void blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs);
+	void blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t base_addr);
 	void blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
-	inline UINT8 expand_rgb5_to_rgb8(UINT8 val);
-	inline UINT8 mix_channel(UINT8 a, UINT8 b);
-	void mix_pixel(UINT32 offset, UINT16 rgb);
-	void set_pixel(UINT32 offset, UINT16 rgb);
+	inline uint8_t expand_rgb5_to_rgb8(uint8_t val);
+	inline uint8_t mix_channel(uint8_t a, uint8_t b);
+	void mix_pixel(uint32_t offset, uint16_t rgb);
+	void set_pixel(uint32_t offset, uint16_t rgb);
 };
 
 enum
@@ -220,68 +220,68 @@ void vii_state::video_start()
 {
 }
 
-inline UINT8 vii_state::expand_rgb5_to_rgb8(UINT8 val)
+inline uint8_t vii_state::expand_rgb5_to_rgb8(uint8_t val)
 {
-	UINT8 temp = val & 0x1f;
+	uint8_t temp = val & 0x1f;
 	return (temp << 3) | (temp >> 2);
 }
 
 // Perform a lerp between a and b
-inline UINT8 vii_state::mix_channel(UINT8 a, UINT8 b)
+inline uint8_t vii_state::mix_channel(uint8_t a, uint8_t b)
 {
-	UINT8 alpha = m_video_regs[0x1c] & 0x00ff;
+	uint8_t alpha = m_video_regs[0x1c] & 0x00ff;
 	return ((64 - alpha) * a + alpha * b) / 64;
 }
 
-void vii_state::mix_pixel(UINT32 offset, UINT16 rgb)
+void vii_state::mix_pixel(uint32_t offset, uint16_t rgb)
 {
 	m_screenram[offset].r = mix_channel(m_screenram[offset].r, expand_rgb5_to_rgb8(rgb >> 10));
 	m_screenram[offset].g = mix_channel(m_screenram[offset].g, expand_rgb5_to_rgb8(rgb >> 5));
 	m_screenram[offset].b = mix_channel(m_screenram[offset].b, expand_rgb5_to_rgb8(rgb));
 }
 
-void vii_state::set_pixel(UINT32 offset, UINT16 rgb)
+void vii_state::set_pixel(uint32_t offset, uint16_t rgb)
 {
 	m_screenram[offset].r = expand_rgb5_to_rgb8(rgb >> 10);
 	m_screenram[offset].g = expand_rgb5_to_rgb8(rgb >> 5);
 	m_screenram[offset].b = expand_rgb5_to_rgb8(rgb);
 }
 
-void vii_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
+void vii_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	UINT32 h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	UINT32 w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-	UINT32 yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
-	UINT32 xflipmask = attr & TILE_X_FLIP ? w - 1 : 0;
+	uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+	uint32_t xflipmask = attr & TILE_X_FLIP ? w - 1 : 0;
 
-	UINT32 nc = ((attr & 0x0003) + 1) << 1;
+	uint32_t nc = ((attr & 0x0003) + 1) << 1;
 
-	UINT32 palette_offset = (attr & 0x0f00) >> 4;
+	uint32_t palette_offset = (attr & 0x0f00) >> 4;
 	palette_offset >>= nc;
 	palette_offset <<= nc;
 
-	UINT32 m = bitmap_addr + nc*w*h/16*tile;
-	UINT32 bits = 0;
-	UINT32 nbits = 0;
+	uint32_t m = bitmap_addr + nc*w*h/16*tile;
+	uint32_t bits = 0;
+	uint32_t nbits = 0;
 
-	UINT32 x, y;
+	uint32_t x, y;
 
 	for(y = 0; y < h; y++)
 	{
-		UINT32 yy = (yoff + (y ^ yflipmask)) & 0x1ff;
+		uint32_t yy = (yoff + (y ^ yflipmask)) & 0x1ff;
 
 		for(x = 0; x < w; x++)
 		{
-			UINT32 xx = (xoff + (x ^ xflipmask)) & 0x1ff;
-			UINT32 pal;
+			uint32_t xx = (xoff + (x ^ xflipmask)) & 0x1ff;
+			uint32_t pal;
 
 			bits <<= nc;
 			if(nbits < nc)
 			{
-				UINT16 b = space.read_word((m++ & 0x3fffff) << 1);
+				uint16_t b = space.read_word((m++ & 0x3fffff) << 1);
 				b = (b << 8) | (b >> 8);
 				bits |= b << (nc - nbits);
 				nbits += 16;
@@ -293,12 +293,12 @@ void vii_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xof
 
 			if((ctrl & 0x0010) && yy < 240)
 			{
-				xx = (xx - (INT16)m_p_rowscroll[yy]) & 0x01ff;
+				xx = (xx - (int16_t)m_p_rowscroll[yy]) & 0x01ff;
 			}
 
 			if(xx < 320 && yy < 240)
 			{
-				UINT16 rgb = m_p_palette[pal];
+				uint16_t rgb = m_p_palette[pal];
 				if(!(rgb & 0x8000))
 				{
 					if (attr & 0x4000)
@@ -315,16 +315,16 @@ void vii_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xof
 	}
 }
 
-void vii_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs)
+void vii_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs)
 {
-	UINT32 x0, y0;
-	UINT32 xscroll = regs[0];
-	UINT32 yscroll = regs[1];
-	UINT32 attr = regs[2];
-	UINT32 ctrl = regs[3];
-	UINT32 tilemap = regs[4];
-	UINT32 palette_map = regs[5];
-	UINT32 h, w, hn, wn;
+	uint32_t x0, y0;
+	uint32_t xscroll = regs[0];
+	uint32_t yscroll = regs[1];
+	uint32_t attr = regs[2];
+	uint32_t ctrl = regs[3];
+	uint32_t tilemap = regs[4];
+	uint32_t palette_map = regs[5];
+	uint32_t h, w, hn, wn;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if(!(ctrl & PAGE_ENABLE_MASK))
@@ -347,9 +347,9 @@ void vii_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int d
 	{
 		for(x0 = 0; x0 < wn; x0++)
 		{
-			UINT16 tile = space.read_word((tilemap + x0 + wn * y0) << 1);
-			UINT16 palette = 0;
-			UINT32 xx, yy;
+			uint16_t tile = space.read_word((tilemap + x0 + wn * y0) << 1);
+			uint16_t palette = 0;
+			uint32_t xx, yy;
 
 			if(!tile)
 			{
@@ -362,8 +362,8 @@ void vii_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int d
 				palette >>= 8;
 			}
 
-			UINT32 tileattr = attr;
-			UINT32 tilectrl = ctrl;
+			uint32_t tileattr = attr;
+			uint32_t tilectrl = ctrl;
 			if ((ctrl & 2) == 0)
 			{   // -(1) bld(1) flip(2) pal(4)
 				tileattr &= ~0x000c;
@@ -384,13 +384,13 @@ void vii_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int d
 	}
 }
 
-void vii_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr)
+void vii_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t base_addr)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT16 tile, attr;
-	INT16 x, y;
-	UINT32 h, w;
-	UINT32 bitmap_addr = 0x40 * m_video_regs[0x22];
+	uint16_t tile, attr;
+	int16_t x, y;
+	uint32_t h, w;
+	uint32_t bitmap_addr = 0x40 * m_video_regs[0x22];
 
 	tile = space.read_word((base_addr + 0) << 1);
 	x = space.read_word((base_addr + 1) << 1);
@@ -427,7 +427,7 @@ void vii_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int
 
 void vii_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth)
 {
-	UINT32 n;
+	uint32_t n;
 
 	if (!(m_video_regs[0x42] & 1))
 	{
@@ -443,7 +443,7 @@ void vii_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 	}
 }
 
-UINT32 vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i, x, y;
 
@@ -473,12 +473,12 @@ UINT32 vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap,
 *    Machine Hardware    *
 *************************/
 
-void vii_state::do_dma(UINT32 len)
+void vii_state::do_dma(uint32_t len)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	UINT32 src = m_video_regs[0x70];
-	UINT32 dst = m_video_regs[0x71] + 0x2c00;
-	UINT32 j;
+	uint32_t src = m_video_regs[0x70];
+	uint32_t dst = m_video_regs[0x71] + 0x2c00;
+	uint32_t j;
 
 	for(j = 0; j < len; j++)
 	{
@@ -583,7 +583,7 @@ WRITE16_MEMBER( vii_state::audio_w )
 	}
 }
 
-void vii_state::switch_bank(UINT32 bank)
+void vii_state::switch_bank(uint32_t bank)
 {
 	if (bank != m_current_bank)
 	{
@@ -592,17 +592,17 @@ void vii_state::switch_bank(UINT32 bank)
 	}
 }
 
-void vii_state::do_gpio(UINT32 offset)
+void vii_state::do_gpio(uint32_t offset)
 {
-	UINT32 index  = (offset - 1) / 5;
-	UINT16 buffer = m_io_regs[5*index + 2];
-	UINT16 dir    = m_io_regs[5*index + 3];
-	UINT16 attr   = m_io_regs[5*index + 4];
-	UINT16 special= m_io_regs[5*index + 5];
+	uint32_t index  = (offset - 1) / 5;
+	uint16_t buffer = m_io_regs[5*index + 2];
+	uint16_t dir    = m_io_regs[5*index + 3];
+	uint16_t attr   = m_io_regs[5*index + 4];
+	uint16_t special= m_io_regs[5*index + 5];
 
-	UINT16 push   = dir;
-	UINT16 pull   = (~dir) & (~attr);
-	UINT16 what   = (buffer & (push | pull));
+	uint16_t push   = dir;
+	uint16_t pull   = (~dir) & (~attr);
+	uint16_t what   = (buffer & (push | pull));
 	what ^= (dir & ~attr);
 	what &= ~special;
 
@@ -610,7 +610,7 @@ void vii_state::do_gpio(UINT32 offset)
 	{
 		if(index == 1)
 		{
-			UINT32 bank = ((what & 0x80) >> 7) | ((what & 0x20) >> 4);
+			uint32_t bank = ((what & 0x80) >> 7) | ((what & 0x20) >> 4);
 			switch_bank(bank);
 		}
 	}
@@ -618,7 +618,7 @@ void vii_state::do_gpio(UINT32 offset)
 	{
 		if(index == 0)
 		{
-			UINT16 temp = m_io_p1->read();
+			uint16_t temp = m_io_p1->read();
 			what |= (temp & 0x0001) ? 0x8000 : 0;
 			what |= (temp & 0x0002) ? 0x4000 : 0;
 			what |= (temp & 0x0004) ? 0x2000 : 0;
@@ -645,13 +645,13 @@ void vii_state::do_i2c()
 {
 }
 
-void vii_state::spg_do_dma(UINT32 len)
+void vii_state::spg_do_dma(uint32_t len)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
-	UINT32 src = ((m_io_regs[0x101] & 0x3f) << 16) | m_io_regs[0x100];
-	UINT32 dst = m_io_regs[0x103] & 0x3fff;
-	UINT32 j;
+	uint32_t src = ((m_io_regs[0x101] & 0x3f) << 16) | m_io_regs[0x100];
+	uint32_t dst = m_io_regs[0x103] & 0x3fff;
+	uint32_t j;
 
 	for(j = 0; j < len; j++)
 		mem.write_word((dst+j) << 1, mem.read_word((src+j) << 1));
@@ -664,7 +664,7 @@ READ16_MEMBER( vii_state::io_r )
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[] = { 'A', 'B', 'C' };
 
-	UINT16 val = m_io_regs[offset];
+	uint16_t val = m_io_regs[offset];
 
 	switch(offset)
 	{
@@ -735,7 +735,7 @@ WRITE16_MEMBER( vii_state::io_w )
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[3] = { 'A', 'B', 'C' };
 
-	UINT16 temp = 0;
+	uint16_t temp = 0;
 
 	switch(offset)
 	{
@@ -758,12 +758,12 @@ WRITE16_MEMBER( vii_state::io_w )
 
 		case 0x10:      // timebase control
 			if ((m_io_regs[offset] & 0x0003) != (data & 0x0003)) {
-				UINT16 hz = 8 << (data & 0x0003);
+				uint16_t hz = 8 << (data & 0x0003);
 				verboselog(3, "*** TMB1 FREQ set to %dHz\n", hz);
 				m_tmb1->adjust(attotime::zero, 0, attotime::from_hz( hz ));
 			}
 			if ((m_io_regs[offset] & 0x000c) != (data & 0x000c)) {
-				UINT16 hz = 128 << ((data & 0x000c) >> 2);
+				uint16_t hz = 128 << ((data & 0x000c) >> 2);
 				verboselog(3, "*** TMB2 FREQ set to %dHz\n", hz);
 				m_tmb2->adjust(attotime::zero, 0, attotime::from_hz( hz ));
 			}
@@ -950,7 +950,7 @@ static INPUT_PORTS_START( walle )
 INPUT_PORTS_END
 
 
-void vii_state::test_centered(UINT8 *ROM)
+void vii_state::test_centered(uint8_t *ROM)
 {
 	if (ROM[0x3cd808] == 0x99 &&
 		ROM[0x3cd809] == 0x99 &&
@@ -967,7 +967,7 @@ void vii_state::test_centered(UINT8 *ROM)
 
 DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size < 0x800000)
 	{
@@ -985,7 +985,7 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 
 DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -1006,8 +1006,8 @@ TIMER_CALLBACK_MEMBER(vii_state::tmb2_tick)
 
 void vii_state::machine_start()
 {
-	memset(m_video_regs, 0, 0x100 * sizeof(UINT16));
-	memset(m_io_regs, 0, 0x100 * sizeof(UINT16));
+	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
+	memset(m_io_regs, 0, 0x100 * sizeof(uint16_t));
 	m_current_bank = 0;
 
 	m_controller_input[0] = 0;
@@ -1048,15 +1048,15 @@ void vii_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
 {
-	UINT32 x = machine().rand() & 0x3ff;
-	UINT32 y = machine().rand() & 0x3ff;
-	UINT32 z = machine().rand() & 0x3ff;
+	uint32_t x = machine().rand() & 0x3ff;
+	uint32_t y = machine().rand() & 0x3ff;
+	uint32_t z = machine().rand() & 0x3ff;
 
 
 	m_controller_input[0] = m_io_p1->read();
-	m_controller_input[1] = (UINT8)x;
-	m_controller_input[2] = (UINT8)y;
-	m_controller_input[3] = (UINT8)z;
+	m_controller_input[1] = (uint8_t)x;
+	m_controller_input[2] = (uint8_t)y;
+	m_controller_input[3] = (uint8_t)z;
 	m_controller_input[4] = 0;
 	x >>= 8;
 	y >>= 8;

@@ -27,7 +27,7 @@ class cgenie_fdc_device : public device_t, public device_expansion_interface
 {
 public:
 	// construction/destruction
-	cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_ADDRESS_MAP(mmio, 8);
 
@@ -65,7 +65,7 @@ private:
 
 	floppy_image_device *m_floppy;
 
-	UINT8 m_irq_status;
+	uint8_t m_irq_status;
 };
 
 // device type definition

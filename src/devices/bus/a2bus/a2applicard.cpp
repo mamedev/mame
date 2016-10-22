@@ -75,14 +75,14 @@ const tiny_rom_entry *a2bus_applicard_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_z80(*this, Z80_TAG), m_bROMAtZ80Zero(false), m_z80stat(false), m_6502stat(false), m_toz80(0), m_to6502(0), m_z80rom(nullptr)
 {
 }
 
-a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_APPLICARD, "PCPI Applicard", tag, owner, clock, "a2aplcrd", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_z80(*this, Z80_TAG), m_bROMAtZ80Zero(false), m_z80stat(false), m_6502stat(false), m_toz80(0), m_to6502(0), m_z80rom(nullptr)
@@ -117,7 +117,7 @@ void a2bus_applicard_device::device_reset()
 	m_z80stat = false;
 }
 
-UINT8 a2bus_applicard_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_applicard_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	switch (offset & 0xf)
 	{
@@ -160,7 +160,7 @@ UINT8 a2bus_applicard_device::read_c0nx(address_space &space, UINT8 offset)
 	return 0xff;
 }
 
-void a2bus_applicard_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_applicard_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset & 0xf)
 	{
@@ -184,7 +184,7 @@ void a2bus_applicard_device::write_c0nx(address_space &space, UINT8 offset, UINT
 
 READ8_MEMBER( a2bus_applicard_device::z80_io_r )
 {
-	UINT8 tmp = 0;
+	uint8_t tmp = 0;
 
 	switch (offset)
 	{

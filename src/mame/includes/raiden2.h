@@ -39,16 +39,16 @@ public:
 			sprite_buffer(320, 256),
 			m_raiden2cop(*this, "raiden2cop")
 	{
-		memset(scrollvals, 0, sizeof(UINT16)*6);
-		memset(sprite_prot_src_addr, 0, sizeof(UINT16)*2);
+		memset(scrollvals, 0, sizeof(uint16_t)*6);
+		memset(sprite_prot_src_addr, 0, sizeof(uint16_t)*2);
 
 	}
 
-	std::unique_ptr<UINT16[]> back_data;
-	std::unique_ptr<UINT16[]> fore_data;
-	std::unique_ptr<UINT16[]> mid_data;
-	std::unique_ptr<UINT16[]> text_data; // private buffers, allocated in init
-	required_shared_ptr<UINT16> sprites;
+	std::unique_ptr<uint16_t[]> back_data;
+	std::unique_ptr<uint16_t[]> fore_data;
+	std::unique_ptr<uint16_t[]> mid_data;
+	std::unique_ptr<uint16_t[]> text_data; // private buffers, allocated in init
+	required_shared_ptr<uint16_t> sprites;
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -85,9 +85,9 @@ public:
 
 	void common_reset();
 
-	static UINT16 const raiden_blended_colors[];
-	static UINT16 const xsedae_blended_colors[];
-	static UINT16 const zeroteam_blended_colors[];
+	static uint16_t const raiden_blended_colors[];
+	static uint16_t const xsedae_blended_colors[];
+	static uint16_t const zeroteam_blended_colors[];
 
 	bool blend_active[0x800]; // cfg
 
@@ -95,11 +95,11 @@ public:
 
 
 	int bg_bank, fg_bank, mid_bank, tx_bank;
-	UINT16 raiden2_tilemap_enable;
-	UINT8 prg_bank;
-	UINT16 cop_bank;
+	uint16_t raiden2_tilemap_enable;
+	uint8_t prg_bank;
+	uint16_t cop_bank;
 
-	UINT16 scrollvals[6];
+	uint16_t scrollvals[6];
 
 
 
@@ -116,8 +116,8 @@ public:
 	DECLARE_WRITE16_MEMBER( sprite_prot_maxx_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_off_w );
 
-	UINT16 sprite_prot_x,sprite_prot_y,dst1,cop_spr_maxx,cop_spr_off;
-	UINT16 sprite_prot_src_addr[2];
+	uint16_t sprite_prot_x,sprite_prot_y,dst1,cop_spr_maxx,cop_spr_off;
+	uint16_t sprite_prot_src_addr[2];
 
 
 
@@ -140,15 +140,15 @@ public:
 	DECLARE_MACHINE_RESET(zeroteam);
 	DECLARE_MACHINE_RESET(xsedae);
 	DECLARE_MACHINE_RESET(raidendx);
-	UINT32 screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(raiden2_interrupt);
-	void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask);
+	void combine32(uint32_t *val, int offset, uint16_t data, uint16_t mem_mask);
 	void sprcpt_init(void);
 
 	void blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, int layer);
 	void tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tilemap);
 
-	void init_blending(const UINT16 *table);
+	void init_blending(const uint16_t *table);
 
 	bitmap_ind16 tile_buffer, sprite_buffer;
 	optional_device<raiden2cop_device> m_raiden2cop;

@@ -42,7 +42,7 @@ public:
 	virtual int create() override;
 	virtual int draw(const int update) override;
 
-	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
+	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
 	virtual std::vector<ui::menu_item> get_slider_list() override;
 	virtual void set_sliders_dirty() override;
 
@@ -90,7 +90,7 @@ private:
 
 	void setup_matrices(uint32_t view_index, bool screen);
 
-	void allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer);
+	void allocate_buffer(render_primitive *prim, uint32_t blend, bgfx::TransientVertexBuffer *buffer);
 	enum buffer_status
 	{
 		BUFFER_PRE_FLUSH,
@@ -104,19 +104,19 @@ private:
 	void render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
 	void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
 
-	void put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex);
+	void put_packed_quad(render_primitive *prim, uint32_t hash, ScreenVertex* vertex);
 	void put_packed_line(render_primitive *prim, ScreenVertex* vertex);
-	void put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, ScreenVertex* vertex);
-	void put_line(float x0, float y0, float x1, float y1, float r, UINT32 rgba, ScreenVertex* vertex, float fth = 1.0f);
+	void put_polygon(const float* coords, uint32_t num_coords, float r, uint32_t rgba, ScreenVertex* vertex);
+	void put_line(float x0, float y0, float x1, float y1, float r, uint32_t rgba, ScreenVertex* vertex, float fth = 1.0f);
 
-	void set_bgfx_state(UINT32 blend);
+	void set_bgfx_state(uint32_t blend);
 
 	static uint32_t u32Color(uint32_t r, uint32_t g, uint32_t b, uint32_t a);
 
 	bool check_for_dirty_atlas();
 	bool update_atlas();
 	void process_atlas_packs(std::vector<std::vector<rectangle_packer::packed_rectangle>>& packed);
-	UINT32 get_texture_hash(render_primitive *prim);
+	uint32_t get_texture_hash(render_primitive *prim);
 
 	osd_options& m_options;
 
@@ -136,7 +136,7 @@ private:
 	bgfx_effect* m_screen_effect[4];
 	std::vector<uint32_t> m_seen_views;
 
-	std::map<UINT32, rectangle_packer::packed_rectangle> m_hash_to_entry;
+	std::map<uint32_t, rectangle_packer::packed_rectangle> m_hash_to_entry;
 	std::vector<rectangle_packer::packable_rectangle> m_texinfo;
 	rectangle_packer m_packer;
 

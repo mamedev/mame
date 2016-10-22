@@ -314,7 +314,7 @@ READ8_MEMBER(gb_state::gb_cart_r)
 	{
 		if (offset < 0x100)
 		{
-			UINT8 *ROM = m_region_maincpu->base();
+			uint8_t *ROM = m_region_maincpu->base();
 			if (m_bios_hack->read())
 			{
 				// patch out logo and checksum checks
@@ -344,7 +344,7 @@ READ8_MEMBER(gb_state::gbc_cart_r)
 	{
 		if (offset < 0x100)
 		{
-			UINT8 *ROM = m_region_maincpu->base();
+			uint8_t *ROM = m_region_maincpu->base();
 			if (m_bios_hack->read())
 			{
 				// patch out logo and checksum checks
@@ -359,7 +359,7 @@ READ8_MEMBER(gb_state::gbc_cart_r)
 		}
 		else if (offset >= 0x200 && offset < 0x900)
 		{
-			UINT8 *ROM = m_region_maincpu->base();
+			uint8_t *ROM = m_region_maincpu->base();
 			return ROM[offset - 0x100];
 		}
 		else if (m_cartslot)

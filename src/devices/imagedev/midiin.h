@@ -26,7 +26,7 @@ class midiin_device :    public device_t,
 {
 public:
 	// construction/destruction
-	midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_input_callback(device_t &device, _Object object) { return downcast<midiin_device &>(device).m_input_cb.set_callback(object); }
 
@@ -59,12 +59,12 @@ protected:
 private:
 	static const int XMIT_RING_SIZE = (8192*4*4);
 
-	void xmit_char(UINT8 data);
+	void xmit_char(uint8_t data);
 
 	osd_midi_device *m_midi;
 	emu_timer *m_timer;
 	devcb_write_line        m_input_cb;
-	UINT8 m_xmitring[XMIT_RING_SIZE];
+	uint8_t m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write;
 	bool m_tx_busy;
 };

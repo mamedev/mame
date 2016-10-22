@@ -8,8 +8,8 @@
 
 inline void wgp_state::common_get_piv_tile_info( tile_data &tileinfo, int tile_index, int num )
 {
-	UINT16 tilenum = m_pivram[tile_index + num * 0x1000];    /* 3 blocks of $2000 */
-	UINT16 attr = m_pivram[tile_index + num * 0x1000 + 0x8000];  /* 3 blocks of $2000 */
+	uint16_t tilenum = m_pivram[tile_index + num * 0x1000];    /* 3 blocks of $2000 */
+	uint16_t attr = m_pivram[tile_index + num * 0x1000 + 0x8000];  /* 3 blocks of $2000 */
 
 	SET_TILE_INFO_MEMBER(2,
 			tilenum & 0x3fff,
@@ -149,7 +149,7 @@ READ16_MEMBER(wgp_state::wgp_piv_ctrl_word_r)
 
 WRITE16_MEMBER(wgp_state::wgp_piv_ctrl_word_w)
 {
-	UINT16 a, b;
+	uint16_t a, b;
 
 	COMBINE_DATA(&m_piv_ctrlram[offset]);
 	data = m_piv_ctrlram[offset];
@@ -326,13 +326,13 @@ Memory Map
    structure for each big sprite: the hardware is probably
    constructing each 4x4 sprite from 4 2x2 sprites... */
 
-static const UINT8 xlookup[16] =
+static const uint8_t xlookup[16] =
 	{ 0, 1, 0, 1,
 		2, 3, 2, 3,
 		0, 1, 0, 1,
 		2, 3, 2, 3 };
 
-static const UINT8 ylookup[16] =
+static const uint8_t ylookup[16] =
 	{ 0, 0, 1, 1,
 		0, 0, 1, 1,
 		2, 2, 3, 3,
@@ -340,14 +340,14 @@ static const UINT8 ylookup[16] =
 
 void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs, i, j, k;
 	int x, y, curx, cury;
 	int zx, zy, zoomx, zoomy, priority = 0;
-	UINT8 small_sprite, col, flipx, flipy;
-	UINT16 code, bigsprite, map_index;
-//  UINT16 rotate = 0;
-	UINT16 tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
+	uint8_t small_sprite, col, flipx, flipy;
+	uint16_t code, bigsprite, map_index;
+//  uint16_t rotate = 0;
+	uint16_t tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
 	static const int primasks[2] = {0x0, 0xfffc};   /* fff0 => under rhs of road only */
 
 	for (offs = 0x1ff; offs >= 0; offs--)
@@ -478,16 +478,16 @@ void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const
 *********************************************************/
 
 static inline void bryan2_drawscanline( bitmap_ind16 &bitmap, int x, int y, int length,
-		const UINT16 *src, int transparent, UINT32 orient, bitmap_ind8 &priority, int pri )
+		const uint16_t *src, int transparent, uint32_t orient, bitmap_ind8 &priority, int pri )
 {
-	UINT16 *dsti = &bitmap.pix16(y, x);
-	UINT8 *dstp = &priority.pix8(y, x);
+	uint16_t *dsti = &bitmap.pix16(y, x);
+	uint8_t *dstp = &priority.pix8(y, x);
 
 	if (transparent)
 	{
 		while (length--)
 		{
-			UINT32 spixel = *src++;
+			uint32_t spixel = *src++;
 			if (spixel < 0x7fff)
 			{
 				*dsti = spixel;
@@ -509,27 +509,27 @@ static inline void bryan2_drawscanline( bitmap_ind16 &bitmap, int x, int y, int 
 
 
 
-void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority )
 {
 	bitmap_ind16 &srcbitmap = m_piv_tilemap[layer]->pixmap();
 	bitmap_ind8 &flagsbitmap = m_piv_tilemap[layer]->flagsmap();
 
-	UINT16 *dst16,*src16;
-	UINT8 *tsrc;
+	uint16_t *dst16,*src16;
+	uint8_t *tsrc;
 	int y_index, src_y_index, row_index, row_zoom;
 
-	/* I have a fairly strong feeling these should be UINT32's, x_index is
+	/* I have a fairly strong feeling these should be uint32_t's, x_index is
 	   falling through from max +ve to max -ve quite a lot in this routine */
 	int sx, x_index, x_step;
 
-	UINT32 zoomx, zoomy;
-	UINT16 scanline[512];
-	UINT16 row_colbank, row_scroll;
+	uint32_t zoomx, zoomy;
+	uint16_t scanline[512];
+	uint16_t row_colbank, row_scroll;
 	int flipscreen = 0; /* n/a */
 
-	UINT16 screen_width = cliprect.width();
-	UINT16 min_y = cliprect.min_y;
-	UINT16 max_y = cliprect.max_y;
+	uint16_t screen_width = cliprect.width();
+	uint16_t min_y = cliprect.min_y;
+	uint16_t max_y = cliprect.max_y;
 
 	int width_mask = 0x3ff;
 
@@ -624,10 +624,10 @@ void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap,
                         SCREEN REFRESH
 **************************************************************/
 
-UINT32 wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
-	UINT8 layer[3];
+	uint8_t layer[3];
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_V))

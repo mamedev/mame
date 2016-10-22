@@ -89,7 +89,7 @@ machine_config_constructor nes_hori4p_device::device_mconfig_additions() const
 //  nes_horitwin_device - constructor
 //-------------------------------------------------
 
-nes_horitwin_device::nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_horitwin_device::nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, NES_HORITWIN, "Hori Twin Adapter", tag, owner, clock, "nes_horitwin", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_port1(*this, "port1"),
@@ -97,7 +97,7 @@ nes_horitwin_device::nes_horitwin_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_hori4p_device::nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_hori4p_device::nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, NES_HORI4P, "Hori 4P Adapter", tag, owner, clock, "nes_hori4p", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_port1(*this, "port1"),
@@ -113,9 +113,9 @@ nes_hori4p_device::nes_hori4p_device(const machine_config &mconfig, const char *
 //  read
 //-------------------------------------------------
 
-UINT8 nes_horitwin_device::read_exp(offs_t offset)
+uint8_t nes_horitwin_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (offset == 0)    //$4016
 		ret |= (m_port1->read_bit0() << 1);
 	else    //$4017
@@ -123,9 +123,9 @@ UINT8 nes_horitwin_device::read_exp(offs_t offset)
 	return ret;
 }
 
-UINT8 nes_hori4p_device::read_exp(offs_t offset)
+uint8_t nes_hori4p_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (m_cfg->read() == 0) // 2P
 	{
 		if (offset == 0)    //$4016
@@ -153,13 +153,13 @@ UINT8 nes_hori4p_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_horitwin_device::write(UINT8 data)
+void nes_horitwin_device::write(uint8_t data)
 {
 	m_port1->write(data);
 	m_port2->write(data);
 }
 
-void nes_hori4p_device::write(UINT8 data)
+void nes_hori4p_device::write(uint8_t data)
 {
 	m_port1->write(data);
 	m_port2->write(data);

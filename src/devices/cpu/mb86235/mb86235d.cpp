@@ -114,12 +114,12 @@ static char* get_ea(int md, int arx, int ary, int disp)
 	return buffer;
 }
 
-static char* dasm_alu_mul(UINT64 opcode, bool twoop)
+static char* dasm_alu_mul(uint64_t opcode, bool twoop)
 {
 	static char buffer[80];
 	char *p = buffer;
 
-	int ma = (opcode & ((UINT64)(1) << 41)) ? 1 : 0;
+	int ma = (opcode & ((uint64_t)(1) << 41)) ? 1 : 0;
 	int o = (opcode >> 42) & 0x1f;
 	int i2 = (opcode >> 47) & 0x1f;
 	int i1 = (opcode >> 52) & 0xf;
@@ -203,7 +203,7 @@ static char* dasm_alu_mul(UINT64 opcode, bool twoop)
 		int mi2 = (opcode >> 32) & 0x1f;
 		int mi1 = (opcode >> 37) & 0xf;
 		int mo = (opcode >> 27) & 0x1f;
-		if (opcode & ((UINT64)(1) << 41))
+		if (opcode & ((uint64_t)(1) << 41))
 			p += sprintf(p, " : FMUL %s, %s, %s", mi1_field[mi1], mi2_field[mi2], mo_field[mo]);
 		else
 			p += sprintf(p, " : MUL %s, %s, %s", mi1_field[mi1], mi2_field[mi2], mo_field[mo]);
@@ -212,7 +212,7 @@ static char* dasm_alu_mul(UINT64 opcode, bool twoop)
 	{
 		if (ma == 0)
 		{
-			if (opcode & ((UINT64)(1) << 56))
+			if (opcode & ((uint64_t)(1) << 56))
 				p += sprintf(p, "FMUL %s, %s, %s", mi1_field[i1], mi2_field[i2], mo_field[o]);
 			else
 				p += sprintf(p, "MUL %s, %s, %s", mi1_field[i1], mi2_field[i2], mo_field[o]);
@@ -222,7 +222,7 @@ static char* dasm_alu_mul(UINT64 opcode, bool twoop)
 	return buffer;
 }
 
-static char* dasm_control(UINT32 pc, UINT64 opcode)
+static char* dasm_control(uint32_t pc, uint64_t opcode)
 {
 	static char buffer[80];
 	char *p = buffer;
@@ -287,10 +287,10 @@ static char* dasm_control(UINT32 pc, UINT64 opcode)
 			p += sprintf(p, "DBLP %04X", pc + rel12);
 			break;
 		case 0x14:
-			p += sprintf(p, "DBBC AR%d:%d, %04X", (UINT32)((opcode >> 13) & 7), (UINT32)((opcode >> 16) & 0xf), pc + rel12);
+			p += sprintf(p, "DBBC AR%d:%d, %04X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
 			break;
 		case 0x15:
-			p += sprintf(p, "DBBS AR%d:%d, %04X", (UINT32)((opcode >> 13) & 7), (UINT32)((opcode >> 16) & 0xf), pc + rel12);
+			p += sprintf(p, "DBBS AR%d:%d, %04X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
 			break;
 		case 0x1b:
 			p += sprintf(p, "DRET");
@@ -343,7 +343,7 @@ static char* dasm_control(UINT32 pc, UINT64 opcode)
 	return buffer;
 }
 
-static char* dasm_double_xfer1(UINT64 opcode)
+static char* dasm_double_xfer1(uint64_t opcode)
 {
 	static char buffer[80];
 	char *p = buffer;
@@ -428,7 +428,7 @@ static char* dasm_double_xfer1(UINT64 opcode)
 	return buffer;
 }
 
-static char* dasm_xfer1(UINT64 opcode)
+static char* dasm_xfer1(uint64_t opcode)
 {
 	static char buffer[80];
 	char *p = buffer;
@@ -445,7 +445,7 @@ static char* dasm_xfer1(UINT64 opcode)
 	{
 		if (sr == 0x58)
 		{
-			p += sprintf(p, "MOV1 #%03X, %s", (UINT32)(opcode & 0xfff), regname[dr]);
+			p += sprintf(p, "MOV1 #%03X, %s", (uint32_t)(opcode & 0xfff), regname[dr]);
 		}
 		else
 		{
@@ -527,7 +527,7 @@ static char* dasm_xfer1(UINT64 opcode)
 	return buffer;
 }
 
-static char* double_xfer2_field(int sd, UINT32 field)
+static char* double_xfer2_field(int sd, uint32_t field)
 {
 	static char buffer[40];
 	char *p = buffer;
@@ -600,7 +600,7 @@ static char* double_xfer2_field(int sd, UINT32 field)
 	return buffer;
 }
 
-static char* dasm_double_xfer2(UINT64 opcode)
+static char* dasm_double_xfer2(uint64_t opcode)
 {
 	static char buffer[80];
 	char *p = buffer;
@@ -648,7 +648,7 @@ static char* dasm_double_xfer2(UINT64 opcode)
 	return buffer;
 }
 
-static char* dasm_xfer2(UINT64 opcode)
+static char* dasm_xfer2(uint64_t opcode)
 {
 	static char buffer[80];
 	char *p = buffer;
@@ -668,7 +668,7 @@ static char* dasm_xfer2(UINT64 opcode)
 		{
 			if (sr == 0x58)
 			{
-				p += sprintf(p, "MOV2 #%06X, %s", (UINT32)(opcode & 0xffffff), regname[dr]);
+				p += sprintf(p, "MOV2 #%06X, %s", (uint32_t)(opcode & 0xffffff), regname[dr]);
 			}
 			else
 			{
@@ -729,7 +729,7 @@ static char* dasm_xfer2(UINT64 opcode)
 			{
 				if (sr == 0x58)
 				{
-					p += sprintf(p, "MOV4 #%06X, ICDTR%d", (UINT32)(opcode & 0xffffff), dr & 7);
+					p += sprintf(p, "MOV4 #%06X, ICDTR%d", (uint32_t)(opcode & 0xffffff), dr & 7);
 				}
 				else
 				{
@@ -760,12 +760,12 @@ static char* dasm_xfer2(UINT64 opcode)
 	return buffer;
 }
 
-static char* dasm_xfer3(UINT64 opcode)
+static char* dasm_xfer3(uint64_t opcode)
 {
 	static char buffer[80];
 	char *p = buffer;
 
-	UINT32 imm = (UINT32)(opcode >> 27);
+	uint32_t imm = (uint32_t)(opcode >> 27);
 	int dr = (opcode >> 19) & 0x7f;
 	int disp = (opcode >> 7) & 0xfff;
 	int ary = (opcode >> 4) & 7;
@@ -790,7 +790,7 @@ static char* dasm_xfer3(UINT64 opcode)
 	return buffer;
 }
 
-static unsigned dasm_mb86235(char *buffer, UINT32 pc, UINT64 opcode)
+static unsigned dasm_mb86235(char *buffer, uint32_t pc, uint64_t opcode)
 {
 	char *p = buffer;
 
@@ -832,7 +832,7 @@ static unsigned dasm_mb86235(char *buffer, UINT32 pc, UINT64 opcode)
 
 CPU_DISASSEMBLE( mb86235 )
 {
-	UINT64 op = *(UINT64*)oprom;
+	uint64_t op = *(uint64_t*)oprom;
 	op = little_endianize_int64(op);
 
 	return dasm_mb86235(buffer, pc, op);

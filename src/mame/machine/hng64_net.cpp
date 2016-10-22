@@ -15,7 +15,7 @@
 #include "includes/hng64.h"
 #include "cpu/z80/kl5c80a12.h"
 
-UINT8 hng64_state::read_comm_data(UINT32 offset)
+uint8_t hng64_state::read_comm_data(uint32_t offset)
 {
 	if((offset & 0x10000) == 0)
 		return m_comm_rom[offset & 0xffff];
@@ -27,7 +27,7 @@ UINT8 hng64_state::read_comm_data(UINT32 offset)
 	return 0xff;
 }
 
-void hng64_state::write_comm_data(UINT32 offset,UINT8 data)
+void hng64_state::write_comm_data(uint32_t offset,uint8_t data)
 {
 	if((offset & 0x10000) == 0)
 	{

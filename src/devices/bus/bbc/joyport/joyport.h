@@ -54,11 +54,11 @@ class bbc_joyport_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~bbc_joyport_slot_device() {}
 
-	UINT8 cb_r();
-	UINT8 pb_r();
+	uint8_t cb_r();
+	uint8_t pb_r();
 
 protected:
 	// device-level overrides
@@ -78,8 +78,8 @@ public:
 	device_bbc_joyport_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bbc_joyport_interface();
 
-	virtual UINT8 cb_r() { return 0xff; }
-	virtual UINT8 pb_r() { return 0x1f; }
+	virtual uint8_t cb_r() { return 0xff; }
+	virtual uint8_t pb_r() { return 0x1f; }
 
 protected:
 	bbc_joyport_slot_device *m_slot;

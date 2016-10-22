@@ -301,7 +301,7 @@ ioport_constructor v1050_keyboard_device::device_input_ports() const
 //  v1050_keyboard_device - constructor
 //-------------------------------------------------
 
-v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, V1050_KEYBOARD, "Visual 1050 Keyboard", tag, owner, clock, "v1050kb", __FILE__),
 	m_maincpu(*this, I8049_TAG),
 	m_discrete(*this, DISCRETE_TAG),
@@ -350,7 +350,7 @@ WRITE_LINE_MEMBER( v1050_keyboard_device::si_w )
 
 READ8_MEMBER( v1050_keyboard_device::kb_p1_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_keylatch < 12)
 	{

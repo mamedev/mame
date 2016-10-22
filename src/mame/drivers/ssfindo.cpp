@@ -228,27 +228,27 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT32> m_vram;
+	required_shared_ptr<uint32_t> m_vram;
 
-	required_region_ptr<UINT16> m_flashrom;
+	required_region_ptr<uint16_t> m_flashrom;
 
 	required_ioport m_io_ps7500;
 
 	// driver init configuration
-	UINT32 m_flashType;
+	uint32_t m_flashType;
 	int m_iocr_hack;
 
 	// common
-	UINT32 m_PS7500_IO[MAXIO];
-	UINT32 m_PS7500_FIFO[256];
+	uint32_t m_PS7500_IO[MAXIO];
+	uint32_t m_PS7500_FIFO[256];
 	emu_timer *m_PS7500timer0;
 	emu_timer *m_PS7500timer1;
 
 	// ssfindo and ppcar
-	UINT32 m_flashAdr;
-	UINT32 m_flashOffset;
-	UINT32 m_adrLatch;
-	UINT32 m_flashN;
+	uint32_t m_flashAdr;
+	uint32_t m_flashOffset;
+	uint32_t m_adrLatch;
+	uint32_t m_flashN;
 
 	// common
 	DECLARE_WRITE32_MEMBER(FIFO_w);
@@ -277,7 +277,7 @@ public:
 	DECLARE_DRIVER_INIT(tetfight);
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(PS7500_Timer0_callback);
@@ -294,7 +294,7 @@ public:
 };
 
 
-UINT32 ssfindo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ssfindo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int s,x,y;
 
@@ -456,7 +456,7 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 
 WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
 {
-	UINT32 temp=m_PS7500_IO[offset];
+	uint32_t temp=m_PS7500_IO[offset];
 
 	COMBINE_DATA(&temp);
 
@@ -547,7 +547,7 @@ READ32_MEMBER(ssfindo_state::io_r)
 
 WRITE32_MEMBER(ssfindo_state::io_w)
 {
-	UINT32 temp = 0;
+	uint32_t temp = 0;
 	COMBINE_DATA(&temp);
 
 #if 0

@@ -45,7 +45,7 @@ const device_type SONY_LDP1450 = &device_creator<sony_ldp1450_device>;
 //  ldp1450_device - constructor
 //-------------------------------------------------
 
-sony_ldp1450_device::sony_ldp1450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sony_ldp1450_device::sony_ldp1450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: laserdisc_device(mconfig, SONY_LDP1450, "Sony LDP-1450", tag, owner, clock, "ldp1450", __FILE__)
 {
 }
@@ -115,7 +115,7 @@ void sony_ldp1450_device::player_vsync(const vbi_metadata &vbi, int fieldnum, co
 //  the first visible line of the frame
 //-------------------------------------------------
 
-INT32 sony_ldp1450_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
+int32_t sony_ldp1450_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	//printf("%d update\n",fieldnum);
 
@@ -133,7 +133,7 @@ void sony_ldp1450_device::set_new_player_state(ldp1450_player_state which)
 	m_index_state = 0;
 }
 
-void sony_ldp1450_device::set_new_player_bcd(UINT8 data)
+void sony_ldp1450_device::set_new_player_bcd(uint8_t data)
 {
 	printf("Frame data BCD %02x\n",data);
 
@@ -145,9 +145,9 @@ void sony_ldp1450_device::set_new_player_bcd(UINT8 data)
 	m_status = LDP_STAT_ACK;
 }
 
-UINT32 sony_ldp1450_device::bcd_to_raw()
+uint32_t sony_ldp1450_device::bcd_to_raw()
 {
-	UINT32 res = 0;
+	uint32_t res = 0;
 	for(int i=0;i<6;i++)
 		res |= (m_internal_bcd[i] & 0xf) << i*4;
 	return res;
@@ -155,7 +155,7 @@ UINT32 sony_ldp1450_device::bcd_to_raw()
 
 void sony_ldp1450_device::exec_enter_cmd()
 {
-	const UINT32 saved_frame = bcd_to_raw();
+	const uint32_t saved_frame = bcd_to_raw();
 
 	switch(m_player_state)
 	{
@@ -175,7 +175,7 @@ void sony_ldp1450_device::exec_enter_cmd()
 	m_player_state = player_standby;
 }
 
-void sony_ldp1450_device::command_w(UINT8 data)
+void sony_ldp1450_device::command_w(uint8_t data)
 {
 	printf("CMD %02x\n",data);
 	m_command = data;
@@ -327,7 +327,7 @@ void sony_ldp1450_device::command_w(UINT8 data)
 			break;
 
 		case 0x60: /* Addr Inq (get current frame number) */
-			for (UINT8 & elem : m_internal_bcd)
+			for (uint8_t & elem : m_internal_bcd)
 			{
 				printf("Return frame %02x\n",elem);
 				m_status = elem;

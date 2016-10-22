@@ -42,11 +42,11 @@ extern const device_type SWIM;
 
 struct applefdc_interface
 {
-	void (*set_lines)(device_t *device, UINT8 lines);
+	void (*set_lines)(device_t *device, uint8_t lines);
 	void (*set_enable_lines)(device_t *device, int enable_mask);
 
-	UINT8 (*read_data)(device_t *device);
-	void (*write_data)(device_t *device, UINT8 data);
+	uint8_t (*read_data)(device_t *device);
+	void (*write_data)(device_t *device, uint8_t data);
 	int (*read_status)(device_t *device);
 };
 
@@ -63,17 +63,17 @@ public:
 	static void static_set_config(device_t &device, const applefdc_interface *intrf) { downcast<applefdc_base_device &>(device).m_interface = intrf; }
 
 	// read/write handlers
-	virtual UINT8 read(UINT8 offset);
-	virtual void write(UINT8 offset, UINT8 data);
+	virtual uint8_t read(uint8_t offset);
+	virtual void write(uint8_t offset, uint8_t data);
 
 	// read/write handlers overloads
-	UINT8 read(offs_t offset)               { return read((UINT8) offset); }
-	void write(offs_t offset, UINT8 data)   { write((UINT8) offset, data); }
-	DECLARE_READ8_MEMBER( read )            { return read((UINT8) offset); }
-	DECLARE_WRITE8_MEMBER( write )          { write((UINT8) offset, data); }
+	uint8_t read(offs_t offset)               { return read((uint8_t) offset); }
+	void write(offs_t offset, uint8_t data)   { write((uint8_t) offset, data); }
+	DECLARE_READ8_MEMBER( read )            { return read((uint8_t) offset); }
+	DECLARE_WRITE8_MEMBER( write )          { write((uint8_t) offset, data); }
 
 	// accessor
-	UINT8 get_lines();
+	uint8_t get_lines();
 
 protected:
 	enum applefdc_t
@@ -84,7 +84,7 @@ protected:
 	};
 
 	// constructor
-	applefdc_base_device(applefdc_t fdc_type, const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	applefdc_base_device(applefdc_t fdc_type, const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,7 +92,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// other protecteds
-	virtual void iwm_modereg_w(UINT8 data);
+	virtual void iwm_modereg_w(uint8_t data);
 
 private:
 	// data that is constant for the lifetime of the emulation
@@ -101,18 +101,18 @@ private:
 	const applefdc_interface *m_interface;
 
 	// data that changes at emulation time
-	UINT8       m_write_byte;
-	UINT8       m_lines;                    /* flags from IWM_MOTOR - IWM_Q7 */
-	UINT8       m_mode;                     /* 0-31; see above */
-	UINT8       m_handshake_hack;           /* not sure what this is for */
+	uint8_t       m_write_byte;
+	uint8_t       m_lines;                    /* flags from IWM_MOTOR - IWM_Q7 */
+	uint8_t       m_mode;                     /* 0-31; see above */
+	uint8_t       m_handshake_hack;           /* not sure what this is for */
 
 	// functions
 	const applefdc_interface *get_interface();
 	int iwm_enable2();
-	UINT8 iwm_readenable2handshake();
-	UINT8 statusreg_r();
-	UINT8 read_reg(int lines);
-	void write_reg(UINT8 data);
+	uint8_t iwm_readenable2handshake();
+	uint8_t statusreg_r();
+	uint8_t read_reg(int lines);
+	void write_reg(uint8_t data);
 	void turn_motor_onoff(bool status);
 	void iwm_access(int offset);
 };
@@ -126,7 +126,7 @@ private:
 class applefdc_device : public applefdc_base_device
 {
 public:
-	applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -138,7 +138,7 @@ public:
 class iwm_device : public applefdc_base_device
 {
 public:
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

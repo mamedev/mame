@@ -17,10 +17,10 @@ WRITE8_MEMBER(pp01_state::pp01_video_write_mode_w)
 	m_video_write_mode = data & 0x0f;
 }
 
-void pp01_state::pp01_video_w(UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
+void pp01_state::pp01_video_w(uint8_t block,uint16_t offset,uint8_t data,uint8_t part)
 {
-	UINT16 addroffset = part ? 0x1000  : 0x0000;
-	UINT8 *ram = m_ram->pointer();
+	uint16_t addroffset = part ? 0x1000  : 0x0000;
+	uint8_t *ram = m_ram->pointer();
 
 	if (BIT(m_video_write_mode,3)) {
 		// Copy mode
@@ -79,13 +79,13 @@ WRITE8_MEMBER(pp01_state::pp01_video_b_2_w)
 }
 
 
-void pp01_state::pp01_set_memory(UINT8 block, UINT8 data)
+void pp01_state::pp01_set_memory(uint8_t block, uint8_t data)
 {
-	UINT8 *mem = memregion("maincpu")->base();
+	uint8_t *mem = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT16 startaddr = block*0x1000;
-	UINT16 endaddr   = ((block+1)*0x1000)-1;
-	UINT8  blocknum  = block + 1;
+	uint16_t startaddr = block*0x1000;
+	uint16_t endaddr   = ((block+1)*0x1000)-1;
+	uint8_t  blocknum  = block + 1;
 	char bank[10];
 	sprintf(bank,"bank%d",blocknum);
 	if (data>=0xE0 && data<=0xEF) {

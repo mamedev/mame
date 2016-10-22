@@ -98,7 +98,7 @@ const tiny_rom_entry *bbc_cumana2_device::device_rom_region() const
 //  bbc_cumanafdc_device - constructor
 //-------------------------------------------------
 
-bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_dfs_rom(*this, "dfs_rom"),
@@ -108,13 +108,13 @@ bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device
 {
 }
 
-bbc_cumana1_device::bbc_cumana1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bbc_cumana1_device::bbc_cumana1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bbc_cumanafdc_device(mconfig, BBC_CUMANA1, "Cumana QFS 8877A FDC", tag, owner, clock, "bbc_cumana1", __FILE__)
 {
 	m_invert = true;
 }
 
-bbc_cumana2_device::bbc_cumana2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bbc_cumana2_device::bbc_cumana2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bbc_cumanafdc_device(mconfig, BBC_CUMANA2, "Cumana QFS Issue 2 8877A FDC", tag, owner, clock, "bbc_cumana2", __FILE__)
 {
 	m_invert = false;

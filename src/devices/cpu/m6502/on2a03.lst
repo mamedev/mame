@@ -63,7 +63,7 @@ adc_nd_zpg
 adc_nd_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(UINT8(TMP+X));
+	TMP = read(uint8_t(TMP+X));
 	do_adc_nd(TMP);
 	prefetch();
 
@@ -144,7 +144,7 @@ rra_nd_zpg
 rra_nd_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = UINT8(TMP+X);
+	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_ror(TMP2);
@@ -214,7 +214,7 @@ sbc_nd_zpg
 sbc_nd_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(UINT8(TMP+X));
+	TMP = read(uint8_t(TMP+X));
 	do_sbc_nd(TMP);
 	prefetch();
 
@@ -290,7 +290,7 @@ isb_nd_zpg
 isb_nd_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = UINT8(TMP+X);
+	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2++;

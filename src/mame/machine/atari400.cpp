@@ -91,7 +91,7 @@ POKEY_INTERRUPT_CB_MEMBER(atari_common_state::interrupt_cb)
 POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a800_keyboard)
 {
 	int ipt;
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	/* decode special */
 	switch (k543210)
@@ -155,7 +155,7 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a800_keyboard)
 POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a5200_keypads)
 {
 	int ipt;
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	/* decode special */
 	switch (k543210)

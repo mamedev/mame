@@ -51,8 +51,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-//  UINT8 *  m_nvram;     // currently this uses generic nvram handling
+	required_shared_ptr<uint8_t> m_videoram;
+//  uint8_t *  m_nvram;     // currently this uses generic nvram handling
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -68,7 +68,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -217,7 +217,7 @@ void dynadice_state::video_start()
 	m_bg_tilemap->set_scrollx(0, -16);
 }
 
-UINT32 dynadice_state::screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynadice_state::screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle myclip = cliprect;
 	myclip.max_x = 15;
@@ -292,10 +292,10 @@ ROM_END
 DRIVER_INIT_MEMBER(dynadice_state,dynadice)
 {
 	int i, j;
-	UINT8 *usr1 = memregion("user1")->base();
-	UINT8 *cpu2 = memregion("audiocpu")->base();
-	UINT8 *gfx1 = memregion("gfx1")->base();
-	UINT8 *gfx2 = memregion("gfx2")->base();
+	uint8_t *usr1 = memregion("user1")->base();
+	uint8_t *cpu2 = memregion("audiocpu")->base();
+	uint8_t *gfx1 = memregion("gfx1")->base();
+	uint8_t *gfx2 = memregion("gfx2")->base();
 
 	cpu2[0x0b] = 0x23;  /* bug in game code  Dec HL -> Inc HL*/
 

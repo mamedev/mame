@@ -36,7 +36,7 @@ WRITE16_MEMBER(toki_state::toki_control_w)
 
 TILE_GET_INFO_MEMBER(toki_state::get_text_tile_info)
 {
-	UINT16 *videoram = m_videoram;
+	uint16_t *videoram = m_videoram;
 	int tile = videoram[tile_index];
 	int color = (tile >> 12) & 0xf;
 
@@ -96,7 +96,7 @@ void toki_state::video_start()
 
 WRITE16_MEMBER(toki_state::foreground_videoram_w)
 {
-	UINT16 *videoram = m_videoram;
+	uint16_t *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
 }
@@ -165,7 +165,7 @@ WRITE16_MEMBER(toki_state::background2_videoram_w)
 void toki_state::toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int x,y,xoffs,yoffs,tile,flipx,flipy,color,offs;
-	UINT16 *sprite_word;
+	uint16_t *sprite_word;
 
 	for (offs = (m_spriteram->bytes()/2)-4;offs >= 0;offs -= 4)
 	{
@@ -208,7 +208,7 @@ void toki_state::toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprec
 void toki_state::tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int x,y,tile,flipx,color,offs;
-	UINT16 *sprite_word;
+	uint16_t *sprite_word;
 
 	for (offs = 0;offs < m_spriteram->bytes() / 2;offs += 4)
 	{
@@ -247,7 +247,7 @@ void toki_state::tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clipre
  *
  *************************************/
 
-UINT32 toki_state::screen_update_toki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t toki_state::screen_update_toki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int background_y_scroll,foreground_y_scroll,background_x_scroll,foreground_x_scroll;
 
@@ -281,7 +281,7 @@ UINT32 toki_state::screen_update_toki(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-UINT32 toki_state::screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t toki_state::screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_foreground_layer->set_scroll_rows(1);
 	m_background_layer->set_scroll_rows(1);

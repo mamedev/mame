@@ -188,7 +188,7 @@ GFXDECODE_END
 
 void contra_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 }

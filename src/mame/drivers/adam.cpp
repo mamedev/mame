@@ -348,7 +348,7 @@ READ8_MEMBER( adam_state::mreq_r )
 {
 	int bmreq = 0, biorq = 1, eos_enable = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1, cs1 = 1, cs2 = 1, cs3 = 1, cs4 = 1;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset < 0x8000)
 	{
@@ -527,7 +527,7 @@ READ8_MEMBER( adam_state::iorq_r )
 {
 	int bmreq = 1, biorq = 0, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch ((offset >> 5) & 0x07)
 	{
@@ -749,7 +749,7 @@ READ8_MEMBER( adam_state::m6801_p2_r )
 
 	*/
 
-	UINT8 data = M6801_MODE_7;
+	uint8_t data = M6801_MODE_7;
 
 	// NET RXD
 	data |= m_adamnet->rxd_r() << 3;

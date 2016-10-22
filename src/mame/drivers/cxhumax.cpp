@@ -32,9 +32,9 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 
 READ32_MEMBER ( cxhumax_state::cx_gxa_r )
 {
-	UINT32 res = m_gxa_cmd_regs[offset];
+	uint32_t res = m_gxa_cmd_regs[offset];
 	verboselog(*this, 9, "(GXA) %08X -> %08X\n", 0xE0600000 + (offset << 2), res);
-/*  UINT8 gxa_command_number = (offset >> 9) & 0x7F;
+/*  uint8_t gxa_command_number = (offset >> 9) & 0x7F;
     verboselog(*this, 9, "      Command: %08X\n", gxa_command_number);
     switch (gxa_command_number) {
         case GXA_CMD_RW_REGISTER:
@@ -57,7 +57,7 @@ READ32_MEMBER ( cxhumax_state::cx_gxa_r )
 WRITE32_MEMBER( cxhumax_state::cx_gxa_w )
 {
 	verboselog(*this, 9, "(GXA) %08X <- %08X\n", 0xE0600000 + (offset << 2), data);
-	UINT8 gxa_command_number = (offset >> 9) & 0x7F;
+	uint8_t gxa_command_number = (offset >> 9) & 0x7F;
 	verboselog(*this, 9, "      Command: %08X\n", gxa_command_number);
 
 	/* Clear non persistent data */
@@ -124,7 +124,7 @@ WRITE32_MEMBER ( cxhumax_state::flash_w )
 
 READ32_MEMBER ( cxhumax_state::flash_r )
 {
-	UINT32 res = 0;
+	uint32_t res = 0;
 	offset *= 2;
 	if(ACCESSING_BITS_0_15)
 		res |= m_flash->read(offset);
@@ -149,7 +149,7 @@ WRITE32_MEMBER ( cxhumax_state::cx_remap_w )
 
 READ32_MEMBER( cxhumax_state::cx_scratch_r )
 {
-	UINT32 data = m_scratch_reg;
+	uint32_t data = m_scratch_reg;
 	verboselog(*this, 9, "(SCRATCH) %08X -> %08X\n", 0xE0400024 + (offset << 2), data);
 
 	if((m_maincpu->pc()==0xF0003BB8) || (m_maincpu->pc()==0x01003724) || (m_maincpu->pc()==0x00005d8c)) { // HDCI-2000
@@ -179,7 +179,7 @@ WRITE32_MEMBER( cxhumax_state::cx_scratch_w )
 
 READ32_MEMBER( cxhumax_state::cx_hsx_r )
 {
-	UINT32 data = 0; // dummy
+	uint32_t data = 0; // dummy
 	verboselog(*this, 9, "(HSX) %08X -> %08X\n", 0xE0000000 + (offset << 2), data);
 	return data;
 }
@@ -191,7 +191,7 @@ WRITE32_MEMBER( cxhumax_state::cx_hsx_w )
 
 READ32_MEMBER( cxhumax_state::cx_romdescr_r )
 {
-	UINT32 data = m_romdescr_reg;
+	uint32_t data = m_romdescr_reg;
 	verboselog(*this, 9, "(ROMDESC0) %08X -> %08X\n", 0xE0010000 + (offset << 2), data);
 	return data;
 }
@@ -204,7 +204,7 @@ WRITE32_MEMBER( cxhumax_state::cx_romdescr_w )
 
 READ32_MEMBER( cxhumax_state::cx_isaromdescr_r )
 {
-	UINT32 data = m_isaromdescr_regs[offset];
+	uint32_t data = m_isaromdescr_regs[offset];
 	verboselog(*this, 9, "(ISAROMDESC%d) %08X -> %08X\n", offset+1, 0xE0010004 + (offset << 2), data);
 	return data;
 }
@@ -217,7 +217,7 @@ WRITE32_MEMBER( cxhumax_state::cx_isaromdescr_w )
 
 READ32_MEMBER( cxhumax_state::cx_isadescr_r )
 {
-	UINT32 data = m_isaromdescr_regs[offset];
+	uint32_t data = m_isaromdescr_regs[offset];
 	verboselog(*this, 9, "(ISA_DESC%d) %08X -> %08X\n", offset+4, 0xE0010010 + (offset << 2), data);
 	return data;
 }
@@ -230,7 +230,7 @@ WRITE32_MEMBER( cxhumax_state::cx_isadescr_w )
 
 READ32_MEMBER( cxhumax_state::cx_rommap_r )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 	verboselog(*this, 9, "(ROM%d_MAP) %08X -> %08X\n", offset, 0xE0010020 + (offset << 2), data);
 	return data;
 }
@@ -242,7 +242,7 @@ WRITE32_MEMBER( cxhumax_state::cx_rommap_w )
 
 READ32_MEMBER( cxhumax_state::cx_rommode_r )
 {
-	UINT32 data = m_rommode_reg;
+	uint32_t data = m_rommode_reg;
 	verboselog(*this, 9, "(ROMMODE) %08X -> %08X\n", 0xE0010034 + (offset << 2), data);
 	return data;
 }
@@ -255,7 +255,7 @@ WRITE32_MEMBER( cxhumax_state::cx_rommode_w )
 
 READ32_MEMBER( cxhumax_state::cx_xoemask_r )
 {
-	UINT32 data = m_xoemask_reg;
+	uint32_t data = m_xoemask_reg;
 	verboselog(*this, 9, "(XOEMASK) %08X -> %08X\n", 0xE0010034 + (offset << 2), data);
 	return data;
 }
@@ -268,7 +268,7 @@ WRITE32_MEMBER( cxhumax_state::cx_xoemask_w )
 
 READ32_MEMBER( cxhumax_state::cx_pci_r )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 	switch (offset) {
 		case PCI_CFG_ADDR_REG:
 			data = m_pci_regs[offset]; break;
@@ -292,7 +292,7 @@ WRITE32_MEMBER( cxhumax_state::cx_pci_w )
 
 READ32_MEMBER( cxhumax_state::cx_extdesc_r )
 {
-	UINT32 data = m_extdesc_regs[offset];
+	uint32_t data = m_extdesc_regs[offset];
 	verboselog(*this, 9, "(EXTDESC) %08X -> %08X\n", 0xE0010080 + (offset << 2), data);
 	return data;
 }
@@ -332,8 +332,8 @@ TIMER_CALLBACK_MEMBER(cxhumax_state::timer_tick)
 
 READ32_MEMBER( cxhumax_state::cx_timers_r )
 {
-	UINT32 data = 0;
-	UINT8 index = offset>>2;
+	uint32_t data = 0;
+	uint8_t index = offset>>2;
 	if(index==16) {
 		data = m_timer_regs.timer_irq;
 		//m_timer_regs.timer_irq=0;
@@ -357,7 +357,7 @@ READ32_MEMBER( cxhumax_state::cx_timers_r )
 
 WRITE32_MEMBER( cxhumax_state::cx_timers_w )
 {
-	UINT8 index = offset>>2;
+	uint8_t index = offset>>2;
 	if(index==16) {
 		verboselog(*this, 9, "(TIMERIRQ) %08X <- %08X\n", 0xE0430000 + (offset << 2), data);
 		COMBINE_DATA(&m_timer_regs.timer_irq);
@@ -389,7 +389,7 @@ WRITE32_MEMBER( cxhumax_state::cx_timers_w )
 
 READ32_MEMBER( cxhumax_state::cx_uart2_r )
 {
-	UINT32 data;
+	uint32_t data;
 	switch (offset) {
 		case UART_STAT_REG:
 			/* Transmitter Idle */
@@ -430,7 +430,7 @@ WRITE32_MEMBER( cxhumax_state::cx_uart2_w )
 
 READ32_MEMBER( cxhumax_state::cx_pll_r )
 {
-	UINT32 data = m_pll_regs[offset];
+	uint32_t data = m_pll_regs[offset];
 	verboselog(*this, 9, "(PLL) %08X -> %08X\n", 0xE0440000 + (offset << 2), data);
 	return data;
 }
@@ -443,7 +443,7 @@ WRITE32_MEMBER( cxhumax_state::cx_pll_w )
 
 READ32_MEMBER( cxhumax_state::cx_pllprescale_r )
 {
-	UINT32 data = m_pllprescale_reg;
+	uint32_t data = m_pllprescale_reg;
 	verboselog(*this, 9, "(PLLPRESCALE) %08X -> %08X\n", 0xE0440094 + (offset << 2), data);
 	return data;
 }
@@ -456,7 +456,7 @@ WRITE32_MEMBER( cxhumax_state::cx_pllprescale_w )
 
 READ32_MEMBER( cxhumax_state::cx_clkdiv_r )
 {
-	UINT32 data = m_clkdiv_regs[offset];
+	uint32_t data = m_clkdiv_regs[offset];
 	verboselog(*this, 9, "(CLKDIV) %08X -> %08X\n", 0xE0440020 + (offset << 2), data);
 	return data;
 }
@@ -469,7 +469,7 @@ WRITE32_MEMBER( cxhumax_state::cx_clkdiv_w )
 
 READ32_MEMBER( cxhumax_state::cx_chipcontrol_r )
 {
-	UINT32 data = m_chipcontrol_regs[offset];
+	uint32_t data = m_chipcontrol_regs[offset];
 	verboselog(*this, 9, "(CHIPCONTROL) %08X -> %08X\n", 0xE0440100 + (offset << 2), data);
 	return data;
 }
@@ -482,7 +482,7 @@ WRITE32_MEMBER( cxhumax_state::cx_chipcontrol_w )
 
 READ32_MEMBER( cxhumax_state::cx_intctrl_r )
 {
-	UINT32 data = m_intctrl_regs[offset];
+	uint32_t data = m_intctrl_regs[offset];
 	verboselog(*this, 9, "(INTCTRL) %08X -> %08X\n", 0xE0450000 + (offset << 2), data);
 	return data;
 }
@@ -557,7 +557,7 @@ WRITE32_MEMBER( cxhumax_state::cx_intctrl_w )
 
 READ32_MEMBER( cxhumax_state::cx_ss_r )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 	switch(offset) {
 		case SS_FIFC_REG:
 			data = m_ss_regs[offset] & 0xFFF0;
@@ -577,7 +577,7 @@ WRITE32_MEMBER( cxhumax_state::cx_ss_w )
 		case SS_CNTL_REG:
 			if (data&1) {
 				// "Send" pending data
-				UINT8 tfd = (m_ss_regs[SS_STAT_REG]>>4) & 0xF;
+				uint8_t tfd = (m_ss_regs[SS_STAT_REG]>>4) & 0xF;
 				if ((tfd>1) && (m_ss_tx_fifo[0] == 0) && (m_ss_tx_fifo[1] != 0xFF)) {
 					// ASCII
 					printf("%s\n", &m_ss_tx_fifo[1]);
@@ -597,7 +597,7 @@ WRITE32_MEMBER( cxhumax_state::cx_ss_w )
 		case SS_FIFO_REG:
 			{
 				// Push data into TX FIFO (if it's not full) and adjust transmit FIFO depth
-				UINT8 tfd = (m_ss_regs[SS_STAT_REG]>>4) & 0xF;
+				uint8_t tfd = (m_ss_regs[SS_STAT_REG]>>4) & 0xF;
 				if (tfd<8) {
 					m_ss_tx_fifo[tfd++] = data;
 					m_ss_regs[SS_STAT_REG] = (m_ss_regs[SS_STAT_REG] & 0xFF0F) | (tfd<<4);
@@ -615,7 +615,7 @@ WRITE32_MEMBER( cxhumax_state::cx_ss_w )
 
 READ32_MEMBER( cxhumax_state::cx_i2c0_r )
 {
-	UINT32 data = m_i2c0_regs[offset];
+	uint32_t data = m_i2c0_regs[offset];
 	verboselog(*this, 9, "(I2C0) %08X -> %08X\n", 0xE04E0000 + (offset << 2), data);
 	return data;
 }
@@ -626,9 +626,9 @@ WRITE32_MEMBER( cxhumax_state::cx_i2c0_w )
 	COMBINE_DATA(&m_i2c0_regs[offset]);
 }
 
-UINT8 cxhumax_state::i2cmem_read_byte(int last)
+uint8_t cxhumax_state::i2cmem_read_byte(int last)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	int i;
 	m_i2cmem->write_sda(1);
 	for (i = 0; i < 8; i++)
@@ -643,7 +643,7 @@ UINT8 cxhumax_state::i2cmem_read_byte(int last)
 	return data;
 }
 
-void cxhumax_state::i2cmem_write_byte(UINT8 data)
+void cxhumax_state::i2cmem_write_byte(uint8_t data)
 {
 	int i;
 	for (i = 0; i < 8; i++)
@@ -676,7 +676,7 @@ void cxhumax_state::i2cmem_stop()
 
 READ32_MEMBER( cxhumax_state::cx_i2c1_r )
 {
-	UINT32 data=0;
+	uint32_t data=0;
 	switch(offset) {
 		case I2C_STAT_REG:
 			data |= m_i2cmem->read_sda()<<3;
@@ -749,7 +749,7 @@ WRITE32_MEMBER( cxhumax_state::cx_i2c1_w )
 
 READ32_MEMBER( cxhumax_state::cx_i2c2_r )
 {
-	UINT32 data = m_i2c2_regs[offset];
+	uint32_t data = m_i2c2_regs[offset];
 	verboselog(*this, 9, "(I2C2) %08X -> %08X\n", 0xE04E2000 + (offset << 2), data);
 	return data;
 }
@@ -762,7 +762,7 @@ WRITE32_MEMBER( cxhumax_state::cx_i2c2_w )
 
 READ32_MEMBER( cxhumax_state::cx_mc_cfg_r )
 {
-	UINT32 data = m_mccfg_regs[offset];
+	uint32_t data = m_mccfg_regs[offset];
 	verboselog(*this, 9, "(MC_CFG) %08X -> %08X\n", 0xE0500300 + (offset << 2), data);
 	return data;
 }
@@ -775,7 +775,7 @@ WRITE32_MEMBER( cxhumax_state::cx_mc_cfg_w )
 
 READ32_MEMBER( cxhumax_state::cx_drm0_r )
 {
-	UINT32 data = m_drm0_regs[offset];
+	uint32_t data = m_drm0_regs[offset];
 	verboselog(*this, 9, "(DRM0) %08X -> %08X\n", 0xE0560000 + (offset << 2), data);
 	switch(offset) {
 		case 0x14/4: // DRM_STATUS_REG
@@ -793,7 +793,7 @@ WRITE32_MEMBER( cxhumax_state::cx_drm0_w )
 
 READ32_MEMBER( cxhumax_state::cx_drm1_r )
 {
-	UINT32 data = m_drm1_regs[offset];
+	uint32_t data = m_drm1_regs[offset];
 	verboselog(*this, 9, "(DRM1) %08X -> %08X\n", 0xE0570000 + (offset << 2), data);
 	return data;
 }
@@ -806,7 +806,7 @@ WRITE32_MEMBER( cxhumax_state::cx_drm1_w )
 
 READ32_MEMBER( cxhumax_state::cx_hdmi_r )
 {
-	UINT32 data = m_hdmi_regs[offset];
+	uint32_t data = m_hdmi_regs[offset];
 	verboselog(*this, 9, "(HDMI) %08X -> %08X\n", 0xE05D0800 + (offset << 2), data);
 	return data;
 }
@@ -835,12 +835,12 @@ void cxhumax_state::video_start()
     The document also contains the constants below as floats.
 --------------------------------------------------------------------------*/
 
-static inline UINT8 clamp16_shift8(UINT32 x)
+static inline uint8_t clamp16_shift8(uint32_t x)
 {
-	return (((INT32) x < 0) ? 0 : (x > 65535 ? 255: x >> 8));
+	return (((int32_t) x < 0) ? 0 : (x > 65535 ? 255: x >> 8));
 }
 
-static inline UINT32 ycc_to_rgb(UINT32 ycc)
+static inline uint32_t ycc_to_rgb(uint32_t ycc)
 {
 	/* original equations:
 
@@ -877,10 +877,10 @@ static inline UINT32 ycc_to_rgb(UINT32 ycc)
 	    B = clip(( common + 516 * Cb            - 13696) >> 8)
 
 	*/
-	UINT8 y = ycc;
-	UINT8 cb = ycc >> 8;
-	UINT8 cr = ycc >> 16;
-	UINT32 r, g, b, common;
+	uint8_t y = ycc;
+	uint8_t cb = ycc >> 8;
+	uint8_t cr = ycc >> 16;
+	uint32_t r, g, b, common;
 
 	common = 298 * y - 56992;
 	r = (common +            409 * cr);
@@ -891,41 +891,41 @@ static inline UINT32 ycc_to_rgb(UINT32 ycc)
 	return rgb_t(clamp16_shift8(r), clamp16_shift8(g), clamp16_shift8(b));
 }
 
-UINT32 cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
 
 
-	UINT32 osd_pointer = m_drm1_regs[DRM_OSD_PTR_REG];
+	uint32_t osd_pointer = m_drm1_regs[DRM_OSD_PTR_REG];
 
 	if(osd_pointer)
 	{
-		UINT32 *ram = m_ram;
-		UINT32 *osd_header = &ram[osd_pointer/4];
-		UINT8  *vbuf = (UINT8*)(&ram[osd_header[3]/4]);
-		UINT32 *palette = &ram[osd_header[7]/4];
+		uint32_t *ram = m_ram;
+		uint32_t *osd_header = &ram[osd_pointer/4];
+		uint8_t  *vbuf = (uint8_t*)(&ram[osd_header[3]/4]);
+		uint32_t *palette = &ram[osd_header[7]/4];
 
-		UINT32 x_disp_start_and_width = osd_header[1];
-		UINT32 xdisp_width = (x_disp_start_and_width >> 16) & 0x1fff;
-		UINT32 xdisp_start = x_disp_start_and_width & 0xfff;
+		uint32_t x_disp_start_and_width = osd_header[1];
+		uint32_t xdisp_width = (x_disp_start_and_width >> 16) & 0x1fff;
+		uint32_t xdisp_start = x_disp_start_and_width & 0xfff;
 
-		UINT32 image_height_and_width = osd_header[2];
-		UINT32 yimg_height = (image_height_and_width >> 16) & 0x7ff;
-		UINT32 ximg_width = image_height_and_width & 0x7ff;
+		uint32_t image_height_and_width = osd_header[2];
+		uint32_t yimg_height = (image_height_and_width >> 16) & 0x7ff;
+		uint32_t ximg_width = image_height_and_width & 0x7ff;
 
-		UINT32 y_position_and_region_alpha = osd_header[5];
-		UINT32 ydisp_last = (y_position_and_region_alpha >> 12) & 0x7ff;
-		UINT32 ydisp_start = y_position_and_region_alpha & 0x7ff;
+		uint32_t y_position_and_region_alpha = osd_header[5];
+		uint32_t ydisp_last = (y_position_and_region_alpha >> 12) & 0x7ff;
+		uint32_t ydisp_start = y_position_and_region_alpha & 0x7ff;
 
-	/*  UINT32 first_x = m_drm0_regs[DRM_ACTIVE_X_REG] & 0xffff;
-	    UINT32 last_x = (m_drm0_regs[DRM_ACTIVE_X_REG] >> 16) & 0xffff;
+	/*  uint32_t first_x = m_drm0_regs[DRM_ACTIVE_X_REG] & 0xffff;
+	    uint32_t last_x = (m_drm0_regs[DRM_ACTIVE_X_REG] >> 16) & 0xffff;
 
-	    UINT32 first_y = m_drm0_regs[DRM_ACTIVE_Y_REG] & 0xfff;
-	    UINT32 last_y = (m_drm0_regs[DRM_ACTIVE_Y_REG] >> 16) & 0xfff;*/
+	    uint32_t first_y = m_drm0_regs[DRM_ACTIVE_Y_REG] & 0xfff;
+	    uint32_t last_y = (m_drm0_regs[DRM_ACTIVE_Y_REG] >> 16) & 0xfff;*/
 
 		for (j=ydisp_start; j <= ydisp_last; j++)
 		{
-			UINT32 *bmp = &bitmap.pix32(j);
+			uint32_t *bmp = &bitmap.pix32(j);
 
 			for (i=xdisp_start; i <= (xdisp_start + xdisp_width); i++)
 			{
@@ -993,7 +993,7 @@ void cxhumax_state::machine_reset()
 	m_i2c0_regs[0x08/4] = 0x08; // SDA high
 	m_i2c2_regs[0x08/4] = 0x08; // SDA high
 
-	UINT8* FLASH = memregion("flash")->base();
+	uint8_t* FLASH = memregion("flash")->base();
 	memcpy(m_ram,FLASH,0x400000);
 
 	m_chipcontrol_regs[PIN_CONFIG_0_REG] =

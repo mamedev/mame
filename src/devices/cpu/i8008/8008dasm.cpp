@@ -18,9 +18,9 @@ static const char flag_names[] = { 'c', 'z', 's', 'p' };
 
 CPU_DISASSEMBLE( i8008 )
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	unsigned PC = pc;
-	UINT8 op = OP(pc++);
+	uint8_t op = OP(pc++);
 	switch (op >> 6)
 	{
 		case 0x03:  // starting with 11

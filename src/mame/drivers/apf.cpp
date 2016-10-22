@@ -118,10 +118,10 @@ public:
 	DECLARE_WRITE8_MEMBER(serial_w);
 
 private:
-	UINT8 m_latch;
-	UINT8 m_keyboard_data;
-	UINT8 m_pad_data;
-	UINT8 m_portb;
+	uint8_t m_latch;
+	uint8_t m_keyboard_data;
+	uint8_t m_pad_data;
+	uint8_t m_portb;
 	bool m_ca2;
 	bool m_has_cart_ram;
 	virtual void machine_start() override;
@@ -139,7 +139,7 @@ private:
 	optional_device<floppy_connector> m_floppy1;
 	required_ioport_array<4> m_joy;
 	optional_ioport_array<8> m_key;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 };
 
 
@@ -156,17 +156,17 @@ READ8_MEMBER( apf_state::videoram_r )
 		if (BIT(m_pad_data, 6) && m_has_cart_ram)
 			offset -= 0x120;
 
-		UINT16 part1 = offset & 0x1f;
-		UINT16 part2 = (offset & 0x1e0) >> 5;
-		UINT16 part3 = (offset & 0x1e00) >> 4;
+		uint16_t part1 = offset & 0x1f;
+		uint16_t part2 = (offset & 0x1e0) >> 5;
+		uint16_t part3 = (offset & 0x1e00) >> 4;
 		if (m_ca2) m_latch = m_p_videoram[part3 | part1]; // get chr
 		m_crtc->css_w(BIT(m_latch, 6));
-		UINT16 latch = (m_latch & 0x1f) << 4;
+		uint16_t latch = (m_latch & 0x1f) << 4;
 		return m_p_videoram[latch | part2 | 0x200]; // get gfx
 	}
 	else
 	{
-		UINT8 data = m_p_videoram[(offset & 0x1ff) | 0x200];
+		uint8_t data = m_p_videoram[(offset & 0x1ff) | 0x200];
 		if (m_ca2) m_crtc->css_w(BIT(data, 6));
 		m_crtc->inv_w(BIT(data, 6));
 		m_crtc->as_w(BIT(data, 7));
@@ -176,7 +176,7 @@ READ8_MEMBER( apf_state::videoram_r )
 
 READ8_MEMBER( apf_state::pia0_porta_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 3; i >= 0; i--)
 		if (!BIT(m_pad_data, i))
@@ -207,7 +207,7 @@ READ8_MEMBER( apf_state::pia1_porta_r )
 
 READ8_MEMBER( apf_state::pia1_portb_r )
 {
-	UINT8 data = m_portb;
+	uint8_t data = m_portb;
 
 	if (m_cass->input() > 0.0038)
 		data |= 0x80;
@@ -277,7 +277,7 @@ void apf_state::machine_reset()
 WRITE8_MEMBER( apf_state::apf_dischw_w)
 {
 	/* bit 3 is index of drive to select */
-	UINT8 drive = BIT(data, 3);
+	uint8_t drive = BIT(data, 3);
 
 	floppy_image_device *floppy = nullptr;
 	if (drive)

@@ -66,9 +66,9 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_paletteram;
-	required_shared_ptr<UINT8> m_paletteram2;
-	required_shared_ptr<UINT8> m_fgram;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_paletteram2;
+	required_shared_ptr<uint8_t> m_fgram;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
@@ -90,7 +90,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_color(int offset);
 };
 
@@ -117,7 +117,7 @@ void onetwo_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(onetwo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-UINT32 onetwo_state::screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t onetwo_state::screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -347,7 +347,7 @@ GFXDECODE_END
 
 void onetwo_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 

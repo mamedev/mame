@@ -34,15 +34,15 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_fgvideoram;
-	required_shared_ptr<UINT8> m_bgvideoram;
-	required_shared_ptr<UINT8> m_txvideoram;
-	required_shared_ptr<UINT8> m_scroll1x;
-	required_shared_ptr<UINT8> m_scroll2x;
-	required_shared_ptr<UINT8> m_scroll1y;
-	required_shared_ptr<UINT8> m_scroll2y;
-	required_shared_ptr<UINT8> m_scroll_x_lo;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_txvideoram;
+	required_shared_ptr<uint8_t> m_scroll1x;
+	required_shared_ptr<uint8_t> m_scroll2x;
+	required_shared_ptr<uint8_t> m_scroll1y;
+	required_shared_ptr<uint8_t> m_scroll2y;
+	required_shared_ptr<uint8_t> m_scroll_x_lo;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
@@ -69,6 +69,6 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 };

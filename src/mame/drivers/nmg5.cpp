@@ -248,21 +248,21 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_scroll_ram;
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_fg_videoram;
-	required_shared_ptr<UINT16> m_bitmap;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_scroll_ram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_bitmap;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 
 	/* misc */
-	UINT8 m_prot_val;
-	UINT8 m_input_data;
-	UINT8 m_priority_reg;
-	UINT8 m_gfx_bank;
+	uint8_t m_prot_val;
+	uint8_t m_input_data;
+	uint8_t m_priority_reg;
+	uint8_t m_gfx_bank;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -289,7 +289,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap( bitmap_ind16 &bitmap );
 };
 
@@ -843,7 +843,7 @@ void nmg5_state::draw_bitmap( bitmap_ind16 &bitmap )
 {
 	int yyy = 256;
 	int xxx = 512 / 4;
-	UINT16 x, y, count;
+	uint16_t x, y, count;
 	int xoff = -12;
 	int yoff = -9;
 	int pix;
@@ -868,7 +868,7 @@ void nmg5_state::draw_bitmap( bitmap_ind16 &bitmap )
 }
 
 
-UINT32 nmg5_state::screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmg5_state::screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrolly(0, m_scroll_ram[3] + 9);
 	m_bg_tilemap->set_scrollx(0, m_scroll_ram[2] + 3);

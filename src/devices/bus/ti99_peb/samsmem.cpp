@@ -27,7 +27,7 @@
 
 #define SAMS_CRU_BASE 0x1e00
 
-sams_memory_expansion_device::sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sams_memory_expansion_device::sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : ti_expansion_card_device(mconfig, TI99_SAMSMEM, "SuperAMS memory expansion card", tag, owner, clock, "ti99_sams", __FILE__),
 	m_ram(*this, RAM_TAG),
 	m_map_mode(false), m_access_mapper(false)

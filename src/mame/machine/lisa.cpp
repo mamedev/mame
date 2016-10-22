@@ -200,7 +200,7 @@ void lisa_state::COPS_send_data_if_possible()
 	{
 //        printf("COPsim: sending %02x to VIA\n", m_fifo_data[m_fifo_head]);
 
-		UINT8 data = m_fifo_data[m_fifo_head];/* output data */
+		uint8_t data = m_fifo_data[m_fifo_head];/* output data */
 		m_via0->write_pa0((data>>0)&1);
 		m_via0->write_pa1((data>>1)&1);
 		m_via0->write_pa2((data>>2)&1);
@@ -220,7 +220,7 @@ void lisa_state::COPS_send_data_if_possible()
 }
 
 /* send data (queue it into the FIFO if needed) */
-void lisa_state::COPS_queue_data(const UINT8 *data, int len)
+void lisa_state::COPS_queue_data(const uint8_t *data, int len)
 {
 #if 0
 	if (m_fifo_size + len <= 8)
@@ -263,8 +263,8 @@ void lisa_state::COPS_queue_data(const UINT8 *data, int len)
 void lisa_state::scan_keyboard()
 {
 	int i, j;
-	UINT8 keycode;
-	UINT32 keybuf[8] = { m_io_line0->read(), m_io_line1->read(), m_io_line2->read(), m_io_line3->read(),
+	uint8_t keycode;
+	uint32_t keybuf[8] = { m_io_line0->read(), m_io_line1->read(), m_io_line2->read(), m_io_line3->read(),
 						m_io_line4->read(), m_io_line5->read(), m_io_line6->read(), m_io_line7->read() };
 
 	if (! m_COPS_force_unplug)
@@ -540,7 +540,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 			{
 				/* format and send reply */
 
-				UINT8 reply[7];
+				uint8_t reply[7];
 
 				reply[0] = 0x80;
 				reply[1] = 0xE0 | m_clock_regs.years;
@@ -584,7 +584,7 @@ void lisa_state::reset_COPS()
 
 void lisa_state::unplug_keyboard()
 {
-	static const UINT8 cmd[2] =
+	static const uint8_t cmd[2] =
 	{
 		0x80,   /* RESET code */
 		0xFD    /* keyboard unplugged */
@@ -611,7 +611,7 @@ void lisa_state::plug_keyboard()
 	        unknown : spanish, US dvorak, italian & swedish
 	*/
 
-	static const UINT8 cmd[2] =
+	static const uint8_t cmd[2] =
 	{
 		0x80,   /* RESET code */
 		0x3f    /* keyboard ID - US for now */
@@ -742,15 +742,15 @@ void lisa_state::video_start()
 /*
     Video update
 */
-UINT32 lisa_state::screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lisa_state::screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *v;
+	uint16_t *v;
 	int x, y;
 	/* resolution is 720*364 on lisa, vs 608*431 on mac XL */
 	int resx = (m_features.has_mac_xl_video) ? 608 : 720;   /* width */
 	int resy = (m_features.has_mac_xl_video) ? 431 : 364;   /* height */
 
-	UINT8 line_buffer[720];
+	uint8_t line_buffer[720];
 
 	v = m_videoram_ptr;
 
@@ -871,7 +871,7 @@ void lisa_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 		m_clock_regs.clock_write_ptr = -1;
 	}
 #if 0
-	UINT32 temp32;
+	uint32_t temp32;
 	SINT8 temp8;
 	temp32 = (m_clock_regs.alarm << 12) | (m_clock_regs.years << 8) | (m_clock_regs.days1 << 4)
 	| m_clock_regs.days2;
@@ -909,7 +909,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa2)
 	m_features.has_double_sided_floppy = 0;
 	m_features.has_mac_xl_video = 0;
 
-	m_bad_parity_table = std::make_unique<UINT8[]>(0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = std::make_unique<uint8_t[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 DRIVER_INIT_MEMBER(lisa_state,lisa210)
@@ -922,7 +922,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa210)
 	m_features.has_double_sided_floppy = 0;
 	m_features.has_mac_xl_video = 0;
 
-	m_bad_parity_table = std::make_unique<UINT8[]>(0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = std::make_unique<uint8_t[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 DRIVER_INIT_MEMBER(lisa_state,mac_xl)
@@ -935,7 +935,7 @@ DRIVER_INIT_MEMBER(lisa_state,mac_xl)
 	m_features.has_double_sided_floppy = 0;
 	m_features.has_mac_xl_video = 1;
 
-	m_bad_parity_table = std::make_unique<UINT8[]>(0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = std::make_unique<uint8_t[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 void lisa_state::machine_start()
@@ -975,7 +975,7 @@ void lisa_state::machine_reset()
 	set_VTIR(0);
 
 	m_video_address_latch = 0;
-	m_videoram_ptr = (UINT16 *) m_ram_ptr;
+	m_videoram_ptr = (uint16_t *) m_ram_ptr;
 
 	m_FDIR = 0;
 	m_via0->write_pb4(m_FDIR);
@@ -1025,7 +1025,7 @@ INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
 					if (m_clock_regs.alarm == 0)
 					{
 						/* generate reset (should cause a VIA interrupt...) */
-						static const UINT8 cmd[2] =
+						static const uint8_t cmd[2] =
 						{
 							0x80,   /* RESET code */
 							0xFC    /* timer time-out */
@@ -1257,7 +1257,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 			}
 			else
 			{   /* system ROMs */
-				answer = ((UINT16*)m_rom_ptr)[(offset & 0x001fff)];
+				answer = ((uint16_t*)m_rom_ptr)[(offset & 0x001fff)];
 				/*logerror("dst address in ROM (setup mode)\n");*/
 			}
 
@@ -1288,7 +1288,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 				/* out of segment limits : bus error */
 
 			}
-			answer = *(UINT16 *)(m_ram_ptr + address);
+			answer = *(uint16_t *)(m_ram_ptr + address);
 
 			if (m_bad_parity_count && m_test_parity
 					&& (m_bad_parity_table[address >> 3] & (0x3 << (address & 0x7))))
@@ -1306,7 +1306,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 				/* out of segment limits : bus error */
 
 			}
-			answer = *(UINT16 *)(m_ram_ptr + address);
+			answer = *(uint16_t *)(m_ram_ptr + address);
 
 			if (m_bad_parity_count && m_test_parity
 					&& (m_bad_parity_table[address >> 3] & (0x3 << (address & 0x7))))
@@ -1331,7 +1331,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 
 		case special_IO:
 			if (! (address & 0x008000))
-				answer = *(UINT16 *)(m_rom_ptr + (address & 0x003fff));
+				answer = *(uint16_t *)(m_rom_ptr + (address & 0x003fff));
 			else
 			{   /* read serial number from ROM */
 				/* this has to be be the least efficient way to read a ROM :-) */
@@ -1490,7 +1490,7 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 				/* out of segment limits : bus error */
 
 			}
-			COMBINE_DATA((UINT16 *) (m_ram_ptr + address));
+			COMBINE_DATA((uint16_t *) (m_ram_ptr + address));
 			if (m_diag2)
 			{
 				if ((ACCESSING_BITS_0_7)
@@ -1529,7 +1529,7 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 				/* out of segment limits : bus error */
 
 			}
-			COMBINE_DATA((UINT16 *) (m_ram_ptr + address));
+			COMBINE_DATA((uint16_t *) (m_ram_ptr + address));
 			if (m_diag2)
 			{
 				if ((ACCESSING_BITS_0_7)
@@ -1857,7 +1857,7 @@ WRITE16_MEMBER(lisa_state::lisa_IO_w)
 		case 0x1:   /* Video Address Latch */
 			/*logerror("video address latch write offs=%X, data=%X\n", offset, data);*/
 			COMBINE_DATA(& m_video_address_latch);
-			m_videoram_ptr = ((UINT16 *)m_ram_ptr) + ((m_video_address_latch << 6) & 0xfc000);
+			m_videoram_ptr = ((uint16_t *)m_ram_ptr) + ((m_video_address_latch << 6) & 0xfc000);
 			/*logerror("video address latch %X -> base address %X\n", m_video_address_latch,
 			                (m_video_address_latch << 7) & 0x1f8000);*/
 			break;

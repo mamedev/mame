@@ -41,13 +41,15 @@ ToDO:
 
 *****************************************************************************************/
 
-#include "machine/genpin.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/genpin.h"
 #include "sound/ay8910.h"
-#include "sound/votrax.h"
 #include "sound/dac.h"
+#include "sound/votrax.h"
+#include "sound/volt_reg.h"
 #include "taito.lh"
 
 class taito_state : public genpin_class
@@ -71,16 +73,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(votrax_request);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 private:
-	UINT8 m_out_offs;
-	UINT8 m_sndcmd;
-	UINT8 m_votrax_cmd;
-	UINT8 m_io[16];
+	uint8_t m_out_offs;
+	uint8_t m_sndcmd;
+	uint8_t m_votrax_cmd;
+	uint8_t m_io[16];
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
 	required_device<pia6821_device> m_pia;
 	optional_device<votrax_sc01_device> m_votrax;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 };
 
 
@@ -270,7 +272,7 @@ WRITE8_MEMBER( taito_state::io_w )
 
 	if (offset == 2)
 	{
-		UINT8 cmd = (m_io[2]>>4) | (m_io[3] & 0xf0);
+		uint8_t cmd = (m_io[2]>>4) | (m_io[3] & 0xf0);
 		if (cmd != m_sndcmd)
 		{
 			m_sndcmd = cmd;
@@ -310,10 +312,10 @@ DRIVER_INIT_MEMBER( taito_state, taito )
 
 TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // don't know, 7446 assumed
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // don't know, 7446 assumed
 	m_out_offs &= 15;
 
-	UINT8 digit = m_out_offs << 1;
+	uint8_t digit = m_out_offs << 1;
 	output().set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
 	output().set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
 }
@@ -332,13 +334,14 @@ static MACHINE_CONFIG_START( taito, taito_state )
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
-	MCFG_SPEAKER_STANDARD_MONO("dacsnd")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "dacsnd", 0.95)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.475) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	//MCFG_PIA_READPA_HANDLER(READ8(taito_state, pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_READPB_HANDLER(READ8(taito_state, pia_pb_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(taito_state, pia_pb_w))
 	//MCFG_PIA_CA2_HANDLER(WRITELINE(taito_state, pia_ca2_w))
@@ -368,16 +371,8 @@ static MACHINE_CONFIG_DERIVED( taito4, taito )
 	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(taito_state, votrax_request))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "voxsnd", 0.15) // todo: fix - it makes noise continuously
 
-	MCFG_DEVICE_REMOVE("pia")
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(taito_state, pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
-	MCFG_PIA_READPB_HANDLER(READ8(taito_state, pia_pb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(taito_state, pia_pb_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(taito_state, pia_ca2_w))
+	MCFG_DEVICE_MODIFY("pia")
 	MCFG_PIA_CB2_HANDLER(WRITELINE(taito_state, pia_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( taito_ay_audio )

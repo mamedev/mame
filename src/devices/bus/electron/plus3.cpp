@@ -96,7 +96,7 @@ const tiny_rom_entry *electron_plus3_device::device_rom_region() const
 //  electron_plus3_device - constructor
 //-------------------------------------------------
 
-electron_plus3_device::electron_plus3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+electron_plus3_device::electron_plus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ELECTRON_PLUS3, "Acorn Plus 3 Disc Expansion", tag, owner, clock, "electron_plus3", __FILE__),
 		device_electron_expansion_interface(mconfig, *this),
 		m_exp_rom(*this, "exp_rom"),

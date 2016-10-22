@@ -1044,7 +1044,7 @@ DRIVER_INIT_MEMBER(splash_state,splash10)
 
 DRIVER_INIT_MEMBER(splash_state,roldfrog)
 {
-	UINT8 * ROM = (UINT8 *)memregion("audiocpu")->base();
+	uint8_t * ROM = (uint8_t *)memregion("audiocpu")->base();
 	membank("sound_bank")->configure_entries(0, 16, &ROM[0x10000], 0x8000);
 
 	m_bitmap_type = 1;
@@ -1053,7 +1053,7 @@ DRIVER_INIT_MEMBER(splash_state,roldfrog)
 
 DRIVER_INIT_MEMBER(splash_state,rebus)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	m_bitmap_type = 1;
 	m_sprite_attr2_shift = 0;
@@ -1397,7 +1397,7 @@ DRIVER_INIT_MEMBER(splash_state,funystrp)
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 0;
 
-	UINT16 *ROM = (UINT16 *)memregion("audiocpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("audiocpu")->base();
 
 	membank("sound_bank")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 

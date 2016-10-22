@@ -52,15 +52,15 @@ static int proximity_out_type  = INVALID_EVENT_TYPE;
 // state information for a lightgun
 struct lightgun_state
 {
-	INT32 lX, lY;
-	INT32 buttons[MAX_BUTTONS];
+	int32_t lX, lY;
+	int32_t buttons[MAX_BUTTONS];
 };
 
 struct x11_api_state
 {
 	XID deviceid; // X11 device id
-	INT32 maxx, maxy;
-	INT32 minx, miny;
+	int32_t maxx, maxy;
+	int32_t minx, miny;
 };
 
 //============================================================

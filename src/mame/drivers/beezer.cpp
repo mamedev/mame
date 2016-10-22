@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "machine/6522via.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/dac.h"
 #include "includes/beezer.h"
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, beezer_state )
@@ -108,12 +107,10 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	//MCFG_DAC_ADD("dac")
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_ADD("custom", BEEZER, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)

@@ -54,15 +54,15 @@ class wd33c93_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<wd33c93_device &>(device).m_irq_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void dma_read_data( int bytes, UINT8 *pData );
-	void dma_write_data(int bytes, UINT8 *pData);
+	void dma_read_data( int bytes, uint8_t *pData );
+	void dma_write_data(int bytes, uint8_t *pData);
 	void clear_dma();
 	int get_dma_count();
 
@@ -72,11 +72,11 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	UINT8 getunit( void );
+	uint8_t getunit( void );
 	void set_xfer_count( int count );
 	int get_xfer_count( void );
 	void complete_immediate( int status );
-	void complete_cmd( UINT8 status );
+	void complete_cmd( uint8_t status );
 	void unimplemented_cmd();
 	void invalid_cmd();
 	void reset_cmd();
@@ -88,14 +88,14 @@ private:
 	void xferinfo_cmd();
 	void dispatch_command();
 
-	UINT8       sasr;
-	UINT8       regs[WD_AUXILIARY_STATUS+1];
-	UINT8       fifo[FIFO_SIZE];
+	uint8_t       sasr;
+	uint8_t       regs[WD_AUXILIARY_STATUS+1];
+	uint8_t       fifo[FIFO_SIZE];
 	int         fifo_pos;
-	UINT8       temp_input[TEMP_INPUT_LEN];
+	uint8_t       temp_input[TEMP_INPUT_LEN];
 	int         temp_input_pos;
-	UINT8       busphase;
-	UINT8       identify;
+	uint8_t       busphase;
+	uint8_t       identify;
 	int         read_pending;
 	emu_timer   *cmd_timer;
 	emu_timer   *service_req_timer;

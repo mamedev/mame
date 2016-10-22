@@ -26,16 +26,16 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);
 
-	UINT8 *get_cart_base() { return m_rom; }
-	void write_prg_bank(UINT8 bank) { m_bank = bank; }
+	uint8_t *get_cart_base() { return m_rom; }
+	void write_prg_bank(uint8_t bank) { m_bank = bank; }
 
 	optional_device<i2cmem_device> m_i2cmem;
 
 protected:
 	// internal state
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 	// ROM is accessed via two 16K banks, but only the first one can be switched
-	UINT8 m_bank;
+	uint8_t m_bank;
 };
 
 // ======================> nes_datach_slot_device
@@ -46,7 +46,7 @@ class nes_datach_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_datach_slot_device();
 
 	// device-level overrides
@@ -70,7 +70,7 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	virtual DECLARE_READ8_MEMBER(read);
-	void write_prg_bank(UINT8 bank) { if (m_cart) m_cart->write_prg_bank(bank); }
+	void write_prg_bank(uint8_t bank) { if (m_cart) m_cart->write_prg_bank(bank); }
 
 	datach_cart_interface*      m_cart;
 };
@@ -97,12 +97,12 @@ class nes_datach_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_datach_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	nes_datach_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual UINT8* get_cart_base();
+	virtual uint8_t* get_cart_base();
 
 protected:
 	// device-level overrides
@@ -116,7 +116,7 @@ class nes_datach_24c01_device : public nes_datach_rom_device
 {
 public:
 	// construction/destruction
-	nes_datach_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_datach_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -139,7 +139,7 @@ class nes_datach_device : public nes_lz93d50_device
 {
 public:
 	// construction/destruction
-	nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -152,12 +152,12 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	UINT8 m_datach_latch;
+	uint8_t m_datach_latch;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<barcode_reader_device> m_reader;
 	required_device<nes_datach_slot_device> m_subslot;
-	UINT8 m_i2c_dir;
-	UINT8 m_i2c_in_use;
+	uint8_t m_i2c_dir;
+	uint8_t m_i2c_in_use;
 
 	static const device_timer_id TIMER_SERIAL = 1;
 	emu_timer *serial_timer;

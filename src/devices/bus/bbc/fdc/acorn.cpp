@@ -155,7 +155,7 @@ const tiny_rom_entry *bbc_acorn1770_device::device_rom_region() const
 //  bbc_acornfdc_device - constructor
 //-------------------------------------------------
 
-bbc_acorn8271_device::bbc_acorn8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bbc_acorn8271_device::bbc_acorn8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BBC_ACORN8271, "Acorn 8271 FDC", tag, owner, clock, "bbc_acorn8271", __FILE__),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_dfs_rom(*this, "dfs_rom"),
@@ -165,7 +165,7 @@ bbc_acorn8271_device::bbc_acorn8271_device(const machine_config &mconfig, const 
 {
 }
 
-bbc_acorn1770_device::bbc_acorn1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bbc_acorn1770_device::bbc_acorn1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BBC_ACORN1770, "Acorn 1770 FDC", tag, owner, clock, "bbc_acorn1770", __FILE__),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_dfs_rom(*this, "dfs_rom"),

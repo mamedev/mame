@@ -12,7 +12,7 @@
                  CE*| 5          36| S1
                INT6*| 6          35| S2
                INT5*| 7          34| INT7*  / P15
-               INT4*| 8          33| INT8*  / P14
+               INT4*| 8          33| int8_t*  / P14
                INT3*| 9          32| INT9*  / P13
                 Phi*|10          31| INT10* / P12
              INTREQ*|11          30| INT11* / P11
@@ -134,7 +134,7 @@ TODO: Tests on a real machine
 /*
     Constructor
 */
-tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, TMS9901, "TMS9901 Programmable System Interface", tag, owner, clock, "tms9901", __FILE__),
 	m_read_block(*this),
 	m_write_p0(*this),
@@ -320,7 +320,7 @@ READ8_MEMBER( tms9901_device::read )
 			answer &= ~(m_pio_direction_mirror >> 8);
 			answer |= (m_pio_output_mirror & m_pio_direction_mirror) >> 8;
 		}
-		if (TRACE_PINS) logerror("%s: input on lines INT15..INT8 = %02x\n", tag(), answer);
+		if (TRACE_PINS) logerror("%s: input on lines INT15..int8_t = %02x\n", tag(), answer);
 		break;
 	case 2:
 		/* exit timer mode */

@@ -14,17 +14,17 @@
 
 const device_type M65C02 = &device_creator<m65c02_device>;
 
-m65c02_device::m65c02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m65c02_device::m65c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M65C02, "M65C02", tag, owner, clock, "mc65c02", __FILE__)
 {
 }
 
-m65c02_device::m65c02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+m65c02_device::m65c02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	m6502_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-offs_t m65c02_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m65c02_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
 }

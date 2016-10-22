@@ -8,7 +8,7 @@
 const device_type PCD_VIDEO = &device_creator<pcd_video_device>;
 const device_type PCX_VIDEO = &device_creator<pcx_video_device>;
 
-pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_gfx_interface(mconfig, *this, nullptr, "palette"),
 	m_maincpu(*this, ":maincpu"),
@@ -18,7 +18,7 @@ pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type 
 {
 }
 
-pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pcdx_video_device(mconfig, PCD_VIDEO, "Siemens PC-D Video", tag, owner, clock, "pcd_video", __FILE__),
 	m_mouse_btn(*this, "MOUSE"),
 	m_mouse_x(*this, "MOUSEX"),
@@ -28,7 +28,7 @@ pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *ta
 {
 }
 
-pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pcdx_video_device(mconfig, PCX_VIDEO, "Siemens PC-X Video", tag, owner, clock, "pcx_video", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_vram(4*1024),
@@ -180,7 +180,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 	address <<= 1;
 	if(lg)
 	{
-		UINT16 data = m_vram[address + 1] | (m_vram[address] << 8);
+		uint16_t data = m_vram[address + 1] | (m_vram[address] << 8);
 		if(m_p2 & 8)
 			data = ~data;
 		for(int i = 0; i < 16; i++)
@@ -188,7 +188,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 	}
 	else
 	{
-		UINT8 data, attr;
+		uint8_t data, attr;
 		int bgnd = 0, fgnd = 1;
 		data = m_charram[m_vram[address] * 16 + linecount];
 		attr = m_vram[address + 1];
@@ -213,7 +213,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 
 SCN2674_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 {
-	UINT8 data;
+	uint8_t data;
 	address <<= 1;
 	data = m_charrom[m_vram[address] * 16 + linecount + (m_vram[address + 1] & 0x20 ? 4096 : 0)];
 	if(cursor && blink)
@@ -297,7 +297,7 @@ READ8_MEMBER(pcd_video_device::t1_r)
 
 READ8_MEMBER(pcd_video_device::p1_r)
 {
-	UINT8 data = (m_mouse_btn->read() & 0x30) | 0x80; // char ram/rom jumper?
+	uint8_t data = (m_mouse_btn->read() & 0x30) | 0x80; // char ram/rom jumper?
 	data |= (m_mouse.xa != CLEAR_LINE ? 0 : 1);
 	data |= (m_mouse.xb != CLEAR_LINE ? 0 : 2);
 	data |= (m_mouse.ya != CLEAR_LINE ? 0 : 4);

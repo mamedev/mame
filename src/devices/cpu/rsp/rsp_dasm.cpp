@@ -57,10 +57,10 @@ static const char *const element2[16] =
 	"00000000", "11111111", "22222222", "33333333", "44444444", "55555555", "66666666", "77777777"
 };
 
-static inline char *signed_imm16(UINT32 op)
+static inline char *signed_imm16(uint32_t op)
 {
 	static char temp[10];
-	INT16 value = op & 0xffff;
+	int16_t value = op & 0xffff;
 
 	if (value < 0)
 	{
@@ -85,7 +85,7 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 	va_end(vl);
 }
 
-static void disasm_cop0(UINT32 op)
+static void disasm_cop0(uint32_t op)
 {
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -99,7 +99,7 @@ static void disasm_cop0(UINT32 op)
 	}
 }
 
-static void disasm_cop2(UINT32 op)
+static void disasm_cop2(uint32_t op)
 {
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -186,7 +186,7 @@ static void disasm_cop2(UINT32 op)
 	}
 }
 
-static void disasm_lwc2(UINT32 op)
+static void disasm_lwc2(uint32_t op)
 {
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
@@ -213,7 +213,7 @@ static void disasm_lwc2(UINT32 op)
 	}
 }
 
-static void disasm_swc2(UINT32 op)
+static void disasm_swc2(uint32_t op)
 {
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
@@ -240,13 +240,13 @@ static void disasm_swc2(UINT32 op)
 	}
 }
 
-offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op)
+offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op)
 {
 	int rs = (op >> 21) & 31;
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
 	int shift = (op >> 6) & 31;
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 
 	output = buffer;
 
@@ -308,10 +308,10 @@ offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op)
 		{
 			switch ((op >> 16) & 0x1f)
 			{
-				case 0x00:  print("bltz   %s, $%08X", reg[rs], pc + 4 + ((INT16)op << 2)); break;
-				case 0x01:  print("bgez   %s, $%08X", reg[rs], pc + 4 + ((INT16)op << 2)); break;
-				case 0x10:  print("bltzal %s, $%08X", reg[rs], pc + 4 + ((INT16)op << 2)); break;
-				case 0x11:  print("bgezal %s, $%08X", reg[rs], pc + 4 + ((INT16)op << 2)); break;
+				case 0x00:  print("bltz   %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
+				case 0x01:  print("bgez   %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
+				case 0x10:  print("bltzal %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
+				case 0x11:  print("bgezal %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
 
 				default:    print("???"); break;
 			}
@@ -320,18 +320,18 @@ offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op)
 
 		case 0x02:  print("j      $%08X", (op & 0x03ffffff) << 2); break;
 		case 0x03:  print("jal    $%08X", (op & 0x03ffffff) << 2); break;
-		case 0x04:  print("beq    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((INT16)(op) << 2)); break;
-		case 0x05:  print("bne    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((INT16)(op) << 2)); break;
-		case 0x06:  print("blez   %s, $%08X", reg[rs], pc + 4 + ((INT16)(op) << 2)); break;
-		case 0x07:  print("bgtz   %s, $%08X", reg[rs], pc + 4 + ((INT16)(op) << 2)); break;
+		case 0x04:  print("beq    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((int16_t)(op) << 2)); break;
+		case 0x05:  print("bne    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((int16_t)(op) << 2)); break;
+		case 0x06:  print("blez   %s, $%08X", reg[rs], pc + 4 + ((int16_t)(op) << 2)); break;
+		case 0x07:  print("bgtz   %s, $%08X", reg[rs], pc + 4 + ((int16_t)(op) << 2)); break;
 		case 0x08:  print("addi   %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
 		case 0x09:  print("addiu  %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
 		case 0x0a:  print("slti   %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
 		case 0x0b:  print("sltiu  %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
-		case 0x0c:  print("andi   %s, %s, $%04X", reg[rt], reg[rs], (UINT16)(op)); break;
-		case 0x0d:  print("ori    %s, %s, $%04X", reg[rt], reg[rs], (UINT16)(op)); break;
-		case 0x0e:  print("xori   %s, %s, $%04X", reg[rt], reg[rs], (UINT16)(op)); break;
-		case 0x0f:  print("lui    %s, %s, $%04X", reg[rt], reg[rs], (UINT16)(op)); break;
+		case 0x0c:  print("andi   %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
+		case 0x0d:  print("ori    %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
+		case 0x0e:  print("xori   %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
+		case 0x0f:  print("lui    %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
 
 		case 0x10:  disasm_cop0(op); break;
 		case 0x12:  disasm_cop2(op); break;
@@ -358,7 +358,7 @@ offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op)
 
 CPU_DISASSEMBLE( rsp )
 {
-	UINT32 op = *(UINT32 *)opram;
+	uint32_t op = *(uint32_t *)opram;
 	op = big_endianize_int32(op);
 	return rsp_dasm_one(buffer, pc, op);
 }

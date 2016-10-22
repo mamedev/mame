@@ -51,9 +51,9 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef device_delegate<void (UINT16 addr, int level)> f3853_interrupt_req_delegate;
+typedef device_delegate<void (uint16_t addr, int level)> f3853_interrupt_req_delegate;
 
-#define F3853_INTERRUPT_REQ_CB(_name) void _name(UINT16 addr, int level)
+#define F3853_INTERRUPT_REQ_CB(_name) void _name(uint16_t addr, int level)
 
 
 // ======================> f3853_device
@@ -62,7 +62,7 @@ class f3853_device :  public device_t
 {
 public:
 	// construction/destruction
-	f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_interrupt_req_callback(device_t &device, f3853_interrupt_req_delegate callback) { downcast<f3853_device &>(device).m_interrupt_req_cb = callback; }
 
@@ -82,22 +82,22 @@ protected:
 private:
 
 	void set_interrupt_request_line();
-	void timer_start(UINT8 value);
+	void timer_start(uint8_t value);
 
 	f3853_interrupt_req_delegate m_interrupt_req_cb;
-	UINT8 m_high;
-	UINT8 m_low; // Bit 7 is set to 0 for timer interrupts, 1 for external interrupts
-	INT32 m_external_enable;
-	INT32 m_timer_enable;
+	uint8_t m_high;
+	uint8_t m_low; // Bit 7 is set to 0 for timer interrupts, 1 for external interrupts
+	int32_t m_external_enable;
+	int32_t m_timer_enable;
 
-	INT32 m_request_flipflop;
+	int32_t m_request_flipflop;
 
-	INT32 m_priority_line;              /* inverted level*/
-	INT32 m_external_interrupt_line;    /* inverted level */
+	int32_t m_priority_line;              /* inverted level*/
+	int32_t m_external_interrupt_line;    /* inverted level */
 
 	emu_timer *m_timer;
 
-	UINT8 m_value_to_cycle[0x100];
+	uint8_t m_value_to_cycle[0x100];
 };
 
 

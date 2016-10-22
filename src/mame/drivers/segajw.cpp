@@ -71,12 +71,12 @@ protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT64      m_coin_start_cycles;
-	UINT64      m_hopper_start_cycles;
-	UINT8       m_coin_counter;
-	UINT8       m_coin_lockout;
-	UINT8       m_hopper_ctrl;
-	UINT8       m_lamps[2];
+	uint64_t      m_coin_start_cycles;
+	uint64_t      m_hopper_start_cycles;
+	uint8_t       m_coin_counter;
+	uint8_t       m_coin_lockout;
+	uint8_t       m_hopper_ctrl;
+	uint8_t       m_lamps[2];
 };
 
 
@@ -146,7 +146,7 @@ INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
 
 CUSTOM_INPUT_MEMBER( segajw_state::hopper_sensors_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// if the hopper is active simulate the coin-out sensor
 	if (m_hopper_start_cycles)
@@ -165,7 +165,7 @@ CUSTOM_INPUT_MEMBER( segajw_state::hopper_sensors_r )
 
 CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// simulates the passage of coins through multiple sensors
 	if (m_coin_start_cycles)

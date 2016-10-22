@@ -112,7 +112,7 @@ const device_type ATARI_CAGE = &device_creator<atari_cage_device>;
 //  atari_cage_device - constructor
 //-------------------------------------------------
 
-atari_cage_device::atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+atari_cage_device::atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ATARI_CAGE, "Atari CAGE", tag, owner, clock, "atari_cage", __FILE__),
 	m_cageram(*this, "cageram"),
 	m_soundlatch(*this, "soundlatch"),
@@ -120,7 +120,7 @@ atari_cage_device::atari_cage_device(const machine_config &mconfig, const char *
 {
 }
 
-atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_cageram(*this, "cageram"),
 	m_soundlatch(*this, "soundlatch"),
@@ -191,7 +191,7 @@ void atari_cage_device::reset_w(int state)
 
 TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::dma_timer_callback )
 {
-	UINT32 *tms32031_io_regs = m_tms32031_io_regs;
+	uint32_t *tms32031_io_regs = m_tms32031_io_regs;
 
 	/* if we weren't enabled, don't do anything, just shut ourself off */
 	if (!m_dma_enabled)
@@ -216,7 +216,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::dma_timer_callback )
 
 void atari_cage_device::update_dma_state(address_space &space)
 {
-	UINT32 *tms32031_io_regs = m_tms32031_io_regs;
+	uint32_t *tms32031_io_regs = m_tms32031_io_regs;
 
 	/* determine the new enabled state */
 	int enabled = ((tms32031_io_regs[DMA_GLOBAL_CTL] & 3) == 3) && (tms32031_io_regs[DMA_TRANSFER_COUNT] != 0);
@@ -224,8 +224,8 @@ void atari_cage_device::update_dma_state(address_space &space)
 	/* see if we turned on */
 	if (enabled && !m_dma_enabled)
 	{
-		INT16 sound_data[STACK_SOUND_BUFSIZE];
-		UINT32 addr, inc;
+		int16_t sound_data[STACK_SOUND_BUFSIZE];
+		uint32_t addr, inc;
 		int i;
 
 		/* make sure our assumptions are correct */
@@ -287,7 +287,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::cage_timer_callback )
 
 void atari_cage_device::update_timer(int which)
 {
-	UINT32 *tms32031_io_regs = m_tms32031_io_regs;
+	uint32_t *tms32031_io_regs = m_tms32031_io_regs;
 
 	/* determine the new enabled state */
 	int base = 0x10 * which;
@@ -325,9 +325,9 @@ void atari_cage_device::update_timer(int which)
 
 void atari_cage_device::update_serial()
 {
-	UINT32 *tms32031_io_regs = m_tms32031_io_regs;
+	uint32_t *tms32031_io_regs = m_tms32031_io_regs;
 	attotime serial_clock_period, bit_clock_period;
-	UINT32 freq;
+	uint32_t freq;
 
 	/* we start out at half the H1 frequency (or 2x the H1 period) */
 	serial_clock_period = m_cpu_h1_clock_period * 2;
@@ -361,8 +361,8 @@ void atari_cage_device::update_serial()
 
 READ32_MEMBER( atari_cage_device::tms32031_io_r )
 {
-	UINT32 *tms32031_io_regs = m_tms32031_io_regs;
-	UINT16 result = tms32031_io_regs[offset];
+	uint32_t *tms32031_io_regs = m_tms32031_io_regs;
+	uint16_t result = tms32031_io_regs[offset];
 
 	switch (offset)
 	{
@@ -379,7 +379,7 @@ READ32_MEMBER( atari_cage_device::tms32031_io_r )
 
 WRITE32_MEMBER( atari_cage_device::tms32031_io_w )
 {
-	UINT32 *tms32031_io_regs = m_tms32031_io_regs;
+	uint32_t *tms32031_io_regs = m_tms32031_io_regs;
 
 	COMBINE_DATA(&tms32031_io_regs[offset]);
 
@@ -499,7 +499,7 @@ READ32_MEMBER( atari_cage_device::cage_io_status_r )
 }
 
 
-UINT16 atari_cage_device::main_r()
+uint16_t atari_cage_device::main_r()
 {
 	driver_device *drvstate = machine().driver_data<driver_device>();
 	if (LOG_COMM)
@@ -519,7 +519,7 @@ TIMER_CALLBACK_MEMBER( atari_cage_device::cage_deferred_w )
 }
 
 
-void atari_cage_device::main_w(UINT16 data)
+void atari_cage_device::main_w(uint16_t data)
 {
 	if (LOG_COMM)
 		logerror("%s:Command to CAGE = %04X\n", machine().describe_context(), data);
@@ -527,9 +527,9 @@ void atari_cage_device::main_w(UINT16 data)
 }
 
 
-UINT16 atari_cage_device::control_r()
+uint16_t atari_cage_device::control_r()
 {
-	UINT16 result = 0;
+	uint16_t result = 0;
 
 	if (m_cpu_to_cage_ready)
 		result |= 2;
@@ -540,9 +540,9 @@ UINT16 atari_cage_device::control_r()
 }
 
 
-void atari_cage_device::control_w(UINT16 data)
+void atari_cage_device::control_w(uint16_t data)
 {
-	UINT32 *tms32031_io_regs = m_tms32031_io_regs;
+	uint32_t *tms32031_io_regs = m_tms32031_io_regs;
 
 	m_control = data;
 
@@ -691,7 +691,7 @@ const device_type ATARI_CAGE_SEATTLE = &device_creator<atari_cage_seattle_device
 //  atari_cage_seattle_device - constructor
 //-------------------------------------------------
 
-atari_cage_seattle_device::atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+atari_cage_seattle_device::atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	atari_cage_device(mconfig, ATARI_CAGE_SEATTLE, "Atari CAGE Seattle", tag, owner, clock, "atari_cage_seattle", __FILE__)
 {
 }

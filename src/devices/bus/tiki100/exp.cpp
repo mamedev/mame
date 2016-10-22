@@ -26,7 +26,7 @@ const device_type TIKI100_BUS_SLOT = &device_creator<tiki100_bus_slot_t>;
 //  tiki100_bus_slot_t - constructor
 //-------------------------------------------------
 
-tiki100_bus_slot_t::tiki100_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+tiki100_bus_slot_t::tiki100_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TIKI100_BUS_SLOT, "TIKI-100 expansion bus slot", tag, owner, clock, "tiki100bus_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_z80daisy_interface(mconfig, *this),
@@ -56,7 +56,7 @@ void tiki100_bus_slot_t::device_start()
 //  tiki100_bus_t - constructor
 //-------------------------------------------------
 
-tiki100_bus_t::tiki100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+tiki100_bus_t::tiki100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TIKI100_BUS, "TIKI-100 expansion bus", tag, owner, clock, "tiki100bus", __FILE__),
 	m_irq_cb(*this),
 	m_nmi_cb(*this),
@@ -98,7 +98,7 @@ void tiki100_bus_t::add_card(device_tiki100bus_card_interface *card)
 //  mrq_r - memory read
 //-------------------------------------------------
 
-UINT8 tiki100_bus_t::mrq_r(address_space &space, offs_t offset, UINT8 data, bool &mdis)
+uint8_t tiki100_bus_t::mrq_r(address_space &space, offs_t offset, uint8_t data, bool &mdis)
 {
 	device_tiki100bus_card_interface *entry = m_device_list.first();
 
@@ -132,7 +132,7 @@ WRITE8_MEMBER( tiki100_bus_t::mrq_w )
 //  iorq_r - I/O read
 //-------------------------------------------------
 
-UINT8 tiki100_bus_t::iorq_r(address_space &space, offs_t offset, UINT8 data)
+uint8_t tiki100_bus_t::iorq_r(address_space &space, offs_t offset, uint8_t data)
 {
 	device_tiki100bus_card_interface *entry = m_device_list.first();
 

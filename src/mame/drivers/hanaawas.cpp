@@ -35,7 +35,7 @@
 READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 {
 	int i, ordinal = 0;
-	UINT16 buttons = 0;
+	uint16_t buttons = 0;
 
 	switch (m_mux)
 	{

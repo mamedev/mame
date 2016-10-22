@@ -56,8 +56,8 @@ enum int_levels
 
 struct ef9369
 {
-	UINT32 addr;
-	UINT16 clut[16];    /* 13-bits - a marking bit and a 444 color */
+	uint32_t addr;
+	uint16_t clut[16];    /* 13-bits - a marking bit and a 444 color */
 };
 
 
@@ -82,7 +82,7 @@ public:
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
-	UINT32 screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -148,7 +148,7 @@ WRITE16_MEMBER(guab_state::guab_tms34061_w)
 
 READ16_MEMBER(guab_state::guab_tms34061_r)
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0xff;
 	int col;
@@ -187,7 +187,7 @@ WRITE16_MEMBER(guab_state::ef9369_w)
 	/* Data register */
 	else
 	{
-		UINT32 entry = pal.addr >> 1;
+		uint32_t entry = pal.addr >> 1;
 
 		if ((pal.addr & 1) == 0)
 		{
@@ -196,7 +196,7 @@ WRITE16_MEMBER(guab_state::ef9369_w)
 		}
 		else
 		{
-			UINT16 col;
+			uint16_t col;
 
 			pal.clut[entry] &= ~0x1f00;
 			pal.clut[entry] |= (data & 0x1f) << 8;
@@ -219,7 +219,7 @@ READ16_MEMBER(guab_state::ef9369_r)
 	struct ef9369 &pal = m_pal;
 	if ((offset & 1) == 0)
 	{
-		UINT16 col = pal.clut[pal.addr >> 1];
+		uint16_t col = pal.clut[pal.addr >> 1];
 
 		if ((pal.addr & 1) == 0)
 			return col & 0xff;
@@ -233,7 +233,7 @@ READ16_MEMBER(guab_state::ef9369_r)
 	}
 }
 
-UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
@@ -248,12 +248,12 @@ UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitma
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &m_tms34061->m_display.vram[256 * y];
-		UINT16 *dest = &bitmap.pix16(y);
+		uint8_t *src = &m_tms34061->m_display.vram[256 * y];
+		uint16_t *dest = &bitmap.pix16(y);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			UINT8 pen = src[x >> 1];
+			uint8_t pen = src[x >> 1];
 
 			/* Draw two 4-bit pixels */
 			*dest++ = m_palette->pen(pen >> 4);
@@ -300,11 +300,11 @@ INPUT_CHANGED_MEMBER(guab_state::coin_inserted)
 {
 	if (newval == 0)
 	{
-		UINT32 credit;
+		uint32_t credit;
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		/* Get the current credit value and add the new coin value */
-		credit = space.read_dword(0x8002c) + (UINT32)(FPTR)param;
+		credit = space.read_dword(0x8002c) + (uint32_t)(uintptr_t)param;
 		space.write_dword(0x8002c, credit);
 	}
 }

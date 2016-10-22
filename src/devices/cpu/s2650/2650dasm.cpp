@@ -11,7 +11,7 @@
 
 #include "emu.h"
 
-static const UINT8 *rambase;
+static const uint8_t *rambase;
 static offs_t pcbase;
 
 #define readarg(A)  (rambase[(A) - pcbase])
@@ -223,7 +223,7 @@ static char *ADR(int pc)
 /* disassemble one instruction at PC into buff. return byte size of instr */
 CPU_DISASSEMBLE( s2650 )
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	int PC = pc;
 	int op = oprom[0];
 	int rv = op & 3;

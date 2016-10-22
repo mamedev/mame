@@ -31,7 +31,7 @@ using namespace uml;
 
 CPU_DISASSEMBLE( rsp );
 
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
+extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
 
 /***************************************************************************
     CONSTANTS
@@ -64,7 +64,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
     descriptor
 -------------------------------------------------*/
 
-static inline UINT32 epc(const opcode_desc *desc)
+static inline uint32_t epc(const opcode_desc *desc)
 {
 	return ((desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 3) : desc->pc) | 0x1000;
 }
@@ -181,7 +181,7 @@ static void cfunc_write32(void *param)
     rspdrc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void rsp_device::rspdrc_set_options(UINT32 options)
+void rsp_device::rspdrc_set_options(uint32_t options)
 {
 	if (!allow_drc()) return;
 	m_drcoptions = options;
@@ -221,7 +221,7 @@ static void cfunc_get_cop0_reg(void *param)
 inline void rsp_device::ccfunc_set_cop0_reg()
 {
 	int reg = m_rsp_state->arg0;
-	UINT32 data = m_rsp_state->arg1;
+	uint32_t data = m_rsp_state->arg1;
 
 	if (reg >= 0 && reg < 8)
 	{
@@ -374,7 +374,7 @@ void rsp_device::code_compile_block(offs_t pc)
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
-				UINT32 nextpc;
+				uint32_t nextpc;
 
 				/* add a code log entry */
 				if (drcuml->logging())
@@ -458,7 +458,7 @@ void rsp_device::code_compile_block(offs_t pc)
 
 inline void rsp_device::ccfunc_unimplemented()
 {
-	UINT32 opcode = m_rsp_state->arg0;
+	uint32_t opcode = m_rsp_state->arg0;
 	fatalerror("PC=%08X: Unimplemented op %08X (%02X,%02X)\n", m_rsp_state->pc, opcode, opcode >> 26, opcode & 0x3f);
 }
 
@@ -667,7 +667,7 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			UINT32 sum = seqhead->opptr.l[0];
+			uint32_t sum = seqhead->opptr.l[0];
 			void *base = m_direct->read_ptr(seqhead->physpc | 0x1000);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                         // load    i0,base,0,dword
 
@@ -689,7 +689,7 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 	/* full verification; sum up everything */
 	else
 	{
-		UINT32 sum = 0;
+		uint32_t sum = 0;
 		void *base = m_direct->read_ptr(seqhead->physpc | 0x1000);
 		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                             // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
@@ -800,10 +800,10 @@ void rsp_device::generate_branch(drcuml_block *block, compiler_state *compiler, 
     generate_delay_slot_and_branch
 ------------------------------------------------------------------*/
 
-void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg)
+void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t linkreg)
 {
 	compiler_state compiler_temp = *compiler;
-	UINT32 op = desc->opptr.l[0];
+	uint32_t op = desc->opptr.l[0];
 
 	/* fetch the target register if dynamic, in case it is modified by the delay slot */
 	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
@@ -815,7 +815,7 @@ void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_st
 	/* set the link if needed -- before the delay slot */
 	if (linkreg != 0)
 	{
-		UML_MOV(block, R32(linkreg), (INT32)(desc->pc + 8));                    // mov    <linkreg>,desc->pc + 8
+		UML_MOV(block, R32(linkreg), (int32_t)(desc->pc + 8));                    // mov    <linkreg>,desc->pc + 8
 	}
 
 	/* compile the delay slot using temporary compiler state */
@@ -835,8 +835,8 @@ void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_st
 int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = op >> 26;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = op >> 26;
 	code_label skip;
 
 	switch (opswitch)
@@ -1045,8 +1045,8 @@ int rsp_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 
 int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = op & 63;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = op & 63;
 	//code_label skip;
 
 	switch (opswitch)
@@ -1140,7 +1140,7 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 			if (RDREG != 0)
 			{
 				UML_OR(block, I0, R32(RSREG), R32(RTREG));                  // dor      i0,<rsreg>,<rtreg>
-				UML_XOR(block, R32(RDREG), I0, (UINT64)~0);             // dxor     <rdreg>,i0,~0
+				UML_XOR(block, R32(RDREG), I0, (uint64_t)~0);             // dxor     <rdreg>,i0,~0
 			}
 			return TRUE;
 
@@ -1200,8 +1200,8 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 
 int rsp_device::generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = RTREG;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = RTREG;
 	code_label skip;
 
 	switch (opswitch)
@@ -1243,8 +1243,8 @@ int rsp_device::generate_regimm(drcuml_block *block, compiler_state *compiler, c
 
 int rsp_device::generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = RSREG;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = RSREG;
 
 	switch (opswitch)
 	{
@@ -1281,7 +1281,7 @@ int rsp_device::generate_cop0(drcuml_block *block, compiler_state *compiler, con
     including disassembly of a RSP instruction
 -------------------------------------------------*/
 
-void rsp_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
+void rsp_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op)
 {
 	if (m_drcuml->logging())
 	{

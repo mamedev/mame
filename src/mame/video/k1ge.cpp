@@ -47,7 +47,7 @@ READ8_MEMBER( k1ge_device::read )
 {
 	assert(offset < 0x4000);
 
-	UINT8 data = m_vram[offset];
+	uint8_t data = m_vram[offset];
 
 	switch( offset )
 	{
@@ -99,16 +99,16 @@ WRITE8_MEMBER( k1ge_device::write )
 }
 
 
-void k1ge_device::draw_scroll_plane( UINT16 *p, UINT16 base, int line, int scroll_x, int scroll_y, int pal_base )
+void k1ge_device::draw_scroll_plane( uint16_t *p, uint16_t base, int line, int scroll_x, int scroll_y, int pal_base )
 {
 	int i;
 	int offset_x = ( scroll_x >> 3 ) * 2;
 	int px = scroll_x & 0x07;
-	UINT16 map_data;
-	UINT16 hflip;
-	UINT16 pcode;
-	UINT16 tile_addr;
-	UINT16 tile_data;
+	uint16_t map_data;
+	uint16_t hflip;
+	uint16_t pcode;
+	uint16_t tile_addr;
+	uint16_t tile_data;
 
 	base += ( ( ( ( scroll_y + line ) >> 3 ) * 0x0040 ) & 0x7ff );
 
@@ -130,7 +130,7 @@ void k1ge_device::draw_scroll_plane( UINT16 *p, UINT16 base, int line, int scrol
 	/* draw pixels */
 	for ( i = 0; i < 160; i++ )
 	{
-		UINT16 col;
+		uint16_t col;
 
 		if ( hflip )
 		{
@@ -167,16 +167,16 @@ void k1ge_device::draw_scroll_plane( UINT16 *p, UINT16 base, int line, int scrol
 }
 
 
-void k1ge_device::draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int scroll_x, int scroll_y )
+void k1ge_device::draw_sprite_plane( uint16_t *p, uint16_t priority, int line, int scroll_x, int scroll_y )
 {
 	struct {
-		UINT16 spr_data;
-		UINT8 x;
-		UINT8 y;
+		uint16_t spr_data;
+		uint8_t x;
+		uint8_t y;
 	} spr[64];
 	int num_sprites = 0;
-	UINT8 spr_y = 0;
-	UINT8 spr_x = 0;
+	uint8_t spr_y = 0;
+	uint8_t spr_x = 0;
 	int i;
 
 	priority <<= 11;
@@ -184,9 +184,9 @@ void k1ge_device::draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int s
 	/* Select sprites */
 	for ( i = 0; i < 256; i += 4 )
 	{
-		UINT16 spr_data = m_vram[ 0x800 + i ] | ( m_vram[ 0x801 + i ] << 8 );
-		UINT8 x = m_vram[ 0x802 + i ];
-		UINT8 y = m_vram[ 0x803 + i ];
+		uint16_t spr_data = m_vram[ 0x800 + i ] | ( m_vram[ 0x801 + i ] << 8 );
+		uint8_t x = m_vram[ 0x802 + i ];
+		uint8_t y = m_vram[ 0x803 + i ];
 
 		spr_x = ( spr_data & 0x0400 ) ? ( spr_x + x ) :  ( scroll_x + x );
 		spr_y = ( spr_data & 0x0200 ) ? ( spr_y + y ) :  ( scroll_y + y );
@@ -207,9 +207,9 @@ void k1ge_device::draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int s
 	for ( i = num_sprites-1; i >= 0; i-- )
 	{
 		int j;
-		UINT16 tile_addr;
-		UINT16 tile_data;
-		UINT16 pcode = 0x100 + ( ( spr[i].spr_data & 0x2000 ) ? 4 : 0 );
+		uint16_t tile_addr;
+		uint16_t tile_data;
+		uint16_t pcode = 0x100 + ( ( spr[i].spr_data & 0x2000 ) ? 4 : 0 );
 
 		tile_addr = 0x2000 + ( ( spr[i].spr_data & 0x1ff ) * 16 );
 		if ( spr[i].spr_data & 0x4000 )
@@ -220,7 +220,7 @@ void k1ge_device::draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int s
 
 		for ( j = 0; j < 8; j++ )
 		{
-			UINT16 col;
+			uint16_t col;
 
 			spr_x = spr[i].x + j;
 
@@ -246,8 +246,8 @@ void k1ge_device::draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int s
 
 void k1ge_device::draw( int line )
 {
-	UINT16 *p = &m_bitmap->pix16(line);
-	UINT16 oowcol = m_vram[0x012] & 0x07;
+	uint16_t *p = &m_bitmap->pix16(line);
+	uint16_t oowcol = m_vram[0x012] & 0x07;
 	int i;
 
 	if ( line < m_wba_v || line >= m_wba_v + m_wsi_v )
@@ -259,7 +259,7 @@ void k1ge_device::draw( int line )
 	}
 	else
 	{
-		UINT16 col = ( ( m_vram[0x118] & 0xc0 ) == 0x80 ) ? m_vram[0x118] & 0x07 : 0;
+		uint16_t col = ( ( m_vram[0x118] & 0xc0 ) == 0x80 ) ? m_vram[0x118] & 0x07 : 0;
 
 		for ( i = 0; i < 160; i++ )
 			p[i] = col;
@@ -312,16 +312,16 @@ void k1ge_device::draw( int line )
 }
 
 
-void k2ge_device::draw_scroll_plane( UINT16 *p, UINT16 base, int line, int scroll_x, int scroll_y, UINT16 pal_base )
+void k2ge_device::draw_scroll_plane( uint16_t *p, uint16_t base, int line, int scroll_x, int scroll_y, uint16_t pal_base )
 {
 	int i;
 	int offset_x = ( scroll_x >> 3 ) * 2;
 	int px = scroll_x & 0x07;
-	UINT16 map_data;
-	UINT16 hflip;
-	UINT16 pcode;
-	UINT16 tile_addr;
-	UINT16 tile_data;
+	uint16_t map_data;
+	uint16_t hflip;
+	uint16_t pcode;
+	uint16_t tile_addr;
+	uint16_t tile_data;
 
 	base += ( ( ( ( scroll_y + line ) >> 3 ) * 0x0040 ) & 0x7ff );
 
@@ -343,7 +343,7 @@ void k2ge_device::draw_scroll_plane( UINT16 *p, UINT16 base, int line, int scrol
 	/* draw pixels */
 	for ( i = 0; i < 160; i++ )
 	{
-		UINT16 col;
+		uint16_t col;
 
 		if ( hflip )
 		{
@@ -380,17 +380,17 @@ void k2ge_device::draw_scroll_plane( UINT16 *p, UINT16 base, int line, int scrol
 }
 
 
-void k2ge_device::draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int scroll_x, int scroll_y )
+void k2ge_device::draw_sprite_plane( uint16_t *p, uint16_t priority, int line, int scroll_x, int scroll_y )
 {
 	struct {
-		UINT16 spr_data;
-		UINT8 x;
-		UINT8 y;
-		UINT8 index;
+		uint16_t spr_data;
+		uint8_t x;
+		uint8_t y;
+		uint8_t index;
 	} spr[64];
 	int num_sprites = 0;
-	UINT8 spr_y = 0;
-	UINT8 spr_x = 0;
+	uint8_t spr_y = 0;
+	uint8_t spr_x = 0;
 	int i;
 
 	priority <<= 11;
@@ -398,9 +398,9 @@ void k2ge_device::draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int s
 	/* Select sprites */
 	for ( i = 0; i < 256; i += 4 )
 	{
-		UINT16 spr_data = m_vram[ 0x800 + i ] | ( m_vram[ 0x801 + i ] << 8 );
-		UINT8 x = m_vram[ 0x802 + i ];
-		UINT8 y = m_vram[ 0x803 + i ];
+		uint16_t spr_data = m_vram[ 0x800 + i ] | ( m_vram[ 0x801 + i ] << 8 );
+		uint8_t x = m_vram[ 0x802 + i ];
+		uint8_t y = m_vram[ 0x803 + i ];
 
 		spr_x = ( spr_data & 0x0400 ) ? ( spr_x + x ) :  ( scroll_x + x );
 		spr_y = ( spr_data & 0x0200 ) ? ( spr_y + y ) :  ( scroll_y + y );
@@ -422,9 +422,9 @@ void k2ge_device::draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int s
 	for ( i = num_sprites-1; i >= 0; i-- )
 	{
 		int j;
-		UINT16 tile_addr;
-		UINT16 tile_data;
-		UINT16 pcode = 0x0200 + ( ( m_vram[0x0c00 + spr[i].index ] & 0x0f ) << 3 );
+		uint16_t tile_addr;
+		uint16_t tile_data;
+		uint16_t pcode = 0x0200 + ( ( m_vram[0x0c00 + spr[i].index ] & 0x0f ) << 3 );
 
 		tile_addr = 0x2000 + ( ( spr[i].spr_data & 0x1ff ) * 16 );
 		if ( spr[i].spr_data & 0x4000 )
@@ -435,7 +435,7 @@ void k2ge_device::draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int s
 
 		for ( j = 0; j < 8; j++ )
 		{
-			UINT16 col;
+			uint16_t col;
 
 			spr_x = spr[i].x + j;
 
@@ -459,16 +459,16 @@ void k2ge_device::draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int s
 }
 
 
-void k2ge_device::k1ge_draw_scroll_plane( UINT16 *p, UINT16 base, int line, int scroll_x, int scroll_y, UINT16 pal_lut_base, UINT16 k2ge_lut_base )
+void k2ge_device::k1ge_draw_scroll_plane( uint16_t *p, uint16_t base, int line, int scroll_x, int scroll_y, uint16_t pal_lut_base, uint16_t k2ge_lut_base )
 {
 	int i;
 	int offset_x = ( scroll_x >> 3 ) * 2;
 	int px = scroll_x & 0x07;
-	UINT16 map_data;
-	UINT16 hflip;
-	UINT16 pcode;
-	UINT16 tile_addr;
-	UINT16 tile_data;
+	uint16_t map_data;
+	uint16_t hflip;
+	uint16_t pcode;
+	uint16_t tile_addr;
+	uint16_t tile_data;
 
 	base += ( ( ( ( scroll_y + line ) >> 3 ) * 0x0040 ) & 0x7ff );
 
@@ -490,7 +490,7 @@ void k2ge_device::k1ge_draw_scroll_plane( UINT16 *p, UINT16 base, int line, int 
 	/* draw pixels */
 	for ( i = 0; i < 160; i++ )
 	{
-		UINT16 col;
+		uint16_t col;
 
 		if ( hflip )
 		{
@@ -505,7 +505,7 @@ void k2ge_device::k1ge_draw_scroll_plane( UINT16 *p, UINT16 base, int line, int 
 
 		if ( col )
 		{
-			UINT16 col2 = 16 * pcode + ( m_vram[ pal_lut_base + 4 * pcode + col ] * 2 );
+			uint16_t col2 = 16 * pcode + ( m_vram[ pal_lut_base + 4 * pcode + col ] * 2 );
 			p[ i ]  = m_vram[ k2ge_lut_base + col2 ] | ( m_vram[ k2ge_lut_base + col2 + 1 ] << 8 );
 		}
 
@@ -528,16 +528,16 @@ void k2ge_device::k1ge_draw_scroll_plane( UINT16 *p, UINT16 base, int line, int 
 }
 
 
-void k2ge_device::k1ge_draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int scroll_x, int scroll_y )
+void k2ge_device::k1ge_draw_sprite_plane( uint16_t *p, uint16_t priority, int line, int scroll_x, int scroll_y )
 {
 	struct {
-		UINT16 spr_data;
-		UINT8 x;
-		UINT8 y;
+		uint16_t spr_data;
+		uint8_t x;
+		uint8_t y;
 	} spr[64];
 	int num_sprites = 0;
-	UINT8 spr_y = 0;
-	UINT8 spr_x = 0;
+	uint8_t spr_y = 0;
+	uint8_t spr_x = 0;
 	int i;
 
 	priority <<= 11;
@@ -545,9 +545,9 @@ void k2ge_device::k1ge_draw_sprite_plane( UINT16 *p, UINT16 priority, int line, 
 	/* Select sprites */
 	for ( i = 0; i < 256; i += 4 )
 	{
-		UINT16 spr_data = m_vram[ 0x800 + i ] | ( m_vram[ 0x801 + i ] << 8 );
-		UINT8 x = m_vram[ 0x802 + i ];
-		UINT8 y = m_vram[ 0x803 + i ];
+		uint16_t spr_data = m_vram[ 0x800 + i ] | ( m_vram[ 0x801 + i ] << 8 );
+		uint8_t x = m_vram[ 0x802 + i ];
+		uint8_t y = m_vram[ 0x803 + i ];
 
 		spr_x = ( spr_data & 0x0400 ) ? ( spr_x + x ) :  ( scroll_x + x );
 		spr_y = ( spr_data & 0x0200 ) ? ( spr_y + y ) :  ( scroll_y + y );
@@ -568,9 +568,9 @@ void k2ge_device::k1ge_draw_sprite_plane( UINT16 *p, UINT16 priority, int line, 
 	for ( i = num_sprites-1; i >= 0; i-- )
 	{
 		int j;
-		UINT16 tile_addr;
-		UINT16 tile_data;
-		UINT16 pcode = ( spr[i].spr_data & 0x2000 ) ? 1 : 0;
+		uint16_t tile_addr;
+		uint16_t tile_data;
+		uint16_t pcode = ( spr[i].spr_data & 0x2000 ) ? 1 : 0;
 
 		tile_addr = 0x2000 + ( ( spr[i].spr_data & 0x1ff ) * 16 );
 		if ( spr[i].spr_data & 0x4000 )
@@ -581,7 +581,7 @@ void k2ge_device::k1ge_draw_sprite_plane( UINT16 *p, UINT16 priority, int line, 
 
 		for ( j = 0; j < 8; j++ )
 		{
-			UINT16 col;
+			uint16_t col;
 
 			spr_x = spr[i].x + j;
 
@@ -598,7 +598,7 @@ void k2ge_device::k1ge_draw_sprite_plane( UINT16 *p, UINT16 priority, int line, 
 
 			if ( spr_x < 160 && col )
 			{
-				UINT16 col2 = 16 * pcode + m_vram[ 0x100 + 4 * pcode + col ] * 2;
+				uint16_t col2 = 16 * pcode + m_vram[ 0x100 + 4 * pcode + col ] * 2;
 				p[ spr_x ] = m_vram[ 0x380 + col2 ] | ( m_vram[ 0x381 + col2 ] << 8 );
 			}
 		}
@@ -608,9 +608,9 @@ void k2ge_device::k1ge_draw_sprite_plane( UINT16 *p, UINT16 priority, int line, 
 
 void k2ge_device::draw( int line )
 {
-	UINT16 *p = &m_bitmap->pix16(line);
-	UINT16 col = 0;
-	UINT16 oowcol;
+	uint16_t *p = &m_bitmap->pix16(line);
+	uint16_t col = 0;
+	uint16_t oowcol;
 	int i;
 
 	oowcol = ( m_vram[0x012] & 0x07 ) * 2;
@@ -802,7 +802,7 @@ void k1ge_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::timer_callback), this));
 	m_hblank_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::hblank_on_timer_callback), this));
-	m_vram = make_unique_clear<UINT8[]>(0x4000);
+	m_vram = make_unique_clear<uint8_t[]>(0x4000);
 	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height() );
 
 	save_pointer(NAME(m_vram.get()), 0x4000);
@@ -863,7 +863,7 @@ void k1ge_device::device_reset()
 
 const device_type K1GE = &device_creator<k1ge_device>;
 
-k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K1GE, "K1GE Monochrome Graphics + LCD", tag, owner, clock, "k1ge", __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_vblank_pin_w(*this)
@@ -871,7 +871,7 @@ k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_video_interface(mconfig, *this)
 	, m_vblank_pin_w(*this)
@@ -897,7 +897,7 @@ machine_config_constructor k1ge_device::device_mconfig_additions() const
 
 const device_type K2GE = &device_creator<k2ge_device>;
 
-k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: k1ge_device(mconfig, K2GE, "K2GE Color Graphics + LCD", tag, owner, clock, "k2ge", __FILE__)
 {
 }

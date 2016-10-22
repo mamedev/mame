@@ -50,7 +50,7 @@ output_manager::output_item* output_manager::find_item(const char *string)
     create_new_item - create a new item
 -------------------------------------------------*/
 
-output_manager::output_item *output_manager::create_new_item(const char *outname, INT32 value)
+output_manager::output_item *output_manager::create_new_item(const char *outname, int32_t value)
 {
 	output_item item;
 
@@ -83,10 +83,10 @@ void output_manager::resume()
     output_set_value - set the value of an output
 -------------------------------------------------*/
 
-void output_manager::set_value(const char *outname, INT32 value)
+void output_manager::set_value(const char *outname, int32_t value)
 {
 	output_item *item = find_item(outname);
-	INT32 oldval;
+	int32_t oldval;
 
 	/* if no item of that name, create a new one and send the item's state */
 	if (item == nullptr)
@@ -150,7 +150,7 @@ void output_manager::set_indexed_value(const char *basename, int index, int valu
     output
 -------------------------------------------------*/
 
-INT32 output_manager::get_value(const char *outname)
+int32_t output_manager::get_value(const char *outname)
 {
 	output_item *item = find_item(outname);
 
@@ -166,7 +166,7 @@ INT32 output_manager::get_value(const char *outname)
     indexed output
 -------------------------------------------------*/
 
-INT32 output_manager::get_indexed_value(const char *basename, int index)
+int32_t output_manager::get_indexed_value(const char *basename, int index)
 {
 	char buffer[100];
 	char *dest = buffer;
@@ -229,7 +229,7 @@ void output_manager::notify_all(output_module *module)
     a given name
 -------------------------------------------------*/
 
-UINT32 output_manager::name_to_id(const char *outname)
+uint32_t output_manager::name_to_id(const char *outname)
 {
 	output_item *item = find_item(outname);
 
@@ -245,7 +245,7 @@ UINT32 output_manager::name_to_id(const char *outname)
     to a given unique ID
 -------------------------------------------------*/
 
-const char *output_manager::id_to_name(UINT32 id)
+const char *output_manager::id_to_name(uint32_t id)
 {
 	for (auto &item : m_itemtable)
 		if (item.second.id == id)

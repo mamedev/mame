@@ -106,7 +106,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tek4051_state::keyboard_tick)
 //  bankswitch -
 //-------------------------------------------------
 
-void tek4051_state::bankswitch(UINT8 data)
+void tek4051_state::bankswitch(uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -558,8 +558,8 @@ READ8_MEMBER( tek4051_state::kb_pia_pa_r )
 
 	*/
 
-	UINT8 data = 0;
-	UINT8 special = m_special->read();
+	uint8_t data = 0;
+	uint8_t special = m_special->read();
 
 	// keyboard column
 	data = m_kc;
@@ -587,8 +587,8 @@ READ8_MEMBER( tek4051_state::kb_pia_pb_r )
 
 	*/
 
-	UINT8 data = 0;
-	UINT8 special = m_special->read();
+	uint8_t data = 0;
+	uint8_t special = m_special->read();
 
 	// shift
 	data |= (BIT(special, 0) & BIT(special, 1));
@@ -757,7 +757,7 @@ READ8_MEMBER( tek4051_state::gpib_pia_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// service request
 	data |= m_gpib->srq_r() << 5;
@@ -875,7 +875,7 @@ READ8_MEMBER( tek4051_state::com_pia_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// data terminal ready
 

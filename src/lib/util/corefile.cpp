@@ -410,8 +410,8 @@ int core_text_file::getc()
 		}
 
 		// fetch the next character
-		utf16_char utf16_buffer[UTF16_CHAR_MAX];
-		unicode_char uchar = unicode_char(~0);
+		char16_t utf16_buffer[UTF16_CHAR_MAX];
+		char32_t uchar = char32_t(~0);
 		switch (m_text_type)
 		{
 		default:
@@ -1221,7 +1221,7 @@ osd_file::error core_file::load(std::string const &filename, void **data, std::u
 	return osd_file::error::NONE;
 }
 
-osd_file::error core_file::load(std::string const &filename, dynamic_buffer &data)
+osd_file::error core_file::load(std::string const &filename, std::vector<uint8_t> &data)
 {
 	ptr file;
 
@@ -1320,7 +1320,7 @@ bool core_filename_ends_with(const std::string &filename, const std::string &ext
 	// work backwards checking for a match
 	while (matches && extlen > 0 && namelen > 0)
 	{
-		if (tolower((UINT8)filename[--namelen]) != tolower((UINT8)extension[--extlen]))
+		if (tolower((uint8_t)filename[--namelen]) != tolower((uint8_t)extension[--extlen]))
 			matches = false;
 	}
 

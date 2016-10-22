@@ -33,7 +33,7 @@ class pcf8593_device :  public device_t,
 						public device_nvram_interface
 {
 public:
-	pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER(scl_w);
 	DECLARE_WRITE_LINE_MEMBER(sda_w);
@@ -60,16 +60,16 @@ private:
 	static const device_timer_id TIMER_UPDATE_COUNTER = 0;
 
 	// internal state
-	UINT8       m_data[16];
+	uint8_t       m_data[16];
 	int         m_pin_scl;
 	int         m_pin_sda;
 	int         m_inp;
 	int         m_active;
 	int         m_bits;
-	UINT8       m_data_recv_index;
-	UINT8       m_data_recv[50];
-	UINT8       m_mode;
-	UINT8       m_pos;
+	uint8_t       m_data_recv_index;
+	uint8_t       m_data_recv[50];
+	uint8_t       m_mode;
+	uint8_t       m_pos;
 	emu_timer * m_timer;
 	enum        { RTC_MODE_NONE, RTC_MODE_SEND, RTC_MODE_RECV };
 };

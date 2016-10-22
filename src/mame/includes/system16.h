@@ -27,16 +27,16 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
-	required_shared_ptr<UINT16> m_textram;
-	optional_shared_ptr<UINT16> m_bg0_tileram;
-	optional_shared_ptr<UINT16> m_bg1_tileram;
-	optional_shared_ptr<UINT16> m_tileram;
-	optional_shared_ptr<UINT16> m_goldnaxeb2_bgpage;
-	optional_shared_ptr<UINT16> m_goldnaxeb2_fgpage;
+	required_shared_ptr<uint16_t> m_textram;
+	optional_shared_ptr<uint16_t> m_bg0_tileram;
+	optional_shared_ptr<uint16_t> m_bg1_tileram;
+	optional_shared_ptr<uint16_t> m_tileram;
+	optional_shared_ptr<uint16_t> m_goldnaxeb2_bgpage;
+	optional_shared_ptr<uint16_t> m_goldnaxeb2_fgpage;
 
 	required_device<sega_16bit_sprite_device> m_sprites;
 
-	UINT16 m_coinctrl;
+	uint16_t m_coinctrl;
 
 	/* game specific */
 	int m_passht4b_io1_val;
@@ -72,7 +72,7 @@ public:
 	int m_bg_page[4];
 	int m_fg_page[4];
 
-	UINT16 m_datsu_page[4];
+	uint16_t m_datsu_page[4];
 
 	int m_bg2_page[4];
 	int m_fg2_page[4];
@@ -88,7 +88,7 @@ public:
 	int m_bg_scrolly;
 	int m_fg_scrollx;
 	int m_fg_scrolly;
-	UINT16 m_tilemapselect;
+	uint16_t m_tilemapselect;
 
 	int m_textlayer_lo_min;
 	int m_textlayer_lo_max;
@@ -102,19 +102,19 @@ public:
 	int m_sample_buffer;
 	int m_sample_select;
 
-	UINT8 *m_soundbank_ptr;     /* Pointer to currently selected portion of ROM */
+	uint8_t *m_soundbank_ptr;     /* Pointer to currently selected portion of ROM */
 
 	/* sys18 */
-	UINT8 *m_sound_bank;
-	UINT16 *m_splittab_bg_x;
-	UINT16 *m_splittab_bg_y;
-	UINT16 *m_splittab_fg_x;
-	UINT16 *m_splittab_fg_y;
+	uint8_t *m_sound_bank;
+	uint16_t *m_splittab_bg_x;
+	uint16_t *m_splittab_bg_y;
+	uint16_t *m_splittab_fg_x;
+	uint16_t *m_splittab_fg_y;
 	int     m_sound_info[4*2];
 	int     m_refreshenable;
 	int     m_system18;
 
-	UINT8 *m_decrypted_region;  // goldnaxeb1 & bayrouteb1
+	uint8_t *m_decrypted_region;  // goldnaxeb1 & bayrouteb1
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -123,7 +123,7 @@ public:
 	optional_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_shared_ptr<UINT16> m_decrypted_opcodes;
+	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_command_irq_w);
@@ -207,10 +207,10 @@ public:
 	DECLARE_VIDEO_START(s16a_bootleg_passsht);
 	DECLARE_VIDEO_START(s16a_bootleg_wb3bl);
 	DECLARE_VIDEO_START(s16a_bootleg);
-	UINT32 screen_update_system16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_system18old(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_s16a_bootleg_passht4b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_system16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_system18old(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_s16a_bootleg_passht4b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void setup_system16_bootleg_spritebanking(  );
 	void update_page(  );
 	void set_tile_bank( int data );

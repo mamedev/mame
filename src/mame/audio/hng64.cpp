@@ -65,8 +65,8 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 {
 	//logerror("hng64_soundram_w %08x: %08x %08x\n", offset, data, mem_mask);
 
-	UINT32 mem_mask32 = mem_mask;
-	UINT32 data32 = data;
+	uint32_t mem_mask32 = mem_mask;
+	uint32_t data32 = data;
 
 	/* swap data around.. keep the v53 happy */
 	data = data32 >> 16;
@@ -92,7 +92,7 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 			fp=fopen(filename, "w+b");
 			if (fp)
 			{
-				fwrite((UINT8*)m_soundram.get(), 0x80000*4, 1, fp);
+				fwrite((uint8_t*)m_soundram.get(), 0x80000*4, 1, fp);
 				fclose(fp);
 			}
 		}
@@ -102,8 +102,8 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 
 READ32_MEMBER(hng64_state::hng64_soundram_r)
 {
-	UINT16 datalo = m_soundram[offset * 2 + 0];
-	UINT16 datahi = m_soundram[offset * 2 + 1];
+	uint16_t datalo = m_soundram[offset * 2 + 0];
+	uint16_t datahi = m_soundram[offset * 2 + 1];
 
 	return flipendian_int16(datahi) | (flipendian_int16(datalo) << 16);
 }
@@ -145,7 +145,7 @@ WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
 
 void hng64_state::reset_sound()
 {
-	UINT8 *RAM = (UINT8*)m_soundram.get();
+	uint8_t *RAM = (uint8_t*)m_soundram.get();
 	membank("bank0")->set_base(&RAM[0x1f0000]);
 	membank("bank1")->set_base(&RAM[0x1f0000]);
 	membank("bank2")->set_base(&RAM[0x1f0000]);
@@ -222,7 +222,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
 
 	// the 2 early games don't do this.. maybe all banks actuallly default to that region tho?
 	// the sound code on those games seems buggier anyway.
-	UINT8 *RAM = (UINT8*)m_soundram.get();
+	uint8_t *RAM = (uint8_t*)m_soundram.get();
 
 	int bank = data & 0x1f;
 

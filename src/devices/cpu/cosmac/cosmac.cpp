@@ -160,7 +160,7 @@ const cosmac_device::ophandler cdp1801_device::s_opcodetable[256] =
 	&cdp1801_device::adi,    &cdp1801_device::sdi,    &cdp1801_device::und,    &cdp1801_device::smi
 };
 
-cosmac_device::ophandler cdp1801_device::get_ophandler(UINT8 opcode)
+cosmac_device::ophandler cdp1801_device::get_ophandler(uint8_t opcode)
 {
 	return s_opcodetable[opcode];
 }
@@ -248,7 +248,7 @@ const cosmac_device::ophandler cdp1802_device::s_opcodetable[256] =
 	&cdp1802_device::adi,    &cdp1802_device::sdi,    &cdp1802_device::shl,    &cdp1802_device::smi
 };
 
-cosmac_device::ophandler cdp1802_device::get_ophandler(UINT8 opcode)
+cosmac_device::ophandler cdp1802_device::get_ophandler(uint8_t opcode)
 {
 	return s_opcodetable[opcode];
 }
@@ -268,7 +268,7 @@ const device_type CDP1802 = &device_creator<cdp1802_device>;
 //  cosmac_device - constructor
 //-------------------------------------------------
 
-cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
@@ -301,7 +301,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 //  cdp1801_device - constructor
 //-------------------------------------------------
 
-cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cosmac_device(mconfig, CDP1801, "CDP1801", tag, owner, clock, "cdp1801", __FILE__)
 {
 }
@@ -311,7 +311,7 @@ cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, d
 //  cdp1802_device - constructor
 //-------------------------------------------------
 
-cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cosmac_device(mconfig, CDP1802, "CDP1802", tag, owner, clock, "cdp1802", __FILE__)
 {
 }
@@ -490,7 +490,7 @@ void cosmac_device::state_string_export(const device_state_entry &entry, std::st
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 cosmac_device::disasm_min_opcode_bytes() const
+uint32_t cosmac_device::disasm_min_opcode_bytes() const
 {
 	return 1;
 }
@@ -501,7 +501,7 @@ UINT32 cosmac_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 cosmac_device::disasm_max_opcode_bytes() const
+uint32_t cosmac_device::disasm_max_opcode_bytes() const
 {
 	return 3;
 }
@@ -512,13 +512,13 @@ UINT32 cosmac_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t cdp1801_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t cdp1801_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cdp1801 );
 	return CPU_DISASSEMBLE_NAME( cdp1801 )(this, buffer, pc, oprom, opram, options);
 }
 
-offs_t cdp1802_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t cdp1802_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cdp1802 );
 	return CPU_DISASSEMBLE_NAME( cdp1802 )(this, buffer, pc, oprom, opram, options);
@@ -533,7 +533,7 @@ offs_t cdp1802_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 //  read_opcode - read an opcode at the given address
 //-------------------------------------------------
 
-inline UINT8 cosmac_device::read_opcode(offs_t pc)
+inline uint8_t cosmac_device::read_opcode(offs_t pc)
 {
 	return m_direct->read_byte(pc);
 }
@@ -543,7 +543,7 @@ inline UINT8 cosmac_device::read_opcode(offs_t pc)
 //  read_byte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT8 cosmac_device::read_byte(offs_t address)
+inline uint8_t cosmac_device::read_byte(offs_t address)
 {
 	return m_program->read_byte(address);
 }
@@ -554,7 +554,7 @@ inline UINT8 cosmac_device::read_byte(offs_t address)
 //  address
 //-------------------------------------------------
 
-inline UINT8 cosmac_device::read_io_byte(offs_t address)
+inline uint8_t cosmac_device::read_io_byte(offs_t address)
 {
 	return m_io->read_byte(address);
 }
@@ -564,7 +564,7 @@ inline UINT8 cosmac_device::read_io_byte(offs_t address)
 //  write_byte - write a byte at the given address
 //-------------------------------------------------
 
-inline void cosmac_device::write_byte(offs_t address, UINT8 data)
+inline void cosmac_device::write_byte(offs_t address, uint8_t data)
 {
 	m_program->write_byte(address, data);
 }
@@ -575,7 +575,7 @@ inline void cosmac_device::write_byte(offs_t address, UINT8 data)
 //  address
 //-------------------------------------------------
 
-inline void cosmac_device::write_io_byte(offs_t address, UINT8 data)
+inline void cosmac_device::write_io_byte(offs_t address, uint8_t data)
 {
 	m_io->write_byte(address, data);
 }
@@ -601,7 +601,7 @@ offs_t cosmac_device::get_memory_address()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 cosmac_device::execute_min_cycles() const
+uint32_t cosmac_device::execute_min_cycles() const
 {
 	return 8 * 2;
 }
@@ -612,7 +612,7 @@ UINT32 cosmac_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 cosmac_device::execute_max_cycles() const
+uint32_t cosmac_device::execute_max_cycles() const
 {
 	return 8 * 3;
 }
@@ -623,7 +623,7 @@ UINT32 cosmac_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 cosmac_device::execute_input_lines() const
+uint32_t cosmac_device::execute_input_lines() const
 {
 	return 7;
 }
@@ -1215,7 +1215,7 @@ void cosmac_device::mark()
 
 void cosmac_device::return_from_interrupt(int ie)
 {
-	UINT8 data = RAM_R(R[X]);
+	uint8_t data = RAM_R(R[X]);
 	R[X]++;
 	P = data & 0xf;
 	X = data >> 4;

@@ -53,8 +53,8 @@ class m68340_sim
 {
 	public:
 
-	UINT32 m_am[4];
-	UINT32 m_ba[4];
+	uint32_t m_am[4];
+	uint32_t m_ba[4];
 
 	void reset(void);
 };

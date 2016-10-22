@@ -81,7 +81,7 @@ READ16_MEMBER(lordgun_state::lordgun_protection_r)
 	{
 		case 0x40/2: // bitswap and xor counter
 		{
-			UINT8 x = m_protection_data;
+			uint8_t x = m_protection_data;
 
 			m_protection_data  = ((( x >> 0) | ( x >> 1)) & 1) << 4;
 			m_protection_data |=  ((~x >> 2) & 1) << 3;
@@ -132,7 +132,7 @@ READ16_MEMBER(lordgun_state::aliencha_protection_r)
 
 		case 0x40/2: // bitswap and xor counter
 		{
-			UINT8 x = m_protection_data;
+			uint8_t x = m_protection_data;
 
 			m_protection_data  = (((x >> 3) ^ (x >> 2)) & 1) << 4;
 			m_protection_data |= (((x >> 2) ^ (x >> 1)) & 1) << 3;
@@ -1043,12 +1043,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(lordgun_state, lordgun)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	int rom_size = 0x100000;
 
 	for(int i = 0; i < rom_size/2; i++)
 	{
-		UINT16 x = rom[i];
+		uint16_t x = rom[i];
 
 		if((i & 0x0120) == 0x0100 || (i & 0x0a00) == 0x0800)
 			x ^= 0x0010;

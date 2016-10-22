@@ -29,7 +29,7 @@ void dc_controller_device::static_set_versions(device_t &device, const char *ver
 	ctrl.versions = versions;
 }
 
-dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	maple_device(mconfig, DC_CONTROLLER, "Dreamcast Controller", tag, owner, clock, "dcctrl", __FILE__)
 {
 	memset(port_tag, 0, sizeof(port_tag));
@@ -39,7 +39,7 @@ dc_controller_device::dc_controller_device(const machine_config &mconfig, const 
 	versions = "Version 1.010,1998/09/28,315-6211-AB   ,Analog Module : The 4th Edition.5/8  +DF";
 }
 
-void dc_controller_device::maple_w(const UINT32 *data, UINT32 in_size)
+void dc_controller_device::maple_w(const uint32_t *data, uint32_t in_size)
 {
 	switch(data[0] & 0xff) {
 	case 0x01: // Device request
@@ -70,7 +70,7 @@ void dc_controller_device::maple_w(const UINT32 *data, UINT32 in_size)
 	}
 }
 
-void dc_controller_device::fixed_status(UINT32 *dest)
+void dc_controller_device::fixed_status(uint32_t *dest)
 {
 	dest[0] = 0x20000000; // Controller
 	dest[1] =
@@ -85,17 +85,17 @@ void dc_controller_device::fixed_status(UINT32 *dest)
 	dest[2] = 0; // No 2nd function
 	dest[3] = 0; // No 3rd function
 	dest[4] = 0x00ff; // Every region, no expansion
-	copy_with_spaces(((UINT8 *)dest) + 18, id, 30);
-	copy_with_spaces(((UINT8 *)dest) + 48, license, 60);
+	copy_with_spaces(((uint8_t *)dest) + 18, id, 30);
+	copy_with_spaces(((uint8_t *)dest) + 48, license, 60);
 	dest[27] = 0x01f401ae; // standby 43mA, max 50mA
 }
 
-void dc_controller_device::free_status(UINT32 *dest)
+void dc_controller_device::free_status(uint32_t *dest)
 {
-	copy_with_spaces((UINT8 *)dest, versions, 80);
+	copy_with_spaces((uint8_t *)dest, versions, 80);
 }
 
-void dc_controller_device::read(UINT32 *dest)
+void dc_controller_device::read(uint32_t *dest)
 {
 	dest[0] = 0x21000000; // Controller
 	dest[1] =

@@ -57,49 +57,49 @@ void dai_state::video_start()
 {
 }
 
-UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i, j, k, l;
 
-	UINT8* char_rom = memregion("gfx1")->base();
+	uint8_t* char_rom = memregion("gfx1")->base();
 
-	UINT16 dai_video_memory_start = 0xbfff;
-	UINT16 dai_scan_lines = 604;    /* scan lines of PAL tv */
+	uint16_t dai_video_memory_start = 0xbfff;
+	uint16_t dai_scan_lines = 604;    /* scan lines of PAL tv */
 
-	UINT16 current_scan_line = 0;
-	UINT16 current_video_memory_address = dai_video_memory_start;
+	uint16_t current_scan_line = 0;
+	uint16_t current_video_memory_address = dai_video_memory_start;
 
-	UINT8 mode;         /* mode byte of line
+	uint8_t mode;         /* mode byte of line
 	                   bits 0-3 - line repeat count
 	                   bits 4-5 - resolution control
 	                   bits 6-7 - display mode control */
-	UINT8 colour;           /* colour byte of line
+	uint8_t colour;           /* colour byte of line
 	                   bits 0-3 - one of 16 colours
 	                   bits 4-5 - colour register for update
 	                   bit  6   - if unset force 'unit colour mode'
 	                   bit  7   - enable coulor change
 	                              if unset bits 0-5 are ignored */
-	UINT8 line_repeat_count;    /* number of horizontalraster scans
+	uint8_t line_repeat_count;    /* number of horizontalraster scans
 	                   for which same data will be displayed
 	                   0000 - 2 lines
 	                   each additional repeat adds 2 scans */
-	UINT8 horizontal_resolution;    /* number of blobs per line
+	uint8_t horizontal_resolution;    /* number of blobs per line
 	                   00 - 88 (low resolution graphics)
 	                   01 - 176 (medium resolution graphics)
 	                   10 - 352 (high resolution graphics)
 	                   11 - 528 (text with 66 chars per line) */
-	UINT8 display_mode;     /* determine how data will be used
+	uint8_t display_mode;     /* determine how data will be used
 	                   to generate the picture
 	                   00 - four colour graphics
 	                   01 - four colour characters
 	                   10 - sixteen colour graphics
 	                   11 - sixteen colour characters */
-	UINT8 unit_mode;
+	uint8_t unit_mode;
 
-	UINT8 current_data_1, current_data_2;
+	uint8_t current_data_1, current_data_2;
 
-	UINT8 current_colour;
+	uint8_t current_colour;
 
 	while (current_scan_line < dai_scan_lines)
 	{

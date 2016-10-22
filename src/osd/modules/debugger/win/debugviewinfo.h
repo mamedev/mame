@@ -27,8 +27,8 @@ public:
 
 	bool owns_window(HWND wnd) const { return m_wnd == wnd; }
 
-	UINT32 prefwidth() const;
-	UINT32 maxwidth();
+	uint32_t prefwidth() const;
+	uint32_t maxwidth();
 	void get_bounds(RECT &bounds) const;
 	void set_bounds(RECT const &newbounds);
 
@@ -57,7 +57,7 @@ protected:
 private:
 	void draw_contents(HDC windc);
 	void update();
-	UINT32 process_scroll(WORD type, HWND wnd);
+	uint32_t process_scroll(WORD type, HWND wnd);
 	LRESULT view_proc(UINT message, WPARAM wparam, LPARAM lparam);
 
 	static void static_update(debug_view &view, void *osdprivate);

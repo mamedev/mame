@@ -366,7 +366,7 @@ READ16_MEMBER(cischeat_state::wildplt_xy_r)
 // buttons & sensors are muxed. bit 0 routes to coin chute (single according to test mode)
 READ16_MEMBER(cischeat_state::wildplt_mux_r)
 {
-	UINT16 split_in = 0xffff;
+	uint16_t split_in = 0xffff;
 	switch(m_wildplt_output & 0xc)
 	{
 //		case 0: return ioport("IN1")->read();
@@ -618,7 +618,7 @@ READ16_MEMBER(cischeat_state::armchmp2_buttons_r)
 {
 	int arm_x = ioport("IN1")->read();
 
-	UINT16 ret = ioport("IN0")->read();
+	uint16_t ret = ioport("IN0")->read();
 
 	if (arm_x < 0x40)       ret &= ~1;
 	else if (arm_x > 0xc0)  ret &= ~2;
@@ -728,9 +728,9 @@ WRITE16_MEMBER(cischeat_state::captflag_motor_command_left_w)
 	captflag_motor_move(LEFT, data);
 }
 
-void cischeat_state::captflag_motor_move(int side, UINT16 data)
+void cischeat_state::captflag_motor_move(int side, uint16_t data)
 {
-	UINT16 & pos  = m_captflag_motor_pos[side];
+	uint16_t & pos  = m_captflag_motor_pos[side];
 
 	timer_device &dev((side == RIGHT) ? *m_captflag_motor_right : *m_captflag_motor_left);
 
@@ -785,8 +785,8 @@ void cischeat_state::captflag_motor_move(int side, UINT16 data)
 
 CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_pos_r)
 {
-	const UINT8 pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
-	return ~pos[m_captflag_motor_pos[(FPTR)param]];
+	const uint8_t pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
+	return ~pos[m_captflag_motor_pos[(uintptr_t)param]];
 }
 
 CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_busy_r)
@@ -1797,7 +1797,7 @@ static const gfx_layout tiles_16x16_quad =
 	16*16*4
 };
 
-static const UINT32 road_layout_xoffset[64] =
+static const uint32_t road_layout_xoffset[64] =
 {
 	STEP16(16*4*0,4),STEP16(16*4*1,4),
 	STEP16(16*4*2,4),STEP16(16*4*3,4)
@@ -2244,12 +2244,12 @@ MACHINE_CONFIG_END
 */
 void cischeat_state::cischeat_untangle_sprites(const char *region)
 {
-	UINT8       *src = memregion(region)->base();
-	const UINT8 *end = src + memregion(region)->bytes();
+	uint8_t       *src = memregion(region)->base();
+	const uint8_t *end = src + memregion(region)->bytes();
 
 	while (src < end)
 	{
-		UINT8 sprite[16*8];
+		uint8_t sprite[16*8];
 		int i;
 
 		for (i = 0; i < 16 ; i++)

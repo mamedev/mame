@@ -25,7 +25,7 @@
 
 PALETTE_INIT_MEMBER(pandoras_state, pandoras)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -69,14 +69,14 @@ PALETTE_INIT_MEMBER(pandoras_state, pandoras)
 	/* sprites */
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* characters */
 	for (i = 0x100; i < 0x200; i++)
 	{
-		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		uint8_t ctabentry = (color_prom[i] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -89,7 +89,7 @@ PALETTE_INIT_MEMBER(pandoras_state, pandoras)
 
 TILE_GET_INFO_MEMBER(pandoras_state::get_tile_info0)
 {
-	UINT8 attr = m_colorram[tile_index];
+	uint8_t attr = m_colorram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			m_videoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x0f,
@@ -145,7 +145,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_flipscreen_w)
 
 ***************************************************************************/
 
-void pandoras_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* sr )
+void pandoras_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* sr )
 {
 	int offs;
 
@@ -166,7 +166,7 @@ void pandoras_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 pandoras_state::screen_update_pandoras(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pandoras_state::screen_update_pandoras(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_layer0->draw(screen, bitmap, cliprect, 1 ,0);
 	draw_sprites(bitmap, cliprect, &m_spriteram[0x800] );

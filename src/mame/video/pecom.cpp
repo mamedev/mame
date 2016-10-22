@@ -16,7 +16,7 @@
 
 WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
 {
-	UINT16 ma = m_cdp1802->get_memory_address();
+	uint16_t ma = m_cdp1802->get_memory_address();
 
 	switch (offset + 3)
 	{
@@ -48,16 +48,16 @@ ADDRESS_MAP_END
 
 CDP1869_CHAR_RAM_READ_MEMBER(pecom_state::pecom_char_ram_r )
 {
-	UINT8 column = pmd & 0x7f;
-	UINT16 charaddr = (column << 4) | cma;
+	uint8_t column = pmd & 0x7f;
+	uint16_t charaddr = (column << 4) | cma;
 
 	return m_charram[charaddr];
 }
 
 CDP1869_CHAR_RAM_WRITE_MEMBER(pecom_state::pecom_char_ram_w )
 {
-	UINT8 column = pmd & 0x7f;
-	UINT16 charaddr = (column << 4) | cma;
+	uint8_t column = pmd & 0x7f;
+	uint16_t charaddr = (column << 4) | cma;
 
 	m_charram[charaddr] = data;
 }
@@ -81,7 +81,7 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 VIDEO_START_MEMBER(pecom_state,pecom)
 {
 	/* allocate memory */
-	m_charram = std::make_unique<UINT8[]>(PECOM_CHAR_RAM_SIZE);
+	m_charram = std::make_unique<uint8_t[]>(PECOM_CHAR_RAM_SIZE);
 
 	/* register for state saving */
 	save_item(NAME(m_reset));

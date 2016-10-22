@@ -85,7 +85,7 @@
 const device_type SNS_LOROM_SA1 = &device_creator<sns_sa1_device>;
 
 
-sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, SNS_LOROM_SA1, "SNES Cart + SA-1", tag, owner, clock, "sns_rom_sa1", __FILE__),
 						device_sns_cart_interface( mconfig, *this ),
 						m_sa1(*this, "sa1cpu"), m_sa1_ctrl(0), m_scpu_sie(0), m_sa1_reset(0), m_sa1_nmi(0), m_sa1_irq(0), m_scpu_ctrl(0), m_sa1_sie(0), m_irq_vector(0), m_nmi_vector(0), m_hcount(0), m_vcount(0), m_bank_c_hi(0), m_bank_c_rom(0), m_bank_d_hi(0), m_bank_d_rom(0), m_bank_e_hi(0), m_bank_e_rom(0), m_bank_f_hi(0), m_bank_f_rom(0), m_bwram_snes(0), m_bwram_sa1(0), m_bwram_sa1_source(0), m_bwram_sa1_format(0), m_bwram_write_snes(0), m_bwram_write_sa1(0), m_bwpa_sa1(0), m_iram_write_snes(0), m_iram_write_sa1(0), m_dma_ctrl(0), m_dma_ccparam(0), m_src_addr(0), m_dst_addr(0), m_dma_cnt(0), m_math_ctlr(0), m_math_overflow(0), m_math_a(0), m_math_b(0), m_math_res(0), m_vda(0), m_vbit(0), m_vlen(0), m_drm(0), m_scpu_flags(0), m_sa1_flags(0), m_hcr(0), m_vcr(0)
@@ -195,7 +195,7 @@ void sns_sa1_device::recalc_irqs()
 
 // handle this separately to avoid accessing recursively the regs?
 
-UINT8 sns_sa1_device::var_length_read(address_space &space, UINT32 offset)
+uint8_t sns_sa1_device::var_length_read(address_space &space, uint32_t offset)
 {
 	// handle 0xffea/0xffeb/0xffee/0xffef
 	if ((offset & 0xffffe0) == 0x00ffe0)
@@ -236,9 +236,9 @@ void sns_sa1_device::dma_transfer(address_space &space)
 
 	while (m_dma_cnt--)
 	{
-		UINT8 data = 0; // open bus?
-		UINT32 dma_src = m_src_addr++;
-		UINT32 dma_dst = m_dst_addr++;
+		uint8_t data = 0; // open bus?
+		uint32_t dma_src = m_src_addr++;
+		uint32_t dma_dst = m_dst_addr++;
 
 		// source and destination cannot be the same
 		// source = { 0=ROM, 1=BWRAM, 2=IRAM }
@@ -312,9 +312,9 @@ void sns_sa1_device::dma_cctype2_transfer(address_space &space)
 {
 }
 
-UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
+uint8_t sns_sa1_device::read_regs(address_space &space, uint32_t offset)
 {
-	UINT8 value = 0xff;
+	uint8_t value = 0xff;
 	offset &= 0x1ff;    // $2200 + offset gives the reg value to compare with docs
 
 	switch (offset)
@@ -349,23 +349,23 @@ UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
 			break;
 		case 0x106:
 			// Math Result bits0-7
-			value = (UINT64)(m_math_res >> 0) & 0xff;
+			value = (uint64_t)(m_math_res >> 0) & 0xff;
 			break;
 		case 0x107:
 			// Math Result bits8-15
-			value = (UINT64)(m_math_res >> 8) & 0xff;
+			value = (uint64_t)(m_math_res >> 8) & 0xff;
 			break;
 		case 0x108:
 			// Math Result bits16-23
-			value = (UINT64)(m_math_res >> 16) & 0xff;
+			value = (uint64_t)(m_math_res >> 16) & 0xff;
 			break;
 		case 0x109:
 			// Math Result bits24-31
-			value = (UINT64)(m_math_res >> 24) & 0xff;
+			value = (uint64_t)(m_math_res >> 24) & 0xff;
 			break;
 		case 0x10a:
 			// Math Result bits32-39
-			value = (UINT64)(m_math_res >> 32) & 0xff;
+			value = (uint64_t)(m_math_res >> 32) & 0xff;
 			break;
 		case 0x10b:
 			// Math Overflow (above 40bit result)
@@ -374,7 +374,7 @@ UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
 		case 0x10c:
 			// Var-Length Read Port Low
 			{
-				UINT32 data = (var_length_read(space, m_vda + 0) <<  0) | (var_length_read(space, m_vda + 1) <<  8)
+				uint32_t data = (var_length_read(space, m_vda + 0) <<  0) | (var_length_read(space, m_vda + 1) <<  8)
 															| (var_length_read(space, m_vda + 2) << 16);
 				data >>= m_vbit;
 				value = (data >> 0) & 0xff;
@@ -383,7 +383,7 @@ UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
 		case 0x10d:
 			// Var-Length Read Port High
 			{
-				UINT32 data = (var_length_read(space, m_vda + 0) <<  0) | (var_length_read(space, m_vda + 1) <<  8)
+				uint32_t data = (var_length_read(space, m_vda + 0) <<  0) | (var_length_read(space, m_vda + 1) <<  8)
 															| (var_length_read(space, m_vda + 2) << 16);
 				data >>= m_vbit;
 
@@ -408,7 +408,7 @@ UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
 	return value;
 }
 
-void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
+void sns_sa1_device::write_regs(address_space &space, uint32_t offset, uint8_t data)
 {
 	offset &= 0x1ff;    // $2200 + offset gives the reg value to compare with docs
 
@@ -749,7 +749,7 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 			switch (m_math_ctlr)
 			{
 				case 0: //signed multiplication
-					m_math_res = (INT16)m_math_a * (INT16)m_math_b;
+					m_math_res = (int16_t)m_math_a * (int16_t)m_math_b;
 					m_math_b = 0;
 					break;
 				case 1: //unsigned division
@@ -757,15 +757,15 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 						m_math_res = 0;
 					else
 					{
-						INT16  quotient  = (INT16)m_math_a / (UINT16)m_math_b;
-						UINT16 remainder = (INT16)m_math_a % (UINT16)m_math_b;
-						m_math_res = (UINT64)((remainder << 16) | quotient);
+						int16_t  quotient  = (int16_t)m_math_a / (uint16_t)m_math_b;
+						uint16_t remainder = (int16_t)m_math_a % (uint16_t)m_math_b;
+						m_math_res = (uint64_t)((remainder << 16) | quotient);
 					}
 					break;
 				case 2: //sigma (accumulative multiplication)
 				case 3:
-					UINT64 acum = (INT16)m_math_a * (INT16)m_math_b;
-					UINT64 mask = U64(0xffffffffff);
+					uint64_t acum = (int16_t)m_math_a * (int16_t)m_math_b;
+					uint64_t mask = U64(0xffffffffff);
 					m_math_res += acum;
 					m_math_overflow = (m_math_res > mask) ? 0x80 : 0;
 					m_math_res &= mask;
@@ -807,20 +807,20 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 	}
 }
 
-UINT8 sns_sa1_device::read_iram(UINT32 offset)
+uint8_t sns_sa1_device::read_iram(uint32_t offset)
 {
 	return m_internal_ram[offset & 0x7ff];
 }
 
-void sns_sa1_device::write_iram(UINT32 offset, UINT8 data)
+void sns_sa1_device::write_iram(uint32_t offset, uint8_t data)
 {
 	m_internal_ram[offset & 0x7ff] = data;
 }
 
-UINT8 sns_sa1_device::read_bwram(UINT32 offset)
+uint8_t sns_sa1_device::read_bwram(uint32_t offset)
 {
 	int shift;
-	UINT8 mask;
+	uint8_t mask;
 
 	if (m_nvram.empty())
 		return 0xff;    // this should probably never happen, or are there SA-1 games with no BWRAM?
@@ -850,9 +850,9 @@ UINT8 sns_sa1_device::read_bwram(UINT32 offset)
 	return (m_nvram[offset & (m_nvram.size() - 1)] >> shift) & mask;
 }
 
-void sns_sa1_device::write_bwram(UINT32 offset, UINT8 data)
+void sns_sa1_device::write_bwram(uint32_t offset, uint8_t data)
 {
-	UINT8 mask;
+	uint8_t mask;
 
 	if (m_nvram.empty())
 		return; // this should probably never happen, or are there SA-1 games with no BWRAM?
@@ -973,7 +973,7 @@ WRITE8_MEMBER(sns_sa1_device::write_h)
 
 READ8_MEMBER( sns_sa1_device::chip_read )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000 && address >= 0x2200 && address < 0x2400)
 		return read_regs(space, address & 0x1ff);   // SA-1 Regs
@@ -993,7 +993,7 @@ READ8_MEMBER( sns_sa1_device::chip_read )
 
 WRITE8_MEMBER( sns_sa1_device::chip_write )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000 && address >= 0x2200 && address < 0x2400)
 		write_regs(space, address & 0x1ff, data);  // SA-1 Regs
@@ -1019,7 +1019,7 @@ WRITE8_MEMBER( sns_sa1_device::chip_write )
 
 READ8_MEMBER( sns_sa1_device::sa1_hi_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -1045,7 +1045,7 @@ READ8_MEMBER( sns_sa1_device::sa1_hi_r )
 
 READ8_MEMBER( sns_sa1_device::sa1_lo_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -1099,7 +1099,7 @@ READ8_MEMBER( sns_sa1_device::sa1_lo_r )
 
 WRITE8_MEMBER( sns_sa1_device::sa1_hi_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000)
 	{
 		if (address < 0x6000)

@@ -31,7 +31,7 @@ const device_type YM2151 = &device_creator<ym2151_device>;
 #define ENV_QUIET       (TL_TAB_LEN>>3)
 
 
-const UINT8 ym2151_device::eg_inc[19*RATE_STEPS] = {
+const uint8_t ym2151_device::eg_inc[19*RATE_STEPS] = {
 	/*cycle:0 1  2 3  4 5  6 7*/
 
 	/* 0 */ 0,1, 0,1, 0,1, 0,1, /* rates 00..11 0 (increment by 0 or 1) */
@@ -63,7 +63,7 @@ const UINT8 ym2151_device::eg_inc[19*RATE_STEPS] = {
 #define O(a) (a*RATE_STEPS)
 
 /*note that there is no O(17) in this table - it's directly in the code */
-const UINT8 ym2151_device::eg_rate_select[32+64+32] = {   /* Envelope Generator rates (32 + 64 rates + 32 RKS) */
+const uint8_t ym2151_device::eg_rate_select[32+64+32] = {   /* Envelope Generator rates (32 + 64 rates + 32 RKS) */
 	/* 32 dummy (infinite time) rates */
 	O(18),O(18),O(18),O(18),O(18),O(18),O(18),O(18),
 	O(18),O(18),O(18),O(18),O(18),O(18),O(18),O(18),
@@ -109,7 +109,7 @@ const UINT8 ym2151_device::eg_rate_select[32+64+32] = {   /* Envelope Generator 
 /*mask  2047, 1023, 511, 255, 127, 63, 31, 15, 7,  3, 1,  0,  0,  0,  0,  0 */
 
 #define O(a) (a*1)
-const UINT8 ym2151_device::eg_rate_shift[32+64+32] = {    /* Envelope Generator counter shifts (32 + 64 rates + 32 RKS) */
+const uint8_t ym2151_device::eg_rate_shift[32+64+32] = {    /* Envelope Generator counter shifts (32 + 64 rates + 32 RKS) */
 	/* 32 infinite time rates */
 	O(0),O(0),O(0),O(0),O(0),O(0),O(0),O(0),
 	O(0),O(0),O(0),O(0),O(0),O(0),O(0),O(0),
@@ -160,14 +160,14 @@ const UINT8 ym2151_device::eg_rate_shift[32+64+32] = {    /* Envelope Generator 
 *   DT2=0 DT2=1 DT2=2 DT2=3
 *   0     600   781   950
 */
-const UINT32 ym2151_device::dt2_tab[4] = { 0, 384, 500, 608 };
+const uint32_t ym2151_device::dt2_tab[4] = { 0, 384, 500, 608 };
 
 /*  DT1 defines offset in Hertz from base note
 *   This table is converted while initialization...
 *   Detune table shown in YM2151 User's Manual is wrong (verified on the real chip)
 */
 
-const UINT8 ym2151_device::dt1_tab[4*32] = { /* 4*32 DT1 values */
+const uint8_t ym2151_device::dt1_tab[4*32] = { /* 4*32 DT1 values */
 /* DT1=0 */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -185,7 +185,7 @@ const UINT8 ym2151_device::dt1_tab[4*32] = { /* 4*32 DT1 values */
 	8, 8, 9,10,11,12,13,14,16,17,19,20,22,22,22,22
 };
 
-const UINT16 ym2151_device::phaseinc_rom[768] = {
+const uint16_t ym2151_device::phaseinc_rom[768] = {
 	1299,1300,1301,1302,1303,1304,1305,1306,1308,1309,1310,1311,1313,1314,1315,1316,
 	1318,1319,1320,1321,1322,1323,1324,1325,1327,1328,1329,1330,1332,1333,1334,1335,
 	1337,1338,1339,1340,1341,1342,1343,1344,1346,1347,1348,1349,1351,1352,1353,1354,
@@ -255,7 +255,7 @@ const UINT16 ym2151_device::phaseinc_rom[768] = {
         some 0x80 could be 0x81 as well as some 0x00 could be 0x01.
 */
 
-const UINT8 ym2151_device::lfo_noise_waveform[256] = {
+const uint8_t ym2151_device::lfo_noise_waveform[256] = {
 	0xFF,0xEE,0xD3,0x80,0x58,0xDA,0x7F,0x94,0x9E,0xE3,0xFA,0x00,0x4D,0xFA,0xFF,0x6A,
 	0x7A,0xDE,0x49,0xF6,0x00,0x33,0xBB,0x63,0x91,0x60,0x51,0xFF,0x00,0xD8,0x7F,0xDE,
 	0xDC,0x73,0x21,0x85,0xB2,0x9C,0x5D,0x24,0xCD,0x91,0x9E,0x76,0x7F,0x20,0xFB,0xF3,
@@ -404,7 +404,7 @@ void ym2151_device::init_tables()
 	}
 }
 
-void ym2151_device::YM2151Operator::key_on(UINT32 key_set, UINT32 eg_cnt)
+void ym2151_device::YM2151Operator::key_on(uint32_t key_set, uint32_t eg_cnt)
 {
 	if (!key)
 	{
@@ -421,7 +421,7 @@ void ym2151_device::YM2151Operator::key_on(UINT32 key_set, UINT32 eg_cnt)
 }
 
 
-void ym2151_device::YM2151Operator::key_off(UINT32 key_set)
+void ym2151_device::YM2151Operator::key_off(uint32_t key_set)
 {
 	if (key)
 	{
@@ -437,7 +437,7 @@ void ym2151_device::YM2151Operator::key_off(UINT32 key_set)
 void ym2151_device::envelope_KONKOFF(YM2151Operator * op, int v)
 {
 	// m1, m2, c1, c2
-	static UINT8 masks[4] = { 0x08, 0x20, 0x10, 0x40 };
+	static uint8_t masks[4] = { 0x08, 0x20, 0x10, 0x40 };
 	for(int i=0; i != 4; i++)
 		if (v & masks[i]) /* M1 */
 			op[i].key_on(1, eg_cnt);
@@ -540,8 +540,8 @@ void ym2151_device::set_connect(YM2151Operator *om1, int cha, int v)
 
 void ym2151_device::refresh_EG(YM2151Operator * op)
 {
-	UINT32 kc;
-	UINT32 v;
+	uint32_t kc;
+	uint32_t v;
 
 	kc = op->kc;
 
@@ -764,7 +764,7 @@ void ym2151_device::write_reg(int r, int v)
 			v &= 0x7f;
 			if (v != op->kc)
 			{
-				UINT32 kc, kc_channel;
+				uint32_t kc, kc_channel;
 
 				kc_channel = (v - (v>>2))*64;
 				kc_channel += 768;
@@ -801,7 +801,7 @@ void ym2151_device::write_reg(int r, int v)
 			v >>= 2;
 			if (v !=  (op->kc_i & 63))
 			{
-				UINT32 kc_channel;
+				uint32_t kc_channel;
 
 				kc_channel = v;
 				kc_channel |= (op->kc_i & ~63);
@@ -827,8 +827,8 @@ void ym2151_device::write_reg(int r, int v)
 
 	case 0x40:      /* DT1, MUL */
 		{
-			UINT32 olddt1_i = op->dt1_i;
-			UINT32 oldmul = op->mul;
+			uint32_t olddt1_i = op->dt1_i;
+			uint32_t oldmul = op->mul;
 
 			op->dt1_i = (v&0x70)<<1;
 			op->mul   = (v&0x0f) ? (v&0x0f)<<1: 1;
@@ -847,8 +847,8 @@ void ym2151_device::write_reg(int r, int v)
 
 	case 0x80:      /* KS, AR */
 		{
-			UINT32 oldks = op->ks;
-			UINT32 oldar = op->ar;
+			uint32_t oldks = op->ks;
+			uint32_t oldar = op->ar;
 
 			op->ks = 5-(v>>6);
 			op->ar = (v&0x1f) ? 32 + ((v&0x1f)<<1) : 0;
@@ -888,7 +888,7 @@ void ym2151_device::write_reg(int r, int v)
 
 	case 0xc0:      /* DT2, D2R */
 		{
-			UINT32 olddt2 = op->dt2;
+			uint32_t olddt2 = op->dt2;
 			op->dt2 = dt2_tab[ v>>6 ];
 			if (op->dt2 != olddt2)
 				op->freq = ( (freq[ op->kc_i + op->dt2 ] + op->dt1) * op->mul ) >> 1;
@@ -1023,7 +1023,7 @@ void ym2151_device::device_start()
 
 int ym2151_device::op_calc(YM2151Operator * OP, unsigned int env, signed int pm)
 {
-	UINT32 p;
+	uint32_t p;
 
 
 	p = (env<<3) + sin_tab[ ( ((signed int)((OP->phase & ~FREQ_MASK) + (pm<<15))) >> FREQ_SH ) & SIN_MASK ];
@@ -1036,8 +1036,8 @@ int ym2151_device::op_calc(YM2151Operator * OP, unsigned int env, signed int pm)
 
 int ym2151_device::op_calc1(YM2151Operator * OP, unsigned int env, signed int pm)
 {
-	UINT32 p;
-	INT32  i;
+	uint32_t p;
+	int32_t  i;
 
 
 	i = (OP->phase & ~FREQ_MASK) + pm;
@@ -1056,13 +1056,13 @@ int ym2151_device::op_calc1(YM2151Operator * OP, unsigned int env, signed int pm
 
 
 
-#define volume_calc(OP) ((OP)->tl + ((UINT32)(OP)->volume) + (AM & (OP)->AMmask))
+#define volume_calc(OP) ((OP)->tl + ((uint32_t)(OP)->volume) + (AM & (OP)->AMmask))
 
 void ym2151_device::chan_calc(unsigned int chan)
 {
 	YM2151Operator *op;
 	unsigned int env;
-	UINT32 AM = 0;
+	uint32_t AM = 0;
 
 	m2 = c1 = c2 = mem = 0;
 	op = &oper[chan*4];    /* M1 */
@@ -1073,7 +1073,7 @@ void ym2151_device::chan_calc(unsigned int chan)
 		AM = lfa << (op->ams-1);
 	env = volume_calc(op);
 	{
-		INT32 out = op->fb_out_prev + op->fb_out_curr;
+		int32_t out = op->fb_out_prev + op->fb_out_curr;
 		op->fb_out_prev = op->fb_out_curr;
 
 		if (!op->connect)
@@ -1113,7 +1113,7 @@ void ym2151_device::chan7_calc()
 {
 	YM2151Operator *op;
 	unsigned int env;
-	UINT32 AM = 0;
+	uint32_t AM = 0;
 
 	m2 = c1 = c2 = mem = 0;
 	op = &oper[7*4];       /* M1 */
@@ -1124,7 +1124,7 @@ void ym2151_device::chan7_calc()
 		AM = lfa << (op->ams-1);
 	env = volume_calc(op);
 	{
-		INT32 out = op->fb_out_prev + op->fb_out_curr;
+		int32_t out = op->fb_out_prev + op->fb_out_curr;
 		op->fb_out_prev = op->fb_out_curr;
 
 		if (!op->connect)
@@ -1154,7 +1154,7 @@ void ym2151_device::chan7_calc()
 	env = volume_calc(op+3);    /* C2 */
 	if (noise & 0x80)
 	{
-		UINT32 noiseout;
+		uint32_t noiseout;
 
 		noiseout = 0;
 		if (env < 0x3ff)
@@ -1557,7 +1557,7 @@ void ym2151_device::advance()
 	noise_p &= 0xffff;
 	while (i)
 	{
-		UINT32 j;
+		uint32_t j;
 		j = ( (noise_rng ^ (noise_rng>>3) ) & 1) ^ 1;
 		noise_rng = (j<<16) | (noise_rng>>1);
 		i--;
@@ -1571,7 +1571,7 @@ void ym2151_device::advance()
 	{
 		if (op->pms)    /* only when phase modulation from LFO is enabled for this channel */
 		{
-			INT32 mod_ind = lfp;       /* -128..+127 (8bits signed) */
+			int32_t mod_ind = lfp;       /* -128..+127 (8bits signed) */
 			if (op->pms < 6)
 				mod_ind >>= (6 - op->pms);
 			else
@@ -1579,7 +1579,7 @@ void ym2151_device::advance()
 
 			if (mod_ind)
 			{
-				UINT32 kc_channel = op->kc_i + mod_ind;
+				uint32_t kc_channel = op->kc_i + mod_ind;
 				(op+0)->phase += ( (freq[ kc_channel + (op+0)->dt2 ] + (op+0)->dt1) * (op+0)->mul ) >> 1;
 				(op+1)->phase += ( (freq[ kc_channel + (op+1)->dt2 ] + (op+1)->dt1) * (op+1)->mul ) >> 1;
 				(op+2)->phase += ( (freq[ kc_channel + (op+2)->dt2 ] + (op+2)->dt1) * (op+2)->mul ) >> 1;
@@ -1649,7 +1649,7 @@ void ym2151_device::advance()
 //  ym2151_device - constructor
 //-------------------------------------------------
 
-ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YM2151, "YM2151", tag, owner, clock, "ym2151", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

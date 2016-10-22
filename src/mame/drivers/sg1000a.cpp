@@ -132,7 +132,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
 	DECLARE_DRIVER_INIT(sg1000a);
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 };
 
 

@@ -7,7 +7,7 @@
 class k007121_device : public device_t
 {
 public:
-	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k007121_device() {}
 
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -17,7 +17,7 @@ public:
 
 	/* shall we move source in the interface? */
 	/* also notice that now we directly pass *gfx[chip] instead of **gfx !! */
-	void sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, palette_device &palette, const UINT8 *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, UINT32 pri_mask, bool is_flakatck = false );
+	void sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, palette_device &palette, const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask, bool is_flakatck = false );
 
 protected:
 	// device-level overrides
@@ -27,7 +27,7 @@ protected:
 
 private:
 	// internal state
-	UINT8    m_ctrlram[8];
+	uint8_t    m_ctrlram[8];
 	int      m_flipscreen;
 	required_device<palette_device> m_palette;
 };

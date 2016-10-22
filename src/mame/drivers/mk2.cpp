@@ -73,7 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mk2_write_a);
 	DECLARE_READ8_MEMBER(mk2_read_b);
 	DECLARE_WRITE8_MEMBER(mk2_write_b);
-	UINT8 m_led[5];
+	uint8_t m_led[5];
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
 };
@@ -160,7 +160,7 @@ READ8_MEMBER( mk2_state::mk2_read_a )
 
 WRITE8_MEMBER( mk2_state::mk2_write_a )
 {
-	UINT8 temp = m_miot->portb_out_get();
+	uint8_t temp = m_miot->portb_out_get();
 
 	m_led[temp & 3] |= data;
 }

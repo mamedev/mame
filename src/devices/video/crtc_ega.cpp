@@ -18,7 +18,7 @@
 const device_type CRTC_EGA = &device_creator<crtc_ega_device>;
 
 
-crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CRTC_EGA, "crtc_EGA", tag, owner, clock, "crtc_ega", __FILE__),
 		device_video_interface(mconfig, *this, false),
 		m_res_out_de_cb(*this),
@@ -50,7 +50,7 @@ WRITE8_MEMBER( crtc_ega_device::address_w )
 
 READ8_MEMBER( crtc_ega_device::register_r )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch (m_register_address_latch)
 	{
@@ -136,15 +136,15 @@ WRITE8_MEMBER( crtc_ega_device::register_w )
 
 void crtc_ega_device::recompute_parameters(bool postload)
 {
-	UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
+	uint16_t hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
 
 	/* compute the screen sizes */
-	UINT16 horiz_pix_total = (m_horiz_char_total + 2) * m_hpixels_per_column;
-	UINT16 vert_pix_total = m_vert_total + 1;
+	uint16_t horiz_pix_total = (m_horiz_char_total + 2) * m_hpixels_per_column;
+	uint16_t vert_pix_total = m_vert_total + 1;
 
 	/* determine the visible area, avoid division by 0 */
-	UINT16 max_visible_x = ( m_horiz_disp + 1 ) * m_hpixels_per_column - 1;
-	UINT16 max_visible_y = m_vert_disp_end;
+	uint16_t max_visible_x = ( m_horiz_disp + 1 ) * m_hpixels_per_column - 1;
+	uint16_t max_visible_y = m_vert_disp_end;
 
 	/* determine the syncing positions */
 	int horiz_sync_char_width = ( m_horiz_retr_end + 1 ) - ( m_horiz_retr_start & 0x1f );
@@ -412,7 +412,7 @@ void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 	case TIMER_HSYNC_ON:
 		{
-			INT8 hsync_width = ( 0x20 | m_horiz_blank_end ) - ( m_horiz_blank_start & 0x1f );
+			int8_t hsync_width = ( 0x20 | m_horiz_blank_end ) - ( m_horiz_blank_start & 0x1f );
 
 			if ( hsync_width <= 0 )
 			{
@@ -439,7 +439,7 @@ void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 
 
-UINT16 crtc_ega_device::get_ma()
+uint16_t crtc_ega_device::get_ma()
 {
 	update_counters();
 
@@ -447,7 +447,7 @@ UINT16 crtc_ega_device::get_ma()
 }
 
 
-UINT8 crtc_ega_device::get_ra()
+uint8_t crtc_ega_device::get_ra()
 {
 	return m_raster_counter;
 }
@@ -490,7 +490,7 @@ void crtc_ega_device::set_hpixels_per_column(int hpixels_per_column)
 void crtc_ega_device::update_cursor_state()
 {
 	/* save and increment cursor counter */
-	UINT8 last_cursor_blink_count = m_cursor_blink_count;
+	uint8_t last_cursor_blink_count = m_cursor_blink_count;
 	m_cursor_blink_count = m_cursor_blink_count + 1;
 
 	/* switch on cursor blinking mode */
@@ -521,13 +521,13 @@ void crtc_ega_device::update_cursor_state()
 }
 
 
-UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	assert(bitmap.valid());
 
 	if (m_has_valid_parameters)
 	{
-		UINT16 y;
+		uint16_t y;
 
 		assert(!m_row_update_cb.isnull());
 
@@ -545,7 +545,7 @@ UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			/* compute the current raster line */
-			UINT8 ra = y % (m_max_ras_addr + 1);
+			uint8_t ra = y % (m_max_ras_addr + 1);
 
 			/* check if the cursor is visible and is on this scanline */
 			int cursor_visible = m_cursor_state &&
@@ -555,7 +555,7 @@ UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 								(m_cursor_addr < (m_current_disp_addr + ( m_horiz_disp + 1 )));
 
 			/* compute the cursor X position, or -1 if not visible */
-			INT8 cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
+			int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
 
 			/* call the external system to draw it */
 			m_row_update_cb(bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp + 1, cursor_x);

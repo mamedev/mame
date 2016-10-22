@@ -91,7 +91,7 @@ PDESC_EXPAND = {
     "wd1":   expand_wd1,
     "b1":    lambda v: "pc = ",
     "b2":    lambda v: "  sti |= S_BRANCH;",
-    "sfai1": lambda v: ["",  "((INT32)("][v["sfai"]],
+    "sfai1": lambda v: ["",  "((int32_t)("][v["sfai"]],
     "sfai2": lambda v: ["",  ")) >> 1"][v["sfai"]],
 }
 

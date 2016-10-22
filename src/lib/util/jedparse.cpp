@@ -38,8 +38,8 @@
 
 struct jed_parse_info
 {
-	UINT16      checksum;               /* checksum value */
-	UINT32      explicit_numfuses;      /* explicitly specified number of fuses */
+	uint16_t      checksum;               /* checksum value */
+	uint32_t      explicit_numfuses;      /* explicitly specified number of fuses */
 };
 
 
@@ -86,10 +86,10 @@ static int isdelim(char c)
     character stream
 -------------------------------------------------*/
 
-static UINT32 suck_number(const UINT8 **psrc)
+static uint32_t suck_number(const uint8_t **psrc)
 {
-	const UINT8 *src = *psrc;
-	UINT32 value = 0;
+	const uint8_t *src = *psrc;
+	uint32_t value = 0;
 
 	/* skip delimiters */
 	while (isdelim(*src))
@@ -117,7 +117,7 @@ static UINT32 suck_number(const UINT8 **psrc)
     process_field - process a single JEDEC field
 -------------------------------------------------*/
 
-static void process_field(jed_data *data, const UINT8 *cursrc, const UINT8 *srcend, jed_parse_info *pinfo)
+static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *srcend, jed_parse_info *pinfo)
 {
 	/* switch off of the field type */
 	switch (*cursrc)
@@ -147,7 +147,7 @@ static void process_field(jed_data *data, const UINT8 *cursrc, const UINT8 *srce
 		/* fuse states */
 		case 'L':
 		{
-			UINT32 curfuse;
+			uint32_t curfuse;
 
 			/* read the fuse number */
 			cursrc++;
@@ -189,11 +189,11 @@ static void process_field(jed_data *data, const UINT8 *cursrc, const UINT8 *srce
 
 int jed_parse(const void *data, size_t length, jed_data *result)
 {
-	const UINT8 *cursrc = (const UINT8 *)data;
-	const UINT8 *srcend = cursrc + length;
-	const UINT8 *scan;
+	const uint8_t *cursrc = (const uint8_t *)data;
+	const uint8_t *srcend = cursrc + length;
+	const uint8_t *scan;
 	jed_parse_info pinfo;
-	UINT16 checksum;
+	uint16_t checksum;
 	int i;
 
 	/* initialize the output and the intermediate info struct */
@@ -218,7 +218,7 @@ int jed_parse(const void *data, size_t length, jed_data *result)
 	checksum += *scan;
 	if (scan + 4 < srcend && ishex(scan[1]) && ishex(scan[2]) && ishex(scan[3]) && ishex(scan[4]))
 	{
-		UINT16 dessum = (hexval(scan[1]) << 12) | (hexval(scan[2]) << 8) | (hexval(scan[3]) << 4) | hexval(scan[4] << 0);
+		uint16_t dessum = (hexval(scan[1]) << 12) | (hexval(scan[2]) << 8) | (hexval(scan[3]) << 4) | hexval(scan[4] << 0);
 		if (dessum != 0 && dessum != checksum)
 			return JEDERR_BAD_XMIT_SUM;
 	}
@@ -283,13 +283,13 @@ int jed_parse(const void *data, size_t length, jed_data *result)
 
 size_t jed_output(const jed_data *data, void *result, size_t length)
 {
-	UINT8 *curdst = (UINT8 *)result;
-	UINT8 *dstend = curdst + length;
+	uint8_t *curdst = (uint8_t *)result;
+	uint8_t *dstend = curdst + length;
 	int i, zeros, ones;
 	char tempbuf[256];
-	UINT16 checksum;
-	UINT8 defbyte;
-	UINT8 *temp;
+	uint16_t checksum;
+	uint8_t defbyte;
+	uint8_t *temp;
 
 	/* always start the DST with a standard header and an STX */
 	tempbuf[0] = 0x02;
@@ -355,7 +355,7 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 
 	/* now compute the transmission checksum */
 	checksum = 0;
-	for (temp = (UINT8 *)result; temp < curdst && temp < dstend; temp++)
+	for (temp = (uint8_t *)result; temp < curdst && temp < dstend; temp++)
 		checksum += *temp & 0x7f;
 	checksum += 0x03;
 
@@ -367,7 +367,7 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 	curdst += strlen(tempbuf);
 
 	/* return the final size */
-	return curdst - (UINT8 *)result;
+	return curdst - (uint8_t *)result;
 }
 
 
@@ -379,7 +379,7 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 
 int jedbin_parse(const void *data, size_t length, jed_data *result)
 {
-	const UINT8 *cursrc = (const UINT8 *)data;
+	const uint8_t *cursrc = (const uint8_t *)data;
 
 	/* initialize the output */
 	memset(result, 0, sizeof(*result));
@@ -424,7 +424,7 @@ int jedbin_parse(const void *data, size_t length, jed_data *result)
 
 size_t jedbin_output(const jed_data *data, void *result, size_t length)
 {
-	UINT8 *curdst = (UINT8 *)result;
+	uint8_t *curdst = (uint8_t *)result;
 
 	/* ensure we have enough room */
 	if (length >= 4 + (data->numfuses + 7) / 8)

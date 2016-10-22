@@ -20,7 +20,7 @@ class pc_kbd_microsoft_natural_device : public device_t,
 {
 public:
 	// construction/destruction
-	pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<cpu_device> m_cpu;
 
@@ -61,10 +61,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	UINT8   m_p0;
-	UINT8   m_p1;
-	UINT8   m_p2;
-	UINT8   m_p3;
+	uint8_t   m_p0;
+	uint8_t   m_p1;
+	uint8_t   m_p2;
+	uint8_t   m_p3;
 };
 
 

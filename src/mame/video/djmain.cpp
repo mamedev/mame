@@ -57,8 +57,8 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 		flipy = (m_obj_ram[offs] >> 11) & 1;
 		size = sizetab[(m_obj_ram[offs] >> 8) & 3];
 
-		ox = (INT16)(m_obj_ram[offs + 1] & 0xffff);
-		oy = (INT16)(m_obj_ram[offs + 1] >> 16);
+		ox = (int16_t)(m_obj_ram[offs + 1] & 0xffff);
+		oy = (int16_t)(m_obj_ram[offs + 1] >> 16);
 
 		xscale = m_obj_ram[offs + 2] >> 16;
 		yscale = m_obj_ram[offs + 2] & 0xffff;
@@ -140,7 +140,7 @@ void djmain_state::video_start()
 	m_k056832->set_layer_offs(1, -88, -27);
 }
 
-UINT32 djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	int pri[NUM_LAYERS + 1];

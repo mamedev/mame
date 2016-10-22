@@ -177,12 +177,12 @@ enum
 /* Configuration structure */
 struct tms34010_display_params
 {
-	UINT16  vcount;                             /* most recent VCOUNT */
-	UINT16  veblnk, vsblnk;                     /* start/end of VBLANK */
-	UINT16  heblnk, hsblnk;                     /* start/end of HBLANK */
-	UINT16  rowaddr, coladdr;                   /* row/column addresses */
-	UINT8   yoffset;                            /* y offset from addresses */
-	UINT8   enabled;                            /* video enabled */
+	uint16_t  vcount;                             /* most recent VCOUNT */
+	uint16_t  veblnk, vsblnk;                     /* start/end of VBLANK */
+	uint16_t  heblnk, hsblnk;                     /* start/end of HBLANK */
+	uint16_t  rowaddr, coladdr;                   /* row/column addresses */
+	uint8_t   yoffset;                            /* y offset from addresses */
+	uint8_t   enabled;                            /* video enabled */
 };
 
 
@@ -215,17 +215,17 @@ typedef device_delegate<void (screen_device &screen, bitmap_rgb32 &bitmap, int s
 	devcb = &tms340x0_device::set_output_int_callback(*device, DEVCB_##_devcb);
 
 
-typedef device_delegate<void (address_space &space, offs_t address, UINT16 *shiftreg)> to_shiftreg_cb_delegate;
+typedef device_delegate<void (address_space &space, offs_t address, uint16_t *shiftreg)> to_shiftreg_cb_delegate;
 
-#define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, UINT16 *shiftreg)
+#define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
 
 #define MCFG_TMS340X0_TO_SHIFTREG_CB(_class, _method) \
 		tms340x0_device::set_to_shiftreg_callback(*device, to_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 
-typedef device_delegate<void (address_space &space, offs_t address, UINT16 *shiftreg)> from_shiftreg_cb_delegate;
+typedef device_delegate<void (address_space &space, offs_t address, uint16_t *shiftreg)> from_shiftreg_cb_delegate;
 
-#define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, UINT16 *shiftreg)
+#define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
 
 #define MCFG_TMS340X0_FROM_SHIFTREG_CB(_class, _method) \
 		tms340x0_device::set_from_shiftreg_callback(*device, from_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
@@ -236,10 +236,10 @@ class tms340x0_device : public cpu_device,
 {
 public:
 	// construction/destruction
-	tms340x0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
+	tms340x0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
 
 	static void set_halt_on_reset(device_t &device, bool halt_on_reset) { downcast<tms340x0_device &>(device).m_halt_on_reset = halt_on_reset; }
-	static void set_pixel_clock(device_t &device, UINT32 pixclock) { downcast<tms340x0_device &>(device).m_pixclock = pixclock; }
+	static void set_pixel_clock(device_t &device, uint32_t pixclock) { downcast<tms340x0_device &>(device).m_pixclock = pixclock; }
 	static void set_pixels_per_clock(device_t &device, int pixperclock) { downcast<tms340x0_device &>(device).m_pixperclock = pixperclock; }
 	static void set_scanline_ind16_callback(device_t &device, scanline_ind16_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_ind16_cb = callback; }
 	static void set_scanline_rgb32_callback(device_t &device, scanline_rgb32_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_rgb32_cb = callback; }
@@ -250,8 +250,8 @@ public:
 	void get_display_params(tms34010_display_params *params);
 	void tms34010_state_postload();
 
-	UINT32 tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual DECLARE_WRITE16_MEMBER(io_register_w) = 0;
 	virtual DECLARE_READ16_MEMBER(io_register_r) = 0;
@@ -268,9 +268,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 10000; }
-	virtual UINT32 execute_input_lines() const override { return 2; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 10000; }
+	virtual uint32_t execute_input_lines() const override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -281,26 +281,26 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; }
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; }
 
-	typedef void (tms340x0_device::*pixel_write_func)(offs_t offset, UINT32 data);
-	typedef UINT32 (tms340x0_device::*pixel_read_func)(offs_t offset);
-	typedef UINT32 (tms340x0_device::*raster_op_func)(UINT32 newpix, UINT32 oldpix);
-	typedef void (tms340x0_device::*wfield_func)(offs_t offset, UINT32 data);
-	typedef UINT32 (tms340x0_device::*rfield_func)(offs_t offset);
-	typedef void (tms340x0_device::*opcode_func)(UINT16 op);
-	typedef UINT32 (tms340x0_device::*pixel_op_func)(UINT32, UINT32, UINT32);
+	typedef void (tms340x0_device::*pixel_write_func)(offs_t offset, uint32_t data);
+	typedef uint32_t (tms340x0_device::*pixel_read_func)(offs_t offset);
+	typedef uint32_t (tms340x0_device::*raster_op_func)(uint32_t newpix, uint32_t oldpix);
+	typedef void (tms340x0_device::*wfield_func)(offs_t offset, uint32_t data);
+	typedef uint32_t (tms340x0_device::*rfield_func)(offs_t offset);
+	typedef void (tms340x0_device::*opcode_func)(uint16_t op);
+	typedef uint32_t (tms340x0_device::*pixel_op_func)(uint32_t, uint32_t, uint32_t);
 	typedef void (tms340x0_device::*pixblt_op_func)(int, int);
 	typedef void (tms340x0_device::*pixblt_b_op_func)(int);
-	typedef void (tms340x0_device::*word_write_func)(address_space &space, offs_t offset,UINT16 data);
-	typedef UINT16 (tms340x0_device::*word_read_func)(address_space &space, offs_t offset);
+	typedef void (tms340x0_device::*word_write_func)(address_space &space, offs_t offset,uint16_t data);
+	typedef uint16_t (tms340x0_device::*word_read_func)(address_space &space, offs_t offset);
 
 	static const wfield_func s_wfield_functions[32];
 	static const rfield_func s_rfield_functions[64];
 	static const opcode_func s_opcode_table[65536 >> 4];
 	static const pixel_op_func s_pixel_op_table[32];
-	static const UINT8 s_pixel_op_timing_table[33];
+	static const uint8_t s_pixel_op_timing_table[33];
 	static const pixblt_op_func s_pixblt_op_table[];
 	static const pixblt_op_func s_pixblt_r_op_table[];
 	static const pixblt_b_op_func s_pixblt_b_op_table[];
@@ -311,28 +311,28 @@ protected:
 
 	address_space_config m_program_config;
 
-	UINT32           m_pc;
-	UINT32           m_ppc;
-	UINT32           m_st;
+	uint32_t           m_pc;
+	uint32_t           m_ppc;
+	uint32_t           m_st;
 	pixel_write_func m_pixel_write;
 	pixel_read_func  m_pixel_read;
 	raster_op_func   m_raster_op;
 	pixel_op_func    m_pixel_op;
-	UINT32           m_pixel_op_timing;
-	UINT32           m_convsp;
-	UINT32           m_convdp;
-	UINT32           m_convmp;
-	INT32            m_gfxcycles;
-	UINT8            m_pixelshift;
-	UINT8            m_is_34020;
+	uint32_t           m_pixel_op_timing;
+	uint32_t           m_convsp;
+	uint32_t           m_convdp;
+	uint32_t           m_convmp;
+	int32_t            m_gfxcycles;
+	uint8_t            m_pixelshift;
+	uint8_t            m_is_34020;
 	bool             m_reset_deferred;
 	bool             m_halt_on_reset; /* /HCS pin, which determines HALT state after reset */
-	UINT8            m_hblank_stable;
-	UINT8            m_external_host_access;
-	UINT8            m_executing;
+	uint8_t            m_hblank_stable;
+	uint8_t            m_external_host_access;
+	uint8_t            m_executing;
 	address_space *m_program;
 	direct_read_data *m_direct;
-	UINT32  m_pixclock;                           /* the pixel clock (0 means don't adjust screen size) */
+	uint32_t  m_pixclock;                           /* the pixel clock (0 means don't adjust screen size) */
 	int     m_pixperclock;                        /* pixels per clock */
 	emu_timer *m_scantimer;
 	int m_icount;
@@ -346,11 +346,11 @@ protected:
 	struct XY
 	{
 #ifdef LSB_FIRST
-		INT16 x;
-		INT16 y;
+		int16_t x;
+		int16_t y;
 #else
-		INT16 y;
-		INT16 x;
+		int16_t y;
+		int16_t x;
 #endif
 	};
 
@@ -358,578 +358,578 @@ protected:
 	/* B registers 0-15 map to regs[30]-regs[15] */
 	union
 	{
-		INT32 reg;
+		int32_t reg;
 		XY xy;
 	} m_regs[31];
 
-	UINT16 m_IOregs[64];
-	UINT16              m_shiftreg[(8 * 512 * sizeof(UINT16))/2];
+	uint16_t m_IOregs[64];
+	uint16_t              m_shiftreg[(8 * 512 * sizeof(uint16_t))/2];
 
-	UINT32 TMS34010_RDMEM_DWORD(offs_t A);
-	void TMS34010_WRMEM_DWORD(offs_t A, UINT32 V);
-	void SET_ST(UINT32 st);
+	uint32_t TMS34010_RDMEM_DWORD(offs_t A);
+	void TMS34010_WRMEM_DWORD(offs_t A, uint32_t V);
+	void SET_ST(uint32_t st);
 	void RESET_ST();
-	UINT32 ROPCODE();
-	INT16 PARAM_WORD();
-	INT32 PARAM_LONG();
-	INT16 PARAM_WORD_NO_INC();
-	INT32 PARAM_LONG_NO_INC();
-	UINT32 RBYTE(offs_t offset);
-	void WBYTE(offs_t offset, UINT32 data);
-	UINT32 RLONG(offs_t offset);
-	void WLONG(offs_t offset, UINT32 data);
-	void PUSH(UINT32 data);
-	INT32 POP();
-	UINT32 read_pixel_1(offs_t offset);
-	UINT32 read_pixel_2(offs_t offset);
-	UINT32 read_pixel_4(offs_t offset);
-	UINT32 read_pixel_8(offs_t offset);
-	UINT32 read_pixel_16(offs_t offset);
-	UINT32 read_pixel_32(offs_t offset);
-	UINT32 read_pixel_shiftreg(offs_t offset);
-	void write_pixel_1(offs_t offset, UINT32 data);
-	void write_pixel_2(offs_t offset, UINT32 data);
-	void write_pixel_4(offs_t offset, UINT32 data);
-	void write_pixel_8(offs_t offset, UINT32 data);
-	void write_pixel_16(offs_t offset, UINT32 data);
-	void write_pixel_32(offs_t offset, UINT32 data);
-	void write_pixel_t_1(offs_t offset, UINT32 data);
-	void write_pixel_t_2(offs_t offset, UINT32 data);
-	void write_pixel_t_4(offs_t offset, UINT32 data);
-	void write_pixel_t_8(offs_t offset, UINT32 data);
-	void write_pixel_t_16(offs_t offset, UINT32 data);
-	void write_pixel_t_32(offs_t offset, UINT32 data);
-	void write_pixel_r_1(offs_t offset, UINT32 data);
-	void write_pixel_r_2(offs_t offset, UINT32 data);
-	void write_pixel_r_4(offs_t offset, UINT32 data);
-	void write_pixel_r_8(offs_t offset, UINT32 data);
-	void write_pixel_r_16(offs_t offset, UINT32 data);
-	void write_pixel_r_32(offs_t offset, UINT32 data);
-	void write_pixel_r_t_1(offs_t offset, UINT32 data);
-	void write_pixel_r_t_2(offs_t offset, UINT32 data);
-	void write_pixel_r_t_4(offs_t offset, UINT32 data);
-	void write_pixel_r_t_8(offs_t offset, UINT32 data);
-	void write_pixel_r_t_16(offs_t offset, UINT32 data);
-	void write_pixel_r_t_32(offs_t offset, UINT32 data);
-	void write_pixel_shiftreg(offs_t offset, UINT32 data);
-	UINT32 raster_op_1(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_2(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_3(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_4(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_5(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_6(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_7(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_8(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_9(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_10(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_11(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_12(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_13(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_14(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_15(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_16(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_17(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_18(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_19(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_20(UINT32 newpix, UINT32 oldpix);
-	UINT32 raster_op_21(UINT32 newpix, UINT32 oldpix);
-	void wfield_01(offs_t offset, UINT32 data);
-	void wfield_02(offs_t offset, UINT32 data);
-	void wfield_03(offs_t offset, UINT32 data);
-	void wfield_04(offs_t offset, UINT32 data);
-	void wfield_05(offs_t offset, UINT32 data);
-	void wfield_06(offs_t offset, UINT32 data);
-	void wfield_07(offs_t offset, UINT32 data);
-	void wfield_08(offs_t offset, UINT32 data);
-	void wfield_09(offs_t offset, UINT32 data);
-	void wfield_10(offs_t offset, UINT32 data);
-	void wfield_11(offs_t offset, UINT32 data);
-	void wfield_12(offs_t offset, UINT32 data);
-	void wfield_13(offs_t offset, UINT32 data);
-	void wfield_14(offs_t offset, UINT32 data);
-	void wfield_15(offs_t offset, UINT32 data);
-	void wfield_16(offs_t offset, UINT32 data);
-	void wfield_17(offs_t offset, UINT32 data);
-	void wfield_18(offs_t offset, UINT32 data);
-	void wfield_19(offs_t offset, UINT32 data);
-	void wfield_20(offs_t offset, UINT32 data);
-	void wfield_21(offs_t offset, UINT32 data);
-	void wfield_22(offs_t offset, UINT32 data);
-	void wfield_23(offs_t offset, UINT32 data);
-	void wfield_24(offs_t offset, UINT32 data);
-	void wfield_25(offs_t offset, UINT32 data);
-	void wfield_26(offs_t offset, UINT32 data);
-	void wfield_27(offs_t offset, UINT32 data);
-	void wfield_28(offs_t offset, UINT32 data);
-	void wfield_29(offs_t offset, UINT32 data);
-	void wfield_30(offs_t offset, UINT32 data);
-	void wfield_31(offs_t offset, UINT32 data);
-	void wfield_32(offs_t offset, UINT32 data);
-	UINT32 rfield_z_01(offs_t offset);
-	UINT32 rfield_z_02(offs_t offset);
-	UINT32 rfield_z_03(offs_t offset);
-	UINT32 rfield_z_04(offs_t offset);
-	UINT32 rfield_z_05(offs_t offset);
-	UINT32 rfield_z_06(offs_t offset);
-	UINT32 rfield_z_07(offs_t offset);
-	UINT32 rfield_z_08(offs_t offset);
-	UINT32 rfield_z_09(offs_t offset);
-	UINT32 rfield_z_10(offs_t offset);
-	UINT32 rfield_z_11(offs_t offset);
-	UINT32 rfield_z_12(offs_t offset);
-	UINT32 rfield_z_13(offs_t offset);
-	UINT32 rfield_z_14(offs_t offset);
-	UINT32 rfield_z_15(offs_t offset);
-	UINT32 rfield_z_16(offs_t offset);
-	UINT32 rfield_z_17(offs_t offset);
-	UINT32 rfield_z_18(offs_t offset);
-	UINT32 rfield_z_19(offs_t offset);
-	UINT32 rfield_z_20(offs_t offset);
-	UINT32 rfield_z_21(offs_t offset);
-	UINT32 rfield_z_22(offs_t offset);
-	UINT32 rfield_z_23(offs_t offset);
-	UINT32 rfield_z_24(offs_t offset);
-	UINT32 rfield_z_25(offs_t offset);
-	UINT32 rfield_z_26(offs_t offset);
-	UINT32 rfield_z_27(offs_t offset);
-	UINT32 rfield_z_28(offs_t offset);
-	UINT32 rfield_z_29(offs_t offset);
-	UINT32 rfield_z_30(offs_t offset);
-	UINT32 rfield_z_31(offs_t offset);
-	UINT32 rfield_32(offs_t offset);
-	UINT32 rfield_s_01(offs_t offset);
-	UINT32 rfield_s_02(offs_t offset);
-	UINT32 rfield_s_03(offs_t offset);
-	UINT32 rfield_s_04(offs_t offset);
-	UINT32 rfield_s_05(offs_t offset);
-	UINT32 rfield_s_06(offs_t offset);
-	UINT32 rfield_s_07(offs_t offset);
-	UINT32 rfield_s_08(offs_t offset);
-	UINT32 rfield_s_09(offs_t offset);
-	UINT32 rfield_s_10(offs_t offset);
-	UINT32 rfield_s_11(offs_t offset);
-	UINT32 rfield_s_12(offs_t offset);
-	UINT32 rfield_s_13(offs_t offset);
-	UINT32 rfield_s_14(offs_t offset);
-	UINT32 rfield_s_15(offs_t offset);
-	UINT32 rfield_s_16(offs_t offset);
-	UINT32 rfield_s_17(offs_t offset);
-	UINT32 rfield_s_18(offs_t offset);
-	UINT32 rfield_s_19(offs_t offset);
-	UINT32 rfield_s_20(offs_t offset);
-	UINT32 rfield_s_21(offs_t offset);
-	UINT32 rfield_s_22(offs_t offset);
-	UINT32 rfield_s_23(offs_t offset);
-	UINT32 rfield_s_24(offs_t offset);
-	UINT32 rfield_s_25(offs_t offset);
-	UINT32 rfield_s_26(offs_t offset);
-	UINT32 rfield_s_27(offs_t offset);
-	UINT32 rfield_s_28(offs_t offset);
-	UINT32 rfield_s_29(offs_t offset);
-	UINT32 rfield_s_30(offs_t offset);
-	UINT32 rfield_s_31(offs_t offset);
-	void unimpl(UINT16 op);
-	void pixblt_l_l(UINT16 op); /* 0f00 */
-	void pixblt_l_xy(UINT16 op); /* 0f20 */
-	void pixblt_xy_l(UINT16 op); /* 0f40 */
-	void pixblt_xy_xy(UINT16 op); /* 0f60 */
-	void pixblt_b_l(UINT16 op); /* 0f80 */
-	void pixblt_b_xy(UINT16 op); /* 0fa0 */
-	void fill_l(UINT16 op);   /* 0fc0 */
-	void fill_xy(UINT16 op);  /* 0fe0 */
-	void line(UINT16 op);     /* df10/df90 */
-	void add_xy_a(UINT16 op); /* e000/e100 */
-	void add_xy_b(UINT16 op); /* e000/e100 */
-	void sub_xy_a(UINT16 op); /* e200/e300 */
-	void sub_xy_b(UINT16 op); /* e200/e300 */
-	void cmp_xy_a(UINT16 op); /* e400/e500 */
-	void cmp_xy_b(UINT16 op); /* e400/e500 */
-	void cpw_a(UINT16 op);    /* e600/e700 */
-	void cpw_b(UINT16 op);    /* e600/e700 */
-	void cvxyl_a(UINT16 op);  /* e800/e900 */
-	void cvxyl_b(UINT16 op);  /* e800/e900 */
-	void movx_a(UINT16 op);   /* ec00/ed00 */
-	void movx_b(UINT16 op);   /* ec00/ed00 */
-	void movy_a(UINT16 op);   /* ee00/ef00 */
-	void movy_b(UINT16 op);   /* ee00/ef00 */
-	void pixt_ri_a(UINT16 op); /* f800/f900 */
-	void pixt_ri_b(UINT16 op); /* f800/f900 */
-	void pixt_rixy_a(UINT16 op); /* f000/f100 */
-	void pixt_rixy_b(UINT16 op); /* f000/f100 */
-	void pixt_ir_a(UINT16 op); /* fa00/fb00 */
-	void pixt_ir_b(UINT16 op); /* fa00/fb00 */
-	void pixt_ii_a(UINT16 op); /* fc00/fd00 */
-	void pixt_ii_b(UINT16 op); /* fc00/fd00 */
-	void pixt_ixyr_a(UINT16 op); /* f200/f300 */
-	void pixt_ixyr_b(UINT16 op); /* f200/f300 */
-	void pixt_ixyixy_a(UINT16 op); /* f400/f500 */
-	void pixt_ixyixy_b(UINT16 op); /* f400/f500 */
-	void drav_a(UINT16 op); /* f600/f700 */
-	void drav_b(UINT16 op); /* f600/f700 */
-	void abs_a(UINT16 op); /* 0380 */
-	void abs_b(UINT16 op); /* 0390 */
-	void add_a(UINT16 op); /* 4000/4100 */
-	void add_b(UINT16 op); /* 4000/4100 */
-	void addc_a(UINT16 op); /* 4200/4200 */
-	void addc_b(UINT16 op); /* 4200/4200 */
-	void addi_w_a(UINT16 op); /* 0b00 */
-	void addi_w_b(UINT16 op); /* 0b10 */
-	void addi_l_a(UINT16 op); /* 0b20 */
-	void addi_l_b(UINT16 op); /* 0b30 */
-	void addk_a(UINT16 op); /* 1000-1300 */
-	void addk_b(UINT16 op); /* 1000-1300 */
-	void and_a(UINT16 op); /* 5000/5100 */
-	void and_b(UINT16 op); /* 5000/5100 */
-	void andi_a(UINT16 op); /* 0b80 */
-	void andi_b(UINT16 op); /* 0b90 */
-	void andn_a(UINT16 op); /* 5200-5300 */
-	void andn_b(UINT16 op); /* 5200-5300 */
-	void btst_k_a(UINT16 op); /* 1c00-1f00 */
-	void btst_k_b(UINT16 op); /* 1c00-1f00 */
-	void btst_r_a(UINT16 op); /* 4a00-4b00 */
-	void btst_r_b(UINT16 op); /* 4a00-4b00 */
-	void clrc(UINT16 op); /* 0320 */
-	void cmp_a(UINT16 op); /* 4800/4900 */
-	void cmp_b(UINT16 op); /* 4800/4900 */
-	void cmpi_w_a(UINT16 op); /* 0b40 */
-	void cmpi_w_b(UINT16 op); /* 0b50 */
-	void cmpi_l_a(UINT16 op); /* 0b60 */
-	void cmpi_l_b(UINT16 op); /* 0b70 */
-	void dint(UINT16 op);
-	void divs_a(UINT16 op); /* 5800/5900 */
-	void divs_b(UINT16 op); /* 5800/5900 */
-	void divu_a(UINT16 op); /* 5a00/5b00 */
-	void divu_b(UINT16 op); /* 5a00/5b00 */
-	void eint(UINT16 op);
-	void exgf0_a(UINT16 op);  /* d500 */
-	void exgf0_b(UINT16 op);    /* d510 */
-	void exgf1_a(UINT16 op);    /* d700 */
-	void exgf1_b(UINT16 op);    /* d710 */
-	void lmo_a(UINT16 op);  /* 6a00/6b00 */
-	void lmo_b(UINT16 op);  /* 6a00/6b00 */
-	void mmfm_a(UINT16 op); /* 09a0 */
-	void mmfm_b(UINT16 op); /* 09b0 */
-	void mmtm_a(UINT16 op); /* 0980 */
-	void mmtm_b(UINT16 op); /* 0990 */
-	void mods_a(UINT16 op); /* 6c00/6d00 */
-	void mods_b(UINT16 op); /* 6c00/6d00 */
-	void modu_a(UINT16 op); /* 6e00/6f00 */
-	void modu_b(UINT16 op); /* 6e00/6f00 */
-	void mpys_a(UINT16 op); /* 5c00/5d00 */
-	void mpys_b(UINT16 op); /* 5c00/5d00 */
-	void mpyu_a(UINT16 op); /* 5e00/5e00 */
-	void mpyu_b(UINT16 op); /* 5e00/5f00 */
-	void neg_a(UINT16 op); /* 03a0 */
-	void neg_b(UINT16 op); /* 03b0 */
-	void negb_a(UINT16 op); /* 03c0 */
-	void negb_b(UINT16 op); /* 03d0 */
-	void nop(UINT16 op); /* 0300 */
-	void not_a(UINT16 op); /* 03e0 */
-	void not_b(UINT16 op); /* 03f0 */
-	void or_a(UINT16 op); /* 5400-5500 */
-	void or_b(UINT16 op); /* 5400-5500 */
-	void ori_a(UINT16 op); /* 0ba0 */
-	void ori_b(UINT16 op); /* 0bb0 */
-	void rl_k_a(UINT16 op); /* 3000-3300 */
-	void rl_k_b(UINT16 op); /* 3000-3300 */
-	void rl_r_a(UINT16 op); /* 6800/6900 */
-	void rl_r_b(UINT16 op); /* 6800/6900 */
-	void setc(UINT16 op); /* 0de0 */
-	void setf0(UINT16 op);
-	void setf1(UINT16 op);
-	void sext0_a(UINT16 op); /* 0500 */
-	void sext0_b(UINT16 op); /* 0510 */
-	void sext1_a(UINT16 op); /* 0700 */
-	void sext1_b(UINT16 op); /* 0710 */
-	void sla_k_a(UINT16 op); /* 2000-2300 */
-	void sla_k_b(UINT16 op); /* 2000-2300 */
-	void sla_r_a(UINT16 op); /* 6000/6100 */
-	void sla_r_b(UINT16 op); /* 6000/6100 */
-	void sll_k_a(UINT16 op); /* 2400-2700 */
-	void sll_k_b(UINT16 op); /* 2400-2700 */
-	void sll_r_a(UINT16 op); /* 6200/6300 */
-	void sll_r_b(UINT16 op); /* 6200/6300 */
-	void sra_k_a(UINT16 op); /* 2800-2b00 */
-	void sra_k_b(UINT16 op); /* 2800-2b00 */
-	void sra_r_a(UINT16 op); /* 6400/6500 */
-	void sra_r_b(UINT16 op); /* 6400/6500 */
-	void srl_k_a(UINT16 op); /* 2c00-2f00 */
-	void srl_k_b(UINT16 op); /* 2c00-2f00 */
-	void srl_r_a(UINT16 op); /* 6600/6700 */
-	void srl_r_b(UINT16 op); /* 6600/6700 */
-	void sub_a(UINT16 op); /* 4400/4500 */
-	void sub_b(UINT16 op); /* 4400/4500 */
-	void subb_a(UINT16 op); /* 4600/4700 */
-	void subb_b(UINT16 op); /* 4600/4700 */
-	void subi_w_a(UINT16 op); /* 0be0 */
-	void subi_w_b(UINT16 op); /* 0bf0 */
-	void subi_l_a(UINT16 op); /* 0d00 */
-	void subi_l_b(UINT16 op); /* 0d10 */
-	void subk_a(UINT16 op); /* 1400-1700 */
-	void subk_b(UINT16 op); /* 1400-1700 */
-	void xor_a(UINT16 op); /* 5600-5700 */
-	void xor_b(UINT16 op); /* 5600-5700 */
-	void xori_a(UINT16 op); /* 0bc0 */
-	void xori_b(UINT16 op); /* 0bd0 */
-	void zext0_a(UINT16 op); /* 0520 */
-	void zext0_b(UINT16 op); /* 0530 */
-	void zext1_a(UINT16 op); /* 0720 */
-	void zext1_b(UINT16 op); /* 0720 */
-	void movi_w_a(UINT16 op);
-	void movi_w_b(UINT16 op);
-	void movi_l_a(UINT16 op);
-	void movi_l_b(UINT16 op);
-	void movk_a(UINT16 op);
-	void movk_b(UINT16 op);
-	void movb_rn_a(UINT16 op); /* 8c00-8d00 */
-	void movb_rn_b(UINT16 op); /* 8c00-8d00 */
-	void movb_nr_a(UINT16 op); /* 8e00-8f00 */
-	void movb_nr_b(UINT16 op); /* 8e00-8f00 */
-	void movb_nn_a(UINT16 op); /* 9c00-9d00 */
-	void movb_nn_b(UINT16 op); /* 9c00-9d00 */
-	void movb_r_no_a(UINT16 op); /* ac00-ad00 */
-	void movb_r_no_b(UINT16 op); /* ac00-ad00 */
-	void movb_no_r_a(UINT16 op); /* ae00-af00 */
-	void movb_no_r_b(UINT16 op); /* ae00-af00 */
-	void movb_no_no_a(UINT16 op); /* bc00-bd00 */
-	void movb_no_no_b(UINT16 op); /* bc00-bd00 */
-	void movb_ra_a(UINT16 op);
-	void movb_ra_b(UINT16 op);
-	void movb_ar_a(UINT16 op);
-	void movb_ar_b(UINT16 op);
-	void movb_aa(UINT16 op);
-	void move_rr_a(UINT16 op); /* 4c00/d00 */
-	void move_rr_b(UINT16 op); /* 4c00/d00 */
-	void move_rr_ax(UINT16 op); /* 4e00/f00 */
-	void move_rr_bx(UINT16 op); /* 4e00/f00 */
-	void move0_rn_a(UINT16 op); /* 8000 */
-	void move0_rn_b(UINT16 op);
-	void move1_rn_a(UINT16 op);
-	void move1_rn_b(UINT16 op);
-	void move0_r_dn_a(UINT16 op); /* a000 */
-	void move0_r_dn_b(UINT16 op);
-	void move1_r_dn_a(UINT16 op);
-	void move1_r_dn_b(UINT16 op);
-	void move0_r_ni_a(UINT16 op); /* 9000 */
-	void move0_r_ni_b(UINT16 op);
-	void move1_r_ni_a(UINT16 op);
-	void move1_r_ni_b(UINT16 op);
-	void move0_nr_a(UINT16 op); /* 8400-500 */
-	void move0_nr_b(UINT16 op); /* 8400-500 */
-	void move1_nr_a(UINT16 op); /* 8600-700 */
-	void move1_nr_b(UINT16 op); /* 8600-700 */
-	void move0_dn_r_a(UINT16 op); /* A400-500 */
-	void move0_dn_r_b(UINT16 op); /* A400-500 */
-	void move1_dn_r_a(UINT16 op); /* A600-700 */
-	void move1_dn_r_b(UINT16 op); /* A600-700 */
-	void move0_ni_r_a(UINT16 op); /* 9400-500 */
-	void move0_ni_r_b(UINT16 op); /* 9400-500 */
-	void move1_ni_r_a(UINT16 op); /* 9600-700 */
-	void move1_ni_r_b(UINT16 op); /* 9600-700 */
-	void move0_nn_a(UINT16 op); /* 8800 */
-	void move0_nn_b(UINT16 op);
-	void move1_nn_a(UINT16 op);
-	void move1_nn_b(UINT16 op);
-	void move0_dn_dn_a(UINT16 op); /* a800 */
-	void move0_dn_dn_b(UINT16 op);
-	void move1_dn_dn_a(UINT16 op);
-	void move1_dn_dn_b(UINT16 op);
-	void move0_ni_ni_a(UINT16 op); /* 9800 */
-	void move0_ni_ni_b(UINT16 op);
-	void move1_ni_ni_a(UINT16 op);
-	void move1_ni_ni_b(UINT16 op);
-	void move0_r_no_a(UINT16 op); /* b000 */
-	void move0_r_no_b(UINT16 op);
-	void move1_r_no_a(UINT16 op);
-	void move1_r_no_b(UINT16 op);
-	void move0_no_r_a(UINT16 op); /* b400 */
-	void move0_no_r_b(UINT16 op);
-	void move1_no_r_a(UINT16 op);
-	void move1_no_r_b(UINT16 op);
-	void move0_no_ni_a(UINT16 op); /* d000 */
-	void move0_no_ni_b(UINT16 op);
-	void move1_no_ni_a(UINT16 op);
-	void move1_no_ni_b(UINT16 op);
-	void move0_no_no_a(UINT16 op); /* b800 */
-	void move0_no_no_b(UINT16 op);
-	void move1_no_no_a(UINT16 op);
-	void move1_no_no_b(UINT16 op);
-	void move0_ra_a(UINT16 op);
-	void move0_ra_b(UINT16 op);
-	void move1_ra_a(UINT16 op);
-	void move1_ra_b(UINT16 op);
-	void move0_ar_a(UINT16 op);
-	void move0_ar_b(UINT16 op);
-	void move1_ar_a(UINT16 op);
-	void move1_ar_b(UINT16 op);
-	void move0_a_ni_a(UINT16 op); /* d400 */
-	void move0_a_ni_b(UINT16 op); /* d410 */
-	void move1_a_ni_a(UINT16 op); /* d600 */
-	void move1_a_ni_b(UINT16 op); /* d610 */
-	void move0_aa(UINT16 op); /* 05c0 */
-	void move1_aa(UINT16 op); /* 07c0 */
-	void call_a(UINT16 op); /* 0920 */
-	void call_b(UINT16 op); /* 0930 */
-	void callr(UINT16 op); /* 0d3f */
-	void calla(UINT16 op); /* 0d5f */
-	void dsj_a(UINT16 op);  /* 0d80 */
-	void dsj_b(UINT16 op);  /* 0d90 */
-	void dsjeq_a(UINT16 op); /* 0da0 */
-	void dsjeq_b(UINT16 op); /* 0db0 */
-	void dsjne_a(UINT16 op); /* 0dc0 */
-	void dsjne_b(UINT16 op); /* 0dd0 */
-	void dsjs_a(UINT16 op);
-	void dsjs_b(UINT16 op);
-	void emu(UINT16 op);     /* 0100 */
-	void exgpc_a(UINT16 op); /* 0120 */
-	void exgpc_b(UINT16 op); /* 0130 */
-	void getpc_a(UINT16 op); /* 0140 */
-	void getpc_b(UINT16 op); /* 0150 */
-	void getst_a(UINT16 op); /* 0180 */
-	void getst_b(UINT16 op); /* 0190 */
-	void j_UC_0(UINT16 op);
-	void j_UC_8(UINT16 op);
-	void j_UC_x(UINT16 op);
-	void j_P_0(UINT16 op);
-	void j_P_8(UINT16 op);
-	void j_P_x(UINT16 op);
-	void j_LS_0(UINT16 op);
-	void j_LS_8(UINT16 op);
-	void j_LS_x(UINT16 op);
-	void j_HI_0(UINT16 op);
-	void j_HI_8(UINT16 op);
-	void j_HI_x(UINT16 op);
-	void j_LT_0(UINT16 op);
-	void j_LT_8(UINT16 op);
-	void j_LT_x(UINT16 op);
-	void j_GE_0(UINT16 op);
-	void j_GE_8(UINT16 op);
-	void j_GE_x(UINT16 op);
-	void j_LE_0(UINT16 op);
-	void j_LE_8(UINT16 op);
-	void j_LE_x(UINT16 op);
-	void j_GT_0(UINT16 op);
-	void j_GT_8(UINT16 op);
-	void j_GT_x(UINT16 op);
-	void j_C_0(UINT16 op);
-	void j_C_8(UINT16 op);
-	void j_C_x(UINT16 op);
-	void j_NC_0(UINT16 op);
-	void j_NC_8(UINT16 op);
-	void j_NC_x(UINT16 op);
-	void j_EQ_0(UINT16 op);
-	void j_EQ_8(UINT16 op);
-	void j_EQ_x(UINT16 op);
-	void j_NE_0(UINT16 op);
-	void j_NE_8(UINT16 op);
-	void j_NE_x(UINT16 op);
-	void j_V_0(UINT16 op);
-	void j_V_8(UINT16 op);
-	void j_V_x(UINT16 op);
-	void j_NV_0(UINT16 op);
-	void j_NV_8(UINT16 op);
-	void j_NV_x(UINT16 op);
-	void j_N_0(UINT16 op);
-	void j_N_8(UINT16 op);
-	void j_N_x(UINT16 op);
-	void j_NN_0(UINT16 op);
-	void j_NN_8(UINT16 op);
-	void j_NN_x(UINT16 op);
-	void jump_a(UINT16 op); /* 0160 */
-	void jump_b(UINT16 op); /* 0170 */
-	void popst(UINT16 op); /* 01c0 */
-	void pushst(UINT16 op); /* 01e0 */
-	void putst_a(UINT16 op); /* 01a0 */
-	void putst_b(UINT16 op); /* 01b0 */
-	void reti(UINT16 op); /* 0940 */
-	void rets(UINT16 op); /* 0960/70 */
-	void rev_a(UINT16 op); /* 0020 */
-	void rev_b(UINT16 op); /* 0030 */
-	void trap(UINT16 op); /* 0900/10 */
-	void addxyi_a(UINT16 op);
-	void addxyi_b(UINT16 op);
-	void blmove(UINT16 op);
-	void cexec_l(UINT16 op);
-	void cexec_s(UINT16 op);
-	void clip(UINT16 op);
-	void cmovcg_a(UINT16 op);
-	void cmovcg_b(UINT16 op);
-	void cmovcm_f(UINT16 op);
-	void cmovcm_b(UINT16 op);
-	void cmovgc_a(UINT16 op);
-	void cmovgc_b(UINT16 op);
-	void cmovgc_a_s(UINT16 op);
-	void cmovgc_b_s(UINT16 op);
-	void cmovmc_f(UINT16 op);
-	void cmovmc_f_va(UINT16 op);
-	void cmovmc_f_vb(UINT16 op);
-	void cmovmc_b(UINT16 op);
-	void cmp_k_a(UINT16 op);
-	void cmp_k_b(UINT16 op);
-	void cvdxyl_a(UINT16 op);
-	void cvdxyl_b(UINT16 op);
-	void cvmxyl_a(UINT16 op);
-	void cvmxyl_b(UINT16 op);
-	void cvsxyl_a(UINT16 op);
-	void cvsxyl_b(UINT16 op);
-	void exgps_a(UINT16 op);
-	void exgps_b(UINT16 op);
-	void fline(UINT16 op);
-	void fpixeq(UINT16 op);
-	void fpixne(UINT16 op);
-	void getps_a(UINT16 op);
-	void getps_b(UINT16 op);
-	void idle(UINT16 op);
-	void linit(UINT16 op);
-	void mwait(UINT16 op);
-	void pfill_xy(UINT16 op);
-	void pixblt_l_m_l(UINT16 op);
-	void retm(UINT16 op);
-	void rmo_a(UINT16 op);
-	void rmo_b(UINT16 op);
-	void rpix_a(UINT16 op);
-	void rpix_b(UINT16 op);
-	void setcdp(UINT16 op);
-	void setcmp(UINT16 op);
-	void setcsp(UINT16 op);
-	void swapf_a(UINT16 op);
-	void swapf_b(UINT16 op);
-	void tfill_xy(UINT16 op);
-	void trapl(UINT16 op);
-	void vblt_b_l(UINT16 op);
-	void vfill_l(UINT16 op);
-	void vlcol(UINT16 op);
-	int apply_window(const char *inst_name,int srcbpp, UINT32 *srcaddr, XY *dst, int *dx, int *dy);
+	uint32_t ROPCODE();
+	int16_t PARAM_WORD();
+	int32_t PARAM_LONG();
+	int16_t PARAM_WORD_NO_INC();
+	int32_t PARAM_LONG_NO_INC();
+	uint32_t RBYTE(offs_t offset);
+	void WBYTE(offs_t offset, uint32_t data);
+	uint32_t RLONG(offs_t offset);
+	void WLONG(offs_t offset, uint32_t data);
+	void PUSH(uint32_t data);
+	int32_t POP();
+	uint32_t read_pixel_1(offs_t offset);
+	uint32_t read_pixel_2(offs_t offset);
+	uint32_t read_pixel_4(offs_t offset);
+	uint32_t read_pixel_8(offs_t offset);
+	uint32_t read_pixel_16(offs_t offset);
+	uint32_t read_pixel_32(offs_t offset);
+	uint32_t read_pixel_shiftreg(offs_t offset);
+	void write_pixel_1(offs_t offset, uint32_t data);
+	void write_pixel_2(offs_t offset, uint32_t data);
+	void write_pixel_4(offs_t offset, uint32_t data);
+	void write_pixel_8(offs_t offset, uint32_t data);
+	void write_pixel_16(offs_t offset, uint32_t data);
+	void write_pixel_32(offs_t offset, uint32_t data);
+	void write_pixel_t_1(offs_t offset, uint32_t data);
+	void write_pixel_t_2(offs_t offset, uint32_t data);
+	void write_pixel_t_4(offs_t offset, uint32_t data);
+	void write_pixel_t_8(offs_t offset, uint32_t data);
+	void write_pixel_t_16(offs_t offset, uint32_t data);
+	void write_pixel_t_32(offs_t offset, uint32_t data);
+	void write_pixel_r_1(offs_t offset, uint32_t data);
+	void write_pixel_r_2(offs_t offset, uint32_t data);
+	void write_pixel_r_4(offs_t offset, uint32_t data);
+	void write_pixel_r_8(offs_t offset, uint32_t data);
+	void write_pixel_r_16(offs_t offset, uint32_t data);
+	void write_pixel_r_32(offs_t offset, uint32_t data);
+	void write_pixel_r_t_1(offs_t offset, uint32_t data);
+	void write_pixel_r_t_2(offs_t offset, uint32_t data);
+	void write_pixel_r_t_4(offs_t offset, uint32_t data);
+	void write_pixel_r_t_8(offs_t offset, uint32_t data);
+	void write_pixel_r_t_16(offs_t offset, uint32_t data);
+	void write_pixel_r_t_32(offs_t offset, uint32_t data);
+	void write_pixel_shiftreg(offs_t offset, uint32_t data);
+	uint32_t raster_op_1(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_2(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_3(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_4(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_5(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_6(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_7(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_8(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_9(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_10(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_11(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_12(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_13(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_14(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_15(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_16(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_17(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_18(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_19(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_20(uint32_t newpix, uint32_t oldpix);
+	uint32_t raster_op_21(uint32_t newpix, uint32_t oldpix);
+	void wfield_01(offs_t offset, uint32_t data);
+	void wfield_02(offs_t offset, uint32_t data);
+	void wfield_03(offs_t offset, uint32_t data);
+	void wfield_04(offs_t offset, uint32_t data);
+	void wfield_05(offs_t offset, uint32_t data);
+	void wfield_06(offs_t offset, uint32_t data);
+	void wfield_07(offs_t offset, uint32_t data);
+	void wfield_08(offs_t offset, uint32_t data);
+	void wfield_09(offs_t offset, uint32_t data);
+	void wfield_10(offs_t offset, uint32_t data);
+	void wfield_11(offs_t offset, uint32_t data);
+	void wfield_12(offs_t offset, uint32_t data);
+	void wfield_13(offs_t offset, uint32_t data);
+	void wfield_14(offs_t offset, uint32_t data);
+	void wfield_15(offs_t offset, uint32_t data);
+	void wfield_16(offs_t offset, uint32_t data);
+	void wfield_17(offs_t offset, uint32_t data);
+	void wfield_18(offs_t offset, uint32_t data);
+	void wfield_19(offs_t offset, uint32_t data);
+	void wfield_20(offs_t offset, uint32_t data);
+	void wfield_21(offs_t offset, uint32_t data);
+	void wfield_22(offs_t offset, uint32_t data);
+	void wfield_23(offs_t offset, uint32_t data);
+	void wfield_24(offs_t offset, uint32_t data);
+	void wfield_25(offs_t offset, uint32_t data);
+	void wfield_26(offs_t offset, uint32_t data);
+	void wfield_27(offs_t offset, uint32_t data);
+	void wfield_28(offs_t offset, uint32_t data);
+	void wfield_29(offs_t offset, uint32_t data);
+	void wfield_30(offs_t offset, uint32_t data);
+	void wfield_31(offs_t offset, uint32_t data);
+	void wfield_32(offs_t offset, uint32_t data);
+	uint32_t rfield_z_01(offs_t offset);
+	uint32_t rfield_z_02(offs_t offset);
+	uint32_t rfield_z_03(offs_t offset);
+	uint32_t rfield_z_04(offs_t offset);
+	uint32_t rfield_z_05(offs_t offset);
+	uint32_t rfield_z_06(offs_t offset);
+	uint32_t rfield_z_07(offs_t offset);
+	uint32_t rfield_z_08(offs_t offset);
+	uint32_t rfield_z_09(offs_t offset);
+	uint32_t rfield_z_10(offs_t offset);
+	uint32_t rfield_z_11(offs_t offset);
+	uint32_t rfield_z_12(offs_t offset);
+	uint32_t rfield_z_13(offs_t offset);
+	uint32_t rfield_z_14(offs_t offset);
+	uint32_t rfield_z_15(offs_t offset);
+	uint32_t rfield_z_16(offs_t offset);
+	uint32_t rfield_z_17(offs_t offset);
+	uint32_t rfield_z_18(offs_t offset);
+	uint32_t rfield_z_19(offs_t offset);
+	uint32_t rfield_z_20(offs_t offset);
+	uint32_t rfield_z_21(offs_t offset);
+	uint32_t rfield_z_22(offs_t offset);
+	uint32_t rfield_z_23(offs_t offset);
+	uint32_t rfield_z_24(offs_t offset);
+	uint32_t rfield_z_25(offs_t offset);
+	uint32_t rfield_z_26(offs_t offset);
+	uint32_t rfield_z_27(offs_t offset);
+	uint32_t rfield_z_28(offs_t offset);
+	uint32_t rfield_z_29(offs_t offset);
+	uint32_t rfield_z_30(offs_t offset);
+	uint32_t rfield_z_31(offs_t offset);
+	uint32_t rfield_32(offs_t offset);
+	uint32_t rfield_s_01(offs_t offset);
+	uint32_t rfield_s_02(offs_t offset);
+	uint32_t rfield_s_03(offs_t offset);
+	uint32_t rfield_s_04(offs_t offset);
+	uint32_t rfield_s_05(offs_t offset);
+	uint32_t rfield_s_06(offs_t offset);
+	uint32_t rfield_s_07(offs_t offset);
+	uint32_t rfield_s_08(offs_t offset);
+	uint32_t rfield_s_09(offs_t offset);
+	uint32_t rfield_s_10(offs_t offset);
+	uint32_t rfield_s_11(offs_t offset);
+	uint32_t rfield_s_12(offs_t offset);
+	uint32_t rfield_s_13(offs_t offset);
+	uint32_t rfield_s_14(offs_t offset);
+	uint32_t rfield_s_15(offs_t offset);
+	uint32_t rfield_s_16(offs_t offset);
+	uint32_t rfield_s_17(offs_t offset);
+	uint32_t rfield_s_18(offs_t offset);
+	uint32_t rfield_s_19(offs_t offset);
+	uint32_t rfield_s_20(offs_t offset);
+	uint32_t rfield_s_21(offs_t offset);
+	uint32_t rfield_s_22(offs_t offset);
+	uint32_t rfield_s_23(offs_t offset);
+	uint32_t rfield_s_24(offs_t offset);
+	uint32_t rfield_s_25(offs_t offset);
+	uint32_t rfield_s_26(offs_t offset);
+	uint32_t rfield_s_27(offs_t offset);
+	uint32_t rfield_s_28(offs_t offset);
+	uint32_t rfield_s_29(offs_t offset);
+	uint32_t rfield_s_30(offs_t offset);
+	uint32_t rfield_s_31(offs_t offset);
+	void unimpl(uint16_t op);
+	void pixblt_l_l(uint16_t op); /* 0f00 */
+	void pixblt_l_xy(uint16_t op); /* 0f20 */
+	void pixblt_xy_l(uint16_t op); /* 0f40 */
+	void pixblt_xy_xy(uint16_t op); /* 0f60 */
+	void pixblt_b_l(uint16_t op); /* 0f80 */
+	void pixblt_b_xy(uint16_t op); /* 0fa0 */
+	void fill_l(uint16_t op);   /* 0fc0 */
+	void fill_xy(uint16_t op);  /* 0fe0 */
+	void line(uint16_t op);     /* df10/df90 */
+	void add_xy_a(uint16_t op); /* e000/e100 */
+	void add_xy_b(uint16_t op); /* e000/e100 */
+	void sub_xy_a(uint16_t op); /* e200/e300 */
+	void sub_xy_b(uint16_t op); /* e200/e300 */
+	void cmp_xy_a(uint16_t op); /* e400/e500 */
+	void cmp_xy_b(uint16_t op); /* e400/e500 */
+	void cpw_a(uint16_t op);    /* e600/e700 */
+	void cpw_b(uint16_t op);    /* e600/e700 */
+	void cvxyl_a(uint16_t op);  /* e800/e900 */
+	void cvxyl_b(uint16_t op);  /* e800/e900 */
+	void movx_a(uint16_t op);   /* ec00/ed00 */
+	void movx_b(uint16_t op);   /* ec00/ed00 */
+	void movy_a(uint16_t op);   /* ee00/ef00 */
+	void movy_b(uint16_t op);   /* ee00/ef00 */
+	void pixt_ri_a(uint16_t op); /* f800/f900 */
+	void pixt_ri_b(uint16_t op); /* f800/f900 */
+	void pixt_rixy_a(uint16_t op); /* f000/f100 */
+	void pixt_rixy_b(uint16_t op); /* f000/f100 */
+	void pixt_ir_a(uint16_t op); /* fa00/fb00 */
+	void pixt_ir_b(uint16_t op); /* fa00/fb00 */
+	void pixt_ii_a(uint16_t op); /* fc00/fd00 */
+	void pixt_ii_b(uint16_t op); /* fc00/fd00 */
+	void pixt_ixyr_a(uint16_t op); /* f200/f300 */
+	void pixt_ixyr_b(uint16_t op); /* f200/f300 */
+	void pixt_ixyixy_a(uint16_t op); /* f400/f500 */
+	void pixt_ixyixy_b(uint16_t op); /* f400/f500 */
+	void drav_a(uint16_t op); /* f600/f700 */
+	void drav_b(uint16_t op); /* f600/f700 */
+	void abs_a(uint16_t op); /* 0380 */
+	void abs_b(uint16_t op); /* 0390 */
+	void add_a(uint16_t op); /* 4000/4100 */
+	void add_b(uint16_t op); /* 4000/4100 */
+	void addc_a(uint16_t op); /* 4200/4200 */
+	void addc_b(uint16_t op); /* 4200/4200 */
+	void addi_w_a(uint16_t op); /* 0b00 */
+	void addi_w_b(uint16_t op); /* 0b10 */
+	void addi_l_a(uint16_t op); /* 0b20 */
+	void addi_l_b(uint16_t op); /* 0b30 */
+	void addk_a(uint16_t op); /* 1000-1300 */
+	void addk_b(uint16_t op); /* 1000-1300 */
+	void and_a(uint16_t op); /* 5000/5100 */
+	void and_b(uint16_t op); /* 5000/5100 */
+	void andi_a(uint16_t op); /* 0b80 */
+	void andi_b(uint16_t op); /* 0b90 */
+	void andn_a(uint16_t op); /* 5200-5300 */
+	void andn_b(uint16_t op); /* 5200-5300 */
+	void btst_k_a(uint16_t op); /* 1c00-1f00 */
+	void btst_k_b(uint16_t op); /* 1c00-1f00 */
+	void btst_r_a(uint16_t op); /* 4a00-4b00 */
+	void btst_r_b(uint16_t op); /* 4a00-4b00 */
+	void clrc(uint16_t op); /* 0320 */
+	void cmp_a(uint16_t op); /* 4800/4900 */
+	void cmp_b(uint16_t op); /* 4800/4900 */
+	void cmpi_w_a(uint16_t op); /* 0b40 */
+	void cmpi_w_b(uint16_t op); /* 0b50 */
+	void cmpi_l_a(uint16_t op); /* 0b60 */
+	void cmpi_l_b(uint16_t op); /* 0b70 */
+	void dint(uint16_t op);
+	void divs_a(uint16_t op); /* 5800/5900 */
+	void divs_b(uint16_t op); /* 5800/5900 */
+	void divu_a(uint16_t op); /* 5a00/5b00 */
+	void divu_b(uint16_t op); /* 5a00/5b00 */
+	void eint(uint16_t op);
+	void exgf0_a(uint16_t op);  /* d500 */
+	void exgf0_b(uint16_t op);    /* d510 */
+	void exgf1_a(uint16_t op);    /* d700 */
+	void exgf1_b(uint16_t op);    /* d710 */
+	void lmo_a(uint16_t op);  /* 6a00/6b00 */
+	void lmo_b(uint16_t op);  /* 6a00/6b00 */
+	void mmfm_a(uint16_t op); /* 09a0 */
+	void mmfm_b(uint16_t op); /* 09b0 */
+	void mmtm_a(uint16_t op); /* 0980 */
+	void mmtm_b(uint16_t op); /* 0990 */
+	void mods_a(uint16_t op); /* 6c00/6d00 */
+	void mods_b(uint16_t op); /* 6c00/6d00 */
+	void modu_a(uint16_t op); /* 6e00/6f00 */
+	void modu_b(uint16_t op); /* 6e00/6f00 */
+	void mpys_a(uint16_t op); /* 5c00/5d00 */
+	void mpys_b(uint16_t op); /* 5c00/5d00 */
+	void mpyu_a(uint16_t op); /* 5e00/5e00 */
+	void mpyu_b(uint16_t op); /* 5e00/5f00 */
+	void neg_a(uint16_t op); /* 03a0 */
+	void neg_b(uint16_t op); /* 03b0 */
+	void negb_a(uint16_t op); /* 03c0 */
+	void negb_b(uint16_t op); /* 03d0 */
+	void nop(uint16_t op); /* 0300 */
+	void not_a(uint16_t op); /* 03e0 */
+	void not_b(uint16_t op); /* 03f0 */
+	void or_a(uint16_t op); /* 5400-5500 */
+	void or_b(uint16_t op); /* 5400-5500 */
+	void ori_a(uint16_t op); /* 0ba0 */
+	void ori_b(uint16_t op); /* 0bb0 */
+	void rl_k_a(uint16_t op); /* 3000-3300 */
+	void rl_k_b(uint16_t op); /* 3000-3300 */
+	void rl_r_a(uint16_t op); /* 6800/6900 */
+	void rl_r_b(uint16_t op); /* 6800/6900 */
+	void setc(uint16_t op); /* 0de0 */
+	void setf0(uint16_t op);
+	void setf1(uint16_t op);
+	void sext0_a(uint16_t op); /* 0500 */
+	void sext0_b(uint16_t op); /* 0510 */
+	void sext1_a(uint16_t op); /* 0700 */
+	void sext1_b(uint16_t op); /* 0710 */
+	void sla_k_a(uint16_t op); /* 2000-2300 */
+	void sla_k_b(uint16_t op); /* 2000-2300 */
+	void sla_r_a(uint16_t op); /* 6000/6100 */
+	void sla_r_b(uint16_t op); /* 6000/6100 */
+	void sll_k_a(uint16_t op); /* 2400-2700 */
+	void sll_k_b(uint16_t op); /* 2400-2700 */
+	void sll_r_a(uint16_t op); /* 6200/6300 */
+	void sll_r_b(uint16_t op); /* 6200/6300 */
+	void sra_k_a(uint16_t op); /* 2800-2b00 */
+	void sra_k_b(uint16_t op); /* 2800-2b00 */
+	void sra_r_a(uint16_t op); /* 6400/6500 */
+	void sra_r_b(uint16_t op); /* 6400/6500 */
+	void srl_k_a(uint16_t op); /* 2c00-2f00 */
+	void srl_k_b(uint16_t op); /* 2c00-2f00 */
+	void srl_r_a(uint16_t op); /* 6600/6700 */
+	void srl_r_b(uint16_t op); /* 6600/6700 */
+	void sub_a(uint16_t op); /* 4400/4500 */
+	void sub_b(uint16_t op); /* 4400/4500 */
+	void subb_a(uint16_t op); /* 4600/4700 */
+	void subb_b(uint16_t op); /* 4600/4700 */
+	void subi_w_a(uint16_t op); /* 0be0 */
+	void subi_w_b(uint16_t op); /* 0bf0 */
+	void subi_l_a(uint16_t op); /* 0d00 */
+	void subi_l_b(uint16_t op); /* 0d10 */
+	void subk_a(uint16_t op); /* 1400-1700 */
+	void subk_b(uint16_t op); /* 1400-1700 */
+	void xor_a(uint16_t op); /* 5600-5700 */
+	void xor_b(uint16_t op); /* 5600-5700 */
+	void xori_a(uint16_t op); /* 0bc0 */
+	void xori_b(uint16_t op); /* 0bd0 */
+	void zext0_a(uint16_t op); /* 0520 */
+	void zext0_b(uint16_t op); /* 0530 */
+	void zext1_a(uint16_t op); /* 0720 */
+	void zext1_b(uint16_t op); /* 0720 */
+	void movi_w_a(uint16_t op);
+	void movi_w_b(uint16_t op);
+	void movi_l_a(uint16_t op);
+	void movi_l_b(uint16_t op);
+	void movk_a(uint16_t op);
+	void movk_b(uint16_t op);
+	void movb_rn_a(uint16_t op); /* 8c00-8d00 */
+	void movb_rn_b(uint16_t op); /* 8c00-8d00 */
+	void movb_nr_a(uint16_t op); /* 8e00-8f00 */
+	void movb_nr_b(uint16_t op); /* 8e00-8f00 */
+	void movb_nn_a(uint16_t op); /* 9c00-9d00 */
+	void movb_nn_b(uint16_t op); /* 9c00-9d00 */
+	void movb_r_no_a(uint16_t op); /* ac00-ad00 */
+	void movb_r_no_b(uint16_t op); /* ac00-ad00 */
+	void movb_no_r_a(uint16_t op); /* ae00-af00 */
+	void movb_no_r_b(uint16_t op); /* ae00-af00 */
+	void movb_no_no_a(uint16_t op); /* bc00-bd00 */
+	void movb_no_no_b(uint16_t op); /* bc00-bd00 */
+	void movb_ra_a(uint16_t op);
+	void movb_ra_b(uint16_t op);
+	void movb_ar_a(uint16_t op);
+	void movb_ar_b(uint16_t op);
+	void movb_aa(uint16_t op);
+	void move_rr_a(uint16_t op); /* 4c00/d00 */
+	void move_rr_b(uint16_t op); /* 4c00/d00 */
+	void move_rr_ax(uint16_t op); /* 4e00/f00 */
+	void move_rr_bx(uint16_t op); /* 4e00/f00 */
+	void move0_rn_a(uint16_t op); /* 8000 */
+	void move0_rn_b(uint16_t op);
+	void move1_rn_a(uint16_t op);
+	void move1_rn_b(uint16_t op);
+	void move0_r_dn_a(uint16_t op); /* a000 */
+	void move0_r_dn_b(uint16_t op);
+	void move1_r_dn_a(uint16_t op);
+	void move1_r_dn_b(uint16_t op);
+	void move0_r_ni_a(uint16_t op); /* 9000 */
+	void move0_r_ni_b(uint16_t op);
+	void move1_r_ni_a(uint16_t op);
+	void move1_r_ni_b(uint16_t op);
+	void move0_nr_a(uint16_t op); /* 8400-500 */
+	void move0_nr_b(uint16_t op); /* 8400-500 */
+	void move1_nr_a(uint16_t op); /* 8600-700 */
+	void move1_nr_b(uint16_t op); /* 8600-700 */
+	void move0_dn_r_a(uint16_t op); /* A400-500 */
+	void move0_dn_r_b(uint16_t op); /* A400-500 */
+	void move1_dn_r_a(uint16_t op); /* A600-700 */
+	void move1_dn_r_b(uint16_t op); /* A600-700 */
+	void move0_ni_r_a(uint16_t op); /* 9400-500 */
+	void move0_ni_r_b(uint16_t op); /* 9400-500 */
+	void move1_ni_r_a(uint16_t op); /* 9600-700 */
+	void move1_ni_r_b(uint16_t op); /* 9600-700 */
+	void move0_nn_a(uint16_t op); /* 8800 */
+	void move0_nn_b(uint16_t op);
+	void move1_nn_a(uint16_t op);
+	void move1_nn_b(uint16_t op);
+	void move0_dn_dn_a(uint16_t op); /* a800 */
+	void move0_dn_dn_b(uint16_t op);
+	void move1_dn_dn_a(uint16_t op);
+	void move1_dn_dn_b(uint16_t op);
+	void move0_ni_ni_a(uint16_t op); /* 9800 */
+	void move0_ni_ni_b(uint16_t op);
+	void move1_ni_ni_a(uint16_t op);
+	void move1_ni_ni_b(uint16_t op);
+	void move0_r_no_a(uint16_t op); /* b000 */
+	void move0_r_no_b(uint16_t op);
+	void move1_r_no_a(uint16_t op);
+	void move1_r_no_b(uint16_t op);
+	void move0_no_r_a(uint16_t op); /* b400 */
+	void move0_no_r_b(uint16_t op);
+	void move1_no_r_a(uint16_t op);
+	void move1_no_r_b(uint16_t op);
+	void move0_no_ni_a(uint16_t op); /* d000 */
+	void move0_no_ni_b(uint16_t op);
+	void move1_no_ni_a(uint16_t op);
+	void move1_no_ni_b(uint16_t op);
+	void move0_no_no_a(uint16_t op); /* b800 */
+	void move0_no_no_b(uint16_t op);
+	void move1_no_no_a(uint16_t op);
+	void move1_no_no_b(uint16_t op);
+	void move0_ra_a(uint16_t op);
+	void move0_ra_b(uint16_t op);
+	void move1_ra_a(uint16_t op);
+	void move1_ra_b(uint16_t op);
+	void move0_ar_a(uint16_t op);
+	void move0_ar_b(uint16_t op);
+	void move1_ar_a(uint16_t op);
+	void move1_ar_b(uint16_t op);
+	void move0_a_ni_a(uint16_t op); /* d400 */
+	void move0_a_ni_b(uint16_t op); /* d410 */
+	void move1_a_ni_a(uint16_t op); /* d600 */
+	void move1_a_ni_b(uint16_t op); /* d610 */
+	void move0_aa(uint16_t op); /* 05c0 */
+	void move1_aa(uint16_t op); /* 07c0 */
+	void call_a(uint16_t op); /* 0920 */
+	void call_b(uint16_t op); /* 0930 */
+	void callr(uint16_t op); /* 0d3f */
+	void calla(uint16_t op); /* 0d5f */
+	void dsj_a(uint16_t op);  /* 0d80 */
+	void dsj_b(uint16_t op);  /* 0d90 */
+	void dsjeq_a(uint16_t op); /* 0da0 */
+	void dsjeq_b(uint16_t op); /* 0db0 */
+	void dsjne_a(uint16_t op); /* 0dc0 */
+	void dsjne_b(uint16_t op); /* 0dd0 */
+	void dsjs_a(uint16_t op);
+	void dsjs_b(uint16_t op);
+	void emu(uint16_t op);     /* 0100 */
+	void exgpc_a(uint16_t op); /* 0120 */
+	void exgpc_b(uint16_t op); /* 0130 */
+	void getpc_a(uint16_t op); /* 0140 */
+	void getpc_b(uint16_t op); /* 0150 */
+	void getst_a(uint16_t op); /* 0180 */
+	void getst_b(uint16_t op); /* 0190 */
+	void j_UC_0(uint16_t op);
+	void j_UC_8(uint16_t op);
+	void j_UC_x(uint16_t op);
+	void j_P_0(uint16_t op);
+	void j_P_8(uint16_t op);
+	void j_P_x(uint16_t op);
+	void j_LS_0(uint16_t op);
+	void j_LS_8(uint16_t op);
+	void j_LS_x(uint16_t op);
+	void j_HI_0(uint16_t op);
+	void j_HI_8(uint16_t op);
+	void j_HI_x(uint16_t op);
+	void j_LT_0(uint16_t op);
+	void j_LT_8(uint16_t op);
+	void j_LT_x(uint16_t op);
+	void j_GE_0(uint16_t op);
+	void j_GE_8(uint16_t op);
+	void j_GE_x(uint16_t op);
+	void j_LE_0(uint16_t op);
+	void j_LE_8(uint16_t op);
+	void j_LE_x(uint16_t op);
+	void j_GT_0(uint16_t op);
+	void j_GT_8(uint16_t op);
+	void j_GT_x(uint16_t op);
+	void j_C_0(uint16_t op);
+	void j_C_8(uint16_t op);
+	void j_C_x(uint16_t op);
+	void j_NC_0(uint16_t op);
+	void j_NC_8(uint16_t op);
+	void j_NC_x(uint16_t op);
+	void j_EQ_0(uint16_t op);
+	void j_EQ_8(uint16_t op);
+	void j_EQ_x(uint16_t op);
+	void j_NE_0(uint16_t op);
+	void j_NE_8(uint16_t op);
+	void j_NE_x(uint16_t op);
+	void j_V_0(uint16_t op);
+	void j_V_8(uint16_t op);
+	void j_V_x(uint16_t op);
+	void j_NV_0(uint16_t op);
+	void j_NV_8(uint16_t op);
+	void j_NV_x(uint16_t op);
+	void j_N_0(uint16_t op);
+	void j_N_8(uint16_t op);
+	void j_N_x(uint16_t op);
+	void j_NN_0(uint16_t op);
+	void j_NN_8(uint16_t op);
+	void j_NN_x(uint16_t op);
+	void jump_a(uint16_t op); /* 0160 */
+	void jump_b(uint16_t op); /* 0170 */
+	void popst(uint16_t op); /* 01c0 */
+	void pushst(uint16_t op); /* 01e0 */
+	void putst_a(uint16_t op); /* 01a0 */
+	void putst_b(uint16_t op); /* 01b0 */
+	void reti(uint16_t op); /* 0940 */
+	void rets(uint16_t op); /* 0960/70 */
+	void rev_a(uint16_t op); /* 0020 */
+	void rev_b(uint16_t op); /* 0030 */
+	void trap(uint16_t op); /* 0900/10 */
+	void addxyi_a(uint16_t op);
+	void addxyi_b(uint16_t op);
+	void blmove(uint16_t op);
+	void cexec_l(uint16_t op);
+	void cexec_s(uint16_t op);
+	void clip(uint16_t op);
+	void cmovcg_a(uint16_t op);
+	void cmovcg_b(uint16_t op);
+	void cmovcm_f(uint16_t op);
+	void cmovcm_b(uint16_t op);
+	void cmovgc_a(uint16_t op);
+	void cmovgc_b(uint16_t op);
+	void cmovgc_a_s(uint16_t op);
+	void cmovgc_b_s(uint16_t op);
+	void cmovmc_f(uint16_t op);
+	void cmovmc_f_va(uint16_t op);
+	void cmovmc_f_vb(uint16_t op);
+	void cmovmc_b(uint16_t op);
+	void cmp_k_a(uint16_t op);
+	void cmp_k_b(uint16_t op);
+	void cvdxyl_a(uint16_t op);
+	void cvdxyl_b(uint16_t op);
+	void cvmxyl_a(uint16_t op);
+	void cvmxyl_b(uint16_t op);
+	void cvsxyl_a(uint16_t op);
+	void cvsxyl_b(uint16_t op);
+	void exgps_a(uint16_t op);
+	void exgps_b(uint16_t op);
+	void fline(uint16_t op);
+	void fpixeq(uint16_t op);
+	void fpixne(uint16_t op);
+	void getps_a(uint16_t op);
+	void getps_b(uint16_t op);
+	void idle(uint16_t op);
+	void linit(uint16_t op);
+	void mwait(uint16_t op);
+	void pfill_xy(uint16_t op);
+	void pixblt_l_m_l(uint16_t op);
+	void retm(uint16_t op);
+	void rmo_a(uint16_t op);
+	void rmo_b(uint16_t op);
+	void rpix_a(uint16_t op);
+	void rpix_b(uint16_t op);
+	void setcdp(uint16_t op);
+	void setcmp(uint16_t op);
+	void setcsp(uint16_t op);
+	void swapf_a(uint16_t op);
+	void swapf_b(uint16_t op);
+	void tfill_xy(uint16_t op);
+	void trapl(uint16_t op);
+	void vblt_b_l(uint16_t op);
+	void vfill_l(uint16_t op);
+	void vlcol(uint16_t op);
+	int apply_window(const char *inst_name,int srcbpp, uint32_t *srcaddr, XY *dst, int *dx, int *dy);
 	int compute_fill_cycles(int left_partials, int right_partials, int full_words, int op_timing);
 	int compute_pixblt_cycles(int left_partials, int right_partials, int full_words, int op_timing);
 	int compute_pixblt_b_cycles(int left_partials, int right_partials, int full_words, int rows, int op_timing, int bpp);
-	void memory_w(address_space &space, offs_t offset,UINT16 data);
-	UINT16 memory_r(address_space &space, offs_t offset);
-	void shiftreg_w(address_space &space, offs_t offset, UINT16 data);
-	UINT16 shiftreg_r(address_space &space, offs_t offset);
-	UINT16 dummy_shiftreg_r(address_space &space, offs_t offset);
-	UINT32 pixel_op00(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op01(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op02(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op03(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op04(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op05(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op06(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op07(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op08(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op09(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op10(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op11(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op12(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op13(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op14(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op15(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op16(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op17(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op18(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op19(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op20(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
-	UINT32 pixel_op21(UINT32 dstpix, UINT32 mask, UINT32 srcpix);
+	void memory_w(address_space &space, offs_t offset,uint16_t data);
+	uint16_t memory_r(address_space &space, offs_t offset);
+	void shiftreg_w(address_space &space, offs_t offset, uint16_t data);
+	uint16_t shiftreg_r(address_space &space, offs_t offset);
+	uint16_t dummy_shiftreg_r(address_space &space, offs_t offset);
+	uint32_t pixel_op00(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op01(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op02(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op03(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op04(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op05(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op06(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op07(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op08(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op09(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op10(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op11(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op12(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op13(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op14(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op15(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op16(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op17(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op18(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op19(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op20(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
+	uint32_t pixel_op21(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
 	void pixblt_1_op0(int src_is_linear, int dst_is_linear);
 	void pixblt_2_op0(int src_is_linear, int dst_is_linear);
 	void pixblt_4_op0(int src_is_linear, int dst_is_linear);
@@ -1020,16 +1020,16 @@ protected:
 class tms34010_device : public tms340x0_device
 {
 public:
-	tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
 	virtual DECLARE_WRITE16_MEMBER( io_register_w ) override;
 	virtual DECLARE_READ16_MEMBER( io_register_r ) override;
 
 protected:
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 8 - 1) / 8; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 8); }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 8 - 1) / 8; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 8); }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 extern const device_type TMS34010;
@@ -1037,16 +1037,16 @@ extern const device_type TMS34010;
 class tms34020_device : public tms340x0_device
 {
 public:
-	tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
 	virtual DECLARE_WRITE16_MEMBER( io_register_w ) override;
 	virtual DECLARE_READ16_MEMBER( io_register_r ) override;
 
 protected:
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 4 - 1) / 4; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 4); }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 extern const device_type TMS34020;

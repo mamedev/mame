@@ -50,7 +50,7 @@ READ8_MEMBER( vic1112_device::via0_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_bus->eoi_r() << 3;
 	data |= m_bus->dav_r() << 4;
@@ -134,7 +134,7 @@ machine_config_constructor vic1112_device::device_mconfig_additions() const
 //  vic1112_device - constructor
 //-------------------------------------------------
 
-vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIC1112, "VIC1112", tag, owner, clock, "vic1112", __FILE__),
 		device_vic20_expansion_card_interface(mconfig, *this),
 		m_via0(*this, M6522_0_TAG),
@@ -171,7 +171,7 @@ void vic1112_device::device_reset()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic1112_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic1112_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (!io2)
 	{
@@ -200,7 +200,7 @@ UINT8 vic1112_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data
 //  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic1112_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic1112_device::vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (!io2)
 	{

@@ -89,7 +89,7 @@ WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2u_2_q_cb)
 }
 
 
-void carpolo_state::carpolo_generate_ball_screen_interrupt(UINT8 cause)
+void carpolo_state::carpolo_generate_ball_screen_interrupt(uint8_t cause)
 {
 	m_ball_screen_collision_cause = cause;
 
@@ -198,7 +198,7 @@ READ8_MEMBER(carpolo_state::carpolo_interrupt_cause_r)
 
 INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 {
-	UINT8 port_value;
+	uint8_t port_value;
 	int player;
 
 
@@ -392,7 +392,7 @@ READ8_MEMBER(carpolo_state::pia_0_port_b_r)
 
 READ8_MEMBER(carpolo_state::pia_1_port_a_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	/* bit 0 - Player 4 steering input (left or right)
 	   bit 1 - Player 3 steering input (left or right)
@@ -415,7 +415,7 @@ READ8_MEMBER(carpolo_state::pia_1_port_a_r)
 
 READ8_MEMBER(carpolo_state::pia_1_port_b_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	/* bit 4 - Player 4 steering input (wheel moving or stopped)
 	   bit 5 - Player 3 steering input (wheel moving or stopped)

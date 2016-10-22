@@ -170,7 +170,7 @@ static void buf_reset(buf_t *buf)
 
 const device_type GAELCO_SERIAL = &device_creator<gaelco_serial_device>;
 
-gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GAELCO_SERIAL, "Gaelco 3D Serial Hardware", tag, owner, clock, "gaelco_serial", __FILE__),
 	m_irq_handler(*this),
 	m_status(0),
@@ -253,14 +253,14 @@ void gaelco_serial_device::device_stop()
 
 TIMER_CALLBACK_MEMBER( gaelco_serial_device::set_status_cb )
 {
-	UINT8 mask = param >> 8;
-	UINT8 set = param & 0xff;
+	uint8_t mask = param >> 8;
+	uint8_t set = param & 0xff;
 
 	m_status &= mask;
 	m_status |= set;
 }
 
-void gaelco_serial_device::set_status(UINT8 mask, UINT8 set, int wait)
+void gaelco_serial_device::set_status(uint8_t mask, uint8_t set, int wait)
 {
 	machine().scheduler().timer_set(attotime::from_hz(wait), timer_expired_delegate(FUNC(gaelco_serial_device::set_status_cb), this), (mask << 8)|set);
 }
@@ -338,7 +338,7 @@ WRITE8_MEMBER( gaelco_serial_device::irq_enable )
 
 READ8_MEMBER( gaelco_serial_device::status_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -366,7 +366,7 @@ WRITE8_MEMBER( gaelco_serial_device::data_w)
 
 READ8_MEMBER( gaelco_serial_device::data_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	std::lock_guard<std::mutex> guard(m_mutex);
 	process_in();

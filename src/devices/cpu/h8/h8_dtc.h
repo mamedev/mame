@@ -20,9 +20,9 @@
 	downcast<h8_dtc_device *>(device)->set_info(intc, irq);
 
 struct h8_dtc_state {
-	UINT32 base, sra, dar, cr;
-	INT32 incs, incd;
-	UINT32 count;
+	uint32_t base, sra, dar, cr;
+	int32_t incs, incd;
+	uint32_t count;
 	int id;
 	int next;
 };
@@ -31,7 +31,7 @@ class h8_dtc_device : public device_t {
 public:
 	enum { DTC_CHAINED = 1000 };
 
-	h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_info(const char *intc, int irq);
 
 	DECLARE_READ8_MEMBER(dtcer_r);
@@ -43,7 +43,7 @@ public:
 	void count_done(int id);
 
 	inline h8_dtc_state *get_object(int vector) { return states + vector; }
-	inline UINT32 get_vector_address(int vector) { return 0x400 | ((vector ? vector : dtvecr & 0x7f) << 1); }
+	inline uint32_t get_vector_address(int vector) { return 0x400 | ((vector ? vector : dtvecr & 0x7f) << 1); }
 	int get_waiting_vector();
 	int get_waiting_writeback();
 	void vector_done(int vector);
@@ -60,7 +60,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	UINT8 dtcer[6], dtvecr;
+	uint8_t dtcer[6], dtvecr;
 	int cur_active_vector;
 
 	std::list<int> waiting_vector, waiting_writeback;

@@ -20,7 +20,7 @@ const device_type RF5C68 = &device_creator<rf5c68_device>;
 //  rf5c68_device - constructor
 //-------------------------------------------------
 
-rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RF5C68, "RF5C68", tag, owner, clock, "rf5c68", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -28,7 +28,7 @@ rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, dev
 		m_wbank(0),
 		m_enable(0)
 {
-	memset(m_data, 0, sizeof(UINT8)*0x10000);
+	memset(m_data, 0, sizeof(uint8_t)*0x10000);
 }
 
 
@@ -142,7 +142,7 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 READ8_MEMBER( rf5c68_device::rf5c68_r )
 {
-	UINT8 shift;
+	uint8_t shift;
 
 	m_stream->update();
 	shift = (offset & 1) ? 11 + 8 : 11;

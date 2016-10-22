@@ -23,7 +23,7 @@
     STATIC VARIABLES
 ***************************************************************************/
 
-static const UINT8 convert_zero[32] =
+static const uint8_t convert_zero[32] =
 { 32,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
 
 static const char *const condition[32] =
@@ -69,7 +69,7 @@ static const char *const condition[32] =
     CODE CODE
 ***************************************************************************/
 
-static inline char *signed_16bit(INT16 val)
+static inline char *signed_16bit(int16_t val)
 {
 	static char temp[10];
 	if (val < 0)
@@ -79,9 +79,9 @@ static inline char *signed_16bit(INT16 val)
 	return temp;
 }
 
-static unsigned dasmjag(int variant, char *buffer, unsigned pc, const UINT8 *oprom)
+static unsigned dasmjag(int variant, char *buffer, unsigned pc, const uint8_t *oprom)
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	int op = ROPCODE(0);
 	int reg1 = (op >> 5) & 31;
 	int reg2 = op & 31;
@@ -121,7 +121,7 @@ static unsigned dasmjag(int variant, char *buffer, unsigned pc, const UINT8 *opr
 		case 28:    sprintf(buffer, "ror     r%d,r%d", reg1, reg2);                 break;
 		case 29:    sprintf(buffer, "rorq    $%x,r%d", convert_zero[reg1], reg2);   break;
 		case 30:    sprintf(buffer, "cmp     r%d,r%d", reg1, reg2);                 break;
-		case 31:    sprintf(buffer, "cmpq    %s,r%d", signed_16bit((INT16)(reg1 << 11) >> 11), reg2);break;
+		case 31:    sprintf(buffer, "cmpq    %s,r%d", signed_16bit((int16_t)(reg1 << 11) >> 11), reg2);break;
 		case 32:    if (variant == JAGUAR_VARIANT_GPU)
 					sprintf(buffer, "sat8    r%d", reg2);
 					else
@@ -159,7 +159,7 @@ static unsigned dasmjag(int variant, char *buffer, unsigned pc, const UINT8 *opr
 		case 50:    sprintf(buffer, "store   r%d,(r15+$%x)", reg2, convert_zero[reg1]*4);break;
 		case 51:    sprintf(buffer, "move    pc,r%d", reg2);                            break;
 		case 52:    sprintf(buffer, "jump    %s(r%d)", condition[reg2], reg1);          break;
-		case 53:    sprintf(buffer, "jr      %s%08X", condition[reg2], pc + ((INT8)(reg1 << 3) >> 2)); break;
+		case 53:    sprintf(buffer, "jr      %s%08X", condition[reg2], pc + ((int8_t)(reg1 << 3) >> 2)); break;
 		case 54:    sprintf(buffer, "mmult   r%d,r%d", reg1, reg2);                 break;
 		case 55:    sprintf(buffer, "mtoi    r%d,r%d", reg1, reg2);                 break;
 		case 56:    sprintf(buffer, "normi   r%d,r%d", reg1, reg2);                 break;

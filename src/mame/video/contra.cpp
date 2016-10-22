@@ -23,7 +23,7 @@
 
 PALETTE_INIT_MEMBER(contra_state, contra)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int chip;
 
 	for (chip = 0; chip < 2; chip++)
@@ -37,7 +37,7 @@ PALETTE_INIT_MEMBER(contra_state, contra)
 
 			for (i = 0; i < 0x100; i++)
 			{
-				UINT8 ctabentry;
+				uint8_t ctabentry;
 
 				if (((pal & 0x01) == 0) && (color_prom[(clut << 8) | i] == 0))
 					ctabentry = 0;
@@ -60,10 +60,10 @@ PALETTE_INIT_MEMBER(contra_state, contra)
 
 TILE_GET_INFO_MEMBER(contra_state::get_fg_tile_info)
 {
-	UINT8 ctrl_3 = m_k007121_1->ctrlram_r(generic_space(), 3);
-	UINT8 ctrl_4 = m_k007121_1->ctrlram_r(generic_space(), 4);
-	UINT8 ctrl_5 = m_k007121_1->ctrlram_r(generic_space(), 5);
-	UINT8 ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_3 = m_k007121_1->ctrlram_r(generic_space(), 3);
+	uint8_t ctrl_4 = m_k007121_1->ctrlram_r(generic_space(), 4);
+	uint8_t ctrl_5 = m_k007121_1->ctrlram_r(generic_space(), 5);
+	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
 	int attr = m_fg_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -87,10 +87,10 @@ TILE_GET_INFO_MEMBER(contra_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(contra_state::get_bg_tile_info)
 {
-	UINT8 ctrl_3 = m_k007121_2->ctrlram_r(generic_space(), 3);
-	UINT8 ctrl_4 = m_k007121_2->ctrlram_r(generic_space(), 4);
-	UINT8 ctrl_5 = m_k007121_2->ctrlram_r(generic_space(), 5);
-	UINT8 ctrl_6 = m_k007121_2->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_3 = m_k007121_2->ctrlram_r(generic_space(), 3);
+	uint8_t ctrl_4 = m_k007121_2->ctrlram_r(generic_space(), 4);
+	uint8_t ctrl_5 = m_k007121_2->ctrlram_r(generic_space(), 5);
+	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(generic_space(), 6);
 	int attr = m_bg_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -115,8 +115,8 @@ TILE_GET_INFO_MEMBER(contra_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 {
-	UINT8 ctrl_5 = m_k007121_1->ctrlram_r(generic_space(), 5);
-	UINT8 ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_5 = m_k007121_1->ctrlram_r(generic_space(), 5);
+	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
 	int attr = m_tx_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -147,8 +147,8 @@ void contra_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(contra_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(contra_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_buffered_spriteram = std::make_unique<UINT8[]>(0x800);
-	m_buffered_spriteram_2 = std::make_unique<UINT8[]>(0x800);
+	m_buffered_spriteram = std::make_unique<uint8_t[]>(0x800);
+	m_buffered_spriteram_2 = std::make_unique<uint8_t[]>(0x800);
 
 	m_bg_clip = m_screen->visible_area();
 	m_bg_clip.min_x += 40;
@@ -210,7 +210,7 @@ WRITE8_MEMBER(contra_state::contra_text_cram_w)
 
 WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
 {
-	UINT8 ctrl_6 = m_k007121_1->ctrlram_r(space, 6);
+	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(space, 6);
 
 	if (offset == 3)
 	{
@@ -234,7 +234,7 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
 
 WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 {
-	UINT8 ctrl_6 = m_k007121_2->ctrlram_r(space, 6);
+	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(space, 6);
 
 	if (offset == 3)
 	{
@@ -267,23 +267,23 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	k007121_device *k007121 = bank ? m_k007121_2 : m_k007121_1;
 	address_space &space = machine().driver_data()->generic_space();
 	int base_color = (k007121->ctrlram_r(space, 6) & 0x30) * 2;
-	const UINT8 *source;
+	const uint8_t *source;
 
 	if (bank == 0)
 		source = m_buffered_spriteram.get();
 	else
 		source = m_buffered_spriteram_2.get();
 
-	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), *m_palette, source, base_color, 40, 0, priority_bitmap, (UINT32)-1);
+	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), *m_palette, source, base_color, 40, 0, priority_bitmap, (uint32_t)-1);
 }
 
-UINT32 contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT8 ctrl_1_0 = m_k007121_1->ctrlram_r(space, 0);
-	UINT8 ctrl_1_2 = m_k007121_1->ctrlram_r(space, 2);
-	UINT8 ctrl_2_0 = m_k007121_2->ctrlram_r(space, 0);
-	UINT8 ctrl_2_2 = m_k007121_2->ctrlram_r(space, 2);
+	uint8_t ctrl_1_0 = m_k007121_1->ctrlram_r(space, 0);
+	uint8_t ctrl_1_2 = m_k007121_1->ctrlram_r(space, 2);
+	uint8_t ctrl_2_0 = m_k007121_2->ctrlram_r(space, 0);
+	uint8_t ctrl_2_2 = m_k007121_2->ctrlram_r(space, 2);
 	rectangle bg_finalclip = m_bg_clip;
 	rectangle fg_finalclip = m_fg_clip;
 	rectangle tx_finalclip = m_tx_clip;

@@ -355,11 +355,11 @@ void sorcerer_state::video_start()
 	m_p_videoram = memregion("maincpu")->base()+0xf000;
 }
 
-UINT32 sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0x80,x;
-	UINT16 *p;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0x80,x;
+	uint16_t *p;
 
 	for (y = 0; y < 30; y++)
 	{
@@ -493,7 +493,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(sorcerer_state, sorcerer)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 }
 

@@ -120,7 +120,7 @@ machine_config_constructor a2bus_echoplus_device::device_mconfig_additions() con
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_via1(*this, VIA1_TAG),
@@ -132,21 +132,21 @@ a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device
 {
 }
 
-a2bus_mockingboard_device::a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_mockingboard_device::a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_ayboard_device(mconfig, A2BUS_MOCKINGBOARD, "Sweet Micro Systems Mockingboard", tag, owner, clock, "a2mockbd", __FILE__)
 {
 	m_isPhasor = false;
 	m_PhasorNative = false;
 }
 
-a2bus_phasor_device::a2bus_phasor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_phasor_device::a2bus_phasor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_ayboard_device(mconfig, A2BUS_PHASOR, "Applied Engineering Phasor", tag, owner, clock, "a2phasor", __FILE__)
 {
 	m_isPhasor = true;
 	m_PhasorNative = false;
 }
 
-a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_ayboard_device(mconfig, A2BUS_ECHOPLUS, "Street Electronics Echo Plus", tag, owner, clock, "a2echop", __FILE__),
 	m_tms(*this, E2P_TMS_TAG)
 {
@@ -176,12 +176,12 @@ void a2bus_ayboard_device::device_reset()
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_ayboard_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_ayboard_device::read_cnxx(address_space &space, uint8_t offset)
 {
 //    printf("Mockingboard(%d): read @ Cn%02X (PC=%x)\n", m_slot, offset, space.device().safe_pc());
 	if (m_isPhasor)
 	{
-		UINT8 retVal = 0;
+		uint8_t retVal = 0;
 		int viaSel;
 
 		if (m_PhasorNative)
@@ -227,7 +227,7 @@ UINT8 a2bus_ayboard_device::read_cnxx(address_space &space, UINT8 offset)
     write_cnxx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_ayboard_device::write_cnxx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_ayboard_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
 {
 	if (m_isPhasor)
 	{
@@ -488,7 +488,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 	}
 }
 
-UINT8 a2bus_ayboard_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_ayboard_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	if (m_isPhasor)
 	{
@@ -498,7 +498,7 @@ UINT8 a2bus_ayboard_device::read_c0nx(address_space &space, UINT8 offset)
 	return 0xff;
 }
 
-void a2bus_ayboard_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_ayboard_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	if (m_isPhasor)
 	{
@@ -506,7 +506,7 @@ void a2bus_ayboard_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
 	}
 }
 
-UINT8 a2bus_echoplus_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_echoplus_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	switch (offset)
 	{
@@ -517,7 +517,7 @@ UINT8 a2bus_echoplus_device::read_c0nx(address_space &space, UINT8 offset)
 	return 0;
 }
 
-void a2bus_echoplus_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_echoplus_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{

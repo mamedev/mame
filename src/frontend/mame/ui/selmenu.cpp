@@ -92,9 +92,9 @@ menu_select_launch::cache::cache(running_machine &machine)
 	// create a texture for snapshot
 	m_snapx_texture = texture_ptr(render.texture_alloc(render_texture::hq_scale), texture_free);
 
-	std::memcpy(&m_no_avail_bitmap->pix32(0), no_avail_bmp, 256 * 256 * sizeof(UINT32));
+	std::memcpy(&m_no_avail_bitmap->pix32(0), no_avail_bmp, 256 * 256 * sizeof(uint32_t));
 
-	std::memcpy(&m_star_bitmap->pix32(0), favorite_star_bmp, 32 * 32 * sizeof(UINT32));
+	std::memcpy(&m_star_bitmap->pix32(0), favorite_star_bmp, 32 * 32 * sizeof(uint32_t));
 	m_star_texture = texture_ptr(render.texture_alloc(), texture_free);
 	m_star_texture->set_bitmap(*m_star_bitmap, m_star_bitmap->cliprect(), TEXFORMAT_ARGB32);
 
@@ -110,7 +110,7 @@ menu_select_launch::cache::cache(running_machine &machine)
 		m_toolbar_texture.emplace_back(texture_ptr(render.texture_alloc(), texture_free));
 		m_sw_toolbar_texture.emplace_back(texture_ptr(render.texture_alloc(), texture_free));
 
-		std::memcpy(&m_toolbar_bitmap.back()->pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(UINT32));
+		std::memcpy(&m_toolbar_bitmap.back()->pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
 		if (m_toolbar_bitmap.back()->valid())
 			m_toolbar_texture.back()->set_bitmap(*m_toolbar_bitmap.back(), m_toolbar_bitmap.back()->cliprect(), TEXFORMAT_ARGB32);
 		else
@@ -118,7 +118,7 @@ menu_select_launch::cache::cache(running_machine &machine)
 
 		if ((i == 0U) || (i == 2U))
 		{
-			std::memcpy(&m_sw_toolbar_bitmap.back()->pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(UINT32));
+			std::memcpy(&m_sw_toolbar_bitmap.back()->pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
 			if (m_sw_toolbar_bitmap.back()->valid())
 				m_sw_toolbar_texture.back()->set_bitmap(*m_sw_toolbar_bitmap.back(), m_sw_toolbar_bitmap.back()->cliprect(), TEXFORMAT_ARGB32);
 			else
@@ -519,7 +519,7 @@ void menu_select_launch::draw_common_arrow(float origx1, float origy1, float ori
 void menu_select_launch::draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width)
 {
 	rgb_t fgcolor = UI_TEXT_COLOR;
-	UINT32 orientation = (!ub) ? ROT0 : ROT0 ^ ORIENTATION_FLIP_Y;
+	uint32_t orientation = (!ub) ? ROT0 : ROT0 ^ ORIENTATION_FLIP_Y;
 
 	if (mouse_hit && origx1 <= mouse_x && origx2 > mouse_x && oy1 <= mouse_y && oy1 + (line_height * text_size) > mouse_y)
 	{
@@ -762,7 +762,7 @@ void menu_select_launch::get_title_search(std::string &snaptext, std::string &se
 //  handle keys for main menu
 //-------------------------------------------------
 
-void menu_select_launch::handle_keys(UINT32 flags, int &iptkey)
+void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 {
 	bool const ignorepause = stack_has_special_main_menu();
 
@@ -978,7 +978,7 @@ void menu_select_launch::handle_keys(UINT32 flags, int &iptkey)
 //  handle input events for main menu
 //-------------------------------------------------
 
-void menu_select_launch::handle_events(UINT32 flags, event &ev)
+void menu_select_launch::handle_events(uint32_t flags, event &ev)
 {
 	auto stop = false;
 	ui_event local_menu_event;
@@ -986,7 +986,7 @@ void menu_select_launch::handle_events(UINT32 flags, event &ev)
 	if (m_pressed)
 	{
 		bool pressed = mouse_pressed();
-		INT32 m_target_x, m_target_y;
+		int32_t m_target_x, m_target_y;
 		bool m_button;
 		auto mouse_target = machine().ui_input().find_mouse(&m_target_x, &m_target_y, &m_button);
 		if (mouse_target && m_button && (hover == HOVER_ARROW_DOWN || hover == HOVER_ARROW_UP))
@@ -1183,7 +1183,7 @@ void menu_select_launch::handle_events(UINT32 flags, event &ev)
 //  draw main menu
 //-------------------------------------------------
 
-void menu_select_launch::draw(UINT32 flags)
+void menu_select_launch::draw(uint32_t flags)
 {
 	bool noinput = (flags & PROCESS_NOINPUT);
 	float line_height = ui().get_line_height();

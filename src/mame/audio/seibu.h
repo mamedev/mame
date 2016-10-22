@@ -43,7 +43,7 @@ ADDRESS_MAP_EXTERN(seibu3_adpcm_sound_map, 8);
 class seibu_sound_device : public device_t
 {
 public:
-	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~seibu_sound_device() {}
 
 	DECLARE_READ16_MEMBER( main_word_r );
@@ -60,9 +60,9 @@ public:
 	DECLARE_WRITE8_MEMBER( main_data_w );
 	DECLARE_WRITE8_MEMBER( pending_w );
 
-	static void apply_decrypt(UINT8 *rom, UINT8 *opcodes, int length);
+	static void apply_decrypt(uint8_t *rom, uint8_t *opcodes, int length);
 	void set_encryption(int mode);
-	UINT8 *get_custom_decrypt();
+	uint8_t *get_custom_decrypt();
 	void update_irq_lines(int param);
 
 protected:
@@ -72,17 +72,17 @@ protected:
 
 	private:
 	int m_encryption_mode;
-	std::unique_ptr<UINT8[]> m_decrypted_opcodes;
+	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
 
 	// internal state
 	device_t *m_sound_cpu;
-	required_region_ptr<UINT8> m_sound_rom;
-	UINT8 m_main2sub[2];
-	UINT8 m_sub2main[2];
+	required_region_ptr<uint8_t> m_sound_rom;
+	uint8_t m_main2sub[2];
+	uint8_t m_sub2main[2];
 	int m_main2sub_pending;
 	int m_sub2main_pending;
-	UINT8 m_rst10_irq;
-	UINT8 m_rst18_irq;
+	uint8_t m_rst10_irq;
+	uint8_t m_rst18_irq;
 
 	enum
 	{
@@ -103,7 +103,7 @@ class seibu_adpcm_device : public device_t,
 									public device_sound_interface
 {
 public:
-	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~seibu_adpcm_device() {}
 
 	void decrypt();
@@ -121,11 +121,11 @@ protected:
 	// internal state
 	oki_adpcm_state m_adpcm;
 	sound_stream *m_stream;
-	UINT32 m_current;
-	UINT32 m_end;
-	UINT8 m_nibble;
-	UINT8 m_playing;
-	required_region_ptr<UINT8> m_base;
+	uint32_t m_current;
+	uint32_t m_end;
+	uint8_t m_nibble;
+	uint8_t m_playing;
+	required_region_ptr<uint8_t> m_base;
 };
 
 extern const device_type SEIBU_ADPCM;

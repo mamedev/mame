@@ -18,17 +18,17 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_vram1;
-	required_shared_ptr<UINT8> m_vram2;
-	required_shared_ptr<UINT8> m_vram3;
-	required_shared_ptr<UINT8> m_vram4;
-	required_shared_ptr<UINT8> m_scrollram;
+	required_shared_ptr<uint8_t> m_vram1;
+	required_shared_ptr<uint8_t> m_vram2;
+	required_shared_ptr<uint8_t> m_vram3;
+	required_shared_ptr<uint8_t> m_vram4;
+	required_shared_ptr<uint8_t> m_scrollram;
 
 	int m_oldport;
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
 	tilemap_t *m_tilemap4;
-	std::unique_ptr<UINT8[]> m_buffer_spriteram;
+	std::unique_ptr<uint8_t[]> m_buffer_spriteram;
 
 	DECLARE_READ8_MEMBER(wheel_r);
 	DECLARE_WRITE8_MEMBER(vram1_w);
@@ -44,7 +44,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ssrj);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	void draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

@@ -31,11 +31,11 @@ public:
 		{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_colorram;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_bgvideoram;
-	required_shared_ptr<UINT16> m_scroll;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_colorram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_bgvideoram;
+	required_shared_ptr<uint16_t> m_scroll;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE16_MEMBER(soundcommand_w);
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(galspnbl);
-	UINT32 screen_update_galspnbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_galspnbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	bitmap_ind16 m_sprite_bitmap;
 	DECLARE_VIDEO_START(galspnbl);

@@ -60,7 +60,7 @@ class h6280_device : public cpu_device
 {
 public:
 	// construction/destruction
-	h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// public interfaces
 	void set_irq_line(int irqline, int state);
@@ -72,8 +72,8 @@ public:
 	DECLARE_WRITE8_MEMBER( timer_w );
 
 	/* functions for use by the PSG and joypad port only! */
-	UINT8 io_get_buffer();
-	void io_set_buffer(UINT8);
+	uint8_t io_get_buffer();
+	void io_set_buffer(uint8_t);
 
 protected:
 	// device-level overrides
@@ -82,9 +82,9 @@ protected:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -93,24 +93,24 @@ protected:
 	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// opcode accessors
-	UINT8 program_read8(offs_t addr);
-	void program_write8(offs_t addr, UINT8 data);
-	UINT8 program_read8z(offs_t addr);
-	void program_write8z(offs_t addr, UINT8 data);
-	UINT16 program_read16(offs_t addr);
-	UINT16 program_read16z(offs_t addr);
-	void push(UINT8 value);
-	void pull(UINT8 &value);
-	UINT8 read_opcode();
-	UINT8 read_opcode_arg();
+	uint8_t program_read8(offs_t addr);
+	void program_write8(offs_t addr, uint8_t data);
+	uint8_t program_read8z(offs_t addr);
+	void program_write8z(offs_t addr, uint8_t data);
+	uint16_t program_read16(offs_t addr);
+	uint16_t program_read16z(offs_t addr);
+	void push(uint8_t value);
+	void pull(uint8_t &value);
+	uint8_t read_opcode();
+	uint8_t read_opcode_arg();
 
 #undef PROTOTYPES
 #define PROTOTYPES(prefix) \
@@ -181,14 +181,14 @@ protected:
 
 	PROTOTYPES(op)
 
-	UINT32 translated(UINT16 addr);
+	uint32_t translated(uint16_t addr);
 	void h6280_cycles(int cyc);
-	void set_nz(UINT8 n);
+	void set_nz(uint8_t n);
 	void clear_t();
-	void do_interrupt(UINT16 vector);
+	void do_interrupt(uint16_t vector);
 	void check_and_take_irq_lines();
 	void check_irq_lines();
-	void check_vdc_vce_penalty(UINT16 addr);
+	void check_vdc_vce_penalty(uint16_t addr);
 	void bra(bool cond);
 	void ea_zpg();
 	void ea_tflg();
@@ -202,40 +202,40 @@ protected:
 	void ea_idy();
 	void ea_ind();
 	void ea_iax();
-	UINT8 rd_imm();
-	UINT8 rd_zpg();
-	UINT8 rd_zpx();
-	UINT8 rd_zpy();
-	UINT8 rd_abs();
-	UINT8 rd_abx();
-	UINT8 rd_aby();
-	UINT8 rd_zpi();
-	UINT8 rd_idx();
-	UINT8 rd_idy();
-	UINT8 rd_tfl();
-	void wr_zpg(UINT8 tmp);
-	void wr_zpx(UINT8 tmp);
-	void wr_zpy(UINT8 tmp);
-	void wr_abs(UINT8 tmp);
-	void wr_abx(UINT8 tmp);
-	void wr_aby(UINT8 tmp);
-	void wr_zpi(UINT8 tmp);
-	void wr_idx(UINT8 tmp);
-	void wr_idy(UINT8 tmp);
-	void wb_ea(UINT8 tmp);
-	void wb_eaz(UINT8 tmp);
-	void compose_p(UINT8 set, UINT8 clr);
-	void tadc(UINT8 tmp);
-	void adc(UINT8 tmp);
-	void tand(UINT8 tmp);
-	void and_a(UINT8 tmp);
-	UINT8 asl(UINT8 tmp);
-	void bbr(int bit, UINT8 tmp);
-	void bbs(int bit, UINT8 tmp);
+	uint8_t rd_imm();
+	uint8_t rd_zpg();
+	uint8_t rd_zpx();
+	uint8_t rd_zpy();
+	uint8_t rd_abs();
+	uint8_t rd_abx();
+	uint8_t rd_aby();
+	uint8_t rd_zpi();
+	uint8_t rd_idx();
+	uint8_t rd_idy();
+	uint8_t rd_tfl();
+	void wr_zpg(uint8_t tmp);
+	void wr_zpx(uint8_t tmp);
+	void wr_zpy(uint8_t tmp);
+	void wr_abs(uint8_t tmp);
+	void wr_abx(uint8_t tmp);
+	void wr_aby(uint8_t tmp);
+	void wr_zpi(uint8_t tmp);
+	void wr_idx(uint8_t tmp);
+	void wr_idy(uint8_t tmp);
+	void wb_ea(uint8_t tmp);
+	void wb_eaz(uint8_t tmp);
+	void compose_p(uint8_t set, uint8_t clr);
+	void tadc(uint8_t tmp);
+	void adc(uint8_t tmp);
+	void tand(uint8_t tmp);
+	void and_a(uint8_t tmp);
+	uint8_t asl(uint8_t tmp);
+	void bbr(int bit, uint8_t tmp);
+	void bbs(int bit, uint8_t tmp);
 	void bcc();
 	void bcs();
 	void beq();
-	void bit(UINT8 tmp);
+	void bit(uint8_t tmp);
 	void bmi();
 	void bne();
 	void bpl();
@@ -250,26 +250,26 @@ protected:
 	void clv();
 	void clx();
 	void cly();
-	void cmp(UINT8 tmp);
-	void cpx(UINT8 tmp);
-	void cpy(UINT8 tmp);
-	UINT8 dec(UINT8 tmp);
+	void cmp(uint8_t tmp);
+	void cpx(uint8_t tmp);
+	void cpy(uint8_t tmp);
+	uint8_t dec(uint8_t tmp);
 	void dex();
 	void dey();
-	void teor(UINT8 tmp);
-	void eor(UINT8 tmp);
-	UINT8 inc(UINT8 tmp);
+	void teor(uint8_t tmp);
+	void eor(uint8_t tmp);
+	uint8_t inc(uint8_t tmp);
 	void inx();
 	void iny();
 	void jmp();
 	void jsr();
-	void lda(UINT8 tmp);
-	void ldx(UINT8 tmp);
-	void ldy(UINT8 tmp);
-	UINT8 lsr(UINT8 tmp);
+	void lda(uint8_t tmp);
+	void ldx(uint8_t tmp);
+	void ldy(uint8_t tmp);
+	uint8_t lsr(uint8_t tmp);
 	void nop();
-	void tora(UINT8 tmp);
-	void ora(UINT8 tmp);
+	void tora(uint8_t tmp);
+	void ora(uint8_t tmp);
 	void pha();
 	void php();
 	void phx();
@@ -278,41 +278,41 @@ protected:
 	void plp();
 	void plx();
 	void ply();
-	UINT8 rmb(int bit, UINT8 tmp);
-	UINT8 rol(UINT8 tmp);
-	UINT8 ror(UINT8 tmp);
+	uint8_t rmb(int bit, uint8_t tmp);
+	uint8_t rol(uint8_t tmp);
+	uint8_t ror(uint8_t tmp);
 	void rti();
 	void rts();
 	void sax();
 	void say();
-	void tsbc(UINT8 tmp);
-	void sbc(UINT8 tmp);
+	void tsbc(uint8_t tmp);
+	void sbc(uint8_t tmp);
 	void sec();
 	void sed();
 	void sei();
 	void set();
-	UINT8 smb(int bit, UINT8 tmp);
-	void st0(UINT8 tmp);
-	void st1(UINT8 tmp);
-	void st2(UINT8 tmp);
-	UINT8 sta();
-	UINT8 stx();
-	UINT8 sty();
-	UINT8 stz();
+	uint8_t smb(int bit, uint8_t tmp);
+	void st0(uint8_t tmp);
+	void st1(uint8_t tmp);
+	void st2(uint8_t tmp);
+	uint8_t sta();
+	uint8_t stx();
+	uint8_t sty();
+	uint8_t stz();
 	void sxy();
 	void tai();
-	void tam(UINT8 tmp);
+	void tam(uint8_t tmp);
 	void tax();
 	void tay();
 	void tdd();
 	void tia();
 	void tii();
 	void tin();
-	void tma(UINT8 tmp);
-	UINT8 trb(UINT8 tmp);
-	UINT8 tsb(UINT8 tmp);
+	void tma(uint8_t tmp);
+	uint8_t trb(uint8_t tmp);
+	uint8_t tsb(uint8_t tmp);
 	void tsx();
-	void tst(UINT8 imm, UINT8 tmp);
+	void tst(uint8_t imm, uint8_t tmp);
 	void txa();
 	void txs();
 	void tya();
@@ -338,24 +338,24 @@ protected:
 	PAIR  m_sp;             /* stack pointer (always 100 - 1FF) */
 	PAIR  m_zp;             /* zero page address */
 	PAIR  m_ea;             /* effective address */
-	UINT8 m_a;              /* Accumulator */
-	UINT8 m_x;              /* X index register */
-	UINT8 m_y;              /* Y index register */
-	UINT8 m_p;              /* Processor status */
-	UINT8 m_mmr[8];         /* Hu6280 memory mapper registers */
-	UINT8 m_irq_mask;       /* interrupt enable/disable */
-	UINT8 m_timer_status;   /* timer status */
-	UINT8 m_timer_ack;      /* timer acknowledge */
-	UINT8 m_clocks_per_cycle; /* 4 = low speed mode, 1 = high speed mode */
-	INT32 m_timer_value;    /* timer interrupt */
-	INT32 m_timer_load;     /* reload value */
-	UINT8 m_nmi_state;
-	UINT8 m_irq_state[3];
-	UINT8 m_irq_pending;
+	uint8_t m_a;              /* Accumulator */
+	uint8_t m_x;              /* X index register */
+	uint8_t m_y;              /* Y index register */
+	uint8_t m_p;              /* Processor status */
+	uint8_t m_mmr[8];         /* Hu6280 memory mapper registers */
+	uint8_t m_irq_mask;       /* interrupt enable/disable */
+	uint8_t m_timer_status;   /* timer status */
+	uint8_t m_timer_ack;      /* timer acknowledge */
+	uint8_t m_clocks_per_cycle; /* 4 = low speed mode, 1 = high speed mode */
+	int32_t m_timer_value;    /* timer interrupt */
+	int32_t m_timer_load;     /* reload value */
+	uint8_t m_nmi_state;
+	uint8_t m_irq_state[3];
+	uint8_t m_irq_pending;
 #if LAZY_FLAGS
-	INT32 m_nz;         /* last value (lazy N and Z flag) */
+	int32_t m_nz;         /* last value (lazy N and Z flag) */
 #endif
-	UINT8 m_io_buffer;  /* last value written to the PSG, timer, and interrupt pages */
+	uint8_t m_io_buffer;  /* last value written to the PSG, timer, and interrupt pages */
 
 	// other internal states
 	int m_icount;

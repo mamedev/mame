@@ -192,7 +192,7 @@ void ashnojoe_state::video_start()
 	m_joetilemap5->set_transparent_pen(15);
 }
 
-UINT32 ashnojoe_state::screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ashnojoe_state::screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//m_tilemap_reg[0] & 0x10 // ?? on coin insertion
 

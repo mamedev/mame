@@ -68,10 +68,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<UINT8> m_videoram;
-	UINT32 screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT8 *m_char_rom;
-	UINT8 m_row;
+	required_shared_ptr<uint8_t> m_videoram;
+	uint32_t screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint8_t *m_char_rom;
+	uint8_t m_row;
 	tilemap_t *m_bg_tilemap;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -91,7 +91,7 @@ WRITE8_MEMBER( i7000_state::i7000_scanlines_w )
 
 READ8_MEMBER( i7000_state::i7000_kbd_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i=0; i<40*25; i++){
 		m_bg_tilemap->mark_tile_dirty(i);
@@ -277,7 +277,7 @@ ADDRESS_MAP_END
 
 DEVICE_IMAGE_LOAD_MEMBER( i7000_state, i7000_card )
 {
-	UINT32 size = m_card->common_get_size("rom");
+	uint32_t size = m_card->common_get_size("rom");
 
 	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
 	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
@@ -316,7 +316,7 @@ void i7000_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(i7000_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 }
 
-UINT32 i7000_state::screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t i7000_state::screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

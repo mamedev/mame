@@ -47,7 +47,7 @@
 #elif defined(__SSE__) || defined(__x86_64__) || defined(_M_X64)
 #define MAX_ALIGNMENT       16
 #else
-#define MAX_ALIGNMENT       sizeof(INT64)
+#define MAX_ALIGNMENT       sizeof(int64_t)
 #endif
 
 
@@ -120,10 +120,10 @@ void *osd_malloc(size_t size)
 	size &= ~size_t(1);
 
 	// basic objects just come from the heap
-	UINT8 *const block = reinterpret_cast<UINT8 *>(HeapAlloc(GetProcessHeap(), 0, size));
+	uint8_t *const block = reinterpret_cast<uint8_t *>(HeapAlloc(GetProcessHeap(), 0, size));
 	if (block == nullptr)
 		return nullptr;
-	UINT8 *const result = reinterpret_cast<UINT8 *>(reinterpret_cast<FPTR>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(FPTR(MAX_ALIGNMENT) - 1));
+	uint8_t *const result = reinterpret_cast<uint8_t *>(reinterpret_cast<uintptr_t>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(uintptr_t(MAX_ALIGNMENT) - 1));
 
 	// store the size and return and pointer to the data afterward
 	*reinterpret_cast<size_t *>(block) = size;
@@ -155,13 +155,13 @@ void *osd_malloc_array(size_t size)
 		return nullptr;
 
 	// now allow access to everything but the first and last pages
-	page_base = VirtualAlloc(reinterpret_cast<UINT8 *>(page_base) + PAGE_SIZE, rounded_size, MEM_COMMIT, PAGE_READWRITE);
+	page_base = VirtualAlloc(reinterpret_cast<uint8_t *>(page_base) + PAGE_SIZE, rounded_size, MEM_COMMIT, PAGE_READWRITE);
 	if (page_base == nullptr)
 		return nullptr;
 
 	// work backwards from the page base to get to the block base
-	UINT8 *const block = GUARD_ALIGN_START ? reinterpret_cast<UINT8 *>(page_base) : (reinterpret_cast<UINT8 *>(page_base) + rounded_size - size);
-	UINT8 *const result = reinterpret_cast<UINT8 *>(reinterpret_cast<FPTR>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(FPTR(MAX_ALIGNMENT) - 1));
+	uint8_t *const block = GUARD_ALIGN_START ? reinterpret_cast<uint8_t *>(page_base) : (reinterpret_cast<uint8_t *>(page_base) + rounded_size - size);
+	uint8_t *const result = reinterpret_cast<uint8_t *>(reinterpret_cast<uintptr_t>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(uintptr_t(MAX_ALIGNMENT) - 1));
 
 	// store the size at the start with a flag indicating it has a guard page
 	*reinterpret_cast<size_t *>(block) = size | 1;
@@ -180,8 +180,8 @@ void osd_free(void *ptr)
 #ifndef MALLOC_DEBUG
 	free(ptr);
 #else
-	UINT8 const offset = *(reinterpret_cast<UINT8 *>(ptr) - 1);
-	UINT8 *const block = reinterpret_cast<UINT8 *>(ptr) - offset;
+	uint8_t const offset = *(reinterpret_cast<uint8_t *>(ptr) - 1);
+	uint8_t *const block = reinterpret_cast<uint8_t *>(ptr) - offset;
 	size_t const size = *reinterpret_cast<size_t *>(block);
 
 	if ((size & 0x1) == 0)

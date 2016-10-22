@@ -16,7 +16,7 @@
 class bfmdm01_device : public device_t
 {
 public:
-	bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~bfmdm01_device() {}
 
 	template<class _Object> static devcb_base &set_busy_callback(device_t &device, _Object object) { return downcast<bfmdm01_device &>(device).m_busy_cb.set_callback(object); }
@@ -30,12 +30,12 @@ public:
 	DECLARE_READ8_MEMBER( unknown_r );
 	DECLARE_WRITE8_MEMBER( unknown_w );
 
-	void writedata(UINT8 data);
+	void writedata(uint8_t data);
 	int busy(void);
 
 	INTERRUPT_GEN_MEMBER(nmi_line_assert);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -55,8 +55,8 @@ private:
 	int m_segbuffer[65];
 	int m_busy;
 
-	UINT8 m_scanline[DM_BYTESPERROW];
-	UINT8 m_comdata;
+	uint8_t m_scanline[DM_BYTESPERROW];
+	uint8_t m_comdata;
 
 	devcb_write_line m_busy_cb;
 

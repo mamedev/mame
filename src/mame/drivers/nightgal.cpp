@@ -58,14 +58,14 @@ public:
 		m_blitter(*this, "blitter") { }
 
 	/* video-related */
-	UINT8 m_blit_raw_data[3];
+	uint8_t m_blit_raw_data[3];
 
 	/* misc */
-	UINT8 m_nsc_latch;
-	UINT8 m_z80_latch;
-	UINT8 m_mux_data;
+	uint8_t m_nsc_latch;
+	uint8_t m_z80_latch;
+	uint8_t m_mux_data;
 
-	required_shared_ptr<UINT8> m_comms_ram;
+	required_shared_ptr<uint8_t> m_comms_ram;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -90,7 +90,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(nightgal);
-	UINT32 screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	required_ioport m_io_cr_clear;
@@ -125,18 +125,18 @@ void nightgal_state::video_start()
 	m_tmp_bitmap = std::make_unique<bitmap_ind16>(256, 256);
 }
 
-UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
-		UINT16 *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
+		uint8_t *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
+		uint16_t *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			UINT32 srcpix = *src++;
+			uint32_t srcpix = *src++;
 			*dst++ = m_palette->pen(srcpix & 0xf);
 			*dst++ = m_palette->pen((srcpix >> 4) & 0xf);
 		}
@@ -150,7 +150,7 @@ UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind1
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 PALETTE_INIT_MEMBER(nightgal_state, nightgal)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -263,7 +263,7 @@ WRITE8_MEMBER(nightgal_state::mux_w)
 
 READ8_MEMBER(nightgal_state::input_1p_r)
 {
-	UINT8 cr_clear = m_io_cr_clear->read();
+	uint8_t cr_clear = m_io_cr_clear->read();
 
 	switch (m_mux_data)
 	{
@@ -282,7 +282,7 @@ READ8_MEMBER(nightgal_state::input_1p_r)
 
 READ8_MEMBER(nightgal_state::input_2p_r)
 {
-	UINT8 coin_port = m_io_coins->read();
+	uint8_t coin_port = m_io_coins->read();
 
 	switch (m_mux_data)
 	{
@@ -1034,7 +1034,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(nightgal_state,royalqn)
 {
-	UINT8 *ROM = memregion("subrom")->base();
+	uint8_t *ROM = memregion("subrom")->base();
 
 	/* patch open bus / protection */
 	ROM[0x027e] = 0x02;

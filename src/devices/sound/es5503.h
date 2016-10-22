@@ -27,7 +27,7 @@ class es5503_device : public device_t,
 {
 public:
 	// construction/destruction
-	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_channels(device_t &device, int channels);
 
@@ -37,7 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	UINT8 get_channel_strobe() { return m_channel_strobe; }
+	uint8_t get_channel_strobe() { return m_channel_strobe; }
 
 	sound_stream *m_stream;
 
@@ -69,32 +69,32 @@ private:
 
 	struct ES5503Osc
 	{
-		UINT16 freq;
-		UINT16 wtsize;
-		UINT8  control;
-		UINT8  vol;
-		UINT8  data;
-		UINT32 wavetblpointer;
-		UINT8  wavetblsize;
-		UINT8  resolution;
+		uint16_t freq;
+		uint16_t wtsize;
+		uint8_t  control;
+		uint8_t  vol;
+		uint8_t  data;
+		uint32_t wavetblpointer;
+		uint8_t  wavetblsize;
+		uint8_t  resolution;
 
-		UINT32 accumulator;
-		UINT8  irqpend;
+		uint32_t accumulator;
+		uint8_t  irqpend;
 	};
 
 	ES5503Osc oscillators[32];
 
-	INT8  oscsenabled;      // # of oscillators enabled
+	int8_t  oscsenabled;      // # of oscillators enabled
 	int   rege0;            // contents of register 0xe0
 
-	UINT8 m_channel_strobe;
+	uint8_t m_channel_strobe;
 
 	int output_channels;
-	UINT32 output_rate;
+	uint32_t output_rate;
 
 	emu_timer *m_timer;
 
-	void halt_osc(int onum, int type, UINT32 *accumulator, int resshift);
+	void halt_osc(int onum, int type, uint32_t *accumulator, int resshift);
 };
 
 

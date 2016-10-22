@@ -182,14 +182,14 @@ static const token_entry c_token_table[] =
 
 /*
     { "INLINE", CUSTOM_CLASS },
-    { "INT8", CUSTOM_CLASS },
-    { "UINT8", CUSTOM_CLASS },
-    { "INT16", CUSTOM_CLASS },
-    { "UINT16", CUSTOM_CLASS },
-    { "INT32", CUSTOM_CLASS },
-    { "UINT32", CUSTOM_CLASS },
-    { "INT64", CUSTOM_CLASS },
-    { "UINT64", CUSTOM_CLASS },
+    { "int8_t", CUSTOM_CLASS },
+    { "uint8_t", CUSTOM_CLASS },
+    { "int16_t", CUSTOM_CLASS },
+    { "uint16_t", CUSTOM_CLASS },
+    { "int32_t", CUSTOM_CLASS },
+    { "uint32_t", CUSTOM_CLASS },
+    { "int64_t", CUSTOM_CLASS },
+    { "uint64_t", CUSTOM_CLASS },
     { "ARRAY_LENGTH", CUSTOM_CLASS },
 */
 	{ nullptr, KEYWORD_CLASS }
@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
 		usage(argv[0]);
 
 	// read the template file into an std::string
-	UINT32 bufsize;
+	uint32_t bufsize;
 	void *buffer;
 	if (util::core_file::load(tempfilename.c_str(), &buffer, bufsize) == osd_file::error::NONE)
 	{
@@ -513,7 +513,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 	bool is_token[256];
 	memset(is_token, 0, sizeof(is_token));
 	for (int toknum = 0; token_chars[toknum] != 0; toknum++)
-		is_token[(UINT8)token_chars[toknum]] = true;
+		is_token[(uint8_t)token_chars[toknum]] = true;
 
 	// open the source file
 	util::core_file::ptr src;
@@ -557,11 +557,11 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 		bool last_token_was_include = false;
 		bool last_was_token = false;
 		bool quotes_are_linked = false;
-		UINT8 curquote = 0;
+		uint8_t curquote = 0;
 		int curcol = 0;
 		for (char *srcptr = srcline; *srcptr != 0; )
 		{
-			UINT8 ch = *srcptr++;
+			uint8_t ch = *srcptr++;
 
 			// track whether or not we are within an extended (C-style) comment
 			if (!in_quotes && !in_inline_comment)
@@ -602,7 +602,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				int toklength;
 
 				// find the end of the token
-				while (*temp != 0 && is_token[(UINT8)*temp])
+				while (*temp != 0 && is_token[(uint8_t)*temp])
 					temp++;
 				toklength = temp - (srcptr - 1);
 

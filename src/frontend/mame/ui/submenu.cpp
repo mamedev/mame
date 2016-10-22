@@ -315,7 +315,7 @@ void submenu::handle()
 
 void submenu::populate()
 {
-	UINT32 arrow_flags;
+	uint32_t arrow_flags;
 
 	// add options
 	for (auto sm_option = m_options.begin(); sm_option < m_options.end(); ++sm_option)

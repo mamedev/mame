@@ -36,7 +36,7 @@ class k053260_device : public device_t,
 						public device_rom_interface
 {
 public:
-	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k053260_device() { }
 
 	DECLARE_READ8_MEMBER( main_read );
@@ -60,9 +60,9 @@ private:
 	sound_stream *  m_stream;
 
 	// live state
-	UINT8           m_portdata[4];
-	UINT8           m_keyon;
-	UINT8           m_mode;
+	uint8_t           m_portdata[4];
+	uint8_t           m_keyon;
+	uint8_t           m_mode;
 
 	// per voice state
 	class KDSC_Voice
@@ -74,35 +74,35 @@ private:
 
 		inline void voice_start(k053260_device &device, int index);
 		inline void voice_reset();
-		inline void set_register(offs_t offset, UINT8 data);
-		inline void set_loop_kadpcm(UINT8 data);
-		inline void set_pan(UINT8 data);
+		inline void set_register(offs_t offset, uint8_t data);
+		inline void set_loop_kadpcm(uint8_t data);
+		inline void set_pan(uint8_t data);
 		inline void update_pan_volume();
 		inline void key_on();
 		inline void key_off();
 		inline void play(stream_sample_t *outputs);
 		inline bool playing() { return m_playing; }
-		inline UINT8 read_rom();
+		inline uint8_t read_rom();
 
 	private:
 		// pointer to owning device
 		k053260_device *m_device;
 
 		// live state
-		UINT32 m_position;
-		UINT16 m_pan_volume[2];
-		UINT16 m_counter;
-		INT8   m_output;
+		uint32_t m_position;
+		uint16_t m_pan_volume[2];
+		uint16_t m_counter;
+		int8_t   m_output;
 		bool   m_playing;
 
 		// per voice registers
-		UINT32 m_start;
-		UINT16 m_length;
-		UINT16 m_pitch;
-		UINT8  m_volume;
+		uint32_t m_start;
+		uint16_t m_length;
+		uint16_t m_pitch;
+		uint8_t  m_volume;
 
 		// bit packed registers
-		UINT8  m_pan;
+		uint8_t  m_pan;
 		bool   m_loop;
 		bool   m_kadpcm;
 	} m_voice[4];

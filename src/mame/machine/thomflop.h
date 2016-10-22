@@ -16,8 +16,8 @@
 #include "machine/mc6843.h"
 #include "machine/mc6854.h"
 
-extern UINT8 to7_controller_type; /* set during init */
-extern UINT8 to7_floppy_bank;
+extern uint8_t to7_controller_type; /* set during init */
+extern uint8_t to7_floppy_bank;
 
 /* number of external floppy controller ROM banks */
 #define TO7_NB_FLOP_BANK 9

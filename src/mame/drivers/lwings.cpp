@@ -269,7 +269,7 @@ READ8_MEMBER(lwings_state::avengers_protection_r)
 
 READ8_MEMBER(lwings_state::avengers_soundlatch2_r)
 {
-	UINT8 data = *m_soundlatch2 | m_soundstate;
+	uint8_t data = *m_soundlatch2 | m_soundstate;
 	m_soundstate = 0;
 	return(data);
 }
@@ -841,7 +841,7 @@ GFXDECODE_END
 
 void lwings_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
@@ -891,7 +891,7 @@ void lwings_state::machine_start()
 
 	if (membank("samplebank"))
 	{
-		UINT8 *OKIROM = memregion("oki")->base();
+		uint8_t *OKIROM = memregion("oki")->base();
 		membank("samplebank")->configure_entries(0, 8, OKIROM, 0x20000);
 	}
 

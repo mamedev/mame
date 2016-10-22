@@ -69,7 +69,7 @@ const device_type PTM6840 = &device_creator<ptm6840_device>;
 //  ptm6840_device - constructor
 //-------------------------------------------------
 
-ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PTM6840, "6840 PTM", tag, owner, clock, "ptm6840", __FILE__),
 		m_internal_clock(0.0),
 		m_out_cb{*this, *this, *this},
@@ -304,7 +304,7 @@ void ptm6840_device::update_interrupts()
 //  compute_counter - Compute Counter
 //-------------------------------------------------
 
-UINT16 ptm6840_device::compute_counter( int counter ) const
+uint16_t ptm6840_device::compute_counter( int counter ) const
 {
 	double clock;
 
@@ -496,7 +496,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 		case PTM_6840_CTRL2:
 		{
 			int idx = (offset == 1) ? 1 : (m_control_reg[1] & CR1_SELECT) ? 0 : 2;
-			UINT8 diffs = data ^ m_control_reg[idx];
+			uint8_t diffs = data ^ m_control_reg[idx];
 			m_t3_divisor = (m_control_reg[2] & T3_PRESCALE_EN) ? 8 : 1;
 			m_mode[idx] = (data >> 3) & 0x07;
 			m_control_reg[idx] = data;

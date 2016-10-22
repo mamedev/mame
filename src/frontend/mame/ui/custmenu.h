@@ -22,7 +22,7 @@ namespace ui {
 struct c_sw_region
 {
 	std::vector<std::string> ui;
-	UINT16 actual;
+	uint16_t actual;
 	void set(std::string &str);
 	std::string getname(std::string &str);
 };
@@ -31,7 +31,7 @@ struct c_sw_region
 struct c_sw_publisher
 {
 	std::vector<std::string> ui;
-	UINT16 actual;
+	uint16_t actual;
 	void set(std::string &str);
 	std::string getname(std::string &str);
 };
@@ -40,7 +40,7 @@ struct c_sw_publisher
 struct c_sw_type
 {
 	std::vector<std::string> ui;
-	UINT16 actual;
+	uint16_t actual;
 	void set(std::string &str);
 };
 
@@ -49,14 +49,14 @@ struct c_sw_list
 {
 	std::vector<std::string> name;
 	std::vector<std::string> description;
-	UINT16 actual;
+	uint16_t actual;
 };
 
 // Software years
 struct c_sw_year
 {
 	std::vector<std::string> ui;
-	UINT16 actual;
+	uint16_t actual;
 	void set(std::string &str);
 };
 

@@ -39,7 +39,7 @@ WRITE8_MEMBER(subs_state::invert2_w)
 }
 
 
-UINT32 subs_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subs_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
@@ -115,7 +115,7 @@ UINT32 subs_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-UINT32 subs_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subs_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */

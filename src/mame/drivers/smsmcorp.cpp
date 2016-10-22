@@ -230,10 +230,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen") { }
 
-	UINT8 m_communication_port[4];
-	UINT8 m_communication_port_status;
+	uint8_t m_communication_port[4];
+	uint8_t m_communication_port_status;
 	bitmap_ind16 m_bitmap;
-	UINT8 m_vid_regs[7];
+	uint8_t m_vid_regs[7];
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(link_r);
 	DECLARE_WRITE8_MEMBER(link_w);
@@ -248,7 +248,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(sureshot);
-	UINT32 screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };
@@ -465,7 +465,7 @@ void smsmfg_state::video_start()
 	save_item(NAME(m_bitmap));
 }
 
-UINT32 smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

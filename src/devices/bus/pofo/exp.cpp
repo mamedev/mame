@@ -47,7 +47,7 @@ WRITE_LINE_MEMBER( device_portfolio_expansion_slot_interface::wake_w ) { m_slot-
 //  portfolio_expansion_slot_t - constructor
 //-------------------------------------------------
 
-portfolio_expansion_slot_t::portfolio_expansion_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+portfolio_expansion_slot_t::portfolio_expansion_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PORTFOLIO_EXPANSION_SLOT, "Atari Portfolio expansion port", tag, owner, clock, "portfolio_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_write_iint(*this),

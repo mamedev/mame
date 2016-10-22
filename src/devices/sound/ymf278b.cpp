@@ -82,10 +82,10 @@ int ymf278b_device::compute_rate(YMF278BSlot *slot, int val)
 	return res;
 }
 
-UINT32 ymf278b_device::compute_decay_env_vol_step(YMF278BSlot *slot, int val)
+uint32_t ymf278b_device::compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 {
 	int rate;
-	UINT32 res;
+	uint32_t res;
 
 	// rate override with damping/pseudo reverb
 	if (slot->DAMP)
@@ -109,7 +109,7 @@ UINT32 ymf278b_device::compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 
 void ymf278b_device::compute_freq_step(YMF278BSlot *slot)
 {
-	UINT32 step;
+	uint32_t step;
 	int oct;
 
 	oct = slot->octave;
@@ -215,9 +215,9 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 {
 	int i, j;
 	YMF278BSlot *slot;
-	INT16 sample = 0;
-	INT32 *mixp;
-	INT32 vl, vr;
+	int16_t sample = 0;
+	int32_t *mixp;
+	int32_t vl, vr;
 
 	if (&stream == m_stream_ymf262)
 	{
@@ -282,7 +282,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 				// update envelope
 				slot->env_vol += slot->env_vol_step;
-				if (((INT32)(slot->env_vol - slot->env_vol_lim)) >= 0)
+				if (((int32_t)(slot->env_vol - slot->env_vol_lim)) >= 0)
 				{
 					slot->env_step++;
 					compute_envelope(slot);
@@ -352,7 +352,7 @@ void ymf278b_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 /**************************************************************************/
 
-void ymf278b_device::A_w(UINT8 reg, UINT8 data)
+void ymf278b_device::A_w(uint8_t reg, uint8_t data)
 {
 	// FM register array 0 (compatible with YMF262)
 	switch(reg)
@@ -416,7 +416,7 @@ void ymf278b_device::A_w(UINT8 reg, UINT8 data)
 	}
 }
 
-void ymf278b_device::B_w(UINT8 reg, UINT8 data)
+void ymf278b_device::B_w(uint8_t reg, uint8_t data)
 {
 	// FM register array 1 (compatible with YMF262)
 	switch(reg)
@@ -452,7 +452,7 @@ void ymf278b_device::retrigger_note(YMF278BSlot *slot)
 	compute_envelope(slot);
 }
 
-void ymf278b_device::C_w(UINT8 reg, UINT8 data)
+void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 {
 	// Handle slot registers specifically
 	if (reg >= 0x08 && reg <= 0xf7)
@@ -466,8 +466,8 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 			case 0:
 			{
 				attotime period;
-				UINT32 offset;
-				UINT8 p[12];
+				uint32_t offset;
+				uint8_t p[12];
 				int i;
 
 				slot->wave &= 0x100;
@@ -719,7 +719,7 @@ WRITE8_MEMBER( ymf278b_device::write )
 
 READ8_MEMBER( ymf278b_device::read )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch (offset)
 	{
@@ -727,7 +727,7 @@ READ8_MEMBER( ymf278b_device::read )
 		case 0:
 		{
 			// bits 0 and 1 are only valid if NEW2 is set
-			UINT8 newbits = 0;
+			uint8_t newbits = 0;
 			if (m_exp & 2)
 				newbits = (m_status_ld << 1) | m_status_busy;
 
@@ -983,7 +983,7 @@ void ymf278b_device::device_start()
 	}
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/768);
-	m_mix_buffer = std::make_unique<INT32[]>(44100*2);
+	m_mix_buffer = std::make_unique<int32_t[]>(44100*2);
 
 	// rate tables
 	precompute_rate_tables();
@@ -1027,7 +1027,7 @@ void ymf278b_device::device_start()
 
 const device_type YMF278B = &device_creator<ymf278b_device>;
 
-ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMF278B, "YMF278B", tag, owner, clock, "ymf278b", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 22),

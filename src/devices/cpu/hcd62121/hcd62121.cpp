@@ -29,7 +29,7 @@ Martin Poupe's site can be found at http://martin.poupe.org/casio/
 const device_type HCD62121 = &device_creator<hcd62121_cpu_device>;
 
 
-hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, HCD62121, "Hitachi HCD62121", tag, owner, clock, "hcd62121", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0), m_prev_pc(0)
@@ -45,15 +45,15 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 }
 
 
-UINT8 hcd62121_cpu_device::read_op()
+uint8_t hcd62121_cpu_device::read_op()
 {
-	UINT8 d = m_program->read_byte( ( m_cseg << 16 ) | m_ip );
+	uint8_t d = m_program->read_byte( ( m_cseg << 16 ) | m_ip );
 	m_ip++;
 	return d;
 }
 
 
-UINT8 hcd62121_cpu_device::datasize( UINT8 op )
+uint8_t hcd62121_cpu_device::datasize( uint8_t op )
 {
 	switch( op & 0x03 )
 	{
@@ -70,7 +70,7 @@ UINT8 hcd62121_cpu_device::datasize( UINT8 op )
 }
 
 
-void hcd62121_cpu_device::read_reg( int size, UINT8 op1 )
+void hcd62121_cpu_device::read_reg( int size, uint8_t op1 )
 {
 	int i;
 
@@ -87,7 +87,7 @@ void hcd62121_cpu_device::read_reg( int size, UINT8 op1 )
 }
 
 
-void hcd62121_cpu_device::write_reg( int size, UINT8 op1 )
+void hcd62121_cpu_device::write_reg( int size, uint8_t op1 )
 {
 	int i;
 
@@ -104,7 +104,7 @@ void hcd62121_cpu_device::write_reg( int size, UINT8 op1 )
 }
 
 
-void hcd62121_cpu_device::read_regreg( int size, UINT8 op1, UINT8 op2, bool op_is_logical )
+void hcd62121_cpu_device::read_regreg( int size, uint8_t op1, uint8_t op2, bool op_is_logical )
 {
 	int i;
 
@@ -130,7 +130,7 @@ void hcd62121_cpu_device::read_regreg( int size, UINT8 op1, UINT8 op2, bool op_i
 		/* We need to swap parameters */
 		for ( i = 0; i < size; i++ )
 		{
-			UINT8 v = m_temp1[i];
+			uint8_t v = m_temp1[i];
 			m_temp1[i] = m_temp2[i];
 			m_temp2[i] = v;
 		}
@@ -138,7 +138,7 @@ void hcd62121_cpu_device::read_regreg( int size, UINT8 op1, UINT8 op2, bool op_i
 }
 
 
-void hcd62121_cpu_device::write_regreg( int size, UINT8 op1, UINT8 op2 )
+void hcd62121_cpu_device::write_regreg( int size, uint8_t op1, uint8_t op2 )
 {
 	int i;
 
@@ -157,10 +157,10 @@ void hcd62121_cpu_device::write_regreg( int size, UINT8 op1, UINT8 op2 )
 }
 
 
-void hcd62121_cpu_device::read_iregreg( int size, UINT8 op1, UINT8 op2 )
+void hcd62121_cpu_device::read_iregreg( int size, uint8_t op1, uint8_t op2 )
 {
 	int i;
-	UINT16 ad;
+	uint16_t ad;
 
 	ad = m_reg[ ( 0x40 | op1 ) & 0x7f ] | ( m_reg[ ( 0x40 | ( op1 + 1 ) ) & 0x7f ] << 8 );
 
@@ -188,7 +188,7 @@ void hcd62121_cpu_device::read_iregreg( int size, UINT8 op1, UINT8 op2 )
 		/* We need to swap parameters */
 		for ( i = 0; i < size; i++ )
 		{
-			UINT8 v = m_temp1[i];
+			uint8_t v = m_temp1[i];
 			m_temp1[i] = m_temp2[i];
 			m_temp2[i] = v;
 		}
@@ -196,14 +196,14 @@ void hcd62121_cpu_device::read_iregreg( int size, UINT8 op1, UINT8 op2 )
 }
 
 
-void hcd62121_cpu_device::write_iregreg( int size, UINT8 op1, UINT8 op2 )
+void hcd62121_cpu_device::write_iregreg( int size, uint8_t op1, uint8_t op2 )
 {
 	int i;
 
 	if ( ( op1 & 0x80 ) || ( op2 & 0x80 ) )
 	{
 		/* store in (reg1) */
-		UINT16 ad = m_reg[ ( 0x40 | op1 ) & 0x7f ] | ( m_reg[ ( 0x40 | ( op1 + 1 ) ) & 0x7f ] << 8 );
+		uint16_t ad = m_reg[ ( 0x40 | op1 ) & 0x7f ] | ( m_reg[ ( 0x40 | ( op1 + 1 ) ) & 0x7f ] << 8 );
 
 		for ( i = 0; i < size; i++ )
 		{
@@ -221,7 +221,7 @@ void hcd62121_cpu_device::write_iregreg( int size, UINT8 op1, UINT8 op2 )
 }
 
 
-void hcd62121_cpu_device::write_iregreg2( int size, UINT8 op1, UINT8 op2 )
+void hcd62121_cpu_device::write_iregreg2( int size, uint8_t op1, uint8_t op2 )
 {
 	int i;
 
@@ -234,7 +234,7 @@ void hcd62121_cpu_device::write_iregreg2( int size, UINT8 op1, UINT8 op2 )
 	else
 	{
 		/* store in (reg1) */
-		UINT16 ad = m_reg[ ( 0x40 | op1 ) & 0x7f ] | ( m_reg[ ( 0x40 | ( op1 + 1 ) ) & 0x7f ] << 8 );
+		uint16_t ad = m_reg[ ( 0x40 | op1 ) & 0x7f ] | ( m_reg[ ( 0x40 | ( op1 + 1 ) ) & 0x7f ] << 8 );
 
 		for ( i = 0; i < size; i++ )
 		{
@@ -246,7 +246,7 @@ void hcd62121_cpu_device::write_iregreg2( int size, UINT8 op1, UINT8 op2 )
 }
 
 
-int hcd62121_cpu_device::check_cond( UINT8 op )
+int hcd62121_cpu_device::check_cond( uint8_t op )
 {
 	switch ( op & 0x07 )
 	{
@@ -506,8 +506,8 @@ void hcd62121_cpu_device::execute_run()
 {
 	do
 	{
-		UINT32 pc = ( m_cseg << 16 ) | m_ip;
-		UINT8 op;
+		uint32_t pc = ( m_cseg << 16 ) | m_ip;
+		uint8_t op;
 
 		debugger_instruction_hook(this, pc);
 		m_prev_pc = pc;
@@ -525,7 +525,7 @@ void hcd62121_cpu_device::execute_run()
 }
 
 
-offs_t hcd62121_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t hcd62121_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hcd62121 );
 	return CPU_DISASSEMBLE_NAME(hcd62121)(this, buffer, pc, oprom, opram, options);

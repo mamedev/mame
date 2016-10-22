@@ -84,7 +84,7 @@ void spacefb_state::video_start()
 
 	width = m_screen->width();
 	height = m_screen->height();
-	m_object_present_map = std::make_unique<UINT8[]>(width * height);
+	m_object_present_map = std::make_unique<uint8_t[]>(width * height);
 
 	/* this start value positions the stars to match the flyer screen shot,
 	   but most likely, the actual star position is random as the hardware
@@ -128,16 +128,16 @@ void spacefb_state::get_starfield_pens(pen_t *pens)
 
 	for (i = 0; i < NUM_STARFIELD_PENS; i++)
 	{
-		UINT8 gb =  ((i >> 0) & 0x01) && color_contrast_g && !disable_star_field;
-		UINT8 ga =  ((i >> 1) & 0x01) && !disable_star_field;
-		UINT8 bb =  ((i >> 2) & 0x01) && color_contrast_b && !disable_star_field;
-		UINT8 ba = (((i >> 3) & 0x01) || background_blue) && !disable_star_field;
-		UINT8 ra = (((i >> 4) & 0x01) || background_red) && !disable_star_field;
-		UINT8 rb =  ((i >> 5) & 0x01) && color_contrast_r && !disable_star_field;
+		uint8_t gb =  ((i >> 0) & 0x01) && color_contrast_g && !disable_star_field;
+		uint8_t ga =  ((i >> 1) & 0x01) && !disable_star_field;
+		uint8_t bb =  ((i >> 2) & 0x01) && color_contrast_b && !disable_star_field;
+		uint8_t ba = (((i >> 3) & 0x01) || background_blue) && !disable_star_field;
+		uint8_t ra = (((i >> 4) & 0x01) || background_red) && !disable_star_field;
+		uint8_t rb =  ((i >> 5) & 0x01) && color_contrast_r && !disable_star_field;
 
-		UINT8 r = combine_3_weights(m_color_weights_rg, 0, rb, ra);
-		UINT8 g = combine_3_weights(m_color_weights_rg, 0, gb, ga);
-		UINT8 b = combine_2_weights(m_color_weights_b,     bb, ba);
+		uint8_t r = combine_3_weights(m_color_weights_rg, 0, rb, ra);
+		uint8_t g = combine_3_weights(m_color_weights_rg, 0, gb, ga);
+		uint8_t b = combine_2_weights(m_color_weights_b,     bb, ba);
 
 		pens[i] = rgb_t(r, g, b);
 	}
@@ -215,27 +215,27 @@ void spacefb_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, 
 void spacefb_state::get_sprite_pens(pen_t *pens)
 {
 	static const double fade_weights[] = { 1.0, 1.5, 2.5, 4.0 };
-	const UINT8 *prom = memregion("proms")->base();
+	const uint8_t *prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < NUM_SPRITE_PENS; i++)
 	{
-		UINT8 data = prom[((m_port_0 & 0x40) >> 2) | (i & 0x0f)];
+		uint8_t data = prom[((m_port_0 & 0x40) >> 2) | (i & 0x0f)];
 
-		UINT8 r0 = (data >> 0) & 0x01;
-		UINT8 r1 = (data >> 1) & 0x01;
-		UINT8 r2 = (data >> 2) & 0x01;
+		uint8_t r0 = (data >> 0) & 0x01;
+		uint8_t r1 = (data >> 1) & 0x01;
+		uint8_t r2 = (data >> 2) & 0x01;
 
-		UINT8 g0 = (data >> 3) & 0x01;
-		UINT8 g1 = (data >> 4) & 0x01;
-		UINT8 g2 = (data >> 5) & 0x01;
+		uint8_t g0 = (data >> 3) & 0x01;
+		uint8_t g1 = (data >> 4) & 0x01;
+		uint8_t g2 = (data >> 5) & 0x01;
 
-		UINT8 b1 = (data >> 6) & 0x01;
-		UINT8 b2 = (data >> 7) & 0x01;
+		uint8_t b1 = (data >> 6) & 0x01;
+		uint8_t b2 = (data >> 7) & 0x01;
 
-		UINT8 r = combine_3_weights(m_color_weights_rg, r0, r1, r2);
-		UINT8 g = combine_3_weights(m_color_weights_rg, g0, g1, g2);
-		UINT8 b = combine_2_weights(m_color_weights_b,      b1, b2);
+		uint8_t r = combine_3_weights(m_color_weights_rg, r0, r1, r2);
+		uint8_t g = combine_3_weights(m_color_weights_rg, g0, g1, g2);
+		uint8_t b = combine_2_weights(m_color_weights_b,      b1, b2);
 
 		if (i >> 4)
 		{
@@ -254,19 +254,19 @@ void spacefb_state::get_sprite_pens(pen_t *pens)
 
 void spacefb_state::draw_bullet(offs_t offs, pen_t pen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip)
 {
-	UINT8 sy;
+	uint8_t sy;
 
-	UINT8 *gfx = memregion("gfx2")->base();
+	uint8_t *gfx = memregion("gfx2")->base();
 
-	UINT8 code = m_videoram[offs + 0x0200] & 0x3f;
-	UINT8 y = ~m_videoram[offs + 0x0100] - 2;
+	uint8_t code = m_videoram[offs + 0x0200] & 0x3f;
+	uint8_t y = ~m_videoram[offs + 0x0100] - 2;
 
 	for (sy = 0; sy < 4; sy++)
 	{
-		UINT8 sx, dy;
+		uint8_t sx, dy;
 
-		UINT8 data = gfx[(code << 2) | sy];
-		UINT8 x = m_videoram[offs + 0x0000];
+		uint8_t data = gfx[(code << 2) | sy];
+		uint8_t x = m_videoram[offs + 0x0000];
 
 		if (flip)
 			dy = ~y;
@@ -279,7 +279,7 @@ void spacefb_state::draw_bullet(offs_t offs, pen_t pen, bitmap_rgb32 &bitmap, co
 			{
 				if (data & 0x01)
 				{
-					UINT16 dx;
+					uint16_t dx;
 
 					if (flip)
 						dx = (255 - x) * 2;
@@ -305,22 +305,22 @@ void spacefb_state::draw_bullet(offs_t offs, pen_t pen, bitmap_rgb32 &bitmap, co
 
 void spacefb_state::draw_sprite(offs_t offs, pen_t *pens, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip)
 {
-	UINT8 sy;
+	uint8_t sy;
 
-	UINT8 *gfx = memregion("gfx1")->base();
+	uint8_t *gfx = memregion("gfx1")->base();
 
-	UINT8 code = ~m_videoram[offs + 0x0200];
-	UINT8 color_base = (~m_videoram[offs + 0x0300] & 0x0f) << 2;
-	UINT8 y = ~m_videoram[offs + 0x0100] - 2;
+	uint8_t code = ~m_videoram[offs + 0x0200];
+	uint8_t color_base = (~m_videoram[offs + 0x0300] & 0x0f) << 2;
+	uint8_t y = ~m_videoram[offs + 0x0100] - 2;
 
 	for (sy = 0; sy < 8; sy++)
 	{
-		UINT8 sx, dy;
+		uint8_t sx, dy;
 
-		UINT8 data1 = gfx[0x0000 | (code << 3) | (sy ^ 0x07)];
-		UINT8 data2 = gfx[0x0800 | (code << 3) | (sy ^ 0x07)];
+		uint8_t data1 = gfx[0x0000 | (code << 3) | (sy ^ 0x07)];
+		uint8_t data2 = gfx[0x0800 | (code << 3) | (sy ^ 0x07)];
 
-		UINT8 x = m_videoram[offs + 0x0000] - 3;
+		uint8_t x = m_videoram[offs + 0x0000] - 3;
 
 		if (flip)
 			dy = ~y;
@@ -331,8 +331,8 @@ void spacefb_state::draw_sprite(offs_t offs, pen_t *pens, bitmap_rgb32 &bitmap, 
 		{
 			for (sx = 0; sx < 8; sx++)
 			{
-				UINT16 dx;
-				UINT8 data;
+				uint16_t dx;
+				uint8_t data;
 				pen_t pen;
 
 				if (flip)
@@ -398,7 +398,7 @@ void spacefb_state::draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect
  *
  *************************************/
 
-UINT32 spacefb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t spacefb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	draw_objects(bitmap, cliprect);
 	draw_starfield(screen, bitmap, cliprect);

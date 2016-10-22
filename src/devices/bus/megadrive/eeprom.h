@@ -18,8 +18,8 @@ class md_std_eeprom_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -31,7 +31,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write) override;
 
 	required_device<i2cmem_device> m_i2cmem;
-	UINT8 m_i2c_mem, m_i2c_clk;
+	uint8_t m_i2c_mem, m_i2c_clk;
 };
 
 // ======================> md_eeprom_nbajam_device
@@ -40,7 +40,7 @@ class md_eeprom_nbajam_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -56,7 +56,7 @@ class md_eeprom_nbajamte_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -72,7 +72,7 @@ class md_eeprom_cslam_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -88,7 +88,7 @@ class md_eeprom_nflqb_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -104,7 +104,7 @@ class md_eeprom_nhlpa_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -120,7 +120,7 @@ class md_eeprom_blara_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -161,7 +161,7 @@ class md_eeprom_nbajam_device_alt : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nbajam_device_alt(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_eeprom_nbajam_device_alt(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 //  virtual machine_config_constructor device_mconfig_additions() const override;
@@ -171,29 +171,29 @@ public:
 	virtual DECLARE_READ16_MEMBER(read) override;
 	virtual DECLARE_WRITE16_MEMBER(write) override;
 
-	std::vector<UINT8> m_sram;
+	std::vector<uint8_t> m_sram;
 
 	void eeprom_i2c_init();
 	void idle_devsel_check();
 	void eeprom_i2c_update();
-	UINT8 eeprom_i2c_out();
+	uint8_t eeprom_i2c_out();
 
 private:
 	// EEPROM runtime vars
-	UINT8 m_eeprom_sda;     // current SDA
-	UINT8 m_eeprom_prev_sda;    // previous SDA
-	UINT8 m_eeprom_scl;     // current SCL
-	UINT8 m_eeprom_prev_scl;   // previous SCL
-	UINT8 m_eeprom_cnt;     // operation count in 0-9
-	UINT8 m_eeprom_readwrite;     // read/write bit
-	UINT16 m_eeprom_slave_mask; // dev addr
-	UINT16 m_eeprom_word_address;  // memory addr
-	UINT16 m_eeprom_devsel;  // selected device
-	UINT16 m_eeprom_byte;  // byte to be written
+	uint8_t m_eeprom_sda;     // current SDA
+	uint8_t m_eeprom_prev_sda;    // previous SDA
+	uint8_t m_eeprom_scl;     // current SCL
+	uint8_t m_eeprom_prev_scl;   // previous SCL
+	uint8_t m_eeprom_cnt;     // operation count in 0-9
+	uint8_t m_eeprom_readwrite;     // read/write bit
+	uint16_t m_eeprom_slave_mask; // dev addr
+	uint16_t m_eeprom_word_address;  // memory addr
+	uint16_t m_eeprom_devsel;  // selected device
+	uint16_t m_eeprom_byte;  // byte to be written
 	int m_eeprom_cur_state;  // current state
 	// EEPROM physical characteristics (configured at init)
-	UINT16 m_eeprom_mask;       // size of the memory - 1
-	UINT16 m_eeprom_pagewrite_mask;  // max number of bytes that can be written in a single write cycle
+	uint16_t m_eeprom_mask;       // size of the memory - 1
+	uint16_t m_eeprom_pagewrite_mask;  // max number of bytes that can be written in a single write cycle
 
 };
 

@@ -50,39 +50,39 @@ public:
 	{
 	}
 
-	required_shared_ptr<UINT32> m_rom;
-	required_shared_ptr<UINT32> m_workram_l;
-	required_shared_ptr<UINT32> m_workram_h;
-	required_shared_ptr<UINT16> m_sound_ram;
+	required_shared_ptr<uint32_t> m_rom;
+	required_shared_ptr<uint32_t> m_workram_l;
+	required_shared_ptr<uint32_t> m_workram_h;
+	required_shared_ptr<uint16_t> m_sound_ram;
 	optional_ioport m_fake_comms;
 
 	memory_region *m_cart_reg[4];
-	std::unique_ptr<UINT8[]>     m_backupram;
-	std::unique_ptr<UINT32[]>    m_scu_regs;
-	std::unique_ptr<UINT16[]>    m_scsp_regs;
-	std::unique_ptr<UINT16[]>    m_vdp2_regs;
-	std::unique_ptr<UINT32[]>    m_vdp2_vram;
-	std::unique_ptr<UINT32[]>    m_vdp2_cram;
-	std::unique_ptr<UINT32[]>    m_vdp1_vram;
-	std::unique_ptr<UINT16[]>    m_vdp1_regs;
+	std::unique_ptr<uint8_t[]>     m_backupram;
+	std::unique_ptr<uint32_t[]>    m_scu_regs;
+	std::unique_ptr<uint16_t[]>    m_scsp_regs;
+	std::unique_ptr<uint16_t[]>    m_vdp2_regs;
+	std::unique_ptr<uint32_t[]>    m_vdp2_vram;
+	std::unique_ptr<uint32_t[]>    m_vdp2_cram;
+	std::unique_ptr<uint32_t[]>    m_vdp1_vram;
+	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
-	UINT8     m_NMI_reset;
-	UINT8     m_en_68k;
+	uint8_t     m_NMI_reset;
+	uint8_t     m_en_68k;
 
 
 	struct {
-		UINT32    src[3];       /* Source DMA lv n address*/
-		UINT32    dst[3];       /* Destination DMA lv n address*/
-		UINT32    src_add[3];   /* Source Addition for DMA lv n*/
-		UINT32    dst_add[3];   /* Destination Addition for DMA lv n*/
-		UINT32    size[3];      /* Transfer DMA size lv n*/
-		UINT32    index[3];
+		uint32_t    src[3];       /* Source DMA lv n address*/
+		uint32_t    dst[3];       /* Destination DMA lv n address*/
+		uint32_t    src_add[3];   /* Source Addition for DMA lv n*/
+		uint32_t    dst_add[3];   /* Destination Addition for DMA lv n*/
+		uint32_t    size[3];      /* Transfer DMA size lv n*/
+		uint32_t    index[3];
 		int       start_factor[3];
-		UINT8     enable_mask[3];
-		UINT32    ist;
-		UINT32    ism;
-		UINT32    illegal_factor[3];
-		UINT32    status;
+		uint8_t     enable_mask[3];
+		uint32_t    ist;
+		uint32_t    ism;
+		uint32_t    illegal_factor[3];
+		uint32_t    status;
 	}m_scu;
 
 	void scu_reset(void);
@@ -93,7 +93,7 @@ public:
 	attotime  m_sinit_boost_timeslice;
 
 	struct {
-		UINT16    **framebuffer_display_lines;
+		uint16_t    **framebuffer_display_lines;
 		int       framebuffer_mode;
 		int       framebuffer_double_interlace;
 		int       fbcr_accessed;
@@ -104,64 +104,64 @@ public:
 		int       framebuffer_clear_on_next_frame;
 		rectangle system_cliprect;
 		rectangle user_cliprect;
-		std::unique_ptr<UINT16[]>   framebuffer[2];
-		UINT16    **framebuffer_draw_lines;
-		std::unique_ptr<UINT8[]>     gfx_decode;
-		UINT16    lopr;
-		UINT16    copr;
-		UINT16    ewdr;
+		std::unique_ptr<uint16_t[]>   framebuffer[2];
+		uint16_t    **framebuffer_draw_lines;
+		std::unique_ptr<uint8_t[]>     gfx_decode;
+		uint16_t    lopr;
+		uint16_t    copr;
+		uint16_t    ewdr;
 
 		int       local_x;
 		int       local_y;
 	}m_vdp1;
 
 	struct {
-		std::unique_ptr<UINT8[]>      gfx_decode;
+		std::unique_ptr<uint8_t[]>      gfx_decode;
 		bitmap_rgb32 roz_bitmap[2];
-		UINT8     dotsel;
-		UINT8     pal;
-		UINT16    h_count;
-		UINT16    v_count;
-		UINT8     exltfg;
-		UINT8     exsyfg;
+		uint8_t     dotsel;
+		uint8_t     pal;
+		uint16_t    h_count;
+		uint16_t    v_count;
+		uint8_t     exltfg;
+		uint8_t     exsyfg;
 		int       old_crmd;
 		int       old_tvmd;
 	}m_vdp2;
 
 	struct {
-		UINT8 IOSEL1;
-		UINT8 IOSEL2;
-		UINT8 EXLE1;
-		UINT8 EXLE2;
-		UINT8 PDR1;
-		UINT8 PDR2;
-		UINT8 DDR1;
-		UINT8 DDR2;
-		UINT8 SF;
-		UINT8 SR;
-		UINT8 IREG[7];
-		UINT8 intback_buf[7];
-		UINT8 OREG[32];
+		uint8_t IOSEL1;
+		uint8_t IOSEL2;
+		uint8_t EXLE1;
+		uint8_t EXLE2;
+		uint8_t PDR1;
+		uint8_t PDR2;
+		uint8_t DDR1;
+		uint8_t DDR2;
+		uint8_t SF;
+		uint8_t SR;
+		uint8_t IREG[7];
+		uint8_t intback_buf[7];
+		uint8_t OREG[32];
 		int   intback_stage;
 		int   pmode;
-		UINT8 SMEM[4];
-		UINT8 intback;
-		UINT8 rtc_data[7];
-		UINT8 slave_on;
+		uint8_t SMEM[4];
+		uint8_t intback;
+		uint8_t rtc_data[7];
+		uint8_t slave_on;
 	}m_smpc;
 
 	/* Saturn specific*/
 	int m_saturn_region;
-	UINT8 m_cart_type;
-	UINT32 *m_cart_dram;
+	uint8_t m_cart_type;
+	uint32_t *m_cart_dram;
 
 	/* ST-V specific */
-	UINT8     m_stv_multi_bank;
-	UINT8     m_prev_bankswitch;
+	uint8_t     m_stv_multi_bank;
+	uint8_t     m_prev_bankswitch;
 	emu_timer *m_stv_rtc_timer;
-	UINT8     m_port_sel,m_mux_data;
-	UINT8     m_system_output;
-	UINT16    m_serial_tx;
+	uint8_t     m_port_sel,m_mux_data;
+	uint8_t     m_system_output;
+	uint16_t    m_serial_tx;
 
 	required_device<sh2_device> m_maincpu;
 	required_device<sh2_device> m_slave;
@@ -179,11 +179,11 @@ public:
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);
-	UINT32 screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
 
-	void scu_do_transfer(UINT8 event);
+	void scu_do_transfer(uint8_t event);
 	void scu_test_pending_irq();
 	DECLARE_READ32_MEMBER(saturn_scu_r);
 	DECLARE_WRITE32_MEMBER(saturn_scu_w);
@@ -191,9 +191,9 @@ public:
 	TIMER_CALLBACK_MEMBER(dma_lv1_ended);
 	TIMER_CALLBACK_MEMBER(dma_lv2_ended);
 	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
-	void scu_single_transfer(address_space &space, UINT32 src, UINT32 dst,UINT8 *src_shift);
-	void scu_dma_direct(address_space &space, UINT8 dma_ch);
-	void scu_dma_indirect(address_space &space,UINT8 dma_ch);
+	void scu_single_transfer(address_space &space, uint32_t src, uint32_t dst,uint8_t *src_shift);
+	void scu_dma_direct(address_space &space, uint8_t dma_ch);
+	void scu_dma_indirect(address_space &space,uint8_t dma_ch);
 	DECLARE_WRITE16_MEMBER(saturn_soundram_w);
 	DECLARE_READ16_MEMBER(saturn_soundram_r);
 	DECLARE_WRITE32_MEMBER(minit_w);
@@ -207,8 +207,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scsp_irq);
 	int m_scsp_last_line;
 
-	UINT8 smpc_direct_mode(UINT8 pad_n);
-	UINT8 smpc_th_control_mode(UINT8 pad_n);
+	uint8_t smpc_direct_mode(uint8_t pad_n);
+	uint8_t smpc_th_control_mode(uint8_t pad_n);
 	TIMER_CALLBACK_MEMBER( smpc_audio_reset_line_pulse );
 	DECLARE_READ8_MEMBER( saturn_SMPC_r );
 	DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
@@ -246,7 +246,7 @@ public:
 	int x2s(int v);
 	int y2s(int v);
 	void vdp1_fill_quad(const rectangle &cliprect, int patterndata, int xsize, const struct spoint *q);
-	void vdp1_fill_line(const rectangle &cliprect, int patterndata, int xsize, INT32 y, INT32 x1, INT32 x2, INT32 u1, INT32 u2, INT32 v1, INT32 v2);
+	void vdp1_fill_line(const rectangle &cliprect, int patterndata, int xsize, int32_t y, int32_t x1, int32_t x2, int32_t u1, int32_t u2, int32_t v1, int32_t v2);
 	void (saturn_state::*drawpixel)(int x, int y, int patterndata, int offsetcnt);
 	void drawpixel_poly(int x, int y, int patterndata, int offsetcnt);
 	void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt);
@@ -254,22 +254,22 @@ public:
 	void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt);
 	void drawpixel_generic(int x, int y, int patterndata, int offsetcnt);
 	void vdp1_fill_slope(const rectangle &cliprect, int patterndata, int xsize,
-							INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 *nx1, INT32 *nx2,
-							INT32 u1, INT32 u2, INT32 slu1, INT32 slu2, INT32 *nu1, INT32 *nu2,
-							INT32 v1, INT32 v2, INT32 slv1, INT32 slv2, INT32 *nv1, INT32 *nv2,
-							INT32 _y1, INT32 y2);
-	void stv_vdp1_setup_shading_for_line(INT32 y, INT32 x1, INT32 x2,
-												INT32 r1, INT32 g1, INT32 b1,
-												INT32 r2, INT32 g2, INT32 b2);
+							int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t *nx1, int32_t *nx2,
+							int32_t u1, int32_t u2, int32_t slu1, int32_t slu2, int32_t *nu1, int32_t *nu2,
+							int32_t v1, int32_t v2, int32_t slv1, int32_t slv2, int32_t *nv1, int32_t *nv2,
+							int32_t _y1, int32_t y2);
+	void stv_vdp1_setup_shading_for_line(int32_t y, int32_t x1, int32_t x2,
+												int32_t r1, int32_t g1, int32_t b1,
+												int32_t r2, int32_t g2, int32_t b2);
 	void stv_vdp1_setup_shading_for_slope(
-							INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 *nx1, INT32 *nx2,
-							INT32 r1, INT32 r2, INT32 slr1, INT32 slr2, INT32 *nr1, INT32 *nr2,
-							INT32 g1, INT32 g2, INT32 slg1, INT32 slg2, INT32 *ng1, INT32 *ng2,
-							INT32 b1, INT32 b2, INT32 slb1, INT32 slb2, INT32 *nb1, INT32 *nb2,
-							INT32 _y1, INT32 y2);
-	UINT16 stv_vdp1_apply_gouraud_shading( int x, int y, UINT16 pix );
+							int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t *nx1, int32_t *nx2,
+							int32_t r1, int32_t r2, int32_t slr1, int32_t slr2, int32_t *nr1, int32_t *nr2,
+							int32_t g1, int32_t g2, int32_t slg1, int32_t slg2, int32_t *ng1, int32_t *ng2,
+							int32_t b1, int32_t b2, int32_t slb1, int32_t slb2, int32_t *nb1, int32_t *nb2,
+							int32_t _y1, int32_t y2);
+	uint16_t stv_vdp1_apply_gouraud_shading( int x, int y, uint16_t pix );
 	void stv_vdp1_setup_shading(const struct spoint* q, const rectangle &cliprect);
-	UINT8 stv_read_gouraud_table( void );
+	uint8_t stv_read_gouraud_table( void );
 	void stv_clear_gouraud_shading(void);
 
 	void stv_clear_framebuffer( int which_framebuffer );
@@ -278,18 +278,18 @@ public:
 
 	struct stv_vdp1_poly_scanline
 	{
-		INT32   x[2];
-		INT32   b[2];
-		INT32   g[2];
-		INT32   r[2];
-		INT32   db;
-		INT32   dg;
-		INT32   dr;
+		int32_t   x[2];
+		int32_t   b[2];
+		int32_t   g[2];
+		int32_t   r[2];
+		int32_t   db;
+		int32_t   dg;
+		int32_t   dr;
 	};
 
 	struct stv_vdp1_poly_scanline_data
 	{
-		INT32   sy, ey;
+		int32_t   sy, ey;
 		struct  stv_vdp1_poly_scanline scanline[512];
 	};
 
@@ -312,30 +312,30 @@ public:
 	struct _stv_gouraud_shading
 	{
 		/* Gouraud shading table */
-		UINT16  GA;
-		UINT16  GB;
-		UINT16  GC;
-		UINT16  GD;
+		uint16_t  GA;
+		uint16_t  GB;
+		uint16_t  GC;
+		uint16_t  GD;
 	} stv_gouraud_shading;
 
-	UINT16 m_sprite_colorbank;
+	uint16_t m_sprite_colorbank;
 
 	/* VDP1 Framebuffer handling */
 	int      stv_sprite_priorities_used[8];
 	int      stv_sprite_priorities_usage_valid;
-	UINT8    stv_sprite_priorities_in_fb_line[512][8];
+	uint8_t    stv_sprite_priorities_in_fb_line[512][8];
 
 
 	/* VDP2 */
 
-	UINT8 get_vblank( void );
-	UINT8 get_hblank( void );
+	uint8_t get_vblank( void );
+	uint8_t get_hblank( void );
 	int get_hcounter( void );
 	int get_vcounter( void );
 	int get_vblank_duration( void );
 	int get_hblank_duration( void );
 	int get_pixel_clock( void );
-	UINT8 get_odd_bit( void );
+	uint8_t get_odd_bit( void );
 	void stv_vdp2_dynamic_res_change( void );
 	int get_vblank_start_position( void );
 	int get_ystep_count( void );
@@ -344,7 +344,7 @@ public:
 	inline int stv_vdp2_window_process(int x,int y);
 	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
 	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
-	int get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,UINT8 win_num);
+	int get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t win_num);
 	int stv_vdp2_apply_window_on_layer(rectangle &cliprect);
 
 	void stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -355,26 +355,26 @@ public:
 	void draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void stv_vdp2_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int transparency,int transparent_color,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
-	void stv_vdp2_drawgfxzoom_rgb555(bitmap_rgb32 &dest_bmp,const rectangle &clip,UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int transparency,int transparent_color,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
-	void stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle &clip, UINT32 code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
-	void stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectangle &clip, UINT32 code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
+	void stv_vdp2_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int transparency,int transparent_color,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
+	void stv_vdp2_drawgfxzoom_rgb555(bitmap_rgb32 &dest_bmp,const rectangle &clip,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int transparency,int transparent_color,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
+	void stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle &clip, uint32_t code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
+	void stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectangle &clip, uint32_t code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
 
-	void stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, UINT32 code,UINT32 color, int flipx,int flipy,int offsx,int offsy, int transparent_color, int alpha);
-	void stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, UINT32 code,UINT32 color, int flipx,int flipy,int offsx,int offsy, int transparent_color);
+	void stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color, int flipx,int flipy,int offsx,int offsy, int transparent_color, int alpha);
+	void stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color, int flipx,int flipy,int offsx,int offsy, int transparent_color);
 
 
 	void stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, int iRP);
 	void stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap, bitmap_rgb32 &roz_bitmap, const rectangle &cliprect, int iRP, int planesizex, int planesizey, int planerenderedsizex, int planerenderedsizey);
-	void stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter );
-	UINT8 stv_vdp2_check_vram_cycle_pattern_registers( UINT8 access_command_pnmdr, UINT8 access_command_cpdr, UINT8 bitmap_enable );
-	UINT8 stv_vdp2_is_rotation_applied(void);
-	UINT8 stv_vdp2_are_map_registers_equal(void);
+	void stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter );
+	uint8_t stv_vdp2_check_vram_cycle_pattern_registers( uint8_t access_command_pnmdr, uint8_t access_command_cpdr, uint8_t bitmap_enable );
+	uint8_t stv_vdp2_is_rotation_applied(void);
+	uint8_t stv_vdp2_are_map_registers_equal(void);
 	void stv_vdp2_get_map_page( int x, int y, int *_map, int *_page );
 
-	void stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 is_roz);
+	void stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t is_roz);
 	void stv_vdp2_fade_effects( void );
 	void stv_vdp2_compute_color_offset( int *r, int *g, int *b, int cor );
 	void stv_vdp2_compute_color_offset_UINT32(rgb_t *rgb, int cor);
@@ -387,110 +387,110 @@ public:
 	void stv_vdp2_draw_NBG2(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 pri);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t pri);
 	int true_vcount[263][4];
 
 	void stv_vdp2_state_save_postload( void );
 	void stv_vdp2_exit ( void );
 	int stv_vdp2_start ( void );
 
-	UINT8 m_vdpdebug_roz;
+	uint8_t m_vdpdebug_roz;
 
 	struct stv_vdp2_tilemap_capabilities
 	{
-		UINT8  enabled;
-		UINT8  transparency;
-		UINT8  colour_calculation_enabled;
-		UINT8  colour_depth;
-		UINT8  alpha;
-		UINT8  tile_size;
-		UINT8  bitmap_enable;
-		UINT8  bitmap_size;
-		UINT8  bitmap_palette_number;
-		UINT8  bitmap_map;
-		UINT16 map_offset[16];
-		UINT8  map_count;
+		uint8_t  enabled;
+		uint8_t  transparency;
+		uint8_t  colour_calculation_enabled;
+		uint8_t  colour_depth;
+		uint8_t  alpha;
+		uint8_t  tile_size;
+		uint8_t  bitmap_enable;
+		uint8_t  bitmap_size;
+		uint8_t  bitmap_palette_number;
+		uint8_t  bitmap_map;
+		uint16_t map_offset[16];
+		uint8_t  map_count;
 
-		UINT8  pattern_data_size;
-		UINT8  character_number_supplement;
-		UINT8  special_priority_register;
-		UINT8  special_colour_control_register;
-		UINT8  supplementary_palette_bits;
-		UINT8  supplementary_character_bits;
+		uint8_t  pattern_data_size;
+		uint8_t  character_number_supplement;
+		uint8_t  special_priority_register;
+		uint8_t  special_colour_control_register;
+		uint8_t  supplementary_palette_bits;
+		uint8_t  supplementary_character_bits;
 
-		INT16 scrollx;
-		INT16 scrolly;
-		UINT32 incx, incy;
+		int16_t scrollx;
+		int16_t scrolly;
+		uint32_t incx, incy;
 
-		UINT8   linescroll_enable;
-		UINT8   linescroll_interval;
-		UINT32  linescroll_table_address;
-		UINT8   vertical_linescroll_enable;
-		UINT8   linezoom_enable;
+		uint8_t   linescroll_enable;
+		uint8_t   linescroll_interval;
+		uint32_t  linescroll_table_address;
+		uint8_t   vertical_linescroll_enable;
+		uint8_t   linezoom_enable;
 
-		UINT8  plane_size;
-		UINT8  colour_ram_address_offset;
-		UINT8  fade_control;
+		uint8_t  plane_size;
+		uint8_t  colour_ram_address_offset;
+		uint8_t  fade_control;
 		struct{
-			UINT8 logic;
-			UINT8 enabled[2];
-			UINT8 area[2];
+			uint8_t logic;
+			uint8_t enabled[2];
+			uint8_t area[2];
 		}window_control;
 
-		UINT8  line_screen_enabled;
-		UINT8  mosaic_screen_enabled;
+		uint8_t  line_screen_enabled;
+		uint8_t  mosaic_screen_enabled;
 
 		int layer_name; /* just to keep track */
 	} stv2_current_tilemap;
 
 	struct rotation_table
 	{
-		INT32   xst;
-		INT32   yst;
-		INT32   zst;
-		INT32   dxst;
-		INT32   dyst;
-		INT32   dx;
-		INT32   dy;
-		INT32   A;
-		INT32   B;
-		INT32   C;
-		INT32   D;
-		INT32   E;
-		INT32   F;
-		INT32   px;
-		INT32   py;
-		INT32   pz;
-		INT32   cx;
-		INT32   cy;
-		INT32   cz;
-		INT32   mx;
-		INT32   my;
-		INT32   kx;
-		INT32   ky;
-		UINT32  kast;
-		INT32   dkast;
-		INT32   dkax;
+		int32_t   xst;
+		int32_t   yst;
+		int32_t   zst;
+		int32_t   dxst;
+		int32_t   dyst;
+		int32_t   dx;
+		int32_t   dy;
+		int32_t   A;
+		int32_t   B;
+		int32_t   C;
+		int32_t   D;
+		int32_t   E;
+		int32_t   F;
+		int32_t   px;
+		int32_t   py;
+		int32_t   pz;
+		int32_t   cx;
+		int32_t   cy;
+		int32_t   cz;
+		int32_t   mx;
+		int32_t   my;
+		int32_t   kx;
+		int32_t   ky;
+		uint32_t  kast;
+		int32_t   dkast;
+		int32_t   dkax;
 
 	} stv_current_rotation_parameter_table;
 
 	struct _stv_vdp2_layer_data_placement
 	{
-		UINT32  map_offset_min;
-		UINT32  map_offset_max;
-		UINT32  tile_offset_min;
-		UINT32  tile_offset_max;
+		uint32_t  map_offset_min;
+		uint32_t  map_offset_max;
+		uint32_t  tile_offset_min;
+		uint32_t  tile_offset_max;
 	} stv_vdp2_layer_data_placement;
 
 	struct _stv_rbg_cache_data
 	{
-		UINT8   watch_vdp2_vram_writes;
-		UINT8   is_cache_dirty;
+		uint8_t   watch_vdp2_vram_writes;
+		uint8_t   is_cache_dirty;
 
-		UINT32  map_offset_min[2];
-		UINT32  map_offset_max[2];
-		UINT32  tile_offset_min[2];
-		UINT32  tile_offset_max[2];
+		uint32_t  map_offset_min[2];
+		uint32_t  map_offset_max[2];
+		uint32_t  tile_offset_min[2];
+		uint32_t  tile_offset_max[2];
 
 		struct stv_vdp2_tilemap_capabilities    layer_data[2];
 
@@ -505,56 +505,56 @@ public:
 
 	struct direntryT
 	{
-		UINT8 record_size;
-		UINT8 xa_record_size;
-		UINT32 firstfad;        // first sector of file
-		UINT32 length;      // length of file
-		UINT8 year;
-		UINT8 month;
-		UINT8 day;
-		UINT8 hour;
-		UINT8 minute;
-		UINT8 second;
-		UINT8 gmt_offset;
-		UINT8 flags;        // iso9660 flags
-		UINT8 file_unit_size;
-		UINT8 interleave_gap_size;
-		UINT16 volume_sequencer_number;
-		UINT8 name[128];
+		uint8_t record_size;
+		uint8_t xa_record_size;
+		uint32_t firstfad;        // first sector of file
+		uint32_t length;      // length of file
+		uint8_t year;
+		uint8_t month;
+		uint8_t day;
+		uint8_t hour;
+		uint8_t minute;
+		uint8_t second;
+		uint8_t gmt_offset;
+		uint8_t flags;        // iso9660 flags
+		uint8_t file_unit_size;
+		uint8_t interleave_gap_size;
+		uint16_t volume_sequencer_number;
+		uint8_t name[128];
 	};
 
 	struct filterT
 	{
-		UINT8 mode;
-		UINT8 chan;
-		UINT8 smmask;
-		UINT8 cimask;
-		UINT8 fid;
-		UINT8 smval;
-		UINT8 cival;
-		UINT8 condtrue;
-		UINT8 condfalse;
-		UINT32 fad;
-		UINT32 range;
+		uint8_t mode;
+		uint8_t chan;
+		uint8_t smmask;
+		uint8_t cimask;
+		uint8_t fid;
+		uint8_t smval;
+		uint8_t cival;
+		uint8_t condtrue;
+		uint8_t condfalse;
+		uint32_t fad;
+		uint32_t range;
 	};
 
 	struct blockT
 	{
-		INT32 size; // size of block
-		INT32 FAD;  // FAD on disc
-		UINT8 data[CD_MAX_SECTOR_DATA];
-		UINT8 chan; // channel
-		UINT8 fnum; // file number
-		UINT8 subm; // subchannel mode
-		UINT8 cinf; // coding information
+		int32_t size; // size of block
+		int32_t FAD;  // FAD on disc
+		uint8_t data[CD_MAX_SECTOR_DATA];
+		uint8_t chan; // channel
+		uint8_t fnum; // file number
+		uint8_t subm; // subchannel mode
+		uint8_t cinf; // coding information
 	};
 
 	struct partitionT
 	{
-		INT32 size;
+		int32_t size;
 		blockT *blocks[MAX_BLOCKS];
-		UINT8 bnum[MAX_BLOCKS];
-		UINT8 numblks;
+		uint8_t bnum[MAX_BLOCKS];
+		uint8_t numblks;
 	};
 
 	// 16-bit transfer types
@@ -584,30 +584,30 @@ public:
 	void stvcd_set_tray_open(void);
 	void stvcd_set_tray_close(void);
 
-	int get_track_index(UINT32 fad);
+	int get_track_index(uint32_t fad);
 	int sega_cdrom_get_adr_control(cdrom_file *file, int track);
-	void cr_standard_return(UINT16 cur_status);
+	void cr_standard_return(uint16_t cur_status);
 	void cd_free_block(blockT *blktofree);
 	void cd_defragblocks(partitionT *part);
-	void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum);
+	void cd_getsectoroffsetnum(uint32_t bufnum, uint32_t *sectoffs, uint32_t *sectnum);
 
-	UINT16 cd_readWord(UINT32 addr);
-	void cd_writeWord(UINT32 addr, UINT16 data);
-	UINT32 cd_readLong(UINT32 addr);
-	void cd_writeLong(UINT32 addr, UINT32 data);
+	uint16_t cd_readWord(uint32_t addr);
+	void cd_writeWord(uint32_t addr, uint16_t data);
+	uint32_t cd_readLong(uint32_t addr);
+	void cd_writeLong(uint32_t addr, uint32_t data);
 
 	void cd_readTOC(void);
-	void cd_readblock(UINT32 fad, UINT8 *dat);
+	void cd_readblock(uint32_t fad, uint8_t *dat);
 	void cd_playdata(void);
 
 	void cd_exec_command( void );
 	// iso9660 utilities
-	void make_dir_current(UINT32 fad);
-	void read_new_dir(UINT32 fileno);
+	void make_dir_current(uint32_t fad);
+	void read_new_dir(uint32_t fileno);
 
-	blockT *cd_alloc_block(UINT8 *blknum);
-	partitionT *cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok);
-	partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok);
+	blockT *cd_alloc_block(uint8_t *blknum);
+	partitionT *cd_filterdata(filterT *flt, int trktype, uint8_t *p_ok);
+	partitionT *cd_read_filtered_sector(int32_t fad, uint8_t *p_ok);
 
 	cdrom_file *cdrom;// = (cdrom_file *)nullptr;
 
@@ -620,41 +620,41 @@ public:
 	blockT blocks[MAX_BLOCKS];
 	blockT curblock;
 
-	UINT8 tocbuf[102*4];
-	UINT8 subqbuf[5*2];
-	UINT8 subrwbuf[12*2];
-	UINT8 finfbuf[256];
+	uint8_t tocbuf[102*4];
+	uint8_t subqbuf[5*2];
+	uint8_t subrwbuf[12*2];
+	uint8_t finfbuf[256];
 
-	INT32 sectlenin, sectlenout;
+	int32_t sectlenin, sectlenout;
 
-	UINT8 lastbuf, playtype;
+	uint8_t lastbuf, playtype;
 
 	transT xfertype;
 	trans32T xfertype32;
-	UINT32 xfercount, calcsize;
-	UINT32 xferoffs, xfersect, xfersectpos, xfersectnum, xferdnum;
+	uint32_t xfercount, calcsize;
+	uint32_t xferoffs, xfersect, xfersectpos, xfersectnum, xferdnum;
 
 	filterT filters[MAX_FILTERS];
 	filterT *cddevice;
 	int cddevicenum;
 
-	UINT16 cr1, cr2, cr3, cr4;
-	UINT16 prev_cr1, prev_cr2, prev_cr3, prev_cr4;
-	UINT8 status_type;
-	UINT16 hirqmask, hirqreg;
-	UINT16 cd_stat;
-	UINT32 cd_curfad;// = 0;
-	UINT32 cd_fad_seek;
-	UINT32 fadstoplay;// = 0;
-	UINT32 in_buffer;// = 0;    // amount of data in the buffer
+	uint16_t cr1, cr2, cr3, cr4;
+	uint16_t prev_cr1, prev_cr2, prev_cr3, prev_cr4;
+	uint8_t status_type;
+	uint16_t hirqmask, hirqreg;
+	uint16_t cd_stat;
+	uint32_t cd_curfad;// = 0;
+	uint32_t cd_fad_seek;
+	uint32_t fadstoplay;// = 0;
+	uint32_t in_buffer;// = 0;    // amount of data in the buffer
 	int oddframe;// = 0;
 	int buffull, sectorstore, freeblocks;
 	int cur_track;
-	UINT8 cmd_pending;
-	UINT8 cd_speed;
-	UINT8 cdda_maxrepeat;
-	UINT8 cdda_repeat_count;
-	UINT8 tray_is_closed;
+	uint8_t cmd_pending;
+	uint8_t cd_speed;
+	uint8_t cdda_maxrepeat;
+	uint8_t cdda_repeat_count;
+	uint8_t tray_is_closed;
 	int get_timing_command( void );
 
 	direntryT curroot;       // root entry of current filesystem
@@ -685,7 +685,7 @@ public:
 	void smpc_memory_setting();
 	void smpc_nmi_req();
 	TIMER_CALLBACK_MEMBER( smpc_nmi_set );
-	void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv);
+	void smpc_comreg_exec(address_space &space, uint8_t data, uint8_t is_stv);
 	DECLARE_READ8_MEMBER( stv_SMPC_r );
 	DECLARE_WRITE8_MEMBER( stv_SMPC_w );
 

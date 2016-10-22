@@ -29,7 +29,7 @@ public:
 	bool validate_boolean_parameter(const char *param, bool *result);
 
 	/* validates a parameter as a numeric value */
-	bool validate_number_parameter(const char *param, UINT64 *result);
+	bool validate_number_parameter(const char *param, uint64_t *result);
 
 	/* validates a parameter as a cpu */
 	bool validate_cpu_parameter(const char *param, device_t **result);
@@ -41,55 +41,55 @@ private:
 	struct global_entry
 	{
 		void *      base;
-		UINT32      size;
+		uint32_t      size;
 	};
 
 
 	struct cheat_map
 	{
-		UINT64      offset;
-		UINT64      first_value;
-		UINT64      previous_value;
-		UINT8       state:1;
-		UINT8       undo:7;
+		uint64_t      offset;
+		uint64_t      first_value;
+		uint64_t      previous_value;
+		uint8_t       state:1;
+		uint8_t       undo:7;
 	};
 
 	// TODO [RH 31 May 2016]: Move this cheat stuff into its own class
 	struct cheat_system
 	{
 		char        cpu[2];
-		UINT8       width;
+		uint8_t       width;
 		std::vector<cheat_map> cheatmap;
-		UINT8       undo;
-		UINT8       signed_cheat;
-		UINT8       swapped_cheat;
+		uint8_t       undo;
+		uint8_t       signed_cheat;
+		uint8_t       swapped_cheat;
 	};
 
 
 	struct cheat_region_map
 	{
-		UINT64      offset;
-		UINT64      endoffset;
+		uint64_t      offset;
+		uint64_t      endoffset;
 		const char *share;
-		UINT8       disabled;
+		uint8_t       disabled;
 	};
 
 	bool debug_command_parameter_expression(const char *param, parsed_expression &result);
 	bool debug_command_parameter_command(const char *param);
 
 	bool cheat_address_is_valid(address_space &space, offs_t address);
-	UINT64 cheat_sign_extend(const cheat_system *cheatsys, UINT64 value);
-	UINT64 cheat_byte_swap(const cheat_system *cheatsys, UINT64 value);
-	UINT64 cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address);
+	uint64_t cheat_sign_extend(const cheat_system *cheatsys, uint64_t value);
+	uint64_t cheat_byte_swap(const cheat_system *cheatsys, uint64_t value);
+	uint64_t cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address);
 
-	UINT64 execute_min(symbol_table &table, void *ref, int params, const UINT64 *param);
-	UINT64 execute_max(symbol_table &table, void *ref, int params, const UINT64 *param);
-	UINT64 execute_if(symbol_table &table, void *ref, int params, const UINT64 *param);
+	uint64_t execute_min(symbol_table &table, void *ref, int params, const uint64_t *param);
+	uint64_t execute_max(symbol_table &table, void *ref, int params, const uint64_t *param);
+	uint64_t execute_if(symbol_table &table, void *ref, int params, const uint64_t *param);
 
-	UINT64 global_get(symbol_table &table, void *ref);
-	void global_set(symbol_table &table, void *ref, UINT64 value);
+	uint64_t global_get(symbol_table &table, void *ref);
+	void global_set(symbol_table &table, void *ref, uint64_t value);
 
-	int mini_printf(char *buffer, const char *format, int params, UINT64 *param);
+	int mini_printf(char *buffer, const char *format, int params, uint64_t *param);
 
 	void execute_trace_internal(int ref, int params, const char *param[], bool trace_over);
 

@@ -25,7 +25,7 @@ TODO:
 enum enum_system { TYPE_WSWAN=0, TYPE_WSC };
 
 
-static const UINT8 ws_portram_init[256] =
+static const uint8_t ws_portram_init[256] =
 {
 	0x00, 0x00, 0x00/*?*/, 0xbb, 0x00, 0x00, 0x00, 0x26, 0xfe, 0xde, 0xf9, 0xfb, 0xdb, 0xd7, 0x7f, 0xf5,
 	0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x9e, 0x9b, 0x00, 0x00, 0x00, 0x00, 0x99, 0xfd, 0xb7, 0xdf,
@@ -74,7 +74,7 @@ static const UINT8 ws_portram_init[256] =
     EA 00 00 FF FF jmp FFFFh:0000h
 
 */
-static const UINT8 ws_fake_bios_code[] = {
+static const uint8_t ws_fake_bios_code[] = {
 	0xfc, 0xbc, 0x00, 0x20, 0x68, 0x00, 0x00, 0x07, 0x68, 0x00, 0xf0, 0x1f, 0xbf, 0x00, 0x04, 0xbe,
 	0xe0, 0xff, 0xb9, 0x10, 0x00, 0xf3, 0xa4, 0xb0, 0x2f, 0xe6, 0xc0, 0xea, 0x00, 0x04, 0x00, 0x00,
 	0xe4, 0xa0, 0x0c, 0x01, 0xe6, 0xa0, 0xea, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -169,7 +169,7 @@ void wswan_state::register_save()
 
 void wswan_state::common_start()
 {
-	m_ws_bios_bank = std::make_unique<UINT8[]>(0x10000);
+	m_ws_bios_bank = std::make_unique<uint8_t[]>(0x10000);
 	memcpy(m_ws_bios_bank.get() + 0xffc0, ws_fake_bios_code, 0x40);
 
 	register_save();
@@ -233,7 +233,7 @@ READ8_MEMBER( wswan_state::bios_r )
 
 READ8_MEMBER( wswan_state::port_r )
 {
-	UINT8 value = m_ws_portram[offset];
+	uint8_t value = m_ws_portram[offset];
 
 	if (offset != 2)
 		logerror("PC=%X: port read %02X\n", m_maincpu->pc(), offset);
@@ -298,7 +298,7 @@ READ8_MEMBER( wswan_state::port_r )
 WRITE8_MEMBER( wswan_state::port_w )
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	UINT8 input;
+	uint8_t input;
 	logerror("PC=%X: port write %02X <- %02X\n", m_maincpu->pc(), offset, data);
 
 	if (offset < 0x40 || (offset >= 0xa1 && offset < 0xb0))
@@ -340,8 +340,8 @@ WRITE8_MEMBER( wswan_state::port_w )
 		             */
 			if (data & 0x80)
 			{
-				UINT32 src, dst;
-				UINT16 length;
+				uint32_t src, dst;
+				uint16_t length;
 
 				src = m_ws_portram[0x40] + (m_ws_portram[0x41] << 8) + (m_ws_portram[0x42] << 16);
 				dst = m_ws_portram[0x44] + (m_ws_portram[0x45] << 8) + (m_ws_portram[0x43] << 16);
@@ -618,14 +618,14 @@ WRITE8_MEMBER( wswan_state::port_w )
 		             */
 			if (data & 0x20)
 			{
-				UINT16 addr = ( ( ( m_ws_portram[0xbd] << 8 ) | m_ws_portram[0xbc] ) << 1 ) & 0x1FF;
+				uint16_t addr = ( ( ( m_ws_portram[0xbd] << 8 ) | m_ws_portram[0xbc] ) << 1 ) & 0x1FF;
 				m_internal_eeprom[ addr ] = m_ws_portram[0xba];
 				m_internal_eeprom[ addr + 1 ] = m_ws_portram[0xbb];
 				data |= 0x02;
 			}
 			else if ( data & 0x10 )
 			{
-				UINT16 addr = ( ( ( m_ws_portram[0xbd] << 8 ) | m_ws_portram[0xbc] ) << 1 ) & 0x1FF;
+				uint16_t addr = ( ( ( m_ws_portram[0xbd] << 8 ) | m_ws_portram[0xbc] ) << 1 ) & 0x1FF;
 				m_ws_portram[0xba] = m_internal_eeprom[ addr ];
 				m_ws_portram[0xbb] = m_internal_eeprom[ addr + 1];
 				data |= 0x01;

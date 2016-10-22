@@ -58,8 +58,8 @@ class nand_device : public device_t
 {
 public:
 	// construction/destruction
-	nand_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_rnb_wr_callback(device_t &device, _Object object) { return downcast<nand_device &>(device).m_write_rnb.set_callback(object); }
 
@@ -141,10 +141,10 @@ public:
 	int is_protected();
 	int is_busy();
 
-	UINT8 data_r();
-	void command_w(UINT8 data);
-	void address_w(UINT8 data);
-	void data_w(UINT8 data);
+	uint8_t data_r();
+	void command_w(uint8_t data);
+	void address_w(uint8_t data);
+	void data_w(uint8_t data);
 
 	void set_data_ptr(void *ptr);
 protected:
@@ -159,8 +159,8 @@ protected:
 						// 0 means no card loaded
 	int m_log2_pages_per_block; // log2 of number of pages per erase block (usually 4 or 5)
 
-	UINT8* m_data_ptr;  // FEEPROM data area
-	std::unique_ptr<UINT8[]> m_data_uid_ptr;
+	uint8_t* m_data_ptr;  // FEEPROM data area
+	std::unique_ptr<uint8_t[]> m_data_uid_ptr;
 
 	sm_mode_t m_mode;               // current operation mode
 	pointer_sm_mode_t m_pointer_mode;       // pointer mode
@@ -172,9 +172,9 @@ protected:
 	int m_status;           // current status
 	int m_accumulated_status;   // accumulated status
 
-	std::unique_ptr<UINT8[]> m_pagereg;   // page register used by program command
-	UINT8 m_id[5];      // chip ID
-	UINT8 m_mp_opcode;  // multi-plane operation code
+	std::unique_ptr<uint8_t[]> m_pagereg;   // page register used by program command
+	uint8_t m_id[5];      // chip ID
+	uint8_t m_mp_opcode;  // multi-plane operation code
 
 	int m_mode_3065;
 
@@ -202,7 +202,7 @@ class smartmedia_image_device : public nand_device,
 {
 public:
 	// construction/destruction
-	smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
@@ -225,7 +225,7 @@ protected:
 
 	image_init_result smartmedia_format_1();
 	image_init_result smartmedia_format_2();
-	int detect_geometry( UINT8 id1, UINT8 id2);
+	int detect_geometry( uint8_t id1, uint8_t id2);
 };
 
 

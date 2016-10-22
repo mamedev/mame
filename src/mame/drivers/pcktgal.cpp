@@ -424,7 +424,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pcktgal_state,pcktgal)
 {
-	UINT8 *rom = memregion("gfx1")->base();
+	uint8_t *rom = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();
 	int i,j,temp[16];
 

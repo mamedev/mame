@@ -80,7 +80,7 @@ INSTRUCTION( add )
 
 INSTRUCTION( aisc )
 {
-	UINT8 y = opcode & 0x0f;
+	uint8_t y = opcode & 0x0f;
 
 	A = A + y;
 
@@ -266,7 +266,7 @@ INSTRUCTION( casc )
 
 INSTRUCTION( jid )
 {
-	UINT16 addr = (PC & 0x700) | (A << 4) | RAM_R(B);
+	uint16_t addr = (PC & 0x700) | (A << 4) | RAM_R(B);
 	PC = (PC & 0x700) | ROM(addr);
 }
 
@@ -286,7 +286,7 @@ INSTRUCTION( jid )
 
 INSTRUCTION( jmp )
 {
-	UINT16 a = ((opcode & 0x07) << 8) | ROM(PC);
+	uint16_t a = ((opcode & 0x07) << 8) | ROM(PC);
 
 	PC = a;
 }
@@ -313,22 +313,22 @@ INSTRUCTION( jmp )
 
 INSTRUCTION( jp )
 {
-	UINT8 page = PC >> 6;
+	uint8_t page = PC >> 6;
 
 	if (page == 2 || page == 3)
 	{
-		UINT8 a = opcode & 0x7f;
+		uint8_t a = opcode & 0x7f;
 		PC = (PC & 0x780) | a;
 	}
 	else if ((opcode & 0xc0) == 0xc0)
 	{
-		UINT8 a = opcode & 0x3f;
+		uint8_t a = opcode & 0x3f;
 		PC = (PC & 0x7c0) | a;
 	}
 	else
 	{
 		// JSRP
-		UINT8 a = opcode & 0x3f;
+		uint8_t a = opcode & 0x3f;
 		PUSH(PC);
 		PC = 0x80 | a;
 	}
@@ -351,7 +351,7 @@ INSTRUCTION( jp )
 
 INSTRUCTION( jsr )
 {
-	UINT16 a = ((opcode & 0x07) << 8) | ROM(PC);
+	uint16_t a = ((opcode & 0x07) << 8) | ROM(PC);
 
 	PUSH(PC + 1);
 	PC = a;
@@ -503,7 +503,7 @@ INSTRUCTION( camq )
 
 	*/
 
-	UINT8 data = (A << 4) | RAM_R(B);
+	uint8_t data = (A << 4) | RAM_R(B);
 
 	WRITE_Q(data);
 
@@ -530,7 +530,7 @@ INSTRUCTION( camq )
 
 INSTRUCTION( ld )
 {
-	UINT8 r = opcode & 0x30;
+	uint8_t r = opcode & 0x30;
 
 	A = RAM_R(B);
 	B = B ^ r;
@@ -641,8 +641,8 @@ INSTRUCTION( smb3 ) { RAM_W(B, RAM_R(B) | 0x8); }
 
 INSTRUCTION( stii )
 {
-	UINT8 y = opcode & 0x0f;
-	UINT16 Bd;
+	uint8_t y = opcode & 0x0f;
+	uint16_t Bd;
 
 	RAM_W(B, y);
 
@@ -667,8 +667,8 @@ INSTRUCTION( stii )
 
 INSTRUCTION( x )
 {
-	UINT8 r = opcode & 0x30;
-	UINT8 t = RAM_R(B);
+	uint8_t r = opcode & 0x30;
+	uint8_t t = RAM_R(B);
 
 	RAM_W(B, A);
 
@@ -692,8 +692,8 @@ INSTRUCTION( x )
 
 INSTRUCTION( xad )
 {
-	UINT8 rd = opcode & 0x7f;
-	UINT8 t = A;
+	uint8_t rd = opcode & 0x7f;
+	uint8_t t = A;
 
 	A = RAM_R(rd);
 
@@ -720,8 +720,8 @@ INSTRUCTION( xad )
 
 INSTRUCTION( xds )
 {
-	UINT8 t, Bd;
-	UINT8 r = opcode & 0x30;
+	uint8_t t, Bd;
+	uint8_t r = opcode & 0x30;
 
 	t = RAM_R(B);
 	RAM_W(B, A);
@@ -755,8 +755,8 @@ INSTRUCTION( xds )
 
 INSTRUCTION( xis )
 {
-	UINT8 t, Bd;
-	UINT8 r = opcode & 0x30;
+	uint8_t t, Bd;
+	uint8_t r = opcode & 0x30;
 
 	t = RAM_R(B);
 	RAM_W(B, A);
@@ -806,7 +806,7 @@ INSTRUCTION( cqma )
 
 INSTRUCTION( ldd )
 {
-	UINT8 rd = opcode & 0x7f;
+	uint8_t rd = opcode & 0x7f;
 
 	A = RAM_R(rd);
 }
@@ -940,7 +940,7 @@ INSTRUCTION( lbi )
 
 INSTRUCTION( lei )
 {
-	UINT8 y = opcode & 0x0f;
+	uint8_t y = opcode & 0x0f;
 
 	EN = y;
 
@@ -965,8 +965,8 @@ INSTRUCTION( lei )
 
 INSTRUCTION( xabr )
 {
-	UINT8 Br = A & 0x03;
-	UINT8 Bd = B & 0x0f;
+	uint8_t Br = A & 0x03;
+	uint8_t Bd = B & 0x0f;
 
 	A = B >> 4;
 	B = (Br << 4) + Bd;
@@ -989,8 +989,8 @@ INSTRUCTION( xabr )
 
 INSTRUCTION( cop444_xabr )
 {
-	UINT8 Br = A & 0x07;
-	UINT8 Bd = B & 0x0f;
+	uint8_t Br = A & 0x07;
+	uint8_t Bd = B & 0x0f;
 
 	A = B >> 4;
 	B = (Br << 4) + Bd;
@@ -1174,7 +1174,7 @@ INSTRUCTION( ing )
 
 INSTRUCTION( inl )
 {
-	UINT8 L = IN_L();
+	uint8_t L = IN_L();
 
 	RAM_W(B, L >> 4);
 	A = L & 0xF;
@@ -1232,7 +1232,7 @@ INSTRUCTION( omg )
 
 INSTRUCTION( xas )
 {
-	UINT8 t = SIO;
+	uint8_t t = SIO;
 	SIO = A;
 	A = t;
 
@@ -1313,7 +1313,7 @@ INSTRUCTION( inil )
 
 INSTRUCTION( ogi )
 {
-	UINT8 y = opcode & 0x0f;
+	uint8_t y = opcode & 0x0f;
 
 	WRITE_G(y);
 }

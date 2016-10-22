@@ -66,7 +66,7 @@ TODO: This table is nowhere near as accurate. If you bother, here's how colors s
 -after the first stage, houses have red/white colors.
 */
 
-static const UINT8 fakecols[4*4][8][3]=
+static const uint8_t fakecols[4*4][8][3]=
 {
 {{0x00,0x00,0x00},
 	{42,87,140},
@@ -226,7 +226,7 @@ void ssrj_state::video_start()
 	m_tilemap2->set_transparent_pen(0);
 	m_tilemap4->set_transparent_pen(0);
 
-	m_buffer_spriteram = std::make_unique<UINT8[]>(0x0800);
+	m_buffer_spriteram = std::make_unique<uint8_t[]>(0x0800);
 }
 
 
@@ -272,7 +272,7 @@ PALETTE_INIT_MEMBER(ssrj_state, ssrj)
 			palette.set_pen_color(i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
 }
 
-UINT32 ssrj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ssrj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap1->set_scrollx(0, 0xff-m_scrollram[2] );
 	m_tilemap1->set_scrolly(0, m_scrollram[0] );

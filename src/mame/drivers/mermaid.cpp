@@ -406,7 +406,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base();
+		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
 		m_adpcm->data_w(m_adpcm_data & 0xf);

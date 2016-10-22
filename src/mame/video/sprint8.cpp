@@ -64,7 +64,7 @@ void sprint8_state::set_pens()
 
 TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info1)
 {
-	UINT8 code = m_video_ram[tile_index];
+	uint8_t code = m_video_ram[tile_index];
 
 	int color = 0;
 
@@ -89,7 +89,7 @@ TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info1)
 
 TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info2)
 {
-	UINT8 code = m_video_ram[tile_index];
+	uint8_t code = m_video_ram[tile_index];
 
 	int color = 0;
 
@@ -129,7 +129,7 @@ void sprint8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	for (i = 0; i < 16; i++)
 	{
-		UINT8 code = m_pos_d_ram[i];
+		uint8_t code = m_pos_d_ram[i];
 
 		int x = m_pos_h_ram[i];
 		int y = m_pos_v_ram[i];
@@ -152,7 +152,7 @@ TIMER_CALLBACK_MEMBER(sprint8_state::sprint8_collision_callback)
 }
 
 
-UINT32 sprint8_state::screen_update_sprint8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sprint8_state::screen_update_sprint8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens();
 	m_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
@@ -178,8 +178,8 @@ void sprint8_state::screen_eof_sprint8(screen_device &screen, bool state)
 
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
-			const UINT16* p1 = &m_helper1.pix16(y);
-			const UINT16* p2 = &m_helper2.pix16(y);
+			const uint16_t* p1 = &m_helper1.pix16(y);
+			const uint16_t* p2 = &m_helper2.pix16(y);
 
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				if (p1[x] != 0x20 && p2[x] == 0x23)

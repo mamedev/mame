@@ -53,24 +53,24 @@ private:
 	class state_item
 	{
 	public:
-		state_item(int index, const char *name, UINT8 valuechars);
+		state_item(int index, const char *name, uint8_t valuechars);
 		state_item(const state_item &) = default;
 		state_item(state_item &&) = default;
 		state_item &operator=(const state_item &) = default;
 		state_item &operator=(state_item &&) = default;
 
-		UINT64 value() const { return m_currval; }
+		uint64_t value() const { return m_currval; }
 		bool changed() const { return m_lastval != m_currval; }
 		int index() const { return m_index; }
-		UINT8 value_length() const { return m_vallen; }
+		uint8_t value_length() const { return m_vallen; }
 
-		void update(UINT64 newval, bool save);
+		void update(uint64_t newval, bool save);
 
 	private:
-		UINT64      m_lastval;          // last value
-		UINT64      m_currval;          // current value
+		uint64_t      m_lastval;          // last value
+		uint64_t      m_currval;          // current value
 		int         m_index;            // index
-		UINT8       m_vallen;           // number of value chars
+		uint8_t       m_vallen;           // number of value chars
 
 	public:
 		std::string m_symbol;           // symbol
@@ -83,7 +83,7 @@ private:
 
 	// internal state
 	int                     m_divider;              // dividing column
-	UINT64                  m_last_update;          // execution counter at last update
+	uint64_t                  m_last_update;          // execution counter at last update
 	std::vector<state_item> m_state_list;           // state data
 
 	// constants

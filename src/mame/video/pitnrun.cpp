@@ -93,7 +93,7 @@ WRITE8_MEMBER(pitnrun_state::color_select_w)
 void pitnrun_state::spotlights()
 {
 	int x,y,i,b,datapix;
-	UINT8 *ROM = memregion("user1")->base();
+	uint8_t *ROM = memregion("user1")->base();
 	for(i=0;i<4;i++)
 		for(y=0;y<128;y++)
 		for(x=0;x<16;x++)
@@ -110,7 +110,7 @@ void pitnrun_state::spotlights()
 
 PALETTE_INIT_MEMBER(pitnrun_state, pitnrun)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	int bit0,bit1,bit2,r,g,b;
 	for (i = 0;i < 32*3; i++)
@@ -176,7 +176,7 @@ void pitnrun_state::video_start()
 
 void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int sx, sy, flipx, flipy, offs,pal;
 
 	for (offs = 0 ; offs < 0x100; offs+=4)
@@ -207,7 +207,7 @@ void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-UINT32 pitnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pitnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int dx=0,dy=0;
 	rectangle myclip=cliprect;
@@ -215,19 +215,19 @@ UINT32 pitnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once(KEYCODE_Q))
 	{
-		UINT8 *ROM = memregion("maincpu")->base();
+		uint8_t *ROM = memregion("maincpu")->base();
 		ROM[0x84f6]=0; /* lap 0 - normal */
 	}
 
 	if (machine().input().code_pressed_once(KEYCODE_W))
 	{
-		UINT8 *ROM = memregion("maincpu")->base();
+		uint8_t *ROM = memregion("maincpu")->base();
 		ROM[0x84f6]=6; /* lap 6 = spotlight */
 	}
 
 	if (machine().input().code_pressed_once(KEYCODE_E))
 	{
-		UINT8 *ROM = memregion("maincpu")->base();
+		uint8_t *ROM = memregion("maincpu")->base();
 		ROM[0x84f6]=2; /* lap 3 (trial 2)= lightnings */
 		ROM[0x8102]=1;
 	}

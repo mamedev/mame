@@ -156,7 +156,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::seawolf_audio_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last;
+	uint8_t rising_bits = data & ~m_port_1_last;
 
 	/* if (data & 0x01)  enable SHIP HIT sound */
 	if (rising_bits & 0x01) m_samples->start(0, 0);
@@ -560,7 +560,7 @@ MACHINE_CONFIG_FRAGMENT( maze_audio )
 MACHINE_CONFIG_END
 
 
-void mw8080bw_state::maze_write_discrete(UINT8 maze_tone_timing_state)
+void mw8080bw_state::maze_write_discrete(uint8_t maze_tone_timing_state)
 {
 	/* controls need to be active low */
 	int controls = ~ioport("IN0")->read() & 0xff;
@@ -1569,7 +1569,7 @@ WRITE8_MEMBER(mw8080bw_state::gmissile_audio_1_w)
 	   reversed (D5=R, D7=L), but the software confirms that
 	   ours is right */
 
-	UINT8 rising_bits = data & ~m_port_1_last;
+	uint8_t rising_bits = data & ~m_port_1_last;
 
 	/* D0 and D1 are not connected */
 
@@ -1658,7 +1658,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::m4_audio_1_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last;
+	uint8_t rising_bits = data & ~m_port_1_last;
 
 	/* D0 and D1 are not connected */
 
@@ -1684,7 +1684,7 @@ WRITE8_MEMBER(mw8080bw_state::m4_audio_1_w)
 
 WRITE8_MEMBER(mw8080bw_state::m4_audio_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last;
+	uint8_t rising_bits = data & ~m_port_2_last;
 
 	/* if (data & 0x01)  enable LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker) */
 	if (rising_bits & 0x01) m_samples1->start(1, 1);
@@ -1922,7 +1922,7 @@ WRITE8_MEMBER(mw8080bw_state::clowns_audio_1_w)
 
 WRITE8_MEMBER(mw8080bw_state::clowns_audio_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last;
+	uint8_t rising_bits = data & ~m_port_2_last;
 
 	m_discrete->write(space, CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
 
@@ -3280,7 +3280,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::phantom2_audio_1_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last;
+	uint8_t rising_bits = data & ~m_port_1_last;
 
 	/* if (data & 0x01)  enable PLAYER SHOT sound */
 	if (rising_bits & 0x01) m_samples->start(0, 0);
@@ -3302,7 +3302,7 @@ WRITE8_MEMBER(mw8080bw_state::phantom2_audio_1_w)
 
 WRITE8_MEMBER(mw8080bw_state::phantom2_audio_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last;
+	uint8_t rising_bits = data & ~m_port_2_last;
 
 	/* D0-D2 are not connected */
 

@@ -474,13 +474,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
-	UINT8 m_main_latch_d800;
-	UINT8 m_snd_latch_0800;
-	UINT8 m_snd_latch_0a02;
-	UINT8 m_ay8910_addr;
+	uint8_t m_main_latch_d800;
+	uint8_t m_snd_latch_0800;
+	uint8_t m_snd_latch_0a02;
+	uint8_t m_ay8910_addr;
 	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
 
@@ -503,7 +503,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(_5clown);
-	UINT32 screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void _5clown_state::machine_start()
@@ -562,7 +562,7 @@ void _5clown_state::video_start()
 }
 
 
-UINT32 _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -570,7 +570,7 @@ UINT32 _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &
 
 PALETTE_INIT_MEMBER(_5clown_state, _5clown)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 /*
     7654 3210
     ---- ---x   RED component.
@@ -1171,7 +1171,7 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 	/* Decrypting main program */
 
 	int x;
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
@@ -1181,8 +1181,8 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 
 	/* Decrypting GFX by segments */
 
-	UINT8 *gfx1_src = memregion( "gfx1" )->base();
-	UINT8 *gfx2_src = memregion( "gfx2" )->base();
+	uint8_t *gfx1_src = memregion( "gfx1" )->base();
+	uint8_t *gfx2_src = memregion( "gfx2" )->base();
 
 	for (x = 0x2000; x < 0x3000; x++)
 	{
@@ -1202,7 +1202,7 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 
 	/* Decrypting sound samples */
 
-	UINT8 *samples_src = memregion( "oki6295" )->base();
+	uint8_t *samples_src = memregion( "oki6295" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{

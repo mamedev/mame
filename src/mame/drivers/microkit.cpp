@@ -55,8 +55,8 @@ public:
 
 private:
 	virtual void machine_reset() override;
-	UINT8 m_resetcnt;
-	UINT8 m_ram_data;
+	uint8_t m_resetcnt;
+	uint8_t m_ram_data;
 	required_device<cosmac_device> m_maincpu;
 	required_device<rs232_port_device> m_rs232;
 	required_device<generic_terminal_device> m_terminal;

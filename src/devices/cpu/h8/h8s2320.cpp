@@ -14,7 +14,7 @@ const device_type H8S2328 = &device_creator<h8s2328_device>;
 const device_type H8S2329 = &device_creator<h8s2329_device>;
 
 
-h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	h8s2000_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2320_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -53,7 +53,7 @@ h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, 
 	ram_start = 0;
 }
 
-h8s2320_device::h8s2320_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2320_device::h8s2320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2000_device(mconfig, H8S2320, "H8S/2320", tag, owner, clock, "h8s2320", __FILE__, address_map_delegate(FUNC(h8s2320_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -92,49 +92,49 @@ h8s2320_device::h8s2320_device(const machine_config &mconfig, const char *tag, d
 	ram_start = 0xffec00;
 }
 
-h8s2321_device::h8s2321_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2321_device::h8s2321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2320_device(mconfig, H8S2321, "H8S/2321", tag, owner, clock, "h8s2321", __FILE__)
 {
 	ram_start = 0xffec00;
 }
 
-h8s2322_device::h8s2322_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2322_device::h8s2322_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2320_device(mconfig, H8S2322, "H8S/2322", tag, owner, clock, "h8s2322", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2323_device::h8s2323_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2323_device::h8s2323_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2320_device(mconfig, H8S2323, "H8S/2323", tag, owner, clock, "h8s2323", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2324_device::h8s2324_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2324_device::h8s2324_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2320_device(mconfig, H8S2324, "H8S/2324", tag, owner, clock, "h8s2324", __FILE__)
 {
 	ram_start = 0xff7c00;
 }
 
-h8s2326_device::h8s2326_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2326_device::h8s2326_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2320_device(mconfig, H8S2326, "H8S/2326", tag, owner, clock, "h8s2326", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2327_device::h8s2327_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2327_device::h8s2327_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2320_device(mconfig, H8S2327, "H8S/2327", tag, owner, clock, "h8s2327", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2328_device::h8s2328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2328_device::h8s2328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2320_device(mconfig, H8S2328, "H8S/2328", tag, owner, clock, "h8s2328", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2329_device::h8s2329_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2329_device::h8s2329_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2320_device(mconfig, H8S2329, "H8S/2329", tag, owner, clock, "h8s2329", __FILE__)
 {
 	ram_start = 0xff7c00;
@@ -456,9 +456,9 @@ void h8s2320_device::interrupt_taken()
 	standard_irq_callback(intc->interrupt_taken(taken_irq_vector));
 }
 
-void h8s2320_device::internal_update(UINT64 current_time)
+void h8s2320_device::internal_update(uint64_t current_time)
 {
-	UINT64 event_time = 0;
+	uint64_t event_time = 0;
 
 	add_event(event_time, adc->internal_update(current_time));
 	add_event(event_time, sci0->internal_update(current_time));

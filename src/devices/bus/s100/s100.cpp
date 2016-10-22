@@ -37,7 +37,7 @@ device_s100_card_interface::device_s100_card_interface(const machine_config &mco
 //-------------------------------------------------
 //  s100_slot_t - constructor
 //-------------------------------------------------
-s100_slot_t::s100_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+s100_slot_t::s100_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_SLOT, "S100 slot", tag, owner, clock, "s100_slot", __FILE__),
 	device_slot_interface(mconfig, *this), m_bus(nullptr)
 {
@@ -60,7 +60,7 @@ void s100_slot_t::device_start()
 //  s100_bus_t - constructor
 //-------------------------------------------------
 
-s100_bus_t::s100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+s100_bus_t::s100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_BUS, "S100", tag, owner, clock, "s100", __FILE__),
 	m_write_irq(*this),
 	m_write_nmi(*this),
@@ -136,7 +136,7 @@ void s100_bus_t::add_card(device_s100_card_interface *card)
 
 READ8_MEMBER( s100_bus_t::smemr_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	device_s100_card_interface *entry = m_device_list.first();
 
@@ -172,7 +172,7 @@ WRITE8_MEMBER( s100_bus_t::mwrt_w )
 
 READ8_MEMBER( s100_bus_t::sinp_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	device_s100_card_interface *entry = m_device_list.first();
 

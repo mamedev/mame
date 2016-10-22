@@ -27,7 +27,7 @@ public:
 	DECLARE_READ16_MEMBER(status_r);
 
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -57,7 +57,7 @@ INPUT_PORTS_END
 
 READ16_MEMBER( lft_state::keyin_r )
 {
-	UINT16 ret = m_term_data;
+	uint16_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

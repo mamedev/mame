@@ -30,15 +30,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_tile_num_ram;
-	required_shared_ptr<UINT8> m_tile_atr_ram;
+	required_shared_ptr<uint8_t> m_tile_num_ram;
+	required_shared_ptr<uint8_t> m_tile_atr_ram;
 	tilemap_t *m_tilemap;
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
 	DECLARE_DRIVER_INIT(mv4in1);
 	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -642,7 +642,7 @@ static GFXDECODE_START( ltcasino )
 GFXDECODE_END
 
 
-UINT32 ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -719,7 +719,7 @@ ROM_END
 DRIVER_INIT_MEMBER(ltcasino_state,mv4in1)
 {
 	int i;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	for(i=0;i<0x10000;i++)
 		rom[i]=BITSWAP8(rom[i],7,6,5,4,3,1,2,0);
 }

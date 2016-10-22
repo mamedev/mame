@@ -77,19 +77,19 @@ void eeprom_base_device::static_set_size(device_t &device, int cells, int cellbi
 //  to set the default data
 //-------------------------------------------------
 
-void eeprom_base_device::static_set_default_data(device_t &device, const UINT8 *data, UINT32 size)
+void eeprom_base_device::static_set_default_data(device_t &device, const uint8_t *data, uint32_t size)
 {
 	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	assert(eeprom.m_data_bits == 8);
-	eeprom.m_default_data.u8 = const_cast<UINT8 *>(data);
+	eeprom.m_default_data.u8 = const_cast<uint8_t *>(data);
 	eeprom.m_default_data_size = size;
 }
 
-void eeprom_base_device::static_set_default_data(device_t &device, const UINT16 *data, UINT32 size)
+void eeprom_base_device::static_set_default_data(device_t &device, const uint16_t *data, uint32_t size)
 {
 	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	assert(eeprom.m_data_bits == 16);
-	eeprom.m_default_data.u16 = const_cast<UINT16 *>(data);
+	eeprom.m_default_data.u16 = const_cast<uint16_t *>(data);
 	eeprom.m_default_data_size = size / 2;
 }
 
@@ -99,7 +99,7 @@ void eeprom_base_device::static_set_default_data(device_t &device, const UINT16 
 //  to set the default value
 //-------------------------------------------------
 
-void eeprom_base_device::static_set_default_value(device_t &device, UINT32 value)
+void eeprom_base_device::static_set_default_value(device_t &device, uint32_t value)
 {
 	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	eeprom.m_default_value = value;
@@ -122,7 +122,7 @@ void eeprom_base_device::static_set_timing(device_t &device, timing_type type, c
 //  read - read data at the given address
 //-------------------------------------------------
 
-UINT32 eeprom_base_device::read(offs_t address)
+uint32_t eeprom_base_device::read(offs_t address)
 {
 	if (!ready())
 		logerror("EEPROM: Read performed before previous operation completed!\n");
@@ -134,7 +134,7 @@ UINT32 eeprom_base_device::read(offs_t address)
 //  write - write data at the given address
 //-------------------------------------------------
 
-void eeprom_base_device::write(offs_t address, UINT32 data)
+void eeprom_base_device::write(offs_t address, uint32_t data)
 {
 	if (!ready())
 		logerror("EEPROM: Write performed before previous operation completed!\n");
@@ -149,7 +149,7 @@ void eeprom_base_device::write(offs_t address, UINT32 data)
 //  performed)
 //-------------------------------------------------
 
-void eeprom_base_device::write_all(UINT32 data)
+void eeprom_base_device::write_all(uint32_t data)
 {
 	if (!ready())
 		logerror("EEPROM: Write all performed before previous operation completed!\n");
@@ -209,8 +209,8 @@ void eeprom_base_device::device_validity_check(validity_checker &valid) const
 
 void eeprom_base_device::device_start()
 {
-	UINT32 size = (m_data_bits == 8 ? 1 : 2) << m_address_bits;
-	m_data = std::make_unique<UINT8 []>(size);
+	uint32_t size = (m_data_bits == 8 ? 1 : 2) << m_address_bits;
+	m_data = std::make_unique<uint8_t []>(size);
 
 	// save states
 	save_item(NAME(m_completion_time));
@@ -236,11 +236,11 @@ void eeprom_base_device::device_reset()
 
 void eeprom_base_device::nvram_default()
 {
-	UINT32 eeprom_length = 1 << m_address_bits;
-	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
+	uint32_t eeprom_length = 1 << m_address_bits;
+	uint32_t eeprom_bytes = eeprom_length * m_data_bits / 8;
 
 	// initialize to the default value
-	UINT32 default_value = m_default_value_set ? m_default_value : ~0;
+	uint32_t default_value = m_default_value_set ? m_default_value : ~0;
 	for (offs_t offs = 0; offs < eeprom_length; offs++)
 		internal_write(offs, default_value);
 
@@ -280,8 +280,8 @@ void eeprom_base_device::nvram_default()
 
 void eeprom_base_device::nvram_read(emu_file &file)
 {
-	UINT32 eeprom_length = 1 << m_address_bits;
-	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
+	uint32_t eeprom_length = 1 << m_address_bits;
+	uint32_t eeprom_bytes = eeprom_length * m_data_bits / 8;
 
 	file.read(&m_data[0], eeprom_bytes);
 }
@@ -294,8 +294,8 @@ void eeprom_base_device::nvram_read(emu_file &file)
 
 void eeprom_base_device::nvram_write(emu_file &file)
 {
-	UINT32 eeprom_length = 1 << m_address_bits;
-	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
+	uint32_t eeprom_length = 1 << m_address_bits;
+	uint32_t eeprom_bytes = eeprom_length * m_data_bits / 8;
 
 	file.write(&m_data[0], eeprom_bytes);
 }
@@ -305,7 +305,7 @@ void eeprom_base_device::nvram_write(emu_file &file)
 //  internal_read - read data at the given address
 //-------------------------------------------------
 
-UINT32 eeprom_base_device::internal_read(offs_t address)
+uint32_t eeprom_base_device::internal_read(offs_t address)
 {
 	if (m_data_bits == 16)
 		return m_data[address * 2] | (m_data[address * 2 + 1] << 8);
@@ -319,7 +319,7 @@ UINT32 eeprom_base_device::internal_read(offs_t address)
 //  address
 //-------------------------------------------------
 
-void eeprom_base_device::internal_write(offs_t address, UINT32 data)
+void eeprom_base_device::internal_write(offs_t address, uint32_t data)
 {
 	if (m_data_bits == 16)
 	{

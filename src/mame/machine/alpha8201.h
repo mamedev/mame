@@ -14,7 +14,7 @@
 class alpha_8201_device : public device_t
 {
 public:
-	alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~alpha_8201_device() {}
 
 	DECLARE_READ8_MEMBER(mcu_data_r);
@@ -39,10 +39,10 @@ private:
 
 	// internal state
 	int m_bus;                      // shared RAM bus direction
-	UINT16 m_mcu_address;           // MCU side RAM address
-	UINT16 m_mcu_d;                 // MCU D output data
-	UINT8 m_mcu_r[4];               // MCU R0-R3 output data
-	std::unique_ptr<UINT8[]> m_shared_ram;            // 1KB RAM
+	uint16_t m_mcu_address;           // MCU side RAM address
+	uint16_t m_mcu_d;                 // MCU D output data
+	uint8_t m_mcu_r[4];               // MCU R0-R3 output data
+	std::unique_ptr<uint8_t[]> m_shared_ram;            // 1KB RAM
 
 	void mcu_update_address();
 	void mcu_writeram();

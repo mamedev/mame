@@ -87,7 +87,7 @@
 
 TIMER_DEVICE_CALLBACK_MEMBER(gberet_state::gberet_interrupt_tick)
 {
-	UINT8 ticks_mask = ~m_interrupt_ticks & (m_interrupt_ticks + 1); // 0->1
+	uint8_t ticks_mask = ~m_interrupt_ticks & (m_interrupt_ticks + 1); // 0->1
 	m_interrupt_ticks++;
 
 	// NMI on d0
@@ -130,7 +130,7 @@ WRITE8_MEMBER(gberet_state::mrgoemon_coin_counter_w)
 WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 {
 	/* bits 0/1/2 = interrupt enable */
-	UINT8 ack_mask = ~data & m_interrupt_mask; // 1->0
+	uint8_t ack_mask = ~data & m_interrupt_mask; // 1->0
 
 	if (ack_mask & 1)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -573,7 +573,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gberet_state,mrgoemon)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x800);
 }
 

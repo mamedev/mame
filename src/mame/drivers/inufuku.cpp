@@ -119,7 +119,7 @@ WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
 
 CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 {
-	UINT16 soundflag = m_pending_command ? 0 : 1;
+	uint16_t soundflag = m_pending_command ? 0 : 1;
 
 	return soundflag;
 }
@@ -324,7 +324,7 @@ GFXDECODE_END
 
 void inufuku_state::machine_start()
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x00000], 0x8000);
 	membank("bank1")->set_entry(0);

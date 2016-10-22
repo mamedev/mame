@@ -93,21 +93,21 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_sc0_vram;
-	required_shared_ptr<UINT16> m_sc1_vram;
-	required_shared_ptr<UINT16> m_sc2_vram;
-	required_shared_ptr<UINT16> m_sc3_vram;
-	required_shared_ptr<UINT16> m_spriteram16;
+	required_shared_ptr<uint16_t> m_sc0_vram;
+	required_shared_ptr<uint16_t> m_sc1_vram;
+	required_shared_ptr<uint16_t> m_sc2_vram;
+	required_shared_ptr<uint16_t> m_sc3_vram;
+	required_shared_ptr<uint16_t> m_spriteram16;
 
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
 	tilemap_t *m_sc3_tilemap;
 
-	UINT16 m_mux_data;
-	UINT16 m_seibucrtc_sc0bank;
-	UINT16 m_layer_en;
-	UINT16 m_scrollram[6];
+	uint16_t m_mux_data;
+	uint16_t m_seibucrtc_sc0bank;
+	uint16_t m_layer_en;
+	uint16_t m_scrollram[6];
 
 	DECLARE_WRITE16_MEMBER(gfxbank_w);
 	DECLARE_READ16_MEMBER(mahjong_panel_r);
@@ -126,10 +126,10 @@ public:
 
 	INTERRUPT_GEN_MEMBER(irq);
 
-	void seibucrtc_sc0bank_w(UINT16 data);
+	void seibucrtc_sc0bank_w(uint16_t data);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*******************************
@@ -263,7 +263,7 @@ WRITE16_MEMBER( goodejan_state::seibucrtc_sc3vram_w )
 	m_sc3_tilemap->mark_tile_dirty(offset);
 }
 
-void goodejan_state::seibucrtc_sc0bank_w(UINT16 data)
+void goodejan_state::seibucrtc_sc0bank_w(uint16_t data)
 {
 	m_seibucrtc_sc0bank = data & 1;
 	m_sc0_tilemap->mark_all_dirty();
@@ -364,7 +364,7 @@ void goodejan_state::video_start()
 	save_item(NAME(m_scrollram));
 }
 
-UINT32 goodejan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goodejan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
@@ -403,7 +403,7 @@ WRITE16_MEMBER(goodejan_state::gfxbank_w)
 /* Multiplexer device for the mahjong panel */
 READ16_MEMBER(goodejan_state::mahjong_panel_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 	ret = 0xffff;
 
 	switch(m_mux_data)

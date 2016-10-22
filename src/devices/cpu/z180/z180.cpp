@@ -81,7 +81,7 @@ Hitachi HD647180 series:
 const device_type Z180 = &device_creator<z180_device>;
 
 
-z180_device::z180_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z180_device::z180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, Z180, "Z180", tag, owner, clock, "z180", __FILE__)
 	, z80_daisy_chain_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
@@ -91,7 +91,7 @@ z180_device::z180_device(const machine_config &mconfig, const char *tag, device_
 }
 
 
-offs_t z180_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t z180_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( z180 );
 	return CPU_DISASSEMBLE_NAME(z180)(this, buffer, pc, oprom, opram, options);
@@ -750,14 +750,14 @@ offs_t z180_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 
 
 
-static UINT8 SZ[256];       /* zero and sign flags */
-static UINT8 SZ_BIT[256];   /* zero, sign and parity/overflow (=zero) flags for BIT opcode */
-static UINT8 SZP[256];      /* zero, sign and parity flags */
-static UINT8 SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 */
-static UINT8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
+static uint8_t SZ[256];       /* zero and sign flags */
+static uint8_t SZ_BIT[256];   /* zero, sign and parity/overflow (=zero) flags for BIT opcode */
+static uint8_t SZP[256];      /* zero, sign and parity flags */
+static uint8_t SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 */
+static uint8_t SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
 
-static std::unique_ptr<UINT8[]> SZHVC_add;
-static std::unique_ptr<UINT8[]> SZHVC_sub;
+static std::unique_ptr<uint8_t[]> SZHVC_add;
+static std::unique_ptr<uint8_t[]> SZHVC_sub;
 
 #include "z180ops.h"
 #include "z180tbl.h"
@@ -781,10 +781,10 @@ const address_space_config *z180_device::memory_space_config(address_spacenum sp
 	}
 }
 
-UINT8 z180_device::z180_readcontrol(offs_t port)
+uint8_t z180_device::z180_readcontrol(offs_t port)
 {
 	/* normal external readport */
-	UINT8 data = m_iospace->read_byte(port);
+	uint8_t data = m_iospace->read_byte(port);
 
 	/* remap internal I/O registers */
 	if((port & (IO_IOCR & 0xc0)) == (IO_IOCR & 0xc0))
@@ -1210,7 +1210,7 @@ data |= 0x02; // kludge for 20pacgal
 	return data;
 }
 
-void z180_device::z180_writecontrol(offs_t port, UINT8 data)
+void z180_device::z180_writecontrol(offs_t port, uint8_t data)
 {
 	/* normal external write port */
 	m_iospace->write_byte(port, data);
@@ -1307,7 +1307,7 @@ void z180_device::z180_writecontrol(offs_t port, UINT8 data)
 	case Z180_TCR:
 		LOG(("Z180 '%s' TCR    wr $%02x ($%02x)\n", tag(), data,  data & Z180_TCR_WMASK));
 		{
-			UINT16 old = IO_TCR;
+			uint16_t old = IO_TCR;
 			/* Force reload on state change */
 			IO_TCR = (IO_TCR & ~Z180_TCR_WMASK) | (data & Z180_TCR_WMASK);
 			if (!(old & Z180_TCR_TDE0) && (IO_TCR & Z180_TCR_TDE0))
@@ -1758,9 +1758,9 @@ int z180_device::z180_dma1()
 	return 6 + cycles;
 }
 
-void z180_device::z180_write_iolines(UINT32 data)
+void z180_device::z180_write_iolines(uint32_t data)
 {
-	UINT32 changes = m_iol ^ data;
+	uint32_t changes = m_iol ^ data;
 
 	/* I/O asynchronous clock 0 (active high) or DREQ0 (mux) */
 	if (changes & Z180_CKA0)
@@ -1887,11 +1887,11 @@ void z180_device::device_start()
 {
 	int i, p;
 	int oldval, newval, val;
-	UINT8 *padd, *padc, *psub, *psbc;
+	uint8_t *padd, *padc, *psub, *psbc;
 
 	/* allocate big flag arrays once */
-	SZHVC_add = std::make_unique<UINT8[]>(2*256*256);
-	SZHVC_sub = std::make_unique<UINT8[]>(2*256*256);
+	SZHVC_add = std::make_unique<uint8_t[]>(2*256*256);
+	SZHVC_sub = std::make_unique<uint8_t[]>(2*256*256);
 
 	padd = &SZHVC_add[  0*256];
 	padc = &SZHVC_add[256*256];
@@ -2158,7 +2158,7 @@ void z180_device::device_reset()
 	m_after_EI = 0;
 	m_ea = 0;
 
-	memcpy(m_cc, (UINT8 *)cc_default, sizeof(m_cc));
+	memcpy(m_cc, (uint8_t *)cc_default, sizeof(m_cc));
 	_IX = _IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	_F = ZF;          /* Zero flag is set */
 
@@ -2459,7 +2459,7 @@ again:
 /****************************************************************************
  * Burn 'cycles' T-states. Adjust R register for the lost time
  ****************************************************************************/
-void z180_device::execute_burn(INT32 cycles)
+void z180_device::execute_burn(int32_t cycles)
 {
 	/* FIXME: This is not appropriate for dma */
 	while ( (cycles > 0) )

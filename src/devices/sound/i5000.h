@@ -34,7 +34,7 @@ class i5000snd_device : public device_t,
 {
 public:
 	// construction/destruction
-	i5000snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i5000snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
@@ -54,14 +54,14 @@ private:
 		bool is_playing;
 		oki_adpcm_state m_adpcm;
 
-		UINT32 address;
+		uint32_t address;
 		int freq_timer;
 		int freq_base;
 		int freq_min;
-		UINT16 sample;
-		UINT8 shift_pos;
-		UINT8 shift_amount;
-		UINT8 shift_mask;
+		uint16_t sample;
+		uint8_t shift_pos;
+		uint8_t shift_amount;
+		uint8_t shift_mask;
 		int vol_r;
 		int vol_l;
 		int output_r;
@@ -71,15 +71,15 @@ private:
 
 	channel_t m_channels[16];
 
-	UINT16 m_regs[0x80];
+	uint16_t m_regs[0x80];
 
-	UINT16 *m_rom_base;
-	UINT32 m_rom_mask;
+	uint16_t *m_rom_base;
+	uint32_t m_rom_mask;
 
 	int m_lut_volume[0x100];
 
 	bool read_sample(int ch);
-	void write_reg16(UINT8 reg, UINT16 data);
+	void write_reg16(uint8_t reg, uint16_t data);
 };
 
 

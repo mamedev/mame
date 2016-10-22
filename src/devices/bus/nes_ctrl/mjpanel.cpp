@@ -69,7 +69,7 @@ ioport_constructor nes_mjpanel_device::device_input_ports() const
 //  nes_mjpanel_device - constructor
 //-------------------------------------------------
 
-nes_mjpanel_device::nes_mjpanel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_mjpanel_device::nes_mjpanel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_MJPANEL, "Famicom Mahjong Panel", tag, owner, clock, "nes_mjpanel", __FILE__)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_panel(*this, "MJPANEL.%u", 0)
@@ -102,9 +102,9 @@ void nes_mjpanel_device::device_reset()
 //  read
 //-------------------------------------------------
 
-UINT8 nes_mjpanel_device::read_exp(offs_t offset)
+uint8_t nes_mjpanel_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (offset)
 	{
 		ret = (m_latch & 1) << 1;
@@ -120,7 +120,7 @@ UINT8 nes_mjpanel_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_mjpanel_device::write(UINT8 data)
+void nes_mjpanel_device::write(uint8_t data)
 {
 	if (data & 0x01)
 		return;

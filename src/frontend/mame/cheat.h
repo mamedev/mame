@@ -49,22 +49,22 @@ class number_and_format
 {
 public:
 	// construction/destruction
-	number_and_format(UINT64 value = 0, int format = 0)
+	number_and_format(uint64_t value = 0, int format = 0)
 		: m_value(value)
 		, m_format(format)
 	{
 	}
 
 	// pass-through to look like a regular number
-	operator UINT64 &() { return m_value; }
-	operator const UINT64 &() const { return m_value; }
+	operator uint64_t &() { return m_value; }
+	operator const uint64_t &() const { return m_value; }
 
 	// format the number according to its format
 	std::string format() const;
 
 private:
 	// internal state
-	UINT64          m_value;
+	uint64_t          m_value;
 	int             m_format;
 };
 
@@ -98,7 +98,7 @@ private:
 	{
 	public:
 		// construction/destruction
-		item(const char *text, UINT64 value, int valformat)
+		item(const char *text, uint64_t value, int valformat)
 			: m_text(text),
 				m_value(value, valformat) { }
 
@@ -116,7 +116,7 @@ private:
 	number_and_format   m_minval;                       // minimum value
 	number_and_format   m_maxval;                       // maximum value
 	number_and_format   m_stepval;                      // step value
-	UINT64              m_value;                        // live value of the parameter
+	uint64_t              m_value;                        // live value of the parameter
 	std::string         m_curtext;                      // holding for a value string
 	std::vector<std::unique_ptr<item>>   m_itemlist;                     // list of items
 };
@@ -135,7 +135,7 @@ public:
 	script_state state() const { return m_state; }
 
 	// actions
-	void execute(cheat_manager &manager, UINT64 &argindex);
+	void execute(cheat_manager &manager, uint64_t &argindex);
 	void save(emu_file &cheatfile) const;
 
 private:
@@ -147,7 +147,7 @@ private:
 		script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &entrynode, bool isaction);
 
 		// actions
-		void execute(cheat_manager &manager, UINT64 &argindex);
+		void execute(cheat_manager &manager, uint64_t &argindex);
 		void save(emu_file &cheatfile) const;
 
 	private:
@@ -160,7 +160,7 @@ private:
 
 			// getters
 			int count() const { return m_count; }
-			int values(UINT64 &argindex, UINT64 *result);
+			int values(uint64_t &argindex, uint64_t *result);
 
 			// actions
 			void save(emu_file &cheatfile) const;
@@ -168,7 +168,7 @@ private:
 		private:
 			// internal state
 			parsed_expression   m_expression;                   // expression for argument
-			UINT64              m_count;                        // number of repetitions
+			uint64_t              m_count;                        // number of repetitions
 		};
 
 		// internal helpers
@@ -179,7 +179,7 @@ private:
 		parsed_expression   m_expression;                           // expression to execute
 		std::string         m_format;                               // string format to print
 		std::vector<std::unique_ptr<output_argument>> m_arglist;    // list of arguments
-		INT8                m_line;                                 // which line to print on
+		int8_t                m_line;                                 // which line to print on
 		ui::text_layout::text_justify m_justify;                    // justification when printing
 
 		// constants
@@ -237,7 +237,7 @@ public:
 	void save(emu_file &cheatfile) const;
 
 	// UI helpers
-	void menu_text(std::string &description, std::string &state, UINT32 &flags);
+	void menu_text(std::string &description, std::string &state, uint32_t &flags);
 
 	// per-frame update
 	void frame_update() { if (m_state == SCRIPT_STATE_RUN) execute_run_script(); }
@@ -258,8 +258,8 @@ private:
 	std::unique_ptr<cheat_script> m_run_script;            // script to run each frame when on
 	symbol_table        m_symbols;                      // symbol table for this cheat
 	script_state        m_state;                        // current cheat state
-	UINT32              m_numtemp;                      // number of temporary variables
-	UINT64              m_argindex;                     // argument index variable
+	uint32_t              m_numtemp;                      // number of temporary variables
+	uint64_t              m_argindex;                     // argument index variable
 
 	// constants
 	static const int DEFAULT_TEMP_VARIABLES = 10;
@@ -293,8 +293,8 @@ public:
 
 	// global helpers
 	static std::string quote_expression(const parsed_expression &expression);
-	static UINT64 execute_frombcd(symbol_table &table, void *ref, int params, const UINT64 *param);
-	static UINT64 execute_tobcd(symbol_table &table, void *ref, int params, const UINT64 *param);
+	static uint64_t execute_frombcd(symbol_table &table, void *ref, int params, const uint64_t *param);
+	static uint64_t execute_tobcd(symbol_table &table, void *ref, int params, const uint64_t *param);
 
 private:
 	// internal helpers
@@ -304,11 +304,11 @@ private:
 	// internal state
 	running_machine &   m_machine;                          // reference to our machine
 	std::vector<std::unique_ptr<cheat_entry>> m_cheatlist;                   // cheat list
-	UINT64              m_framecount;                       // frame count
+	uint64_t              m_framecount;                       // frame count
 	std::vector<std::string>  m_output;                     // array of output strings
 	std::vector<ui::text_layout::text_justify> m_justify;   // justification for each string
-	UINT8               m_numlines;                         // number of lines available for output
-	INT8                m_lastline;                         // last line used for output
+	uint8_t               m_numlines;                         // number of lines available for output
+	int8_t                m_lastline;                         // last line used for output
 	bool                m_disabled;                         // true if the cheat engine is disabled
 	symbol_table        m_symtable;                         // global symbol table
 	std::unique_ptr<debugger_cpu> m_cpu;                    // debugger interface for cpus/memory

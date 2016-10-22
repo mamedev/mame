@@ -44,7 +44,7 @@ class namco_63701x_device : public device_t,
 							public device_sound_interface
 {
 public:
-	namco_63701x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_63701x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~namco_63701x_device() { }
 
 protected:
@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(namco_63701x_w);
 
 private:
-	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<uint8_t> m_rom;
 	voice_63701x m_voices[2];
 	sound_stream *m_stream; /* channel assigned by the mixer */
 };

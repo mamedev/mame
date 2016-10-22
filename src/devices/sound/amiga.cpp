@@ -33,7 +33,7 @@ const device_type AMIGA = &device_creator<amiga_sound_device>;
 //  amiga_sound_device - constructor
 //-------------------------------------------------
 
-amiga_sound_device::amiga_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amiga_sound_device::amiga_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AMIGA, "Amiga Paula", tag, owner, clock, "amiga_paula", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr)
@@ -95,7 +95,7 @@ void amiga_sound_device::dma_reload(audio_channel *chan)
 //  data_w - manual mode data writer
 //-------------------------------------------------
 
-void amiga_sound_device::data_w(int which, UINT16 data)
+void amiga_sound_device::data_w(int which, uint16_t data)
 {
 	m_channel[which].manualmode = true;
 }

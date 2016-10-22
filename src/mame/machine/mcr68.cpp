@@ -21,7 +21,7 @@
 
 READ8_MEMBER(mcr68_state::zwackery_port_1_r)
 {
-	UINT8 ret = ioport("IN1")->read();
+	uint8_t ret = ioport("IN1")->read();
 
 	downcast<pia6821_device *>(machine().device("pia1"))->set_port_a_z_mask(ret);
 
@@ -31,7 +31,7 @@ READ8_MEMBER(mcr68_state::zwackery_port_1_r)
 
 READ8_MEMBER(mcr68_state::zwackery_port_3_r)
 {
-	UINT8 ret = ioport("IN3")->read();
+	uint8_t ret = ioport("IN3")->read();
 
 	downcast<pia6821_device *>(machine().device("pia2"))->set_port_a_z_mask(ret);
 
@@ -369,7 +369,7 @@ LOG(("reload_count(%d): period = %f  count = %d\n", counter, period.as_double(),
 }
 
 
-UINT16 mcr68_state::compute_counter(int counter)
+uint16_t mcr68_state::compute_counter(int counter)
 {
 	struct counter_state *m6840 = &m_m6840_state[counter];
 	attotime period;
@@ -416,7 +416,7 @@ WRITE8_MEMBER(mcr68_state::mcr68_6840_w_common)
 	{
 		int counter = (offset == 1) ? 1 : (m_m6840_state[1].control & 0x01) ? 0 : 2;
 		struct counter_state *m6840 = &m_m6840_state[counter];
-		UINT8 diffs = data ^ m6840->control;
+		uint8_t diffs = data ^ m6840->control;
 
 		m6840->control = data;
 

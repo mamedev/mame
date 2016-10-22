@@ -39,7 +39,7 @@ public:
 
 	std::string     text;
 	std::string     subtext;
-	UINT32          flags;
+	uint32_t          flags;
 	void            *ref;
 	menu_item_type  type;   // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
 };

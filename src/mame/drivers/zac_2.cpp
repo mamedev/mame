@@ -28,10 +28,10 @@ public:
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ8_MEMBER(serial_r);
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
-	UINT8 m_t_c;
-	UINT8 m_out_offs;
+	uint8_t m_t_c;
+	uint8_t m_out_offs;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 	required_ioport_array<6> m_row;
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
@@ -42,7 +42,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 private:
-	UINT8 m_input_line;
+	uint8_t m_input_line;
 };
 
 
@@ -188,14 +188,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_inttimer)
 
 TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	m_out_offs++;
 // displays, solenoids, lamps
 
 	if (m_out_offs < 0x40)
 	{
-		UINT8 display = (m_out_offs >> 3) & 7;
-		UINT8 digit = m_out_offs & 7;
+		uint8_t display = (m_out_offs >> 3) & 7;
+		uint8_t digit = m_out_offs & 7;
 		output().set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
 	}
 }

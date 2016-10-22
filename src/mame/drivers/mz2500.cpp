@@ -93,61 +93,61 @@ public:
 
 	floppy_image_device *m_floppy;
 
-	std::unique_ptr<UINT8[]> m_main_ram;
-	UINT8 *m_ipl_rom;
-	UINT8 *m_kanji_rom;
-	UINT8 *m_kanji2_rom;
-	std::unique_ptr<UINT8[]> m_pcg_ram;
-	std::unique_ptr<UINT8[]> m_emm_ram;
-	UINT8 *m_dic_rom;
-	UINT8 *m_phone_rom;
-	UINT8 *m_iplpro_rom;
+	std::unique_ptr<uint8_t[]> m_main_ram;
+	uint8_t *m_ipl_rom;
+	uint8_t *m_kanji_rom;
+	uint8_t *m_kanji2_rom;
+	std::unique_ptr<uint8_t[]> m_pcg_ram;
+	std::unique_ptr<uint8_t[]> m_emm_ram;
+	uint8_t *m_dic_rom;
+	uint8_t *m_phone_rom;
+	uint8_t *m_iplpro_rom;
 
-	UINT8 m_bank_val[8];
-	UINT8 m_bank_addr;
-	UINT8 m_irq_sel;
-	UINT8 m_irq_vector[4];
-	UINT8 m_irq_mask[4];
-	UINT8 m_irq_pending[4];
-	UINT8 m_kanji_bank;
-	UINT8 m_dic_bank;
-	UINT8 m_fdc_reverse;
-	UINT8 m_key_mux;
-	UINT8 m_monitor_type;
-	UINT8 m_text_reg[0x100];
-	UINT8 m_text_reg_index;
-	UINT8 m_text_col_size;
-	UINT8 m_text_font_reg;
-	UINT8 m_pal_select;
-	UINT16 m_cg_vs;
-	UINT16 m_cg_ve;
-	UINT16 m_cg_hs;
-	UINT16 m_cg_he;
-	INT16 m_tv_vs;
-	INT16 m_tv_ve;
-	INT16 m_tv_hs;
-	INT16 m_tv_he;
-	UINT8 m_cg_latch[4];
-	UINT8 m_cg_reg_index;
-	UINT8 m_cg_reg[0x20];
-	UINT8 m_clut16[0x10];
-	UINT16 m_clut256[0x100];
-	UINT8 m_cg_mask;
+	uint8_t m_bank_val[8];
+	uint8_t m_bank_addr;
+	uint8_t m_irq_sel;
+	uint8_t m_irq_vector[4];
+	uint8_t m_irq_mask[4];
+	uint8_t m_irq_pending[4];
+	uint8_t m_kanji_bank;
+	uint8_t m_dic_bank;
+	uint8_t m_fdc_reverse;
+	uint8_t m_key_mux;
+	uint8_t m_monitor_type;
+	uint8_t m_text_reg[0x100];
+	uint8_t m_text_reg_index;
+	uint8_t m_text_col_size;
+	uint8_t m_text_font_reg;
+	uint8_t m_pal_select;
+	uint16_t m_cg_vs;
+	uint16_t m_cg_ve;
+	uint16_t m_cg_hs;
+	uint16_t m_cg_he;
+	int16_t m_tv_vs;
+	int16_t m_tv_ve;
+	int16_t m_tv_hs;
+	int16_t m_tv_he;
+	uint8_t m_cg_latch[4];
+	uint8_t m_cg_reg_index;
+	uint8_t m_cg_reg[0x20];
+	uint8_t m_clut16[0x10];
+	uint16_t m_clut256[0x100];
+	uint8_t m_cg_mask;
 	int m_scr_x_size;
 	int m_scr_y_size;
-	UINT8 m_cg_clear_flag;
-	UINT32 m_rom_index;
-	UINT8 m_hrom_index;
-	UINT8 m_lrom_index;
-	struct { UINT8 r,g,b; } m_pal[16];
-	UINT8 m_joy_mode;
-	UINT16 m_kanji_index;
-	UINT32 m_emm_offset;
-	UINT8 m_old_portc;
-	UINT8 m_prev_col_val;
-	UINT8 m_pio_latchb;
-	UINT8 m_ym_porta;
-	UINT8 m_screen_enable;
+	uint8_t m_cg_clear_flag;
+	uint32_t m_rom_index;
+	uint8_t m_hrom_index;
+	uint8_t m_lrom_index;
+	struct { uint8_t r,g,b; } m_pal[16];
+	uint8_t m_joy_mode;
+	uint16_t m_kanji_index;
+	uint32_t m_emm_offset;
+	uint8_t m_old_portc;
+	uint8_t m_prev_col_val;
+	uint8_t m_pio_latchb;
+	uint8_t m_ym_porta;
+	uint8_t m_screen_enable;
 	DECLARE_READ8_MEMBER(bank0_r);
 	DECLARE_READ8_MEMBER(bank1_r);
 	DECLARE_READ8_MEMBER(bank2_r);
@@ -193,14 +193,14 @@ public:
 	DECLARE_READ8_MEMBER(mz2500_emm_data_r);
 	DECLARE_WRITE8_MEMBER(mz2500_emm_addr_w);
 	DECLARE_WRITE8_MEMBER(mz2500_emm_data_w);
-	UINT8 mz2500_cg_latch_compare();
-	UINT8 mz2500_ram_read(UINT16 offset, UINT8 bank_num);
-	void mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num);
+	uint8_t mz2500_cg_latch_compare();
+	uint8_t mz2500_ram_read(uint16_t offset, uint8_t bank_num);
+	void mz2500_ram_write(uint16_t offset, uint8_t data, uint8_t bank_num);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mz2500);
-	UINT32 screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mz2500_vbl);
 
 	DECLARE_READ8_MEMBER(fdc_r);
@@ -222,18 +222,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mz2500_rtc_alarm_irq);
 	IRQ_CALLBACK_MEMBER( mz2500_irq_ack );
 
-	void draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr);
-	void draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr);
+	void draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uint16_t map_addr);
+	void draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,uint16_t map_addr);
 	void draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	void draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri);
 	void draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri);
 	void draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 
-	void mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,UINT16  pen,UINT8 width,UINT8 height);
+	void mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  pen,uint8_t width,uint8_t height);
 	void mz2500_reconfigure_screen();
-	UINT8 pal_256_param(int index, int param);
-	void mz2500_reset(mz2500_state *state, UINT8 type);
+	uint8_t pal_256_param(int index, int param);
+	void mz2500_reset(mz2500_state *state, uint8_t type);
 	required_device<palette_device> m_palette;
 };
 
@@ -243,7 +243,7 @@ public:
 #define WRAM_RESET 0
 #define IPL_RESET 1
 
-static const UINT8 bank_reset_val[2][8] =
+static const uint8_t bank_reset_val[2][8] =
 {
 	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
 	{ 0x34, 0x35, 0x36, 0x37, 0x04, 0x05, 0x06, 0x07 }
@@ -266,7 +266,7 @@ void mz2500_state::video_start()
 */
 
 /* helper function, to draw stuff without getting crazy with height / width conditions :) */
-void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,UINT16  pen,UINT8 width,UINT8 height)
+void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  pen,uint8_t width,uint8_t height)
 {
 	if(width && height)
 	{
@@ -289,14 +289,14 @@ void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,UINT16  pe
 		bitmap.pix16(y, x) = m_palette->pen(pen);
 }
 
-void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr)
+void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uint16_t map_addr)
 {
-	UINT8 *vram = m_main_ram.get(); // TODO
+	uint8_t *vram = m_main_ram.get(); // TODO
 	int x,y,count,xi,yi;
-	UINT8 *gfx_data;
-	UINT8 y_step;
-	UINT8 s_y;
-	UINT8 y_height;
+	uint8_t *gfx_data;
+	uint8_t y_step;
+	uint8_t s_y;
+	uint8_t y_height;
 
 	count = (map_addr & 0x7ff);
 
@@ -341,7 +341,7 @@ void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UIN
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 pen_bit[3],pen;
+					uint8_t pen_bit[3],pen;
 					int res_x,res_y;
 
 					res_x = x*8+xi;
@@ -378,14 +378,14 @@ void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UIN
 	}
 }
 
-void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr)
+void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,uint16_t map_addr)
 {
-	UINT8 *vram = m_main_ram.get(); // TODO
+	uint8_t *vram = m_main_ram.get(); // TODO
 	int x,y,count,xi,yi;
-	UINT8 *gfx_data;
-	UINT8 y_step;
-	UINT8 s_y;
-	UINT8 y_height;
+	uint8_t *gfx_data;
+	uint8_t y_step;
+	uint8_t s_y;
+	uint8_t y_height;
 
 	count = (((plane * 0x400) + map_addr) & 0x7ff);
 
@@ -431,7 +431,7 @@ void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 pen_bit[3],pen;
+					uint8_t pen_bit[3],pen;
 					int res_x,res_y;
 
 					res_x = x*8+xi;
@@ -470,9 +470,9 @@ void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int
 
 void mz2500_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
-	UINT32 count;
-	UINT8 *vram = m_main_ram.get(); // TODO
-	UINT8 pen,pen_bit[2];
+	uint32_t count;
+	uint8_t *vram = m_main_ram.get(); // TODO
+	uint8_t pen,pen_bit[2];
 	int x,y,xi,pen_i;
 	int res_x,res_y;
 
@@ -511,16 +511,16 @@ void mz2500_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprec
 
 void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri)
 {
-	UINT32 count;
-	UINT8 *vram = m_main_ram.get(); //TODO
-	UINT8 pen,pen_bit[4];
+	uint32_t count;
+	uint8_t *vram = m_main_ram.get(); //TODO
+	uint8_t pen,pen_bit[4];
 	int x,y,xi,pen_i;
-	UINT32 wa_reg;
-	UINT8 s_x;
-	UINT8 base_mask;
+	uint32_t wa_reg;
+	uint8_t s_x;
+	uint8_t base_mask;
 	int res_x,res_y;
-	UINT8 cg_interlace;
-	UINT8 pen_mask;
+	uint8_t cg_interlace;
+	uint8_t pen_mask;
 
 	base_mask = (x_size == 640) ? 0x3f : 0x1f;
 
@@ -568,15 +568,15 @@ void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 
 void mz2500_state::draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri)
 {
-	UINT32 count;
-	UINT8 *vram = m_main_ram.get();
-	UINT8 pen,pen_bit[8];
+	uint32_t count;
+	uint8_t *vram = m_main_ram.get();
+	uint8_t pen,pen_bit[8];
 	int x,y,xi,pen_i;
-	UINT32 wa_reg;
-	UINT8 s_x;
-	UINT8 base_mask;
+	uint32_t wa_reg;
+	uint8_t s_x;
+	uint8_t base_mask;
 	int res_x,res_y;
-	UINT8 cg_interlace;
+	uint8_t cg_interlace;
 
 	base_mask = 0x3f; //no x_size == 640
 
@@ -625,7 +625,7 @@ void mz2500_state::draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &clipr
 
 void mz2500_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 base_addr;
+	uint16_t base_addr;
 
 	base_addr = m_text_reg[1] | ((m_text_reg[2] & 0x7) << 8);
 
@@ -694,7 +694,7 @@ void mz2500_state::draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-UINT32 mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect); //TODO: correct?
 
@@ -780,12 +780,12 @@ void mz2500_state::mz2500_reconfigure_screen()
 	}
 }
 
-UINT8 mz2500_state::mz2500_cg_latch_compare()
+uint8_t mz2500_state::mz2500_cg_latch_compare()
 {
-	UINT8 compare_val = m_cg_reg[0x07] & 0xf;
-	UINT8 pix_val;
-	UINT8 res;
-	UINT16 i;
+	uint8_t compare_val = m_cg_reg[0x07] & 0xf;
+	uint8_t pix_val;
+	uint8_t res;
+	uint16_t i;
 	res = 0;
 
 	for(i=1;i<0x100;i<<=1)
@@ -798,10 +798,10 @@ UINT8 mz2500_state::mz2500_cg_latch_compare()
 	return res;
 }
 
-UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
+uint8_t mz2500_state::mz2500_ram_read(uint16_t offset, uint8_t bank_num)
 {
-	UINT8 *ram = m_main_ram.get(); // TODO
-	UINT8 cur_bank = m_bank_val[bank_num];
+	uint8_t *ram = m_main_ram.get(); // TODO
+	uint8_t cur_bank = m_bank_val[bank_num];
 
 	switch(cur_bank)
 	{
@@ -856,10 +856,10 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 	return 0xff;
 }
 
-void mz2500_state::mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num)
+void mz2500_state::mz2500_ram_write(uint16_t offset, uint8_t data, uint8_t bank_num)
 {
-	UINT8 *ram = m_main_ram.get(); // TODO
-	UINT8 cur_bank = m_bank_val[bank_num];
+	uint8_t *ram = m_main_ram.get(); // TODO
+	uint8_t cur_bank = m_bank_val[bank_num];
 
 //  if(cur_bank >= 0x30 && cur_bank <= 0x33)
 //      printf("CG REG = %02x %02x %02x %02x | offset = %04x | data = %02x\n",m_cg_reg[0],m_cg_reg[1],m_cg_reg[2],m_cg_reg[3],offset,data);
@@ -1007,7 +1007,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_bank_addr_w)
 
 READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = m_bank_val[m_bank_addr];
 
@@ -1045,7 +1045,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_dictionary_bank_w)
 /* 0xf4 - 0xf7 all returns vblank / hblank states */
 READ8_MEMBER(mz2500_state::mz2500_crtc_hvblank_r)
 {
-	UINT8 vblank_bit, hblank_bit;
+	uint8_t vblank_bit, hblank_bit;
 
 	vblank_bit = machine().first_screen()->vblank() ? 0 : 1;
 	hblank_bit = machine().first_screen()->hblank() ? 0 : 2;
@@ -1077,9 +1077,9 @@ TVRAM / CRTC registers
 [0x0f] ---- x--- sets monitor type interlace / progressive
 */
 
-UINT8 mz2500_state::pal_256_param(int index, int param)
+uint8_t mz2500_state::pal_256_param(int index, int param)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	switch(param & 3)
 	{
@@ -1116,7 +1116,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
 			if(m_text_reg_index == 0x0a) // set 256 color palette
 			{
 				int i,r,g,b;
-				UINT8 b_param,r_param,g_param;
+				uint8_t b_param,r_param,g_param;
 
 				b_param = (data & 0x03) >> 0;
 				r_param = (data & 0x0c) >> 2;
@@ -1252,8 +1252,8 @@ WRITE8_MEMBER(mz2500_state::mz2500_rom_w)
 /* sets 16 color entries out of 4096 possible combinations */
 WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 {
-	UINT8 pal_index;
-	UINT8 pal_entry;
+	uint8_t pal_index;
+	uint8_t pal_entry;
 
 	pal_index = m_maincpu->state_int(Z80_B);
 	pal_entry = (pal_index & 0x1e) >> 1;
@@ -1292,7 +1292,7 @@ READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
 {
 	if(m_cg_reg[0x07] & 0x10)
 	{
-		UINT8 vblank_bit;
+		uint8_t vblank_bit;
 
 		vblank_bit = machine().first_screen()->vblank() ? 0 : 0x80 | m_cg_clear_flag;
 
@@ -1359,9 +1359,9 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 
 	if((m_cg_reg_index & 0x1f) == 0x05 && (m_cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
 	{
-		UINT32 i;
-		UINT8 *vram = m_main_ram.get(); // TODO
-		UINT32 layer_bank;
+		uint32_t i;
+		uint8_t *vram = m_main_ram.get(); // TODO
+		uint32_t layer_bank;
 
 		layer_bank = (m_cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
 
@@ -1410,7 +1410,7 @@ WRITE8_MEMBER(mz2500_state::timer_w)
 
 READ8_MEMBER(mz2500_state::mz2500_joystick_r)
 {
-	UINT8 res,dir_en,in_r;
+	uint8_t res,dir_en,in_r;
 
 	res = 0xff;
 	in_r = ~ioport(m_joy_mode & 0x40 ? "JOY_2P" : "JOY_1P")->read();
@@ -1456,14 +1456,14 @@ WRITE8_MEMBER(mz2500_state::mz2500_kanji_w)
 
 READ8_MEMBER(mz2500_state::rp5c15_8_r)
 {
-	UINT8 rtc_index = (m_maincpu->state_int(Z80_B));
+	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
 
 	return m_rtc->read(space, rtc_index);
 }
 
 WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 {
-	UINT8 rtc_index = (m_maincpu->state_int(Z80_B));
+	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
 
 	m_rtc->write(space, rtc_index, data);
 }
@@ -1471,7 +1471,7 @@ WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 
 READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
 {
-	UINT8 emm_lo_index;
+	uint8_t emm_lo_index;
 
 	emm_lo_index = (m_maincpu->state_int(Z80_B));
 
@@ -1485,7 +1485,7 @@ READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
 
 WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
 {
-	UINT8 emm_hi_index;
+	uint8_t emm_hi_index;
 
 	emm_hi_index = (m_maincpu->state_int(Z80_B));
 
@@ -1494,7 +1494,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
 
 WRITE8_MEMBER(mz2500_state::mz2500_emm_data_w)
 {
-	UINT8 emm_lo_index;
+	uint8_t emm_lo_index;
 
 	emm_lo_index = (m_maincpu->state_int(Z80_B));
 
@@ -1722,7 +1722,7 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void mz2500_state::mz2500_reset(mz2500_state *state, UINT8 type)
+void mz2500_state::mz2500_reset(mz2500_state *state, uint8_t type)
 {
 	int i;
 
@@ -1755,12 +1755,12 @@ static const gfx_layout mz2500_pcg_layout_3bpp =
 void mz2500_state::machine_start()
 {
 	/* TODO: main RAM actually needs to be splitted */
-	m_main_ram = make_unique_clear<UINT8[]>(0x80000);
-	m_pcg_ram = make_unique_clear<UINT8[]>(0x2000);
+	m_main_ram = make_unique_clear<uint8_t[]>(0x80000);
+	m_pcg_ram = make_unique_clear<uint8_t[]>(0x2000);
 	m_ipl_rom = memregion("ipl")->base();
 	m_kanji_rom = memregion("kanji")->base();
 	m_kanji2_rom = memregion("kanji2")->base();
-	m_emm_ram = make_unique_clear<UINT8[]>(0x100000);
+	m_emm_ram = make_unique_clear<uint8_t[]>(0x100000);
 	m_dic_rom = memregion("dictionary")->base();
 	m_phone_rom = memregion("phone")->base();
 	m_iplpro_rom = memregion("iplpro")->base();
@@ -1776,7 +1776,7 @@ void mz2500_state::machine_start()
 
 void mz2500_state::machine_reset()
 {
-	UINT32 i;
+	uint32_t i;
 
 	mz2500_reset(this, IPL_RESET);
 
@@ -1888,7 +1888,7 @@ READ8_MEMBER(mz2500_state::mz2500_porta_r)
 
 READ8_MEMBER(mz2500_state::mz2500_portb_r)
 {
-	UINT8 vblank_bit;
+	uint8_t vblank_bit;
 
 	vblank_bit = machine().first_screen()->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
 

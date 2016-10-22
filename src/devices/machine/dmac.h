@@ -55,7 +55,7 @@ class dmac_device : public device_t, public amiga_autoconfig
 {
 public:
 	// construction/destruction
-	dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
 	template<class _Object> static devcb_base &set_cfgout_handler(device_t &device, _Object object)
@@ -80,8 +80,8 @@ public:
 		{ return downcast<dmac_device &>(device).m_io_write_handler.set_callback(object); }
 
 	void set_address_space(address_space *space) { m_space = space; };
-	void set_rom(UINT8 *rom) { m_rom = rom; };
-	void set_ram(UINT8 *ram) { m_ram = ram; };
+	void set_rom(uint8_t *rom) { m_rom = rom; };
+	void set_ram(uint8_t *ram) { m_ram = ram; };
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( configin_w );
@@ -140,8 +140,8 @@ private:
 	devcb_write8 m_io_write_handler;
 
 	address_space *m_space;
-	UINT8 *m_rom;
-	UINT8 *m_ram;
+	uint8_t *m_rom;
+	uint8_t *m_ram;
 	int m_ram_size;
 
 	// autoconfig state
@@ -151,10 +151,10 @@ private:
 	int m_rst;
 
 	// register
-	UINT16 m_cntr;  // control register
-	UINT16 m_istr;  // interrupt status register
-	UINT32 m_wtc;   // word transfer count
-	UINT32 m_acr;   // address control register
+	uint16_t m_cntr;  // control register
+	uint16_t m_istr;  // interrupt status register
+	uint32_t m_wtc;   // word transfer count
+	uint32_t m_acr;   // address control register
 
 	bool m_dma_active;
 

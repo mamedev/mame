@@ -23,7 +23,7 @@ class nec_common_device : public cpu_device
 {
 public:
 	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type);
+	nec_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
 
 protected:
 	// device-level overrides
@@ -31,10 +31,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 80; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 80; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -47,9 +47,9 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
@@ -58,66 +58,66 @@ private:
 /* NEC registers */
 union necbasicregs
 {                   /* eight general registers */
-	UINT16 w[8];    /* viewed as 16 bits registers */
-	UINT8  b[16];   /* or as 8 bit registers */
+	uint16_t w[8];    /* viewed as 16 bits registers */
+	uint8_t  b[16];   /* or as 8 bit registers */
 };
 
 	necbasicregs m_regs;
 	offs_t  m_fetch_xor;
-	UINT16  m_sregs[4];
+	uint16_t  m_sregs[4];
 
-	UINT16  m_ip;
+	uint16_t  m_ip;
 
 	/* PSW flags */
-	INT32   m_SignVal;
-	UINT32  m_AuxVal;   /* 0 or non-0 valued flags */
-	UINT32  m_OverVal;
-	UINT32  m_ZeroVal;
-	UINT32  m_CarryVal;
-	UINT32  m_ParityVal;
-	UINT8   m_TF; /* 0 or 1 valued flags */
-	UINT8   m_IF;
-	UINT8   m_DF;
-	UINT8   m_MF;
+	int32_t   m_SignVal;
+	uint32_t  m_AuxVal;   /* 0 or non-0 valued flags */
+	uint32_t  m_OverVal;
+	uint32_t  m_ZeroVal;
+	uint32_t  m_CarryVal;
+	uint32_t  m_ParityVal;
+	uint8_t   m_TF; /* 0 or 1 valued flags */
+	uint8_t   m_IF;
+	uint8_t   m_DF;
+	uint8_t   m_MF;
 
 	/* interrupt related */
-	UINT32  m_pending_irq;
-	UINT32  m_nmi_state;
-	UINT32  m_irq_state;
-	UINT32  m_poll_state;
-	UINT8   m_no_interrupt;
-	UINT8   m_halted;
+	uint32_t  m_pending_irq;
+	uint32_t  m_nmi_state;
+	uint32_t  m_irq_state;
+	uint32_t  m_poll_state;
+	uint8_t   m_no_interrupt;
+	uint8_t   m_halted;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_io;
 	int     m_icount;
 
-	UINT8   m_prefetch_size;
-	UINT8   m_prefetch_cycles;
-	INT8    m_prefetch_count;
-	UINT8   m_prefetch_reset;
-	UINT32  m_chip_type;
+	uint8_t   m_prefetch_size;
+	uint8_t   m_prefetch_cycles;
+	int8_t    m_prefetch_count;
+	uint8_t   m_prefetch_reset;
+	uint32_t  m_chip_type;
 
-	UINT32  m_prefix_base;    /* base address of the latest prefix segment */
-	UINT8   m_seg_prefix;     /* prefix segment indicator */
+	uint32_t  m_prefix_base;    /* base address of the latest prefix segment */
+	uint8_t   m_seg_prefix;     /* prefix segment indicator */
 
-	UINT32 m_EA;
-	UINT16 m_EO;
-	UINT16 m_E16;
+	uint32_t m_EA;
+	uint16_t m_EO;
+	uint16_t m_E16;
 
-	UINT32 m_debugger_temp;
+	uint32_t m_debugger_temp;
 
 	typedef void (nec_common_device::*nec_ophandler)();
-	typedef UINT32 (nec_common_device::*nec_eahandler)();
+	typedef uint32_t (nec_common_device::*nec_eahandler)();
 	static const nec_ophandler s_nec_instruction[256];
 	static const nec_eahandler s_GetEA[192];
 
 	inline void prefetch();
 	void do_prefetch(int previous_ICount);
-	inline UINT8 fetch();
-	inline UINT16 fetchword();
-	UINT8 fetchop();
+	inline uint8_t fetch();
+	inline uint16_t fetchword();
+	uint8_t fetchop();
 	void nec_interrupt(unsigned int_num, int source);
 	void nec_trap();
 	void external_int();
@@ -369,57 +369,57 @@ union necbasicregs
 	void i_ffpre();
 	void i_wait();
 
-	UINT32 EA_000();
-	UINT32 EA_001();
-	UINT32 EA_002();
-	UINT32 EA_003();
-	UINT32 EA_004();
-	UINT32 EA_005();
-	UINT32 EA_006();
-	UINT32 EA_007();
-	UINT32 EA_100();
-	UINT32 EA_101();
-	UINT32 EA_102();
-	UINT32 EA_103();
-	UINT32 EA_104();
-	UINT32 EA_105();
-	UINT32 EA_106();
-	UINT32 EA_107();
-	UINT32 EA_200();
-	UINT32 EA_201();
-	UINT32 EA_202();
-	UINT32 EA_203();
-	UINT32 EA_204();
-	UINT32 EA_205();
-	UINT32 EA_206();
-	UINT32 EA_207();
+	uint32_t EA_000();
+	uint32_t EA_001();
+	uint32_t EA_002();
+	uint32_t EA_003();
+	uint32_t EA_004();
+	uint32_t EA_005();
+	uint32_t EA_006();
+	uint32_t EA_007();
+	uint32_t EA_100();
+	uint32_t EA_101();
+	uint32_t EA_102();
+	uint32_t EA_103();
+	uint32_t EA_104();
+	uint32_t EA_105();
+	uint32_t EA_106();
+	uint32_t EA_107();
+	uint32_t EA_200();
+	uint32_t EA_201();
+	uint32_t EA_202();
+	uint32_t EA_203();
+	uint32_t EA_204();
+	uint32_t EA_205();
+	uint32_t EA_206();
+	uint32_t EA_207();
 };
 
 
 class v20_device : public nec_common_device
 {
 public:
-	v20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 class v30_device : public nec_common_device
 {
 public:
-	v30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 class v33_device : public nec_common_device
 {
 public:
-	v33_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class v33a_device : public nec_common_device
 {
 public:
-	v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

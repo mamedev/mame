@@ -132,7 +132,7 @@ INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
 
 WRITE32_MEMBER(policetr_state::control_w)
 {
-	UINT32 old = m_control_data;
+	uint32_t old = m_control_data;
 
 	// bit $80000000 = BSMT access/ROM read
 	// bit $20000000 = toggled every 64 IRQ4's
@@ -213,7 +213,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 	/* see if the PC matches */
 	if ((space.device().safe_pcbase() & 0x1fffffff) == m_speedup_pc)
 	{
-		UINT64 curr_cycles = m_maincpu->total_cycles();
+		uint64_t curr_cycles = m_maincpu->total_cycles();
 
 		/* if less than 50 cycles from the last time, count it */
 		if (curr_cycles - m_last_cycles < 50)

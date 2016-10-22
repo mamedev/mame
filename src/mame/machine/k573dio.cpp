@@ -105,7 +105,7 @@ static MACHINE_CONFIG_FRAGMENT( k573dio )
 	MCFG_DS2401_ADD( "digital_id" )
 MACHINE_CONFIG_END
 
-k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KONAMI_573_DIGITAL_IO_BOARD, "Konami 573 digital I/O board", tag, owner, clock, "k573dio", __FILE__),
 	mas3507d(*this, "mpeg"),
 	digital_id(*this, "digital_id"),
@@ -116,7 +116,7 @@ k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, d
 void k573dio_device::device_start()
 {
 	output_cb.resolve_safe();
-	ram = std::make_unique<UINT16[]>(12 * 1024 * 1024 );
+	ram = std::make_unique<uint16_t[]>(12 * 1024 * 1024 );
 	save_pointer( NAME(ram.get()), 12 * 1024 * 1024 );
 }
 
@@ -239,7 +239,7 @@ WRITE16_MEMBER(k573dio_device::ram_write_adr_low_w)
 
 READ16_MEMBER(k573dio_device::ram_r)
 {
-	UINT16 res = ram[ram_adr >> 1];
+	uint16_t res = ram[ram_adr >> 1];
 	ram_adr += 2;
 	return res;
 }
@@ -338,7 +338,7 @@ WRITE16_MEMBER(k573dio_device::output_2_w)
 	output(2, data);
 }
 
-void k573dio_device::output(int offset, UINT16 data)
+void k573dio_device::output(int offset, uint16_t data)
 {
 	data = (data >> 12) & 0x0f;
 	static const int shift[] = { 0, 2, 3, 1 };

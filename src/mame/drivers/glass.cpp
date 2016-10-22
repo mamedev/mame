@@ -324,10 +324,10 @@ void glass_state::ROM16_split_gfx( const char *src_reg, const char *dst_reg, int
 	int i;
 
 	/* get a pointer to the source data */
-	UINT8 *src = (UINT8 *)memregion(src_reg)->base();
+	uint8_t *src = (uint8_t *)memregion(src_reg)->base();
 
 	/* get a pointer to the destination data */
-	UINT8 *dst = (UINT8 *)memregion(dst_reg)->base();
+	uint8_t *dst = (uint8_t *)memregion(dst_reg)->base();
 
 	/* fill destination areas with the proper data */
 	for (i = 0; i < length / 2; i++)
@@ -346,7 +346,7 @@ void glass_state::ROM16_split_gfx( const char *src_reg, const char *dst_reg, int
 
 READ16_MEMBER( glass_state::mainram_r )
 {
-	UINT16 ret = m_mainram[offset];
+	uint16_t ret = m_mainram[offset];
 	int pc = space.device().safe_pc();
 
 	if (offset == (0xfede96 - 0xfec000)>>1)

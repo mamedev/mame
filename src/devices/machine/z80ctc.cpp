@@ -78,7 +78,7 @@ const device_type Z80CTC = &device_creator<z80ctc_device>;
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
-z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80CTC, "Z80 CTC", tag, owner, clock, "z80ctc", __FILE__),
 		device_z80daisy_interface(mconfig, *this),
 		m_intr_cb(*this),
@@ -354,7 +354,7 @@ attotime z80ctc_device::ctc_channel::period() const
 //  read - read the channel's state
 //-------------------------------------------------
 
-UINT8 z80ctc_device::ctc_channel::read()
+uint8_t z80ctc_device::ctc_channel::read()
 {
 	// if we're in counter mode, just return the count
 	if ((m_mode & MODE) == MODE_COUNTER || (m_mode & WAITING_FOR_TRIG))
@@ -379,7 +379,7 @@ UINT8 z80ctc_device::ctc_channel::read()
 //  write - handle writes to a channel
 //-------------------------------------------------
 
-void z80ctc_device::ctc_channel::write(UINT8 data)
+void z80ctc_device::ctc_channel::write(uint8_t data)
 {
 	// if we're waiting for a time constant, this is it
 	if ((m_mode & CONSTANT) == CONSTANT_LOAD)
@@ -449,7 +449,7 @@ void z80ctc_device::ctc_channel::write(UINT8 data)
 //  side-effects
 //-------------------------------------------------
 
-void z80ctc_device::ctc_channel::trigger(UINT8 data)
+void z80ctc_device::ctc_channel::trigger(uint8_t data)
 {
 	// normalize data
 	data = data ? 1 : 0;

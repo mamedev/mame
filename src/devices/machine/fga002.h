@@ -46,8 +46,8 @@ class fga002_device :  public device_t
 {
 	public:
 	// construction/destruction
-	fga002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fga002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER (write);
 	DECLARE_READ8_MEMBER (read);
@@ -96,23 +96,23 @@ class fga002_device :  public device_t
 
  private:
 
-	UINT8 m_tim0count;
-	UINT8   m_fga002[0x500];
+	uint8_t m_tim0count;
+	uint8_t   m_fga002[0x500];
 
-	UINT8 do_fga002reg_ctl3_r();
-	void do_fga002reg_ctl3_w(UINT8 data);
+	uint8_t do_fga002reg_ctl3_r();
+	void do_fga002reg_ctl3_w(uint8_t data);
 
 	/* Timer functions */
-	UINT8 do_fga002reg_tim0preload_r();
-	void  do_fga002reg_tim0preload_w(UINT8 data);
-	UINT8 do_fga002reg_tim0ctl_r();
-	void  do_fga002reg_tim0ctl_w(UINT8 data);
-	UINT8 do_fga002reg_tim0count_r();
-	void  do_fga002reg_tim0count_w(UINT8 data);
-	UINT8 do_fga002reg_icrtim0_r();
-	void  do_fga002reg_icrtim0_w(UINT8 data);
-	UINT8 do_fga002reg_istim0_r();
-	void  do_fga002reg_istim0_w(UINT8 data);
+	uint8_t do_fga002reg_tim0preload_r();
+	void  do_fga002reg_tim0preload_w(uint8_t data);
+	uint8_t do_fga002reg_tim0ctl_r();
+	void  do_fga002reg_tim0ctl_w(uint8_t data);
+	uint8_t do_fga002reg_tim0count_r();
+	void  do_fga002reg_tim0count_w(uint8_t data);
+	uint8_t do_fga002reg_icrtim0_r();
+	void  do_fga002reg_icrtim0_w(uint8_t data);
+	uint8_t do_fga002reg_istim0_r();
+	void  do_fga002reg_istim0_w(uint8_t data);
 	emu_timer *fga_timer;
 	enum
 	{
@@ -146,47 +146,47 @@ class fga002_device :  public device_t
 	};
 
 	/* Interrupt support */
-	UINT8 m_irq_level;
-	UINT8 do_fga002reg_localiack_r();
-	void do_fga002reg_localiack_w(UINT8 data);
+	uint8_t m_irq_level;
+	uint8_t do_fga002reg_localiack_r();
+	void do_fga002reg_localiack_w(uint8_t data);
 
-	UINT8 do_fga002reg_islocal0_r();
-	UINT8 do_fga002reg_islocal1_r();
-	UINT8 do_fga002reg_islocal2_r();
-	UINT8 do_fga002reg_islocal3_r();
-	UINT8 do_fga002reg_islocal4_r();
-	UINT8 do_fga002reg_islocal5_r();
-	UINT8 do_fga002reg_islocal6_r();
-	UINT8 do_fga002reg_islocal7_r();
+	uint8_t do_fga002reg_islocal0_r();
+	uint8_t do_fga002reg_islocal1_r();
+	uint8_t do_fga002reg_islocal2_r();
+	uint8_t do_fga002reg_islocal3_r();
+	uint8_t do_fga002reg_islocal4_r();
+	uint8_t do_fga002reg_islocal5_r();
+	uint8_t do_fga002reg_islocal6_r();
+	uint8_t do_fga002reg_islocal7_r();
 
 	void islocal_w(int status, int vector, int control, int data);
-	void  do_fga002reg_islocal0_w(UINT8 data);
-	void  do_fga002reg_islocal1_w(UINT8 data);
-	void  do_fga002reg_islocal2_w(UINT8 data);
-	void  do_fga002reg_islocal3_w(UINT8 data);
-	void  do_fga002reg_islocal4_w(UINT8 data);
-	void  do_fga002reg_islocal5_w(UINT8 data);
-	void  do_fga002reg_islocal6_w(UINT8 data);
-	void  do_fga002reg_islocal7_w(UINT8 data);
+	void  do_fga002reg_islocal0_w(uint8_t data);
+	void  do_fga002reg_islocal1_w(uint8_t data);
+	void  do_fga002reg_islocal2_w(uint8_t data);
+	void  do_fga002reg_islocal3_w(uint8_t data);
+	void  do_fga002reg_islocal4_w(uint8_t data);
+	void  do_fga002reg_islocal5_w(uint8_t data);
+	void  do_fga002reg_islocal6_w(uint8_t data);
+	void  do_fga002reg_islocal7_w(uint8_t data);
 
-	UINT8 do_fga002reg_icrlocal0_r();
-	UINT8 do_fga002reg_icrlocal1_r();
-	UINT8 do_fga002reg_icrlocal2_r();
-	UINT8 do_fga002reg_icrlocal3_r();
-	UINT8 do_fga002reg_icrlocal4_r();
-	UINT8 do_fga002reg_icrlocal5_r();
-	UINT8 do_fga002reg_icrlocal6_r();
-	UINT8 do_fga002reg_icrlocal7_r();
-	void  do_fga002reg_icrlocal0_w(UINT8 data);
-	void  do_fga002reg_icrlocal1_w(UINT8 data);
-	void  do_fga002reg_icrlocal2_w(UINT8 data);
-	void  do_fga002reg_icrlocal3_w(UINT8 data);
-	void  do_fga002reg_icrlocal4_w(UINT8 data);
-	void  do_fga002reg_icrlocal5_w(UINT8 data);
-	void  do_fga002reg_icrlocal6_w(UINT8 data);
-	void  do_fga002reg_icrlocal7_w(UINT8 data);
+	uint8_t do_fga002reg_icrlocal0_r();
+	uint8_t do_fga002reg_icrlocal1_r();
+	uint8_t do_fga002reg_icrlocal2_r();
+	uint8_t do_fga002reg_icrlocal3_r();
+	uint8_t do_fga002reg_icrlocal4_r();
+	uint8_t do_fga002reg_icrlocal5_r();
+	uint8_t do_fga002reg_icrlocal6_r();
+	uint8_t do_fga002reg_icrlocal7_r();
+	void  do_fga002reg_icrlocal0_w(uint8_t data);
+	void  do_fga002reg_icrlocal1_w(uint8_t data);
+	void  do_fga002reg_icrlocal2_w(uint8_t data);
+	void  do_fga002reg_icrlocal3_w(uint8_t data);
+	void  do_fga002reg_icrlocal4_w(uint8_t data);
+	void  do_fga002reg_icrlocal5_w(uint8_t data);
+	void  do_fga002reg_icrlocal6_w(uint8_t data);
+	void  do_fga002reg_icrlocal7_w(uint8_t data);
 
-	void trigger_interrupt(UINT8 data);
+	void trigger_interrupt(uint8_t data);
 	void check_interrupts();
 
 	enum {

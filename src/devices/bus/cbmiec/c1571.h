@@ -44,8 +44,8 @@ class c1571_t :  public device_t,
 {
 public:
 	// construction/destruction
-	c1571_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	c1571_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1571_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	c1571_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -89,7 +89,7 @@ protected:
 	virtual void cbm_iec_reset(int state) override;
 
 	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(UINT8 data) override;
+	virtual void parallel_data_w(uint8_t data) override;
 	virtual void parallel_strobe_w(int state) override;
 
 	enum
@@ -131,7 +131,7 @@ class c1570_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	c1570_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1570_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -145,7 +145,7 @@ class c1571cr_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	c1571cr_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1571cr_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -162,7 +162,7 @@ class mini_chief_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	mini_chief_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mini_chief_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

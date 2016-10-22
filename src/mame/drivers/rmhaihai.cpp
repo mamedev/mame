@@ -51,8 +51,8 @@ public:
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	tilemap_t *m_bg_tilemap;
 	int m_keyboard_cmd;
@@ -72,7 +72,7 @@ public:
 	DECLARE_MACHINE_START(themj);
 	DECLARE_MACHINE_RESET(themj);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
@@ -109,7 +109,7 @@ void rmhaihai_state::video_start()
 	save_item(NAME(m_gfxbank));
 }
 
-UINT32 rmhaihai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rmhaihai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -676,7 +676,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
 {
-	UINT8 *rom = memregion("gfx1")->base();
+	uint8_t *rom = memregion("gfx1")->base();
 	int size = memregion("gfx1")->bytes();
 	int a,b;
 

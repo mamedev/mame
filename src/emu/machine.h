@@ -114,18 +114,18 @@ public:
 	{
 		void set(struct tm &t);
 
-		UINT8       second;     // seconds (0-59)
-		UINT8       minute;     // minutes (0-59)
-		UINT8       hour;       // hours (0-23)
-		UINT8       mday;       // day of month (1-31)
-		UINT8       month;      // month (0-11)
-		INT32       year;       // year (1=1 AD)
-		UINT8       weekday;    // day of week (0-6)
-		UINT16      day;        // day of year (0-365)
-		UINT8       is_dst;     // is this daylight savings?
+		uint8_t       second;     // seconds (0-59)
+		uint8_t       minute;     // minutes (0-59)
+		uint8_t       hour;       // hours (0-23)
+		uint8_t       mday;       // day of month (1-31)
+		uint8_t       month;      // month (0-11)
+		int32_t       year;       // year (1=1 AD)
+		uint8_t       weekday;    // day of week (0-6)
+		uint16_t      day;        // day of year (0-365)
+		uint8_t       is_dst;     // is this daylight savings?
 	};
 
-	INT64           time;       // number of seconds elapsed since midnight, January 1 1970 UTC
+	int64_t           time;       // number of seconds elapsed since midnight, January 1 1970 UTC
 	full_time       local_time; // local time
 	full_time       utc_time;   // UTC coordinated time
 };
@@ -234,7 +234,7 @@ public:
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 	void strlog(const char *str) const;
-	UINT32 rand();
+	uint32_t rand();
 	const char *describe_context();
 	std::string compose_saveload_filename(const char *base_filename, const char **searchpath = nullptr);
 
@@ -247,7 +247,7 @@ private:
 
 public:
 	// debugger-related information
-	UINT32                  debug_flags;        // the current debug flags
+	uint32_t                  debug_flags;        // the current debug flags
 
 private:
 	// internal helpers
@@ -257,7 +257,7 @@ private:
 	void set_saveload_filename(const char *filename);
 	std::string get_statename(const char *statename_opt) const;
 	void handle_saveload();
-	void soft_reset(void *ptr = nullptr, INT32 param = 0);
+	void soft_reset(void *ptr = nullptr, int32_t param = 0);
 	std::string nvram_filename(device_t &device) const;
 	void nvram_load();
 	void nvram_save();
@@ -304,7 +304,7 @@ private:
 	emu_timer *             m_soft_reset_timer;     // timer used to schedule a soft reset
 
 	// misc state
-	UINT32                  m_rand_seed;            // current random number seed
+	uint32_t                  m_rand_seed;            // current random number seed
 	bool                    m_ui_active;            // ui active or not (useful for games / systems with keyboard inputs)
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths

@@ -6,11 +6,11 @@
 #include "includes/gamepock.h"
 
 
-void gamepock_state::hd44102ch_w( int which, int c_d, UINT8 data )
+void gamepock_state::hd44102ch_w( int which, int c_d, uint8_t data )
 {
 	if ( c_d )
 	{
-		UINT8   y;
+		uint8_t   y;
 		/* Data */
 		m_hd44102ch[which].ram[ m_hd44102ch[which].address ] = data;
 
@@ -91,7 +91,7 @@ void gamepock_state::lcd_update()
 
 WRITE8_MEMBER( gamepock_state::port_a_w )
 {
-	UINT8   old_port_a = m_port_a;
+	uint8_t   old_port_a = m_port_a;
 
 	m_port_a = data;
 
@@ -117,7 +117,7 @@ READ8_MEMBER( gamepock_state::port_b_r )
 
 READ8_MEMBER( gamepock_state::port_c_r )
 {
-	UINT8   data = 0xFF;
+	uint8_t   data = 0xFF;
 
 	if ( m_port_a & 0x80 )
 	{
@@ -144,9 +144,9 @@ void gamepock_state::machine_reset()
 
 }
 
-UINT32 gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8   ad;
+	uint8_t   ad;
 	int     i,j;
 
 	/* Handle HD44102CH #0 */

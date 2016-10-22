@@ -67,8 +67,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
 private:
-	UINT8 m_keydata;
-	UINT8 m_irq_mask;
+	uint8_t m_keydata;
+	uint8_t m_irq_mask;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -189,7 +189,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( hunter2_state::keyboard_r )
 {
-	UINT8 i,data = 0xff;
+	uint8_t i,data = 0xff;
 	for (i = 0; i < 7; i++)
 	{
 		if (!BIT(m_keydata, i))
@@ -204,7 +204,7 @@ READ8_MEMBER( hunter2_state::keyboard_r )
 
 READ8_MEMBER( hunter2_state::serial_dsr_r )
 {
-	UINT8 res = 0x00;
+	uint8_t res = 0x00;
 
 	if(m_rs232->dsr_r())
 		res |= 0x80;
@@ -220,7 +220,7 @@ WRITE8_MEMBER( hunter2_state::keyboard_w )
 
 READ8_MEMBER( hunter2_state::serial_rx_r )
 {
-	UINT8 res = 0x28;
+	uint8_t res = 0x28;
 
 	if(m_rs232->rxd_r())
 		res |= 0x01;
@@ -305,7 +305,7 @@ WRITE8_MEMBER( hunter2_state::memmap_w )
 	else
 	if (data >= 0x80)
 	{
-		UINT8 bank = data & 0x0f;
+		uint8_t bank = data & 0x0f;
 		m_bank1->set_bank(16 + (bank*3));
 		m_bank2->set_bank(17 + (bank*3));
 		m_bank3->set_bank(18 + (bank*3));
@@ -324,7 +324,7 @@ void hunter2_state::machine_reset()
 // it is presumed that writing to rom will go nowhere
 DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
 {
-	UINT8 *ram = m_ram->base();
+	uint8_t *ram = m_ram->base();
 
 	m_nvram->set_base(ram,m_ram->bytes());
 }

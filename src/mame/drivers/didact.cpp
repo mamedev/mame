@@ -96,13 +96,13 @@ class didact_state : public driver_device
 	required_ioport m_io_line2;
 	required_ioport m_io_line3;
 	required_ioport m_io_line4;
-	UINT8 m_line0;
-	UINT8 m_line1;
-	UINT8 m_line2;
-	UINT8 m_line3;
-	UINT8 m_reset;
-	UINT8 m_shift;
-	UINT8 m_led;
+	uint8_t m_line0;
+	uint8_t m_line1;
+	uint8_t m_line2;
+	uint8_t m_line3;
+	uint8_t m_reset;
+	uint8_t m_shift;
+	uint8_t m_led;
 	optional_device<rs232_port_device> m_rs232;
 	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
 };
@@ -158,7 +158,7 @@ class md6802_state : public didact_state
 		{ }
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_tb16_74145;
-	UINT8 m_segments;
+	uint8_t m_segments;
 	DECLARE_READ8_MEMBER( pia2_kbA_r );
 	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
 	DECLARE_READ8_MEMBER( pia2_kbB_r );
@@ -175,8 +175,8 @@ protected:
 /* Keyboard */
 READ8_MEMBER( md6802_state::pia2_kbA_r )
 {
-	UINT8 ls145;
-	UINT8 pa = 0xff;
+	uint8_t ls145;
+	uint8_t pa = 0xff;
 
 	// Read out the selected column
 	ls145 = m_tb16_74145->read() & 0x0f;
@@ -208,7 +208,7 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 /* Pull the cathodes low enabling the correct digit and lit the segments held by port B */
 WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 {
-	UINT8 digit_nbr;
+	uint8_t digit_nbr;
 
 //  LOG(("--->%s(%02x)\n", FUNCNAME, data));
 
@@ -354,7 +354,7 @@ READ8_MEMBER( mp68a_state::pia2_kbA_r )
 
 WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 {
-	UINT8 digit_nbr;
+	uint8_t digit_nbr;
 
 	/* Display memory is at $702 to $708 in AAAADD format (A=address digit, D=Data digit)
 	   but we are using data read from the port. */
@@ -377,7 +377,7 @@ WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 
 READ8_MEMBER( mp68a_state::pia2_kbB_r )
 {
-	UINT8 a012, line, pb;
+	uint8_t a012, line, pb;
 
 	LOG(("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_line0, m_line1, m_line2, m_line3, m_shift));
 
@@ -522,11 +522,11 @@ public:
 		{ }
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_kbd_74145;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cassette_image_device> m_cassette;
-	UINT8 *m_char_ptr;
-	UINT8 *m_vram;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint8_t *m_char_ptr;
+	uint8_t *m_vram;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override { m_maincpu->reset(); LOG(("--->%s()\n", FUNCNAME)); };
 	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER( pia_r );
@@ -548,8 +548,8 @@ protected:
 	required_ioport m_io_line7;
 	required_ioport m_io_line8;
 	required_ioport m_io_line9;
-	UINT8 m_pia1_B;
-	UINT8 m_50hz;
+	uint8_t m_pia1_B;
+	uint8_t m_50hz;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(e100_state::rtc_w)
@@ -561,7 +561,7 @@ void e100_state::machine_start()
 {
 	LOG(("%s()\n", FUNCNAME));
 	m_char_ptr  = memregion("chargen")->base();
-	m_vram      = (UINT8 *)m_videoram.target();
+	m_vram      = (uint8_t *)m_videoram.target();
 
 	/* register for state saving */
 	save_pointer (NAME (m_char_ptr), sizeof(m_char_ptr));
@@ -570,12 +570,12 @@ void e100_state::machine_start()
 	save_item(NAME(m_pia1_B));
 }
 
-UINT32 e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 	int vramad;
-	UINT8 *chardata;
-	UINT8 charcode;
+	uint8_t *chardata;
+	uint8_t charcode;
 
 	LOGSCREEN(("%s()\n", FUNCNAME));
 	vramad = 0;
@@ -633,14 +633,14 @@ WRITE8_MEMBER( e100_state::pia_w )
 /* PIA read  - the Esselte 100 allows the PIA:s to be accessed simultaneously */
 READ8_MEMBER( e100_state::pia_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x18)
 	{
 	case 0x18: // read PIA1 and PIA2 at the same time, should really only happen for writes...
 		{
-			UINT8 data1 =  m_pia1->read(space, offset);
-			UINT8 data2 =  m_pia2->read(space, offset);
+			uint8_t data1 =  m_pia1->read(space, offset);
+			uint8_t data2 =  m_pia2->read(space, offset);
 			logerror("%s: Dual device read may have caused unpredictable results on real hardware\n", FUNCNAME);
 			data = data1 & data2; // We assume that the stable behaviour is that data lines with a low level by either device succeeds
 			LOGCS(("%s %s[%02x] %02x & %02x -> %02x Dual device read!!\n", PIA1_TAG "/" PIA2_TAG, FUNCNAME, offset, data1, data2, data));
@@ -668,7 +668,7 @@ WRITE8_MEMBER( e100_state::pia1_kbA_w )
 READ8_MEMBER( e100_state::pia1_kbA_r )
 {
 	int ls145;
-	UINT8 pa = 0x00;
+	uint8_t pa = 0x00;
 
 	// Read out the selected column
 	ls145 = m_kbd_74145->read() & 0x3ff;
@@ -725,7 +725,7 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
 #define CASS_IN    0x80
 WRITE8_MEMBER( e100_state::pia1_kbB_w )
 {
-	UINT8 col;
+	uint8_t col;
 
 	// Keyboard
 	//  if (VERBOSE && data != m_pia1_B) LOGSCAN(("%s(%02x)\n", FUNCNAME, data));

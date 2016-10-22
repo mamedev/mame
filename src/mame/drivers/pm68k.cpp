@@ -31,16 +31,16 @@ public:
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	required_shared_ptr<UINT16> m_p_base;
+	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
 
 READ16_MEMBER( pm68k_state::keyin_r )
 {
-	UINT16 ret = m_term_data;
+	uint16_t ret = m_term_data;
 	m_term_data = 0;
 	return ret << 8;
 }
@@ -68,7 +68,7 @@ INPUT_PORTS_END
 
 void pm68k_state::machine_reset()
 {
-	UINT8* ROM = memregion("maincpu")->base();
+	uint8_t* ROM = memregion("maincpu")->base();
 	memcpy(m_p_base, ROM, 8);
 	m_maincpu->reset();
 }

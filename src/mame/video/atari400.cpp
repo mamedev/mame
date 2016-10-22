@@ -36,7 +36,7 @@ void atari_common_state::video_start()
  *
  **************************************************************/
 
-static const UINT8 atari_palette[256*3] =
+static const uint8_t atari_palette[256*3] =
 {
 	/* Grey */
 	0x00,0x00,0x00, 0x25,0x25,0x25, 0x34,0x34,0x34, 0x4e,0x4e,0x4e,

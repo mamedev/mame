@@ -780,7 +780,7 @@ void eeprom_serial_x24c44_device::device_start()
 	// start the base class
 	eeprom_base_device::device_start();
 
-	INT16 i=0;
+	int16_t i=0;
 	m_ram_length=0xf;
 
 	for (i=0;i<16;i++){
@@ -806,7 +806,7 @@ void eeprom_serial_x24c44_device::device_start()
 }
 
 void eeprom_serial_x24c44_device::copy_eeprom_to_ram(){
-	UINT16 i=0;
+	uint16_t i=0;
 	LOG1(("EEPROM TO RAM COPY!!!\n"));
 	for (i=0;i<16;i++){
 		m_ram_data[i]=read(i);
@@ -817,7 +817,7 @@ void eeprom_serial_x24c44_device::copy_eeprom_to_ram(){
 
 
 void eeprom_serial_x24c44_device::copy_ram_to_eeprom(){
-	UINT16 i=0;
+	uint16_t i=0;
 	if (m_store_latch){
 		LOG1(("RAM TO EEPROM COPY\n"));
 		for (i=0;i<16;i++){
@@ -910,7 +910,7 @@ void eeprom_serial_x24c44_device::execute_command()
 
 void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 {
-//UINT32 tmp=0;
+//uint32_t tmp=0;
 #if (VERBOSE_PRINTF > 0 || VERBOSE_LOGERROR > 0)
 	// for debugging purposes
 	if ((event & EVENT_CS_RISING_EDGE) != 0) LOG2(("Event: CS rising\n"));
@@ -1127,7 +1127,7 @@ WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::di_write) { base_di_write(state);
 
 // macro for defining a new device class
 #define DEFINE_SERIAL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits, _cells, _addrbits) \
-eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) \
+eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) \
 	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, "Serial EEPROM " #_uppercase " (" #_cells "x" #_bits ")", tag, owner, #_lowercase "_" #_bits, __FILE__) \
 { \
 	static_set_size(*this, _cells, _bits); \

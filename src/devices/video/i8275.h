@@ -42,7 +42,7 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define I8275_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)
+#define I8275_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t lineattr, uint8_t lten, uint8_t rvv, uint8_t vsp, uint8_t gpa, uint8_t hlgt)
 
 
 #define MCFG_I8275_CHARACTER_WIDTH(_value) \
@@ -69,7 +69,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)> i8275_draw_character_delegate;
+typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t lineattr, uint8_t lten, uint8_t rvv, uint8_t vsp, uint8_t gpa, uint8_t hlgt)> i8275_draw_character_delegate;
 
 
 // ======================> i8275_device
@@ -79,7 +79,7 @@ class i8275_device :   public device_t,
 {
 public:
 	// construction/destruction
-	i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_character_width(device_t &device, int value) { downcast<i8275_device &>(device).m_hpixels_per_column = value; }
 	static void static_set_display_callback(device_t &device, i8275_draw_character_delegate callback) { downcast<i8275_device &>(device).m_display_cb = callback; }
@@ -96,7 +96,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( lpen_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -189,13 +189,13 @@ protected:
 
 	bitmap_rgb32 m_bitmap;
 
-	UINT8 m_status;
-	UINT8 m_param[REG_DMA + 1];
+	uint8_t m_status;
+	uint8_t m_param[REG_DMA + 1];
 	int m_param_idx;
 	int m_param_end;
 
-	UINT8 m_buffer[2][80];
-	UINT8 m_fifo[2][16];
+	uint8_t m_buffer[2][80];
+	uint8_t m_fifo[2][16];
 	int m_buffer_idx;
 	int m_fifo_idx;
 	bool m_fifo_next;
@@ -219,7 +219,7 @@ protected:
 
 	int m_cursor_blink;
 	int m_char_blink;
-	UINT8 m_stored_attr;
+	uint8_t m_stored_attr;
 
 	// timers
 	emu_timer *m_hrtc_on_timer;

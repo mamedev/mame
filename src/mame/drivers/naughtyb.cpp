@@ -146,7 +146,7 @@ READ8_MEMBER(naughtyb_state::popflame_protection_r)/* Not used by bootleg/hack *
 {
 	static const int seed00[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
 	static const int seed10[4] = { 0x68, 0x60, 0x68, 0x60|0x80 };
-	UINT8 seedxx;
+	uint8_t seedxx;
 
 	seedxx = (m_r_index < 0x89) ? 1 : 0;
 

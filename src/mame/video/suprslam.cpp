@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_bg_tile_info)
 }
 
 
-UINT32 suprslam_state::suprslam_tile_callback( UINT32 code )
+uint32_t suprslam_state::suprslam_tile_callback( uint32_t code )
 {
 	return m_sp_videoram[code];
 }
@@ -63,7 +63,7 @@ void suprslam_state::video_start()
 	m_screen_tilemap->set_transparent_pen(15);
 }
 
-UINT32 suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_screen_tilemap->set_scrollx(0, m_screen_vregs[0x04/2] );
 
@@ -79,7 +79,7 @@ UINT32 suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_ind1
 
 WRITE16_MEMBER(suprslam_state::suprslam_bank_w)
 {
-	UINT16 old_screen_bank, old_bg_bank;
+	uint16_t old_screen_bank, old_bg_bank;
 	old_screen_bank = m_screen_bank;
 	old_bg_bank = m_bg_bank;
 

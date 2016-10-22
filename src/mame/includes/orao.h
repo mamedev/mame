@@ -31,16 +31,16 @@ public:
 	DECLARE_DRIVER_INIT(orao103);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	required_shared_ptr<UINT8> m_memory;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_memory;
+	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<20> m_line;
-	UINT8 m_beep;
+	uint8_t m_beep;
 };
 
 #endif /* ORAO_H_ */

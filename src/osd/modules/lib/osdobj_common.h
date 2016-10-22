@@ -187,7 +187,7 @@ public:
 	virtual void wait_for_debugger(device_t &device, bool firststop) override;
 
 	// audio overridables
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) override;
+	virtual void update_audio_stream(const int16_t *buffer, int samples_this_frame) override;
 	virtual void set_mastervolume(int attenuation) override;
 	virtual bool no_sound() override;
 
@@ -195,7 +195,7 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	// video overridables
-	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
+	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
 	virtual std::vector<ui::menu_item> get_slider_list() override;
 
 	// command option overrides
@@ -237,7 +237,7 @@ public:
 	bool verbose() const { return m_print_verbose; }
 	void set_verbose(bool print_verbose) { m_print_verbose = print_verbose; }
 
-	void notify(const char *outname, INT32 value) const { m_output->notify(outname, value); }
+	void notify(const char *outname, int32_t value) const { m_output->notify(outname, value); }
 
 	static std::list<std::shared_ptr<osd_window>> s_window_list;
 protected:

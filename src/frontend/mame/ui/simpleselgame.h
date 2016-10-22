@@ -43,7 +43,7 @@ private:
 	void inkey_special(const event *menu_event);
 
 	// internal state
-	UINT8                   m_error;
+	uint8_t                   m_error;
 	bool                    m_rerandomize;
 	std::string             m_search;
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];

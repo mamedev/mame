@@ -62,7 +62,7 @@ INTERRUPT_GEN_MEMBER(orbit_state::orbit_interrupt)
  *
  *************************************/
 
-void orbit_state::update_misc_flags(address_space &space, UINT8 val)
+void orbit_state::update_misc_flags(address_space &space, uint8_t val)
 {
 	m_misc_flags = val;
 
@@ -87,7 +87,7 @@ void orbit_state::update_misc_flags(address_space &space, UINT8 val)
 
 WRITE8_MEMBER(orbit_state::orbit_misc_w)
 {
-	UINT8 bit = offset >> 1;
+	uint8_t bit = offset >> 1;
 
 	if (offset & 1)
 		update_misc_flags(space, m_misc_flags | (1 << bit));

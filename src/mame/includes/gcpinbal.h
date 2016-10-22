@@ -32,31 +32,31 @@ public:
 	required_device<msm6585_device> m_msm;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_tilemapram;
-	required_shared_ptr<UINT16> m_ioc_ram;
+	required_shared_ptr<uint16_t> m_tilemapram;
+	required_shared_ptr<uint16_t> m_ioc_ram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	/* video-related */
 	tilemap_t     *m_tilemap[3];
-	UINT16      m_scrollx[3];
-	UINT16      m_scrolly[3];
-	UINT16      m_bg0_gfxset;
-	UINT16      m_bg1_gfxset;
+	uint16_t      m_scrollx[3];
+	uint16_t      m_scrolly[3];
+	uint16_t      m_bg0_gfxset;
+	uint16_t      m_bg1_gfxset;
 #ifdef MAME_DEBUG
-	UINT8       m_dislayer[4];
+	uint8_t       m_dislayer[4];
 #endif
 
 	/* sound-related */
-	UINT32      m_msm_start;
-	UINT32      m_msm_end;
-	UINT32      m_msm_bank;
-	UINT32      m_adpcm_start;
-	UINT32      m_adpcm_end;
-	UINT32      m_adpcm_idle;
-	UINT8       m_adpcm_trigger;
-	UINT8       m_adpcm_data;
+	uint32_t      m_msm_start;
+	uint32_t      m_msm_end;
+	uint32_t      m_msm_bank;
+	uint32_t      m_adpcm_start;
+	uint32_t      m_adpcm_end;
+	uint32_t      m_adpcm_idle;
+	uint8_t       m_adpcm_trigger;
+	uint8_t       m_adpcm_data;
 
 	DECLARE_READ16_MEMBER(ioc_r);
 	DECLARE_WRITE16_MEMBER(ioc_w);
@@ -68,7 +68,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gcpinbal_interrupt);
 	void gcpinbal_core_vh_start(  );
 	DECLARE_WRITE_LINE_MEMBER(gcp_adpcm_int);

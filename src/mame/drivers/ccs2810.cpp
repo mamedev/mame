@@ -94,12 +94,12 @@ public:
 	DECLARE_WRITE8_MEMBER(port40_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
-	UINT8 m_term_data;
-	UINT8 m_26_count;
+	uint8_t m_term_data;
+	uint8_t m_26_count;
 	bool m_ss;
 	bool m_dden;
 	bool m_dsize;
-	UINT8 m_ds;
+	uint8_t m_ds;
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -146,7 +146,7 @@ INPUT_PORTS_END
 //*************************************
 READ8_MEMBER( ccs_state::port20_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -203,8 +203,8 @@ d7 : drq
 
 READ8_MEMBER( ccs_state::port34_r )
 {
-	//return (UINT8)m_drq | (m_ds << 1) | ((UINT8)fdc->hld_r() << 5) | 0x40 | ((UINT8)m_intrq << 7);
-	return (UINT8)m_fdc->drq_r() | (m_ds << 1) | 0x20 | 0x40 | ((UINT8)m_fdc->intrq_r() << 7); // hld_r doesn't do anything
+	//return (uint8_t)m_drq | (m_ds << 1) | ((uint8_t)fdc->hld_r() << 5) | 0x40 | ((uint8_t)m_intrq << 7);
+	return (uint8_t)m_fdc->drq_r() | (m_ds << 1) | 0x20 | 0x40 | ((uint8_t)m_fdc->intrq_r() << 7); // hld_r doesn't do anything
 }
 
 /* Status 2
@@ -229,8 +229,8 @@ READ8_MEMBER( ccs_state::port04_r )
 		idx = m_floppy->idx_r()^1;
 		dside = m_floppy->twosid_r();
 	}
-	return (UINT8)trk00 | 0 | ((UINT8)wprt << 2) | ((UINT8)m_ss << 3) |
-		idx << 4 | ((UINT8)m_dden << 5) | ((UINT8)dside << 6) | ((UINT8)m_fdc->drq_r() << 7);
+	return (uint8_t)trk00 | 0 | ((uint8_t)wprt << 2) | ((uint8_t)m_ss << 3) |
+		idx << 4 | ((uint8_t)m_dden << 5) | ((uint8_t)dside << 6) | ((uint8_t)m_fdc->drq_r() << 7);
 }
 
 /* Control 1
@@ -297,7 +297,7 @@ MACHINE_RESET_MEMBER( ccs_state, ccs )
 
 DRIVER_INIT_MEMBER( ccs_state, ccs2810 )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
@@ -306,7 +306,7 @@ DRIVER_INIT_MEMBER( ccs_state, ccs2810 )
 
 DRIVER_INIT_MEMBER( ccs_state, ccs2422 )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);

@@ -204,7 +204,7 @@ softlist_parser::softlist_parser(util::core_file &file, const std::string &filen
 	char buffer[1024];
 	while (!m_done)
 	{
-		UINT32 length = m_file.read(buffer, sizeof(buffer));
+		uint32_t length = m_file.read(buffer, sizeof(buffer));
 		m_done = m_file.eof();
 		if (XML_Parse(m_parser, buffer, length, m_done) == XML_STATUS_ERROR)
 		{
@@ -341,7 +341,7 @@ bool softlist_parser::parse_name_and_value(const char **attributes, std::string 
 //  current part's list
 //-------------------------------------------------
 
-void softlist_parser::add_rom_entry(std::string &&name, std::string &&hashdata, UINT32 offset, UINT32 length, UINT32 flags)
+void softlist_parser::add_rom_entry(std::string &&name, std::string &&hashdata, uint32_t offset, uint32_t length, uint32_t flags)
 {
 	// get the current part
 	if (m_current_part == nullptr)
@@ -597,7 +597,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 			// handle region attributes
 			const std::string &width = attrvalues[2];
 			const std::string &endianness = attrvalues[3];
-			UINT32 regionflags = ROMENTRYTYPE_REGION;
+			uint32_t regionflags = ROMENTRYTYPE_REGION;
 
 			if (!width.empty())
 			{
@@ -689,8 +689,8 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		const std::string &loadflag = attrvalues[7];
 		if (!sizestr.empty() && !offsetstr.empty())
 		{
-			UINT32 length = strtol(sizestr.c_str(), nullptr, 0);
-			UINT32 offset = strtol(offsetstr.c_str(), nullptr, 0);
+			uint32_t length = strtol(sizestr.c_str(), nullptr, 0);
+			uint32_t offset = strtol(offsetstr.c_str(), nullptr, 0);
 
 			if (loadflag == "reload")
 				add_rom_entry("", "", offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS);
@@ -740,7 +740,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		}
 		else if (!sizestr.empty() && !loadflag.empty() && loadflag == "ignore")
 		{
-			UINT32 length = strtol(sizestr.c_str(), nullptr, 0);
+			uint32_t length = strtol(sizestr.c_str(), nullptr, 0);
 			add_rom_entry("", "", 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 		}
 		else

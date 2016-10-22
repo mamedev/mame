@@ -32,7 +32,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -56,7 +56,7 @@ void mk85_state::video_start()
 {
 }
 
-UINT32 mk85_state::screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mk85_state::screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

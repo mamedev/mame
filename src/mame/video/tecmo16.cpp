@@ -215,7 +215,7 @@ WRITE16_MEMBER(tecmo16_state::scroll_char_y_w)
 
 /******************************************************************************/
 
-UINT32 tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_tile_bitmap_bg.fill(0, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);

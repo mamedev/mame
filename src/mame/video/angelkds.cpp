@@ -123,8 +123,8 @@ a split down the middle of the screen
 
 void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int enable_n)
 {
-	const UINT8 *source = m_spriteram + 0x100 - 4;
-	const UINT8 *finish = m_spriteram;
+	const uint8_t *source = m_spriteram + 0x100 - 4;
+	const uint8_t *finish = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(3);
 
 	while (source >= finish)
@@ -145,16 +145,16 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	x = X position
 
 	*/
-		UINT16 tile_no = source[0];
-		UINT8 attr = source[1];
-		UINT8 ypos = source[2];
-		UINT8 xpos = source[3];
+		uint16_t tile_no = source[0];
+		uint8_t attr = source[1];
+		uint8_t ypos = source[2];
+		uint8_t xpos = source[3];
 
-		UINT8 enable = attr & 0xc0;
-		UINT8 flipx = (attr & 0x10) >> 4;
-		UINT8 flipy = (attr & 0x20) >> 5;
-		UINT8 bank = attr & 0x08;
-		UINT8 color = attr & 0x03;
+		uint8_t enable = attr & 0xc0;
+		uint8_t flipx = (attr & 0x10) >> 4;
+		uint8_t flipy = (attr & 0x20) >> 5;
+		uint8_t bank = attr & 0x08;
+		uint8_t color = attr & 0x03;
 
 		if (bank)
 			tile_no += 0x100;
@@ -231,7 +231,7 @@ void angelkds_state::video_start()
 
 /* enable bits are uncertain */
 
-UINT32 angelkds_state::screen_update_angelkds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t angelkds_state::screen_update_angelkds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;

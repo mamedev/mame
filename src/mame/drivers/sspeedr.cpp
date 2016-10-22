@@ -51,7 +51,7 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_lamp_w)
 
 
 /* uses a 7447A, which is equivalent to an LS47/48 */
-static const UINT8 ls48_map[16] =
+static const uint8_t ls48_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_time_w)

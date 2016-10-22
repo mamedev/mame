@@ -68,9 +68,9 @@ enum vram_t
 // Layers
 struct layer_t
 {
-	std::unique_ptr<UINT8[]> videorams[2];
+	std::unique_ptr<uint8_t[]> videorams[2];
 
-	std::unique_ptr<UINT8[]> scrollrams[2];
+	std::unique_ptr<uint8_t[]> scrollrams[2];
 	int scroll_x;
 	int scroll_y;
 
@@ -92,21 +92,21 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	std::unique_ptr<UINT8[]> m_hm86171_colorram;
+	std::unique_ptr<uint8_t[]> m_hm86171_colorram;
 	layer_t m_layers[2];
-	UINT8 m_ss9601_byte_lo;
-	UINT8 m_ss9601_byte_lo2;
-	std::unique_ptr<UINT8[]> m_ss9601_reelrams[2];
+	uint8_t m_ss9601_byte_lo;
+	uint8_t m_ss9601_byte_lo2;
+	std::unique_ptr<uint8_t[]> m_ss9601_reelrams[2];
 	std::unique_ptr<bitmap_ind16> m_reelbitmap;
-	UINT8 m_ss9601_scrollctrl;
-	UINT8 m_ss9601_tilesize;
-	UINT8 m_ss9601_disable;
+	uint8_t m_ss9601_scrollctrl;
+	uint8_t m_ss9601_tilesize;
+	uint8_t m_ss9601_disable;
 	int m_hm86171_offs;
-	UINT8 m_dsw_mask;
-	optional_shared_ptr<UINT16> m_outputs16;
-	optional_shared_ptr<UINT8> m_outputs;
-	UINT16 m_bishjan_sound;
-	UINT16 m_bishjan_input;
+	uint8_t m_dsw_mask;
+	optional_shared_ptr<uint16_t> m_outputs16;
+	optional_shared_ptr<uint8_t> m_outputs;
+	uint16_t m_bishjan_sound;
+	uint16_t m_bishjan_input;
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo2_w);
 	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_w);
@@ -173,7 +173,7 @@ public:
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	DECLARE_VIDEO_START(subsino2);
-	UINT32 screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
@@ -194,7 +194,7 @@ private:
 inline void subsino2_state::ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int addr;
-	UINT16 offs;
+	uint16_t offs;
 	switch (l->tilesize)
 	{
 		default:
@@ -228,7 +228,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_byte_lo2_w)
 }
 
 
-static inline void ss9601_videoram_w(layer_t *l, vram_t vram, address_space &space, offs_t offset, UINT8 data)
+static inline void ss9601_videoram_w(layer_t *l, vram_t vram, address_space &space, offs_t offset, uint8_t data)
 {
 	l->videorams[vram][offset] = data;
 
@@ -603,7 +603,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_disable_w)
 
 VIDEO_START_MEMBER(subsino2_state,subsino2)
 {
-	m_hm86171_colorram = std::make_unique<UINT8[]>(256*3);
+	m_hm86171_colorram = std::make_unique<uint8_t[]>(256*3);
 
 	// SS9601 Regs:
 
@@ -627,19 +627,19 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 		// line scroll
 		l->tmap->set_scroll_rows(0x200);
 
-		l->videorams[VRAM_HI] = std::make_unique<UINT8[]>(0x80 * 0x40);
-		l->videorams[VRAM_LO] = std::make_unique<UINT8[]>(0x80 * 0x40);
+		l->videorams[VRAM_HI] = std::make_unique<uint8_t[]>(0x80 * 0x40);
+		l->videorams[VRAM_LO] = std::make_unique<uint8_t[]>(0x80 * 0x40);
 
-		l->scrollrams[VRAM_HI] = std::make_unique<UINT8[]>(0x200);
-		l->scrollrams[VRAM_LO] = std::make_unique<UINT8[]>(0x200);
+		l->scrollrams[VRAM_HI] = std::make_unique<uint8_t[]>(0x200);
+		l->scrollrams[VRAM_LO] = std::make_unique<uint8_t[]>(0x200);
 		memset(l->scrollrams[VRAM_HI].get(), 0, 0x200);
 		memset(l->scrollrams[VRAM_LO].get(), 0, 0x200);
 	}
 
 	// SS9601 Reels:
 
-	m_ss9601_reelrams[VRAM_HI] = std::make_unique<UINT8[]>(0x2000);
-	m_ss9601_reelrams[VRAM_LO] = std::make_unique<UINT8[]>(0x2000);
+	m_ss9601_reelrams[VRAM_HI] = std::make_unique<uint8_t[]>(0x2000);
+	m_ss9601_reelrams[VRAM_LO] = std::make_unique<uint8_t[]>(0x2000);
 	memset(m_ss9601_reelrams[VRAM_HI].get(), 0, 0x2000);
 	memset(m_ss9601_reelrams[VRAM_LO].get(), 0, 0x2000);
 	m_reelbitmap = std::make_unique<bitmap_ind16>(0x80*8, 0x40*8);
@@ -655,7 +655,7 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 */
 }
 
-UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = ~m_ss9601_disable;
 	int y;
@@ -702,7 +702,7 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 
 		// line scroll
 
-		UINT16 scroll_dx = 0;
+		uint16_t scroll_dx = 0;
 		for (y = 0; y < 0x200; y++)
 		{
 			if (mask_y[i])
@@ -734,7 +734,7 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 					visible.max_y = 4 * 0x10 * (y+1) - 1;
 
 					int reeladdr = y * 0x80 * 4 + x;
-					UINT16 reelscroll = (m_ss9601_reelrams[VRAM_HI][reeladdr] << 8) + m_ss9601_reelrams[VRAM_LO][reeladdr];
+					uint16_t reelscroll = (m_ss9601_reelrams[VRAM_HI][reeladdr] << 8) + m_ss9601_reelrams[VRAM_LO][reeladdr];
 
 					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 - visible.min_x);
 
@@ -766,8 +766,8 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 				}
 			}
 
-			INT32 sx = -l->scroll_x;
-			INT32 sy = -(l->scroll_y + 1);
+			int32_t sx = -l->scroll_x;
+			int32_t sy = -(l->scroll_y + 1);
 			copyscrollbitmap(bitmap, *m_reelbitmap, 1, &sx, 1, &sy, cliprect);
 		}
 		else
@@ -899,7 +899,7 @@ WRITE16_MEMBER(subsino2_state::bishjan_input_w)
 READ16_MEMBER(subsino2_state::bishjan_input_r)
 {
 	int i;
-	UINT16 res = 0xff;
+	uint16_t res = 0xff;
 	static const char *const port[] = { "KEYB_0", "KEYB_1", "KEYB_2", "KEYB_3", "KEYB_4" };
 
 	for (i = 0; i < 5; i++)
@@ -2570,7 +2570,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,bishjan)
 {
-	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
 	rom[0x042EA/2] = 0x4008;
@@ -2640,7 +2640,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,new2001)
 {
-	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
 	// patch serial protection test (ERROR 041920 otherwise)
 	rom[0x19A2/2] = 0x4066;
@@ -2680,7 +2680,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,humlan)
 {
-	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
 	// patch serial protection test (ERROR 093099 otherwise)
 	rom[0x170A/2] = 0x4066;
@@ -2744,7 +2744,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,expcard)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xed4dc-0xc0000] = 0xeb;
@@ -2842,7 +2842,7 @@ DRIVER_INIT_MEMBER(subsino2_state,mtrain)
 	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x0cec] = 0x18;
 	rom[0xb037] = 0x18;
 
@@ -2896,7 +2896,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,saklove)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
 	rom[0x0e029] = 0xeb;
@@ -2956,7 +2956,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,xplan)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xeded9-0xc0000] = 0xeb;
@@ -3016,7 +3016,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,xtrain)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xe190f-0xc0000] = 0xeb;
@@ -3079,7 +3079,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,ptrain)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xe1b08-0xc0000] = 0xeb;
@@ -3124,7 +3124,7 @@ DRIVER_INIT_MEMBER(subsino2_state,wtrnymph)
 	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0x8000);
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x0d79] = 0x18;
 	rom[0xc1cf] = 0x18;
 	rom[0xc2a9] = 0x18;

@@ -415,7 +415,7 @@ GFXDECODE_END
 
 void mcatadv_state::machine_start()
 {
-	UINT8 *ROM = memregion("soundcpu")->base();
+	uint8_t *ROM = memregion("soundcpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	membank("bank1")->set_entry(1);

@@ -30,27 +30,27 @@ class dc_state : public driver_device
 		m_naomig1(*this, "rom_board"),
 		m_aica(*this, "aica") { }
 
-	required_shared_ptr<UINT64> dc_framebuffer_ram; // '32-bit access area'
-	required_shared_ptr<UINT64> dc_texture_ram; // '64-bit access area'
+	required_shared_ptr<uint64_t> dc_framebuffer_ram; // '32-bit access area'
+	required_shared_ptr<uint64_t> dc_texture_ram; // '64-bit access area'
 
-	required_shared_ptr<UINT32> dc_sound_ram;
-	required_shared_ptr<UINT64> dc_ram;
+	required_shared_ptr<uint32_t> dc_sound_ram;
+	required_shared_ptr<uint64_t> dc_ram;
 
 	/* machine related */
-	UINT32 dc_sysctrl_regs[0x200/4];
-	UINT32 g1bus_regs[0x100/4]; // DC-only
-	UINT32 g2bus_regs[0x100/4];
-	UINT8 m_armrst;
+	uint32_t dc_sysctrl_regs[0x200/4];
+	uint32_t g1bus_regs[0x100/4]; // DC-only
+	uint32_t g2bus_regs[0x100/4];
+	uint8_t m_armrst;
 
 	struct {
-		UINT32 g2_addr;
-		UINT32 root_addr;
-		UINT32 size;
-		UINT8 dir;
-		UINT8 flag;
-		UINT8 indirect;
-		UINT8 start;
-		UINT8 sel;
+		uint32_t g2_addr;
+		uint32_t root_addr;
+		uint32_t size;
+		uint8_t dir;
+		uint8_t flag;
+		uint8_t indirect;
+		uint8_t start;
+		uint8_t sel;
 	}m_g2_dma[4];
 
 	virtual void machine_start() override;
@@ -62,11 +62,11 @@ class dc_state : public driver_device
 	DECLARE_READ32_MEMBER(dc_arm_aica_r);
 	DECLARE_WRITE32_MEMBER(dc_arm_aica_w);
 	void g2_dma_execute(address_space &space, int channel);
-	inline int decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
-	inline int decode_reg3216_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
+	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
+	inline int decode_reg3216_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 	int dc_compute_interrupt_level();
 	void dc_update_interrupt_status();
-	inline int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
+	inline int decode_reg_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 	DECLARE_READ64_MEMBER( dc_sysctrl_r );
 	DECLARE_WRITE64_MEMBER( dc_sysctrl_w );
 	DECLARE_READ64_MEMBER( dc_gdrom_r );
@@ -85,7 +85,7 @@ class dc_state : public driver_device
 	optional_device<naomi_g1_device> m_naomig1;
 	required_device<aica_device> m_aica;
 
-	void generic_dma(UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32 size, bool to_mainram);
+	void generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram);
 	TIMER_DEVICE_CALLBACK_MEMBER(dc_scanline);
 };
 

@@ -45,7 +45,7 @@
  * ...so it stays here for now.
  */
 
-UINT8 channelf_state::port_read_with_latch(UINT8 ext, UINT8 latch_state)
+uint8_t channelf_state::port_read_with_latch(uint8_t ext, uint8_t latch_state)
 {
 	return (~ext | latch_state);
 }
@@ -57,7 +57,7 @@ READ8_MEMBER( channelf_state::port_0_r )
 
 READ8_MEMBER( channelf_state::port_1_r )
 {
-	UINT8 ext_value;
+	uint8_t ext_value;
 
 	if ((m_latch[0] & 0x40) == 0)
 		ext_value = ioport("RIGHT_C")->read();
@@ -69,7 +69,7 @@ READ8_MEMBER( channelf_state::port_1_r )
 
 READ8_MEMBER( channelf_state::port_4_r )
 {
-	UINT8 ext_value;
+	uint8_t ext_value;
 
 	if ((m_latch[0] & 0x40) == 0)
 		ext_value = ioport("LEFT_C")->read();

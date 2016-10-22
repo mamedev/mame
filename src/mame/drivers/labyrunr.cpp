@@ -158,7 +158,7 @@ GFXDECODE_END
 
 void labyrunr_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 }

@@ -23,7 +23,7 @@ class ui_manager
 {
 public:
 	// construction/destruction
-	ui_manager(running_machine &machine) : m_machine(machine),m_use_natural_keyboard(false),m_show_timecode_counter(false),m_show_timecode_total(false) { }
+	ui_manager(running_machine &machine) : m_machine(machine),m_show_timecode_counter(false),m_show_timecode_total(false) { }
 
 	virtual ~ui_manager() { }
 
@@ -31,8 +31,6 @@ public:
 
 	// is a menuing system active?  we want to disable certain keyboard/mouse inputs under such context
 	virtual bool is_menu_active() { return false; }
-
-	bool use_natural_keyboard() const { return m_use_natural_keyboard; }
 
 	void set_show_timecode_counter(bool value) { m_show_timecode_counter = value; m_show_timecode_total = true; }
 
@@ -48,7 +46,6 @@ public:
 protected:
 	// instance variables
 	running_machine &       m_machine;
-	bool                    m_use_natural_keyboard;
 	bool                    m_show_timecode_counter;
 	bool                    m_show_timecode_total;
 };

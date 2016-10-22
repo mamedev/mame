@@ -490,13 +490,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
 {
-	UINT16 *RAM  = (UINT16 *) memregion("maincpu")->base();
+	uint16_t *RAM  = (uint16_t *) memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes() / 2;
 	int i;
 
 	for (i = 0; i < size; i++)
 	{
-		UINT16 x = RAM[i];
+		uint16_t x = RAM[i];
 		x = (x & ~0x0606) | ((x & 0x0202) << 1) | ((x & 0x0404) >> 1);
 		RAM[i] = x;
 	}

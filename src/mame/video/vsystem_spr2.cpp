@@ -18,7 +18,7 @@
 // Pipe Dream
 
 // there were lots of comments saying drivers using the
-//  static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
+//  static const uint8_t zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 // table for zooming needed upgrading, are we sure this isn't one of the
 // differences between this sprite chip and the one in vsystem_spr.c, pspikes zooming is very rough
 
@@ -29,7 +29,7 @@
 
 const device_type VSYSTEM_SPR2 = &device_creator<vsystem_spr2_device>;
 
-vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VSYSTEM_SPR2, "Video System Sprites Type 2", tag, owner, clock, "vsystem_spr2", __FILE__)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
@@ -76,7 +76,7 @@ void vsystem_spr2_device::set_offsets(device_t &device, int xoffs, int yoffs)
 	dev.m_yoffs = yoffs;
 }
 
-UINT32 vsystem_spr2_device::tile_callback_noindirect(UINT32 tile)
+uint32_t vsystem_spr2_device::tile_callback_noindirect(uint32_t tile)
 {
 	return tile;
 }
@@ -93,7 +93,7 @@ void vsystem_spr2_device::device_reset()
 }
 
 
-int vsystem_spr2_device::get_sprite_attributes(UINT16* ram)
+int vsystem_spr2_device::get_sprite_attributes(uint16_t* ram)
 {
 	// sprite is disabled
 	if (!(ram[2] & 0x0080))
@@ -128,7 +128,7 @@ void vsystem_spr2_device::handle_xsize_map_inc(void)
 }
 
 template<class _BitmapClass>
-void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, _BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
+void vsystem_spr2_device::turbofrc_draw_sprites_common( uint16_t* spriteram3,  int spriteram3_bytes, int spritepalettebank, _BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
 {
 	int attr_start, first;
 	first = 4 * spriteram3[0x1fe];
@@ -235,8 +235,8 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int
 	}
 }
 
-void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
+void vsystem_spr2_device::turbofrc_draw_sprites( uint16_t* spriteram3,  int spriteram3_bytes, int spritepalettebank, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
 { turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spritepalettebank, bitmap, cliprect, priority_bitmap, pri_param ); }
 
-void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
+void vsystem_spr2_device::turbofrc_draw_sprites( uint16_t* spriteram3,  int spriteram3_bytes, int spritepalettebank, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
 { turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spritepalettebank, bitmap, cliprect, priority_bitmap, pri_param ); }

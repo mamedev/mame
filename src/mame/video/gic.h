@@ -54,20 +54,20 @@ class gic_device :  public device_t
 {
 public:
 	// construction/destruction
-	gic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	gic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int lines, const char *shortname, const char *source);
+	gic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int lines, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_screen_tag(device_t &device, const char *screen_tag) { downcast<gic_device &>(device).m_screen_tag = screen_tag; }
 
 	DECLARE_PALETTE_INIT(gic);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	inline bitmap_ind16 *get_bitmap() { return &m_bitmap; }
 
 	//plgDavid please change this to a MESS friendly handshake
-	void set_shared_memory(const UINT8*m){ m_ram = m;};
+	void set_shared_memory(const uint8_t*m){ m_ram = m;};
 
 	// Global constants (non mesured figures)
 	static const int START_ACTIVE_SCAN = 10;
@@ -93,11 +93,11 @@ protected:
 	/* timers */
 	static const device_timer_id TIMER_VBLANK = 0;
 
-	void draw_char_left (int x, int y, UINT8 code, bitmap_ind16 &bitmap);
-	void draw_char_right(int x, int y, UINT8 code, bitmap_ind16 &bitmap,int bg_col);
+	void draw_char_left (int x, int y, uint8_t code, bitmap_ind16 &bitmap);
+	void draw_char_right(int x, int y, uint8_t code, bitmap_ind16 &bitmap,int bg_col);
 
 	bitmap_ind16 m_bitmap;
-	UINT8 *      m_cgrom;          // internal chargen ROM
+	uint8_t *      m_cgrom;          // internal chargen ROM
 
 	emu_timer    *m_vblank_timer;
 	sound_stream *m_stream;
@@ -105,7 +105,7 @@ protected:
 	int m_audiocnt;
 	int m_audioval;
 	int m_audioreset;
-	const UINT8* m_ram;
+	const uint8_t* m_ram;
 };
 
 // device type definition

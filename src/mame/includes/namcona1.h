@@ -57,28 +57,28 @@ public:
 	required_ioport_array<4> m_muxed_inputs;
 	required_ioport          m_io_p3;
 
-	required_shared_ptr<UINT16> m_workram;
-	required_shared_ptr<UINT16> m_vreg;
-	required_shared_ptr<UINT16> m_paletteram;
-	required_shared_ptr<UINT16> m_cgram;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_scroll;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_workram;
+	required_shared_ptr<uint16_t> m_vreg;
+	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<uint16_t> m_cgram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_scroll;
+	required_shared_ptr<uint16_t> m_spriteram;
 
-	// this has to be UINT8 to be in the right byte order for the tilemap system
-	std::vector<UINT8> m_shaperam;
+	// this has to be uint8_t to be in the right byte order for the tilemap system
+	std::vector<uint8_t> m_shaperam;
 
-	UINT16 *m_prgrom;
-	UINT16 *m_maskrom;
+	uint16_t *m_prgrom;
+	uint16_t *m_maskrom;
 	int m_mEnableInterrupts;
 	int m_gametype;
-	UINT16 m_count;
-	UINT32 m_keyval;
-	UINT16 m_mcu_mailbox[8];
-	UINT8 m_mcu_port4;
-	UINT8 m_mcu_port5;
-	UINT8 m_mcu_port6;
-	UINT8 m_mcu_port8;
+	uint16_t m_count;
+	uint32_t m_keyval;
+	uint16_t m_mcu_mailbox[8];
+	uint8_t m_mcu_port4;
+	uint8_t m_mcu_port5;
+	uint8_t m_mcu_port6;
+	uint8_t m_mcu_port8;
 	tilemap_t *m_bg_tilemap[4+1];
 	int m_palette_is_dirty;
 
@@ -103,14 +103,14 @@ public:
 	DECLARE_READ8_MEMBER(portana_r);
 	void simulate_mcu();
 	void write_version_info();
-	int transfer_dword(UINT32 dest, UINT32 source);
+	int transfer_dword(uint32_t dest, uint32_t source);
 	void blit();
 	void UpdatePalette(int offset);
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(gfxram_r);
 	DECLARE_WRITE16_MEMBER(gfxram_w);
-	void pdraw_tile( screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, UINT32 code, int color,
+	void pdraw_tile( screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, uint32_t code, int color,
 		int sx, int sy, int flipx, int flipy, int priority, int bShadow, int bOpaque, int gfx_region );
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask );
@@ -139,11 +139,11 @@ public:
 	TILE_GET_INFO_MEMBER(tilemap_get_info3);
 	TILE_GET_INFO_MEMBER(roz_get_info);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void postload();
 
 private:
-	void tilemap_get_info(tile_data &tileinfo, int tile_index, const UINT16 *tilemap_videoram, bool use_4bpp_gfx);
+	void tilemap_get_info(tile_data &tileinfo, int tile_index, const uint16_t *tilemap_videoram, bool use_4bpp_gfx);
 };

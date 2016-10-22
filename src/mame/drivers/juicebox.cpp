@@ -13,6 +13,7 @@
 #include "machine/s3c44b0.h"
 #include "machine/smartmed.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
 #include "softlist.h"
 
@@ -34,16 +35,14 @@ public:
 	juicebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_dac(*this, "dac"),
 			m_s3c44b0(*this, "s3c44b0"),
 			m_smartmedia(*this, "smartmedia")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
 	required_device<s3c44b0_device> m_s3c44b0;
 	required_device<smartmedia_image_device> m_smartmedia;
-	UINT32 port[9];
+	uint32_t port[9];
 	jb_smc_t smc;
 
 	#if defined(JUICEBOX_ENTER_DEBUG_MENU) || defined(JUICEBOX_DISPLAY_ROM_ID)
@@ -58,8 +57,8 @@ public:
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void smc_reset( );
 	void smc_init( );
-	UINT8 smc_read( );
-	void smc_write( UINT8 data);
+	uint8_t smc_read( );
+	void smc_write( uint8_t data);
 	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
 	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
@@ -99,9 +98,9 @@ void juicebox_state::smc_init( )
 	smc_reset();
 }
 
-UINT8 juicebox_state::smc_read( )
+uint8_t juicebox_state::smc_read( )
 {
-	UINT8 data;
+	uint8_t data;
 	if (m_smartmedia->is_present())
 	{
 		data = m_smartmedia->data_r();
@@ -114,7 +113,7 @@ UINT8 juicebox_state::smc_read( )
 	return data;
 }
 
-void juicebox_state::smc_write( UINT8 data)
+void juicebox_state::smc_write( uint8_t data)
 {
 	verboselog(5, "smc_write %08X\n", data);
 	if (m_smartmedia->is_present())
@@ -139,7 +138,7 @@ void juicebox_state::smc_write( UINT8 data)
 
 READ32_MEMBER(juicebox_state::s3c44b0_gpio_port_r)
 {
-	UINT32 data = port[offset];
+	uint32_t data = port[offset];
 	switch (offset)
 	{
 		case S3C44B0_GPIO_PORT_A :
@@ -222,7 +221,7 @@ WRITE32_MEMBER(juicebox_state::s3c44b0_gpio_port_w)
 
 READ32_MEMBER(juicebox_state::juicebox_nand_r)
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 	if (ACCESSING_BITS_0_7) data = data | (smc_read() <<  0);
 	if (ACCESSING_BITS_8_15) data = data | (smc_read() <<  8);
 	if (ACCESSING_BITS_16_23) data = data | (smc_read() << 16);
@@ -240,18 +239,11 @@ WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
 	if (ACCESSING_BITS_24_31) smc_write((data >> 24) & 0xFF);
 }
 
-// I2S
-
-WRITE16_MEMBER(juicebox_state::s3c44b0_i2s_data_w )
-{
-	m_dac->write_signed16(data ^ 0x8000);
-}
-
 // ...
 
 INPUT_CHANGED_MEMBER(juicebox_state::port_changed)
 {
-	m_s3c44b0->request_eint((FPTR)param);
+	m_s3c44b0->request_eint((uintptr_t)param);
 }
 
 // ...
@@ -321,15 +313,15 @@ static MACHINE_CONFIG_START( juicebox, juicebox_state )
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c44b0", s3c44b0_device, video_update)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("s3c44b0", S3C44B0, 10000000)
 	MCFG_S3C44B0_GPIO_PORT_R_CB(READ32(juicebox_state, s3c44b0_gpio_port_r))
 	MCFG_S3C44B0_GPIO_PORT_W_CB(WRITE32(juicebox_state, s3c44b0_gpio_port_w))
-	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16(juicebox_state, s3c44b0_i2s_data_w))
+	MCFG_S3C44B0_I2S_DATA_W_CB(DEVWRITE16("dac", dac_word_interface, write))
 
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 

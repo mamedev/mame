@@ -24,7 +24,7 @@ class zs01_device : public device_t,
 {
 public:
 	// construction/destruction
-	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	// inline configuration helpers
 	static void static_set_ds2401_tag( device_t &device, const char *ds2401_tag ) { downcast<zs01_device &>( device ).m_ds2401_tag = ds2401_tag; }
@@ -47,10 +47,10 @@ protected:
 private:
 	inline void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, const char *s_fmt, ... );
 
-	void decrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte );
-	void decrypt2( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte );
-	void encrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT32 previous_byte );
-	UINT16 calc_crc( UINT8 *buffer, UINT32 length );
+	void decrypt( uint8_t *destination, uint8_t *source, int length, uint8_t *key, uint8_t previous_byte );
+	void decrypt2( uint8_t *destination, uint8_t *source, int length, uint8_t *key, uint8_t previous_byte );
+	void encrypt( uint8_t *destination, uint8_t *source, int length, uint8_t *key, uint32_t previous_byte );
+	uint16_t calc_crc( uint8_t *buffer, uint32_t length );
 	int data_offset();
 
 	enum size_t
@@ -85,13 +85,13 @@ private:
 	int m_shift;
 	int m_bit;
 	int m_byte;
-	UINT8 m_write_buffer[ 12 ];
-	UINT8 m_read_buffer[ 12 ];
-	UINT8 m_response_key[ 8 ];
-	UINT8 m_response_to_reset[ 4 ];
-	UINT8 m_command_key[ 8 ];
-	UINT8 m_data_key[ 8 ];
-	UINT8 m_data[ 4096 ];
+	uint8_t m_write_buffer[ 12 ];
+	uint8_t m_read_buffer[ 12 ];
+	uint8_t m_response_key[ 8 ];
+	uint8_t m_response_to_reset[ 4 ];
+	uint8_t m_command_key[ 8 ];
+	uint8_t m_data_key[ 8 ];
+	uint8_t m_data[ 4096 ];
 	ds2401_device *m_ds2401;
 };
 

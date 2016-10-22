@@ -119,7 +119,7 @@ class bbc_1mhzbus_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	bbc_1mhzbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_1mhzbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~bbc_1mhzbus_slot_device();
 
 	// callbacks

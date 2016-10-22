@@ -108,7 +108,7 @@ const tiny_rom_entry *cuda_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
+void cuda_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 {
 //    printf("PORT %c write %02x (DDR = %02x) (PC=%x)\n", 'A' + offset, data, ddrs[offset], m_maincpu->pc());
 
@@ -211,7 +211,7 @@ WRITE8_MEMBER( cuda_device::ddr_w )
 
 READ8_MEMBER( cuda_device::ports_r )
 {
-	UINT8 incoming = 0;
+	uint8_t incoming = 0;
 
 	switch (offset)
 	{
@@ -382,7 +382,7 @@ WRITE8_MEMBER( cuda_device::pram_w )
 //  cuda_device - constructor
 //-------------------------------------------------
 
-cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CUDA, "Apple Cuda", tag, owner, clock, "cuda", __FILE__),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),
@@ -440,7 +440,7 @@ void cuda_device::device_start()
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));
 
-	UINT8 *rom = device().machine().root_device().memregion(device().subtag(CUDA_CPU_TAG).c_str())->base();
+	uint8_t *rom = device().machine().root_device().memregion(device().subtag(CUDA_CPU_TAG).c_str())->base();
 
 	if (rom)
 	{

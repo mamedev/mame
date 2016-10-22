@@ -69,13 +69,13 @@ const tiny_rom_entry *nubus_cb264_device::device_rom_region() const
 //  nubus_cb264_device - constructor
 //-------------------------------------------------
 
-nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, NUBUS_CB264, "RasterOps ColorBoard 264 video card", tag, owner, clock, "nb_cb264", __FILE__),
 		device_nubus_card_interface(mconfig, *this), m_cb264_mode(0), m_cb264_vbl_disable(0), m_cb264_toggle(0), m_count(0), m_clutoffs(0)
 {
 }
 
-nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_nubus_card_interface(mconfig, *this), m_cb264_mode(0), m_cb264_vbl_disable(0), m_cb264_toggle(0), m_count(0), m_clutoffs(0)
 {
@@ -87,7 +87,7 @@ nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, device_typ
 
 void nubus_cb264_device::device_start()
 {
-	UINT32 slotspace;
+	uint32_t slotspace;
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
@@ -125,11 +125,11 @@ void nubus_cb264_device::device_reset()
 
 ***************************************************************************/
 
-UINT32 nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline, *base;
+	uint32_t *scanline, *base;
 	int x, y;
-	UINT8 pixels;
+	uint8_t pixels;
 
 	if (!m_cb264_vbl_disable)
 	{
@@ -205,7 +205,7 @@ UINT32 nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		case 4: // 24 bpp
 		case 7: // ???
 			{
-				UINT32 *vram32 = (UINT32 *)&m_vram[0];
+				uint32_t *vram32 = (uint32_t *)&m_vram[0];
 
 				for (y = 0; y < 480; y++)
 				{

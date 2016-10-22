@@ -12,7 +12,7 @@
 class aw_rom_board : public naomi_g1_device
 {
 public:
-	aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_keyregion(device_t &device, const char *keyregion);
 
@@ -31,33 +31,33 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram) override;
-	virtual void dma_advance(UINT32 size) override;
+	virtual void dma_get_position(uint8_t *&base, uint32_t &limit, bool to_mainram) override;
+	virtual void dma_advance(uint32_t size) override;
 
 private:
 	enum { EPR, MPR_RECORD, MPR_FILE };
 
 	required_memory_region m_region;
 	optional_memory_region m_keyregion;
-	UINT32 rombd_key;
-	UINT32 mpr_offset, mpr_bank;
-	UINT32 epr_offset, mpr_file_offset;
-	UINT16 mpr_record_index, mpr_first_file_index;
-	UINT16 decrypted_buf[16];
+	uint32_t rombd_key;
+	uint32_t mpr_offset, mpr_bank;
+	uint32_t epr_offset, mpr_file_offset;
+	uint16_t mpr_record_index, mpr_first_file_index;
+	uint16_t decrypted_buf[16];
 
-	UINT32 dma_offset, dma_limit;
+	uint32_t dma_offset, dma_limit;
 
 	struct sbox_set {
-		UINT8 S0[32];
-		UINT8 S1[16];
-		UINT8 S2[16];
-		UINT8 S3[8];
+		uint8_t S0[32];
+		uint8_t S1[16];
+		uint8_t S2[16];
+		uint8_t S3[8];
 	};
 
 	static const int permutation_table[4][16];
 	static const sbox_set sboxes_table[4];
-	static UINT16 decrypt(UINT16 cipherText, UINT32 address, const UINT32 key);
-	UINT16 decrypt16(UINT32 address) { return decrypt(m_region->u16(address), address, rombd_key); }
+	static uint16_t decrypt(uint16_t cipherText, uint32_t address, const uint32_t key);
+	uint16_t decrypt16(uint32_t address) { return decrypt(m_region->u16(address), address, rombd_key); }
 
 	void set_key();
 	void recalc_dma_offset(int mode);

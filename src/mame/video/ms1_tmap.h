@@ -45,13 +45,13 @@ class megasys1_tilemap_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
-	megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_8x8_scroll_factor(device_t &device, int scroll_factor);
 	static void static_set_16x16_scroll_factor(device_t &device, int scroll_factor);
 	static void static_set_bits_per_color_code(device_t &device, int bits);
-	static void static_set_colorbase(device_t &device, UINT16 colorbase);
+	static void static_set_colorbase(device_t &device, uint16_t colorbase);
 
 	// memory handlers
 	DECLARE_WRITE16_MEMBER(write);
@@ -59,9 +59,9 @@ public:
 	DECLARE_WRITE16_MEMBER(scroll_w);
 
 	// drawing and layer control
-	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority = 0, UINT8 priority_mask = 0xff);
+	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority = 0, uint8_t priority_mask = 0xff);
 	void enable(bool enable);
-	void set_flip(UINT32 attributes);
+	void set_flip(uint32_t attributes);
 
 protected:
 	// device-level overrides
@@ -70,21 +70,21 @@ protected:
 
 private:
 	// shared memory finder
-	required_shared_ptr<UINT16> m_scrollram;
+	required_shared_ptr<uint16_t> m_scrollram;
 
 	// configuration
 	int m_8x8_scroll_factor;
 	int m_16x16_scroll_factor;
 	int m_bits_per_color_code;
-	UINT16 m_colorbase;
+	uint16_t m_colorbase;
 
 	// decoding info
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	// internal state
-	UINT16 m_scrollx;
-	UINT16 m_scrolly;
-	UINT16 m_scroll_flag;
+	uint16_t m_scrollx;
+	uint16_t m_scrolly;
+	uint16_t m_scroll_flag;
 	tilemap_t *m_tmap;
 	tilemap_t *m_tilemap[2][4];
 

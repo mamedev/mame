@@ -96,11 +96,11 @@ WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_v_w)
 
 void wolfpack_state::video_start()
 {
-	UINT16 val = 0;
+	uint16_t val = 0;
 
 	int i;
 
-	m_LFSR = std::make_unique<UINT8[]>(0x8000);
+	m_LFSR = std::make_unique<uint8_t[]>(0x8000);
 
 	m_screen->register_screen_bitmap(m_helper);
 
@@ -119,7 +119,7 @@ void wolfpack_state::video_start()
 
 void wolfpack_state::draw_ship(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const UINT32 scaler[] =
+	static const uint32_t scaler[] =
 	{
 		0x00000, 0x00500, 0x00a00, 0x01000,
 		0x01000, 0x01200, 0x01500, 0x01800,
@@ -225,7 +225,7 @@ void wolfpack_state::draw_water(palette_device &palette, bitmap_ind16 &bitmap, c
 
 	for (y = rect.min_y; y <= rect.max_y; y++)
 	{
-		UINT16* p = &bitmap.pix16(y);
+		uint16_t* p = &bitmap.pix16(y);
 
 		for (x = rect.min_x; x <= rect.max_x; x++)
 			p[x] = palette.pen_indirect(p[x]) | 0x08;
@@ -233,12 +233,12 @@ void wolfpack_state::draw_water(palette_device &palette, bitmap_ind16 &bitmap, c
 }
 
 
-UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	int j;
 
-	UINT8 color = 0x48;
+	uint8_t color = 0x48;
 	if (m_ship_size & 0x10) color += 0x13;
 	if (m_ship_size & 0x20) color += 0x22;
 	if (m_ship_size & 0x40) color += 0x3a;

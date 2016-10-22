@@ -70,17 +70,17 @@ public:
 		m_palette(*this, "palette"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_colorram2;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_colorram2;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_bg2_tilemap;
-	UINT8    m_scroll;
-	UINT8    m_scrollhi;
+	uint8_t    m_scroll;
+	uint8_t    m_scrollhi;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -100,14 +100,14 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(chanbara);
-	UINT32 screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 
 PALETTE_INIT_MEMBER(chanbara_state, chanbara)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, red, green, blue;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -213,7 +213,7 @@ void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg2_tilemap->set_scrolly(0, m_scroll | (m_scrollhi << 8));
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -455,9 +455,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chanbara_state,chanbara)
 {
-	UINT8   *src = memregion("gfx4")->base();
-	UINT8   *dst = memregion("gfx3")->base() + 0x4000;
-	UINT8   *bg = memregion("user1")->base();
+	uint8_t   *src = memregion("gfx4")->base();
+	uint8_t   *dst = memregion("gfx3")->base() + 0x4000;
+	uint8_t   *bg = memregion("user1")->base();
 
 	int i;
 	for (i = 0; i < 0x1000; i++)

@@ -19,7 +19,7 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 	va_end(vl);
 }
 
-static inline UINT32 reverse(UINT32 v)
+static inline uint32_t reverse(uint32_t v)
 {
 	// Taken from http://www-graphics.stanford.edu/~seander/bithacks.html#ReverseParallel
 	// swap odd and even bits
@@ -36,10 +36,10 @@ static inline UINT32 reverse(UINT32 v)
 	return v;
 }
 
-offs_t ssem_dasm_one(char *buffer, offs_t pc, UINT32 op)
+offs_t ssem_dasm_one(char *buffer, offs_t pc, uint32_t op)
 {
-	UINT8 instr = (reverse(op) >> 13) & 7;
-	UINT8 addr = reverse(op) & 0x1f;
+	uint8_t instr = (reverse(op) >> 13) & 7;
+	uint8_t addr = reverse(op) & 0x1f;
 
 	output = buffer;
 
@@ -79,9 +79,9 @@ offs_t ssem_dasm_one(char *buffer, offs_t pc, UINT32 op)
 
 CPU_DISASSEMBLE( ssem )
 {
-	UINT32 op = (*(UINT8 *)(opram + 0) << 24) |
-				(*(UINT8 *)(opram + 1) << 16) |
-				(*(UINT8 *)(opram + 2) <<  8) |
-				(*(UINT8 *)(opram + 3) <<  0);
+	uint32_t op = (*(uint8_t *)(opram + 0) << 24) |
+				(*(uint8_t *)(opram + 1) << 16) |
+				(*(uint8_t *)(opram + 2) <<  8) |
+				(*(uint8_t *)(opram + 3) <<  0);
 	return ssem_dasm_one(buffer, pc, op);
 }

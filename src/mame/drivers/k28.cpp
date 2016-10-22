@@ -55,26 +55,26 @@ public:
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
 
-	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	UINT32 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x20];  // (internal use)
+	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
+	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	uint32_t m_display_cache[0x20];       // (internal use)
+	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(UINT32 digits, UINT32 mask);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update = true);
+	void set_display_segmask(uint32_t digits, uint32_t mask);
+	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
 
 	bool m_power_on;
-	UINT8 m_inp_mux;
-	UINT8 m_phoneme;
+	uint8_t m_inp_mux;
+	uint8_t m_phoneme;
 	int m_speech_strobe;
 	int m_vfd_data_enable;
 	int m_vfd_data_in;
 	int m_vfd_clock;
-	UINT64 m_vfd_shiftreg;
-	UINT64 m_vfd_shiftreg_out;
+	uint64_t m_vfd_shiftreg;
+	uint64_t m_vfd_shiftreg_out;
 	int m_vfd_shiftcount;
 
 	DECLARE_WRITE8_MEMBER(mcu_p0_w);
@@ -169,7 +169,7 @@ void k28_state::power_off()
 
 void k28_state::display_update()
 {
-	UINT32 active_state[0x20];
+	uint32_t active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -182,7 +182,7 @@ void k28_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			uint32_t ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -237,7 +237,7 @@ void k28_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void k28_state::set_display_segmask(UINT32 digits, UINT32 mask)
+void k28_state::set_display_segmask(uint32_t digits, uint32_t mask)
 {
 	// set a segment mask per selected digit, but leave unselected ones alone
 	for (int i = 0; i < 0x20; i++)
@@ -248,12 +248,12 @@ void k28_state::set_display_segmask(UINT32 digits, UINT32 mask)
 	}
 }
 
-void k28_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
+void k28_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	UINT32 mask = (1 << maxx) - 1;
+	uint32_t mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
@@ -298,7 +298,7 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 
 READ8_MEMBER(k28_state::mcu_p1_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// multiplexed inputs (active low)
 	for (int i = 0; i < 7; i++)
@@ -353,11 +353,11 @@ WRITE8_MEMBER(k28_state::mcu_prog_w)
 			m_vfd_shiftcount = 0;
 
 			// output 0-15: digit segment data
-			UINT16 seg_data = (UINT16)(m_vfd_shiftreg >> 19);
+			uint16_t seg_data = (uint16_t)(m_vfd_shiftreg >> 19);
 			seg_data = BITSWAP16(seg_data,0,1,13,9,10,12,14,8,3,4,5,2,15,11,6,7);
 
 			// output 16-24: digit select
-			UINT16 digit_sel = (UINT16)(m_vfd_shiftreg >> 10) & 0x1ff;
+			uint16_t digit_sel = (uint16_t)(m_vfd_shiftreg >> 10) & 0x1ff;
 			set_display_segmask(0x1ff, 0x3fff);
 			display_matrix(16, 9, seg_data, digit_sel);
 

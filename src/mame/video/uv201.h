@@ -94,7 +94,7 @@ class uv201_device :    public device_t,
 {
 public:
 	// construction/destruction
-	uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_ext_int_wr_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_write_ext_int.set_callback(object); }
 	template<class _Object> static devcb_base &set_hblank_wr_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_write_hblank.set_callback(object); }
@@ -106,7 +106,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 	DECLARE_READ_LINE_MEMBER( kbd_r );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -134,13 +134,13 @@ private:
 	devcb_read8        m_read_db;
 
 	rgb_t m_palette_val[32];
-	UINT8 m_ram[0x90];
-	UINT8 m_y_int;
-	UINT8 m_fmod;
-	UINT8 m_bg;
-	UINT8 m_cmd;
-	UINT8 m_freeze_x;
-	UINT16 m_freeze_y;
+	uint8_t m_ram[0x90];
+	uint8_t m_y_int;
+	uint8_t m_fmod;
+	uint8_t m_bg;
+	uint8_t m_cmd;
+	uint8_t m_freeze_x;
+	uint16_t m_freeze_y;
 	int m_field;
 
 	// timers

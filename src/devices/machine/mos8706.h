@@ -50,7 +50,7 @@
 class mos8706_device : public device_t
 {
 public:
-	mos8706_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8706_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

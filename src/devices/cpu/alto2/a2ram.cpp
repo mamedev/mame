@@ -12,7 +12,7 @@
 #define DEBUG_BRANCH        0       //!< define to 1 to print branching to ROM/RAM
 
 //! direct read access to the microcode CRAM
-#define RD_CRAM(addr) (*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4))
+#define RD_CRAM(addr) (*reinterpret_cast<uint32_t *>(m_ucode_cram.get() + addr * 4))
 
 /**
  * @brief read the microcode ROM/RAM halfword
@@ -70,9 +70,9 @@
  */
 void alto2_cpu_device::rdram()
 {
-	UINT32 addr, value;
-	UINT32 bank = GET_CRAM_BANKSEL(m_cram_addr);
-	UINT32 wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
+	uint32_t addr, value;
+	uint32_t bank = GET_CRAM_BANKSEL(m_cram_addr);
+	uint32_t wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
 
 	if (GET_CRAM_RAMROM(m_cram_addr)) {
 		/* read CROM 0 at current mpc */
@@ -94,10 +94,10 @@ void alto2_cpu_device::rdram()
 #endif
 		return;
 	}
-	value = *reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4) ^ ALTO2_UCODE_INVERTED;
+	value = *reinterpret_cast<uint32_t *>(m_ucode_cram.get() + addr * 4) ^ ALTO2_UCODE_INVERTED;
 #if DEBUG_RDRAM
 	char buffer[256];
-	UINT8* oprom = m_ucode_cram.get() + 4 * wordaddr;
+	uint8_t* oprom = m_ucode_cram.get() + 4 * wordaddr;
 	disasm_disassemble(buffer, wordaddr, oprom, oprom, 0);
 	printf("RD CRAM_BANKSEL=%d RAM%d [%04o] upper:%06o lower:%06o value:%011o '%s'\n",
 			GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr, m_myl, m_alu,
@@ -125,10 +125,10 @@ void alto2_cpu_device::rdram()
  */
 void alto2_cpu_device::wrtram()
 {
-	const UINT32 bank = GET_CRAM_BANKSEL(m_cram_addr);
-	const UINT32 wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
-	const UINT32 addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;  // write RAM 0,1,2
-	const UINT32 value = (m_myl << 16) | m_alu;
+	const uint32_t bank = GET_CRAM_BANKSEL(m_cram_addr);
+	const uint32_t wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
+	const uint32_t addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;  // write RAM 0,1,2
+	const uint32_t value = (m_myl << 16) | m_alu;
 
 	LOG((this,LOG_CPU,0,"    wrtram: RAM%d [%04o] upper:%06o lower:%06o", bank, wordaddr, m_myl, m_alu));
 
@@ -138,11 +138,11 @@ void alto2_cpu_device::wrtram()
 		return;
 	}
 	LOG((this,LOG_CPU,0,"\n"));
-	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4) = value ^ ALTO2_UCODE_INVERTED;
+	*reinterpret_cast<uint32_t *>(m_ucode_cram.get() + addr * 4) = value ^ ALTO2_UCODE_INVERTED;
 
 #if DEBUG_WRTRAM
 	char buffer[256];
-	UINT8* oprom = m_ucode_cram.get() + 4 * wordaddr;
+	uint8_t* oprom = m_ucode_cram.get() + 4 * wordaddr;
 	disasm_disassemble(buffer, wordaddr, oprom, oprom, 0);
 	printf("WR CRAM_BANKSEL=%d RAM%d [%04o] upper:%06o lower:%06o value:%011o '%s'\n",
 			GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr, m_myl, m_alu,
@@ -158,10 +158,10 @@ void alto2_cpu_device::wrtram()
  */
 void alto2_cpu_device::bs_early_read_sreg()
 {
-	UINT16 r;
+	uint16_t r;
 
 	if (rsel()) {
-		UINT8 bank = m_s_reg_bank[m_task];
+		uint8_t bank = m_s_reg_bank[m_task];
 		r = m_s[bank][rsel()];
 		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= S[%o][%02o] (%#o)\n", rsel(), bank, rsel(), r));
 	} else {
@@ -186,7 +186,7 @@ void alto2_cpu_device::bs_early_load_sreg()
  */
 void alto2_cpu_device::bs_late_load_sreg()
 {
-	UINT8 bank = m_s_reg_bank[m_task];
+	uint8_t bank = m_s_reg_bank[m_task];
 	m_s[bank][rsel()] = m_myl;
 	LOG((this,LOG_RAM,2,"    S%02o<- S[%o][%02o] := %#o\n", rsel(), bank, rsel(), m_myl));
 }
@@ -232,8 +232,8 @@ void alto2_cpu_device::branch_RAM(const char *from, int page)
 void alto2_cpu_device::f1_late_swmode()
 {
 	// Currently executing in what CROM/CRAM page?
-	UINT16 page = m_mpc / ALTO2_UCODE_PAGE_SIZE;
-	UINT16 next;
+	uint16_t page = m_mpc / ALTO2_UCODE_PAGE_SIZE;
+	uint16_t next;
 
 	switch (m_cram_config) {
 	case 1: // 1K CROM, 1K CRAM

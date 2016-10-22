@@ -87,7 +87,7 @@
 /*
    Constructor for the HFDC card.
 */
-myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ti_expansion_card_device(mconfig, TI99_HFDC, "Myarc Hard and Floppy Disk Controller", tag, owner, clock, "ti99_hfdc", __FILE__), m_motor_on_timer(nullptr),
 		m_hdc9234(*this, FDC_TAG),
 		m_clock(*this, CLOCK_TAG), m_current_floppy(nullptr),
@@ -149,7 +149,7 @@ SETADDRESS_DBIN_MEMBER( myarc_hfdc_device::setaddress_dbin )
     Access for debugger. This is a stripped-down version of the
     main methods below. We only allow ROM and RAM access.
 */
-void myarc_hfdc_device::debug_read(offs_t offset, UINT8* value)
+void myarc_hfdc_device::debug_read(offs_t offset, uint8_t* value)
 {
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -168,7 +168,7 @@ void myarc_hfdc_device::debug_read(offs_t offset, UINT8* value)
 	}
 }
 
-void myarc_hfdc_device::debug_write(offs_t offset, UINT8 data)
+void myarc_hfdc_device::debug_write(offs_t offset, uint8_t data)
 {
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -369,7 +369,7 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 */
 READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 {
-	UINT8 reply;
+	uint8_t reply;
 	if ((offset & 0xff00)==m_cru_base)
 	{
 		if ((offset & 0x00ff)==0)  // CRU bits 0-7
@@ -546,7 +546,7 @@ void myarc_hfdc_device::harddisk_skcom_callback(mfm_harddisk_device *harddisk, i
 	signal_drive_status();
 }
 
-void myarc_hfdc_device::set_bits(UINT8& byte, int mask, bool set)
+void myarc_hfdc_device::set_bits(uint8_t& byte, int mask, bool set)
 {
 	if (set) byte |= mask;
 	else byte &= ~mask;
@@ -570,7 +570,7 @@ int myarc_hfdc_device::bit_to_index(int value)
 */
 void myarc_hfdc_device::signal_drive_status()
 {
-	UINT8 reply = 0;
+	uint8_t reply = 0;
 	// Status byte as defined by HDC9234
 	// +------+------+------+------+------+------+------+------+
 	// | ECC  |Index | SeekC| Tr00 | User | WrPrt| Ready|Fault |
@@ -853,7 +853,7 @@ READ8_MEMBER( myarc_hfdc_device::read_buffer )
 {
 	if (TRACE_DMA) logerror("Read access to onboard SRAM at %04x\n", m_dma_address);
 	if (m_dma_address > 0x8000) logerror("Read access beyond RAM size: %06x\n", m_dma_address);
-	UINT8 value = m_buffer_ram->pointer()[m_dma_address & 0x7fff];
+	uint8_t value = m_buffer_ram->pointer()[m_dma_address & 0x7fff];
 	m_dma_address = (m_dma_address+1) & 0x7fff;
 	return value;
 }

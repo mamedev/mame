@@ -258,7 +258,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
 	MCFG_SOUND_ADD(AY8912_TAG, AY8912, 1000000)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(dragon_alpha_state, psg_porta_read))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(dragon_alpha_state, psg_porta_write))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
 	// pia 2
 	MCFG_DEVICE_ADD( PIA2_TAG, PIA6821, 0)

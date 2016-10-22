@@ -11,18 +11,18 @@
 class naomi_rom_board : public naomi_board
 {
 public:
-	naomi_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	naomi_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void board_setup_address(UINT32 address, bool is_dma) override;
-	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit) override;
-	virtual void board_advance(UINT32 size) override;
+	virtual void board_setup_address(uint32_t address, bool is_dma) override;
+	virtual void board_get_buffer(uint8_t *&base, uint32_t &limit) override;
+	virtual void board_advance(uint32_t size) override;
 
 private:
-	UINT32 rom_cur_address;
+	uint32_t rom_cur_address;
 	required_memory_region m_region;
 };
 

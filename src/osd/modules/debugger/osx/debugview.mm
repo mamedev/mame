@@ -68,7 +68,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-- (NSColor *)foregroundForAttribute:(UINT8)attrib {
+- (NSColor *)foregroundForAttribute:(uint8_t)attrib {
 	if (attrib & DCA_COMMENT)
 		return (attrib & DCA_DISABLED) ? DisabledCommentForeground : CommentForeground;
 	else if (attrib & DCA_INVALID)
@@ -80,7 +80,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-- (NSColor *)backgroundForAttribute:(UINT8)attrib {
+- (NSColor *)backgroundForAttribute:(uint8_t)attrib {
 	BOOL const active = [[self window] isKeyWindow] && ([[self window] firstResponder] == self);
 	if ((attrib & DCA_SELECTED) && (attrib & DCA_CURRENT))
 		return active ? SelectedCurrentBackground : InactiveSelectedCurrentBackground;
@@ -119,7 +119,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		data += ((position.y - view->visible_position().y) * view->visible_size().x);
 		int			attr = -1;
 		NSUInteger	start = 0, length = 0;
-		for (UINT32 col = origin.x; col < origin.x + size.x; col++)
+		for (uint32_t col = origin.x; col < origin.x + size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col - origin.x].byte];
 			if ((start < length) && (attr != data[col - origin.x].attrib))
@@ -162,7 +162,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-- (void)convertBounds:(NSRect)b toFirstAffectedLine:(INT32 *)f count:(INT32 *)c {
+- (void)convertBounds:(NSRect)b toFirstAffectedLine:(int32_t *)f count:(int32_t *)c {
 	*f = lround(floor(b.origin.y / fontHeight));
 	*c = lround(ceil((b.origin.y + b.size.height) / fontHeight)) - *f;
 }
@@ -352,12 +352,12 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		return;
 	}
 
-	for (UINT32 row = 0; row < size.y; row++, data += size.x)
+	for (uint32_t row = 0; row < size.y; row++, data += size.x)
 	{
 		// add content for the line and set colours
 		int			attr = -1;
 		NSUInteger	start = [text length], length = start;
-		for (UINT32 col = 0; col < size.x; col++)
+		for (uint32_t col = 0; col < size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col].byte];
 			if ((start < length) && (attr != (data[col].attrib & ~DCA_SELECTED)))
@@ -597,7 +597,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	debug_view_xy const size = view->visible_size();
 
 	// work out how much we need to draw
-	INT32 row, clip;
+	int32_t row, clip;
 	[self convertBounds:dirtyRect toFirstAffectedLine:&row count:&clip];
 	clip += row;
 	row = std::max(row, origin.y);
@@ -624,7 +624,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	{
 		int			attr = -1;
 		NSUInteger	start = 0, length = 0;
-		for (UINT32 col = origin.x; col < origin.x + size.x; col++)
+		for (uint32_t col = origin.x; col < origin.x + size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col - origin.x].byte];
 			if ((start < length) && (attr != data[col - origin.x].attrib))

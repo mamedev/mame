@@ -64,7 +64,7 @@ void device_disasm_interface::static_set_dasm_override(device_t &device, dasm_ov
 //  disassemble - interface for disassembly
 //-------------------------------------------------
 
-offs_t device_disasm_interface::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t device_disasm_interface::disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	offs_t result = 0;
 

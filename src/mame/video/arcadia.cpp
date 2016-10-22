@@ -224,7 +224,7 @@ collisions, one is for sprite/sprite collisions.
 
 #include "includes/arcadia.h"
 
-static const UINT8 chars[0x40][8]={
+static const uint8_t chars[0x40][8]={
 	// read from the screen generated from a palladium
 	{ 0,0,0,0,0,0,0,0 },                        // 00 (space)
 	{ 1,2,4,8,16,32,64,128 },                   // 01 (\)
@@ -312,7 +312,7 @@ void arcadia_state::video_start()
 
 READ8_MEMBER( arcadia_state::video_r )
 {
-	UINT8 data=0;
+	uint8_t data=0;
 	switch (offset)
 	{
 	case 0xff: data = m_charline|0xf0;break;
@@ -421,7 +421,7 @@ WRITE8_MEMBER( arcadia_state::video_w )
 	}
 }
 
-void arcadia_state::draw_char(UINT8 *ch, int charcode, int y, int x)
+void arcadia_state::draw_char(uint8_t *ch, int charcode, int y, int x)
 {
 	int k,b,cc,sc, colour;
 	if (m_multicolor)
@@ -474,7 +474,7 @@ void arcadia_state::draw_char(UINT8 *ch, int charcode, int y, int x)
 }
 
 
-void arcadia_state::vh_draw_line(int y, UINT8 chars1[16])
+void arcadia_state::vh_draw_line(int y, uint8_t chars1[16])
 {
 	int x, ch, j, h;
 	int graphics = m_graphics;
@@ -541,7 +541,7 @@ int arcadia_state::sprite_collision(int n1, int n2)
 void arcadia_state::draw_sprites()
 {
 	int i, k, x, y, color=0;
-	UINT8 b;
+	uint8_t b;
 
 	m_reg.d.collision_bg|=0xf;
 	m_reg.d.collision_sprite|=0x3f;
@@ -669,7 +669,7 @@ READ8_MEMBER( arcadia_state::vsync_r )
 	return m_line>=216 ? 0x80 : 0 ;
 }
 
-UINT32 arcadia_state::screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t arcadia_state::screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

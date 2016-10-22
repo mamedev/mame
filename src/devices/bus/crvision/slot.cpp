@@ -45,7 +45,7 @@ device_crvision_cart_interface::~device_crvision_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_crvision_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_crvision_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -62,7 +62,7 @@ void device_crvision_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //-------------------------------------------------
 //  crvision_cart_slot_device - constructor
 //-------------------------------------------------
-crvision_cart_slot_device::crvision_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+crvision_cart_slot_device::crvision_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, CRVISION_CART_SLOT, "CreatiVision Cartridge Slot", tag, owner, clock, "crvision_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -154,7 +154,7 @@ image_init_result crvision_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 
 		if (size > 0x4800)
 		{
@@ -223,7 +223,7 @@ std::string crvision_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 size = m_file->size();
+		uint32_t size = m_file->size();
 		int type = CRV_4K;
 
 		switch (size)

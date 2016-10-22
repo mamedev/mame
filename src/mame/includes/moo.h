@@ -39,19 +39,19 @@ public:
 		m_soundlatch3(*this, "soundlatch3") { }
 
 	/* memory pointers */
-	optional_shared_ptr<UINT16> m_workram;
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<uint16_t> m_workram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	int         m_sprite_colorbase;
 	int         m_layer_colorbase[4];
 	int         m_layerpri[3];
 	int         m_alpha_enabled;
-	UINT16      m_zmask;
+	uint16_t      m_zmask;
 
 	/* misc */
-	UINT16      m_protram[16];
-	UINT16      m_cur_control2;
+	uint16_t      m_protram[16];
+	uint16_t      m_cur_control2;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -83,7 +83,7 @@ public:
 	DECLARE_MACHINE_RESET(moo);
 	DECLARE_VIDEO_START(moo);
 	DECLARE_VIDEO_START(bucky);
-	UINT32 screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(moo_interrupt);
 	INTERRUPT_GEN_MEMBER(moobl_interrupt);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);

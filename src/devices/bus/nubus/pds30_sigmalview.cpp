@@ -61,7 +61,7 @@ const tiny_rom_entry *nubus_lview_device::device_rom_region() const
 //  nubus_lview_device - constructor
 //-------------------------------------------------
 
-nubus_lview_device::nubus_lview_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nubus_lview_device::nubus_lview_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, PDS030_LVIEW, "Sigma Designs L-View", tag, owner, clock, "pd3_lviw", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0)
@@ -70,7 +70,7 @@ nubus_lview_device::nubus_lview_device(const machine_config &mconfig, const char
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0)
@@ -85,7 +85,7 @@ nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_typ
 
 void nubus_lview_device::device_start()
 {
-	UINT32 slotspace;
+	uint32_t slotspace;
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
@@ -96,7 +96,7 @@ void nubus_lview_device::device_start()
 //  printf("[lview %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	m_vram32 = (UINT32 *)&m_vram[0];
+	m_vram32 = (uint32_t *)&m_vram[0];
 
 	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_lview_device::vram_r), this), write32_delegate(FUNC(nubus_lview_device::vram_w), this));
 	m_nubus->install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_lview_device::vram_r), this), write32_delegate(FUNC(nubus_lview_device::vram_w), this));
@@ -138,11 +138,11 @@ void nubus_lview_device::device_timer(emu_timer &timer, device_timer_id tid, int
 
 ***************************************************************************/
 
-UINT32 nubus_lview_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nubus_lview_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels, *vram;
+	uint8_t pixels, *vram;
 
 	vram = &m_vram[0x20];
 
@@ -169,7 +169,7 @@ UINT32 nubus_lview_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 READ32_MEMBER( nubus_lview_device::lview_r )
 {
-	UINT32 rv = 0;
+	uint32_t rv = 0;
 
 //    printf("prot_r: @ %x, mask %08x [PC=%x  state %d]\n", offset, mem_mask, machine().device("maincpu")->safe_pc(), m_protstate);
 

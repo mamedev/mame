@@ -43,7 +43,7 @@ WRITE8_MEMBER(bombjack_state::bombjack_flipscreen_w)
 
 TILE_GET_INFO_MEMBER(bombjack_state::get_bg_tile_info)
 {
-	UINT8 *tilerom = memregion("gfx4")->base();
+	uint8_t *tilerom = memregion("gfx4")->base();
 
 	int offs = (m_background_image & 0x07) * 0x200 + tile_index;
 	int code = (m_background_image & 0x10) ? tilerom[offs] : 0;
@@ -126,7 +126,7 @@ void bombjack_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 bombjack_state::screen_update_bombjack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bombjack_state::screen_update_bombjack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

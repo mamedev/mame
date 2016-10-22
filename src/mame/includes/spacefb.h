@@ -42,14 +42,14 @@ public:
 	required_device<samples_device> m_samples;
 	required_device<screen_device> m_screen;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
-	UINT8 m_sound_latch;
+	uint8_t m_sound_latch;
 	emu_timer *m_interrupt_timer;
-	std::unique_ptr<UINT8[]> m_object_present_map;
-	UINT8 m_port_0;
-	UINT8 m_port_2;
-	UINT32 m_star_shift_reg;
+	std::unique_ptr<uint8_t[]> m_object_present_map;
+	uint8_t m_port_0;
+	uint8_t m_port_2;
+	uint32_t m_star_shift_reg;
 	double m_color_weights_rg[3];
 	double m_color_weights_b[2];
 
@@ -67,7 +67,7 @@ public:
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void start_interrupt_timer();
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void shift_star_generator();
 	void get_starfield_pens(pen_t *pens);
 	void draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

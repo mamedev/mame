@@ -271,7 +271,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(smsbootleg_state,sms_supergame)
 {
-	UINT8* rom = memregion("maincpu")->base();
+	uint8_t* rom = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
 
 	for (int i = 0;i < size;i++)

@@ -132,18 +132,18 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT16> m_sc0_vram;
-	required_shared_ptr<UINT16> m_sc1_vram;
-	required_shared_ptr<UINT16> m_sc2_vram;
-	required_shared_ptr<UINT16> m_sc3_vram;
+	required_shared_ptr<uint16_t> m_sc0_vram;
+	required_shared_ptr<uint16_t> m_sc1_vram;
+	required_shared_ptr<uint16_t> m_sc2_vram;
+	required_shared_ptr<uint16_t> m_sc3_vram;
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
 	tilemap_t *m_sc3_tilemap;
-	UINT16 m_vblank;
-	UINT16 m_hblank;
-	UINT8 mcucomm;
-	UINT8 mcudata;
+	uint16_t m_vblank;
+	uint16_t m_hblank;
+	uint8_t mcucomm;
+	uint8_t mcudata;
 	DECLARE_READ16_MEMBER(hvretrace_r);
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_READ16_MEMBER(chewheel_mcu_r);
@@ -159,7 +159,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc3_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -167,7 +167,7 @@ public:
 
 TILE_GET_INFO_MEMBER(mil4000_state::get_sc0_tile_info)
 {
-	UINT32 data = (m_sc0_vram[tile_index*2]<<16) | m_sc0_vram[tile_index*2+1];
+	uint32_t data = (m_sc0_vram[tile_index*2]<<16) | m_sc0_vram[tile_index*2+1];
 	int tile = data >> 14;
 	int color = (m_sc0_vram[tile_index*2+1] & 0x1f)+0;
 
@@ -179,7 +179,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc0_tile_info)
 
 TILE_GET_INFO_MEMBER(mil4000_state::get_sc1_tile_info)
 {
-	UINT32 data = (m_sc1_vram[tile_index*2]<<16) | m_sc1_vram[tile_index*2+1];
+	uint32_t data = (m_sc1_vram[tile_index*2]<<16) | m_sc1_vram[tile_index*2+1];
 	int tile = data >> 14;
 	int color = (m_sc1_vram[tile_index*2+1] & 0x1f)+0x10;
 
@@ -191,7 +191,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc1_tile_info)
 
 TILE_GET_INFO_MEMBER(mil4000_state::get_sc2_tile_info)
 {
-	UINT32 data = (m_sc2_vram[tile_index*2]<<16) | m_sc2_vram[tile_index*2+1];
+	uint32_t data = (m_sc2_vram[tile_index*2]<<16) | m_sc2_vram[tile_index*2+1];
 	int tile = data >> 14;
 	int color = (m_sc2_vram[tile_index*2+1] & 0x1f)+0x20;
 
@@ -203,7 +203,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc2_tile_info)
 
 TILE_GET_INFO_MEMBER(mil4000_state::get_sc3_tile_info)
 {
-	UINT32 data = (m_sc3_vram[tile_index*2]<<16) | m_sc3_vram[tile_index*2+1];
+	uint32_t data = (m_sc3_vram[tile_index*2]<<16) | m_sc3_vram[tile_index*2+1];
 	int tile = data >> 14;
 	int color = (m_sc3_vram[tile_index*2+1] & 0x1f)+0x30;
 
@@ -225,7 +225,7 @@ void mil4000_state::video_start()
 	m_sc3_tilemap->set_transparent_pen(0);
 }
 
-UINT32 mil4000_state::screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mil4000_state::screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_sc1_tilemap->draw(screen, bitmap, cliprect, 0,0);
@@ -237,7 +237,7 @@ UINT32 mil4000_state::screen_update_mil4000(screen_device &screen, bitmap_ind16 
 /*TODO*/
 READ16_MEMBER(mil4000_state::hvretrace_r)
 {
-	UINT16 res;
+	uint16_t res;
 
 	res = 0;
 

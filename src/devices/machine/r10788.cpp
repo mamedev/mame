@@ -54,7 +54,7 @@
 
 const device_type R10788 = &device_creator<r10788_device>;
 
-r10788_device::r10788_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+r10788_device::r10788_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, R10788, "Rockwell 10788", tag, owner, clock, "r10788", __FILE__),
 		m_ktr(0), m_kts(0), m_kla(0), m_klb(0), m_mask_a(15), m_mask_b(15), m_ker(0),
 		m_io_counter(0), m_scan_counter(0),
@@ -111,7 +111,7 @@ void r10788_device::device_reset()
  */
 void r10788_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	UINT8 data;
+	uint8_t data;
 	switch (id)
 	{
 		case TIMER_DISPLAY:
@@ -186,7 +186,7 @@ WRITE8_MEMBER( r10788_device::io_w )
 READ8_MEMBER( r10788_device::io_r )
 {
 	assert(offset < 16);
-	UINT8 data = 0xf;
+	uint8_t data = 0xf;
 	switch (offset)
 	{
 		case KTR:  // Transfer Keyboard Return

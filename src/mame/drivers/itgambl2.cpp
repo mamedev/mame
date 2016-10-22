@@ -75,7 +75,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(itgambl2);
-	UINT32 screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 };
@@ -93,10 +93,10 @@ void itgambl2_state::video_start()
 }
 
 /* (dirty) debug code for looking 8bpps blitter-based gfxs */
-UINT32 itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
-	const UINT8 *blit_ram = memregion("gfx1")->base();
+	const uint8_t *blit_ram = memregion("gfx1")->base();
 
 	if(machine().input().code_pressed(KEYCODE_Z))
 		m_test_x++;
@@ -132,7 +132,7 @@ UINT32 itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rgb3
 	{
 		for(x = 0; x < m_test_x; x++)
 		{
-			UINT32 color;
+			uint32_t color;
 
 			color = (blit_ram[count] & 0xff) >> 0;
 

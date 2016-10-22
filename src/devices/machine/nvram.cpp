@@ -22,7 +22,7 @@ const device_type NVRAM = &device_creator<nvram_device>;
 //  nvram_device - constructor
 //-------------------------------------------------
 
-nvram_device::nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nvram_device::nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NVRAM, "NVRAM", tag, owner, clock, "nvram", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
@@ -103,7 +103,7 @@ void nvram_device::nvram_default()
 		// random values
 		case DEFAULT_RANDOM:
 		{
-			UINT8 *nvram = reinterpret_cast<UINT8 *>(m_base);
+			uint8_t *nvram = reinterpret_cast<uint8_t *>(m_base);
 			for (int index = 0; index < m_length; index++)
 				nvram[index] = machine().rand();
 			break;

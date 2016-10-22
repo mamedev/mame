@@ -85,7 +85,7 @@ WRITE16_MEMBER(pgm_arm_type2_state::arm7_latch_68k_w )
 
 READ16_MEMBER(pgm_arm_type2_state::arm7_ram_r )
 {
-	UINT16 *share16 = reinterpret_cast<UINT16 *>(m_arm7_shareram.target());
+	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, space.device().safe_pc());
@@ -94,7 +94,7 @@ READ16_MEMBER(pgm_arm_type2_state::arm7_ram_r )
 
 WRITE16_MEMBER(pgm_arm_type2_state::arm7_ram_w )
 {
-	UINT16 *share16 = reinterpret_cast<UINT16 *>(m_arm7_shareram.target());
+	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, space.device().safe_pc());
@@ -222,7 +222,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,martmast)
 READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
 {
 	int pc = space.device().safe_pc();
-	UINT32 data = m_arm_ram[0x300c/4];
+	uint32_t data = m_arm_ram[0x300c/4];
 
 	if (pc==0x080109b4)
 	{
@@ -232,7 +232,7 @@ READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
 
 		if (r4==0x18002f9e)
 		{
-			UINT32 data2 =  m_arm_ram[0x2F9C/4]&0xffff0000;
+			uint32_t data2 =  m_arm_ram[0x2F9C/4]&0xffff0000;
 			if ((data==0x00000000) && (data2==0x00000000)) space.device().execute().spin_until_interrupt();
 		}
 	}
@@ -242,7 +242,7 @@ READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
 
 READ16_MEMBER(pgm_arm_type2_state::ddp2_main_speedup_r )
 {
-	UINT16 data = m_mainram[0x0ee54/2];
+	uint16_t data = m_mainram[0x0ee54/2];
 	int pc = space.device().safe_pc();
 
 	if (pc == 0x149dce) space.device().execute().spin_until_interrupt();

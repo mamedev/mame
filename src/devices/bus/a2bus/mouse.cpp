@@ -172,7 +172,7 @@ const tiny_rom_entry *a2bus_mouse_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, MOUSE_PIA_TAG),
@@ -186,7 +186,7 @@ a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_typ
 	m_rom_bank = 0;
 }
 
-a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_MOUSE, "Apple II Mouse Card", tag, owner, clock, "a2mouse", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, MOUSE_PIA_TAG),
@@ -261,7 +261,7 @@ void a2bus_mouse_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_mouse_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_mouse_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	return m_pia->read(space, offset & 3);
 }
@@ -271,7 +271,7 @@ UINT8 a2bus_mouse_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_mouse_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_mouse_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	m_pia->write(space, offset & 3, data);
 }
@@ -280,7 +280,7 @@ void a2bus_mouse_device::write_c0nx(address_space &space, UINT8 offset, UINT8 da
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_mouse_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_mouse_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	return m_rom[offset+m_rom_bank];
 }
@@ -333,7 +333,7 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_ddr_a_w)
 
 READ8_MEMBER(a2bus_mouse_device::mcu_port_b_r)
 {
-	UINT8 b_in = m_port_b_in;
+	uint8_t b_in = m_port_b_in;
 
 	// clear the gates, leave everything else alone between pulses
 	m_port_b_in &= 0x85;
@@ -435,7 +435,7 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_timer_w)
 	if (recalc)
 	{
 		// recalculate the timer now
-		UINT32 m_ticks = 2043600 / 4;
+		uint32_t m_ticks = 2043600 / 4;
 		m_ticks /= prescale[m_timer_ctl & 7];
 		m_ticks /= (int)(m_timer_cnt + 1);
 		m_timer->adjust(attotime::from_hz((double)m_ticks), TIMER_68705, attotime::from_hz((double)m_ticks));

@@ -29,7 +29,6 @@
 #include "machine/pic8259.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
-#include "sound/dac.h"
 #include "sound/mos6581.h"
 #include "video/mc6845.h"
 #include "video/mos6566.h"
@@ -130,9 +129,9 @@ public:
 	required_memory_region m_basic;
 	required_memory_region m_kernal;
 	required_memory_region m_charom;
-	optional_shared_ptr<UINT8> m_buffer_ram;
-	optional_shared_ptr<UINT8> m_extbuf_ram;
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_buffer_ram;
+	optional_shared_ptr<uint8_t> m_extbuf_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 	required_ioport_array<8> m_pa;
 	required_ioport_array<8> m_pb;
 	required_ioport m_lock;
@@ -154,7 +153,7 @@ public:
 		int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
 		int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs);
 
-	UINT8 read_keyboard();
+	uint8_t read_keyboard();
 	void set_busy2(int state);
 
 	DECLARE_READ8_MEMBER( read );
@@ -211,12 +210,12 @@ public:
 	int m_user_irq;
 
 	// keyboard state;
-	UINT8 m_tpi2_pa;
-	UINT8 m_tpi2_pb;
-	UINT8 m_cia_pa;
+	uint8_t m_tpi2_pa;
+	uint8_t m_tpi2_pb;
+	uint8_t m_cia_pa;
 
-	UINT8 m_ext_cia_pb;
-	UINT8 m_ext_tpi_pb;
+	uint8_t m_ext_cia_pb;
+	uint8_t m_ext_tpi_pb;
 
 	// timers
 	emu_timer *m_todclk_timer;
@@ -253,7 +252,7 @@ public:
 
 	required_device<pla_device> m_pla2;
 	required_device<mos6566_device> m_vic;
-	optional_shared_ptr<UINT8> m_color_ram;
+	optional_shared_ptr<uint8_t> m_color_ram;
 
 	DECLARE_MACHINE_START( p500 );
 	DECLARE_MACHINE_START( p500_ntsc );
@@ -272,8 +271,8 @@ public:
 		int *csbank1, int *csbank2, int *csbank3, int *basiclocs, int *basichics, int *kernalcs,
 		int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs, int *aec, int *vsysaden);
 
-	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae);
-	void write_memory(address_space &space, offs_t offset, UINT8 data, int ba, int ae);
+	uint8_t read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae);
+	void write_memory(address_space &space, offs_t offset, uint8_t data, int ba, int ae);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -320,7 +319,7 @@ public:
 #define A0 BIT(offset, 0)
 #define VA12 BIT(va, 12)
 
-static void cbmb_quick_sethiaddress(address_space &space, UINT16 hiaddress)
+static void cbmb_quick_sethiaddress(address_space &space, uint16_t hiaddress)
 {
 	space.write_byte(0xf0046, hiaddress & 0xff);
 	space.write_byte(0xf0047, hiaddress >> 8);
@@ -347,8 +346,8 @@ QUICKLOAD_LOAD_MEMBER( p500_state, p500 )
 void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
 	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
 {
-	UINT32 input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | m_busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
-	UINT32 data = m_pla1->read(input);
+	uint32_t input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | m_busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
+	uint32_t data = m_pla1->read(input);
 
 	*casseg1 = BIT(data, 0);
 	*rasseg1 = BIT(data, 1);
@@ -368,8 +367,8 @@ void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, 
 void cbm2hp_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
 	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
 {
-	UINT32 input = ras << 13 | cas << 12 | refen << 11 | eras << 10 | ecas << 9 | m_busy2 << 8 | P3 << 3 | P2 << 2 | P1 << 1 | P0;
-	UINT32 data = m_pla1->read(input);
+	uint32_t input = ras << 13 | cas << 12 | refen << 11 | eras << 10 | ecas << 9 | m_busy2 << 8 | P3 << 3 | P2 << 2 | P1 << 1 | P0;
+	uint32_t data = m_pla1->read(input);
 
 	*casseg1 = BIT(data, 0);
 	*casseg2 = BIT(data, 1);
@@ -460,7 +459,7 @@ READ8_MEMBER( cbm2_state::read )
 		&diskromcs, &csbank1, &csbank2, &csbank3, &basiccs, &knbcs, &kernalcs,
 		&crtccs, &cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs);
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!dramen)
 	{
@@ -649,7 +648,7 @@ READ8_MEMBER( cbm2_state::ext_read )
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
 
 	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!casseg1)
 	{
@@ -671,7 +670,7 @@ READ8_MEMBER( cbm2_state::ext_read )
 	return data;
 #endif
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (offset < 0x40000) data = m_ram->pointer()[offset];
 	return data;
 }
@@ -721,10 +720,10 @@ void p500_state::read_pla1(offs_t offset, int busy2, int clrnibcsb, int procvid,
 	int sphi2 = m_vic->phi0_r();
 	int bras = 1;
 
-	UINT32 input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
+	uint32_t input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
 			clrnibcsb << 7 | m_dramon << 6 | procvid << 5 | refen << 4 | m_vicdotsel << 3 | ba << 2 | aec << 1 | srw;
 
-	UINT32 data = m_pla1->read(input);
+	uint32_t data = m_pla1->read(input);
 
 	*datxen = BIT(data, 0);
 	*dramxen = BIT(data, 1);
@@ -747,10 +746,10 @@ void p500_state::read_pla2(offs_t offset, offs_t va, int ba, int vicen, int ae, 
 	int sphi2 = m_vic->phi0_r();
 	int bcas = 1;
 
-	UINT32 input = VA12 << 15 | ba << 14 | A13 << 13 | A15 << 12 | A14 << 11 | A11 << 10 | A10 << 9 | A12 << 8 |
+	uint32_t input = VA12 << 15 | ba << 14 | A13 << 13 | A15 << 12 | A14 << 11 | A11 << 10 | A10 << 9 | A12 << 8 |
 			sphi2 << 7 | vicen << 6 | m_statvid << 5 | m_vicdotsel << 4 | ae << 3 | segf << 2 | bcas << 1 | bank0;
 
-	UINT32 data = m_pla2->read(input);
+	uint32_t data = m_pla2->read(input);
 
 	*clrnibcsb = BIT(data, 0);
 	*extbufcs = BIT(data, 1);
@@ -837,7 +836,7 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int ba, int ae, i
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae)
+uint8_t p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae)
 {
 	int srw = 1, busy2 = 1, refen = 0;
 
@@ -853,7 +852,7 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (clrniben)
 	{
@@ -938,7 +937,7 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 //  write_memory -
 //-------------------------------------------------
 
-void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, int ba, int ae)
+void p500_state::write_memory(address_space &space, offs_t offset, uint8_t data, int ba, int ae)
 {
 	int srw = 0, busy2 = 1, refen = 0;
 	offs_t va = 0xffff;
@@ -1065,8 +1064,8 @@ READ8_MEMBER( p500_state::vic_videoram_r )
 		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 
-	UINT8 data = 0xff;
-//  UINT8 clrnib = 0xf;
+	uint8_t data = 0xff;
+//  uint8_t clrnib = 0xf;
 
 	if (vsysaden)
 	{
@@ -1112,7 +1111,7 @@ READ8_MEMBER( p500_state::vic_colorram_r )
 		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 
-	UINT8 data = 0x0f;
+	uint8_t data = 0x0f;
 
 	if (!clrnibcs)
 	{
@@ -1401,9 +1400,9 @@ MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[(ma + column) & 0x7ff];
+		uint8_t code = m_video_ram[(ma + column) & 0x7ff];
 		offs_t char_rom_addr = (ma & 0x1000) | (m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = m_charom->base()[char_rom_addr & 0xfff];
+		uint8_t data = m_charom->base()[char_rom_addr & 0xfff];
 
 		for (int bit = 0; bit < 9; bit++)
 		{
@@ -1436,7 +1435,7 @@ WRITE_LINE_MEMBER( p500_state::vic_irq_w )
 
 READ8_MEMBER( cbm2_state::sid_potx_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_cia_pa >> 6)
 	{
@@ -1463,7 +1462,7 @@ READ8_MEMBER( cbm2_state::sid_potx_r )
 
 READ8_MEMBER( cbm2_state::sid_poty_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_cia_pa >> 6)
 	{
@@ -1524,7 +1523,7 @@ READ8_MEMBER( cbm2_state::tpi1_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// IEEE-488
 	data |= m_ieee2->ren_r() << 2;
@@ -1585,7 +1584,7 @@ READ8_MEMBER( cbm2_state::tpi1_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// IEEE-488
 	data |= m_ieee2->ifc_r();
@@ -1654,9 +1653,9 @@ WRITE_LINE_MEMBER( p500_state::tpi1_cb_w )
 //  tpi6525_interface tpi2_intf
 //-------------------------------------------------
 
-UINT8 cbm2_state::read_keyboard()
+uint8_t cbm2_state::read_keyboard()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(m_tpi2_pa, 0)) data &= m_pa[0]->read();
 	if (!BIT(m_tpi2_pa, 1)) data &= m_pa[1]->read();
@@ -1789,7 +1788,7 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// IEEE-488
 	data |= m_ieee1->read(space, 0);
@@ -1848,7 +1847,7 @@ READ8_MEMBER( cbm2_state::cia_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// joystick
 	data |= m_joy1->joy_r() & 0x0f;
@@ -1900,7 +1899,7 @@ READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
 
 	*/
 
-	UINT8 data = 0xc0;
+	uint8_t data = 0xc0;
 
 	// _BUSY1
 	data |= !m_busen1;
@@ -1993,7 +1992,7 @@ READ8_MEMBER( cbm2_state::ext_cia_pb_r )
 
 	*/
 
-	UINT8 data = 0xc0;
+	uint8_t data = 0xc0;
 
 	// _BUSY1
 	data |= !m_busen1;

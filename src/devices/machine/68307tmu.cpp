@@ -142,7 +142,7 @@ void m68307_timer::init(m68307cpu_device *device)
 	wd_mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::wd_timer_callback),this), parent);
 }
 
-UINT16 m68307_timer::read_tcn(UINT16 mem_mask, int which)
+uint16_t m68307_timer::read_tcn(uint16_t mem_mask, int which)
 {
 	// we should return the current timer value by
 	// calculating what it should be based on the time
@@ -150,14 +150,14 @@ UINT16 m68307_timer::read_tcn(UINT16 mem_mask, int which)
 	return 0x3a98;
 }
 
-void m68307_timer::write_ter(UINT16 data, UINT16 mem_mask, int which)
+void m68307_timer::write_ter(uint16_t data, uint16_t mem_mask, int which)
 {
 	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
 	m68307_single_timer* tptr = &singletimer[which];
 	if (data & 0x2) tptr->regs[m68307TIMER_TMR] &= ~0x2;
 }
 
-void m68307_timer::write_tmr(UINT16 data, UINT16 mem_mask, int which)
+void m68307_timer::write_tmr(uint16_t data, uint16_t mem_mask, int which)
 {
 	m68307cpu_device* m68k = parent;
 	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
@@ -208,7 +208,7 @@ void m68307_timer::write_tmr(UINT16 data, UINT16 mem_mask, int which)
 
 }
 
-void m68307_timer::write_trr(UINT16 data, UINT16 mem_mask, int which)
+void m68307_timer::write_trr(uint16_t data, uint16_t mem_mask, int which)
 {
 	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
 	m68307_single_timer* tptr = &singletimer[which];

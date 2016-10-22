@@ -192,16 +192,16 @@ enum
 #define VCR0_DUTY_MASK      0xe000
 #define VCR0_DUTY_SHIFT     13
 
-static const UINT32 banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
+static const uint32_t banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
 
 #define DRAM_BANK_SEL       (banks[(VREG(DSBA) >> 7) & 3])
 
 struct i82716_t
 {
-	UINT16  r[16];
-	std::unique_ptr<UINT16[]>  dram;
+	uint16_t  r[16];
+	std::unique_ptr<uint16_t[]>  dram;
 
-	std::unique_ptr<UINT8[]>   line_buf;  // there's actually two
+	std::unique_ptr<uint8_t[]>   line_buf;  // there's actually two
 };
 
 
@@ -225,8 +225,8 @@ public:
 	int m_lamp_strobe;
 	int m_old_lamp_strobe;
 	int m_vsync_latch_preset;
-	UINT8 m_p1;
-	UINT8 m_p3;
+	uint8_t m_p1;
+	uint8_t m_p3;
 	int m_d68681_val;
 	i82716_t m_i82716;
 	DECLARE_WRITE16_MEMBER(i82716_w);
@@ -245,7 +245,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_maygayv1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(vsync_interrupt);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
@@ -303,11 +303,11 @@ void maygayv1_state::video_start()
 }
 
 
-UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	i82716_t &i82716 = m_i82716;
-	UINT16 *atable = &i82716.dram[VREG(ATBA)];
-	UINT16 *otable = &i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
+	uint16_t *atable = &i82716.dram[VREG(ATBA)];
+	uint16_t *otable = &i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
 
 	int sl, sx;
 	int slmask = 0xffff;     // TODO: Save if using scanline callbacks
@@ -327,10 +327,10 @@ UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind1
 	for (sl = cliprect.min_x; sl <= cliprect.max_y; ++sl)
 	{
 		int obj;
-		UINT16 aflags = atable[sl];
-		UINT16 slmask_old = slmask;
+		uint16_t aflags = atable[sl];
+		uint16_t slmask_old = slmask;
 
-		UINT16 *bmp_ptr = &bitmap.pix16(sl);
+		uint16_t *bmp_ptr = &bitmap.pix16(sl);
 
 		slmask = 0xffff ^ (slmask ^ aflags);
 
@@ -346,11 +346,11 @@ UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind1
 			// Draw on this line?
 			if ( !BIT(slmask, obj) )
 			{
-				UINT32  objbase, trans, width;
-				INT32   x, xpos;
-				UINT16  w0, w1, w2;
-				UINT16  *objptr;
-				UINT8 *bmpptr; // ?
+				uint32_t  objbase, trans, width;
+				int32_t   x, xpos;
+				uint16_t  w0, w1, w2;
+				uint16_t  *objptr;
+				uint8_t *bmpptr; // ?
 
 				/* Get object table entry words */
 				w0 = otable[offs];
@@ -396,15 +396,15 @@ UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind1
 				objptr = &i82716.dram[objbase + ((4 * width) * otable[offs + 3])];
 
 				// endian alert
-				bmpptr = (UINT8*)objptr;
+				bmpptr = (uint8_t*)objptr;
 
 				// 4bpp
 				for (x = xpos; x < std::min(xbound, int(xpos + width * 8)); ++x)
 				{
 					if (x >= 0)
 					{
-						UINT8 p1 = *bmpptr & 0xf;
-						UINT8 p2 = *bmpptr >> 4;
+						uint8_t p1 = *bmpptr & 0xf;
+						uint8_t p2 = *bmpptr >> 4;
 
 						if (!trans || p1)
 							i82716.line_buf[x] = p1;
@@ -423,7 +423,7 @@ UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind1
 		// Write it out
 		for (sx = cliprect.min_x; sx < cliprect.max_x; sx += 2)
 		{
-			UINT8 pix = i82716.line_buf[sx / 2];
+			uint8_t pix = i82716.line_buf[sx / 2];
 
 			bmp_ptr[sx + 0] = pix & 0xf;
 			bmp_ptr[sx + 1] = pix >> 4;
@@ -456,11 +456,11 @@ void maygayv1_state::screen_eof_maygayv1(screen_device &screen, bool state)
 		if (!(VREG(VCR0) & VCR0_DEI))
 		{
 			int i;
-			UINT16 *palbase = &i82716.dram[VREG(CTBA)];
+			uint16_t *palbase = &i82716.dram[VREG(CTBA)];
 
 			for (i = 0; i < 16; ++i)
 			{
-				UINT16 entry = *palbase++;
+				uint16_t entry = *palbase++;
 				m_palette->set_pen_color(entry & 0xf, pal4bit(entry >> 12), pal4bit(entry >> 8), pal4bit(entry >> 4));
 			}
 		}
@@ -838,8 +838,8 @@ WRITE8_MEMBER(maygayv1_state::b_writ)
 void maygayv1_state::machine_start()
 {
 	i82716_t &i82716 = m_i82716;
-	i82716.dram = std::make_unique<UINT16[]>(0x80000/2);   // ???
-	i82716.line_buf = std::make_unique<UINT8[]>(512);
+	i82716.dram = std::make_unique<uint16_t[]>(0x80000/2);   // ???
+	i82716.line_buf = std::make_unique<uint8_t[]>(512);
 
 	save_pointer(NAME(i82716.dram.get()), 0x40000);
 }

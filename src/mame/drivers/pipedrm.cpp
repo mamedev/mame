@@ -905,7 +905,7 @@ DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
 {
 	const memory_share *share = memshare("palette");
 	/* sprite RAM lives at the end of palette RAM */
-	m_spriteram.set_target((UINT8*)share->ptr() + 0xc00, 0x400);
+	m_spriteram.set_target((uint8_t*)share->ptr() + 0xc00, 0x400);
 	m_maincpu->space(AS_PROGRAM).install_ram(0xcc00, 0xcfff, m_spriteram);
 }
 

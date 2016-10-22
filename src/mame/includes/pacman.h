@@ -29,32 +29,32 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<namco_device> m_namco_sound;
-	optional_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_spriteram2;
-	optional_shared_ptr<UINT8> m_s2650_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_colorram;
-	optional_shared_ptr<UINT8> m_s2650games_tileram;
-	optional_shared_ptr<UINT8> m_rocktrv2_prot_data;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_spriteram2;
+	optional_shared_ptr<uint8_t> m_s2650_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_s2650games_tileram;
+	optional_shared_ptr<uint8_t> m_rocktrv2_prot_data;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_patched_opcodes;
+	optional_shared_ptr<uint8_t> m_patched_opcodes;
 
-	UINT8 m_cannonb_bit_to_read;
+	uint8_t m_cannonb_bit_to_read;
 	int m_mystery;
-	UINT8 m_counter;
+	uint8_t m_counter;
 	int m_bigbucks_bank;
-	UINT8 m_rocktrv2_question_bank;
+	uint8_t m_rocktrv2_question_bank;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_charbank;
-	UINT8 m_spritebank;
-	UINT8 m_palettebank;
-	UINT8 m_colortablebank;
-	UINT8 m_flipscreen;
-	UINT8 m_bgpriority;
+	uint8_t m_charbank;
+	uint8_t m_spritebank;
+	uint8_t m_palettebank;
+	uint8_t m_colortablebank;
+	uint8_t m_flipscreen;
+	uint8_t m_bgpriority;
 	int m_xoffsethack;
-	UINT8 m_inv_spr;
-	UINT8 m_irq_mask;
+	uint8_t m_inv_spr;
+	uint8_t m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(pacman_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(piranha_interrupt_vector_w);
@@ -143,8 +143,8 @@ public:
 	DECLARE_MACHINE_RESET(superabc);
 	DECLARE_VIDEO_START(pengo);
 	DECLARE_VIDEO_START(jrpacman);
-	UINT32 screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 	INTERRUPT_GEN_MEMBER(s2650_interrupt);
@@ -152,8 +152,8 @@ public:
 	void jrpacman_mark_tile_dirty( int offset );
 	void maketrax_rom_decode();
 	void korosuke_rom_decode();
-	void eyes_decode(UINT8 *data);
-	void mspacman_install_patches(UINT8 *ROM);
+	void eyes_decode(uint8_t *data);
+	void mspacman_install_patches(uint8_t *ROM);
 
 	// theglopb.c
 	void theglobp_decrypt_rom_8();
@@ -165,11 +165,11 @@ public:
 	DECLARE_MACHINE_RESET(theglobp);
 
 	// pacplus.c
-	UINT8 pacplus_decrypt(int addr, UINT8 e);
+	uint8_t pacplus_decrypt(int addr, uint8_t e);
 	void pacplus_decode();
 
 	// jumpshot.c
-	UINT8 jumpshot_decrypt(int addr, UINT8 e);
+	uint8_t jumpshot_decrypt(int addr, uint8_t e);
 	void jumpshot_decode();
 
 	// acitya.c

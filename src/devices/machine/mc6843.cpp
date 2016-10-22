@@ -74,7 +74,7 @@ static const char *const mc6843_cmd[16] =
 
 const device_type MC6843 = &device_creator<mc6843_device>;
 
-mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC6843, "MC6843 floppy controller", tag, owner, clock, "mc6843", __FILE__),
 	m_write_irq(*this),
 	m_CTAR(0),
@@ -164,7 +164,7 @@ void mc6843_device::device_reset()
 
 
 
-legacy_floppy_image_device* mc6843_device::floppy_image( UINT8 drive )
+legacy_floppy_image_device* mc6843_device::floppy_image( uint8_t drive )
 {
 	legacy_floppy_image_device *img = floppy_get_device( machine(), drive );
 	if (!img && owner()) {
@@ -480,7 +480,7 @@ void mc6843_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 READ8_MEMBER( mc6843_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch ( offset ) {
 	case 0: /* Data Input Register (DIR) */
@@ -680,7 +680,7 @@ WRITE8_MEMBER( mc6843_device::write )
 		else if ( (cmd == CMD_FFW) && FWF )
 		{
 			/* assume we are formatting */
-			UINT8 nibble;
+			uint8_t nibble;
 			nibble =
 				(data & 0x01) |
 				((data & 0x04) >> 1 )|
@@ -704,9 +704,9 @@ WRITE8_MEMBER( mc6843_device::write )
 				{
 					/* valid address id field */
 					legacy_floppy_image_device* img = floppy_image( );
-					UINT8 track  = m_data[1];
-					UINT8 sector = m_data[3];
-					UINT8 filler = 0xe5; /* standard Thomson filler */
+					uint8_t track  = m_data[1];
+					uint8_t sector = m_data[3];
+					uint8_t filler = 0xe5; /* standard Thomson filler */
 					LOG(( "%f %s mc6843_w: address id detected track=%i sector=%i\n", machine().time().as_double(), machine().describe_context(), track, sector));
 					img->floppy_drive_format_sector( m_side, sector, track, 0, sector, 0, filler );
 				}

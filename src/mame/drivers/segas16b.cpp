@@ -897,7 +897,7 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 
 
 
-void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index)
+void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index)
 {
 	switch (index)
 	{
@@ -969,7 +969,7 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 //  memory mapper chip
 //-------------------------------------------------
 
-UINT8 segas16b_state::mapper_sound_r()
+uint8_t segas16b_state::mapper_sound_r()
 {
 	return 0;
 }
@@ -980,7 +980,7 @@ UINT8 segas16b_state::mapper_sound_r()
 //  memory mapper chip
 //-------------------------------------------------
 
-void segas16b_state::mapper_sound_w(UINT8 data)
+void segas16b_state::mapper_sound_w(uint8_t data)
 {
 	if (m_soundlatch != nullptr)
 		m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
@@ -1296,9 +1296,9 @@ void segas16b_state::machine_reset()
 	// configure sprite banks
 	if (m_sprites.found())
 	{
-		static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-		static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
-		const UINT8 *banklist = (m_romboard == ROM_BOARD_171_5358 || m_romboard == ROM_BOARD_171_5358_SMALL) ? alternate_banklist : default_banklist;
+		static const uint8_t default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+		static const uint8_t alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
+		const uint8_t *banklist = (m_romboard == ROM_BOARD_171_5358 || m_romboard == ROM_BOARD_171_5358_SMALL) ? alternate_banklist : default_banklist;
 		for (int banknum = 0; banknum < 16; banknum++)
 			m_sprites->set_bank(banknum, banklist[banknum]);
 	}
@@ -1353,7 +1353,7 @@ void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoff
 	rom_5704_bank_w(space, 1, m_workram[0x3094/2] & 0x00ff, 0x00ff);
 
 	// process any new sound data
-	UINT16 temp = m_workram[soundoffs];
+	uint16_t temp = m_workram[soundoffs];
 	if ((temp & 0xff00) != 0x0000)
 	{
 		m_mapper->write(space, 0x03, temp >> 8);
@@ -1391,7 +1391,7 @@ void segas16b_state::ddux_i8751_sim()
 	m_maincpu->set_input_line(4, HOLD_LINE);
 
 	// process any new sound data
-	UINT16 temp = m_workram[0x0bd0/2];
+	uint16_t temp = m_workram[0x0bd0/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -1421,7 +1421,7 @@ void segas16b_state::goldnaxe_i8751_sim()
 	}
 
 	// process any new sound data
-	UINT16 temp = m_workram[0x2cfc/2];
+	uint16_t temp = m_workram[0x2cfc/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -1442,7 +1442,7 @@ void segas16b_state::goldnaxe_i8751_sim()
 
 void segas16b_state::tturf_i8751_sim()
 {
-	UINT16 temp;
+	uint16_t temp;
 
 	// signal a VBLANK to the main CPU
 	m_maincpu->set_input_line(4, HOLD_LINE);
@@ -1474,7 +1474,7 @@ void segas16b_state::wb3_i8751_sim()
 	m_maincpu->set_input_line(4, HOLD_LINE);
 
 	// process any new sound data
-	UINT16 temp = m_workram[0x0008/2];
+	uint16_t temp = m_workram[0x0008/2];
 	if ((temp & 0x00ff) != 0x0000)
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -1571,7 +1571,7 @@ READ16_MEMBER( segas16b_state::dunkshot_custom_io_r )
 
 READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
 {
-	UINT16 result;
+	uint16_t result;
 
 	switch (offset & (0x3000/2))
 	{
@@ -3692,7 +3692,7 @@ static MACHINE_CONFIG_DERIVED( system16b_split, system16b )
 	MCFG_DEVICE_REMOVE("mapper")
 MACHINE_CONFIG_END
 
-void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, UINT16* latched_pageselect, UINT16* latched_yscroll, UINT16* latched_xscroll, UINT16* textram)
+void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram)
 {
 	// grab the page regsisters from where the bootleg stores them instead, then convert them to the format the original video emulation code expects
 	if (i == 0)
@@ -8667,7 +8667,7 @@ DRIVER_INIT_MEMBER(segas16b_state,goldnaxe_5704)
 	DRIVER_INIT_CALL(generic_5704);
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16b_state::goldnaxe_i8751_sim), this);
 
-	static const UINT8 memory_control_5704[0x10] =
+	static const uint8_t memory_control_5704[0x10] =
 		{ 0x02,0x00, 0x02,0x08, 0x00,0x1f, 0x00,0xff, 0x00,0x20, 0x01,0x10, 0x00,0x14, 0x00,0xc4 };
 	m_i8751_initial_config = memory_control_5704;
 }
@@ -8677,7 +8677,7 @@ DRIVER_INIT_MEMBER(segas16b_state,goldnaxe_5797)
 	DRIVER_INIT_CALL(generic_5797);
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16b_state::goldnaxe_i8751_sim), this);
 
-	static const UINT8 memory_control_5797[0x10] =
+	static const uint8_t memory_control_5797[0x10] =
 		{ 0x02,0x00, 0x00,0x1f, 0x00,0x1e, 0x00,0xff, 0x00,0x20, 0x01,0x10, 0x00,0x14, 0x00,0xc4 };
 	m_i8751_initial_config = memory_control_5797;
 }
@@ -8708,7 +8708,7 @@ DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 
 	if (memregion("maincpux") != nullptr)
 	{
-		UINT8 *rom = memregion("maincpux")->base();
+		uint8_t *rom = memregion("maincpux")->base();
 		memcpy(m_decrypted_opcodes, rom, 0x30000);
 	}
 }
@@ -9012,13 +9012,13 @@ WRITE16_MEMBER( isgsm_state::cart_addr_low_w )
 READ16_MEMBER( isgsm_state::cart_data_r )
 {
 	int size = memregion("gamecart_rgn")->bytes();
-	UINT8 *rgn = memregion("gamecart_rgn")->base();
+	uint8_t *rgn = memregion("gamecart_rgn")->base();
 	return rgn[(++m_cart_addr & (size - 1)) ^ 1] ^ m_read_xor;
 }
 
 WRITE16_MEMBER( isgsm_state::data_w )
 {
-	UINT8 *dest = nullptr;
+	uint8_t *dest = nullptr;
 
 	// m_data_type
 	// rrrp o?dd
@@ -9109,7 +9109,7 @@ WRITE16_MEMBER( isgsm_state::data_w )
 
 		for (int i = 0; i < bytes_to_write; i++)
 		{
-			UINT8 byte = 0;
+			uint8_t byte = 0;
 
 			if (m_data_mode & 0x8)
 			{
@@ -9189,12 +9189,12 @@ WRITE16_MEMBER( isgsm_state::cart_security_high_w )
 	m_security_latch = data;
 }
 
-UINT32 isgsm_state::shinfz_security(UINT32 input)
+uint32_t isgsm_state::shinfz_security(uint32_t input)
 {
 	return BITSWAP32(input, 19, 20, 25, 26, 15, 0, 16, 2, 8, 9, 13, 14, 31, 21, 7, 18, 11, 30, 22, 17, 3, 4, 12, 28, 29, 5, 27, 10, 23, 24, 1, 6);
 }
 
-UINT32 isgsm_state::tetrbx_security(UINT32 input)
+uint32_t isgsm_state::tetrbx_security(uint32_t input)
 {
 	// no bitswap on this cart? just returns what was written
 	return input;
@@ -9412,8 +9412,8 @@ DRIVER_INIT_MEMBER(isgsm_state,isgsm)
 	DRIVER_INIT_CALL(generic_5521);
 
 	// decrypt the bios...
-	std::vector<UINT16> temp(0x20000/2);
-	UINT16 *rom = (UINT16 *)memregion("bios")->base();
+	std::vector<uint16_t> temp(0x20000/2);
+	uint16_t *rom = (uint16_t *)memregion("bios")->base();
 	for (int addr = 0; addr < 0x20000/2; addr++)
 		temp[addr ^ 0x4127] = BITSWAP16(rom[addr], 6, 14, 4, 2, 12, 10, 8, 0, 1, 9, 11, 13, 3, 5, 7, 15);
 	memcpy(rom, &temp[0], 0x20000);
@@ -9423,8 +9423,8 @@ DRIVER_INIT_MEMBER(isgsm_state,shinfz)
 {
 	init_isgsm();
 
-	std::vector<UINT16> temp(0x200000/2);
-	UINT16 *rom = (UINT16 *)memregion("gamecart_rgn")->base();
+	std::vector<uint16_t> temp(0x200000/2);
+	uint16_t *rom = (uint16_t *)memregion("gamecart_rgn")->base();
 	for (int addr = 0; addr < 0x200000/2; addr++)
 		temp[addr ^ 0x68956] = BITSWAP16(rom[addr], 8, 4, 12, 3, 6, 7, 1, 0, 15, 11, 5, 14, 10, 2, 9, 13);
 	memcpy(rom, &temp[0], 0x200000);
@@ -9437,8 +9437,8 @@ DRIVER_INIT_MEMBER(isgsm_state,tetrbx)
 {
 	init_isgsm();
 
-	std::vector<UINT16> temp(0x80000/2);
-	UINT16 *rom = (UINT16 *)memregion("gamecart_rgn")->base();
+	std::vector<uint16_t> temp(0x80000/2);
+	uint16_t *rom = (uint16_t *)memregion("gamecart_rgn")->base();
 	for (int addr = 0; addr < 0x80000/2; addr++)
 		temp[addr ^ 0x2A6E6] = BITSWAP16(rom[addr], 4, 0, 12, 5, 7, 3, 1, 14, 10, 11, 9, 6, 15, 2, 13, 8);
 	memcpy(rom, &temp[0], 0x80000);

@@ -716,7 +716,7 @@ DRIVER_INIT_MEMBER(sauro_state,tecfri)
 	/* This game doesn't like all memory to be initialized to zero, it won't
 	   initialize the high scores */
 
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	memset(&RAM[0xe000], 0, 0x100);
 	RAM[0xe000] = 1;

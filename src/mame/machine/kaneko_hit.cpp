@@ -30,7 +30,7 @@
 
 const device_type KANEKO_HIT = &device_creator<kaneko_hit_device>;
 
-kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KANEKO_HIT, "Kaneko CALC Hitbox", tag, owner, clock, "kaneko_hit", __FILE__),
 		m_watchdog(*this, "^watchdog")
 {
@@ -149,7 +149,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_w)
 READ16_MEMBER(kaneko_hit_device::kaneko_hit_type0_r)
 {
 	calc1_hit_t &hit = m_hit;
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	switch (offset)
 	{
@@ -186,9 +186,9 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type0_r)
 			return data;
 
 		case 0x10/2:
-			return (((UINT32)hit.mult_a * (UINT32)hit.mult_b) >> 16);
+			return (((uint32_t)hit.mult_a * (uint32_t)hit.mult_b) >> 16);
 		case 0x12/2:
-			return (((UINT32)hit.mult_a * (UINT32)hit.mult_b) & 0xffff);
+			return (((uint32_t)hit.mult_a * (uint32_t)hit.mult_b) & 0xffff);
 
 		case 0x14/2:
 			return (machine().rand() & 0xffff);
@@ -234,8 +234,8 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type0_w)
 READ16_MEMBER(kaneko_hit_device::kaneko_hit_type1_r)
 {
 	calc1_hit_t &hit = m_hit;
-	UINT16 data = 0;
-	INT16 x_coll, y_coll;
+	uint16_t data = 0;
+	int16_t x_coll, y_coll;
 
 
 	x_coll = calc_compute_x(hit);
@@ -328,9 +328,9 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type1_w)
   result      <---------->  |     <-------->     |       <---->
 */
 
-INT16 kaneko_hit_device::calc_compute_x(calc1_hit_t &hit)
+int16_t kaneko_hit_device::calc_compute_x(calc1_hit_t &hit)
 {
-	INT16 x_coll;
+	int16_t x_coll;
 
 	// X distance
 	if ((hit.x2p >= hit.x1p) && (hit.x2p < (hit.x1p + hit.x1s)))        // x2p inside x1
@@ -343,9 +343,9 @@ INT16 kaneko_hit_device::calc_compute_x(calc1_hit_t &hit)
 	return x_coll;
 }
 
-INT16 kaneko_hit_device::calc_compute_y(calc1_hit_t &hit)
+int16_t kaneko_hit_device::calc_compute_y(calc1_hit_t &hit)
 {
-	INT16 y_coll;
+	int16_t y_coll;
 
 	// Y distance
 	if ((hit.y2p >= hit.y1p) && (hit.y2p < (hit.y1p + hit.y1s)))        // y2p inside y1

@@ -29,7 +29,7 @@ class floppy_controller_device : public device_t, public device_memexp_interface
 {
 public:
 	// construction/destruction
-	floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
@@ -48,7 +48,7 @@ protected:
 	required_device<floppy_connector> m_floppy0, m_floppy1;
 	floppy_image_device *m_floppy;
 
-	UINT8 m_latch, m_shifter;
+	uint8_t m_latch, m_shifter;
 	bool m_latching_inverter;
 	int m_current_cyl;
 	attotime m_last_latching_inverter_update_time;

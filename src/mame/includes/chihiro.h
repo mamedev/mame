@@ -63,7 +63,7 @@ public:
 struct vertex_nv {
 	union {
 		float fv[4];
-		UINT32 iv[4];
+		uint32_t iv[4];
 	} attribute[16];
 };
 
@@ -434,23 +434,23 @@ public:
 	DECLARE_READ32_MEMBER(geforce_r);
 	DECLARE_WRITE32_MEMBER(geforce_w);
 	void vblank_callback(screen_device &screen, bool state);
-	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_interrupts();
 	void set_interrupt_device(pic8259_device *device);
 
-	void render_texture_simple(INT32 scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
-	void render_color(INT32 scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
-	void render_register_combiners(INT32 scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid);
+	void render_texture_simple(int32_t scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
+	void render_color(int32_t scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
+	void render_register_combiners(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid);
 
-	int geforce_commandkind(UINT32 word);
-	UINT32 geforce_object_offset(UINT32 handle);
-	void geforce_read_dma_object(UINT32 handle, UINT32 &offset, UINT32 &size);
-	void geforce_assign_object(address_space &space, UINT32 chanel, UINT32 subchannel, UINT32 address);
-	int geforce_exec_method(address_space &space, UINT32 channel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen);
-	UINT32 texture_get_texel(int number, int x, int y);
-	UINT8 *read_pixel(int x, int y, INT32 c[4]);
-	void write_pixel(int x, int y, UINT32 color, int depth);
-	void combiner_initialize_registers(UINT32 argb8[6]);
+	int geforce_commandkind(uint32_t word);
+	uint32_t geforce_object_offset(uint32_t handle);
+	void geforce_read_dma_object(uint32_t handle, uint32_t &offset, uint32_t &size);
+	void geforce_assign_object(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t address);
+	int geforce_exec_method(address_space &space, uint32_t channel, uint32_t subchannel, uint32_t method, uint32_t address, int &countlen);
+	uint32_t texture_get_texel(int number, int x, int y);
+	uint8_t *read_pixel(int x, int y, int32_t c[4]);
+	void write_pixel(int x, int y, uint32_t color, int depth);
+	void combiner_initialize_registers(uint32_t argb8[6]);
 	void combiner_initialize_stage(int stage_number);
 	void combiner_initialize_final();
 	void combiner_map_input(int stage_number); // map combiner registers to variables A..D
@@ -470,56 +470,56 @@ public:
 	void combiner_function_ABsumCD(float result[4]);
 	void combiner_compute_rgb_outputs(int index);
 	void combiner_compute_a_outputs(int index);
-	void combiner_argb8_float(UINT32 color, float reg[4]);
-	UINT32 combiner_float_argb8(float reg[4]);
-	UINT32 dilate0(UINT32 value, int bits);
-	UINT32 dilate1(UINT32 value, int bits);
+	void combiner_argb8_float(uint32_t color, float reg[4]);
+	uint32_t combiner_float_argb8(float reg[4]);
+	uint32_t dilate0(uint32_t value, int bits);
+	uint32_t dilate1(uint32_t value, int bits);
 	void computedilated(void);
 	int toggle_register_combiners_usage();
 	int toggle_wait_vblank_support();
 	void debug_grab_texture(int type, const char *filename);
-	void debug_grab_vertex_program_slot(int slot, UINT32 *instruction);
+	void debug_grab_vertex_program_slot(int slot, uint32_t *instruction);
 	void start(address_space *cpu_space);
 	void savestate_items();
 	void compute_supersample_factors(float &horizontal, float &vertical);
-	void compute_limits_rendertarget(UINT32 chanel, UINT32 subchannel);
+	void compute_limits_rendertarget(uint32_t chanel, uint32_t subchannel);
 	void read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib);
-	int read_vertices_0x1800(address_space & space, vertex_nv *destination, UINT32 address, int limit);
-	int read_vertices_0x1808(address_space & space, vertex_nv *destination, UINT32 address, int limit);
+	int read_vertices_0x1800(address_space & space, vertex_nv *destination, uint32_t address, int limit);
+	int read_vertices_0x1808(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
-	int read_vertices_0x1818(address_space & space, vertex_nv *destination, UINT32 address, int limit);
+	int read_vertices_0x1818(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	void convert_vertices_poly(vertex_nv *source, nv2avertex_t *destination, int count);
 	void assemble_primitive(vertex_nv *source, int count, render_delegate &renderspans);
-	UINT32 render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
-	UINT32 render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
-	void clear_render_target(int what, UINT32 value);
-	void clear_depth_buffer(int what, UINT32 value);
-	inline UINT8 *direct_access_ptr(offs_t address);
+	uint32_t render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
+	uint32_t render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
+	void clear_render_target(int what, uint32_t value);
+	void clear_depth_buffer(int what, uint32_t value);
+	inline uint8_t *direct_access_ptr(offs_t address);
 	TIMER_CALLBACK_MEMBER(puller_timer_work);
 
 	struct {
-		UINT32 regs[0x80 / 4];
+		uint32_t regs[0x80 / 4];
 		struct {
-			UINT32 objhandle;
-			UINT32 objclass;
-			UINT32 method[0x2000 / 4];
-			// int execute_method(address_space & space, UINT32 method, UINT32 address, int &countlen); // for the future
+			uint32_t objhandle;
+			uint32_t objclass;
+			uint32_t method[0x2000 / 4];
+			// int execute_method(address_space & space, uint32_t method, uint32_t address, int &countlen); // for the future
 		} object;
 	} channel[32][8];
-	UINT32 pfifo[0x2000 / 4];
-	UINT32 pcrtc[0x1000 / 4];
-	UINT32 pmc[0x1000 / 4];
-	UINT32 pgraph[0x2000 / 4];
-	UINT32 ramin[0x100000 / 4];
-	UINT32 dma_offset[2];
-	UINT32 dma_size[2];
-	UINT8 *basemempointer;
-	UINT8 *topmempointer;
+	uint32_t pfifo[0x2000 / 4];
+	uint32_t pcrtc[0x1000 / 4];
+	uint32_t pmc[0x1000 / 4];
+	uint32_t pgraph[0x2000 / 4];
+	uint32_t ramin[0x100000 / 4];
+	uint32_t dma_offset[2];
+	uint32_t dma_size[2];
+	uint8_t *basemempointer;
+	uint8_t *topmempointer;
 	pic8259_device *interruptdevice;
 	rectangle clippingwindows[8];
 	rectangle limits_rendertarget;
-	UINT32 pitch_rendertarget;
-	UINT32 pitch_depthbuffer;
+	uint32_t pitch_rendertarget;
+	uint32_t pitch_depthbuffer;
 	int log2height_rendertarget;
 	int log2width_rendertarget;
 	int dilate_rendertarget;
@@ -529,13 +529,13 @@ public:
 	NV2A_COLOR_FORMAT colorformat_rendertarget;
 	int bytespixel_rendertarget;
 	rectangle clear_rendertarget;
-	UINT32 antialias_control;
+	uint32_t antialias_control;
 	float supersample_factor_x;
 	float supersample_factor_y;
-	UINT32 *rendertarget;
-	UINT32 *depthbuffer;
-	UINT32 *displayedtarget;
-	UINT32 vertexbuffer_address[16];
+	uint32_t *rendertarget;
+	uint32_t *depthbuffer;
+	uint32_t *displayedtarget;
+	uint32_t vertexbuffer_address[16];
 	int vertexbuffer_stride[16];
 	NV2A_VTXBUF_TYPE vertexbuffer_kind[16];
 	int vertexbuffer_size[16];
@@ -564,10 +564,10 @@ public:
 		int rectwidth;
 	} texture[4];
 	NV2A_BEGIN_END primitive_type;
-	UINT32 primitives_count;
+	uint32_t primitives_count;
 	int indexesleft_count;
 	int indexesleft_first;
-	UINT32 indexesleft[1024]; // vertex indices sent by the software to the 3d accelerator
+	uint32_t indexesleft[1024]; // vertex indices sent by the software to the 3d accelerator
 	int vertex_count;
 	unsigned int vertex_first;
 	int vertex_accumulated;
@@ -679,7 +679,7 @@ public:
 		int used;
 		std::mutex lock;
 	} combiner;
-	UINT32 color_mask;
+	uint32_t color_mask;
 	bool backface_culling_enabled;
 	NV2A_GL_FRONT_FACE backface_culling_winding;
 	NV2A_GL_CULL_FACE backface_culling_culled;
@@ -700,7 +700,7 @@ public:
 	NV2A_BLEND_EQUATION blend_equation;
 	NV2A_BLEND_FACTOR blend_function_source;
 	NV2A_BLEND_FACTOR blend_function_destination;
-	UINT32 blend_color;
+	uint32_t blend_color;
 	bool logical_operation_enabled;
 	NV2A_LOGIC_OP logical_operation;
 	struct {
@@ -727,8 +727,8 @@ public:
 	emu_timer *puller_timer;
 	int puller_waiting;
 	address_space *puller_space;
-	UINT32 dilated0[16][2048];
-	UINT32 dilated1[16][2048];
+	uint32_t dilated0[16][2048];
+	uint32_t dilated1[16][2048];
 	int dilatechose[256];
 	nvidia_object_data *objectdata;
 	int debug_grab_texttype;

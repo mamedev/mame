@@ -77,15 +77,16 @@
 */
 
 #include "includes/thomson.h"
-#include "bus/rs232/rs232.h"
-#include "machine/6821pia.h"
-#include "machine/wd_fdc.h"
-#include "machine/clock.h"
 #include "bus/centronics/ctronics.h"
-#include "imagedev/flopdrv.h"
+#include "bus/rs232/rs232.h"
 #include "formats/cd90_640_dsk.h"
 #include "formats/basicdsk.h"
+#include "imagedev/flopdrv.h"
+#include "machine/6821pia.h"
+#include "machine/clock.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/volt_reg.h"
 #include "softlist.h"
 
 
@@ -635,13 +636,16 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 
 /* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD ( "buzzer", DAC, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit buzzer */
-	MCFG_SOUND_ADD ( "dac", DAC, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 6-bit game extention DAC */
-	MCFG_SOUND_ADD ( "speech", DAC, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("buzzer", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (6-bit game extension DAC)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "buzzer", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
+/* speech synthesis */
+	MCFG_SOUND_ADD("mea8000", MEA8000, 3840000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 /* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -652,14 +656,10 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 /* timer */
 	MCFG_DEVICE_ADD("mc6846", MC6846, 0)
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to7_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITE8(thomson_state, to7_timer_cp2_out))
+	MCFG_MC6846_OUT_CP2_CB(DEVWRITELINE("buzzer", dac_bit_interface, write))
 	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to7_timer_port_in))
-	MCFG_MC6846_OUT_CTO_CB(WRITE8(thomson_state, to7_timer_tco_out))
+	MCFG_MC6846_OUT_CTO_CB(WRITELINE(thomson_state, to7_set_cassette))
 	MCFG_MC6846_IRQ_CB(WRITELINE(thomson_state, thom_dev_irq_0))
-
-/* speech synthesis */
-	MCFG_DEVICE_ADD("mea8000", MEA8000, 0)
-	MCFG_MEA8000_DAC("speech")
 
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
@@ -1122,7 +1122,7 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo5_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo5_sys_portb_in))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo5_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, mo5_sys_portb_out))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(NOOP)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* WARNING: differs from TO7 ! */
@@ -1704,7 +1704,7 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to8_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITE8(thomson_state, to8_timer_cp2_out))
+	MCFG_MC6846_OUT_CP2_CB(WRITELINE(thomson_state, to8_timer_cp2_out))
 	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to8_timer_port_in))
 
 	/* internal ram */
@@ -1868,7 +1868,7 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to9p_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITE8(thomson_state, to8_timer_cp2_out))
+	MCFG_MC6846_OUT_CP2_CB(WRITELINE(thomson_state, to8_timer_cp2_out))
 	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to9p_timer_port_in))
 
 	/* internal ram */
@@ -2213,7 +2213,7 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo6_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo6_sys_portb_in))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, mo6_sys_portb_out))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
@@ -2482,7 +2482,7 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo6_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo5nr_sys_portb_in))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo5nr_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, mo6_sys_portb_out))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */

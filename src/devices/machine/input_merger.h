@@ -56,7 +56,7 @@ public:
 
 protected:
 	// constructor/destructor
-	input_merger_device(machine_config const &mconfig, device_type type, char const *name, char const *tag, device_t *owner, UINT32 clock, char const *shortname, char const *source);
+	input_merger_device(machine_config const &mconfig, device_type type, char const *name, char const *tag, device_t *owner, uint32_t clock, char const *shortname, char const *source);
 	virtual ~input_merger_device() override;
 
 	// device-level overrides
@@ -73,7 +73,7 @@ protected:
 class input_merger_active_high_device : public input_merger_device
 {
 public:
-	input_merger_active_high_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	input_merger_active_high_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -88,7 +88,7 @@ protected:
 class input_merger_active_low_device : public input_merger_device
 {
 public:
-	input_merger_active_low_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	input_merger_active_low_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides

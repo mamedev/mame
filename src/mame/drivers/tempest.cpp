@@ -315,7 +315,7 @@ public:
 	required_device<mathbox_device> m_mathbox;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<avg_tempest_device> m_avg;
-	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<uint8_t> m_rom;
 
 	required_ioport m_knob_p1;
 	required_ioport m_knob_p2;
@@ -324,7 +324,7 @@ public:
 	required_ioport m_in1;
 	required_ioport m_in2;
 
-	UINT8 m_player_select;
+	uint8_t m_player_select;
 	DECLARE_WRITE8_MEMBER(wdclr_w);
 	DECLARE_WRITE8_MEMBER(tempest_led_w);
 	DECLARE_WRITE8_MEMBER(tempest_coin_w);

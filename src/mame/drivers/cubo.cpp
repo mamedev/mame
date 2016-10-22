@@ -331,8 +331,8 @@ public:
 	m_cdda(*this, "cdda")
 	{ }
 
-	void handle_joystick_cia(UINT8 pra, UINT8 dra);
-	UINT16 handle_joystick_potgor(UINT16 potgor);
+	void handle_joystick_cia(uint8_t pra, uint8_t dra);
+	uint16_t handle_joystick_potgor(uint16_t potgor);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
 	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
@@ -353,11 +353,11 @@ public:
 
 	int m_oldstate[2];
 	int m_cd32_shifter[2];
-	UINT16 m_potgo_value;
+	uint16_t m_potgo_value;
 
 protected:
 	virtual void rs232_tx(int state) override;
-	virtual void potgo_w(UINT16 data) override;
+	virtual void potgo_w(uint16_t data) override;
 
 private:
 	required_device<microtouch_device> m_microtouch;
@@ -365,7 +365,7 @@ private:
 
 	typedef void (cubo_state::*input_hack_func)();
 	input_hack_func m_input_hack;
-	void chip_ram_w8_hack(offs_t byteoffs, UINT8 data);
+	void chip_ram_w8_hack(offs_t byteoffs, uint8_t data);
 	void cndypuzl_input_hack();
 	void haremchl_input_hack();
 	void lsrquiz_input_hack();
@@ -436,7 +436,7 @@ void cubo_state::rs232_tx(int state)
 	m_microtouch->rx_w(state);
 }
 
-void cubo_state::potgo_w(UINT16 data)
+void cubo_state::potgo_w(uint16_t data)
 {
 	int i;
 
@@ -448,30 +448,30 @@ void cubo_state::potgo_w(UINT16 data)
 
 	for (i = 0; i < 8; i += 2)
 	{
-		UINT16 dir = 0x0200 << i;
+		uint16_t dir = 0x0200 << i;
 		if (data & dir)
 		{
-			UINT16 d = 0x0100 << i;
+			uint16_t d = 0x0100 << i;
 			m_potgo_value &= ~d;
 			m_potgo_value |= data & d;
 		}
 	}
 	for (i = 0; i < 2; i++)
 	{
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
 			m_cd32_shifter[i] = 8;
 	}
 }
 
-void cubo_state::handle_joystick_cia(UINT8 pra, UINT8 dra)
+void cubo_state::handle_joystick_cia(uint8_t pra, uint8_t dra)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		UINT8 but = 0x40 << i;
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint8_t but = 0x40 << i;
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		if (!(m_potgo_value & p5dir) || !(m_potgo_value & p5dat))
 		{
@@ -489,14 +489,14 @@ void cubo_state::handle_joystick_cia(UINT8 pra, UINT8 dra)
 	}
 }
 
-UINT16 cubo_state::handle_joystick_potgor(UINT16 potgor)
+uint16_t cubo_state::handle_joystick_potgor(uint16_t potgor)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		UINT16 p9dir = 0x0800 << (i * 4); /* output enable P9 */
-		UINT16 p9dat = 0x0400 << (i * 4); /* data P9 */
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint16_t p9dir = 0x0800 << (i * 4); /* output enable P9 */
+		uint16_t p9dat = 0x0400 << (i * 4); /* data P9 */
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		/* p5 is floating in input-mode */
 		potgor &= ~p5dat;
@@ -522,7 +522,7 @@ CUSTOM_INPUT_MEMBER( cubo_state::cubo_input )
 
 CUSTOM_INPUT_MEMBER( cubo_state::cd32_sel_mirror_input )
 {
-	UINT8 bits = m_player_ports[(int)(FPTR)param]->read();
+	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;
 }
 
@@ -1166,14 +1166,14 @@ ROM_END
  *
  *************************************/
 
-void cubo_state::chip_ram_w8_hack(offs_t byteoffs, UINT8 data)
+void cubo_state::chip_ram_w8_hack(offs_t byteoffs, uint8_t data)
 {
-	UINT16 word = chip_ram_r(byteoffs);
+	uint16_t word = chip_ram_r(byteoffs);
 
 	if (byteoffs & 1)
 		word = (word & 0xff00) | data;
 	else
-		word = (word & 0x00ff) | (((UINT16)data) << 8);
+		word = (word & 0x00ff) | (((uint16_t)data) << 8);
 
 	chip_ram_w(byteoffs, word);
 }
@@ -1182,7 +1182,7 @@ void cubo_state::cndypuzl_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w(r_A5 - 0x7ebe, 0x0000);
 	}
 }
@@ -1197,8 +1197,8 @@ void cubo_state::haremchl_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (chip_ram_r(r_A5 - 0x7f00 + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (chip_ram_r(r_A5 - 0x7f00 + 2));
 		chip_ram_w8_hack(r_A2 + 0x1f, 0x00);
 	}
 }
@@ -1213,8 +1213,8 @@ void cubo_state::lsrquiz_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fe0 + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fe0 + 2));
 		chip_ram_w8_hack(r_A2 + 0x13, 0x00);
 	}
 }
@@ -1230,8 +1230,8 @@ void cubo_state::lsrquiz2_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (chip_ram_r(r_A5 - 0x7fdc + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (chip_ram_r(r_A5 - 0x7fdc + 2));
 		chip_ram_w8_hack(r_A2 + 0x17, 0x00);
 	}
 }
@@ -1246,8 +1246,8 @@ void cubo_state::lasstixx_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fa2 + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fa2 + 2));
 		chip_ram_w8_hack(r_A2 + 0x24, 0x00);
 	}
 }
@@ -1262,7 +1262,7 @@ void cubo_state::mgnumber_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w(r_A5 - 0x7ed8, 0x0000);
 	}
 }
@@ -1277,7 +1277,7 @@ void cubo_state::mgprem11_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w8_hack(r_A5 - 0x7eca, 0x00);
 	}
 }

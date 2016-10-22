@@ -18,6 +18,6 @@ All rights reserved.
 
 */
 
-int m7700_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 *oprom, int m_flag, int x_flag);
+int m7700_disassemble(char* buff, unsigned int pc, unsigned int pb, const uint8_t *oprom, int m_flag, int x_flag);
 
 #endif /* __M7700DS_H__ */

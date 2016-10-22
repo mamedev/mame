@@ -49,15 +49,15 @@ public:
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
 private:
-	UINT8 m_hblank;
-	UINT16 m_vram_addr;
-	UINT8 m_vram_latch;
-	UINT8 m_attr_latch;
-//  UINT8 m_gfx_mode;
-	UINT8 m_mux_data;
+	uint8_t m_hblank;
+	uint16_t m_vram_addr;
+	uint8_t m_vram_latch;
+	uint8_t m_attr_latch;
+//  uint8_t m_gfx_mode;
+	uint8_t m_mux_data;
 	bool m_video_wl;
 	bool m_ram_bank;
-	UINT8 *m_p_vram;
+	uint8_t *m_p_vram;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -86,14 +86,14 @@ void pasopia_state::video_start()
 MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *m_p_chargen = memregion("chargen")->base();
-	UINT8 chr,gfx,fg=7,bg=0; // colours need to be determined
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t *m_p_chargen = memregion("chargen")->base();
+	uint8_t chr,gfx,fg=7,bg=0; // colours need to be determined
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
-		UINT8 inv=0;
+		uint8_t inv=0;
 		if (x == cursor_x) inv=0xff;
 		mem = ma + x;
 		chr = m_p_vram[mem & 0x7ff];
@@ -181,7 +181,7 @@ READ8_MEMBER( pasopia_state::portb_1_r )
 	--x- ---- vblank
 	---x ---- LCD system mode, active low
 	*/
-	UINT8 grph_latch,lcd_mode;
+	uint8_t grph_latch,lcd_mode;
 
 	m_hblank ^= 0x40; //TODO
 	grph_latch = (m_p_vram[m_vram_addr | 0x4000] & 0x80);
@@ -218,7 +218,7 @@ READ8_MEMBER( pasopia_state::rombank_r )
 
 READ8_MEMBER( pasopia_state::keyb_r )
 {
-	UINT8 i,j,res = 0;
+	uint8_t i,j,res = 0;
 	for (j=0; j<3; j++)
 	{
 		if (BIT(m_mux_data, 4+j))
@@ -270,7 +270,7 @@ DRIVER_INIT_MEMBER(pasopia_state,pasopia)
 We preset all banks here, so that bankswitching will incur no speed penalty.
 0000 indicates ROMs, 10000 indicates RAM.
 */
-	UINT8 *ram = memregion("maincpu")->base();
+	uint8_t *ram = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ram[0x00000], 0x10000);
 	membank("bank2")->configure_entry(0, &ram[0x10000]);
 

@@ -23,11 +23,11 @@
 //**************************************************************************
 
 // relative devices return ~512 units per onscreen pixel
-const INT32 INPUT_RELATIVE_PER_PIXEL = 512;
+const int32_t INPUT_RELATIVE_PER_PIXEL = 512;
 
 // absolute devices return values between -65536 and +65536
-const INT32 INPUT_ABSOLUTE_MIN = -65536;
-const INT32 INPUT_ABSOLUTE_MAX = 65536;
+const int32_t INPUT_ABSOLUTE_MIN = -65536;
+const int32_t INPUT_ABSOLUTE_MAX = 65536;
 
 // maximum number of axis/buttons/hats with ITEM_IDs for use by osd layer
 const int INPUT_MAX_AXIS = 8;
@@ -354,7 +354,7 @@ class input_manager;
 
 
 // callback for getting the value of an item on a device
-typedef INT32 (*item_get_state_func)(void *device_internal, void *item_internal);
+typedef int32_t (*item_get_state_func)(void *device_internal, void *item_internal);
 
 // controller alias table typedef
 typedef std::map<std::string, std::string> devicemap_table_type;
@@ -379,15 +379,15 @@ public:
 	std::string to_string() const;
 
 	// update the state of a live map
-	UINT8 update(INT32 xaxisval, INT32 yaxisval);
+	uint8_t update(int32_t xaxisval, int32_t yaxisval);
 
 	// joystick mapping codes
-	static const UINT8 JOYSTICK_MAP_NEUTRAL = 0x00;
-	static const UINT8 JOYSTICK_MAP_LEFT    = 0x01;
-	static const UINT8 JOYSTICK_MAP_RIGHT   = 0x02;
-	static const UINT8 JOYSTICK_MAP_UP      = 0x04;
-	static const UINT8 JOYSTICK_MAP_DOWN    = 0x08;
-	static const UINT8 JOYSTICK_MAP_STICKY  = 0x0f;
+	static const uint8_t JOYSTICK_MAP_NEUTRAL = 0x00;
+	static const uint8_t JOYSTICK_MAP_LEFT    = 0x01;
+	static const uint8_t JOYSTICK_MAP_RIGHT   = 0x02;
+	static const uint8_t JOYSTICK_MAP_UP      = 0x04;
+	static const uint8_t JOYSTICK_MAP_DOWN    = 0x08;
+	static const uint8_t JOYSTICK_MAP_STICKY  = 0x0f;
 
 private:
 	// internal helpers
@@ -399,8 +399,8 @@ private:
 	}
 
 	// internal state
-	UINT8                   m_map[9][9];            // 9x9 grid
-	UINT8                   m_lastmap;              // last value returned (for sticky tracking)
+	uint8_t                   m_map[9][9];            // 9x9 grid
+	uint8_t                   m_lastmap;              // last value returned (for sticky tracking)
 	std::string             m_origstring;           // originally parsed string
 };
 
@@ -446,7 +446,7 @@ public:
 
 private:
 	// internal state
-	UINT32      m_internal;
+	uint32_t      m_internal;
 };
 
 
@@ -516,17 +516,17 @@ public:
 	input_item_id itemid() const { return m_itemid; }
 	input_item_class itemclass() const { return m_itemclass; }
 	const char *token() const { return m_token.c_str(); }
-	INT32 current() const { return m_current; }
-	INT32 memory() const { return m_memory; }
+	int32_t current() const { return m_current; }
+	int32_t memory() const { return m_memory; }
 
 	// helpers
-	INT32 update_value();
-	void set_memory(INT32 value) { m_memory = value; }
+	int32_t update_value();
+	void set_memory(int32_t value) { m_memory = value; }
 
 	// readers
-	virtual INT32 read_as_switch(input_item_modifier modifier) = 0;
-	virtual INT32 read_as_relative(input_item_modifier modifier) = 0;
-	virtual INT32 read_as_absolute(input_item_modifier modifier) = 0;
+	virtual int32_t read_as_switch(input_item_modifier modifier) = 0;
+	virtual int32_t read_as_relative(input_item_modifier modifier) = 0;
+	virtual int32_t read_as_absolute(input_item_modifier modifier) = 0;
 
 protected:
 	// internal state
@@ -539,8 +539,8 @@ protected:
 	std::string             m_token;                // tokenized name for non-standard items
 
 	// live state
-	INT32                   m_current;              // current raw value
-	INT32                   m_memory;               // "memory" value, to remember where we started during polling
+	int32_t                   m_current;              // current raw value
+	int32_t                   m_memory;               // "memory" value, to remember where we started during polling
 };
 
 
@@ -577,7 +577,7 @@ public:
 	void set_joystick_map(const joystick_map &map) { m_joymap = map; }
 
 	// helpers
-	INT32 apply_deadzone_and_saturation(INT32 value) const;
+	int32_t apply_deadzone_and_saturation(int32_t value) const;
 	void apply_steadykey() const;
 	bool match_device_id(const char * deviceid);
 
@@ -593,8 +593,8 @@ private:
 
 	// joystick information
 	joystick_map            m_joymap;               // joystick map for this device
-	INT32                   m_joystick_deadzone;    // deadzone for joystick
-	INT32                   m_joystick_saturation;  // saturation position for joystick
+	int32_t                   m_joystick_deadzone;    // deadzone for joystick
+	int32_t                   m_joystick_saturation;  // saturation position for joystick
 	bool                    m_steadykey_enabled;    // steadykey enabled for keyboards
 	bool                    m_lightgun_reload_button; // lightgun reload hack
 };
@@ -658,7 +658,7 @@ public:
 	input_class &device_class(input_device_class devclass) { assert(devclass < ARRAY_LENGTH(m_class)); assert(m_class[devclass] != nullptr); return *m_class[devclass]; }
 
 	// input code readers
-	INT32 code_value(input_code code);
+	int32_t code_value(input_code code);
 	bool code_pressed(input_code code) { return code_value(code) != 0; }
 	bool code_pressed_once(input_code code);
 
@@ -678,7 +678,7 @@ public:
 
 	// input sequence readers
 	bool seq_pressed(const input_seq &seq);
-	INT32 seq_axis_value(const input_seq &seq, input_item_class &itemclass);
+	int32_t seq_axis_value(const input_seq &seq, input_item_class &itemclass);
 
 	// input sequence polling
 	void seq_poll_start(input_item_class itemclass, const input_seq *startseq = nullptr);
@@ -1181,7 +1181,7 @@ extern const char joystick_map_4way_diagonal[];
 // input_device_item helpers
 inline input_manager &input_device_item::manager() const { return m_device.manager(); }
 inline running_machine &input_device_item::machine() const { return m_device.machine(); }
-inline  INT32 input_device_item::update_value() { return m_current = (*m_getstate)(m_device.internal(), m_internal); }
+inline  int32_t input_device_item::update_value() { return m_current = (*m_getstate)(m_device.internal(), m_internal); }
 
 // input_device helpers
 inline input_manager &input_device::manager() const { return m_class.manager(); }

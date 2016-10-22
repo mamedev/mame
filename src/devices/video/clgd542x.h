@@ -16,8 +16,8 @@ class cirrus_gd5428_device :  public svga_device
 {
 public:
 	// construction/destruction
-	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual READ8_MEMBER(port_03c0_r) override;
 	virtual WRITE8_MEMBER(port_03c0_w) override;
 	virtual READ8_MEMBER(port_03b0_r) override;
@@ -27,84 +27,84 @@ public:
 	virtual READ8_MEMBER(mem_r) override;
 	virtual WRITE8_MEMBER(mem_w) override;
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual UINT16 offset() override;
+	virtual uint16_t offset() override;
 
-	UINT8 m_chip_id;
+	uint8_t m_chip_id;
 
-	UINT8 gc_mode_ext;
-	UINT8 gc_bank_0;
-	UINT8 gc_bank_1;
+	uint8_t gc_mode_ext;
+	uint8_t gc_bank_0;
+	uint8_t gc_bank_1;
 	bool gc_locked;
-	UINT8 m_lock_reg;
-	UINT8 m_gr10;  // high byte of background colour (in 15/16bpp)
-	UINT8 m_gr11;  // high byte of foreground colour (in 15/16bpp)
+	uint8_t m_lock_reg;
+	uint8_t m_gr10;  // high byte of background colour (in 15/16bpp)
+	uint8_t m_gr11;  // high byte of foreground colour (in 15/16bpp)
 
-	UINT8 m_cr19;
-	UINT8 m_cr1a;
-	UINT8 m_cr1b;
+	uint8_t m_cr19;
+	uint8_t m_cr1a;
+	uint8_t m_cr1b;
 
 	// hardware cursor
-	UINT16 m_cursor_x;
-	UINT16 m_cursor_y;
-	UINT16 m_cursor_addr;
-	UINT8 m_cursor_attr;
+	uint16_t m_cursor_x;
+	uint16_t m_cursor_y;
+	uint16_t m_cursor_addr;
+	uint8_t m_cursor_attr;
 	bool m_ext_palette_enabled;
-	struct { UINT8 red, green, blue; } m_ext_palette[16];  // extra palette, colour 0 is cursor background, colour 15 is cursor foreground, colour 2 is overscan border colour
+	struct { uint8_t red, green, blue; } m_ext_palette[16];  // extra palette, colour 0 is cursor background, colour 15 is cursor foreground, colour 2 is overscan border colour
 
 	// BitBLT engine
-	UINT8 m_blt_status;
-	UINT8 m_blt_rop;
-	UINT8 m_blt_mode;
-	UINT32 m_blt_source;
-	UINT32 m_blt_dest;
-	UINT16 m_blt_source_pitch;
-	UINT16 m_blt_dest_pitch;
-	UINT16 m_blt_height;
-	UINT16 m_blt_width;
-	UINT32 m_blt_source_current;
-	UINT32 m_blt_dest_current;
-	UINT16 m_blt_trans_colour;
-	UINT16 m_blt_trans_colour_mask;
+	uint8_t m_blt_status;
+	uint8_t m_blt_rop;
+	uint8_t m_blt_mode;
+	uint32_t m_blt_source;
+	uint32_t m_blt_dest;
+	uint16_t m_blt_source_pitch;
+	uint16_t m_blt_dest_pitch;
+	uint16_t m_blt_height;
+	uint16_t m_blt_width;
+	uint32_t m_blt_source_current;
+	uint32_t m_blt_dest_current;
+	uint16_t m_blt_trans_colour;
+	uint16_t m_blt_trans_colour_mask;
 
 	bool m_blt_system_transfer;  // blit from system memory
-	UINT8 m_blt_system_count;
-	UINT32 m_blt_system_buffer;
-	UINT16 m_blt_pixel_count;
-	UINT16 m_blt_scan_count;
+	uint8_t m_blt_system_count;
+	uint32_t m_blt_system_buffer;
+	uint16_t m_blt_pixel_count;
+	uint16_t m_blt_scan_count;
 
-	UINT8 m_scratchpad1;
-	UINT8 m_scratchpad2;
-	UINT8 m_scratchpad3;
-	UINT8 m_vclk_num[4];
-	UINT8 m_vclk_denom[4];
+	uint8_t m_scratchpad1;
+	uint8_t m_scratchpad2;
+	uint8_t m_scratchpad3;
+	uint8_t m_vclk_num[4];
+	uint8_t m_vclk_denom[4];
 
-	inline UINT8 cirrus_vga_latch_write(int offs, UINT8 data);
+	inline uint8_t cirrus_vga_latch_write(int offs, uint8_t data);
 private:
 	void cirrus_define_video_mode();
-	UINT8 cirrus_seq_reg_read(UINT8 index);
-	void cirrus_seq_reg_write(UINT8 index, UINT8 data);
-	UINT8 cirrus_gc_reg_read(UINT8 index);
-	void cirrus_gc_reg_write(UINT8 index, UINT8 data);
-	UINT8 cirrus_crtc_reg_read(UINT8 index);
-	void cirrus_crtc_reg_write(UINT8 index, UINT8 data);
+	uint8_t cirrus_seq_reg_read(uint8_t index);
+	void cirrus_seq_reg_write(uint8_t index, uint8_t data);
+	uint8_t cirrus_gc_reg_read(uint8_t index);
+	void cirrus_gc_reg_write(uint8_t index, uint8_t data);
+	uint8_t cirrus_crtc_reg_read(uint8_t index);
+	void cirrus_crtc_reg_write(uint8_t index, uint8_t data);
 
 	void start_bitblt();
 	void start_reverse_bitblt();
 	void start_system_bitblt();
 	void blit_dword();
 	void blit_byte();  // used for colour expanded system-to-vram bitblts
-	void copy_pixel(UINT8 src, UINT8 dst);
+	void copy_pixel(uint8_t src, uint8_t dst);
 };
 
 class cirrus_gd5430_device :  public cirrus_gd5428_device
 {
 public:
-	cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	virtual void device_start() override;
 };

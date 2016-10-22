@@ -52,7 +52,7 @@ READ16_MEMBER(konamigx_state::K055550_word_r)
 
 WRITE16_MEMBER(konamigx_state::K055550_word_w)
 {
-	UINT32 adr, bsize, count, i, lim;
+	uint32_t adr, bsize, count, i, lim;
 	int src, tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
 	int dx, dy, angle;
 
@@ -181,7 +181,7 @@ WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
 	int dst_addr, /*dst_count,*/ dst_skip;
 	int mod_addr, mod_count, mod_skip, mod_offs;
 	int mode, i, element_size = 1;
-	UINT16 mod_val, mod_data;
+	uint16_t mod_val, mod_data;
 
 	COMBINE_DATA(m_prot_data+offset);
 
@@ -260,14 +260,14 @@ WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
 	}
 }
 
-void konamigx_state::konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode) // (WARNING: assumed big endianess)
+void konamigx_state::konamigx_esc_alert(uint32_t *srcbase, int srcoffs, int count, int mode) // (WARNING: assumed big endianess)
 {
-	UINT16* k053247_ram;
+	uint16_t* k053247_ram;
 	m_k055673->k053247_get_ram(&k053247_ram);
 
 
 // hand-filled but should be close
-static const UINT8 ztable[7][8] =
+static const uint8_t ztable[7][8] =
 {
 	{5,4,3,2,1,7,6,0},
 	{4,3,2,1,0,7,6,5},
@@ -278,7 +278,7 @@ static const UINT8 ztable[7][8] =
 	{5,4,3,2,1,7,6,0}
 };
 
-static const UINT8 ptable[7][8] =
+static const uint8_t ptable[7][8] =
 {
 	{0x00,0x00,0x00,0x10,0x20,0x00,0x00,0x30},
 	{0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x20},
@@ -289,10 +289,10 @@ static const UINT8 ptable[7][8] =
 	{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x10}
 };
 
-	INT32 data1, data2, i, j, vpos, hpos, voffs, hoffs, vcorr, hcorr, vmask, magicid;
-	UINT32 *src, *srcend, *obj, *objend;
-	UINT16 *dst;
-	const UINT8  *zcode, *pcode;
+	int32_t data1, data2, i, j, vpos, hpos, voffs, hoffs, vcorr, hcorr, vmask, magicid;
+	uint32_t *src, *srcend, *obj, *objend;
+	uint16_t *dst;
+	const uint8_t  *zcode, *pcode;
 
 	if (!count || !srcbase) return;
 
@@ -476,20 +476,20 @@ WRITE32_MEMBER(konamigx_state::fantjour_dma_w)
 {
 	COMBINE_DATA(m_fantjour_dma + offset);
 	if(!offset && ACCESSING_BITS_24_31) {
-		UINT32 sa = m_fantjour_dma[1];
-		//      UINT16 ss = (m_fantjour_dma[2] & 0xffff0000) >> 16;
-		//      UINT32 sb = ((m_fantjour_dma[2] & 0xffff) << 16) | ((m_fantjour_dma[3] & 0xffff0000) >> 16);
+		uint32_t sa = m_fantjour_dma[1];
+		//      uint16_t ss = (m_fantjour_dma[2] & 0xffff0000) >> 16;
+		//      uint32_t sb = ((m_fantjour_dma[2] & 0xffff) << 16) | ((m_fantjour_dma[3] & 0xffff0000) >> 16);
 
-		UINT32 da = ((m_fantjour_dma[3] & 0xffff) << 16) | ((m_fantjour_dma[4] & 0xffff0000) >> 16);
-		//      UINT16 ds = m_fantjour_dma[4] & 0xffff;
-		UINT32 db = m_fantjour_dma[5];
+		uint32_t da = ((m_fantjour_dma[3] & 0xffff) << 16) | ((m_fantjour_dma[4] & 0xffff0000) >> 16);
+		//      uint16_t ds = m_fantjour_dma[4] & 0xffff;
+		uint32_t db = m_fantjour_dma[5];
 
-		//      UINT8 sz1 = m_fantjour_dma[0] >> 8;
-		UINT8 sz2 = m_fantjour_dma[0] >> 16;
-		UINT8 mode = m_fantjour_dma[0] >> 24;
+		//      uint8_t sz1 = m_fantjour_dma[0] >> 8;
+		uint8_t sz2 = m_fantjour_dma[0] >> 16;
+		uint8_t mode = m_fantjour_dma[0] >> 24;
 
-		UINT32 x   = m_fantjour_dma[6];
-		UINT32 i1, i2;
+		uint32_t x   = m_fantjour_dma[6];
+		uint32_t i1, i2;
 
 		if(mode == 0x93)
 			for(i1=0; i1 <= sz2; i1++)

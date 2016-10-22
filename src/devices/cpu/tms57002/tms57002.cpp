@@ -20,7 +20,7 @@ static ADDRESS_MAP_START(internal_pgm, AS_PROGRAM, 32, tms57002_device)
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
-tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS57002, "TMS57002", tag, owner, clock, "tms57002", __FILE__),
 		device_sound_interface(mconfig, *this), macc(0), st0(0), st1(0), sti(0),
 		txrd(0),
@@ -32,7 +32,7 @@ tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag,
 
 WRITE_LINE_MEMBER(tms57002_device::pload_w)
 {
-	UINT8 olds = sti;
+	uint8_t olds = sti;
 	if(state)
 		sti &= ~IN_PLOAD;
 	else
@@ -47,7 +47,7 @@ WRITE_LINE_MEMBER(tms57002_device::pload_w)
 
 WRITE_LINE_MEMBER(tms57002_device::cload_w)
 {
-	UINT8 olds = sti;
+	uint8_t olds = sti;
 	if(state)
 		sti &= ~IN_CLOAD;
 	else
@@ -90,7 +90,7 @@ WRITE8_MEMBER(tms57002_device::data_w)
 	case IN_PLOAD:
 		host[hidx++] = data;
 		if(hidx >= 3) {
-			UINT32 val = (host[0]<<16) | (host[1]<<8) | host[2];
+			uint32_t val = (host[0]<<16) | (host[1]<<8) | host[2];
 			hidx = 0;
 
 			switch(sti & SU_MASK) {
@@ -112,7 +112,7 @@ WRITE8_MEMBER(tms57002_device::data_w)
 		if(sti & SU_CVAL) {
 			host[hidx++] = data;
 			if(hidx >= 4) {
-				UINT32 val = (host[0]<<24) | (host[1]<<16) | (host[2]<<8) | host[3];
+				uint32_t val = (host[0]<<24) | (host[1]<<16) | (host[2]<<8) | host[3];
 				cmem[sa] = val;
 				sti &= ~SU_CVAL;
 				allow_update = 0;
@@ -127,7 +127,7 @@ WRITE8_MEMBER(tms57002_device::data_w)
 	case IN_PLOAD|IN_CLOAD:
 		host[hidx++] = data;
 		if(hidx >= 4) {
-			UINT32 val = (host[0]<<24) | (host[1]<<16) | (host[2]<<8) | host[3];
+			uint32_t val = (host[0]<<24) | (host[1]<<16) | (host[2]<<8) | host[3];
 			hidx = 0;
 			cmem[ca++] = val;
 		}
@@ -137,7 +137,7 @@ WRITE8_MEMBER(tms57002_device::data_w)
 
 READ8_MEMBER(tms57002_device::data_r)
 {
-	UINT8 res;
+	uint8_t res;
 	if(!(sti & S_HOST))
 		return 0xff;
 
@@ -186,8 +186,8 @@ WRITE_LINE_MEMBER(tms57002_device::sync_w)
 
 void tms57002_device::xm_init()
 {
-	UINT32 adr = xoa + xba;
-	UINT32 mask = 0;
+	uint32_t adr = xoa + xba;
+	uint32_t mask = 0;
 
 	switch(st0 & ST0_M) {
 	case ST0_M_64K:  mask = 0x0ffff; break;
@@ -207,8 +207,8 @@ void tms57002_device::xm_init()
 
 inline void tms57002_device::xm_step_read()
 {
-	UINT32 adr = xm_adr;
-	UINT8 v = data->read_byte(adr);
+	uint32_t adr = xm_adr;
+	uint8_t v = data->read_byte(adr);
 	int done;
 	if(st0 & ST0_WORD) {
 		if(st0 & ST0_SEL) {
@@ -245,8 +245,8 @@ inline void tms57002_device::xm_step_read()
 
 inline void tms57002_device::xm_step_write()
 {
-	UINT32 adr = xm_adr;
-	UINT8 v;
+	uint32_t adr = xm_adr;
+	uint8_t v;
 	int done;
 	if(st0 & ST0_WORD) {
 		if(st0 & ST0_SEL) {
@@ -277,10 +277,10 @@ inline void tms57002_device::xm_step_write()
 		xm_adr = adr+1;
 }
 
-INT64 tms57002_device::macc_to_output_0(INT64 rounding, UINT64 rmask)
+int64_t tms57002_device::macc_to_output_0(int64_t rounding, uint64_t rmask)
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 	int over = 0;
 
 	// Overflow detection and shifting
@@ -302,10 +302,10 @@ INT64 tms57002_device::macc_to_output_0(INT64 rounding, UINT64 rmask)
 	return m;
 }
 
-INT64 tms57002_device::macc_to_output_1(INT64 rounding, UINT64 rmask)
+int64_t tms57002_device::macc_to_output_1(int64_t rounding, uint64_t rmask)
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 	int over = 0;
 
 	// Overflow detection and shifting
@@ -328,10 +328,10 @@ INT64 tms57002_device::macc_to_output_1(INT64 rounding, UINT64 rmask)
 	return m;
 }
 
-INT64 tms57002_device::macc_to_output_2(INT64 rounding, UINT64 rmask)
+int64_t tms57002_device::macc_to_output_2(int64_t rounding, uint64_t rmask)
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 	int over = 0;
 
 	// Overflow detection and shifting
@@ -354,10 +354,10 @@ INT64 tms57002_device::macc_to_output_2(INT64 rounding, UINT64 rmask)
 	return m;
 }
 
-INT64 tms57002_device::macc_to_output_3(INT64 rounding, UINT64 rmask)
+int64_t tms57002_device::macc_to_output_3(int64_t rounding, uint64_t rmask)
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 	int over = 0;
 
 	// Overflow detection and shifting
@@ -377,10 +377,10 @@ INT64 tms57002_device::macc_to_output_3(INT64 rounding, UINT64 rmask)
 	return m;
 }
 
-INT64 tms57002_device::macc_to_output_0s(INT64 rounding, UINT64 rmask)
+int64_t tms57002_device::macc_to_output_0s(int64_t rounding, uint64_t rmask)
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 	int over = 0;
 
 	// Overflow detection and shifting
@@ -406,10 +406,10 @@ INT64 tms57002_device::macc_to_output_0s(INT64 rounding, UINT64 rmask)
 	return m;
 }
 
-INT64 tms57002_device::macc_to_output_1s(INT64 rounding, UINT64 rmask)
+int64_t tms57002_device::macc_to_output_1s(int64_t rounding, uint64_t rmask)
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 	int over = 0;
 
 	// Overflow detection and shifting
@@ -436,10 +436,10 @@ INT64 tms57002_device::macc_to_output_1s(INT64 rounding, UINT64 rmask)
 	return m;
 }
 
-INT64 tms57002_device::macc_to_output_2s(INT64 rounding, UINT64 rmask)
+int64_t tms57002_device::macc_to_output_2s(int64_t rounding, uint64_t rmask)
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 	int over = 0;
 
 	// Overflow detection and shifting
@@ -466,10 +466,10 @@ INT64 tms57002_device::macc_to_output_2s(INT64 rounding, UINT64 rmask)
 	return m;
 }
 
-INT64 tms57002_device::macc_to_output_3s(INT64 rounding, UINT64 rmask)
+int64_t tms57002_device::macc_to_output_3s(int64_t rounding, uint64_t rmask)
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 	int over = 0;
 
 	// Overflow detection and shifting
@@ -493,10 +493,10 @@ INT64 tms57002_device::macc_to_output_3s(INT64 rounding, UINT64 rmask)
 	return m;
 }
 
-INT64 tms57002_device::check_macc_overflow_0()
+int64_t tms57002_device::check_macc_overflow_0()
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 
 	// Overflow detection
 	m1 = m & 0xf800000000000ULL;
@@ -506,10 +506,10 @@ INT64 tms57002_device::check_macc_overflow_0()
 	return m;
 }
 
-INT64 tms57002_device::check_macc_overflow_1()
+int64_t tms57002_device::check_macc_overflow_1()
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 
 	// Overflow detection
 	m1 = m & 0xfe00000000000ULL;
@@ -519,10 +519,10 @@ INT64 tms57002_device::check_macc_overflow_1()
 	return m;
 }
 
-INT64 tms57002_device::check_macc_overflow_2()
+int64_t tms57002_device::check_macc_overflow_2()
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 
 	// Overflow detection
 	m1 = m & 0xff80000000000ULL;
@@ -532,15 +532,15 @@ INT64 tms57002_device::check_macc_overflow_2()
 	return m;
 }
 
-INT64 tms57002_device::check_macc_overflow_3()
+int64_t tms57002_device::check_macc_overflow_3()
 {
 	return macc;
 }
 
-INT64 tms57002_device::check_macc_overflow_0s()
+int64_t tms57002_device::check_macc_overflow_0s()
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 
 	// Overflow detection
 	m1 = m & 0xf800000000000ULL;
@@ -554,10 +554,10 @@ INT64 tms57002_device::check_macc_overflow_0s()
 	return m;
 }
 
-INT64 tms57002_device::check_macc_overflow_1s()
+int64_t tms57002_device::check_macc_overflow_1s()
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 
 	// Overflow detection
 	m1 = m & 0xfe00000000000ULL;
@@ -571,10 +571,10 @@ INT64 tms57002_device::check_macc_overflow_1s()
 	return m;
 }
 
-INT64 tms57002_device::check_macc_overflow_2s()
+int64_t tms57002_device::check_macc_overflow_2s()
 {
-	INT64 m = macc;
-	UINT64 m1;
+	int64_t m = macc;
+	uint64_t m1;
 
 	// Overflow detection
 	m1 = m & 0xff80000000000ULL;
@@ -588,7 +588,7 @@ INT64 tms57002_device::check_macc_overflow_2s()
 	return m;
 }
 
-INT64 tms57002_device::check_macc_overflow_3s()
+int64_t tms57002_device::check_macc_overflow_3s()
 {
 	return macc;
 }
@@ -611,7 +611,7 @@ void tms57002_device::cache_flush()
 	}
 }
 
-void tms57002_device::add_one(cstate *cs, unsigned short op, UINT8 param)
+void tms57002_device::add_one(cstate *cs, unsigned short op, uint8_t param)
 {
 	short ipc = cache.iused++;
 	cache.inst[ipc].op = op;
@@ -626,7 +626,7 @@ void tms57002_device::add_one(cstate *cs, unsigned short op, UINT8 param)
 	}
 }
 
-void tms57002_device::decode_one(UINT32 opcode, cstate *cs, void (tms57002_device::*dec)(UINT32 opcode, unsigned short *op, cstate *cs))
+void tms57002_device::decode_one(uint32_t opcode, cstate *cs, void (tms57002_device::*dec)(uint32_t opcode, unsigned short *op, cstate *cs))
 {
 	unsigned short op = 0;
 	(this->*dec)(opcode, &op, cs);
@@ -635,7 +635,7 @@ void tms57002_device::decode_one(UINT32 opcode, cstate *cs, void (tms57002_devic
 	add_one(cs, op, opcode & 0xff);
 }
 
-short tms57002_device::get_hash(unsigned char adr, UINT32 st1, short *pnode)
+short tms57002_device::get_hash(unsigned char adr, uint32_t st1, short *pnode)
 {
 	short hnode;
 	st1 &= ST1_CACHE;
@@ -650,7 +650,7 @@ short tms57002_device::get_hash(unsigned char adr, UINT32 st1, short *pnode)
 	return -1;
 }
 
-short tms57002_device::get_hashnode(unsigned char adr, UINT32 st1, short pnode)
+short tms57002_device::get_hashnode(unsigned char adr, uint32_t st1, short pnode)
 {
 	short hnode = cache.hused++;
 	cache.hashnode[hnode].st1 = st1 & ST1_CACHE;
@@ -667,7 +667,7 @@ int tms57002_device::decode_get_pc()
 {
 	short pnode, res;
 	cstate cs;
-	UINT8 adr = pc;
+	uint8_t adr = pc;
 
 	res = get_hash(adr, st1, &pnode);
 	if(res != -1)
@@ -684,7 +684,7 @@ int tms57002_device::decode_get_pc()
 
 	for(;;) {
 		short ipc;
-		UINT32 opcode = program->read_dword(adr << 2);
+		uint32_t opcode = program->read_dword(adr << 2);
 
 		cs.inc = 0;
 
@@ -734,8 +734,8 @@ void tms57002_device::execute_run()
 		}
 
 		for(;;) {
-			UINT32 c, d;
-			INT64 r;
+			uint32_t c, d;
+			int64_t r;
 			const icd *i = cache.inst + ipc;
 
 			ipc = i->next;
@@ -800,10 +800,10 @@ void tms57002_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 		si[2] = inputs[2][0] & 0xffffff;
 		si[3] = inputs[3][0] & 0xffffff;
 	}
-	outputs[0][0] = INT16(so[0] >> 8);
-	outputs[1][0] = INT16(so[1] >> 8);
-	outputs[2][0] = INT16(so[2] >> 8);
-	outputs[3][0] = INT16(so[3] >> 8);
+	outputs[0][0] = int16_t(so[0] >> 8);
+	outputs[1][0] = int16_t(so[1] >> 8);
+	outputs[2][0] = int16_t(so[2] >> 8);
+	outputs[3][0] = int16_t(so[3] >> 8);
 
 	sync_w(1);
 }
@@ -877,32 +877,32 @@ void tms57002_device::device_start()
 	save_item(NAME(allow_update));
 }
 
-UINT32 tms57002_device::execute_min_cycles() const
+uint32_t tms57002_device::execute_min_cycles() const
 {
 	return 1;
 }
 
-UINT32 tms57002_device::execute_max_cycles() const
+uint32_t tms57002_device::execute_max_cycles() const
 {
 	return 3;
 }
 
-UINT32 tms57002_device::execute_input_lines() const
+uint32_t tms57002_device::execute_input_lines() const
 {
 	return 0;
 }
 
-UINT32 tms57002_device::disasm_min_opcode_bytes() const
+uint32_t tms57002_device::disasm_min_opcode_bytes() const
 {
 	return 4;
 }
 
-UINT32 tms57002_device::disasm_max_opcode_bytes() const
+uint32_t tms57002_device::disasm_max_opcode_bytes() const
 {
 	return 4;
 }
 
-offs_t tms57002_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tms57002_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms57002 );
 	return CPU_DISASSEMBLE_NAME(tms57002)(this, buffer, pc, oprom, opram, options);

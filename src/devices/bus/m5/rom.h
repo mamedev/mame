@@ -13,8 +13,8 @@ class m5_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	m5_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	m5_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m5_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	m5_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override {}
@@ -30,7 +30,7 @@ class m5_ram_device : public m5_rom_device
 {
 public:
 	// construction/destruction
-	m5_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m5_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override {}

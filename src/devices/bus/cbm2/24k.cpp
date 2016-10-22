@@ -26,7 +26,7 @@ const device_type CBM2_24K = &device_creator<cbm2_24k_cartridge_device>;
 //  cbm2_24k_cartridge_device - constructor
 //-------------------------------------------------
 
-cbm2_24k_cartridge_device::cbm2_24k_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cbm2_24k_cartridge_device::cbm2_24k_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CBM2_24K, "24K RAM/ROM cartridge", tag, owner, clock, "cbm2_24k", __FILE__),
 	device_cbm2_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram")
@@ -48,7 +48,7 @@ void cbm2_24k_cartridge_device::device_start()
 //  cbm2_bd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 cbm2_24k_cartridge_device::cbm2_bd_r(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3)
+uint8_t cbm2_24k_cartridge_device::cbm2_bd_r(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (!csbank1)
 	{
@@ -71,7 +71,7 @@ UINT8 cbm2_24k_cartridge_device::cbm2_bd_r(address_space &space, offs_t offset, 
 //  cbm2_bd_w - cartridge data write
 //-------------------------------------------------
 
-void cbm2_24k_cartridge_device::cbm2_bd_w(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3)
+void cbm2_24k_cartridge_device::cbm2_bd_w(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (!csbank1)
 	{

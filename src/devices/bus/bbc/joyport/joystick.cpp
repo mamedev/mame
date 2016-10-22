@@ -43,7 +43,7 @@ ioport_constructor bbcmc_joystick_device::device_input_ports() const
 //  bbcmc_joystick_device - constructor
 //-------------------------------------------------
 
-bbcmc_joystick_device::bbcmc_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bbcmc_joystick_device::bbcmc_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BBCMC_JOYSTICK, "Master Compact Joystick", tag, owner, clock, "bbcmc_joystick", __FILE__),
 	device_bbc_joyport_interface(mconfig, *this),
 	m_joy(*this, "JOY")
@@ -73,12 +73,12 @@ void bbcmc_joystick_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-UINT8 bbcmc_joystick_device::cb_r()
+uint8_t bbcmc_joystick_device::cb_r()
 {
 	return 0xff;
 }
 
-UINT8 bbcmc_joystick_device::pb_r()
+uint8_t bbcmc_joystick_device::pb_r()
 {
 	return m_joy->read();
 }

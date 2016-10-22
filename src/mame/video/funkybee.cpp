@@ -13,7 +13,7 @@
 
 PALETTE_INIT_MEMBER(funkybee_state, funkybee)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* first, the character/sprite palette */
@@ -155,7 +155,7 @@ void funkybee_state::draw_columns( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 funkybee_state::screen_update_funkybee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t funkybee_state::screen_update_funkybee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

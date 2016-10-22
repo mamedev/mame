@@ -52,7 +52,7 @@ machine_config_constructor m68307cpu_device::device_mconfig_additions() const
 }
 
 
-m68307cpu_device::m68307cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68307cpu_device::m68307cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m68000_device(mconfig, "MC68307", tag, owner, clock, M68307, 16,24, ADDRESS_MAP_NAME(m68307_internal_map), "mc68307", __FILE__),
 	write_irq(*this),
 	write_a_tx(*this),
@@ -111,43 +111,43 @@ int m68307_calc_cs(m68307cpu_device *m68k, offs_t address)
 
 
 
-UINT16 m68307cpu_device::simple_read_immediate_16_m68307(offs_t address)
+uint16_t m68307cpu_device::simple_read_immediate_16_m68307(offs_t address)
 {
 //  m68307_currentcs = m68307_calc_cs(this, address);
 	return m_direct->read_word(address);
 }
 
-UINT8 m68307cpu_device::read_byte_m68307(offs_t address)
+uint8_t m68307cpu_device::read_byte_m68307(offs_t address)
 {
 //  m68307_currentcs = m68307_calc_cs(this, address);
 	return m_space->read_byte(address);
 }
 
-UINT16 m68307cpu_device::read_word_m68307(offs_t address)
+uint16_t m68307cpu_device::read_word_m68307(offs_t address)
 {
 //  m68307_currentcs = m68307_calc_cs(this, address);
 	return m_space->read_word(address);
 }
 
-UINT32 m68307cpu_device::read_dword_m68307(offs_t address)
+uint32_t m68307cpu_device::read_dword_m68307(offs_t address)
 {
 //  m68307_currentcs = m68307_calc_cs(this, address);
 	return m_space->read_dword(address);
 }
 
-void m68307cpu_device::write_byte_m68307(offs_t address, UINT8 data)
+void m68307cpu_device::write_byte_m68307(offs_t address, uint8_t data)
 {
 //  m68307_currentcs = m68307_calc_cs(this, address);
 	m_space->write_byte(address, data);
 }
 
-void m68307cpu_device::write_word_m68307(offs_t address, UINT16 data)
+void m68307cpu_device::write_word_m68307(offs_t address, uint16_t data)
 {
 //  m68307_currentcs = m68307_calc_cs(this, address);
 	m_space->write_word(address, data);
 }
 
-void m68307cpu_device::write_dword_m68307(offs_t address, UINT32 data)
+void m68307cpu_device::write_dword_m68307(offs_t address, uint32_t data)
 {
 //  m68307_currentcs = m68307_calc_cs(this, address);
 	m_space->write_dword(address, data);
@@ -185,7 +185,7 @@ void m68307cpu_device::set_port_callbacks(m68307_porta_read_delegate porta_r, m6
 
 
 
-UINT16 m68307cpu_device::get_cs(offs_t address)
+uint16_t m68307cpu_device::get_cs(offs_t address)
 {
 	m68307_currentcs = m68307_calc_cs(this, address);
 

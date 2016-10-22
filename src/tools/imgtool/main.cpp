@@ -172,7 +172,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	int total_count, total_size, freespace_err;
-	UINT64 freespace;
+	uint64_t freespace;
 	imgtool::image::ptr image;
 	imgtool::partition::ptr partition;
 	imgtool::directory::ptr imgenum;
@@ -181,6 +181,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	char last_modified[19];
 	const char *path;
 	int partition_index = 0;
+	std::string info;
 
 	// attempt to open image
 	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_READ, image);
@@ -205,9 +206,9 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 
 	fprintf(stdout, "Contents of %s:%s\n", argv[1], path ? path : "");
 
-	image->info(buf, sizeof(buf));
-	if (buf[0])
-		fprintf(stdout, "%s\n", buf);
+	info = image->info();
+	if (!info.empty())
+		fprintf(stdout, "%s\n", info.c_str());
 	fprintf(stdout, "------------------------------  --------  ---------------  ------------------\n");
 
 	while (((err = imgenum->get_next(ent)) == 0) && !ent.eof)
@@ -587,9 +588,9 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	std::unique_ptr<imgtool::image> img;
-	imgtool_stream *stream = nullptr;
-	std::vector<UINT8> buffer;
-	UINT32 track, head, sector;
+	imgtool::stream *stream = nullptr;
+	std::vector<uint8_t> buffer;
+	uint32_t track, head, sector;
 
 	/* attempt to open image */
 	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_READ, img);
@@ -604,18 +605,18 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	if (err)
 		goto done;
 
-	stream = stream_open(argv[5], OSD_FOPEN_WRITE);
+	stream = imgtool::stream::open(argv[5], OSD_FOPEN_WRITE);
 	if (!stream)
 	{
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE);
 		goto done;
 	}
 
-	stream_write(stream, &buffer[0], buffer.size());
+	stream->write(&buffer[0], buffer.size());
 
 done:
 	if (stream)
-		stream_close(stream);
+		delete stream;
 	if (err)
 		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
@@ -627,9 +628,9 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	std::unique_ptr<imgtool::image> img;
-	imgtool_stream *stream = nullptr;
-	dynamic_buffer buffer;
-	UINT32 size, track, head, sector;
+	imgtool::stream *stream = nullptr;
+	std::vector<uint8_t> buffer;
+	uint32_t size, track, head, sector;
 
 	// attempt to open image
 	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_RW, img);
@@ -640,18 +641,18 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 	head = atoi(argv[3]);
 	sector = atoi(argv[4]);
 
-	stream = stream_open(argv[5], OSD_FOPEN_READ);
+	stream = imgtool::stream::open(argv[5], OSD_FOPEN_READ);
 	if (!stream)
 	{
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE);
 		goto done;
 	}
 
-	size = (UINT32) stream_size(stream);
+	size = (uint32_t) stream->size();
 
 	buffer.resize(size);
 
-	stream_read(stream, &buffer[0], size);
+	stream->read(&buffer[0], size);
 
 	err = img->write_sector(track, head, sector, &buffer[0], size);
 	if (err)
@@ -659,7 +660,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 
 done:
 	if (stream)
-		stream_close(stream);
+		delete stream;
 	if (err)
 		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;

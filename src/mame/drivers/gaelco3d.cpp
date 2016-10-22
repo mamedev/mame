@@ -188,16 +188,16 @@ void gaelco3d_state::machine_start()
 
 MACHINE_RESET_MEMBER(gaelco3d_state,common)
 {
-	UINT16 *src;
+	uint16_t *src;
 	int i;
 
 	m_framenum = 0;
 
 	/* boot the ADSP chip */
-	src = (UINT16 *)memregion("user1")->base();
+	src = (uint16_t *)memregion("user1")->base();
 	for (i = 0; i < (src[3] & 0xff) * 8; i++)
 	{
-		UINT32 opcode = ((src[i*4+0] & 0xff) << 16) | ((src[i*4+1] & 0xff) << 8) | (src[i*4+2] & 0xff);
+		uint32_t opcode = ((src[i*4+0] & 0xff) << 16) | ((src[i*4+1] & 0xff) << 8) | (src[i*4+2] & 0xff);
 		m_adsp_ram_base[i] = opcode;
 	}
 
@@ -272,7 +272,7 @@ WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)
 
 READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 {
-	UINT32 result = 0xffff;
+	uint32_t result = 0xffff;
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -295,7 +295,7 @@ READ32_MEMBER(gaelco3d_state::eeprom_data32_r)
 		return (eeprom_data_r(space, 0, mem_mask >> 16) << 16) | 0xffff;
 	else if (ACCESSING_BITS_0_7)
 	{
-		UINT8 data = m_serial->data_r(space,0);
+		uint8_t data = m_serial->data_r(space,0);
 		if (LOG)
 			logerror("%06X:read(%02X) = %08X & %08X\n", m_maincpu->pc(), offset, data, mem_mask);
 		return  data | 0xffffff00;
@@ -397,7 +397,7 @@ WRITE16_MEMBER(gaelco3d_state::sound_status_w)
 
 CUSTOM_INPUT_MEMBER(gaelco3d_state::analog_bit_r)
 {
-	int which = (FPTR)param;
+	int which = (uintptr_t)param;
 	return (m_analog_ports[which] >> 7) & 0x01;
 }
 
@@ -454,8 +454,8 @@ WRITE16_MEMBER(gaelco3d_state::analog_port_latch_w)
 
 READ32_MEMBER(gaelco3d_state::tms_m68k_ram_r)
 {
-//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", space.device().safe_pc(), offset, !(offset & 1) ? ((INT32)m_m68k_ram_base[offset/2] >> 16) : (int)(INT16)m_m68k_ram_base[offset/2]);
-	return (INT32)(INT16)m_m68k_ram_base[offset ^ m_tms_offset_xor];
+//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", space.device().safe_pc(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
+	return (int32_t)(int16_t)m_m68k_ram_base[offset ^ m_tms_offset_xor];
 }
 
 
@@ -613,7 +613,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", m_adsp_ireg, reg, m_adsp_incs, m_adsp_size);
 	if (m_adsp_incs)
-		dmadac_transfer(&m_dmadac[0], SOUND_CHANNELS, m_adsp_incs, SOUND_CHANNELS * m_adsp_incs, m_adsp_size / (SOUND_CHANNELS * m_adsp_incs), (INT16 *)&m_adsp_fastram_base[reg - 0x3800]);
+		dmadac_transfer(&m_dmadac[0], SOUND_CHANNELS, m_adsp_incs, SOUND_CHANNELS * m_adsp_incs, m_adsp_size / (SOUND_CHANNELS * m_adsp_incs), (int16_t *)&m_adsp_fastram_base[reg - 0x3800]);
 
 	/* increment it */
 	reg += m_adsp_size;
@@ -646,7 +646,7 @@ WRITE32_MEMBER(gaelco3d_state::adsp_tx_callback)
 		{
 			/* get the autobuffer registers */
 			int     mreg, lreg;
-			UINT16  source;
+			uint16_t  source;
 			attotime sample_period;
 
 			m_adsp_ireg = (m_adsp_control_regs[S1_AUTOBUF_REG] >> 9) & 7;

@@ -6,7 +6,7 @@
 class tc0180vcu_device : public device_t
 {
 public:
-	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tc0180vcu_device() {}
 
 	// static configuration
@@ -33,16 +33,16 @@ protected:
 
 private:
 	// internal state
-	UINT16         m_ctrl[0x10];
+	uint16_t         m_ctrl[0x10];
 
-	std::unique_ptr<UINT16[]>       m_ram;
-	std::unique_ptr<UINT16[]>       m_scrollram;
+	std::unique_ptr<uint16_t[]>       m_ram;
+	std::unique_ptr<uint16_t[]>       m_scrollram;
 
 	tilemap_t      *m_tilemap[3];
 
-	UINT16         m_bg_rambank[2], m_fg_rambank[2], m_tx_rambank;
-	UINT8          m_framebuffer_page;
-	UINT8          m_video_control;
+	uint16_t         m_bg_rambank[2], m_fg_rambank[2], m_tx_rambank;
+	uint8_t          m_framebuffer_page;
+	uint8_t          m_video_control;
 
 	int            m_bg_color_base;
 	int            m_fg_color_base;
@@ -54,7 +54,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	void video_control( UINT8 data );
+	void video_control( uint8_t data );
 };
 
 extern const device_type TC0180VCU;

@@ -25,22 +25,22 @@
 #define FREGEXP(rnum)       (m_r[rnum].exponent())
 #define FREGMAN(rnum)       (m_r[rnum].mantissa())
 
-#define FP2LONG(rnum)       ((FREGEXP(rnum) << 24) | ((UINT32)FREGMAN(rnum) >> 8))
-#define LONG2FP(rnum,v)     do { m_r[rnum].set_mantissa((v) << 8); m_r[rnum].set_exponent((INT32)(v) >> 24); } while (0)
+#define FP2LONG(rnum)       ((FREGEXP(rnum) << 24) | ((uint32_t)FREGMAN(rnum) >> 8))
+#define LONG2FP(rnum,v)     do { m_r[rnum].set_mantissa((v) << 8); m_r[rnum].set_exponent((int32_t)(v) >> 24); } while (0)
 #define SHORT2FP(rnum,v)    do { \
-								if ((UINT16)(v) == 0x8000) { m_r[rnum].set_mantissa(0); m_r[rnum].set_exponent(-128); } \
-								else { m_r[rnum].set_mantissa((v) << 20); m_r[rnum].set_exponent((INT16)(v) >> 12); } \
+								if ((uint16_t)(v) == 0x8000) { m_r[rnum].set_mantissa(0); m_r[rnum].set_exponent(-128); } \
+								else { m_r[rnum].set_mantissa((v) << 20); m_r[rnum].set_exponent((int16_t)(v) >> 12); } \
 							} while (0)
 
-#define DIRECT(op)              (((IREG(TMR_DP) & 0xff) << 16) | ((UINT16)op))
+#define DIRECT(op)              (((IREG(TMR_DP) & 0xff) << 16) | ((uint16_t)op))
 #define INDIRECT_D(op,o)        ((this->*s_indirect_d[((o) >> 3) & 31])(op,o))
 #define INDIRECT_1(op,o)        ((this->*s_indirect_1[((o) >> 3) & 31])(op,o))
 #define INDIRECT_1_DEF(op,o)    ((this->*s_indirect_1_def[((o) >> 3) & 31])(op,o,defptr))
 
 #define SIGN(val)           ((val) & 0x80000000)
 
-#define OVERFLOW_SUB(a,b,r) ((INT32)(((a) ^ (b)) & ((a) ^ (r))) < 0)
-#define OVERFLOW_ADD(a,b,r) ((INT32)(((a) ^ (r)) & ((b) ^ (r))) < 0)
+#define OVERFLOW_SUB(a,b,r) ((int32_t)(((a) ^ (b)) & ((a) ^ (r))) < 0)
+#define OVERFLOW_ADD(a,b,r) ((int32_t)(((a) ^ (r)) & ((b) ^ (r))) < 0)
 
 #define CLR_FLAGS(f)        do { IREG(TMR_ST) &= ~(f); } while (0)
 #define CLR_NVUF()          CLR_FLAGS(NFLAG | VFLAG | UFFLAG)
@@ -51,16 +51,16 @@
 #define OR_NZ(val)          do { IREG(TMR_ST) |= (((val) >> 28) & NFLAG) | (((val) == 0) << 2); } while (0)
 #define OR_NZF(reg)         do { IREG(TMR_ST) |= ((reg.mantissa() >> 28) & NFLAG) | ((reg.exponent() == -128) << 2); } while (0)
 #define OR_NUF(reg)         do { int temp = (reg.exponent() == -128) << 4; IREG(TMR_ST) |= ((reg.mantissa() >> 28) & NFLAG) | (temp) | (temp << 2); } while (0)
-#define OR_V_SUB(a,b,r)     do { UINT32 temp = ((((a) ^ (b)) & ((a) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
-#define OR_V_ADD(a,b,r)     do { UINT32 temp = ((((a) ^ (r)) & ((b) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
-#define OR_C_SUB(a,b,r)     do { IREG(TMR_ST) |= ((UINT32)(b) > (UINT32)(a)); } while (0)
-#define OR_C_ADD(a,b,r)     do { IREG(TMR_ST) |= ((UINT32)(a) > (UINT32)(r)); } while (0)
-#define OR_C_SBB(a,b,c)     do { INT64 temp = (INT64)(a) - (UINT32)(b) - (UINT32)(c); IREG(TMR_ST) |= (temp < 0); } while (0)
-#define OR_C_ADC(a,b,c)     do { UINT64 temp = (UINT64)(a) + (UINT32)(b) + (UINT32)(c); IREG(TMR_ST) |= (temp > 0xffffffff); } while (0)
+#define OR_V_SUB(a,b,r)     do { uint32_t temp = ((((a) ^ (b)) & ((a) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
+#define OR_V_ADD(a,b,r)     do { uint32_t temp = ((((a) ^ (r)) & ((b) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
+#define OR_C_SUB(a,b,r)     do { IREG(TMR_ST) |= ((uint32_t)(b) > (uint32_t)(a)); } while (0)
+#define OR_C_ADD(a,b,r)     do { IREG(TMR_ST) |= ((uint32_t)(a) > (uint32_t)(r)); } while (0)
+#define OR_C_SBB(a,b,c)     do { int64_t temp = (int64_t)(a) - (uint32_t)(b) - (uint32_t)(c); IREG(TMR_ST) |= (temp < 0); } while (0)
+#define OR_C_ADC(a,b,c)     do { uint64_t temp = (uint64_t)(a) + (uint32_t)(b) + (uint32_t)(c); IREG(TMR_ST) |= (temp > 0xffffffff); } while (0)
 
 #define OVM()               (IREG(TMR_ST) & OVMFLAG)
 
-#define DECLARE_DEF         UINT32 defval; UINT32 *defptr = &defval
+#define DECLARE_DEF         uint32_t defval; uint32_t *defptr = &defval
 #define UPDATE_DEF()        *defptr = defval
 
 
@@ -69,7 +69,7 @@
 //  IMPLEMENTATION
 //**************************************************************************
 
-void tms3203x_device::illegal(UINT32 op)
+void tms3203x_device::illegal(uint32_t op)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
@@ -79,7 +79,7 @@ void tms3203x_device::illegal(UINT32 op)
 }
 
 
-void tms3203x_device::unimplemented(UINT32 op)
+void tms3203x_device::unimplemented(uint32_t op)
 {
 	fatalerror("Unimplemented op @ %06X: %08X (tbl=%03X)\n", m_pc - 1, op, op >> 21);
 }
@@ -87,7 +87,7 @@ void tms3203x_device::unimplemented(UINT32 op)
 
 inline void tms3203x_device::execute_one()
 {
-	UINT32 op = ROPCODE(m_pc);
+	uint32_t op = ROPCODE(m_pc);
 	m_icount -= 2;  // 2 clocks per cycle
 	m_pc++;
 #if (TMS_3203X_LOG_OPCODE_USAGE)
@@ -101,7 +101,7 @@ void tms3203x_device::update_special(int dreg)
 {
 	if (dreg == TMR_BK)
 	{
-		UINT32 temp = IREG(TMR_BK);
+		uint32_t temp = IREG(TMR_BK);
 		m_bkmask = temp;
 		while (temp >>= 1)
 			m_bkmask |= temp;
@@ -123,27 +123,27 @@ void tms3203x_device::update_special(int dreg)
 //  CONDITION CODES
 //**************************************************************************
 
-const UINT32 C_LO = 1 << 1;
-const UINT32 C_LS = 1 << 2;
-const UINT32 C_HI = 1 << 3;
-const UINT32 C_HS = 1 << 4;
-const UINT32 C_EQ = 1 << 5;
-const UINT32 C_NE = 1 << 6;
-const UINT32 C_LT = 1 << 7;
-const UINT32 C_LE = 1 << 8;
-const UINT32 C_GT = 1 << 9;
-const UINT32 C_GE = 1 << 10;
-const UINT32 C_NV = 1 << 12;
-const UINT32 C_V = 1 << 13;
-const UINT32 C_NUF = 1 << 14;
-const UINT32 C_UF = 1 << 15;
-const UINT32 C_NLV = 1 << 16;
-const UINT32 C_LV = 1 << 17;
-const UINT32 C_NLUF = 1 << 18;
-const UINT32 C_LUF = 1 << 19;
-const UINT32 C_ZUF = 1 << 20;
+const uint32_t C_LO = 1 << 1;
+const uint32_t C_LS = 1 << 2;
+const uint32_t C_HI = 1 << 3;
+const uint32_t C_HS = 1 << 4;
+const uint32_t C_EQ = 1 << 5;
+const uint32_t C_NE = 1 << 6;
+const uint32_t C_LT = 1 << 7;
+const uint32_t C_LE = 1 << 8;
+const uint32_t C_GT = 1 << 9;
+const uint32_t C_GE = 1 << 10;
+const uint32_t C_NV = 1 << 12;
+const uint32_t C_V = 1 << 13;
+const uint32_t C_NUF = 1 << 14;
+const uint32_t C_UF = 1 << 15;
+const uint32_t C_NLV = 1 << 16;
+const uint32_t C_LV = 1 << 17;
+const uint32_t C_NLUF = 1 << 18;
+const uint32_t C_LUF = 1 << 19;
+const uint32_t C_ZUF = 1 << 20;
 
-const UINT32 condition_table[0x80] =
+const uint32_t condition_table[0x80] =
 {
 /* ------- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_NLV | C_NLUF,
 /* ------C */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_NLV | C_NLUF,
@@ -324,7 +324,7 @@ void tms3203x_device::double_to_dsp_with_flags(double val, tmsreg &result)
 	}
 	else if (exponent > 127)
 	{
-		if ((INT32)id.i[BYTE_XOR_BE(0)] >= 0)
+		if ((int32_t)id.i[BYTE_XOR_BE(0)] >= 0)
 			result.set_mantissa(0x7fffffff);
 		else
 		{
@@ -340,7 +340,7 @@ void tms3203x_device::double_to_dsp_with_flags(double val, tmsreg &result)
 		result.set_exponent(-128);
 		IREG(TMR_ST) |= ZFLAG;
 	}
-	else if ((INT32)id.i[BYTE_XOR_BE(0)] >= 0)
+	else if ((int32_t)id.i[BYTE_XOR_BE(0)] >= 0)
 	{
 		result.set_mantissa(mantissa);
 		result.set_exponent(exponent);
@@ -370,7 +370,7 @@ void tms3203x_device::int2float(tmsreg &srcdst)
 #else
 void tms3203x_device::int2float(tmsreg &srcdst)
 {
-	UINT32 man = srcdst.mantissa();
+	uint32_t man = srcdst.mantissa();
 	int exp, cnt;
 
 	// never overflows or underflows
@@ -384,14 +384,14 @@ void tms3203x_device::int2float(tmsreg &srcdst)
 	}
 
 	// check for -1 here because count_leading_ones will infinite loop
-	else if (man == (UINT32)-1)
+	else if (man == (uint32_t)-1)
 	{
 		man = 0;
 		exp = -1;
 	}
 
 	// positive values; count leading zeros and shift
-	else if ((INT32)man > 0)
+	else if ((int32_t)man > 0)
 	{
 		cnt = count_leading_zeros(man);
 		man <<= cnt;
@@ -418,12 +418,12 @@ void tms3203x_device::int2float(tmsreg &srcdst)
 #if USE_FP
 void tms3203x_device::float2int(tmsreg &srcdst, int setflags)
 {
-	INT32 val;
+	int32_t val;
 
 	if (setflags) CLR_NZVUF();
 	if (srcdst.exponent() > 30)
 	{
-		if ((INT32)srcdst.mantissa() >= 0)
+		if ((int32_t)srcdst.mantissa() >= 0)
 			val = 0x7fffffff;
 		else
 			val = 0x80000000;
@@ -437,7 +437,7 @@ void tms3203x_device::float2int(tmsreg &srcdst, int setflags)
 #else
 void tms3203x_device::float2int(tmsreg &srcdst, bool setflags)
 {
-	INT32 man = srcdst.mantissa();
+	int32_t man = srcdst.mantissa();
 	int shift = 31 - srcdst.exponent();
 
 	// never underflows
@@ -474,7 +474,7 @@ void tms3203x_device::negf(tmsreg &dst, tmsreg tmsreg &src)
 #else
 void tms3203x_device::negf(tmsreg &dst, tmsreg &src)
 {
-	INT32 man = src.mantissa();
+	int32_t man = src.mantissa();
 
 	CLR_NZVUF();
 
@@ -512,8 +512,8 @@ void tms3203x_device::addf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 #else
 void tms3203x_device::addf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 {
-	INT64 man;
-	INT64 m1, m2;
+	int64_t man;
+	int64_t m1, m2;
 	int exp, cnt;
 
 	// reset over/underflow conditions
@@ -534,8 +534,8 @@ void tms3203x_device::addf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// extract mantissas from 1.0.31 values to 1.1.31 values
-	m1 = (INT64)src1.mantissa() ^ 0x80000000;
-	m2 = (INT64)src2.mantissa() ^ 0x80000000;
+	m1 = (int64_t)src1.mantissa() ^ 0x80000000;
+	m2 = (int64_t)src2.mantissa() ^ 0x80000000;
 
 	// normalize based on the exponent
 	if (src1.exponent() > src2.exponent())
@@ -574,24 +574,24 @@ void tms3203x_device::addf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// if the mantissa is >= 2.0 or < -2.0, normalize
-	else if (man >= INT64(U64(0x100000000)) || man < INT64(U64(0xffffffff00000000)))
+	else if (man >= int64_t(U64(0x100000000)) || man < int64_t(U64(0xffffffff00000000)))
 	{
 		man >>= 1;
 		exp++;
 	}
 
 	// if the mantissa is < 1.0 and > -1.0, normalize
-	else if (man < INT64(U64(0x80000000)) && man >= INT64(U64(0xffffffff80000000)))
+	else if (man < int64_t(U64(0x80000000)) && man >= int64_t(U64(0xffffffff80000000)))
 	{
 		if (man > 0)
 		{
-			cnt = count_leading_zeros((UINT32)man);
+			cnt = count_leading_zeros((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
 		else
 		{
-			cnt = count_leading_ones((UINT32)man);
+			cnt = count_leading_ones((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
@@ -615,7 +615,7 @@ void tms3203x_device::addf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 
 	// store the result back, removing the implicit one and putting
 	// back the sign bit
-	dst.set_mantissa((UINT32)man ^ 0x80000000);
+	dst.set_mantissa((uint32_t)man ^ 0x80000000);
 	dst.set_exponent(exp);
 	OR_NZF(dst);
 }
@@ -632,8 +632,8 @@ void tms3203x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 #else
 void tms3203x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 {
-	INT64 man;
-	INT64 m1, m2;
+	int64_t man;
+	int64_t m1, m2;
 	int exp, cnt;
 
 	// reset over/underflow conditions
@@ -648,8 +648,8 @@ void tms3203x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// extract mantissas from 1.0.31 values to 1.1.31 values
-	m1 = (INT64)src1.mantissa() ^ 0x80000000;
-	m2 = (INT64)src2.mantissa() ^ 0x80000000;
+	m1 = (int64_t)src1.mantissa() ^ 0x80000000;
+	m2 = (int64_t)src2.mantissa() ^ 0x80000000;
 
 	// normalize based on the exponent
 	if (src1.exponent() > src2.exponent())
@@ -687,24 +687,24 @@ void tms3203x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// if the mantissa is >= 2.0 or < -2.0, normalize
-	else if (man >= INT64(U64(0x100000000)) || man < INT64(U64(0xffffffff00000000)))
+	else if (man >= int64_t(U64(0x100000000)) || man < int64_t(U64(0xffffffff00000000)))
 	{
 		man >>= 1;
 		exp++;
 	}
 
 	// if the mantissa is < 1.0 and > -1.0, normalize
-	else if (man < INT64(U64(0x80000000)) && man >= INT64(U64(0xffffffff80000000)))
+	else if (man < int64_t(U64(0x80000000)) && man >= int64_t(U64(0xffffffff80000000)))
 	{
 		if (man > 0)
 		{
-			cnt = count_leading_zeros((UINT32)man);
+			cnt = count_leading_zeros((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
 		else
 		{
-			cnt = count_leading_ones((UINT32)man);
+			cnt = count_leading_ones((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
@@ -730,7 +730,7 @@ void tms3203x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 
 	// store the result back, removing the implicit one and putting
 	// back the sign bit
-	dst.set_mantissa((UINT32)man ^ 0x80000000);
+	dst.set_mantissa((uint32_t)man ^ 0x80000000);
 	dst.set_exponent(exp);
 	OR_NZF(dst);
 }
@@ -760,11 +760,11 @@ void tms3203x_device::mpyf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// convert the mantissas from 1.0.31 numbers to 1.1.23 numbers
-	INT32 m1 = (src1.mantissa() >> 8) ^ 0x800000;
-	INT32 m2 = (src2.mantissa() >> 8) ^ 0x800000;
+	int32_t m1 = (src1.mantissa() >> 8) ^ 0x800000;
+	int32_t m2 = (src2.mantissa() >> 8) ^ 0x800000;
 
 	// multiply the mantissas and add the exponents
-	INT64 man = (INT64)m1 * (INT64)m2;
+	int64_t man = (int64_t)m1 * (int64_t)m2;
 	int exp = src1.exponent() + src2.exponent();
 
 	// chop off the low bits, going from 1.2.46 down to 1.2.31
@@ -778,11 +778,11 @@ void tms3203x_device::mpyf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// if the mantissa is >= 2.0 or <= -2.0, normalize
-	else if (man >= INT64(U64(0x100000000)))
+	else if (man >= int64_t(U64(0x100000000)))
 	{
 		man >>= 1;
 		exp++;
-		if (man >= INT64(U64(0x100000000)))
+		if (man >= int64_t(U64(0x100000000)))
 		{
 			man >>= 1;
 			exp++;
@@ -790,7 +790,7 @@ void tms3203x_device::mpyf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// if the mantissa is >= 2.0 or <= -2.0, normalize
-	else if (man < INT64(U64(0xffffffff00000000)))
+	else if (man < int64_t(U64(0xffffffff00000000)))
 	{
 		man >>= 1;
 		exp++;
@@ -814,7 +814,7 @@ void tms3203x_device::mpyf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 
 	// store the result back, removing the implicit one and putting
 	// back the sign bit
-	dst.set_mantissa((UINT32)man ^ 0x80000000);
+	dst.set_mantissa((uint32_t)man ^ 0x80000000);
 	dst.set_exponent(exp);
 	OR_NZF(dst);
 }
@@ -830,7 +830,7 @@ void tms3203x_device::norm(tmsreg &dst, tmsreg &src)
 #else
 void tms3203x_device::norm(tmsreg &dst, tmsreg &src)
 {
-	INT32 man = src.mantissa();
+	int32_t man = src.mantissa();
 	int exp = src.exponent();
 
 	CLR_NZVUF();
@@ -847,13 +847,13 @@ void tms3203x_device::norm(tmsreg &dst, tmsreg &src)
 		int cnt;
 		if (man > 0)
 		{
-			cnt = count_leading_zeros((UINT32)man);
+			cnt = count_leading_zeros((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
 		else
 		{
-			cnt = count_leading_ones((UINT32)man);
+			cnt = count_leading_ones((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
@@ -882,64 +882,64 @@ void tms3203x_device::norm(tmsreg &dst, tmsreg &src)
 
 // immediate displacement variants
 
-UINT32 tms3203x_device::mod00_d(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod00_d(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	return IREG(reg) + (UINT8)op;
+	return IREG(reg) + (uint8_t)op;
 }
 
-UINT32 tms3203x_device::mod01_d(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod01_d(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	return IREG(reg) - (UINT8)op;
+	return IREG(reg) - (uint8_t)op;
 }
 
-UINT32 tms3203x_device::mod02_d(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod02_d(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	IREG(reg) += (UINT8)op;
+	IREG(reg) += (uint8_t)op;
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod03_d(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod03_d(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	IREG(reg) -= (UINT8)op;
+	IREG(reg) -= (uint8_t)op;
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod04_d(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod04_d(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	IREG(reg) += (UINT8)op;
+	uint32_t result = IREG(reg);
+	IREG(reg) += (uint8_t)op;
 	return result;
 }
 
-UINT32 tms3203x_device::mod05_d(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod05_d(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	IREG(reg) -= (UINT8)op;
+	uint32_t result = IREG(reg);
+	IREG(reg) -= (uint8_t)op;
 	return result;
 }
 
-UINT32 tms3203x_device::mod06_d(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod06_d(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) + (UINT8)op;
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) + (uint8_t)op;
 	if (temp >= IREG(TMR_BK))
 		temp -= IREG(TMR_BK);
 	IREG(reg) = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
 	return result;
 }
 
-UINT32 tms3203x_device::mod07_d(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod07_d(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) - (UINT8)op;
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) - (uint8_t)op;
 	if (temp < 0)
 		temp += IREG(TMR_BK);
 	IREG(reg) = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
@@ -949,58 +949,58 @@ UINT32 tms3203x_device::mod07_d(UINT32 op, UINT8 ar)
 
 // immediate displacement variants (implied 1)
 
-UINT32 tms3203x_device::mod00_1(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod00_1(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) + 1;
 }
 
-UINT32 tms3203x_device::mod01_1(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod01_1(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) - 1;
 }
 
-UINT32 tms3203x_device::mod02_1(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod02_1(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return ++IREG(reg);
 }
 
-UINT32 tms3203x_device::mod03_1(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod03_1(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return --IREG(reg);
 }
 
-UINT32 tms3203x_device::mod04_1(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod04_1(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg)++;
 }
 
-UINT32 tms3203x_device::mod05_1(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod05_1(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg)--;
 }
 
-UINT32 tms3203x_device::mod06_1(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod06_1(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) + 1;
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) + 1;
 	if (temp >= IREG(TMR_BK))
 		temp -= IREG(TMR_BK);
 	IREG(reg) = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
 	return result;
 }
 
-UINT32 tms3203x_device::mod07_1(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod07_1(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) - 1;
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) - 1;
 	if (temp < 0)
 		temp += IREG(TMR_BK);
 	IREG(reg) = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
@@ -1010,64 +1010,64 @@ UINT32 tms3203x_device::mod07_1(UINT32 op, UINT8 ar)
 
 // IR0 displacement variants
 
-UINT32 tms3203x_device::mod08(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod08(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) + IREG(TMR_IR0);
 }
 
-UINT32 tms3203x_device::mod09(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod09(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) - IREG(TMR_IR0);
 }
 
-UINT32 tms3203x_device::mod0a(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod0a(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	IREG(reg) += IREG(TMR_IR0);
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod0b(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod0b(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	IREG(reg) -= IREG(TMR_IR0);
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod0c(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod0c(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
+	uint32_t result = IREG(reg);
 	IREG(reg) += IREG(TMR_IR0);
 	return result;
 }
 
-UINT32 tms3203x_device::mod0d(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod0d(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
+	uint32_t result = IREG(reg);
 	IREG(reg) -= IREG(TMR_IR0);
 	return result;
 }
 
-UINT32 tms3203x_device::mod0e(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod0e(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) + IREG(TMR_IR0);
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) + IREG(TMR_IR0);
 	if (temp >= IREG(TMR_BK))
 		temp -= IREG(TMR_BK);
 	IREG(reg) = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
 	return result;
 }
 
-UINT32 tms3203x_device::mod0f(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod0f(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) - IREG(TMR_IR0);
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) - IREG(TMR_IR0);
 	if (temp < 0)
 		temp += IREG(TMR_BK);
 	IREG(reg) = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
@@ -1077,64 +1077,64 @@ UINT32 tms3203x_device::mod0f(UINT32 op, UINT8 ar)
 
 // IR1 displacement variants
 
-UINT32 tms3203x_device::mod10(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod10(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) + IREG(TMR_IR1);
 }
 
-UINT32 tms3203x_device::mod11(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod11(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) - IREG(TMR_IR1);
 }
 
-UINT32 tms3203x_device::mod12(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod12(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	IREG(reg) += IREG(TMR_IR1);
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod13(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod13(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	IREG(reg) -= IREG(TMR_IR1);
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod14(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod14(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
+	uint32_t result = IREG(reg);
 	IREG(reg) += IREG(TMR_IR1);
 	return result;
 }
 
-UINT32 tms3203x_device::mod15(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod15(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
+	uint32_t result = IREG(reg);
 	IREG(reg) -= IREG(TMR_IR1);
 	return result;
 }
 
-UINT32 tms3203x_device::mod16(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod16(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) + IREG(TMR_IR1);
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) + IREG(TMR_IR1);
 	if (temp >= IREG(TMR_BK))
 		temp -= IREG(TMR_BK);
 	IREG(reg) = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
 	return result;
 }
 
-UINT32 tms3203x_device::mod17(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod17(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) - IREG(TMR_IR1);
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) - IREG(TMR_IR1);
 	if (temp < 0)
 		temp += IREG(TMR_BK);
 	IREG(reg) = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
@@ -1144,19 +1144,19 @@ UINT32 tms3203x_device::mod17(UINT32 op, UINT8 ar)
 
 // special variants
 
-UINT32 tms3203x_device::mod18(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod18(uint32_t op, uint8_t ar)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod19(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::mod19(uint32_t op, uint8_t ar)
 {
 	unimplemented(op);
 	return 0;
 }
 
-UINT32 tms3203x_device::modillegal(UINT32 op, UINT8 ar)
+uint32_t tms3203x_device::modillegal(uint32_t op, uint8_t ar)
 {
 	illegal(op);
 	return 0;
@@ -1165,37 +1165,37 @@ UINT32 tms3203x_device::modillegal(UINT32 op, UINT8 ar)
 
 // immediate displacement variants (implied 1)
 
-UINT32 tms3203x_device::mod00_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod00_1_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) + 1;
 }
 
-UINT32 tms3203x_device::mod01_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod01_1_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) - 1;
 }
 
-UINT32 tms3203x_device::mod02_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod02_1_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 defval = IREG(reg) + 1;
+	uint32_t defval = IREG(reg) + 1;
 	*defptrptr = defval;
 	defptrptr = &IREG(reg);
 	return defval;
 }
 
-UINT32 tms3203x_device::mod03_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod03_1_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 defval = IREG(reg) - 1;
+	uint32_t defval = IREG(reg) - 1;
 	*defptrptr = defval;
 	defptrptr = &IREG(reg);
 	return defval;
 }
 
-UINT32 tms3203x_device::mod04_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod04_1_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	*defptrptr = IREG(reg) + 1;
@@ -1203,7 +1203,7 @@ UINT32 tms3203x_device::mod04_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod05_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod05_1_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	*defptrptr = IREG(reg) - 1;
@@ -1211,11 +1211,11 @@ UINT32 tms3203x_device::mod05_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod06_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod06_1_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) + 1;
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) + 1;
 	if (temp >= IREG(TMR_BK))
 		temp -= IREG(TMR_BK);
 	*defptrptr = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
@@ -1223,11 +1223,11 @@ UINT32 tms3203x_device::mod06_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 	return result;
 }
 
-UINT32 tms3203x_device::mod07_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod07_1_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) - 1;
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) - 1;
 	if (temp < 0)
 		temp += IREG(TMR_BK);
 	*defptrptr = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
@@ -1238,37 +1238,37 @@ UINT32 tms3203x_device::mod07_1_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 
 // IR0 displacement variants
 
-UINT32 tms3203x_device::mod08_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod08_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) + IREG(TMR_IR0);
 }
 
-UINT32 tms3203x_device::mod09_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod09_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) - IREG(TMR_IR0);
 }
 
-UINT32 tms3203x_device::mod0a_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod0a_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 defval = IREG(reg) + IREG(TMR_IR0);
+	uint32_t defval = IREG(reg) + IREG(TMR_IR0);
 	*defptrptr = defval;
 	defptrptr = &IREG(reg);
 	return defval;
 }
 
-UINT32 tms3203x_device::mod0b_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod0b_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 defval = IREG(reg) - IREG(TMR_IR0);
+	uint32_t defval = IREG(reg) - IREG(TMR_IR0);
 	*defptrptr = defval;
 	defptrptr = &IREG(reg);
 	return defval;
 }
 
-UINT32 tms3203x_device::mod0c_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod0c_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	*defptrptr = IREG(reg) + IREG(TMR_IR0);
@@ -1276,7 +1276,7 @@ UINT32 tms3203x_device::mod0c_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod0d_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod0d_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	*defptrptr = IREG(reg) - IREG(TMR_IR0);
@@ -1284,11 +1284,11 @@ UINT32 tms3203x_device::mod0d_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod0e_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod0e_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) + IREG(TMR_IR0);
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) + IREG(TMR_IR0);
 	if (temp >= IREG(TMR_BK))
 		temp -= IREG(TMR_BK);
 	*defptrptr = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
@@ -1296,11 +1296,11 @@ UINT32 tms3203x_device::mod0e_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 	return result;
 }
 
-UINT32 tms3203x_device::mod0f_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod0f_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) - IREG(TMR_IR0);
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) - IREG(TMR_IR0);
 	if (temp < 0)
 		temp += IREG(TMR_BK);
 	*defptrptr = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
@@ -1311,37 +1311,37 @@ UINT32 tms3203x_device::mod0f_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 
 // IR1 displacement variants
 
-UINT32 tms3203x_device::mod10_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod10_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) + IREG(TMR_IR1);
 }
 
-UINT32 tms3203x_device::mod11_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod11_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg) - IREG(TMR_IR1);
 }
 
-UINT32 tms3203x_device::mod12_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod12_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 defval = IREG(reg) + IREG(TMR_IR1);
+	uint32_t defval = IREG(reg) + IREG(TMR_IR1);
 	*defptrptr = defval;
 	defptrptr = &IREG(reg);
 	return defval;
 }
 
-UINT32 tms3203x_device::mod13_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod13_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 defval = IREG(reg) - IREG(TMR_IR1);
+	uint32_t defval = IREG(reg) - IREG(TMR_IR1);
 	*defptrptr = defval;
 	defptrptr = &IREG(reg);
 	return defval;
 }
 
-UINT32 tms3203x_device::mod14_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod14_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	*defptrptr = IREG(reg) + IREG(TMR_IR1);
@@ -1349,7 +1349,7 @@ UINT32 tms3203x_device::mod14_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod15_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod15_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	*defptrptr = IREG(reg) - IREG(TMR_IR1);
@@ -1357,11 +1357,11 @@ UINT32 tms3203x_device::mod15_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod16_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod16_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) + IREG(TMR_IR1);
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) + IREG(TMR_IR1);
 	if (temp >= IREG(TMR_BK))
 		temp -= IREG(TMR_BK);
 	*defptrptr = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
@@ -1369,11 +1369,11 @@ UINT32 tms3203x_device::mod16_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 	return result;
 }
 
-UINT32 tms3203x_device::mod17_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod17_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
-	UINT32 result = IREG(reg);
-	INT32 temp = (result & m_bkmask) - IREG(TMR_IR1);
+	uint32_t result = IREG(reg);
+	int32_t temp = (result & m_bkmask) - IREG(TMR_IR1);
 	if (temp < 0)
 		temp += IREG(TMR_BK);
 	*defptrptr = (IREG(reg) & ~m_bkmask) | (temp & m_bkmask);
@@ -1381,19 +1381,19 @@ UINT32 tms3203x_device::mod17_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 	return result;
 }
 
-UINT32 tms3203x_device::mod18_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod18_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	int reg = TMR_AR0 + (ar & 7);
 	return IREG(reg);
 }
 
-UINT32 tms3203x_device::mod19_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::mod19_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	unimplemented(op);
 	return 0;
 }
 
-UINT32 tms3203x_device::modillegal_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
+uint32_t tms3203x_device::modillegal_def(uint32_t op, uint8_t ar, uint32_t *&defptrptr)
 {
 	illegal(op);
 	return 0;
@@ -1404,42 +1404,42 @@ UINT32 tms3203x_device::modillegal_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 
 #define ABSF(dreg, sreg)                                                \
 {                                                                       \
-	INT32 man = FREGMAN(sreg);                                          \
+	int32_t man = FREGMAN(sreg);                                          \
 	CLR_NZVUF();                                                        \
 	m_r[dreg] = m_r[sreg];                              \
 	if (man < 0)                                                        \
 	{                                                                   \
 		m_r[dreg].set_mantissa(~man);                           \
-		if (man == (INT32)0x80000000 && FREGEXP(sreg) == 127)           \
+		if (man == (int32_t)0x80000000 && FREGEXP(sreg) == 127)           \
 			IREG(TMR_ST) |= VFLAG | LVFLAG;                             \
 	}                                                                   \
 	OR_NZF(m_r[dreg]);                                          \
 }
 
-void tms3203x_device::absf_reg(UINT32 op)
+void tms3203x_device::absf_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	int sreg = op & 7;
 	ABSF(dreg, sreg);
 }
 
-void tms3203x_device::absf_dir(UINT32 op)
+void tms3203x_device::absf_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	ABSF(dreg, TMR_TEMP1);
 }
 
-void tms3203x_device::absf_ind(UINT32 op)
+void tms3203x_device::absf_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	ABSF(dreg, TMR_TEMP1);
 }
 
-void tms3203x_device::absf_imm(UINT32 op)
+void tms3203x_device::absf_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(TMR_TEMP1, op);
@@ -1450,7 +1450,7 @@ void tms3203x_device::absf_imm(UINT32 op)
 
 #define ABSI(dreg, src)                                             \
 {                                                                   \
-	UINT32 _res = ((INT32)src < 0) ? -src : src;                    \
+	uint32_t _res = ((int32_t)src < 0) ? -src : src;                    \
 	if (!OVM() || _res != 0x80000000)                                   \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
@@ -1466,30 +1466,30 @@ void tms3203x_device::absf_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::absi_reg(UINT32 op)
+void tms3203x_device::absi_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	ABSI(dreg, src);
 }
 
-void tms3203x_device::absi_dir(UINT32 op)
+void tms3203x_device::absi_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
 	ABSI(dreg, src);
 }
 
-void tms3203x_device::absi_ind(UINT32 op)
+void tms3203x_device::absi_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
 	ABSI(dreg, src);
 }
 
-void tms3203x_device::absi_imm(UINT32 op)
+void tms3203x_device::absi_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
 	ABSI(dreg, src);
 }
@@ -1498,14 +1498,14 @@ void tms3203x_device::absi_imm(UINT32 op)
 
 #define ADDC(dreg, src1, src2)                                      \
 {                                                                   \
-	UINT32 _res = src1 + src2 + (IREG(TMR_ST) & CFLAG);             \
+	uint32_t _res = src1 + src2 + (IREG(TMR_ST) & CFLAG);             \
 	if (!OVM() || !OVERFLOW_ADD(src1,src2,_res))                    \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
-		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
+		IREG(dreg) = ((int32_t)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
 	if (dreg < 8)                                                   \
 	{                                                               \
-		UINT32 tempc = IREG(TMR_ST) & CFLAG;                        \
+		uint32_t tempc = IREG(TMR_ST) & CFLAG;                        \
 		CLR_NZCVUF();                                               \
 		OR_C_ADC(src1,src2,tempc);                                  \
 		OR_V_ADD(src1,src2,_res);                                   \
@@ -1515,63 +1515,63 @@ void tms3203x_device::absi_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::addc_reg(UINT32 op)
+void tms3203x_device::addc_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ADDC(dreg, dst, src);
 }
 
-void tms3203x_device::addc_dir(UINT32 op)
+void tms3203x_device::addc_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ADDC(dreg, dst, src);
 }
 
-void tms3203x_device::addc_ind(UINT32 op)
+void tms3203x_device::addc_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ADDC(dreg, dst, src);
 }
 
-void tms3203x_device::addc_imm(UINT32 op)
+void tms3203x_device::addc_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ADDC(dreg, dst, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::addf_reg(UINT32 op)
+void tms3203x_device::addf_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	addf(m_r[dreg], m_r[dreg], m_r[op & 7]);
 }
 
-void tms3203x_device::addf_dir(UINT32 op)
+void tms3203x_device::addf_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	addf(m_r[dreg], m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::addf_ind(UINT32 op)
+void tms3203x_device::addf_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	addf(m_r[dreg], m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::addf_imm(UINT32 op)
+void tms3203x_device::addf_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(TMR_TEMP1, op);
@@ -1582,11 +1582,11 @@ void tms3203x_device::addf_imm(UINT32 op)
 
 #define ADDI(dreg, src1, src2)                                      \
 {                                                                   \
-	UINT32 _res = src1 + src2;                                      \
+	uint32_t _res = src1 + src2;                                      \
 	if (!OVM() || !OVERFLOW_ADD(src1,src2,_res))                    \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
-		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
+		IREG(dreg) = ((int32_t)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
 	if (dreg < 8)                                                   \
 	{                                                               \
 		CLR_NZCVUF();                                               \
@@ -1598,35 +1598,35 @@ void tms3203x_device::addf_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::addi_reg(UINT32 op)
+void tms3203x_device::addi_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ADDI(dreg, dst, src);
 }
 
-void tms3203x_device::addi_dir(UINT32 op)
+void tms3203x_device::addi_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ADDI(dreg, dst, src);
 }
 
-void tms3203x_device::addi_ind(UINT32 op)
+void tms3203x_device::addi_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ADDI(dreg, dst, src);
 }
 
-void tms3203x_device::addi_imm(UINT32 op)
+void tms3203x_device::addi_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ADDI(dreg, dst, src);
 }
 
@@ -1634,7 +1634,7 @@ void tms3203x_device::addi_imm(UINT32 op)
 
 #define AND(dreg, src1, src2)                                       \
 {                                                                   \
-	UINT32 _res = (src1) & (src2);                                  \
+	uint32_t _res = (src1) & (src2);                                  \
 	IREG(dreg) = _res;                                              \
 	if (dreg < 8)                                                   \
 	{                                                               \
@@ -1645,35 +1645,35 @@ void tms3203x_device::addi_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::and_reg(UINT32 op)
+void tms3203x_device::and_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	AND(dreg, dst, src);
 }
 
-void tms3203x_device::and_dir(UINT32 op)
+void tms3203x_device::and_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	AND(dreg, dst, src);
 }
 
-void tms3203x_device::and_ind(UINT32 op)
+void tms3203x_device::and_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	AND(dreg, dst, src);
 }
 
-void tms3203x_device::and_imm(UINT32 op)
+void tms3203x_device::and_imm(uint32_t op)
 {
-	UINT32 src = (UINT16)op;
+	uint32_t src = (uint16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	AND(dreg, dst, src);
 }
 
@@ -1681,7 +1681,7 @@ void tms3203x_device::and_imm(UINT32 op)
 
 #define ANDN(dreg, src1, src2)                                      \
 {                                                                   \
-	UINT32 _res = (src1) & ~(src2);                                 \
+	uint32_t _res = (src1) & ~(src2);                                 \
 	IREG(dreg) = _res;                                              \
 	if (dreg < 8)                                                   \
 	{                                                               \
@@ -1692,35 +1692,35 @@ void tms3203x_device::and_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::andn_reg(UINT32 op)
+void tms3203x_device::andn_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ANDN(dreg, dst, src);
 }
 
-void tms3203x_device::andn_dir(UINT32 op)
+void tms3203x_device::andn_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ANDN(dreg, dst, src);
 }
 
-void tms3203x_device::andn_ind(UINT32 op)
+void tms3203x_device::andn_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ANDN(dreg, dst, src);
 }
 
-void tms3203x_device::andn_imm(UINT32 op)
+void tms3203x_device::andn_imm(uint32_t op)
 {
-	UINT32 src = (UINT16)op;
+	uint32_t src = (uint16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	ANDN(dreg, dst, src);
 }
 
@@ -1728,19 +1728,19 @@ void tms3203x_device::andn_imm(UINT32 op)
 
 #define ASH(dreg, src, count)                                       \
 {                                                                   \
-	UINT32 _res;                                                    \
-	INT32 _count = (INT16)(count << 9) >> 9;    /* 7 LSBs */        \
+	uint32_t _res;                                                    \
+	int32_t _count = (int16_t)(count << 9) >> 9;    /* 7 LSBs */        \
 	if (_count < 0)                                                 \
 	{                                                               \
 		if (_count >= -31)                                          \
-			_res = (INT32)src >> -_count;                           \
+			_res = (int32_t)src >> -_count;                           \
 		else                                                        \
-			_res = (INT32)src >> 31;                                \
+			_res = (int32_t)src >> 31;                                \
 	}                                                               \
 	else                                                            \
 	{                                                               \
 		if (_count <= 31)                                           \
-			_res = (INT32)src << _count;                            \
+			_res = (int32_t)src << _count;                            \
 		else                                                        \
 			_res = 0;                                               \
 	}                                                               \
@@ -1752,77 +1752,77 @@ void tms3203x_device::andn_imm(UINT32 op)
 		if (_count < 0)                                             \
 		{                                                           \
 			if (_count >= -32)                                      \
-				OR_C(((INT32)src >> (-_count - 1)) & 1);            \
+				OR_C(((int32_t)src >> (-_count - 1)) & 1);            \
 			else                                                    \
-				OR_C(((INT32)src >> 31) & 1);                       \
+				OR_C(((int32_t)src >> 31) & 1);                       \
 		}                                                           \
 		else if (_count > 0)                                        \
 		{                                                           \
 			if (_count <= 32)                                       \
-				OR_C(((UINT32)src << (_count - 1)) >> 31);          \
+				OR_C(((uint32_t)src << (_count - 1)) >> 31);          \
 		}                                                           \
 	}                                                               \
 	else if (dreg >= TMR_BK)                                        \
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::ash_reg(UINT32 op)
+void tms3203x_device::ash_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	int count = IREG(op & 31);
-	UINT32 src = IREG(dreg);
+	uint32_t src = IREG(dreg);
 	ASH(dreg, src, count);
 }
 
-void tms3203x_device::ash_dir(UINT32 op)
+void tms3203x_device::ash_dir(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	int count = RMEM(DIRECT(op));
-	UINT32 src = IREG(dreg);
+	uint32_t src = IREG(dreg);
 	ASH(dreg, src, count);
 }
 
-void tms3203x_device::ash_ind(UINT32 op)
+void tms3203x_device::ash_ind(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	int count = RMEM(INDIRECT_D(op, op >> 8));
-	UINT32 src = IREG(dreg);
+	uint32_t src = IREG(dreg);
 	ASH(dreg, src, count);
 }
 
-void tms3203x_device::ash_imm(UINT32 op)
+void tms3203x_device::ash_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	int count = op;
-	UINT32 src = IREG(dreg);
+	uint32_t src = IREG(dreg);
 	ASH(dreg, src, count);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::cmpf_reg(UINT32 op)
+void tms3203x_device::cmpf_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	subf(m_r[TMR_TEMP2], m_r[dreg], m_r[op & 7]);
 }
 
-void tms3203x_device::cmpf_dir(UINT32 op)
+void tms3203x_device::cmpf_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	subf(m_r[TMR_TEMP2], m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::cmpf_ind(UINT32 op)
+void tms3203x_device::cmpf_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	subf(m_r[TMR_TEMP2], m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::cmpf_imm(UINT32 op)
+void tms3203x_device::cmpf_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(TMR_TEMP1, op);
@@ -1833,44 +1833,44 @@ void tms3203x_device::cmpf_imm(UINT32 op)
 
 #define CMPI(src1, src2)                                            \
 {                                                                   \
-	UINT32 _res = src1 - src2;                                      \
+	uint32_t _res = src1 - src2;                                      \
 	CLR_NZCVUF();                                                   \
 	OR_C_SUB(src1,src2,_res);                                       \
 	OR_V_SUB(src1,src2,_res);                                       \
 	OR_NZ(_res);                                                    \
 }
 
-void tms3203x_device::cmpi_reg(UINT32 op)
+void tms3203x_device::cmpi_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
-	UINT32 dst = IREG((op >> 16) & 31);
+	uint32_t src = IREG(op & 31);
+	uint32_t dst = IREG((op >> 16) & 31);
 	CMPI(dst, src);
 }
 
-void tms3203x_device::cmpi_dir(UINT32 op)
+void tms3203x_device::cmpi_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
-	UINT32 dst = IREG((op >> 16) & 31);
+	uint32_t src = RMEM(DIRECT(op));
+	uint32_t dst = IREG((op >> 16) & 31);
 	CMPI(dst, src);
 }
 
-void tms3203x_device::cmpi_ind(UINT32 op)
+void tms3203x_device::cmpi_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
-	UINT32 dst = IREG((op >> 16) & 31);
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t dst = IREG((op >> 16) & 31);
 	CMPI(dst, src);
 }
 
-void tms3203x_device::cmpi_imm(UINT32 op)
+void tms3203x_device::cmpi_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
-	UINT32 dst = IREG((op >> 16) & 31);
+	uint32_t src = (int16_t)op;
+	uint32_t dst = IREG((op >> 16) & 31);
 	CMPI(dst, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::fix_reg(UINT32 op)
+void tms3203x_device::fix_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	m_r[TMR_TEMP1] = m_r[op & 7];
@@ -1878,25 +1878,25 @@ void tms3203x_device::fix_reg(UINT32 op)
 	m_r[dreg].set_mantissa(m_r[TMR_TEMP1].mantissa());
 }
 
-void tms3203x_device::fix_dir(UINT32 op)
+void tms3203x_device::fix_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
 	LONG2FP(TMR_TEMP1, res);
 	float2int(m_r[TMR_TEMP1], dreg < 8);
 	m_r[dreg].set_mantissa(m_r[TMR_TEMP1].mantissa());
 }
 
-void tms3203x_device::fix_ind(UINT32 op)
+void tms3203x_device::fix_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
 	LONG2FP(TMR_TEMP1, res);
 	float2int(m_r[TMR_TEMP1], dreg < 8);
 	m_r[dreg].set_mantissa(m_r[TMR_TEMP1].mantissa());
 }
 
-void tms3203x_device::fix_imm(UINT32 op)
+void tms3203x_device::fix_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	SHORT2FP(TMR_TEMP1, op);
@@ -1912,37 +1912,37 @@ void tms3203x_device::fix_imm(UINT32 op)
 	int2float(m_r[dreg]);                                   \
 }
 
-void tms3203x_device::float_reg(UINT32 op)
+void tms3203x_device::float_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 7;
 	FLOAT(dreg, src);
 }
 
-void tms3203x_device::float_dir(UINT32 op)
+void tms3203x_device::float_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	FLOAT(dreg, src);
 }
 
-void tms3203x_device::float_ind(UINT32 op)
+void tms3203x_device::float_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	FLOAT(dreg, src);
 }
 
-void tms3203x_device::float_imm(UINT32 op)
+void tms3203x_device::float_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 7;
 	FLOAT(dreg, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::idle(UINT32 op)
+void tms3203x_device::idle(uint32_t op)
 {
 	m_is_idling = true;
 	IREG(TMR_ST) |= GIEFLAG;
@@ -1953,7 +1953,7 @@ void tms3203x_device::idle(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::lde_reg(UINT32 op)
+void tms3203x_device::lde_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	m_r[dreg].set_exponent(m_r[op & 7].exponent());
@@ -1961,9 +1961,9 @@ void tms3203x_device::lde_reg(UINT32 op)
 		m_r[dreg].set_mantissa(0);
 }
 
-void tms3203x_device::lde_dir(UINT32 op)
+void tms3203x_device::lde_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	m_r[dreg].set_exponent(m_r[TMR_TEMP1].exponent());
@@ -1971,9 +1971,9 @@ void tms3203x_device::lde_dir(UINT32 op)
 		m_r[dreg].set_mantissa(0);
 }
 
-void tms3203x_device::lde_ind(UINT32 op)
+void tms3203x_device::lde_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	m_r[dreg].set_exponent(m_r[TMR_TEMP1].exponent());
@@ -1981,7 +1981,7 @@ void tms3203x_device::lde_ind(UINT32 op)
 		m_r[dreg].set_mantissa(0);
 }
 
-void tms3203x_device::lde_imm(UINT32 op)
+void tms3203x_device::lde_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(TMR_TEMP1, op);
@@ -1992,7 +1992,7 @@ void tms3203x_device::lde_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldf_reg(UINT32 op)
+void tms3203x_device::ldf_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	m_r[dreg] = m_r[op & 7];
@@ -2000,25 +2000,25 @@ void tms3203x_device::ldf_reg(UINT32 op)
 	OR_NZF(m_r[dreg]);
 }
 
-void tms3203x_device::ldf_dir(UINT32 op)
+void tms3203x_device::ldf_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(dreg, res);
 	CLR_NZVUF();
 	OR_NZF(m_r[dreg]);
 }
 
-void tms3203x_device::ldf_ind(UINT32 op)
+void tms3203x_device::ldf_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(dreg, res);
 	CLR_NZVUF();
 	OR_NZF(m_r[dreg]);
 }
 
-void tms3203x_device::ldf_imm(UINT32 op)
+void tms3203x_device::ldf_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(dreg, op);
@@ -2028,8 +2028,8 @@ void tms3203x_device::ldf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfi_dir(UINT32 op) { unimplemented(op); }
-void tms3203x_device::ldfi_ind(UINT32 op) { unimplemented(op); }
+void tms3203x_device::ldfi_dir(uint32_t op) { unimplemented(op); }
+void tms3203x_device::ldfi_ind(uint32_t op) { unimplemented(op); }
 
 /*-----------------------------------------------------*/
 
@@ -2045,62 +2045,62 @@ void tms3203x_device::ldfi_ind(UINT32 op) { unimplemented(op); }
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::ldi_reg(UINT32 op)
+void tms3203x_device::ldi_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	LDI(dreg, src);
 }
 
-void tms3203x_device::ldi_dir(UINT32 op)
+void tms3203x_device::ldi_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
 	LDI(dreg, src);
 }
 
-void tms3203x_device::ldi_ind(UINT32 op)
+void tms3203x_device::ldi_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
 	LDI(dreg, src);
 }
 
-void tms3203x_device::ldi_imm(UINT32 op)
+void tms3203x_device::ldi_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
 	LDI(dreg, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldii_dir(UINT32 op) { unimplemented(op); }
-void tms3203x_device::ldii_ind(UINT32 op) { unimplemented(op); }
+void tms3203x_device::ldii_dir(uint32_t op) { unimplemented(op); }
+void tms3203x_device::ldii_ind(uint32_t op) { unimplemented(op); }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldm_reg(UINT32 op)
+void tms3203x_device::ldm_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	m_r[dreg].set_mantissa(m_r[op & 7].mantissa());
 }
 
-void tms3203x_device::ldm_dir(UINT32 op)
+void tms3203x_device::ldm_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	m_r[dreg].set_mantissa(res);
 }
 
-void tms3203x_device::ldm_ind(UINT32 op)
+void tms3203x_device::ldm_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	m_r[dreg].set_mantissa(res);
 }
 
-void tms3203x_device::ldm_imm(UINT32 op)
+void tms3203x_device::ldm_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(TMR_TEMP1, op);
@@ -2111,19 +2111,19 @@ void tms3203x_device::ldm_imm(UINT32 op)
 
 #define LSH(dreg, src, count)                                       \
 {                                                                   \
-	UINT32 _res;                                                    \
-	INT32 _count = (INT16)(count << 9) >> 9;    /* 7 LSBs */        \
+	uint32_t _res;                                                    \
+	int32_t _count = (int16_t)(count << 9) >> 9;    /* 7 LSBs */        \
 	if (_count < 0)                                                 \
 	{                                                               \
 		if (_count >= -31)                                          \
-			_res = (UINT32)src >> -_count;                          \
+			_res = (uint32_t)src >> -_count;                          \
 		else                                                        \
 			_res = 0;                                               \
 	}                                                               \
 	else                                                            \
 	{                                                               \
 		if (_count <= 31)                                           \
-			_res = (UINT32)src << _count;                           \
+			_res = (uint32_t)src << _count;                           \
 		else                                                        \
 			_res = 0;                                               \
 	}                                                               \
@@ -2135,75 +2135,75 @@ void tms3203x_device::ldm_imm(UINT32 op)
 		if (_count < 0)                                             \
 		{                                                           \
 			if (_count >= -32)                                      \
-				OR_C(((UINT32)src >> (-_count - 1)) & 1);           \
+				OR_C(((uint32_t)src >> (-_count - 1)) & 1);           \
 		}                                                           \
 		else if (_count > 0)                                        \
 		{                                                           \
 			if (_count <= 32)                                       \
-				OR_C(((UINT32)src << (_count - 1)) >> 31);          \
+				OR_C(((uint32_t)src << (_count - 1)) >> 31);          \
 		}                                                           \
 	}                                                               \
 	else if (dreg >= TMR_BK)                                        \
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::lsh_reg(UINT32 op)
+void tms3203x_device::lsh_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	int count = IREG(op & 31);
-	UINT32 src = IREG(dreg);
+	uint32_t src = IREG(dreg);
 	LSH(dreg, src, count);
 }
 
-void tms3203x_device::lsh_dir(UINT32 op)
+void tms3203x_device::lsh_dir(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	int count = RMEM(DIRECT(op));
-	UINT32 src = IREG(dreg);
+	uint32_t src = IREG(dreg);
 	LSH(dreg, src, count);
 }
 
-void tms3203x_device::lsh_ind(UINT32 op)
+void tms3203x_device::lsh_ind(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	int count = RMEM(INDIRECT_D(op, op >> 8));
-	UINT32 src = IREG(dreg);
+	uint32_t src = IREG(dreg);
 	LSH(dreg, src, count);
 }
 
-void tms3203x_device::lsh_imm(UINT32 op)
+void tms3203x_device::lsh_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	int count = op;
-	UINT32 src = IREG(dreg);
+	uint32_t src = IREG(dreg);
 	LSH(dreg, src, count);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::mpyf_reg(UINT32 op)
+void tms3203x_device::mpyf_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	mpyf(m_r[dreg], m_r[dreg], m_r[op & 31]);
 }
 
-void tms3203x_device::mpyf_dir(UINT32 op)
+void tms3203x_device::mpyf_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
 	LONG2FP(TMR_TEMP1, res);
 	mpyf(m_r[dreg], m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::mpyf_ind(UINT32 op)
+void tms3203x_device::mpyf_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
 	LONG2FP(TMR_TEMP1, res);
 	mpyf(m_r[dreg], m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::mpyf_imm(UINT32 op)
+void tms3203x_device::mpyf_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	SHORT2FP(TMR_TEMP1, op);
@@ -2214,51 +2214,51 @@ void tms3203x_device::mpyf_imm(UINT32 op)
 
 #define MPYI(dreg, src1, src2)                                      \
 {                                                                   \
-	INT64 _res = (INT64)((INT32)(src1 << 8) >> 8) * (INT64)((INT32)(src2 << 8) >> 8);\
-	if (!OVM() || (_res >= -(INT64)0x80000000 && _res <= (INT64)0x7fffffff))        \
+	int64_t _res = (int64_t)((int32_t)(src1 << 8) >> 8) * (int64_t)((int32_t)(src2 << 8) >> 8);\
+	if (!OVM() || (_res >= -(int64_t)0x80000000 && _res <= (int64_t)0x7fffffff))        \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
 		IREG(dreg) = (_res < 0) ? 0x80000000 : 0x7fffffff;          \
 	if (dreg < 8)                                                   \
 	{                                                               \
 		CLR_NZVUF();                                                \
-		OR_NZ((UINT32)_res);                                        \
-		if (_res < -(INT64)0x80000000 || _res > (INT64)0x7fffffff)  \
+		OR_NZ((uint32_t)_res);                                        \
+		if (_res < -(int64_t)0x80000000 || _res > (int64_t)0x7fffffff)  \
 			IREG(TMR_ST) |= VFLAG | LVFLAG;                         \
 	}                                                               \
 	else if (dreg >= TMR_BK)                                        \
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::mpyi_reg(UINT32 op)
+void tms3203x_device::mpyi_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	MPYI(dreg, dst, src);
 }
 
-void tms3203x_device::mpyi_dir(UINT32 op)
+void tms3203x_device::mpyi_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	MPYI(dreg, dst, src);
 }
 
-void tms3203x_device::mpyi_ind(UINT32 op)
+void tms3203x_device::mpyi_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	MPYI(dreg, dst, src);
 }
 
-void tms3203x_device::mpyi_imm(UINT32 op)
+void tms3203x_device::mpyi_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	MPYI(dreg, dst, src);
 }
 
@@ -2266,14 +2266,14 @@ void tms3203x_device::mpyi_imm(UINT32 op)
 
 #define NEGB(dreg, src)                                             \
 {                                                                   \
-	UINT32 _res = 0 - src - (IREG(TMR_ST) & CFLAG);                 \
+	uint32_t _res = 0 - src - (IREG(TMR_ST) & CFLAG);                 \
 	if (!OVM() || !OVERFLOW_SUB(0,src,_res))                        \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
-		IREG(dreg) = ((INT32)src < 0) ? 0x80000000 : 0x7fffffff;    \
+		IREG(dreg) = ((int32_t)src < 0) ? 0x80000000 : 0x7fffffff;    \
 	if (dreg < 8)                                                   \
 	{                                                               \
-		UINT32 tempc = IREG(TMR_ST) & CFLAG;                        \
+		uint32_t tempc = IREG(TMR_ST) & CFLAG;                        \
 		CLR_NZCVUF();                                               \
 		OR_C_SBB(0,src,tempc);                                      \
 		OR_V_SUB(0,src,_res);                                       \
@@ -2283,59 +2283,59 @@ void tms3203x_device::mpyi_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::negb_reg(UINT32 op)
+void tms3203x_device::negb_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	NEGB(dreg, src);
 }
 
-void tms3203x_device::negb_dir(UINT32 op)
+void tms3203x_device::negb_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
 	NEGB(dreg, src);
 }
 
-void tms3203x_device::negb_ind(UINT32 op)
+void tms3203x_device::negb_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
 	NEGB(dreg, src);
 }
 
-void tms3203x_device::negb_imm(UINT32 op)
+void tms3203x_device::negb_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
 	NEGB(dreg, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::negf_reg(UINT32 op)
+void tms3203x_device::negf_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	negf(m_r[dreg], m_r[op & 7]);
 }
 
-void tms3203x_device::negf_dir(UINT32 op)
+void tms3203x_device::negf_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	negf(m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::negf_ind(UINT32 op)
+void tms3203x_device::negf_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	negf(m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::negf_imm(UINT32 op)
+void tms3203x_device::negf_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(TMR_TEMP1, op);
@@ -2346,11 +2346,11 @@ void tms3203x_device::negf_imm(UINT32 op)
 
 #define NEGI(dreg, src)                                             \
 {                                                                   \
-	UINT32 _res = 0 - src;                                          \
+	uint32_t _res = 0 - src;                                          \
 	if (!OVM() || !OVERFLOW_SUB(0,src,_res))                        \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
-		IREG(dreg) = ((INT32)src < 0) ? 0x80000000 : 0x7fffffff;    \
+		IREG(dreg) = ((int32_t)src < 0) ? 0x80000000 : 0x7fffffff;    \
 	if (dreg < 8)                                                   \
 	{                                                               \
 		CLR_NZCVUF();                                               \
@@ -2362,70 +2362,70 @@ void tms3203x_device::negf_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::negi_reg(UINT32 op)
+void tms3203x_device::negi_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	NEGI(dreg, src);
 }
 
-void tms3203x_device::negi_dir(UINT32 op)
+void tms3203x_device::negi_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
 	NEGI(dreg, src);
 }
 
-void tms3203x_device::negi_ind(UINT32 op)
+void tms3203x_device::negi_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
 	NEGI(dreg, src);
 }
 
-void tms3203x_device::negi_imm(UINT32 op)
+void tms3203x_device::negi_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
 	NEGI(dreg, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::nop_reg(UINT32 op)
+void tms3203x_device::nop_reg(uint32_t op)
 {
 }
 
-void tms3203x_device::nop_ind(UINT32 op)
+void tms3203x_device::nop_ind(uint32_t op)
 {
 	RMEM(INDIRECT_D(op, op >> 8));
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::norm_reg(UINT32 op)
+void tms3203x_device::norm_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	norm(m_r[dreg], m_r[op & 7]);
 }
 
-void tms3203x_device::norm_dir(UINT32 op)
+void tms3203x_device::norm_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	norm(m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::norm_ind(UINT32 op)
+void tms3203x_device::norm_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	norm(m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::norm_imm(UINT32 op)
+void tms3203x_device::norm_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(TMR_TEMP1, op);
@@ -2436,7 +2436,7 @@ void tms3203x_device::norm_imm(UINT32 op)
 
 #define NOT(dreg, src)                                              \
 {                                                                   \
-	UINT32 _res = ~(src);                                           \
+	uint32_t _res = ~(src);                                           \
 	IREG(dreg) = _res;                                              \
 	if (dreg < 8)                                                   \
 	{                                                               \
@@ -2447,40 +2447,40 @@ void tms3203x_device::norm_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::not_reg(UINT32 op)
+void tms3203x_device::not_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	NOT(dreg, src);
 }
 
-void tms3203x_device::not_dir(UINT32 op)
+void tms3203x_device::not_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
 	NOT(dreg, src);
 }
 
-void tms3203x_device::not_ind(UINT32 op)
+void tms3203x_device::not_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
 	NOT(dreg, src);
 }
 
-void tms3203x_device::not_imm(UINT32 op)
+void tms3203x_device::not_imm(uint32_t op)
 {
-	UINT32 src = (UINT16)op;
+	uint32_t src = (uint16_t)op;
 	int dreg = (op >> 16) & 31;
 	NOT(dreg, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::pop(UINT32 op)
+void tms3203x_device::pop(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
-	UINT32 val = RMEM(IREG(TMR_SP)--);
+	uint32_t val = RMEM(IREG(TMR_SP)--);
 	IREG(dreg) = val;
 	if (dreg < 8)
 	{
@@ -2491,21 +2491,21 @@ void tms3203x_device::pop(UINT32 op)
 		update_special(dreg);
 }
 
-void tms3203x_device::popf(UINT32 op)
+void tms3203x_device::popf(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
-	UINT32 val = RMEM(IREG(TMR_SP)--);
+	uint32_t val = RMEM(IREG(TMR_SP)--);
 	LONG2FP(dreg, val);
 	CLR_NZVUF();
 	OR_NZF(m_r[dreg]);
 }
 
-void tms3203x_device::push(UINT32 op)
+void tms3203x_device::push(uint32_t op)
 {
 	WMEM(++IREG(TMR_SP), IREG((op >> 16) & 31));
 }
 
-void tms3203x_device::pushf(UINT32 op)
+void tms3203x_device::pushf(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	WMEM(++IREG(TMR_SP), FP2LONG(dreg));
@@ -2515,7 +2515,7 @@ void tms3203x_device::pushf(UINT32 op)
 
 #define OR(dreg, src1, src2)                                        \
 {                                                                   \
-	UINT32 _res = (src1) | (src2);                                  \
+	uint32_t _res = (src1) | (src2);                                  \
 	IREG(dreg) = _res;                                              \
 	if (dreg < 8)                                                   \
 	{                                                               \
@@ -2526,56 +2526,56 @@ void tms3203x_device::pushf(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::or_reg(UINT32 op)
+void tms3203x_device::or_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	OR(dreg, dst, src);
 }
 
-void tms3203x_device::or_dir(UINT32 op)
+void tms3203x_device::or_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	OR(dreg, dst, src);
 }
 
-void tms3203x_device::or_ind(UINT32 op)
+void tms3203x_device::or_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	OR(dreg, dst, src);
 }
 
-void tms3203x_device::or_imm(UINT32 op)
+void tms3203x_device::or_imm(uint32_t op)
 {
-	UINT32 src = (UINT16)op;
+	uint32_t src = (uint16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	OR(dreg, dst, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::maxspeed(UINT32 op) { unimplemented(op); }
+void tms3203x_device::maxspeed(uint32_t op) { unimplemented(op); }
 
 /*-----------------------------------------------------*/
 
 #define RND(dreg)                                                   \
 {                                                                   \
-	INT32 man = FREGMAN(dreg);                                      \
+	int32_t man = FREGMAN(dreg);                                      \
 	CLR_NVUF();                                                     \
 	if (man < 0x7fffff80)                                           \
 	{                                                               \
-		m_r[dreg].set_mantissa(((UINT32)man + 0x80) & 0xffffff00);  \
+		m_r[dreg].set_mantissa(((uint32_t)man + 0x80) & 0xffffff00);  \
 		OR_NUF(m_r[dreg]);                                  \
 	}                                                               \
 	else if (FREGEXP(dreg) < 127)                                   \
 	{                                                               \
-		m_r[dreg].set_mantissa(((UINT32)man + 0x80) & 0x7fffff00);  \
+		m_r[dreg].set_mantissa(((uint32_t)man + 0x80) & 0x7fffff00);  \
 		m_r[dreg].set_exponent(FREGEXP(dreg) + 1);          \
 		OR_NUF(m_r[dreg]);                                  \
 	}                                                               \
@@ -2586,7 +2586,7 @@ void tms3203x_device::maxspeed(UINT32 op) { unimplemented(op); }
 	}                                                               \
 }
 
-void tms3203x_device::rnd_reg(UINT32 op)
+void tms3203x_device::rnd_reg(uint32_t op)
 {
 	int sreg = op & 7;
 	int dreg = (op >> 16) & 7;
@@ -2594,23 +2594,23 @@ void tms3203x_device::rnd_reg(UINT32 op)
 	RND(dreg);
 }
 
-void tms3203x_device::rnd_dir(UINT32 op)
+void tms3203x_device::rnd_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(dreg, res);
 	RND(dreg);
 }
 
-void tms3203x_device::rnd_ind(UINT32 op)
+void tms3203x_device::rnd_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(dreg, res);
 	RND(dreg);
 }
 
-void tms3203x_device::rnd_imm(UINT32 op)
+void tms3203x_device::rnd_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(dreg, op);
@@ -2619,10 +2619,10 @@ void tms3203x_device::rnd_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::rol(UINT32 op)
+void tms3203x_device::rol(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
-	UINT32 res = IREG(dreg);
+	uint32_t res = IREG(dreg);
 	int newcflag = res >> 31;
 	res = (res << 1) | newcflag;
 	IREG(dreg) = res;
@@ -2636,10 +2636,10 @@ void tms3203x_device::rol(UINT32 op)
 		update_special(dreg);
 }
 
-void tms3203x_device::rolc(UINT32 op)
+void tms3203x_device::rolc(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
-	UINT32 res = IREG(dreg);
+	uint32_t res = IREG(dreg);
 	int newcflag = res >> 31;
 	res = (res << 1) | (IREG(TMR_ST) & CFLAG);
 	IREG(dreg) = res;
@@ -2653,10 +2653,10 @@ void tms3203x_device::rolc(UINT32 op)
 		update_special(dreg);
 }
 
-void tms3203x_device::ror(UINT32 op)
+void tms3203x_device::ror(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
-	UINT32 res = IREG(dreg);
+	uint32_t res = IREG(dreg);
 	int newcflag = res & 1;
 	res = (res >> 1) | (newcflag << 31);
 	IREG(dreg) = res;
@@ -2670,10 +2670,10 @@ void tms3203x_device::ror(UINT32 op)
 		update_special(dreg);
 }
 
-void tms3203x_device::rorc(UINT32 op)
+void tms3203x_device::rorc(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
-	UINT32 res = IREG(dreg);
+	uint32_t res = IREG(dreg);
 	int newcflag = res & 1;
 	res = (res >> 1) | ((IREG(TMR_ST) & CFLAG) << 31);
 	IREG(dreg) = res;
@@ -2689,7 +2689,7 @@ void tms3203x_device::rorc(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::rtps_reg(UINT32 op)
+void tms3203x_device::rtps_reg(uint32_t op)
 {
 	IREG(TMR_RC) = IREG(op & 31);
 	IREG(TMR_RS) = m_pc;
@@ -2699,7 +2699,7 @@ void tms3203x_device::rtps_reg(UINT32 op)
 	m_delayed = true;
 }
 
-void tms3203x_device::rtps_dir(UINT32 op)
+void tms3203x_device::rtps_dir(uint32_t op)
 {
 	IREG(TMR_RC) = RMEM(DIRECT(op));
 	IREG(TMR_RS) = m_pc;
@@ -2709,7 +2709,7 @@ void tms3203x_device::rtps_dir(UINT32 op)
 	m_delayed = true;
 }
 
-void tms3203x_device::rtps_ind(UINT32 op)
+void tms3203x_device::rtps_ind(uint32_t op)
 {
 	IREG(TMR_RC) = RMEM(INDIRECT_D(op, op >> 8));
 	IREG(TMR_RS) = m_pc;
@@ -2719,9 +2719,9 @@ void tms3203x_device::rtps_ind(UINT32 op)
 	m_delayed = true;
 }
 
-void tms3203x_device::rtps_imm(UINT32 op)
+void tms3203x_device::rtps_imm(uint32_t op)
 {
-	IREG(TMR_RC) = (UINT16)op;
+	IREG(TMR_RC) = (uint16_t)op;
 	IREG(TMR_RS) = m_pc;
 	IREG(TMR_RE) = m_pc;
 	IREG(TMR_ST) |= RMFLAG;
@@ -2731,54 +2731,54 @@ void tms3203x_device::rtps_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::stf_dir(UINT32 op)
+void tms3203x_device::stf_dir(uint32_t op)
 {
 	WMEM(DIRECT(op), FP2LONG((op >> 16) & 7));
 }
 
-void tms3203x_device::stf_ind(UINT32 op)
+void tms3203x_device::stf_ind(uint32_t op)
 {
 	WMEM(INDIRECT_D(op, op >> 8), FP2LONG((op >> 16) & 7));
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::stfi_dir(UINT32 op) { unimplemented(op); }
-void tms3203x_device::stfi_ind(UINT32 op) { unimplemented(op); }
+void tms3203x_device::stfi_dir(uint32_t op) { unimplemented(op); }
+void tms3203x_device::stfi_ind(uint32_t op) { unimplemented(op); }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::sti_dir(UINT32 op)
+void tms3203x_device::sti_dir(uint32_t op)
 {
 	WMEM(DIRECT(op), IREG((op >> 16) & 31));
 }
 
-void tms3203x_device::sti_ind(UINT32 op)
+void tms3203x_device::sti_ind(uint32_t op)
 {
 	WMEM(INDIRECT_D(op, op >> 8), IREG((op >> 16) & 31));
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::stii_dir(UINT32 op) { unimplemented(op); }
-void tms3203x_device::stii_ind(UINT32 op) { unimplemented(op); }
+void tms3203x_device::stii_dir(uint32_t op) { unimplemented(op); }
+void tms3203x_device::stii_ind(uint32_t op) { unimplemented(op); }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::sigi(UINT32 op) { unimplemented(op); }
+void tms3203x_device::sigi(uint32_t op) { unimplemented(op); }
 
 /*-----------------------------------------------------*/
 
 #define SUBB(dreg, src1, src2)                                      \
 {                                                                   \
-	UINT32 _res = src1 - src2 - (IREG(TMR_ST) & CFLAG);             \
+	uint32_t _res = src1 - src2 - (IREG(TMR_ST) & CFLAG);             \
 	if (!OVM() || !OVERFLOW_SUB(src1,src2,_res))                    \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
-		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
+		IREG(dreg) = ((int32_t)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
 	if (dreg < 8)                                                   \
 	{                                                               \
-		UINT32 tempc = IREG(TMR_ST) & CFLAG;                        \
+		uint32_t tempc = IREG(TMR_ST) & CFLAG;                        \
 		CLR_NZCVUF();                                               \
 		OR_C_SBB(src1,src2,tempc);                                  \
 		OR_V_SUB(src1,src2,_res);                                   \
@@ -2788,35 +2788,35 @@ void tms3203x_device::sigi(UINT32 op) { unimplemented(op); }
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::subb_reg(UINT32 op)
+void tms3203x_device::subb_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBB(dreg, dst, src);
 }
 
-void tms3203x_device::subb_dir(UINT32 op)
+void tms3203x_device::subb_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBB(dreg, dst, src);
 }
 
-void tms3203x_device::subb_ind(UINT32 op)
+void tms3203x_device::subb_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBB(dreg, dst, src);
 }
 
-void tms3203x_device::subb_imm(UINT32 op)
+void tms3203x_device::subb_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBB(dreg, dst, src);
 }
 
@@ -2824,7 +2824,7 @@ void tms3203x_device::subb_imm(UINT32 op)
 
 #define SUBC(dreg, src)                                             \
 {                                                                   \
-	UINT32 dst = IREG(dreg);                                        \
+	uint32_t dst = IREG(dreg);                                        \
 	if (dst >= src)                                                 \
 		IREG(dreg) = ((dst - src) << 1) | 1;                        \
 	else                                                            \
@@ -2833,59 +2833,59 @@ void tms3203x_device::subb_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::subc_reg(UINT32 op)
+void tms3203x_device::subc_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	SUBC(dreg, src);
 }
 
-void tms3203x_device::subc_dir(UINT32 op)
+void tms3203x_device::subc_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
 	SUBC(dreg, src);
 }
 
-void tms3203x_device::subc_ind(UINT32 op)
+void tms3203x_device::subc_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
 	SUBC(dreg, src);
 }
 
-void tms3203x_device::subc_imm(UINT32 op)
+void tms3203x_device::subc_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
 	SUBC(dreg, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::subf_reg(UINT32 op)
+void tms3203x_device::subf_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	subf(m_r[dreg], m_r[dreg], m_r[op & 7]);
 }
 
-void tms3203x_device::subf_dir(UINT32 op)
+void tms3203x_device::subf_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	subf(m_r[dreg], m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::subf_ind(UINT32 op)
+void tms3203x_device::subf_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	subf(m_r[dreg], m_r[dreg], m_r[TMR_TEMP1]);
 }
 
-void tms3203x_device::subf_imm(UINT32 op)
+void tms3203x_device::subf_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(TMR_TEMP1, op);
@@ -2896,11 +2896,11 @@ void tms3203x_device::subf_imm(UINT32 op)
 
 #define SUBI(dreg, src1, src2)                                      \
 {                                                                   \
-	UINT32 _res = src1 - src2;                                      \
+	uint32_t _res = src1 - src2;                                      \
 	if (!OVM() || !OVERFLOW_SUB(src1,src2,_res))                    \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
-		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
+		IREG(dreg) = ((int32_t)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
 	if (dreg < 8)                                                   \
 	{                                                               \
 		CLR_NZCVUF();                                               \
@@ -2912,97 +2912,97 @@ void tms3203x_device::subf_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::subi_reg(UINT32 op)
+void tms3203x_device::subi_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBI(dreg, dst, src);
 }
 
-void tms3203x_device::subi_dir(UINT32 op)
+void tms3203x_device::subi_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBI(dreg, dst, src);
 }
 
-void tms3203x_device::subi_ind(UINT32 op)
+void tms3203x_device::subi_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBI(dreg, dst, src);
 }
 
-void tms3203x_device::subi_imm(UINT32 op)
+void tms3203x_device::subi_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBI(dreg, dst, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::subrb_reg(UINT32 op)
+void tms3203x_device::subrb_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBB(dreg, src, dst);
 }
 
-void tms3203x_device::subrb_dir(UINT32 op)
+void tms3203x_device::subrb_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBB(dreg, src, dst);
 }
 
-void tms3203x_device::subrb_ind(UINT32 op)
+void tms3203x_device::subrb_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBB(dreg, src, dst);
 }
 
-void tms3203x_device::subrb_imm(UINT32 op)
+void tms3203x_device::subrb_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBB(dreg, src, dst);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::subrf_reg(UINT32 op)
+void tms3203x_device::subrf_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	subf(m_r[dreg], m_r[op & 7], m_r[dreg]);
 }
 
-void tms3203x_device::subrf_dir(UINT32 op)
+void tms3203x_device::subrf_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	subf(m_r[dreg], m_r[TMR_TEMP1], m_r[dreg]);
 }
 
-void tms3203x_device::subrf_ind(UINT32 op)
+void tms3203x_device::subrf_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, res);
 	subf(m_r[dreg], m_r[TMR_TEMP1], m_r[dreg]);
 }
 
-void tms3203x_device::subrf_imm(UINT32 op)
+void tms3203x_device::subrf_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(TMR_TEMP1, op);
@@ -3011,35 +3011,35 @@ void tms3203x_device::subrf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::subri_reg(UINT32 op)
+void tms3203x_device::subri_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBI(dreg, src, dst);
 }
 
-void tms3203x_device::subri_dir(UINT32 op)
+void tms3203x_device::subri_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBI(dreg, src, dst);
 }
 
-void tms3203x_device::subri_ind(UINT32 op)
+void tms3203x_device::subri_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBI(dreg, src, dst);
 }
 
-void tms3203x_device::subri_imm(UINT32 op)
+void tms3203x_device::subri_imm(uint32_t op)
 {
-	UINT32 src = (INT16)op;
+	uint32_t src = (int16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	SUBI(dreg, src, dst);
 }
 
@@ -3047,36 +3047,36 @@ void tms3203x_device::subri_imm(UINT32 op)
 
 #define TSTB(src1, src2)                                            \
 {                                                                   \
-	UINT32 _res = (src1) & (src2);                                  \
+	uint32_t _res = (src1) & (src2);                                  \
 	CLR_NZVUF();                                                    \
 	OR_NZ(_res);                                                    \
 }
 
-void tms3203x_device::tstb_reg(UINT32 op)
+void tms3203x_device::tstb_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
-	UINT32 dst = IREG((op >> 16) & 31);
+	uint32_t src = IREG(op & 31);
+	uint32_t dst = IREG((op >> 16) & 31);
 	TSTB(dst, src);
 }
 
-void tms3203x_device::tstb_dir(UINT32 op)
+void tms3203x_device::tstb_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
-	UINT32 dst = IREG((op >> 16) & 31);
+	uint32_t src = RMEM(DIRECT(op));
+	uint32_t dst = IREG((op >> 16) & 31);
 	TSTB(dst, src);
 }
 
-void tms3203x_device::tstb_ind(UINT32 op)
+void tms3203x_device::tstb_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
-	UINT32 dst = IREG((op >> 16) & 31);
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t dst = IREG((op >> 16) & 31);
 	TSTB(dst, src);
 }
 
-void tms3203x_device::tstb_imm(UINT32 op)
+void tms3203x_device::tstb_imm(uint32_t op)
 {
-	UINT32 src = (UINT16)op;
-	UINT32 dst = IREG((op >> 16) & 31);
+	uint32_t src = (uint16_t)op;
+	uint32_t dst = IREG((op >> 16) & 31);
 	TSTB(dst, src);
 }
 
@@ -3084,7 +3084,7 @@ void tms3203x_device::tstb_imm(UINT32 op)
 
 #define XOR(dreg, src1, src2)                                       \
 {                                                                   \
-	UINT32 _res = (src1) ^ (src2);                                  \
+	uint32_t _res = (src1) ^ (src2);                                  \
 	IREG(dreg) = _res;                                              \
 	if (dreg < 8)                                                   \
 	{                                                               \
@@ -3095,41 +3095,41 @@ void tms3203x_device::tstb_imm(UINT32 op)
 		update_special(dreg);                                       \
 }
 
-void tms3203x_device::xor_reg(UINT32 op)
+void tms3203x_device::xor_reg(uint32_t op)
 {
-	UINT32 src = IREG(op & 31);
+	uint32_t src = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	XOR(dreg, dst, src);
 }
 
-void tms3203x_device::xor_dir(UINT32 op)
+void tms3203x_device::xor_dir(uint32_t op)
 {
-	UINT32 src = RMEM(DIRECT(op));
+	uint32_t src = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	XOR(dreg, dst, src);
 }
 
-void tms3203x_device::xor_ind(UINT32 op)
+void tms3203x_device::xor_ind(uint32_t op)
 {
-	UINT32 src = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t src = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	XOR(dreg, dst, src);
 }
 
-void tms3203x_device::xor_imm(UINT32 op)
+void tms3203x_device::xor_imm(uint32_t op)
 {
-	UINT32 src = (UINT16)op;
+	uint32_t src = (uint16_t)op;
 	int dreg = (op >> 16) & 31;
-	UINT32 dst = IREG(dreg);
+	uint32_t dst = IREG(dreg);
 	XOR(dreg, dst, src);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::iack_dir(UINT32 op)
+void tms3203x_device::iack_dir(uint32_t op)
 {
 	offs_t addr = DIRECT(op);
 	m_iack_cb(addr, ASSERT_LINE);
@@ -3137,7 +3137,7 @@ void tms3203x_device::iack_dir(UINT32 op)
 	m_iack_cb(addr, CLEAR_LINE);
 }
 
-void tms3203x_device::iack_ind(UINT32 op)
+void tms3203x_device::iack_ind(uint32_t op)
 {
 	offs_t addr = INDIRECT_D(op, op >> 8);
 	m_iack_cb(addr, ASSERT_LINE);
@@ -3147,35 +3147,35 @@ void tms3203x_device::iack_ind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::addc3_regreg(UINT32 op)
+void tms3203x_device::addc3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	ADDC(dreg, src1, src2);
 }
 
-void tms3203x_device::addc3_indreg(UINT32 op)
+void tms3203x_device::addc3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	ADDC(dreg, src1, src2);
 }
 
-void tms3203x_device::addc3_regind(UINT32 op)
+void tms3203x_device::addc3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	ADDC(dreg, src1, src2);
 }
 
-void tms3203x_device::addc3_indind(UINT32 op)
+void tms3203x_device::addc3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	ADDC(dreg, src1, src2);
@@ -3183,7 +3183,7 @@ void tms3203x_device::addc3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::addf3_regreg(UINT32 op)
+void tms3203x_device::addf3_regreg(uint32_t op)
 {
 	int sreg1 = (op >> 8) & 7;
 	int sreg2 = op & 7;
@@ -3191,29 +3191,29 @@ void tms3203x_device::addf3_regreg(UINT32 op)
 	addf(m_r[dreg], m_r[sreg1], m_r[sreg2]);
 }
 
-void tms3203x_device::addf3_indreg(UINT32 op)
+void tms3203x_device::addf3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
 	int sreg2 = op & 7;
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, src1);
 	addf(m_r[dreg], m_r[TMR_TEMP1], m_r[sreg2]);
 }
 
-void tms3203x_device::addf3_regind(UINT32 op)
+void tms3203x_device::addf3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int sreg1 = (op >> 8) & 7;
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP2, src2);
 	addf(m_r[dreg], m_r[sreg1], m_r[TMR_TEMP2]);
 }
 
-void tms3203x_device::addf3_indind(UINT32 op)
+void tms3203x_device::addf3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 7;
 	UPDATE_DEF();
 	LONG2FP(TMR_TEMP1, src1);
@@ -3223,36 +3223,36 @@ void tms3203x_device::addf3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::addi3_regreg(UINT32 op)
+void tms3203x_device::addi3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	ADDI(dreg, src1, src2);
 }
 
-void tms3203x_device::addi3_indreg(UINT32 op)
+void tms3203x_device::addi3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	ADDI(dreg, src1, src2);
 }
 
-void tms3203x_device::addi3_regind(UINT32 op)
+void tms3203x_device::addi3_regind(uint32_t op)
 {
 	// Radikal Bikers confirms via ADDI3 AR3,*AR3++(1),R2 / SUB $0001,R2 sequence
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	ADDI(dreg, src1, src2);
 }
 
-void tms3203x_device::addi3_indind(UINT32 op)
+void tms3203x_device::addi3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	ADDI(dreg, src1, src2);
@@ -3260,35 +3260,35 @@ void tms3203x_device::addi3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::and3_regreg(UINT32 op)
+void tms3203x_device::and3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	AND(dreg, src1, src2);
 }
 
-void tms3203x_device::and3_indreg(UINT32 op)
+void tms3203x_device::and3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	AND(dreg, src1, src2);
 }
 
-void tms3203x_device::and3_regind(UINT32 op)
+void tms3203x_device::and3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	AND(dreg, src1, src2);
 }
 
-void tms3203x_device::and3_indind(UINT32 op)
+void tms3203x_device::and3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	AND(dreg, src1, src2);
@@ -3296,35 +3296,35 @@ void tms3203x_device::and3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::andn3_regreg(UINT32 op)
+void tms3203x_device::andn3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	ANDN(dreg, src1, src2);
 }
 
-void tms3203x_device::andn3_indreg(UINT32 op)
+void tms3203x_device::andn3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	ANDN(dreg, src1, src2);
 }
 
-void tms3203x_device::andn3_regind(UINT32 op)
+void tms3203x_device::andn3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	ANDN(dreg, src1, src2);
 }
 
-void tms3203x_device::andn3_indind(UINT32 op)
+void tms3203x_device::andn3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	ANDN(dreg, src1, src2);
@@ -3332,35 +3332,35 @@ void tms3203x_device::andn3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ash3_regreg(UINT32 op)
+void tms3203x_device::ash3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	ASH(dreg, src1, src2);
 }
 
-void tms3203x_device::ash3_indreg(UINT32 op)
+void tms3203x_device::ash3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	ASH(dreg, src1, src2);
 }
 
-void tms3203x_device::ash3_regind(UINT32 op)
+void tms3203x_device::ash3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	ASH(dreg, src1, src2);
 }
 
-void tms3203x_device::ash3_indind(UINT32 op)
+void tms3203x_device::ash3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	ASH(dreg, src1, src2);
@@ -3368,34 +3368,34 @@ void tms3203x_device::ash3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::cmpf3_regreg(UINT32 op)
+void tms3203x_device::cmpf3_regreg(uint32_t op)
 {
 	int sreg1 = (op >> 8) & 7;
 	int sreg2 = op & 7;
 	subf(m_r[TMR_TEMP1], m_r[sreg1], m_r[sreg2]);
 }
 
-void tms3203x_device::cmpf3_indreg(UINT32 op)
+void tms3203x_device::cmpf3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
 	int sreg2 = op & 7;
 	LONG2FP(TMR_TEMP1, src1);
 	subf(m_r[TMR_TEMP1], m_r[TMR_TEMP1], m_r[sreg2]);
 }
 
-void tms3203x_device::cmpf3_regind(UINT32 op)
+void tms3203x_device::cmpf3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int sreg1 = (op >> 8) & 7;
 	LONG2FP(TMR_TEMP2, src2);
 	subf(m_r[TMR_TEMP1], m_r[sreg1], m_r[TMR_TEMP2]);
 }
 
-void tms3203x_device::cmpf3_indind(UINT32 op)
+void tms3203x_device::cmpf3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	UPDATE_DEF();
 	LONG2FP(TMR_TEMP1, src1);
 	LONG2FP(TMR_TEMP2, src2);
@@ -3404,67 +3404,67 @@ void tms3203x_device::cmpf3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::cmpi3_regreg(UINT32 op)
+void tms3203x_device::cmpi3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	CMPI(src1, src2);
 }
 
-void tms3203x_device::cmpi3_indreg(UINT32 op)
+void tms3203x_device::cmpi3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	CMPI(src1, src2);
 }
 
-void tms3203x_device::cmpi3_regind(UINT32 op)
+void tms3203x_device::cmpi3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	CMPI(src1, src2);
 }
 
-void tms3203x_device::cmpi3_indind(UINT32 op)
+void tms3203x_device::cmpi3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	UPDATE_DEF();
 	CMPI(src1, src2);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::lsh3_regreg(UINT32 op)
+void tms3203x_device::lsh3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	LSH(dreg, src1, src2);
 }
 
-void tms3203x_device::lsh3_indreg(UINT32 op)
+void tms3203x_device::lsh3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	LSH(dreg, src1, src2);
 }
 
-void tms3203x_device::lsh3_regind(UINT32 op)
+void tms3203x_device::lsh3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	LSH(dreg, src1, src2);
 }
 
-void tms3203x_device::lsh3_indind(UINT32 op)
+void tms3203x_device::lsh3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	LSH(dreg, src1, src2);
@@ -3472,7 +3472,7 @@ void tms3203x_device::lsh3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::mpyf3_regreg(UINT32 op)
+void tms3203x_device::mpyf3_regreg(uint32_t op)
 {
 	int sreg1 = (op >> 8) & 7;
 	int sreg2 = op & 7;
@@ -3480,29 +3480,29 @@ void tms3203x_device::mpyf3_regreg(UINT32 op)
 	mpyf(m_r[dreg], m_r[sreg1], m_r[sreg2]);
 }
 
-void tms3203x_device::mpyf3_indreg(UINT32 op)
+void tms3203x_device::mpyf3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
 	int sreg2 = op & 7;
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, src1);
 	mpyf(m_r[dreg], m_r[TMR_TEMP1], m_r[sreg2]);
 }
 
-void tms3203x_device::mpyf3_regind(UINT32 op)
+void tms3203x_device::mpyf3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int sreg1 = (op >> 8) & 7;
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP2, src2);
 	mpyf(m_r[dreg], m_r[sreg1], m_r[TMR_TEMP2]);
 }
 
-void tms3203x_device::mpyf3_indind(UINT32 op)
+void tms3203x_device::mpyf3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 7;
 	UPDATE_DEF();
 	LONG2FP(TMR_TEMP1, src1);
@@ -3512,35 +3512,35 @@ void tms3203x_device::mpyf3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::mpyi3_regreg(UINT32 op)
+void tms3203x_device::mpyi3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	MPYI(dreg, src1, src2);
 }
 
-void tms3203x_device::mpyi3_indreg(UINT32 op)
+void tms3203x_device::mpyi3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	MPYI(dreg, src1, src2);
 }
 
-void tms3203x_device::mpyi3_regind(UINT32 op)
+void tms3203x_device::mpyi3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	MPYI(dreg, src1, src2);
 }
 
-void tms3203x_device::mpyi3_indind(UINT32 op)
+void tms3203x_device::mpyi3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	MPYI(dreg, src1, src2);
@@ -3548,35 +3548,35 @@ void tms3203x_device::mpyi3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::or3_regreg(UINT32 op)
+void tms3203x_device::or3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	OR(dreg, src1, src2);
 }
 
-void tms3203x_device::or3_indreg(UINT32 op)
+void tms3203x_device::or3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	OR(dreg, src1, src2);
 }
 
-void tms3203x_device::or3_regind(UINT32 op)
+void tms3203x_device::or3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	OR(dreg, src1, src2);
 }
 
-void tms3203x_device::or3_indind(UINT32 op)
+void tms3203x_device::or3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	OR(dreg, src1, src2);
@@ -3584,35 +3584,35 @@ void tms3203x_device::or3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::subb3_regreg(UINT32 op)
+void tms3203x_device::subb3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	SUBB(dreg, src1, src2);
 }
 
-void tms3203x_device::subb3_indreg(UINT32 op)
+void tms3203x_device::subb3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	SUBB(dreg, src1, src2);
 }
 
-void tms3203x_device::subb3_regind(UINT32 op)
+void tms3203x_device::subb3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	SUBB(dreg, src1, src2);
 }
 
-void tms3203x_device::subb3_indind(UINT32 op)
+void tms3203x_device::subb3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	SUBB(dreg, src1, src2);
@@ -3620,7 +3620,7 @@ void tms3203x_device::subb3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::subf3_regreg(UINT32 op)
+void tms3203x_device::subf3_regreg(uint32_t op)
 {
 	int sreg1 = (op >> 8) & 7;
 	int sreg2 = op & 7;
@@ -3628,29 +3628,29 @@ void tms3203x_device::subf3_regreg(UINT32 op)
 	subf(m_r[dreg], m_r[sreg1], m_r[sreg2]);
 }
 
-void tms3203x_device::subf3_indreg(UINT32 op)
+void tms3203x_device::subf3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
 	int sreg2 = op & 7;
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP1, src1);
 	subf(m_r[dreg], m_r[TMR_TEMP1], m_r[sreg2]);
 }
 
-void tms3203x_device::subf3_regind(UINT32 op)
+void tms3203x_device::subf3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int sreg1 = (op >> 8) & 7;
 	int dreg = (op >> 16) & 7;
 	LONG2FP(TMR_TEMP2, src2);
 	subf(m_r[dreg], m_r[sreg1], m_r[TMR_TEMP2]);
 }
 
-void tms3203x_device::subf3_indind(UINT32 op)
+void tms3203x_device::subf3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 7;
 	UPDATE_DEF();
 	LONG2FP(TMR_TEMP1, src1);
@@ -3660,35 +3660,35 @@ void tms3203x_device::subf3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::subi3_regreg(UINT32 op)
+void tms3203x_device::subi3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	SUBI(dreg, src1, src2);
 }
 
-void tms3203x_device::subi3_indreg(UINT32 op)
+void tms3203x_device::subi3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	SUBI(dreg, src1, src2);
 }
 
-void tms3203x_device::subi3_regind(UINT32 op)
+void tms3203x_device::subi3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	SUBI(dreg, src1, src2);
 }
 
-void tms3203x_device::subi3_indind(UINT32 op)
+void tms3203x_device::subi3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	SUBI(dreg, src1, src2);
@@ -3696,67 +3696,67 @@ void tms3203x_device::subi3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::tstb3_regreg(UINT32 op)
+void tms3203x_device::tstb3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	TSTB(src1, src2);
 }
 
-void tms3203x_device::tstb3_indreg(UINT32 op)
+void tms3203x_device::tstb3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	TSTB(src1, src2);
 }
 
-void tms3203x_device::tstb3_regind(UINT32 op)
+void tms3203x_device::tstb3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	TSTB(src1, src2);
 }
 
-void tms3203x_device::tstb3_indind(UINT32 op)
+void tms3203x_device::tstb3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	UPDATE_DEF();
 	TSTB(src1, src2);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::xor3_regreg(UINT32 op)
+void tms3203x_device::xor3_regreg(uint32_t op)
 {
-	UINT32 src1 = IREG((op >> 8) & 31);
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	XOR(dreg, src1, src2);
 }
 
-void tms3203x_device::xor3_indreg(UINT32 op)
+void tms3203x_device::xor3_indreg(uint32_t op)
 {
-	UINT32 src1 = RMEM(INDIRECT_1(op, op >> 8));
-	UINT32 src2 = IREG(op & 31);
+	uint32_t src1 = RMEM(INDIRECT_1(op, op >> 8));
+	uint32_t src2 = IREG(op & 31);
 	int dreg = (op >> 16) & 31;
 	XOR(dreg, src1, src2);
 }
 
-void tms3203x_device::xor3_regind(UINT32 op)
+void tms3203x_device::xor3_regind(uint32_t op)
 {
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
-	UINT32 src1 = IREG((op >> 8) & 31);
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = IREG((op >> 8) & 31);
 	int dreg = (op >> 16) & 31;
 	XOR(dreg, src1, src2);
 }
 
-void tms3203x_device::xor3_indind(UINT32 op)
+void tms3203x_device::xor3_indind(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src2 = RMEM(INDIRECT_1(op, op));
+	uint32_t src1 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src2 = RMEM(INDIRECT_1(op, op));
 	int dreg = (op >> 16) & 31;
 	UPDATE_DEF();
 	XOR(dreg, src1, src2);
@@ -3764,26 +3764,26 @@ void tms3203x_device::xor3_indind(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfu_reg(UINT32 op)
+void tms3203x_device::ldfu_reg(uint32_t op)
 {
 	m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfu_dir(UINT32 op)
+void tms3203x_device::ldfu_dir(uint32_t op)
 {
-	UINT32 res = RMEM(DIRECT(op));
+	uint32_t res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(dreg, res);
 }
 
-void tms3203x_device::ldfu_ind(UINT32 op)
+void tms3203x_device::ldfu_ind(uint32_t op)
 {
-	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 7;
 	LONG2FP(dreg, res);
 }
 
-void tms3203x_device::ldfu_imm(UINT32 op)
+void tms3203x_device::ldfu_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 7;
 	SHORT2FP(dreg, op);
@@ -3791,27 +3791,27 @@ void tms3203x_device::ldfu_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldflo_reg(UINT32 op)
+void tms3203x_device::ldflo_reg(uint32_t op)
 {
 	if (CONDITION_LO())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldflo_dir(UINT32 op)
+void tms3203x_device::ldflo_dir(uint32_t op)
 {
 	if (CONDITION_LO())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldflo_ind(UINT32 op)
+void tms3203x_device::ldflo_ind(uint32_t op)
 {
 	if (CONDITION_LO())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -3819,7 +3819,7 @@ void tms3203x_device::ldflo_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldflo_imm(UINT32 op)
+void tms3203x_device::ldflo_imm(uint32_t op)
 {
 	if (CONDITION_LO())
 	{
@@ -3830,27 +3830,27 @@ void tms3203x_device::ldflo_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfls_reg(UINT32 op)
+void tms3203x_device::ldfls_reg(uint32_t op)
 {
 	if (CONDITION_LS())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfls_dir(UINT32 op)
+void tms3203x_device::ldfls_dir(uint32_t op)
 {
 	if (CONDITION_LS())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfls_ind(UINT32 op)
+void tms3203x_device::ldfls_ind(uint32_t op)
 {
 	if (CONDITION_LS())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -3858,7 +3858,7 @@ void tms3203x_device::ldfls_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfls_imm(UINT32 op)
+void tms3203x_device::ldfls_imm(uint32_t op)
 {
 	if (CONDITION_LS())
 	{
@@ -3869,27 +3869,27 @@ void tms3203x_device::ldfls_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfhi_reg(UINT32 op)
+void tms3203x_device::ldfhi_reg(uint32_t op)
 {
 	if (CONDITION_HI())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfhi_dir(UINT32 op)
+void tms3203x_device::ldfhi_dir(uint32_t op)
 {
 	if (CONDITION_HI())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfhi_ind(UINT32 op)
+void tms3203x_device::ldfhi_ind(uint32_t op)
 {
 	if (CONDITION_HI())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -3897,7 +3897,7 @@ void tms3203x_device::ldfhi_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfhi_imm(UINT32 op)
+void tms3203x_device::ldfhi_imm(uint32_t op)
 {
 	if (CONDITION_HI())
 	{
@@ -3908,27 +3908,27 @@ void tms3203x_device::ldfhi_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfhs_reg(UINT32 op)
+void tms3203x_device::ldfhs_reg(uint32_t op)
 {
 	if (CONDITION_HS())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfhs_dir(UINT32 op)
+void tms3203x_device::ldfhs_dir(uint32_t op)
 {
 	if (CONDITION_HS())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfhs_ind(UINT32 op)
+void tms3203x_device::ldfhs_ind(uint32_t op)
 {
 	if (CONDITION_HS())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -3936,7 +3936,7 @@ void tms3203x_device::ldfhs_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfhs_imm(UINT32 op)
+void tms3203x_device::ldfhs_imm(uint32_t op)
 {
 	if (CONDITION_HS())
 	{
@@ -3947,27 +3947,27 @@ void tms3203x_device::ldfhs_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfeq_reg(UINT32 op)
+void tms3203x_device::ldfeq_reg(uint32_t op)
 {
 	if (CONDITION_EQ())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfeq_dir(UINT32 op)
+void tms3203x_device::ldfeq_dir(uint32_t op)
 {
 	if (CONDITION_EQ())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfeq_ind(UINT32 op)
+void tms3203x_device::ldfeq_ind(uint32_t op)
 {
 	if (CONDITION_EQ())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -3975,7 +3975,7 @@ void tms3203x_device::ldfeq_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfeq_imm(UINT32 op)
+void tms3203x_device::ldfeq_imm(uint32_t op)
 {
 	if (CONDITION_EQ())
 	{
@@ -3986,27 +3986,27 @@ void tms3203x_device::ldfeq_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfne_reg(UINT32 op)
+void tms3203x_device::ldfne_reg(uint32_t op)
 {
 	if (CONDITION_NE())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfne_dir(UINT32 op)
+void tms3203x_device::ldfne_dir(uint32_t op)
 {
 	if (CONDITION_NE())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfne_ind(UINT32 op)
+void tms3203x_device::ldfne_ind(uint32_t op)
 {
 	if (CONDITION_NE())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4014,7 +4014,7 @@ void tms3203x_device::ldfne_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfne_imm(UINT32 op)
+void tms3203x_device::ldfne_imm(uint32_t op)
 {
 	if (CONDITION_NE())
 	{
@@ -4025,27 +4025,27 @@ void tms3203x_device::ldfne_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldflt_reg(UINT32 op)
+void tms3203x_device::ldflt_reg(uint32_t op)
 {
 	if (CONDITION_LT())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldflt_dir(UINT32 op)
+void tms3203x_device::ldflt_dir(uint32_t op)
 {
 	if (CONDITION_LT())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldflt_ind(UINT32 op)
+void tms3203x_device::ldflt_ind(uint32_t op)
 {
 	if (CONDITION_LT())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4053,7 +4053,7 @@ void tms3203x_device::ldflt_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldflt_imm(UINT32 op)
+void tms3203x_device::ldflt_imm(uint32_t op)
 {
 	if (CONDITION_LT())
 	{
@@ -4064,27 +4064,27 @@ void tms3203x_device::ldflt_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfle_reg(UINT32 op)
+void tms3203x_device::ldfle_reg(uint32_t op)
 {
 	if (CONDITION_LE())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfle_dir(UINT32 op)
+void tms3203x_device::ldfle_dir(uint32_t op)
 {
 	if (CONDITION_LE())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfle_ind(UINT32 op)
+void tms3203x_device::ldfle_ind(uint32_t op)
 {
 	if (CONDITION_LE())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4092,7 +4092,7 @@ void tms3203x_device::ldfle_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfle_imm(UINT32 op)
+void tms3203x_device::ldfle_imm(uint32_t op)
 {
 	if (CONDITION_LE())
 	{
@@ -4103,27 +4103,27 @@ void tms3203x_device::ldfle_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfgt_reg(UINT32 op)
+void tms3203x_device::ldfgt_reg(uint32_t op)
 {
 	if (CONDITION_GT())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfgt_dir(UINT32 op)
+void tms3203x_device::ldfgt_dir(uint32_t op)
 {
 	if (CONDITION_GT())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfgt_ind(UINT32 op)
+void tms3203x_device::ldfgt_ind(uint32_t op)
 {
 	if (CONDITION_GT())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4131,7 +4131,7 @@ void tms3203x_device::ldfgt_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfgt_imm(UINT32 op)
+void tms3203x_device::ldfgt_imm(uint32_t op)
 {
 	if (CONDITION_GT())
 	{
@@ -4142,27 +4142,27 @@ void tms3203x_device::ldfgt_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfge_reg(UINT32 op)
+void tms3203x_device::ldfge_reg(uint32_t op)
 {
 	if (CONDITION_GE())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfge_dir(UINT32 op)
+void tms3203x_device::ldfge_dir(uint32_t op)
 {
 	if (CONDITION_GE())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfge_ind(UINT32 op)
+void tms3203x_device::ldfge_ind(uint32_t op)
 {
 	if (CONDITION_GE())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4170,7 +4170,7 @@ void tms3203x_device::ldfge_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfge_imm(UINT32 op)
+void tms3203x_device::ldfge_imm(uint32_t op)
 {
 	if (CONDITION_GE())
 	{
@@ -4181,27 +4181,27 @@ void tms3203x_device::ldfge_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfnv_reg(UINT32 op)
+void tms3203x_device::ldfnv_reg(uint32_t op)
 {
 	if (CONDITION_NV())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfnv_dir(UINT32 op)
+void tms3203x_device::ldfnv_dir(uint32_t op)
 {
 	if (CONDITION_NV())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfnv_ind(UINT32 op)
+void tms3203x_device::ldfnv_ind(uint32_t op)
 {
 	if (CONDITION_NV())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4209,7 +4209,7 @@ void tms3203x_device::ldfnv_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfnv_imm(UINT32 op)
+void tms3203x_device::ldfnv_imm(uint32_t op)
 {
 	if (CONDITION_NV())
 	{
@@ -4220,27 +4220,27 @@ void tms3203x_device::ldfnv_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfv_reg(UINT32 op)
+void tms3203x_device::ldfv_reg(uint32_t op)
 {
 	if (CONDITION_V())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfv_dir(UINT32 op)
+void tms3203x_device::ldfv_dir(uint32_t op)
 {
 	if (CONDITION_V())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfv_ind(UINT32 op)
+void tms3203x_device::ldfv_ind(uint32_t op)
 {
 	if (CONDITION_V())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4248,7 +4248,7 @@ void tms3203x_device::ldfv_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfv_imm(UINT32 op)
+void tms3203x_device::ldfv_imm(uint32_t op)
 {
 	if (CONDITION_V())
 	{
@@ -4259,27 +4259,27 @@ void tms3203x_device::ldfv_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfnuf_reg(UINT32 op)
+void tms3203x_device::ldfnuf_reg(uint32_t op)
 {
 	if (CONDITION_NUF())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfnuf_dir(UINT32 op)
+void tms3203x_device::ldfnuf_dir(uint32_t op)
 {
 	if (CONDITION_NUF())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfnuf_ind(UINT32 op)
+void tms3203x_device::ldfnuf_ind(uint32_t op)
 {
 	if (CONDITION_NUF())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4287,7 +4287,7 @@ void tms3203x_device::ldfnuf_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfnuf_imm(UINT32 op)
+void tms3203x_device::ldfnuf_imm(uint32_t op)
 {
 	if (CONDITION_NUF())
 	{
@@ -4298,27 +4298,27 @@ void tms3203x_device::ldfnuf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfuf_reg(UINT32 op)
+void tms3203x_device::ldfuf_reg(uint32_t op)
 {
 	if (CONDITION_UF())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfuf_dir(UINT32 op)
+void tms3203x_device::ldfuf_dir(uint32_t op)
 {
 	if (CONDITION_UF())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfuf_ind(UINT32 op)
+void tms3203x_device::ldfuf_ind(uint32_t op)
 {
 	if (CONDITION_UF())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4326,7 +4326,7 @@ void tms3203x_device::ldfuf_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfuf_imm(UINT32 op)
+void tms3203x_device::ldfuf_imm(uint32_t op)
 {
 	if (CONDITION_UF())
 	{
@@ -4337,27 +4337,27 @@ void tms3203x_device::ldfuf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfnlv_reg(UINT32 op)
+void tms3203x_device::ldfnlv_reg(uint32_t op)
 {
 	if (CONDITION_NLV())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfnlv_dir(UINT32 op)
+void tms3203x_device::ldfnlv_dir(uint32_t op)
 {
 	if (CONDITION_NLV())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfnlv_ind(UINT32 op)
+void tms3203x_device::ldfnlv_ind(uint32_t op)
 {
 	if (CONDITION_NLV())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4365,7 +4365,7 @@ void tms3203x_device::ldfnlv_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfnlv_imm(UINT32 op)
+void tms3203x_device::ldfnlv_imm(uint32_t op)
 {
 	if (CONDITION_NLV())
 	{
@@ -4376,27 +4376,27 @@ void tms3203x_device::ldfnlv_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldflv_reg(UINT32 op)
+void tms3203x_device::ldflv_reg(uint32_t op)
 {
 	if (CONDITION_LV())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldflv_dir(UINT32 op)
+void tms3203x_device::ldflv_dir(uint32_t op)
 {
 	if (CONDITION_LV())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldflv_ind(UINT32 op)
+void tms3203x_device::ldflv_ind(uint32_t op)
 {
 	if (CONDITION_LV())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4404,7 +4404,7 @@ void tms3203x_device::ldflv_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldflv_imm(UINT32 op)
+void tms3203x_device::ldflv_imm(uint32_t op)
 {
 	if (CONDITION_LV())
 	{
@@ -4415,27 +4415,27 @@ void tms3203x_device::ldflv_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfnluf_reg(UINT32 op)
+void tms3203x_device::ldfnluf_reg(uint32_t op)
 {
 	if (CONDITION_NLUF())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfnluf_dir(UINT32 op)
+void tms3203x_device::ldfnluf_dir(uint32_t op)
 {
 	if (CONDITION_NLUF())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfnluf_ind(UINT32 op)
+void tms3203x_device::ldfnluf_ind(uint32_t op)
 {
 	if (CONDITION_NLUF())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4443,7 +4443,7 @@ void tms3203x_device::ldfnluf_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfnluf_imm(UINT32 op)
+void tms3203x_device::ldfnluf_imm(uint32_t op)
 {
 	if (CONDITION_NLUF())
 	{
@@ -4454,27 +4454,27 @@ void tms3203x_device::ldfnluf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfluf_reg(UINT32 op)
+void tms3203x_device::ldfluf_reg(uint32_t op)
 {
 	if (CONDITION_LUF())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfluf_dir(UINT32 op)
+void tms3203x_device::ldfluf_dir(uint32_t op)
 {
 	if (CONDITION_LUF())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfluf_ind(UINT32 op)
+void tms3203x_device::ldfluf_ind(uint32_t op)
 {
 	if (CONDITION_LUF())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4482,7 +4482,7 @@ void tms3203x_device::ldfluf_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfluf_imm(UINT32 op)
+void tms3203x_device::ldfluf_imm(uint32_t op)
 {
 	if (CONDITION_LUF())
 	{
@@ -4493,27 +4493,27 @@ void tms3203x_device::ldfluf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfzuf_reg(UINT32 op)
+void tms3203x_device::ldfzuf_reg(uint32_t op)
 {
 	if (CONDITION_ZUF())
 		m_r[(op >> 16) & 7] = m_r[op & 7];
 }
 
-void tms3203x_device::ldfzuf_dir(UINT32 op)
+void tms3203x_device::ldfzuf_dir(uint32_t op)
 {
 	if (CONDITION_ZUF())
 	{
-		UINT32 res = RMEM(DIRECT(op));
+		uint32_t res = RMEM(DIRECT(op));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
 }
 
-void tms3203x_device::ldfzuf_ind(UINT32 op)
+void tms3203x_device::ldfzuf_ind(uint32_t op)
 {
 	if (CONDITION_ZUF())
 	{
-		UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
+		uint32_t res = RMEM(INDIRECT_D(op, op >> 8));
 		int dreg = (op >> 16) & 7;
 		LONG2FP(dreg, res);
 	}
@@ -4521,7 +4521,7 @@ void tms3203x_device::ldfzuf_ind(UINT32 op)
 		INDIRECT_D(op, op >> 8);
 }
 
-void tms3203x_device::ldfzuf_imm(UINT32 op)
+void tms3203x_device::ldfzuf_imm(uint32_t op)
 {
 	if (CONDITION_ZUF())
 	{
@@ -4532,7 +4532,7 @@ void tms3203x_device::ldfzuf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldiu_reg(UINT32 op)
+void tms3203x_device::ldiu_reg(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	IREG(dreg) = IREG(op & 31);
@@ -4540,7 +4540,7 @@ void tms3203x_device::ldiu_reg(UINT32 op)
 		update_special(dreg);
 }
 
-void tms3203x_device::ldiu_dir(UINT32 op)
+void tms3203x_device::ldiu_dir(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	IREG(dreg) = RMEM(DIRECT(op));
@@ -4548,7 +4548,7 @@ void tms3203x_device::ldiu_dir(UINT32 op)
 		update_special(dreg);
 }
 
-void tms3203x_device::ldiu_ind(UINT32 op)
+void tms3203x_device::ldiu_ind(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
 	IREG(dreg) = RMEM(INDIRECT_D(op, op >> 8));
@@ -4556,17 +4556,17 @@ void tms3203x_device::ldiu_ind(UINT32 op)
 		update_special(dreg);
 }
 
-void tms3203x_device::ldiu_imm(UINT32 op)
+void tms3203x_device::ldiu_imm(uint32_t op)
 {
 	int dreg = (op >> 16) & 31;
-	IREG(dreg) = (INT16)op;
+	IREG(dreg) = (int16_t)op;
 	if (dreg >= TMR_BK)
 		update_special(dreg);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldilo_reg(UINT32 op)
+void tms3203x_device::ldilo_reg(uint32_t op)
 {
 	if (CONDITION_LO())
 	{
@@ -4577,9 +4577,9 @@ void tms3203x_device::ldilo_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldilo_dir(UINT32 op)
+void tms3203x_device::ldilo_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_LO())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4589,9 +4589,9 @@ void tms3203x_device::ldilo_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldilo_ind(UINT32 op)
+void tms3203x_device::ldilo_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_LO())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4601,12 +4601,12 @@ void tms3203x_device::ldilo_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldilo_imm(UINT32 op)
+void tms3203x_device::ldilo_imm(uint32_t op)
 {
 	if (CONDITION_LO())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -4614,7 +4614,7 @@ void tms3203x_device::ldilo_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldils_reg(UINT32 op)
+void tms3203x_device::ldils_reg(uint32_t op)
 {
 	if (CONDITION_LS())
 	{
@@ -4625,9 +4625,9 @@ void tms3203x_device::ldils_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldils_dir(UINT32 op)
+void tms3203x_device::ldils_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_LS())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4637,9 +4637,9 @@ void tms3203x_device::ldils_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldils_ind(UINT32 op)
+void tms3203x_device::ldils_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_LS())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4649,12 +4649,12 @@ void tms3203x_device::ldils_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldils_imm(UINT32 op)
+void tms3203x_device::ldils_imm(uint32_t op)
 {
 	if (CONDITION_LS())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -4662,7 +4662,7 @@ void tms3203x_device::ldils_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldihi_reg(UINT32 op)
+void tms3203x_device::ldihi_reg(uint32_t op)
 {
 	if (CONDITION_HI())
 	{
@@ -4673,9 +4673,9 @@ void tms3203x_device::ldihi_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldihi_dir(UINT32 op)
+void tms3203x_device::ldihi_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_HI())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4685,9 +4685,9 @@ void tms3203x_device::ldihi_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldihi_ind(UINT32 op)
+void tms3203x_device::ldihi_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_HI())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4697,12 +4697,12 @@ void tms3203x_device::ldihi_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldihi_imm(UINT32 op)
+void tms3203x_device::ldihi_imm(uint32_t op)
 {
 	if (CONDITION_HI())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -4710,7 +4710,7 @@ void tms3203x_device::ldihi_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldihs_reg(UINT32 op)
+void tms3203x_device::ldihs_reg(uint32_t op)
 {
 	if (CONDITION_HS())
 	{
@@ -4721,9 +4721,9 @@ void tms3203x_device::ldihs_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldihs_dir(UINT32 op)
+void tms3203x_device::ldihs_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_HS())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4733,9 +4733,9 @@ void tms3203x_device::ldihs_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldihs_ind(UINT32 op)
+void tms3203x_device::ldihs_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_HS())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4745,12 +4745,12 @@ void tms3203x_device::ldihs_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldihs_imm(UINT32 op)
+void tms3203x_device::ldihs_imm(uint32_t op)
 {
 	if (CONDITION_HS())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -4758,7 +4758,7 @@ void tms3203x_device::ldihs_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldieq_reg(UINT32 op)
+void tms3203x_device::ldieq_reg(uint32_t op)
 {
 	if (CONDITION_EQ())
 	{
@@ -4769,9 +4769,9 @@ void tms3203x_device::ldieq_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldieq_dir(UINT32 op)
+void tms3203x_device::ldieq_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_EQ())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4781,9 +4781,9 @@ void tms3203x_device::ldieq_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldieq_ind(UINT32 op)
+void tms3203x_device::ldieq_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_EQ())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4793,12 +4793,12 @@ void tms3203x_device::ldieq_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldieq_imm(UINT32 op)
+void tms3203x_device::ldieq_imm(uint32_t op)
 {
 	if (CONDITION_EQ())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -4806,7 +4806,7 @@ void tms3203x_device::ldieq_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldine_reg(UINT32 op)
+void tms3203x_device::ldine_reg(uint32_t op)
 {
 	if (CONDITION_NE())
 	{
@@ -4817,9 +4817,9 @@ void tms3203x_device::ldine_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldine_dir(UINT32 op)
+void tms3203x_device::ldine_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_NE())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4829,9 +4829,9 @@ void tms3203x_device::ldine_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldine_ind(UINT32 op)
+void tms3203x_device::ldine_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_NE())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4841,12 +4841,12 @@ void tms3203x_device::ldine_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldine_imm(UINT32 op)
+void tms3203x_device::ldine_imm(uint32_t op)
 {
 	if (CONDITION_NE())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -4854,7 +4854,7 @@ void tms3203x_device::ldine_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldilt_reg(UINT32 op)
+void tms3203x_device::ldilt_reg(uint32_t op)
 {
 	if (CONDITION_LT())
 	{
@@ -4865,9 +4865,9 @@ void tms3203x_device::ldilt_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldilt_dir(UINT32 op)
+void tms3203x_device::ldilt_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_LT())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4877,9 +4877,9 @@ void tms3203x_device::ldilt_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldilt_ind(UINT32 op)
+void tms3203x_device::ldilt_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_LT())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4889,12 +4889,12 @@ void tms3203x_device::ldilt_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldilt_imm(UINT32 op)
+void tms3203x_device::ldilt_imm(uint32_t op)
 {
 	if (CONDITION_LT())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -4902,7 +4902,7 @@ void tms3203x_device::ldilt_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldile_reg(UINT32 op)
+void tms3203x_device::ldile_reg(uint32_t op)
 {
 	if (CONDITION_LE())
 	{
@@ -4913,9 +4913,9 @@ void tms3203x_device::ldile_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldile_dir(UINT32 op)
+void tms3203x_device::ldile_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_LE())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4925,9 +4925,9 @@ void tms3203x_device::ldile_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldile_ind(UINT32 op)
+void tms3203x_device::ldile_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_LE())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4937,12 +4937,12 @@ void tms3203x_device::ldile_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldile_imm(UINT32 op)
+void tms3203x_device::ldile_imm(uint32_t op)
 {
 	if (CONDITION_LE())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -4950,7 +4950,7 @@ void tms3203x_device::ldile_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldigt_reg(UINT32 op)
+void tms3203x_device::ldigt_reg(uint32_t op)
 {
 	if (CONDITION_GT())
 	{
@@ -4961,9 +4961,9 @@ void tms3203x_device::ldigt_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldigt_dir(UINT32 op)
+void tms3203x_device::ldigt_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_GT())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4973,9 +4973,9 @@ void tms3203x_device::ldigt_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldigt_ind(UINT32 op)
+void tms3203x_device::ldigt_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_GT())
 	{
 		int dreg = (op >> 16) & 31;
@@ -4985,12 +4985,12 @@ void tms3203x_device::ldigt_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldigt_imm(UINT32 op)
+void tms3203x_device::ldigt_imm(uint32_t op)
 {
 	if (CONDITION_GT())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -4998,7 +4998,7 @@ void tms3203x_device::ldigt_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldige_reg(UINT32 op)
+void tms3203x_device::ldige_reg(uint32_t op)
 {
 	if (CONDITION_GE())
 	{
@@ -5009,9 +5009,9 @@ void tms3203x_device::ldige_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldige_dir(UINT32 op)
+void tms3203x_device::ldige_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_GE())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5021,9 +5021,9 @@ void tms3203x_device::ldige_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldige_ind(UINT32 op)
+void tms3203x_device::ldige_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_GE())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5033,12 +5033,12 @@ void tms3203x_device::ldige_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldige_imm(UINT32 op)
+void tms3203x_device::ldige_imm(uint32_t op)
 {
 	if (CONDITION_GE())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -5046,7 +5046,7 @@ void tms3203x_device::ldige_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldinv_reg(UINT32 op)
+void tms3203x_device::ldinv_reg(uint32_t op)
 {
 	if (CONDITION_NV())
 	{
@@ -5057,9 +5057,9 @@ void tms3203x_device::ldinv_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinv_dir(UINT32 op)
+void tms3203x_device::ldinv_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_NV())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5069,9 +5069,9 @@ void tms3203x_device::ldinv_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinv_ind(UINT32 op)
+void tms3203x_device::ldinv_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_NV())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5081,12 +5081,12 @@ void tms3203x_device::ldinv_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinv_imm(UINT32 op)
+void tms3203x_device::ldinv_imm(uint32_t op)
 {
 	if (CONDITION_NV())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -5094,7 +5094,7 @@ void tms3203x_device::ldinv_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldiuf_reg(UINT32 op)
+void tms3203x_device::ldiuf_reg(uint32_t op)
 {
 	if (CONDITION_UF())
 	{
@@ -5105,9 +5105,9 @@ void tms3203x_device::ldiuf_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldiuf_dir(UINT32 op)
+void tms3203x_device::ldiuf_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_UF())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5117,9 +5117,9 @@ void tms3203x_device::ldiuf_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldiuf_ind(UINT32 op)
+void tms3203x_device::ldiuf_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_UF())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5129,12 +5129,12 @@ void tms3203x_device::ldiuf_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldiuf_imm(UINT32 op)
+void tms3203x_device::ldiuf_imm(uint32_t op)
 {
 	if (CONDITION_UF())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -5142,7 +5142,7 @@ void tms3203x_device::ldiuf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldinuf_reg(UINT32 op)
+void tms3203x_device::ldinuf_reg(uint32_t op)
 {
 	if (CONDITION_NUF())
 	{
@@ -5153,9 +5153,9 @@ void tms3203x_device::ldinuf_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinuf_dir(UINT32 op)
+void tms3203x_device::ldinuf_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_NUF())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5165,9 +5165,9 @@ void tms3203x_device::ldinuf_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinuf_ind(UINT32 op)
+void tms3203x_device::ldinuf_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_NUF())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5177,12 +5177,12 @@ void tms3203x_device::ldinuf_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinuf_imm(UINT32 op)
+void tms3203x_device::ldinuf_imm(uint32_t op)
 {
 	if (CONDITION_NUF())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -5190,7 +5190,7 @@ void tms3203x_device::ldinuf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldiv_reg(UINT32 op)
+void tms3203x_device::ldiv_reg(uint32_t op)
 {
 	if (CONDITION_V())
 	{
@@ -5201,9 +5201,9 @@ void tms3203x_device::ldiv_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldiv_dir(UINT32 op)
+void tms3203x_device::ldiv_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_V())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5213,9 +5213,9 @@ void tms3203x_device::ldiv_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldiv_ind(UINT32 op)
+void tms3203x_device::ldiv_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_V())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5225,12 +5225,12 @@ void tms3203x_device::ldiv_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldiv_imm(UINT32 op)
+void tms3203x_device::ldiv_imm(uint32_t op)
 {
 	if (CONDITION_V())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -5238,7 +5238,7 @@ void tms3203x_device::ldiv_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldinlv_reg(UINT32 op)
+void tms3203x_device::ldinlv_reg(uint32_t op)
 {
 	if (CONDITION_NLV())
 	{
@@ -5249,9 +5249,9 @@ void tms3203x_device::ldinlv_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinlv_dir(UINT32 op)
+void tms3203x_device::ldinlv_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_NLV())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5261,9 +5261,9 @@ void tms3203x_device::ldinlv_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinlv_ind(UINT32 op)
+void tms3203x_device::ldinlv_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_NLV())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5273,12 +5273,12 @@ void tms3203x_device::ldinlv_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinlv_imm(UINT32 op)
+void tms3203x_device::ldinlv_imm(uint32_t op)
 {
 	if (CONDITION_NLV())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -5286,7 +5286,7 @@ void tms3203x_device::ldinlv_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldilv_reg(UINT32 op)
+void tms3203x_device::ldilv_reg(uint32_t op)
 {
 	if (CONDITION_LV())
 	{
@@ -5297,9 +5297,9 @@ void tms3203x_device::ldilv_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldilv_dir(UINT32 op)
+void tms3203x_device::ldilv_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_LV())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5309,9 +5309,9 @@ void tms3203x_device::ldilv_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldilv_ind(UINT32 op)
+void tms3203x_device::ldilv_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_LV())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5321,12 +5321,12 @@ void tms3203x_device::ldilv_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldilv_imm(UINT32 op)
+void tms3203x_device::ldilv_imm(uint32_t op)
 {
 	if (CONDITION_LV())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -5334,7 +5334,7 @@ void tms3203x_device::ldilv_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldinluf_reg(UINT32 op)
+void tms3203x_device::ldinluf_reg(uint32_t op)
 {
 	if (CONDITION_NLUF())
 	{
@@ -5345,9 +5345,9 @@ void tms3203x_device::ldinluf_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinluf_dir(UINT32 op)
+void tms3203x_device::ldinluf_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_NLUF())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5357,9 +5357,9 @@ void tms3203x_device::ldinluf_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinluf_ind(UINT32 op)
+void tms3203x_device::ldinluf_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_NLUF())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5369,12 +5369,12 @@ void tms3203x_device::ldinluf_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldinluf_imm(UINT32 op)
+void tms3203x_device::ldinluf_imm(uint32_t op)
 {
 	if (CONDITION_NLUF())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -5382,7 +5382,7 @@ void tms3203x_device::ldinluf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldiluf_reg(UINT32 op)
+void tms3203x_device::ldiluf_reg(uint32_t op)
 {
 	if (CONDITION_LUF())
 	{
@@ -5393,9 +5393,9 @@ void tms3203x_device::ldiluf_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldiluf_dir(UINT32 op)
+void tms3203x_device::ldiluf_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_LUF())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5405,9 +5405,9 @@ void tms3203x_device::ldiluf_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldiluf_ind(UINT32 op)
+void tms3203x_device::ldiluf_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_LUF())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5417,12 +5417,12 @@ void tms3203x_device::ldiluf_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldiluf_imm(UINT32 op)
+void tms3203x_device::ldiluf_imm(uint32_t op)
 {
 	if (CONDITION_LUF())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -5430,7 +5430,7 @@ void tms3203x_device::ldiluf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldizuf_reg(UINT32 op)
+void tms3203x_device::ldizuf_reg(uint32_t op)
 {
 	if (CONDITION_ZUF())
 	{
@@ -5441,9 +5441,9 @@ void tms3203x_device::ldizuf_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldizuf_dir(UINT32 op)
+void tms3203x_device::ldizuf_dir(uint32_t op)
 {
-	UINT32 val = RMEM(DIRECT(op));
+	uint32_t val = RMEM(DIRECT(op));
 	if (CONDITION_ZUF())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5453,9 +5453,9 @@ void tms3203x_device::ldizuf_dir(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldizuf_ind(UINT32 op)
+void tms3203x_device::ldizuf_ind(uint32_t op)
 {
-	UINT32 val = RMEM(INDIRECT_D(op, op >> 8));
+	uint32_t val = RMEM(INDIRECT_D(op, op >> 8));
 	if (CONDITION_ZUF())
 	{
 		int dreg = (op >> 16) & 31;
@@ -5465,12 +5465,12 @@ void tms3203x_device::ldizuf_ind(UINT32 op)
 	}
 }
 
-void tms3203x_device::ldizuf_imm(UINT32 op)
+void tms3203x_device::ldizuf_imm(uint32_t op)
 {
 	if (CONDITION_ZUF())
 	{
 		int dreg = (op >> 16) & 31;
-		IREG(dreg) = (INT16)op;
+		IREG(dreg) = (int16_t)op;
 		if (dreg >= TMR_BK)
 			update_special(dreg);
 	}
@@ -5478,7 +5478,7 @@ void tms3203x_device::ldizuf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-inline void tms3203x_device::execute_delayed(UINT32 newpc)
+inline void tms3203x_device::execute_delayed(uint32_t newpc)
 {
 	m_delayed = true;
 
@@ -5511,20 +5511,20 @@ inline void tms3203x_device::execute_delayed(UINT32 newpc)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::br_imm(UINT32 op)
+void tms3203x_device::br_imm(uint32_t op)
 {
 	m_pc = op & 0xffffff;
 	m_icount -= 3*2;
 }
 
-void tms3203x_device::brd_imm(UINT32 op)
+void tms3203x_device::brd_imm(uint32_t op)
 {
 	execute_delayed(op & 0xffffff);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::call_imm(UINT32 op)
+void tms3203x_device::call_imm(uint32_t op)
 {
 	WMEM(++IREG(TMR_SP), m_pc);
 	m_pc = op & 0xffffff;
@@ -5533,7 +5533,7 @@ void tms3203x_device::call_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::rptb_imm(UINT32 op)
+void tms3203x_device::rptb_imm(uint32_t op)
 {
 	IREG(TMR_RS) = m_pc;
 	IREG(TMR_RE) = op & 0xffffff;
@@ -5543,11 +5543,11 @@ void tms3203x_device::rptb_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::swi(UINT32 op) { unimplemented(op); }
+void tms3203x_device::swi(uint32_t op) { unimplemented(op); }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::brc_reg(UINT32 op)
+void tms3203x_device::brc_reg(uint32_t op)
 {
 	if (condition(op >> 16))
 	{
@@ -5556,7 +5556,7 @@ void tms3203x_device::brc_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::brcd_reg(UINT32 op)
+void tms3203x_device::brcd_reg(uint32_t op)
 {
 	if (condition(op >> 16))
 		execute_delayed(IREG(op & 31));
@@ -5564,26 +5564,26 @@ void tms3203x_device::brcd_reg(UINT32 op)
 		execute_delayed(~0);
 }
 
-void tms3203x_device::brc_imm(UINT32 op)
+void tms3203x_device::brc_imm(uint32_t op)
 {
 	if (condition(op >> 16))
 	{
-		m_pc += (INT16)op;
+		m_pc += (int16_t)op;
 		m_icount -= 3*2;
 	}
 }
 
-void tms3203x_device::brcd_imm(UINT32 op)
+void tms3203x_device::brcd_imm(uint32_t op)
 {
 	if (condition(op >> 16))
-		execute_delayed(m_pc + 2 + (INT16)op);
+		execute_delayed(m_pc + 2 + (int16_t)op);
 	else
 		execute_delayed(~0);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::dbc_reg(UINT32 op)
+void tms3203x_device::dbc_reg(uint32_t op)
 {
 	int reg = TMR_AR0 + ((op >> 22) & 7);
 	int res = (IREG(reg) - 1) & 0xffffff;
@@ -5595,7 +5595,7 @@ void tms3203x_device::dbc_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::dbcd_reg(UINT32 op)
+void tms3203x_device::dbcd_reg(uint32_t op)
 {
 	int reg = TMR_AR0 + ((op >> 22) & 7);
 	int res = (IREG(reg) - 1) & 0xffffff;
@@ -5606,32 +5606,32 @@ void tms3203x_device::dbcd_reg(UINT32 op)
 		execute_delayed(~0);
 }
 
-void tms3203x_device::dbc_imm(UINT32 op)
+void tms3203x_device::dbc_imm(uint32_t op)
 {
 	int reg = TMR_AR0 + ((op >> 22) & 7);
 	int res = (IREG(reg) - 1) & 0xffffff;
 	IREG(reg) = res | (IREG(reg) & 0xff000000);
 	if (condition(op >> 16) && !(res & 0x800000))
 	{
-		m_pc += (INT16)op;
+		m_pc += (int16_t)op;
 		m_icount -= 3*2;
 	}
 }
 
-void tms3203x_device::dbcd_imm(UINT32 op)
+void tms3203x_device::dbcd_imm(uint32_t op)
 {
 	int reg = TMR_AR0 + ((op >> 22) & 7);
 	int res = (IREG(reg) - 1) & 0xffffff;
 	IREG(reg) = res | (IREG(reg) & 0xff000000);
 	if (condition(op >> 16) && !(res & 0x800000))
-		execute_delayed(m_pc + 2 + (INT16)op);
+		execute_delayed(m_pc + 2 + (int16_t)op);
 	else
 		execute_delayed(~0);
 }
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::callc_reg(UINT32 op)
+void tms3203x_device::callc_reg(uint32_t op)
 {
 	if (condition(op >> 16))
 	{
@@ -5641,12 +5641,12 @@ void tms3203x_device::callc_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::callc_imm(UINT32 op)
+void tms3203x_device::callc_imm(uint32_t op)
 {
 	if (condition(op >> 16))
 	{
 		WMEM(++IREG(TMR_SP), m_pc);
-		m_pc += (INT16)op;
+		m_pc += (int16_t)op;
 		m_icount -= 3*2;
 	}
 }
@@ -5664,7 +5664,7 @@ void tms3203x_device::trap(int trapnum)
 	m_icount -= 4*2;
 }
 
-void tms3203x_device::trapc(UINT32 op)
+void tms3203x_device::trapc(uint32_t op)
 {
 	if (condition(op >> 16))
 		trap(op & 0x3f);
@@ -5672,7 +5672,7 @@ void tms3203x_device::trapc(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::retic_reg(UINT32 op)
+void tms3203x_device::retic_reg(uint32_t op)
 {
 	if (condition(op >> 16))
 	{
@@ -5683,7 +5683,7 @@ void tms3203x_device::retic_reg(UINT32 op)
 	}
 }
 
-void tms3203x_device::retsc_reg(UINT32 op)
+void tms3203x_device::retsc_reg(uint32_t op)
 {
 	if (condition(op >> 16))
 	{
@@ -5694,12 +5694,12 @@ void tms3203x_device::retsc_reg(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::mpyaddf_0(UINT32 op)
+void tms3203x_device::mpyaddf_0(uint32_t op)
 {
 	// src3 * src4, src1 + src2
 	DECLARE_DEF;
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[TMR_TEMP2]);
@@ -5708,12 +5708,12 @@ void tms3203x_device::mpyaddf_0(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpyaddf_1(UINT32 op)
+void tms3203x_device::mpyaddf_1(uint32_t op)
 {
 	// src3 * src1, src4 + src2
 	DECLARE_DEF;
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
@@ -5722,12 +5722,12 @@ void tms3203x_device::mpyaddf_1(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpyaddf_2(UINT32 op)
+void tms3203x_device::mpyaddf_2(uint32_t op)
 {
 	// src1 * src2, src3 + src4
 	DECLARE_DEF;
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[(op >> 19) & 7], m_r[(op >> 16) & 7]);
@@ -5736,12 +5736,12 @@ void tms3203x_device::mpyaddf_2(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpyaddf_3(UINT32 op)
+void tms3203x_device::mpyaddf_3(uint32_t op)
 {
 	// src3 * src1, src2 + src4
 	DECLARE_DEF;
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
@@ -5752,12 +5752,12 @@ void tms3203x_device::mpyaddf_3(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::mpysubf_0(UINT32 op)
+void tms3203x_device::mpysubf_0(uint32_t op)
 {
 	// src3 * src4, src1 - src2
 	DECLARE_DEF;
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[TMR_TEMP2]);
@@ -5766,12 +5766,12 @@ void tms3203x_device::mpysubf_0(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpysubf_1(UINT32 op)
+void tms3203x_device::mpysubf_1(uint32_t op)
 {
 	// src3 * src1, src4 - src2
 	DECLARE_DEF;
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
@@ -5780,12 +5780,12 @@ void tms3203x_device::mpysubf_1(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpysubf_2(UINT32 op)
+void tms3203x_device::mpysubf_2(uint32_t op)
 {
 	// src1 * src2, src3 - src4
 	DECLARE_DEF;
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[(op >> 19) & 7], m_r[(op >> 16) & 7]);
@@ -5794,12 +5794,12 @@ void tms3203x_device::mpysubf_2(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpysubf_3(UINT32 op)
+void tms3203x_device::mpysubf_3(uint32_t op)
 {
 	// src3 * src1, src2 - src4
 	DECLARE_DEF;
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
@@ -5810,96 +5810,96 @@ void tms3203x_device::mpysubf_3(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::mpyaddi_0(UINT32 op)
+void tms3203x_device::mpyaddi_0(uint32_t op)
 {
 	// src3 * src4, src1 + src2
 	DECLARE_DEF;
-	UINT32 src1 = IREG((op >> 19) & 7);
-	UINT32 src2 = IREG((op >> 16) & 7);
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
-	INT64 mres = (INT64)((INT32)(src3 << 8) >> 8) * (INT64)((INT32)(src4 << 8) >> 8);
-	UINT32 ares = src1 + src2;
+	uint32_t src1 = IREG((op >> 19) & 7);
+	uint32_t src2 = IREG((op >> 16) & 7);
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
+	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src4 << 8) >> 8);
+	uint32_t ares = src1 + src2;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(INT64)0x80000000 || mres > (INT64)0x7fffffff)
+		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
 			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
 		if (OVERFLOW_ADD(src1,src2,ares))
-			ares = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;
+			ares = ((int32_t)src1 < 0) ? 0x80000000 : 0x7fffffff;
 	}
 	IREG((op >> 23) & 1) = mres;
 	IREG(((op >> 22) & 1) | 2) = ares;
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpyaddi_1(UINT32 op)
+void tms3203x_device::mpyaddi_1(uint32_t op)
 {
 	// src3 * src1, src4 + src2
 	DECLARE_DEF;
-	UINT32 src1 = IREG((op >> 19) & 7);
-	UINT32 src2 = IREG((op >> 16) & 7);
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
-	INT64 mres = (INT64)((INT32)(src3 << 8) >> 8) * (INT64)((INT32)(src1 << 8) >> 8);
-	UINT32 ares = src4 + src2;
+	uint32_t src1 = IREG((op >> 19) & 7);
+	uint32_t src2 = IREG((op >> 16) & 7);
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
+	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src1 << 8) >> 8);
+	uint32_t ares = src4 + src2;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(INT64)0x80000000 || mres > (INT64)0x7fffffff)
+		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
 			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
 		if (OVERFLOW_ADD(src4,src2,ares))
-			ares = ((INT32)src4 < 0) ? 0x80000000 : 0x7fffffff;
+			ares = ((int32_t)src4 < 0) ? 0x80000000 : 0x7fffffff;
 	}
 	IREG((op >> 23) & 1) = mres;
 	IREG(((op >> 22) & 1) | 2) = ares;
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpyaddi_2(UINT32 op)
+void tms3203x_device::mpyaddi_2(uint32_t op)
 {
 	// src1 * src2, src3 + src4
 	DECLARE_DEF;
-	UINT32 src1 = IREG((op >> 19) & 7);
-	UINT32 src2 = IREG((op >> 16) & 7);
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
-	INT64 mres = (INT64)((INT32)(src1 << 8) >> 8) * (INT64)((INT32)(src2 << 8) >> 8);
-	UINT32 ares = src3 + src4;
+	uint32_t src1 = IREG((op >> 19) & 7);
+	uint32_t src2 = IREG((op >> 16) & 7);
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
+	int64_t mres = (int64_t)((int32_t)(src1 << 8) >> 8) * (int64_t)((int32_t)(src2 << 8) >> 8);
+	uint32_t ares = src3 + src4;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(INT64)0x80000000 || mres > (INT64)0x7fffffff)
+		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
 			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
 		if (OVERFLOW_ADD(src3,src4,ares))
-			ares = ((INT32)src3 < 0) ? 0x80000000 : 0x7fffffff;
+			ares = ((int32_t)src3 < 0) ? 0x80000000 : 0x7fffffff;
 	}
 	IREG((op >> 23) & 1) = mres;
 	IREG(((op >> 22) & 1) | 2) = ares;
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpyaddi_3(UINT32 op)
+void tms3203x_device::mpyaddi_3(uint32_t op)
 {
 	// src3 * src1, src2 + src4
 	DECLARE_DEF;
-	UINT32 src1 = IREG((op >> 19) & 7);
-	UINT32 src2 = IREG((op >> 16) & 7);
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
-	INT64 mres = (INT64)((INT32)(src3 << 8) >> 8) * (INT64)((INT32)(src1 << 8) >> 8);
-	UINT32 ares = src2 + src4;
+	uint32_t src1 = IREG((op >> 19) & 7);
+	uint32_t src2 = IREG((op >> 16) & 7);
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
+	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src1 << 8) >> 8);
+	uint32_t ares = src2 + src4;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(INT64)0x80000000 || mres > (INT64)0x7fffffff)
+		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
 			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
 		if (OVERFLOW_ADD(src2,src4,ares))
-			ares = ((INT32)src2 < 0) ? 0x80000000 : 0x7fffffff;
+			ares = ((int32_t)src2 < 0) ? 0x80000000 : 0x7fffffff;
 	}
 	IREG((op >> 23) & 1) = mres;
 	IREG(((op >> 22) & 1) | 2) = ares;
@@ -5908,96 +5908,96 @@ void tms3203x_device::mpyaddi_3(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::mpysubi_0(UINT32 op)
+void tms3203x_device::mpysubi_0(uint32_t op)
 {
 	// src3 * src4, src1 - src2
 	DECLARE_DEF;
-	UINT32 src1 = IREG((op >> 19) & 7);
-	UINT32 src2 = IREG((op >> 16) & 7);
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
-	INT64 mres = (INT64)((INT32)(src3 << 8) >> 8) * (INT64)((INT32)(src4 << 8) >> 8);
-	UINT32 ares = src1 - src2;
+	uint32_t src1 = IREG((op >> 19) & 7);
+	uint32_t src2 = IREG((op >> 16) & 7);
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
+	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src4 << 8) >> 8);
+	uint32_t ares = src1 - src2;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(INT64)0x80000000 || mres > (INT64)0x7fffffff)
+		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
 			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
 		if (OVERFLOW_SUB(src1,src2,ares))
-			ares = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;
+			ares = ((int32_t)src1 < 0) ? 0x80000000 : 0x7fffffff;
 	}
 	IREG((op >> 23) & 1) = mres;
 	IREG(((op >> 22) & 1) | 2) = ares;
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpysubi_1(UINT32 op)
+void tms3203x_device::mpysubi_1(uint32_t op)
 {
 	// src3 * src1, src4 - src2
 	DECLARE_DEF;
-	UINT32 src1 = IREG((op >> 19) & 7);
-	UINT32 src2 = IREG((op >> 16) & 7);
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
-	INT64 mres = (INT64)((INT32)(src3 << 8) >> 8) * (INT64)((INT32)(src1 << 8) >> 8);
-	UINT32 ares = src4 - src2;
+	uint32_t src1 = IREG((op >> 19) & 7);
+	uint32_t src2 = IREG((op >> 16) & 7);
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
+	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src1 << 8) >> 8);
+	uint32_t ares = src4 - src2;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(INT64)0x80000000 || mres > (INT64)0x7fffffff)
+		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
 			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
 		if (OVERFLOW_SUB(src4,src2,ares))
-			ares = ((INT32)src4 < 0) ? 0x80000000 : 0x7fffffff;
+			ares = ((int32_t)src4 < 0) ? 0x80000000 : 0x7fffffff;
 	}
 	IREG((op >> 23) & 1) = mres;
 	IREG(((op >> 22) & 1) | 2) = ares;
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpysubi_2(UINT32 op)
+void tms3203x_device::mpysubi_2(uint32_t op)
 {
 	// src1 * src2, src3 - src4
 	DECLARE_DEF;
-	UINT32 src1 = IREG((op >> 19) & 7);
-	UINT32 src2 = IREG((op >> 16) & 7);
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
-	INT64 mres = (INT64)((INT32)(src1 << 8) >> 8) * (INT64)((INT32)(src2 << 8) >> 8);
-	UINT32 ares = src3 - src4;
+	uint32_t src1 = IREG((op >> 19) & 7);
+	uint32_t src2 = IREG((op >> 16) & 7);
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
+	int64_t mres = (int64_t)((int32_t)(src1 << 8) >> 8) * (int64_t)((int32_t)(src2 << 8) >> 8);
+	uint32_t ares = src3 - src4;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(INT64)0x80000000 || mres > (INT64)0x7fffffff)
+		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
 			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
 		if (OVERFLOW_SUB(src3,src4,ares))
-			ares = ((INT32)src3 < 0) ? 0x80000000 : 0x7fffffff;
+			ares = ((int32_t)src3 < 0) ? 0x80000000 : 0x7fffffff;
 	}
 	IREG((op >> 23) & 1) = mres;
 	IREG(((op >> 22) & 1) | 2) = ares;
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpysubi_3(UINT32 op)
+void tms3203x_device::mpysubi_3(uint32_t op)
 {
 	// src3 * src1, src2 - src4
 	DECLARE_DEF;
-	UINT32 src1 = IREG((op >> 19) & 7);
-	UINT32 src2 = IREG((op >> 16) & 7);
-	UINT32 src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
-	UINT32 src4 = RMEM(INDIRECT_1(op, op));
-	INT64 mres = (INT64)((INT32)(src3 << 8) >> 8) * (INT64)((INT32)(src1 << 8) >> 8);
-	UINT32 ares = src2 - src4;
+	uint32_t src1 = IREG((op >> 19) & 7);
+	uint32_t src2 = IREG((op >> 16) & 7);
+	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
+	uint32_t src4 = RMEM(INDIRECT_1(op, op));
+	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src1 << 8) >> 8);
+	uint32_t ares = src2 - src4;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(INT64)0x80000000 || mres > (INT64)0x7fffffff)
+		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
 			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
 		if (OVERFLOW_SUB(src2,src4,ares))
-			ares = ((INT32)src2 < 0) ? 0x80000000 : 0x7fffffff;
+			ares = ((int32_t)src2 < 0) ? 0x80000000 : 0x7fffffff;
 	}
 	IREG((op >> 23) & 1) = mres;
 	IREG(((op >> 22) & 1) | 2) = ares;
@@ -6006,7 +6006,7 @@ void tms3203x_device::mpysubi_3(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::stfstf(UINT32 op)
+void tms3203x_device::stfstf(uint32_t op)
 {
 	DECLARE_DEF;
 	WMEM(INDIRECT_1_DEF(op, op >> 8), FP2LONG((op >> 16) & 7));
@@ -6014,7 +6014,7 @@ void tms3203x_device::stfstf(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::stisti(UINT32 op)
+void tms3203x_device::stisti(uint32_t op)
 {
 	DECLARE_DEF;
 	WMEM(INDIRECT_1_DEF(op, op >> 8), IREG((op >> 16) & 7));
@@ -6024,10 +6024,10 @@ void tms3203x_device::stisti(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::ldfldf(UINT32 op)
+void tms3203x_device::ldfldf(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 res;
+	uint32_t res;
 	int dreg;
 
 	res = RMEM(INDIRECT_1_DEF(op, op >> 8));
@@ -6039,7 +6039,7 @@ void tms3203x_device::ldfldf(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::ldildi(UINT32 op)
+void tms3203x_device::ldildi(uint32_t op)
 {
 	DECLARE_DEF;
 	IREG((op >> 19) & 7) = RMEM(INDIRECT_1_DEF(op, op >> 8));
@@ -6055,11 +6055,11 @@ void tms3203x_device::ldildi(UINT32 op)
 //  sreg1 = ((op >> 19) & 7)
 //  dreg1 = ((op >> 22) & 7)
 
-void tms3203x_device::absfstf(UINT32 op)
+void tms3203x_device::absfstf(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = FP2LONG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = FP2LONG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
 		LONG2FP(TMR_TEMP1, src2);
@@ -6069,11 +6069,11 @@ void tms3203x_device::absfstf(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::absisti(UINT32 op)
+void tms3203x_device::absisti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
 		ABSI(dreg, src2);
@@ -6082,11 +6082,11 @@ void tms3203x_device::absisti(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::addf3stf(UINT32 op)
+void tms3203x_device::addf3stf(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = FP2LONG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = FP2LONG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		LONG2FP(TMR_TEMP1, src2);
 		addf(m_r[(op >> 22) & 7], m_r[(op >> 19) & 7], m_r[TMR_TEMP1]);
@@ -6095,53 +6095,53 @@ void tms3203x_device::addf3stf(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::addi3sti(UINT32 op)
+void tms3203x_device::addi3sti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
-		UINT32 src1 = IREG((op >> 19) & 7);
+		uint32_t src1 = IREG((op >> 19) & 7);
 		ADDI(dreg, src1, src2);
 	}
 	WMEM(INDIRECT_1(op, op >> 8), src3);
 	UPDATE_DEF();
 }
 
-void tms3203x_device::and3sti(UINT32 op)
+void tms3203x_device::and3sti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
-		UINT32 src1 = IREG((op >> 19) & 7);
+		uint32_t src1 = IREG((op >> 19) & 7);
 		AND(dreg, src1, src2);
 	}
 	WMEM(INDIRECT_1(op, op >> 8), src3);
 	UPDATE_DEF();
 }
 
-void tms3203x_device::ash3sti(UINT32 op)
+void tms3203x_device::ash3sti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
-		UINT32 count = IREG((op >> 19) & 7);
+		uint32_t count = IREG((op >> 19) & 7);
 		ASH(dreg, src2, count);
 	}
 	WMEM(INDIRECT_1(op, op >> 8), src3);
 	UPDATE_DEF();
 }
 
-void tms3203x_device::fixsti(UINT32 op)
+void tms3203x_device::fixsti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
 		LONG2FP(dreg, src2);
@@ -6151,11 +6151,11 @@ void tms3203x_device::fixsti(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::floatstf(UINT32 op)
+void tms3203x_device::floatstf(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = FP2LONG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = FP2LONG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
 		IREG(dreg) = src2;
@@ -6165,11 +6165,11 @@ void tms3203x_device::floatstf(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::ldfstf(UINT32 op)
+void tms3203x_device::ldfstf(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = FP2LONG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = FP2LONG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
 		LONG2FP(dreg, src2);
@@ -6178,35 +6178,35 @@ void tms3203x_device::ldfstf(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::ldisti(UINT32 op)
+void tms3203x_device::ldisti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	IREG((op >> 22) & 7) = src2;
 	WMEM(INDIRECT_1(op, op >> 8), src3);
 	UPDATE_DEF();
 }
 
-void tms3203x_device::lsh3sti(UINT32 op)
+void tms3203x_device::lsh3sti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
-		UINT32 count = IREG((op >> 19) & 7);
+		uint32_t count = IREG((op >> 19) & 7);
 		LSH(dreg, src2, count);
 	}
 	WMEM(INDIRECT_1(op, op >> 8), src3);
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpyf3stf(UINT32 op)
+void tms3203x_device::mpyf3stf(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = FP2LONG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = FP2LONG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		LONG2FP(TMR_TEMP1, src2);
 		mpyf(m_r[(op >> 22) & 7], m_r[(op >> 19) & 7], m_r[TMR_TEMP1]);
@@ -6215,25 +6215,25 @@ void tms3203x_device::mpyf3stf(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::mpyi3sti(UINT32 op)
+void tms3203x_device::mpyi3sti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
-		UINT32 src1 = IREG((op >> 19) & 7);
+		uint32_t src1 = IREG((op >> 19) & 7);
 		MPYI(dreg, src1, src2);
 	}
 	WMEM(INDIRECT_1(op, op >> 8), src3);
 	UPDATE_DEF();
 }
 
-void tms3203x_device::negfstf(UINT32 op)
+void tms3203x_device::negfstf(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = FP2LONG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = FP2LONG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		LONG2FP(TMR_TEMP1, src2);
 		negf(m_r[(op >> 22) & 7], m_r[TMR_TEMP1]);
@@ -6242,11 +6242,11 @@ void tms3203x_device::negfstf(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::negisti(UINT32 op)
+void tms3203x_device::negisti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
 		NEGI(dreg, src2);
@@ -6255,11 +6255,11 @@ void tms3203x_device::negisti(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::notsti(UINT32 op)
+void tms3203x_device::notsti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
 		NOT(dreg, src2);
@@ -6268,25 +6268,25 @@ void tms3203x_device::notsti(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::or3sti(UINT32 op)
+void tms3203x_device::or3sti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
-		UINT32 src1 = IREG((op >> 19) & 7);
+		uint32_t src1 = IREG((op >> 19) & 7);
 		OR(dreg, src1, src2);
 	}
 	WMEM(INDIRECT_1(op, op >> 8), src3);
 	UPDATE_DEF();
 }
 
-void tms3203x_device::subf3stf(UINT32 op)
+void tms3203x_device::subf3stf(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = FP2LONG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = FP2LONG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		LONG2FP(TMR_TEMP1, src2);
 		subf(m_r[(op >> 22) & 7], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
@@ -6295,28 +6295,28 @@ void tms3203x_device::subf3stf(UINT32 op)
 	UPDATE_DEF();
 }
 
-void tms3203x_device::subi3sti(UINT32 op)
+void tms3203x_device::subi3sti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
-		UINT32 src1 = IREG((op >> 19) & 7);
+		uint32_t src1 = IREG((op >> 19) & 7);
 		SUBI(dreg, src2, src1);
 	}
 	WMEM(INDIRECT_1(op, op >> 8), src3);
 	UPDATE_DEF();
 }
 
-void tms3203x_device::xor3sti(UINT32 op)
+void tms3203x_device::xor3sti(uint32_t op)
 {
 	DECLARE_DEF;
-	UINT32 src3 = IREG((op >> 16) & 7);
-	UINT32 src2 = RMEM(INDIRECT_1_DEF(op, op));
+	uint32_t src3 = IREG((op >> 16) & 7);
+	uint32_t src2 = RMEM(INDIRECT_1_DEF(op, op));
 	{
 		int dreg = (op >> 22) & 7;
-		UINT32 src1 = IREG((op >> 19) & 7);
+		uint32_t src1 = IREG((op >> 19) & 7);
 		XOR(dreg, src1, src2);
 	}
 	WMEM(INDIRECT_1(op, op >> 8), src3);
@@ -6328,7 +6328,7 @@ void tms3203x_device::xor3sti(UINT32 op)
 //  FUNCTION TABLE
 //**************************************************************************
 
-UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_d[0x20])(UINT32, UINT8) =
+uint32_t (tms3203x_device::*const tms3203x_device::s_indirect_d[0x20])(uint32_t, uint8_t) =
 {
 	&tms3203x_device::mod00_d,      &tms3203x_device::mod01_d,      &tms3203x_device::mod02_d,      &tms3203x_device::mod03_d,
 	&tms3203x_device::mod04_d,      &tms3203x_device::mod05_d,      &tms3203x_device::mod06_d,      &tms3203x_device::mod07_d,
@@ -6341,7 +6341,7 @@ UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_d[0x20])(UINT32, UIN
 };
 
 
-UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_1[0x20])(UINT32, UINT8) =
+uint32_t (tms3203x_device::*const tms3203x_device::s_indirect_1[0x20])(uint32_t, uint8_t) =
 {
 	&tms3203x_device::mod00_1,      &tms3203x_device::mod01_1,      &tms3203x_device::mod02_1,      &tms3203x_device::mod03_1,
 	&tms3203x_device::mod04_1,      &tms3203x_device::mod05_1,      &tms3203x_device::mod06_1,      &tms3203x_device::mod07_1,
@@ -6354,7 +6354,7 @@ UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_1[0x20])(UINT32, UIN
 };
 
 
-UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_1_def[0x20])(UINT32, UINT8, UINT32 *&) =
+uint32_t (tms3203x_device::*const tms3203x_device::s_indirect_1_def[0x20])(uint32_t, uint8_t, uint32_t *&) =
 {
 	&tms3203x_device::mod00_1_def,  &tms3203x_device::mod01_1_def,  &tms3203x_device::mod02_1_def,  &tms3203x_device::mod03_1_def,
 	&tms3203x_device::mod04_1_def,  &tms3203x_device::mod05_1_def,  &tms3203x_device::mod06_1_def,  &tms3203x_device::mod07_1_def,
@@ -6366,7 +6366,7 @@ UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_1_def[0x20])(UINT32,
 	&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def
 };
 
-void (tms3203x_device::*const tms3203x_device::s_tms32031ops[])(UINT32 op) =
+void (tms3203x_device::*const tms3203x_device::s_tms32031ops[])(uint32_t op) =
 {
 	&tms3203x_device::absf_reg,     &tms3203x_device::absf_dir,     &tms3203x_device::absf_ind,     &tms3203x_device::absf_imm,     // 0x00
 	&tms3203x_device::absi_reg,     &tms3203x_device::absi_dir,     &tms3203x_device::absi_ind,     &tms3203x_device::absi_imm,

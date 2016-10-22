@@ -69,7 +69,7 @@ class ttl7474_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_output_cb(device_t &device, _Object object) { return downcast<ttl7474_device &>(device).m_output_func.set_callback(object); }
@@ -95,19 +95,19 @@ private:
 	devcb_write_line m_comp_output_func;
 
 	// inputs
-	UINT8 m_clear;              // pin 1/13
-	UINT8 m_preset;             // pin 4/10
-	UINT8 m_clk;                // pin 3/11
-	UINT8 m_d;                  // pin 2/12
+	uint8_t m_clear;              // pin 1/13
+	uint8_t m_preset;             // pin 4/10
+	uint8_t m_clk;                // pin 3/11
+	uint8_t m_d;                  // pin 2/12
 
 	// outputs
-	UINT8 m_output;             // pin 5/9
-	UINT8 m_output_comp;        // pin 6/8
+	uint8_t m_output;             // pin 5/9
+	uint8_t m_output_comp;        // pin 6/8
 
 	// internal
-	UINT8 m_last_clock;
-	UINT8 m_last_output;
-	UINT8 m_last_output_comp;
+	uint8_t m_last_clock;
+	uint8_t m_last_output;
+	uint8_t m_last_output_comp;
 
 	void update();
 	void init();

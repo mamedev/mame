@@ -24,7 +24,7 @@ extern const device_type TI99_IDE;
 class nouspikel_ide_interface_device : public ti_expansion_card_device
 {
 public:
-	nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 
@@ -55,8 +55,8 @@ private:
 
 	bool    m_tms9995_mode;
 
-	UINT16  m_input_latch;
-	UINT16  m_output_latch;
+	uint16_t  m_input_latch;
+	uint16_t  m_output_latch;
 
 	required_device<ram_device> m_ram;
 };

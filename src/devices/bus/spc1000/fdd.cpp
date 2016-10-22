@@ -134,7 +134,7 @@ const device_type SPC1000_FDD_EXP = &device_creator<spc1000_fdd_exp_device>;
 //  spc1000_fdd_exp_device - constructor
 //-------------------------------------------------
 
-spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, SPC1000_FDD_EXP, "SPC1000 FDD expansion", tag, owner, clock, "spc1000_fdd_exp", __FILE__),
 		device_spc1000_card_interface(mconfig, *this),
 		m_cpu(*this, "fdccpu"),
@@ -190,7 +190,7 @@ READ8_MEMBER(spc1000_fdd_exp_device::read)
 		return 0xff;
 	else
 	{
-		UINT8 data = 0;
+		uint8_t data = 0;
 		switch (offset)
 		{
 			case 1:

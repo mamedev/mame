@@ -14,7 +14,7 @@
 
 class tms57002_device : public cpu_device, public device_sound_interface {
 public:
-	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
@@ -31,13 +31,13 @@ protected:
 	virtual void device_reset() override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	enum {
@@ -118,22 +118,22 @@ private:
 		short ipc;
 	};
 
-	INT64 macc;
+	int64_t macc;
 
-	UINT32 cmem[256];
-	UINT32 dmem0[256];
-	UINT32 dmem1[32];
+	uint32_t cmem[256];
+	uint32_t dmem0[256];
+	uint32_t dmem1[32];
 
-	UINT32 si[4], so[4];
+	uint32_t si[4], so[4];
 
-	UINT32 st0, st1, sti;
-	UINT32 aacc, xoa, xba, xwr, xrd, txrd, creg;
+	uint32_t st0, st1, sti;
+	uint32_t aacc, xoa, xba, xwr, xrd, txrd, creg;
 
-	UINT8 pc, hpc, ca, id, ba0, ba1, rptc, rptc_next, sa;
+	uint8_t pc, hpc, ca, id, ba0, ba1, rptc, rptc_next, sa;
 
-	UINT32 xm_adr;
+	uint32_t xm_adr;
 
-	UINT8 host[4], hidx, allow_update;
+	uint8_t host[4], hidx, allow_update;
 
 	cd cache;
 
@@ -143,46 +143,46 @@ private:
 	int icount;
 	int unsupported_inst_warning;
 
-	void decode_error(UINT32 opcode);
-	void decode_cat1(UINT32 opcode, unsigned short *op, cstate *cs);
-	void decode_cat2_pre(UINT32 opcode, unsigned short *op, cstate *cs);
-	void decode_cat3(UINT32 opcode, unsigned short *op, cstate *cs);
-	void decode_cat2_post(UINT32 opcode, unsigned short *op, cstate *cs);
+	void decode_error(uint32_t opcode);
+	void decode_cat1(uint32_t opcode, unsigned short *op, cstate *cs);
+	void decode_cat2_pre(uint32_t opcode, unsigned short *op, cstate *cs);
+	void decode_cat3(uint32_t opcode, unsigned short *op, cstate *cs);
+	void decode_cat2_post(uint32_t opcode, unsigned short *op, cstate *cs);
 
-	inline int xmode(UINT32 opcode, char type, cstate *cs);
-	inline int sfao(UINT32 st1);
-	inline int dbp(UINT32 st1);
-	inline int crm(UINT32 st1);
-	inline int sfai(UINT32 st1);
-	inline int sfmo(UINT32 st1);
-	inline int rnd(UINT32 st1);
-	inline int movm(UINT32 st1);
-	inline int sfma(UINT32 st1);
+	inline int xmode(uint32_t opcode, char type, cstate *cs);
+	inline int sfao(uint32_t st1);
+	inline int dbp(uint32_t st1);
+	inline int crm(uint32_t st1);
+	inline int sfai(uint32_t st1);
+	inline int sfmo(uint32_t st1);
+	inline int rnd(uint32_t st1);
+	inline int movm(uint32_t st1);
+	inline int sfma(uint32_t st1);
 
 	void xm_init();
 	void xm_step_read();
 	void xm_step_write();
-	INT64 macc_to_output_0(INT64 rounding, UINT64 rmask);
-	INT64 macc_to_output_1(INT64 rounding, UINT64 rmask);
-	INT64 macc_to_output_2(INT64 rounding, UINT64 rmask);
-	INT64 macc_to_output_3(INT64 rounding, UINT64 rmask);
-	INT64 macc_to_output_0s(INT64 rounding, UINT64 rmask);
-	INT64 macc_to_output_1s(INT64 rounding, UINT64 rmask);
-	INT64 macc_to_output_2s(INT64 rounding, UINT64 rmask);
-	INT64 macc_to_output_3s(INT64 rounding, UINT64 rmask);
-	INT64 check_macc_overflow_0();
-	INT64 check_macc_overflow_1();
-	INT64 check_macc_overflow_2();
-	INT64 check_macc_overflow_3();
-	INT64 check_macc_overflow_0s();
-	INT64 check_macc_overflow_1s();
-	INT64 check_macc_overflow_2s();
-	INT64 check_macc_overflow_3s();
+	int64_t macc_to_output_0(int64_t rounding, uint64_t rmask);
+	int64_t macc_to_output_1(int64_t rounding, uint64_t rmask);
+	int64_t macc_to_output_2(int64_t rounding, uint64_t rmask);
+	int64_t macc_to_output_3(int64_t rounding, uint64_t rmask);
+	int64_t macc_to_output_0s(int64_t rounding, uint64_t rmask);
+	int64_t macc_to_output_1s(int64_t rounding, uint64_t rmask);
+	int64_t macc_to_output_2s(int64_t rounding, uint64_t rmask);
+	int64_t macc_to_output_3s(int64_t rounding, uint64_t rmask);
+	int64_t check_macc_overflow_0();
+	int64_t check_macc_overflow_1();
+	int64_t check_macc_overflow_2();
+	int64_t check_macc_overflow_3();
+	int64_t check_macc_overflow_0s();
+	int64_t check_macc_overflow_1s();
+	int64_t check_macc_overflow_2s();
+	int64_t check_macc_overflow_3s();
 	void cache_flush();
-	void add_one(cstate *cs, unsigned short op, UINT8 param);
-	void decode_one(UINT32 opcode, cstate *cs, void (tms57002_device::*dec)(UINT32 opcode, unsigned short *op, cstate *cs));
-	short get_hash(unsigned char adr, UINT32 st1, short *pnode);
-	short get_hashnode(unsigned char adr, UINT32 st1, short pnode);
+	void add_one(cstate *cs, unsigned short op, uint8_t param);
+	void decode_one(uint32_t opcode, cstate *cs, void (tms57002_device::*dec)(uint32_t opcode, unsigned short *op, cstate *cs));
+	short get_hash(unsigned char adr, uint32_t st1, short *pnode);
+	short get_hashnode(unsigned char adr, uint32_t st1, short pnode);
 	int decode_get_pc();
 };
 

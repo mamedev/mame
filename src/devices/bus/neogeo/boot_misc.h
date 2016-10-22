@@ -15,8 +15,8 @@ class neogeo_bootleg_cart : public neogeo_rom_device
 {
 public:
 	// construction/destruction
-	neogeo_bootleg_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source);
-	neogeo_bootleg_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock);
+	neogeo_bootleg_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source);
+	neogeo_bootleg_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -42,7 +42,7 @@ extern const device_type NEOGEO_BOOTLEG_CART;
 class neogeo_garoubl_cart : public neogeo_bootleg_cart
 {
 public:
-	neogeo_garoubl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_garoubl_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 };
@@ -57,7 +57,7 @@ extern const device_type NEOGEO_GAROUBL_CART;
 class neogeo_kof97oro_cart : public neogeo_bootleg_cart
 {
 public:
-	neogeo_kof97oro_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_kof97oro_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 };
@@ -72,7 +72,7 @@ extern const device_type NEOGEO_KOF97ORO_CART;
 class neogeo_kf10thep_cart : public neogeo_bootleg_cart
 {
 public:
-	neogeo_kf10thep_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_kf10thep_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 };
@@ -87,7 +87,7 @@ extern const device_type NEOGEO_KF10THEP_CART;
 class neogeo_kf2k5uni_cart : public neogeo_bootleg_cart
 {
 public:
-	neogeo_kf2k5uni_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_kf2k5uni_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 };
@@ -101,7 +101,7 @@ extern const device_type NEOGEO_KF2K5UNI_CART;
 class neogeo_kf2k4se_cart : public neogeo_bootleg_cart
 {
 public:
-	neogeo_kf2k4se_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_kf2k4se_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 };
@@ -116,7 +116,7 @@ extern const device_type NEOGEO_KF2K4SE_CART;
 class neogeo_lans2004_cart : public neogeo_bootleg_cart
 {
 public:
-	neogeo_lans2004_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_lans2004_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 };
@@ -131,7 +131,7 @@ extern const device_type NEOGEO_LANS2004_CART;
 class neogeo_samsho5b_cart : public neogeo_bootleg_cart
 {
 public:
-	neogeo_samsho5b_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_samsho5b_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 };
@@ -146,7 +146,7 @@ extern const device_type NEOGEO_SAMSHO5B_CART;
 class neogeo_mslug3b6_cart : public neogeo_bootleg_cart
 {
 public:
-	neogeo_mslug3b6_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_mslug3b6_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 
@@ -165,14 +165,14 @@ extern const device_type NEOGEO_MSLUG3B6_CART;
 class neogeo_ms5plus_cart : public neogeo_bootleg_cart
 {
 public:
-	neogeo_ms5plus_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_ms5plus_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 1; }
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_prot->mslug5p_prot_r(space, offset, mem_mask); }
-	virtual UINT32 get_bank_base(UINT16 sel) override { return m_prot->mslug5p_bank_base(sel); }
+	virtual uint32_t get_bank_base(uint16_t sel) override { return m_prot->mslug5p_bank_base(sel); }
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
@@ -189,7 +189,7 @@ extern const device_type NEOGEO_MS5PLUS_CART;
 class neogeo_kog_cart : public neogeo_bootleg_cart
 {
 public:
-	neogeo_kog_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_kog_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 

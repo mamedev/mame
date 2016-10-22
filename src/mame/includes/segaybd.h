@@ -65,14 +65,14 @@ public:
 //	DECLARE_READ8_MEMBER( link_portc0_r );
 
 	// game-specific output handlers
-	void gforce2_output_cb1(UINT16 data);
-	void gforce2_output_cb2(UINT16 data);
-	void gloc_output_cb1(UINT16 data);
-	void gloc_output_cb2(UINT16 data);
-	void r360_output_cb2(UINT16 data);
-	void pdrift_output_cb1(UINT16 data);
-	void pdrift_output_cb2(UINT16 data);
-	void rchase_output_cb2(UINT16 data);
+	void gforce2_output_cb1(uint16_t data);
+	void gforce2_output_cb2(uint16_t data);
+	void gloc_output_cb1(uint16_t data);
+	void gloc_output_cb2(uint16_t data);
+	void r360_output_cb2(uint16_t data);
+	void pdrift_output_cb1(uint16_t data);
+	void pdrift_output_cb2(uint16_t data);
+	void rchase_output_cb2(uint16_t data);
 
 	// game-specific driver init
 	DECLARE_DRIVER_INIT(generic);
@@ -83,11 +83,11 @@ public:
 	DECLARE_DRIVER_INIT(gloc);
 
 	// video updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// internal types
-	typedef delegate<void (UINT16)> output_delegate;
+	typedef delegate<void (uint16_t)> output_delegate;
 
 	// timer IDs
 	enum
@@ -125,12 +125,12 @@ protected:
 	output_delegate m_output_cb2;
 
 	// internal state
-	UINT16          m_pdrift_bank;
+	uint16_t          m_pdrift_bank;
 	emu_timer *     m_scanline_timer;
-	UINT8           m_analog_data[4];
+	uint8_t           m_analog_data[4];
 	int             m_irq2_scanline;
-	UINT8           m_timer_irq_state;
-	UINT8           m_vblank_irq_state;
-	UINT8           m_misc_io_data[0x10];
+	uint8_t           m_timer_irq_state;
+	uint8_t           m_vblank_irq_state;
+	uint8_t           m_misc_io_data[0x10];
 	bitmap_ind16    m_tmp_bitmap;
 };

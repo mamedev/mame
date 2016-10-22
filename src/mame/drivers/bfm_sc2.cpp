@@ -234,9 +234,9 @@ public:
 	optional_device<meters_device> m_meters; // scorpion2_vid doesn't use this (scorpion2_vidm does)
 
 	int m_sc2gui_update_mmtr; //not used?
-	UINT8 *m_nvram;
-	UINT8 m_key[8];
-	UINT8 m_e2ram[1024];
+	uint8_t *m_nvram;
+	uint8_t m_key[8];
+	uint8_t m_e2ram[1024];
 	int m_mmtr_latch;
 	int m_irq_status;
 	int m_optic_pattern;
@@ -270,8 +270,8 @@ public:
 	int m_hopper_running;
 	int m_hopper_coin_sense;
 	int m_timercnt;
-	UINT8 m_sc2_Inputs[64];
-	UINT8 m_input_override[64];
+	uint8_t m_sc2_Inputs[64];
+	uint8_t m_input_override[64];
 	int m_e2reg;
 	int m_e2state;
 	int m_e2cnt;
@@ -281,8 +281,8 @@ public:
 	int m_e2data_pin;
 	int m_e2dummywrite;
 	int m_e2data_to_read;
-	UINT8 m_codec_data[256];
-	UINT8 m_lamps_old[0x20];
+	uint8_t m_codec_data[256];
+	uint8_t m_lamps_old[0x20];
 	void e2ram_init(nvram_device &nvram, void *data, size_t size);
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -439,7 +439,7 @@ void bfm_sc2_state::on_scorpion2_reset()
 	// init rom bank ////////////////////////////////////////////////////////
 
 	{
-		UINT8 *rom = memregion("maincpu")->base();
+		uint8_t *rom = memregion("maincpu")->base();
 
 		m_rombank1->configure_entries(0, 4, &rom[0x00000], 0x02000);
 
@@ -511,7 +511,7 @@ int bfm_sc2_state::Scorpion2_GetSwitchState(int strobe, int data)
 
 void bfm_sc2_state::e2ram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init_e2ram[] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
+	static const uint8_t init_e2ram[] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
 	memset(data,0x00,size);
 	memcpy(data,init_e2ram,sizeof(init_e2ram));
 }
@@ -2253,7 +2253,7 @@ int bfm_sc2_state::sc2_find_project_string( )
 {
 	// search for the project string to find the title (usually just at ff00)
 	char title_string[4][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2" };
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
 	for (auto & elem : title_string)
@@ -2266,8 +2266,8 @@ int bfm_sc2_state::sc2_find_project_string( )
 			int found = 1;
 			for (j=0;j<strlength;j+=1)
 			{
-				UINT8 rom = src[(i+j)];
-				UINT8 chr = elem[j];
+				uint8_t rom = src[(i+j)];
+				uint8_t chr = elem[j];
 
 				if (rom != chr)
 				{
@@ -2285,7 +2285,7 @@ int bfm_sc2_state::sc2_find_project_string( )
 
 				while (!end)
 				{
-					UINT8 rom;
+					uint8_t rom;
 					int addr;
 
 					addr = (i+count);
@@ -2335,7 +2335,7 @@ void bfm_sc2_state::adder2_common_init()
 {
 	if (memregion("proms") != nullptr)
 	{
-		UINT8 *pal;
+		uint8_t *pal;
 		pal = memregion("proms")->base();
 		memcpy(m_key, pal, 8);
 	}

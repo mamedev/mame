@@ -43,15 +43,15 @@ class bsmt2000_device : public device_t,
 
 public:
 	// construction/destruction
-	bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
 	static void static_set_ready_callback(device_t &device, ready_callback callback);
 
 	// public interface
-	UINT16 read_status();
-	void write_reg(UINT16 data);
-	void write_data(UINT16 data);
+	uint16_t read_status();
+	void write_reg(uint16_t data);
+	void write_data(uint16_t data);
 
 protected:
 	// device-level overrides
@@ -93,12 +93,12 @@ private:
 	// internal state
 	sound_stream *              m_stream;
 	tms32015_device *           m_cpu;
-	UINT16                      m_register_select;
-	UINT16                      m_write_data;
-	UINT16                      m_rom_address;
-	UINT16                      m_rom_bank;
-	INT16                       m_left_data;
-	INT16                       m_right_data;
+	uint16_t                      m_register_select;
+	uint16_t                      m_write_data;
+	uint16_t                      m_rom_address;
+	uint16_t                      m_rom_bank;
+	int16_t                       m_left_data;
+	int16_t                       m_right_data;
 	bool                        m_write_pending;
 };
 

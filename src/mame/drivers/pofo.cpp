@@ -57,7 +57,7 @@
 #define TIMER_TICK_TAG  "tick"
 #define SCREEN_TAG      "screen"
 
-static const UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
+static const uint8_t INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
 
 
 
@@ -93,8 +93,8 @@ public:
 	required_device<timer_device> m_timer_tick;
 	required_device<nvram_device> m_nvram;
 	required_device<ram_device> m_ram;
-	required_region_ptr<UINT8> m_rom;
-	required_region_ptr<UINT8> m_char_rom;
+	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<uint8_t> m_char_rom;
 	required_ioport_array<8> m_y;
 	required_ioport m_battery;
 
@@ -142,10 +142,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( iint_w );
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
 
-	UINT8 m_ip;
-	UINT8 m_ie;
-	UINT16 m_counter;
-	UINT8 m_keylatch;
+	uint8_t m_ip;
+	uint8_t m_ie;
+	uint16_t m_counter;
+	uint8_t m_keylatch;
 	int m_rom_b;
 
 	DECLARE_PALETTE_INIT(portfolio);
@@ -240,7 +240,7 @@ WRITE8_MEMBER( portfolio_state::irq_mask_w )
 
 IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 {
-	UINT8 vector = 0;
+	uint8_t vector = 0;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -277,11 +277,11 @@ IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 
 void portfolio_state::scan_keyboard()
 {
-	UINT8 keycode = 0xff;
+	uint8_t keycode = 0xff;
 
 	for (int row = 0; row < 8; row++)
 	{
-		UINT8 data = static_cast<int>(m_y[row]->read());
+		uint8_t data = static_cast<int>(m_y[row]->read());
 
 		if (data != 0xff)
 		{
@@ -429,7 +429,7 @@ READ8_MEMBER( portfolio_state::battery_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// peripheral detect
 	data |= m_exp->pdet_r() << 5;
@@ -505,7 +505,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::counter_tick)
 
 READ8_MEMBER( portfolio_state::counter_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -552,7 +552,7 @@ WRITE8_MEMBER( portfolio_state::counter_w )
 
 READ8_MEMBER( portfolio_state::mem_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	int iom = 0;
 	int bcom = 1;
@@ -644,7 +644,7 @@ WRITE8_MEMBER( portfolio_state::mem_w )
 
 READ8_MEMBER( portfolio_state::io_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	int iom = 1;
 	int bcom = 1;
@@ -924,8 +924,8 @@ PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 READ8_MEMBER( portfolio_state::hd61830_rd_r )
 {
 	// TODO with real ROM: offs_t address = ((offset & 0xff) << 4) | ((offset >> 12) & 0x0f);
-	UINT16 address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
-	UINT8 data = m_char_rom[address];
+	uint16_t address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
+	uint8_t data = m_char_rom[address];
 
 	return data;
 }

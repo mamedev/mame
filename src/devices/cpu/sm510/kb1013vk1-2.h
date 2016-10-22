@@ -23,10 +23,10 @@
 class kb1013vk12_device : public sm500_device
 {
 public:
-	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void execute_one() override;
 
 	// opcode handlers

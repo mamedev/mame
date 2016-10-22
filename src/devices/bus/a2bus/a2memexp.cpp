@@ -73,13 +73,13 @@ const tiny_rom_entry *a2bus_ramfactor_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_memexp_device::a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_memexp_device::a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this), m_isramfactor(false), m_bankhior(0), m_addrmask(0), m_rom(nullptr), m_wptr(0), m_liveptr(0)
 {
 }
 
-a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_memexp_device(mconfig, A2BUS_MEMEXP, "Apple II Memory Expansion Card", tag, owner, clock, "a2memexp", __FILE__)
 {
 	m_isramfactor = false;
@@ -87,7 +87,7 @@ a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig
 	m_addrmask = 0xfffff;
 }
 
-a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_memexp_device(mconfig, A2BUS_RAMFACTOR, "Applied Engineering RamFactor", tag, owner, clock, "a2ramfac", __FILE__)
 {
 	m_isramfactor = true;
@@ -106,7 +106,7 @@ void a2bus_memexp_device::device_start()
 
 	m_rom = device().machine().root_device().memregion(this->subtag(MEMEXP_ROM_REGION).c_str())->base();
 
-	memset(m_ram, 0xff, 1024*1024*sizeof(UINT8));
+	memset(m_ram, 0xff, 1024*1024*sizeof(uint8_t));
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_ram));
@@ -116,7 +116,7 @@ void a2bus_memexp_device::device_start()
 
 void a2bus_memexp_device::device_reset()
 {
-	memset(m_regs, 0, sizeof(UINT8) * 0x10);
+	memset(m_regs, 0, sizeof(uint8_t) * 0x10);
 	m_wptr = m_liveptr = 0;
 }
 
@@ -125,9 +125,9 @@ void a2bus_memexp_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_memexp_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_memexp_device::read_c0nx(address_space &space, uint8_t offset)
 {
-	UINT8 retval = m_regs[offset];
+	uint8_t retval = m_regs[offset];
 
 	if (offset == 3)
 	{
@@ -149,7 +149,7 @@ UINT8 a2bus_memexp_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_memexp_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_memexp_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 //    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
 
@@ -201,7 +201,7 @@ void a2bus_memexp_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_memexp_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_memexp_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	int slotimg = m_slot * 0x100;
 
@@ -218,7 +218,7 @@ UINT8 a2bus_memexp_device::read_cnxx(address_space &space, UINT8 offset)
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-UINT8 a2bus_memexp_device::read_c800(address_space &space, UINT16 offset)
+uint8_t a2bus_memexp_device::read_c800(address_space &space, uint16_t offset)
 {
 	// c70a diags confirm: bit 1 of cn0F banks in the second half of the ROM
 	if ((m_isramfactor) && (m_regs[0xf] & 0x01))

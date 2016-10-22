@@ -336,11 +336,12 @@ C - uses sub board with support for player 3 and 4 controls
 ***********************************************************************/
 
 #include "emu.h"
+#include "includes/namcos1.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/ym2151.h"
 #include "machine/nvram.h"
-#include "includes/namcos1.h"
+#include "sound/volt_reg.h"
+#include "sound/ym2151.h"
 
 
 /**********************************************************************/
@@ -365,44 +366,15 @@ WRITE8_MEMBER(namcos1_state::coin_w)
 	machine().bookkeeping().coin_counter_w(1, data & 4);
 }
 
-void namcos1_state::update_DACs()
-{
-	m_dac->write_signed16(0x8000 + (m_dac0_value * m_dac0_gain) + (m_dac1_value * m_dac1_gain));
-}
-
-void namcos1_state::init_DACs()
-{
-	m_dac0_value = 0;
-	m_dac1_value = 0;
-	m_dac0_gain = 0x80;
-	m_dac1_gain = 0x80;
-}
-
 WRITE8_MEMBER(namcos1_state::dac_gain_w)
 {
-	int value;
+	/* DAC0 (GAIN0 = bit0, GAIN1 = bit2) */
+	int dac0_gain = (BIT(data, 2) << 1) | BIT(data, 0);
+	m_dac0->set_output_gain(ALL_OUTPUTS, (dac0_gain + 1) / 4.0f);
 
-	/* DAC0 (bits 0,2) */
-	value = (data & 1) | ((data >> 1) & 2); /* GAIN0,GAIN1 */
-	m_dac0_gain = 0x20 * (value+1);
-
-	/* DAC1 (bits 3,4) */
-	value = (data >> 3) & 3; /* GAIN2,GAIN3 */
-	m_dac1_gain = 0x20 * (value+1);
-
-	update_DACs();
-}
-
-WRITE8_MEMBER(namcos1_state::dac0_w)
-{
-	m_dac0_value = data - 0x80; /* shift zero point */
-	update_DACs();
-}
-
-WRITE8_MEMBER(namcos1_state::dac1_w)
-{
-	m_dac1_value = data - 0x80; /* shift zero point */
-	update_DACs();
+	/* DAC1 (GAIN2 = bit3, GAIN3 = bit4) */
+	int dac1_gain = (BIT(data, 4) << 1) | BIT(data, 3);
+	m_dac1->set_output_gain(ALL_OUTPUTS, (dac1_gain + 1) / 4.0f);
 }
 
 
@@ -452,8 +424,8 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("mcubank") /* banked external ROM */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("triram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("nvram") /* EEPROM */
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(dac0_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(dac1_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("dac0", dac_byte_interface, write)
+	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("dac1", dac_byte_interface, write)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(mcu_bankswitch_w) /* ROM bank selector */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(irq_ack_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("mcu", 0) /* internal ROM */
@@ -1096,9 +1068,11 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac0", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

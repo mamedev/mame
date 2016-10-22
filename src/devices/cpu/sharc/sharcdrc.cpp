@@ -197,20 +197,20 @@ static void cfunc_write_snoop(void *param)
 
 void adsp21062_device::sharc_cfunc_unimplemented()
 {
-	UINT64 op = m_core->arg64;
-	fatalerror("PC=%08X: Unimplemented op %04X%08X\n", m_core->pc, (UINT32)(op >> 32), (UINT32)(op));
+	uint64_t op = m_core->arg64;
+	fatalerror("PC=%08X: Unimplemented op %04X%08X\n", m_core->pc, (uint32_t)(op >> 32), (uint32_t)(op));
 }
 
 void adsp21062_device::sharc_cfunc_unimplemented_compute()
 {
-	UINT64 op = m_core->arg64;
-	fatalerror("PC=%08X: Unimplemented compute %04X%08X\n", m_core->pc, (UINT32)(op >> 32), (UINT32)(op));
+	uint64_t op = m_core->arg64;
+	fatalerror("PC=%08X: Unimplemented compute %04X%08X\n", m_core->pc, (uint32_t)(op >> 32), (uint32_t)(op));
 }
 
 void adsp21062_device::sharc_cfunc_unimplemented_shiftimm()
 {
-	UINT64 op = m_core->arg64;
-	fatalerror("PC=%08X: Unimplemented shiftimm %04X%08X\n", m_core->pc, (UINT32)(op >> 32), (UINT32)(op));
+	uint64_t op = m_core->arg64;
+	fatalerror("PC=%08X: Unimplemented shiftimm %04X%08X\n", m_core->pc, (uint32_t)(op >> 32), (uint32_t)(op));
 }
 
 void adsp21062_device::sharc_cfunc_read_iop()
@@ -262,9 +262,9 @@ bool adsp21062_device::if_condition_always_true(int condition)
 		return false;
 }
 
-UINT32 adsp21062_device::do_condition_astat_bits(int condition)
+uint32_t adsp21062_device::do_condition_astat_bits(int condition)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	switch (condition)
 	{
 		case 0x00: r = AZ; break;               // EQ
@@ -873,7 +873,7 @@ void adsp21062_device::static_generate_pop_status()
 }
 
 
-void adsp21062_device::static_generate_exception(UINT8 exception, const char *name)
+void adsp21062_device::static_generate_exception(uint8_t exception, const char *name)
 {
 	code_handle *&exception_handle = m_exception[exception];
 
@@ -1149,7 +1149,7 @@ void adsp21062_device::compile_block(offs_t pc)
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
-				UINT32 nextpc;
+				uint32_t nextpc;
 
 				/* determine the last instruction in this sequence */
 				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
@@ -1571,7 +1571,7 @@ void adsp21062_device::generate_update_cycles(drcuml_block *block, compiler_stat
 	compiler->cycles = 0;
 }
 
-void adsp21062_device::generate_write_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 data)
+void adsp21062_device::generate_write_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data)
 {
 	code_label skip;
 
@@ -1628,7 +1628,7 @@ void adsp21062_device::generate_write_mode1_imm(drcuml_block *block, compiler_st
 	UML_MOV(block, MODE1, data);
 }
 
-void adsp21062_device::generate_set_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 data)
+void adsp21062_device::generate_set_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data)
 {
 	if (data & 0x1)
 		fatalerror("generate_set_mode1_imm: tried to enable I8 bit reversing");
@@ -1688,7 +1688,7 @@ void adsp21062_device::generate_set_mode1_imm(drcuml_block *block, compiler_stat
 	UML_OR(block, MODE1, MODE1, data);
 }
 
-void adsp21062_device::generate_clear_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 data)
+void adsp21062_device::generate_clear_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data)
 {
 	if (data & 0x1)
 		fatalerror("generate_clear_mode1_imm: tried to disable I8 bit reversing");
@@ -2141,7 +2141,7 @@ void adsp21062_device::generate_read_ureg(drcuml_block *block, compiler_state *c
     generate_write_ureg - contents of register I0 or 32-bit immediate data are written into UREG
 -------------------------------------------------*/
 
-void adsp21062_device::generate_write_ureg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int ureg, bool imm, UINT32 data)
+void adsp21062_device::generate_write_ureg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int ureg, bool imm, uint32_t data)
 {
 	switch (ureg)
 	{
@@ -2250,7 +2250,7 @@ void adsp21062_device::generate_write_ureg(drcuml_block *block, compiler_state *
 			if (imm)
 			{
 				UML_DAND(block, mem(&m_core->px), mem(&m_core->px), ~0xffff);
-				UML_DOR(block, mem(&m_core->px), mem(&m_core->px), (UINT64)(data));
+				UML_DOR(block, mem(&m_core->px), mem(&m_core->px), (uint64_t)(data));
 			}
 			else
 			{
@@ -2264,7 +2264,7 @@ void adsp21062_device::generate_write_ureg(drcuml_block *block, compiler_state *
 			if (imm)
 			{
 				UML_DAND(block, mem(&m_core->px), mem(&m_core->px), 0xffff);
-				UML_DOR(block, mem(&m_core->px), mem(&m_core->px), (UINT64)(data) << 16);
+				UML_DOR(block, mem(&m_core->px), mem(&m_core->px), (uint64_t)(data) << 16);
 			}
 			else
 			{
@@ -2282,13 +2282,13 @@ void adsp21062_device::generate_write_ureg(drcuml_block *block, compiler_state *
 
 int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT64 opcode = desc->opptr.q[0];
+	uint64_t opcode = desc->opptr.q[0];
 
 	switch ((opcode >> 45) & 7)
 	{
 		case 0:             // subops
 		{
-			UINT32 subop = (opcode >> 40) & 0x1f;
+			uint32_t subop = (opcode >> 40) & 0x1f;
 			switch (subop)
 			{
 				case 0x00:          // NOP / idle                       |000|00000|
@@ -2669,9 +2669,9 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 
 				case 0x0c:          // do until counter expired             |000|01100|
 				{
-					UINT16 data = (UINT16)(opcode >> 24);
+					uint16_t data = (uint16_t)(opcode >> 24);
 					int offset = SIGN_EXTEND24(opcode & 0xffffff);
-					UINT32 address = desc->pc + offset;
+					uint32_t address = desc->pc + offset;
 
 					UML_MOV(block, LCNTR, data);
 					if (data > 0)
@@ -2692,7 +2692,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				{
 					int ureg = (opcode >> 32) & 0xff;
 					int offset = SIGN_EXTEND24(opcode & 0xffffff);
-					UINT32 address = desc->pc + offset;
+					uint32_t address = desc->pc + offset;
 
 					generate_read_ureg(block, compiler, desc, ureg, false);
 
@@ -2713,7 +2713,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				case 0x0e:          // do until                             |000|01110|
 				{
 					int offset = SIGN_EXTEND24(opcode & 0xffffff);
-					UINT32 address = desc->pc + offset;
+					uint32_t address = desc->pc + offset;
 
 					// push pc
 					UML_MOV(block, I0, desc->pc + 1);
@@ -2729,7 +2729,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				case 0x0f:          // immediate data -> ureg               |000|01111|
 				{
 					int ureg = (opcode >> 32) & 0xff;
-					UINT32 data = (UINT32)opcode;
+					uint32_t data = (uint32_t)opcode;
 
 					generate_write_ureg(block, compiler, desc, ureg, true, data);
 					return TRUE;
@@ -2741,7 +2741,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				case 0x13:
 				{
 					int ureg = (opcode >> 32) & 0xff;
-					UINT32 address = (UINT32)(opcode);
+					uint32_t address = (uint32_t)(opcode);
 					int d = (opcode >> 40) & 1;
 					int g = (opcode >> 41) & 1;
 
@@ -2791,7 +2791,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				{
 					int bop = (opcode >> 37) & 0x7;
 					int sreg = (opcode >> 32) & 0xf;
-					UINT32 data = (UINT32)opcode;
+					uint32_t data = (uint32_t)opcode;
 
 					switch (bop)
 					{
@@ -3068,7 +3068,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					{
 						int g = (opcode >> 38) & 0x1;
 						int i = (opcode >> 32) & 0x7;
-						INT32 data = (INT32)(opcode);
+						int32_t data = (int32_t)(opcode);
 
 						if (g)
 						{
@@ -3425,7 +3425,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				int i = (opcode >> 41) & 0x7;
 				int m = (opcode >> 38) & 0x7;
 				int g = (opcode >> 37) & 0x1;
-				UINT32 data = (UINT32)opcode;
+				uint32_t data = (uint32_t)opcode;
 
 				if (g)
 				{
@@ -3526,7 +3526,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 			int d = (opcode >> 40) & 1;
 			int i = (opcode >> 41) & 0x7;
 			int ureg = (opcode >> 32) & 0xff;
-			UINT32 offset = (UINT32)opcode;
+			uint32_t offset = (uint32_t)opcode;
 
 			if (d)
 			{
@@ -3687,7 +3687,7 @@ void adsp21062_device::generate_unimplemented_compute(drcuml_block *block, compi
 
 void adsp21062_device::generate_compute(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT64 opcode = desc->opptr.q[0];
+	uint64_t opcode = desc->opptr.q[0];
 	if ((opcode & 0x7fffff) == 0)
 		return;
 
@@ -3700,7 +3700,7 @@ void adsp21062_device::generate_compute(drcuml_block *block, compiler_state *com
 
 	if (opcode & 0x400000)      // multi-function operation
 	{
-		UINT32 multiop = (opcode >> 16) & 0x3f;
+		uint32_t multiop = (opcode >> 16) & 0x3f;
 		int fm = rs;
 		int fa = rn;
 		int fxm = (opcode >> 6) & 0x3;          // registers 0 - 3
@@ -4114,7 +4114,7 @@ void adsp21062_device::generate_compute(drcuml_block *block, compiler_state *com
 	}
 	else                            // single-function operation
 	{
-		UINT32 operation = (opcode >> 12) & 0xff;
+		uint32_t operation = (opcode >> 12) & 0xff;
 
 		switch ((opcode >> 20) & 3)
 		{
@@ -5460,7 +5460,7 @@ void adsp21062_device::generate_do_condition(drcuml_block *block, compiler_state
 
 void adsp21062_device::generate_shift_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int data, int shiftop, int rn, int rx)
 {
-	INT8 shift = data & 0xff;
+	int8_t shift = data & 0xff;
 	int bit = data & 0x3f;
 	int len = (data >> 6) & 0x3f;
 

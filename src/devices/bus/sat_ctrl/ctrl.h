@@ -29,13 +29,13 @@ public:
 	device_saturn_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_saturn_control_port_interface();
 
-	virtual UINT16 read_direct() { return 0; };
-	virtual UINT8 read_ctrl(UINT8 offset) { return 0; };
-	virtual UINT8 read_status() { return 0xf0; };
-	virtual UINT8 read_id(int idx) { return 0xff; };
+	virtual uint16_t read_direct() { return 0; };
+	virtual uint8_t read_ctrl(uint8_t offset) { return 0; };
+	virtual uint8_t read_status() { return 0xf0; };
+	virtual uint8_t read_id(int idx) { return 0xff; };
 
 protected:
-	UINT8 m_ctrl_id;
+	uint8_t m_ctrl_id;
 	saturn_control_port_device *m_port;
 };
 
@@ -46,13 +46,13 @@ class saturn_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~saturn_control_port_device();
 
-	UINT16 read_direct();
-	UINT8 read_ctrl(UINT8 offset);
-	UINT8 read_status();
-	UINT8 read_id(int idx);
+	uint16_t read_direct();
+	uint8_t read_ctrl(uint8_t offset);
+	uint8_t read_status();
+	uint8_t read_id(int idx);
 
 	// device-level overrides
 	virtual void device_start() override;

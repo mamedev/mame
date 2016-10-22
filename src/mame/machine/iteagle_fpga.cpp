@@ -28,7 +28,7 @@ DEVICE_ADDRESS_MAP_START(ram_map, 32, iteagle_fpga_device)
 	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
-iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ITEAGLE_FPGA, "ITEagle FPGA", tag, owner, clock, "iteagle_fpga", __FILE__),
 		m_rtc(*this, "eagle2_rtc"), m_version(0), m_seq_init(0)
 {
@@ -104,13 +104,13 @@ void iteagle_fpga_device::device_reset()
 	m_serial_rx3.clear();
 }
 
-void iteagle_fpga_device::update_sequence(UINT32 data)
+void iteagle_fpga_device::update_sequence(uint32_t data)
 {
-	UINT32 offset = 0x04/4;
+	uint32_t offset = 0x04/4;
 	if (data & 0x80) {
 		m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((m_version>>(8*(data&3)))&0xff);
 	} else {
-		UINT32 val1, feed;
+		uint32_t val1, feed;
 		feed = ((m_seq<<4) ^ m_seq)>>7;
 		if (data & 0x1) {
 			val1 = ((m_seq & 0x2)<<1) | ((m_seq & 0x4)>>1) | ((m_seq & 0x8)>>3);
@@ -135,10 +135,10 @@ void iteagle_fpga_device::update_sequence(UINT32 data)
 }
 
 // Eagle 1 sequence generator
-void iteagle_fpga_device::update_sequence_eg1(UINT32 data)
+void iteagle_fpga_device::update_sequence_eg1(uint32_t data)
 {
-	UINT32 offset = 0x04/4;
-	UINT32 val1, feed;
+	uint32_t offset = 0x04/4;
+	uint32_t val1, feed;
 	feed = ((m_seq<<4) ^ m_seq)>>7;
 	if (data & 0x1) {
 		val1 = ((m_seq & 0x2)<<6) | ((m_seq & 0x4)<<4) | ((m_seq & 0x8)<<2) | ((m_seq & 0x10)<<0)
@@ -179,7 +179,7 @@ void iteagle_fpga_device::device_timer(emu_timer &timer, device_timer_id tid, in
 
 READ32_MEMBER( iteagle_fpga_device::fpga_r )
 {
-	UINT32 result = m_fpga_regs[offset];
+	uint32_t result = m_fpga_regs[offset];
 
 	switch (offset) {
 		case 0x00/4:
@@ -394,7 +394,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 //*************************************
 READ32_MEMBER( iteagle_fpga_device::rtc_r )
 {
-	UINT32 result = m_rtc_regs[offset];
+	uint32_t result = m_rtc_regs[offset];
 
 	switch (offset) {
 		default:
@@ -446,7 +446,7 @@ WRITE32_MEMBER( iteagle_fpga_device::rtc_w )
 //*************************************
 READ32_MEMBER( iteagle_fpga_device::ram_r )
 {
-	UINT32 result = m_ram[offset];
+	uint32_t result = m_ram[offset];
 	if (LOG_RAM)
 		logerror("%s:FPGA ram_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 	return result;
@@ -478,7 +478,7 @@ machine_config_constructor iteagle_eeprom_device::device_mconfig_additions() con
 	return MACHINE_CONFIG_NAME( iteagle_eeprom );
 }
 
-iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ITEAGLE_EEPROM, "ITEagle EEPROM AT93C46", tag, owner, clock, "eeprom", __FILE__),
 		m_eeprom(*this, "eeprom"), m_sw_version(0), m_hw_version(0)
 {
@@ -508,7 +508,7 @@ void iteagle_eeprom_device::device_start()
 	// EEPROM: Set software version and calc crc
 	m_iteagle_default_eeprom[0xe] = m_sw_version;
 	m_iteagle_default_eeprom[0x4] = (m_iteagle_default_eeprom[0x4] & 0xff00) | m_hw_version;
-	UINT16 checkSum = 0;
+	uint16_t checkSum = 0;
 	for (int i=0; i<0x3f; i++) {
 		checkSum += m_iteagle_default_eeprom[i];
 	//logerror("eeprom init i: %x data: %04x\n", i, iteagle_default_eeprom[i]);
@@ -527,15 +527,15 @@ void iteagle_eeprom_device::device_reset()
 	pci_device::device_reset();
 }
 
-void iteagle_eeprom_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+void iteagle_eeprom_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	m_memory_space = memory_space;
 }
 
 READ32_MEMBER( iteagle_eeprom_device::eeprom_r )
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 
 	switch (offset) {
 		case 0xC/4: // I2C Handler
@@ -602,7 +602,7 @@ DEVICE_ADDRESS_MAP_START(ctrl_map, 32, iteagle_periph_device)
 	AM_RANGE(0x000, 0x0cf) AM_READWRITE(ctrl_r, ctrl_w)
 ADDRESS_MAP_END
 
-iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ITEAGLE_PERIPH, "ITEagle Peripheral Controller", tag, owner, clock, "periph", __FILE__),
 	m_rtc(*this, "eagle1_rtc")
 {
@@ -631,7 +631,7 @@ void iteagle_periph_device::device_reset()
 READ32_MEMBER( iteagle_periph_device::ctrl_r )
 {
 	system_time systime;
-	UINT32 result = m_ctrl_regs[offset];
+	uint32_t result = m_ctrl_regs[offset];
 	switch (offset) {
 		case 0x0/4:
 			if (LOG_PERIPH)

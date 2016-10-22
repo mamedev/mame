@@ -96,19 +96,19 @@ MC6845_UPDATE_ROW( mbc55x_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-	UINT8   *ram    = &m_ram->pointer()[0];
-	UINT8   *red    = &m_video_mem[RED_PLANE_OFFSET];
-	UINT8   *blue   = &m_video_mem[BLUE_PLANE_OFFSET];
-	UINT8   *green;
+	uint8_t   *ram    = &m_ram->pointer()[0];
+	uint8_t   *red    = &m_video_mem[RED_PLANE_OFFSET];
+	uint8_t   *blue   = &m_video_mem[BLUE_PLANE_OFFSET];
+	uint8_t   *green;
 	int     offset;
-	UINT8   rpx,gpx,bpx;
-	UINT8   rb,gb,bb;
+	uint8_t   rpx,gpx,bpx;
+	uint8_t   rb,gb,bb;
 
 	int     x_pos;
 	int     pixelno;
-	UINT8   bitno;
-	UINT8   shifts;
-	UINT8   colour;
+	uint8_t   bitno;
+	uint8_t   shifts;
+	uint8_t   colour;
 
 	switch(m_vram_page)
 	{
@@ -130,7 +130,7 @@ MC6845_UPDATE_ROW( mbc55x_state::crtc_update_row )
 
 	for(x_pos=0; x_pos<x_count; x_pos++)
 	{
-		UINT16 mem = (offset+(x_pos*4)) % COLOUR_PLANE_SIZE;
+		uint16_t mem = (offset+(x_pos*4)) % COLOUR_PLANE_SIZE;
 		rpx=red[mem];
 		gpx=green[mem];
 		bpx=blue[mem];

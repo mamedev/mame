@@ -26,8 +26,8 @@ class a2bus_mouse_device:
 {
 public:
 	// construction/destruction
-	a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -59,30 +59,30 @@ protected:
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
-	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) override;
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
 
 	required_device<pia6821_device> m_pia;
 	required_device<m68705_device> m_mcu;
 	required_ioport m_mouseb, m_mousex, m_mousey;
 
 private:
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 	bool m_started;
 	int m_rom_bank;
-	UINT8 m_ddr_a;
-	UINT8 m_ddr_b;
-	UINT8 m_ddr_c;
-	UINT8 m_port_a_out;
-	UINT8 m_port_b_out;
-	UINT8 m_port_c_out;
-	UINT8 m_port_a_in;
-	UINT8 m_port_b_in;
-	UINT8 m_port_c_in;
-	UINT8 m_timer_cnt;
-	UINT8 m_timer_ctl;
-	UINT8 m_mask_option;
+	uint8_t m_ddr_a;
+	uint8_t m_ddr_b;
+	uint8_t m_ddr_c;
+	uint8_t m_port_a_out;
+	uint8_t m_port_b_out;
+	uint8_t m_port_c_out;
+	uint8_t m_port_a_in;
+	uint8_t m_port_b_in;
+	uint8_t m_port_c_in;
+	uint8_t m_timer_cnt;
+	uint8_t m_timer_ctl;
+	uint8_t m_mask_option;
 	int last_mx, last_my, count_x, count_y;
 	emu_timer *m_timer, *m_read_timer;
 };

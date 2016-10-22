@@ -23,15 +23,15 @@ const char *const score7_cpu_device::m_i1b_op[8]  = { "lwp", "lhp", "", "lbup", 
 const char *const score7_cpu_device::m_cr_op[2]   = { "mtcr", "mfcr" };
 
 
-char *score7_cpu_device::disasm32(char *buffer, offs_t pc, UINT32 opcode)
+char *score7_cpu_device::disasm32(char *buffer, offs_t pc, uint32_t opcode)
 {
 	switch((opcode >> 25) & 0x1f)
 	{
 		case 0x00:      // Special-form
 		{
-			UINT8 ra = GET_S_RA(opcode);
-			UINT8 rb = GET_S_RB(opcode);
-			UINT8 rd = GET_S_RD(opcode);
+			uint8_t ra = GET_S_RA(opcode);
+			uint8_t rb = GET_S_RB(opcode);
+			uint8_t rd = GET_S_RD(opcode);
 			const char *cu = GET_S_CU(opcode) ? ".c": "";
 			const char *lk = GET_S_LK(opcode) ? "l": "";
 
@@ -180,14 +180,14 @@ char *score7_cpu_device::disasm32(char *buffer, offs_t pc, UINT32 opcode)
 	return buffer;
 }
 
-char *score7_cpu_device::disasm16(char *buffer, offs_t pc, UINT16 opcode)
+char *score7_cpu_device::disasm16(char *buffer, offs_t pc, uint16_t opcode)
 {
 	switch((opcode >> 12) & 0x07)
 	{
 		case 0x00:      // R-form-1
 		{
-			UINT8 rd = GET_R_RD(opcode);
-			UINT8 ra = GET_R_RA(opcode);
+			uint8_t rd = GET_R_RD(opcode);
+			uint8_t ra = GET_R_RA(opcode);
 
 			switch(GET_R_FUNC4(opcode))
 			{
@@ -256,9 +256,9 @@ char *score7_cpu_device::disasm16(char *buffer, offs_t pc, UINT16 opcode)
 	return buffer;
 }
 
-offs_t score7_cpu_device::disasm(char *buffer, offs_t pc, UINT32 opcode)
+offs_t score7_cpu_device::disasm(char *buffer, offs_t pc, uint32_t opcode)
 {
-	UINT8 p = (pc & 0x02) ? 0 : (((opcode>>30) & 2) | ((opcode>>15) & 1));
+	uint8_t p = (pc & 0x02) ? 0 : (((opcode>>30) & 2) | ((opcode>>15) & 1));
 
 	switch(p)
 	{
@@ -286,9 +286,9 @@ offs_t score7_cpu_device::disasm(char *buffer, offs_t pc, UINT32 opcode)
 //  helper function
 //-------------------------------------------------
 
-offs_t score7_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t score7_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	UINT32 opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
+	uint32_t opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 
 	return disasm(buffer, pc, opcode);
 }

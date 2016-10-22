@@ -817,7 +817,7 @@ void running_machine::set_rtc_datetime(const system_time &systime)
 //  rand - standardized random numbers
 //-------------------------------------------------
 
-UINT32 running_machine::rand()
+uint32_t running_machine::rand()
 {
 	m_rand_seed = 1664525 * m_rand_seed + 1013904223;
 
@@ -863,7 +863,7 @@ void running_machine::handle_saveload()
 		}
 		else
 		{
-			UINT32 const openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			uint32_t const openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 			// open the file
 			emu_file file(m_saveload_searchpath, openflags);
@@ -927,7 +927,7 @@ void running_machine::handle_saveload()
 //  of the system
 //-------------------------------------------------
 
-void running_machine::soft_reset(void *ptr, INT32 param)
+void running_machine::soft_reset(void *ptr, int32_t param)
 {
 	logerror("Soft reset\n");
 

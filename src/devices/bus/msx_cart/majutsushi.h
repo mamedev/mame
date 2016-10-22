@@ -14,7 +14,7 @@ class msx_cart_majutsushi : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_majutsushi(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_majutsushi(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -29,10 +29,10 @@ public:
 	void restore_banks();
 
 private:
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 
-	UINT8 m_selected_bank[4];
-	UINT8 *m_bank_base[8];
+	uint8_t m_selected_bank[4];
+	uint8_t *m_bank_base[8];
 };
 
 

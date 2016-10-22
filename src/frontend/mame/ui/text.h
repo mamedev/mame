@@ -98,7 +98,7 @@ private:
 	// we'll get there eventually
 	struct positioned_char
 	{
-		unicode_char character;
+		char32_t character;
 		char_style style;
 		source_info source;
 		float xoffset;
@@ -112,7 +112,7 @@ private:
 		line(text_layout &layout, text_justify justify, float yoffset, float height);
 
 		// methods
-		void add_character(unicode_char ch, const char_style &style, const source_info &source);
+		void add_character(char32_t ch, const char_style &style, const source_info &source);
 		void truncate(size_t position);
 
 		// accessors
@@ -151,7 +151,7 @@ private:
 	// methods
 	void add_text(const char *text, const char_style &style);
 	void start_new_line(text_justify justify, float height);
-	float get_char_width(unicode_char ch, float size);
+	float get_char_width(char32_t ch, float size);
 	void truncate_wrap();
 	void word_wrap();
 	void invalidate_calculated_actual_width();

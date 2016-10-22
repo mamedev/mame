@@ -25,16 +25,16 @@ public:
 
 	DECLARE_PALETTE_INIT(pk8000);
 
-	UINT32 pk8000_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *videomem);
+	uint32_t pk8000_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *videomem);
 protected:
-	UINT8 m_pk8000_text_start;
-	UINT8 m_pk8000_chargen_start;
-	UINT8 m_pk8000_video_start;
-	UINT8 m_pk8000_color_start;
+	uint8_t m_pk8000_text_start;
+	uint8_t m_pk8000_chargen_start;
+	uint8_t m_pk8000_video_start;
+	uint8_t m_pk8000_color_start;
 
-	UINT8 m_pk8000_video_mode;
-	UINT8 m_pk8000_video_color;
-	UINT8 m_pk8000_color[32];
-	UINT8 m_pk8000_video_enable;
+	uint8_t m_pk8000_video_mode;
+	uint8_t m_pk8000_video_color;
+	uint8_t m_pk8000_color[32];
+	uint8_t m_pk8000_video_enable;
 	required_device<cpu_device> m_maincpu;
 };

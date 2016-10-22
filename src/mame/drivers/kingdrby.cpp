@@ -94,16 +94,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	UINT8 m_sound_cmd;
-	required_shared_ptr<UINT8> m_vram;
-	required_shared_ptr<UINT8> m_attr;
+	uint8_t m_sound_cmd;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_attr;
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc0w_tilemap;
 	tilemap_t *m_sc1_tilemap;
-	UINT8 m_p1_hopper;
-	UINT8 m_p2_hopper;
-	UINT8 m_mux_data;
-	required_shared_ptr<UINT8> m_spriteram;
+	uint8_t m_p1_hopper;
+	uint8_t m_p2_hopper;
+	uint8_t m_mux_data;
+	required_shared_ptr<uint8_t> m_spriteram;
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
 	DECLARE_WRITE8_MEMBER(led_array_w);
@@ -121,7 +121,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(kingdrby);
 	DECLARE_PALETTE_INIT(kingdrbb);
-	UINT32 screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -190,7 +190,7 @@ void kingdrby_state::video_start()
 	m_sc1_tilemap->set_transparent_pen(0);
 }
 
-static const UINT8 hw_sprite[16] =
+static const uint8_t hw_sprite[16] =
 {
 	0x34, 0x34, 0x34, 0x34, 0x34, 0x34, 0x34, 0x22,
 	0x22, 0x22, 0x22, 0x22, 0x22, 0x11, 0x22, 0x22
@@ -198,7 +198,7 @@ static const UINT8 hw_sprite[16] =
 
 void kingdrby_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int count = 0;
 
 	/*sprites not fully understood.*/
@@ -240,7 +240,7 @@ void kingdrby_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
@@ -324,8 +324,8 @@ READ8_MEMBER(kingdrby_state::input_mux_r)
 
 READ8_MEMBER(kingdrby_state::key_matrix_r)
 {
-	UINT16 p1_val,p2_val;
-	UINT8 p1_res,p2_res;
+	uint16_t p1_val,p2_val;
+	uint8_t p1_res,p2_res;
 
 	p1_val = ioport("KEY_1P")->read();
 	p2_val = ioport("KEY_2P")->read();
@@ -379,7 +379,7 @@ READ8_MEMBER(kingdrby_state::sound_cmd_r)
 	return m_sound_cmd;
 }
 
-static const UINT8 led_map[16] =
+static const uint8_t led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
 WRITE8_MEMBER(kingdrby_state::led_array_w)
@@ -866,7 +866,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -892,8 +892,8 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 
 PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 {
-	UINT8 *raw_prom = memregion("raw_prom")->base();
-	UINT8 *prom = memregion("proms")->base();
+	uint8_t *raw_prom = memregion("raw_prom")->base();
+	uint8_t *prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 

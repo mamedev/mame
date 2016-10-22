@@ -56,9 +56,9 @@ public:
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_READ8_MEMBER(portfc_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	required_shared_ptr<UINT8> m_p_rom;
-	UINT8 m_term_data;
-	UINT8 m_port02_data;
+	required_shared_ptr<uint8_t> m_p_rom;
+	uint8_t m_term_data;
+	uint8_t m_port02_data;
 	virtual void machine_reset() override;
 };
 
@@ -75,7 +75,7 @@ READ8_MEMBER( hpz80unk_state::port03_r )
 
 READ8_MEMBER( hpz80unk_state::port04_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -108,8 +108,8 @@ INPUT_PORTS_END
 
 void hpz80unk_state::machine_reset()
 {
-	UINT8* user1 = memregion("user1")->base();
-	memcpy((UINT8*)m_p_rom, user1, 0x4000);
+	uint8_t* user1 = memregion("user1")->base();
+	memcpy((uint8_t*)m_p_rom, user1, 0x4000);
 
 	// this should be rom/ram banking
 }

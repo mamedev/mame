@@ -15,11 +15,11 @@ public:
 		m_bit_count(0)
 	{ }
 
-	UINT32 m_byte_ptr;
-	UINT8 m_bit_count;
+	uint32_t m_byte_ptr;
+	uint8_t m_bit_count;
 
-	void IM_prepareDecomp(UINT32 in_buf);
-	UINT8 IM_getCodeword(UINT8 *ROM, UINT32 *mmc, const UINT8 code_len);
+	void IM_prepareDecomp(uint32_t in_buf);
+	uint8_t IM_getCodeword(uint8_t *ROM, uint32_t *mmc, const uint8_t code_len);
 };
 
 class SDD1_GCD //Golomb-Code Decoder
@@ -30,13 +30,13 @@ public:
 
 	SDD1_IM* m_IM;
 
-	void GCD_getRunCount(UINT8 *ROM, UINT32 *mmc, UINT8 code_num, UINT8* MPScount, UINT8* LPSind);
+	void GCD_getRunCount(uint8_t *ROM, uint32_t *mmc, uint8_t code_num, uint8_t* MPScount, uint8_t* LPSind);
 };
 
 class SDD1_BG // Bits Generator
 {
 public:
-	SDD1_BG(SDD1_GCD* associatedGCD, UINT8 code)
+	SDD1_BG(SDD1_GCD* associatedGCD, uint8_t code)
 		: m_code_num(code),
 			m_MPScount(0),
 			m_LPSind(0),
@@ -44,19 +44,19 @@ public:
 	{
 	}
 
-	UINT8 m_code_num;
-	UINT8 m_MPScount;
-	UINT8 m_LPSind;
+	uint8_t m_code_num;
+	uint8_t m_MPScount;
+	uint8_t m_LPSind;
 	SDD1_GCD* m_GCD;
 
 	void BG_prepareDecomp();
-	UINT8 BG_getBit(UINT8 *ROM, UINT32 *mmc, UINT8* endOfRun);
+	uint8_t BG_getBit(uint8_t *ROM, uint32_t *mmc, uint8_t* endOfRun);
 } ;
 
 struct SDD1_PEM_ContextInfo
 {
-	UINT8 status;
-	UINT8 MPS;
+	uint8_t status;
+	uint8_t MPS;
 };
 
 class SDD1_PEM //Probability Estimation Module
@@ -82,7 +82,7 @@ public:
 	SDD1_BG* m_BG[8];
 
 	void PEM_prepareDecomp();
-	UINT8 PEM_getBit(UINT8 *ROM, UINT32 *mmc, UINT8 context);
+	uint8_t PEM_getBit(uint8_t *ROM, uint32_t *mmc, uint8_t context);
 } ;
 
 
@@ -92,15 +92,15 @@ public:
 	SDD1_CM(SDD1_PEM* associatedPEM)
 	: m_bitplanesInfo(0), m_contextBitsInfo(0), m_bit_number(0), m_currBitplane(0), m_PEM(associatedPEM) { }
 
-	UINT8 m_bitplanesInfo;
-	UINT8 m_contextBitsInfo;
-	UINT8 m_bit_number;
-	UINT8 m_currBitplane;
-	UINT16 m_prevBitplaneBits[8];
+	uint8_t m_bitplanesInfo;
+	uint8_t m_contextBitsInfo;
+	uint8_t m_bit_number;
+	uint8_t m_currBitplane;
+	uint16_t m_prevBitplaneBits[8];
 	SDD1_PEM* m_PEM;
 
-	void CM_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte);
-	UINT8 CM_getBit(UINT8 *ROM, UINT32 *mmc);
+	void CM_prepareDecomp(uint8_t *ROM, uint32_t *mmc, uint32_t first_byte);
+	uint8_t CM_getBit(uint8_t *ROM, uint32_t *mmc);
 } ;
 
 
@@ -110,13 +110,13 @@ public:
 	SDD1_OL(SDD1_CM* associatedCM)
 	: m_bitplanesInfo(0), m_length(0), m_buffer(nullptr), m_CM(associatedCM) { }
 
-	UINT8 m_bitplanesInfo;
-	UINT16 m_length;
-	UINT8* m_buffer;
+	uint8_t m_bitplanesInfo;
+	uint16_t m_length;
+	uint8_t* m_buffer;
 	SDD1_CM* m_CM;
 
-	void OL_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte, UINT16 out_len, UINT8 *out_buf);
-	void OL_launch(UINT8 *ROM, UINT32 *mmc);
+	void OL_prepareDecomp(uint8_t *ROM, uint32_t *mmc, uint32_t first_byte, uint16_t out_len, uint8_t *out_buf);
+	void OL_launch(uint8_t *ROM, uint32_t *mmc);
 } ;
 
 class SDD1_emu
@@ -140,7 +140,7 @@ public:
 	std::unique_ptr<SDD1_CM> m_CM;
 	std::unique_ptr<SDD1_OL> m_OL;
 
-	void SDD1emu_decompress(UINT8 *ROM, UINT32 *mmc, UINT32 in_buf, UINT16 out_len, UINT8 *out_buf);
+	void SDD1emu_decompress(uint8_t *ROM, uint32_t *mmc, uint32_t in_buf, uint16_t out_len, uint8_t *out_buf);
 
 private:
 	running_machine& m_machine;
@@ -155,8 +155,8 @@ class sns_rom_sdd1_device : public device_t,
 {
 public:
 	// construction/destruction
-	sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -170,26 +170,26 @@ public:
 	virtual DECLARE_READ8_MEMBER(chip_read) override;
 	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
-	UINT8 read_helper(UINT32 offset);
+	uint8_t read_helper(uint32_t offset);
 
-	UINT8 m_sdd1_enable;  // channel bit-mask
-	UINT8 m_xfer_enable;  // channel bit-mask
-	UINT32 m_mmc[4];      // memory map controller ROM indices
+	uint8_t m_sdd1_enable;  // channel bit-mask
+	uint8_t m_xfer_enable;  // channel bit-mask
+	uint32_t m_mmc[4];      // memory map controller ROM indices
 
 	struct
 	{
-		UINT32 addr;    // $43x2-$43x4 -- DMA transfer address
-		UINT16 size;    // $43x5-$43x6 -- DMA transfer size
+		uint32_t addr;    // $43x2-$43x4 -- DMA transfer address
+		uint16_t size;    // $43x5-$43x6 -- DMA transfer size
 	} m_dma[8];
 
 	std::unique_ptr<SDD1_emu> m_sdd1emu;
 
 	struct
 	{
-		std::unique_ptr<UINT8[]> data;    // pointer to decompressed S-DD1 data (65536 bytes)
-		UINT16 offset;  // read index into S-DD1 decompression buffer
-		UINT32 size;    // length of data buffer; reads decrement counter, set ready to false at 0
-		UINT8 ready;    // 1 when data[] is valid; 0 to invoke sdd1emu.decompress()
+		std::unique_ptr<uint8_t[]> data;    // pointer to decompressed S-DD1 data (65536 bytes)
+		uint16_t offset;  // read index into S-DD1 decompression buffer
+		uint32_t size;    // length of data buffer; reads decrement counter, set ready to false at 0
+		uint8_t ready;    // 1 when data[] is valid; 0 to invoke sdd1emu.decompress()
 	} m_buffer;
 };
 

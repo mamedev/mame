@@ -27,13 +27,13 @@ public:
 	virtual ~device_kcexp_interface();
 
 	// reading and writing
-	virtual UINT8 module_id_r() { return 0xff; }
-	virtual void control_w(UINT8 data) { }
-	virtual void read(offs_t offset, UINT8 &data) { }
-	virtual void write(offs_t offset, UINT8 data) { }
-	virtual void io_read(offs_t offset, UINT8 &data) { }
-	virtual void io_write(offs_t offset, UINT8 data) { }
-	virtual UINT8* get_cart_base() { return nullptr; }
+	virtual uint8_t module_id_r() { return 0xff; }
+	virtual void control_w(uint8_t data) { }
+	virtual void read(offs_t offset, uint8_t &data) { }
+	virtual void write(offs_t offset, uint8_t data) { }
+	virtual void io_read(offs_t offset, uint8_t &data) { }
+	virtual void io_write(offs_t offset, uint8_t data) { }
+	virtual uint8_t* get_cart_base() { return nullptr; }
 	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) { };
 };
 
@@ -44,8 +44,8 @@ class kcexp_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual ~kcexp_slot_device();
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
@@ -59,12 +59,12 @@ public:
 	static void static_set_next_slot(device_t &device, const char *next_module_tag);
 
 	// reading and writing
-	virtual UINT8 module_id_r();
-	virtual void control_w(UINT8 data);
-	virtual void read(offs_t offset, UINT8 &data);
-	virtual void write(offs_t offset, UINT8 data);
-	virtual void io_read(offs_t offset, UINT8 &data);
-	virtual void io_write(offs_t offset, UINT8 data);
+	virtual uint8_t module_id_r();
+	virtual void control_w(uint8_t data);
+	virtual void read(offs_t offset, uint8_t &data);
+	virtual void write(offs_t offset, uint8_t data);
+	virtual void io_read(offs_t offset, uint8_t &data);
+	virtual void io_write(offs_t offset, uint8_t data);
 	virtual DECLARE_WRITE_LINE_MEMBER( mei_w );
 	virtual DECLARE_WRITE_LINE_MEMBER( meo_w );
 
@@ -85,7 +85,7 @@ class kccart_slot_device : public kcexp_slot_device,
 {
 public:
 	// construction/destruction
-	kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~kccart_slot_device();
 
 	// device-level overrides

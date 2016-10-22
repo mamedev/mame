@@ -313,11 +313,11 @@ WRITE_LINE_MEMBER(spiders_state::flipscreen_w)
 
 MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 {
-	UINT8 x = 0;
+	uint8_t x = 0;
 
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		UINT8 data1, data2, data3;
+		uint8_t data1, data2, data3;
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 3) & 0x3f00) |
@@ -333,7 +333,7 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 
 		for (int i = 0; i < 8; i++)
 		{
-			UINT8 color;
+			uint8_t color;
 
 			if (m_flipscreen)
 			{
@@ -389,11 +389,11 @@ WRITE8_MEMBER(spiders_state::gfx_rom_intf_w)
 
 READ8_MEMBER(spiders_state::gfx_rom_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	if (m_gfx_rom_ctrl_mode)
 	{
-		UINT8 *rom = memregion("gfx1")->base();
+		uint8_t *rom = memregion("gfx1")->base();
 
 		ret = rom[m_gfx_rom_address];
 
@@ -401,7 +401,7 @@ READ8_MEMBER(spiders_state::gfx_rom_r)
 	}
 	else
 	{
-		UINT8 shift_count = m_gfx_rom_ctrl_latch << 2;
+		uint8_t shift_count = m_gfx_rom_ctrl_latch << 2;
 		m_gfx_rom_address = (m_gfx_rom_address & ~(0x0f << shift_count)) | (m_gfx_rom_ctrl_data << shift_count);
 
 		ret = 0;

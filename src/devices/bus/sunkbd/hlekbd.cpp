@@ -755,7 +755,7 @@ hle_device_base::hle_device_base(
 		char const *name,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock,
+		uint32_t clock,
 		char const *shortname,
 		char const *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
@@ -880,7 +880,7 @@ void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int par
 	switch (id)
 	{
 	case CLICK_TIMER_ID:
-		m_beeper_state &= ~UINT8(BEEPER_CLICK);
+		m_beeper_state &= ~uint8_t(BEEPER_CLICK);
 		m_beeper->set_state(m_beeper_state ? 1 : 0);
 		break;
 
@@ -922,7 +922,7 @@ void hle_device_base::tra_complete()
     handle a key being pressed
 --------------------------------------------------*/
 
-void hle_device_base::key_make(UINT8 row, UINT8 column)
+void hle_device_base::key_make(uint8_t row, uint8_t column)
 {
 	// we should have stopped processing if we filled the FIFO
 	assert(!fifo_full());
@@ -931,7 +931,7 @@ void hle_device_base::key_make(UINT8 row, UINT8 column)
 	transmit_byte((row << 4) | column);
 	if (m_keyclick)
 	{
-		m_beeper_state |= UINT8(BEEPER_CLICK);
+		m_beeper_state |= uint8_t(BEEPER_CLICK);
 		m_beeper->set_state(m_beeper_state ? 1 : 0);
 		m_click_timer->reset(attotime::from_msec(5));
 	}
@@ -947,7 +947,7 @@ void hle_device_base::key_make(UINT8 row, UINT8 column)
     handle a key being released
 --------------------------------------------------*/
 
-void hle_device_base::key_break(UINT8 row, UINT8 column)
+void hle_device_base::key_break(uint8_t row, uint8_t column)
 {
 	// we should have stopped processing if we filled the FIFO
 	assert(!fifo_full());
@@ -968,7 +968,7 @@ void hle_device_base::key_break(UINT8 row, UINT8 column)
     send a byte or queue it to send later
 --------------------------------------------------*/
 
-void hle_device_base::transmit_byte(UINT8 byte)
+void hle_device_base::transmit_byte(uint8_t byte)
 {
 	device_buffered_serial_interface::transmit_byte(byte);
 	if (fifo_full())
@@ -981,7 +981,7 @@ void hle_device_base::transmit_byte(UINT8 byte)
     handle received byte frame
 --------------------------------------------------*/
 
-void hle_device_base::received_byte(UINT8 byte)
+void hle_device_base::received_byte(uint8_t byte)
 {
 	switch (m_rx_state)
 	{
@@ -1004,13 +1004,13 @@ void hle_device_base::received_byte(UINT8 byte)
 			break;
 
 		case COMMAND_BELL_ON:
-			m_beeper_state |= UINT8(BEEPER_BELL);
+			m_beeper_state |= uint8_t(BEEPER_BELL);
 			m_beeper->set_state(m_beeper_state ? 1 : 0);
 			m_rx_state = RX_IDLE;
 			break;
 
 		case COMMAND_BELL_OFF:
-			m_beeper_state &= ~UINT8(BEEPER_BELL);
+			m_beeper_state &= ~uint8_t(BEEPER_BELL);
 			m_beeper->set_state(m_beeper_state ? 1 : 0);
 			m_rx_state = RX_IDLE;
 			break;
@@ -1023,7 +1023,7 @@ void hle_device_base::received_byte(UINT8 byte)
 		case COMMAND_CLICK_OFF:
 			m_keyclick = 0U;
 			m_click_timer->reset();
-			m_beeper_state &= ~UINT8(BEEPER_CLICK);
+			m_beeper_state &= ~uint8_t(BEEPER_CLICK);
 			m_beeper->set_state(m_beeper_state ? 1 : 0);
 			m_rx_state = RX_IDLE;
 			break;
@@ -1034,7 +1034,7 @@ void hle_device_base::received_byte(UINT8 byte)
 
 		case COMMAND_LAYOUT:
 			transmit_byte(0xfeU);
-			transmit_byte(UINT8(m_dips->read() & 0x3fU));
+			transmit_byte(uint8_t(m_dips->read() & 0x3fU));
 			m_rx_state = RX_IDLE;
 			break;
 
@@ -1057,7 +1057,7 @@ void hle_device_base::received_byte(UINT8 byte)
     response
 --------------------------------------------------*/
 
-UINT8 hle_type4_device_base::ident_byte()
+uint8_t hle_type4_device_base::ident_byte()
 {
 	return (m_dips->read() & 0x80U) ? 0x03U : 0x04U;
 }
@@ -1077,7 +1077,7 @@ hle_type3_device::hle_type3_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock)
+		uint32_t clock)
 	: hle_device_base(
 			mconfig,
 			SUN_TYPE3_HLE_KEYBOARD,
@@ -1108,7 +1108,7 @@ ioport_constructor hle_type3_device::device_input_ports() const
     response
 --------------------------------------------------*/
 
-UINT8 hle_type3_device::ident_byte()
+uint8_t hle_type3_device::ident_byte()
 {
 	return 0x03U;
 }
@@ -1128,7 +1128,7 @@ hle_type4_device::hle_type4_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock)
+		uint32_t clock)
 	: hle_type4_device_base(
 			mconfig,
 			SUN_TYPE4_HLE_KEYBOARD,
@@ -1167,7 +1167,7 @@ hle_type5_device::hle_type5_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock)
+		uint32_t clock)
 	: hle_type4_device_base(
 			mconfig,
 			SUN_TYPE5_HLE_KEYBOARD,
@@ -1206,7 +1206,7 @@ hle_type5_gb_device::hle_type5_gb_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock)
+		uint32_t clock)
 	: hle_type4_device_base(
 			mconfig,
 			SUN_TYPE5_HLE_KEYBOARD,
@@ -1245,7 +1245,7 @@ hle_type5_se_device::hle_type5_se_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock)
+		uint32_t clock)
 	: hle_type4_device_base(
 			mconfig,
 			SUN_TYPE5_HLE_KEYBOARD,
@@ -1284,7 +1284,7 @@ hle_type5_jp_device::hle_type5_jp_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock)
+		uint32_t clock)
 	: hle_type4_device_base(
 			mconfig,
 			SUN_TYPE5_HLE_KEYBOARD,

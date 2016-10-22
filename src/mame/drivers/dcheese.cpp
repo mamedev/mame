@@ -160,7 +160,7 @@ READ8_MEMBER(dcheese_state::sound_status_r)
 
 WRITE8_MEMBER(dcheese_state::sound_control_w)
 {
-	UINT8 diff = data ^ m_sound_control;
+	uint8_t diff = data ^ m_sound_control;
 	m_sound_control = data;
 
 	/* bit 0x20 = LED */

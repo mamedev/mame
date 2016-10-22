@@ -20,10 +20,10 @@ class atapi_cdrom_device : public atapi_hle_device,
 	public t10mmc
 {
 public:
-	atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
+	atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,const char *shortname, const char *source);
 
-	UINT16 *identify_device_buffer() { return m_identify_buffer; }
+	uint16_t *identify_device_buffer() { return m_identify_buffer; }
 
 protected:
 	// device-level overrides
@@ -41,7 +41,7 @@ protected:
 class atapi_fixed_cdrom_device : public atapi_cdrom_device
 {
 public:
-	atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	virtual void device_reset() override;
 };

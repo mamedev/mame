@@ -42,18 +42,18 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_t0;
-	UINT8 m_t1;
-	UINT8 m_p0;
-	UINT8 m_p1;
-	UINT8 m_p2;
-	UINT8 m_prog;
-	UINT8 m_bus;
-	UINT8 m_attract_mode;
-	UINT8 m_active_bank;
-	UINT8 m_pkr_io_ram[0x100];
-	UINT16 m_video_ram[0x0400];
-	UINT8 m_color_ram[0x0400];
+	uint8_t m_t0;
+	uint8_t m_t1;
+	uint8_t m_p0;
+	uint8_t m_p1;
+	uint8_t m_p2;
+	uint8_t m_prog;
+	uint8_t m_bus;
+	uint8_t m_attract_mode;
+	uint8_t m_active_bank;
+	uint8_t m_pkr_io_ram[0x100];
+	uint16_t m_video_ram[0x0400];
+	uint8_t m_color_ram[0x0400];
 	DECLARE_WRITE8_MEMBER(t0_w);
 	DECLARE_WRITE8_MEMBER(t1_w);
 	DECLARE_WRITE8_MEMBER(p0_w);
@@ -74,7 +74,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(drw80pkr);
-	UINT32 screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -138,7 +138,7 @@ WRITE8_MEMBER(drw80pkr_state::bus_w)
 
 WRITE8_MEMBER(drw80pkr_state::drw80pkr_io_w)
 {
-	UINT16 n_offs;
+	uint16_t n_offs;
 
 	if (m_p2 == 0x3f || m_p2 == 0x7f)
 	{
@@ -246,8 +246,8 @@ READ8_MEMBER(drw80pkr_state::bus_r)
 
 READ8_MEMBER(drw80pkr_state::drw80pkr_io_r)
 {
-	UINT8 ret;
-	UINT16 kbdin;
+	uint8_t ret;
+	uint16_t kbdin;
 
 	ret = 0x00;
 
@@ -345,7 +345,7 @@ void drw80pkr_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(drw80pkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
 }
 
-UINT32 drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -354,7 +354,7 @@ UINT32 drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_ind1
 
 PALETTE_INIT_MEMBER(drw80pkr_state, drw80pkr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < palette.entries(); j++)

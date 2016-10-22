@@ -68,7 +68,7 @@ const tiny_rom_entry *nubus_wsportrait_device::device_rom_region() const
 //  nubus_wsportrait_device - constructor
 //-------------------------------------------------
 
-nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, NUBUS_WSPORTRAIT, "Macintosh II Portrait Video Card", tag, owner, clock, "nb_wspt", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
@@ -77,7 +77,7 @@ nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, 
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
@@ -92,7 +92,7 @@ nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, 
 
 void nubus_wsportrait_device::device_start()
 {
-	UINT32 slotspace;
+	uint32_t slotspace;
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
@@ -103,7 +103,7 @@ void nubus_wsportrait_device::device_start()
 	printf("[wsportrait %p] slotspace = %x\n", (void *)this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	m_vram32 = (UINT32 *)&m_vram[0];
+	m_vram32 = (uint32_t *)&m_vram[0];
 
 	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_wsportrait_device::vram_r), this), write32_delegate(FUNC(nubus_wsportrait_device::vram_w), this));
 	m_nubus->install_device(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, read32_delegate(FUNC(nubus_wsportrait_device::vram_r), this), write32_delegate(FUNC(nubus_wsportrait_device::vram_w), this));
@@ -144,11 +144,11 @@ void nubus_wsportrait_device::device_timer(emu_timer &timer, device_timer_id tid
 
 ***************************************************************************/
 
-UINT32 nubus_wsportrait_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nubus_wsportrait_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels, *vram;
+	uint8_t pixels, *vram;
 
 	// first time?  kick off the VBL timer
 	vram = &m_vram[0x80];

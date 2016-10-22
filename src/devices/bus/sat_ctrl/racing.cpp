@@ -56,7 +56,7 @@ ioport_constructor saturn_wheel_device::device_input_ports() const
 //  saturn_wheel_device - constructor
 //-------------------------------------------------
 
-saturn_wheel_device::saturn_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+saturn_wheel_device::saturn_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, SATURN_WHEEL, "Sega Saturn Racing Wheel", tag, owner, clock, "saturn_racing", __FILE__),
 					device_saturn_control_port_interface(mconfig, *this),
 					m_joy(*this, "JOY"),
@@ -88,9 +88,9 @@ void saturn_wheel_device::device_reset()
 //  read_ctrl
 //-------------------------------------------------
 
-UINT8 saturn_wheel_device::read_ctrl(UINT8 offset)
+uint8_t saturn_wheel_device::read_ctrl(uint8_t offset)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 	switch (offset)
 	{
 		case 0:

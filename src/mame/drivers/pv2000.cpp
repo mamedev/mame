@@ -62,9 +62,9 @@ public:
 	DECLARE_READ8_MEMBER(cass_in);
 	DECLARE_WRITE8_MEMBER(cass_out);
 	bool m_last_state;
-	UINT8 m_key_pressed;
-	UINT8 m_keyb_column;
-	UINT8 m_cass_conf;
+	uint8_t m_key_pressed;
+	uint8_t m_keyb_column;
+	uint8_t m_cass_conf;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
@@ -96,7 +96,7 @@ WRITE8_MEMBER( pv2000_state::keys_w )
 
 READ8_MEMBER( pv2000_state::keys_hi_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	char kbdrow[6];
 
 	switch ( m_keyb_column )
@@ -120,7 +120,7 @@ READ8_MEMBER( pv2000_state::keys_hi_r )
 
 READ8_MEMBER( pv2000_state::keys_lo_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	char kbdrow[6];
 
 	logerror("%s: pv2000_keys_r\n", machine().describe_context() );
@@ -321,7 +321,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 	if ( m_keyb_column == 0x0f )
 	{
 		/* Check if a key is pressed */
-		UINT8 key_pressed;
+		uint8_t key_pressed;
 
 		key_pressed = ioport( "IN0" )->read()
 			| ioport( "IN1" )->read()
@@ -362,7 +362,7 @@ void pv2000_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x2000 && size != 0x4000)
 	{

@@ -32,10 +32,10 @@ public:
 	device_nes_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_nes_control_port_interface();
 
-	virtual UINT8 read_bit0() { return 0; };
-	virtual UINT8 read_bit34() { return 0; };
-	virtual UINT8 read_exp(offs_t offset) { return 0; };
-	virtual void write(UINT8 data) { };
+	virtual uint8_t read_bit0() { return 0; };
+	virtual uint8_t read_bit34() { return 0; };
+	virtual uint8_t read_exp(offs_t offset) { return 0; };
+	virtual void write(uint8_t data) { };
 
 protected:
 	nes_control_port_device *m_port;
@@ -53,15 +53,15 @@ class nes_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_control_port_device();
 
 	static void set_brightpixel_callback(device_t &device, nesctrl_brightpixel_delegate callback) { downcast<nes_control_port_device &>(device).m_brightpixel_cb = callback; }
 
-	UINT8 read_bit0();
-	UINT8 read_bit34();
-	UINT8 read_exp(offs_t offset);
-	void write(UINT8 data);
+	uint8_t read_bit0();
+	uint8_t read_bit34();
+	uint8_t read_exp(offs_t offset);
+	void write(uint8_t data);
 
 	nesctrl_brightpixel_delegate m_brightpixel_cb;
 

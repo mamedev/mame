@@ -64,7 +64,7 @@ machine_config_constructor sv806_device::device_mconfig_additions() const
 //  sv806_device - constructor
 //-------------------------------------------------
 
-sv806_device::sv806_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sv806_device::sv806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SV806, "SV-806 80 Column Cartridge", tag, owner, clock, "sv806", __FILE__),
 	device_svi_slot_interface(mconfig, *this),
 	m_crtc(*this, "crtc"),
@@ -72,7 +72,7 @@ sv806_device::sv806_device(const machine_config &mconfig, const char *tag, devic
 	m_gfx(*this, "gfx"),
 	m_ram_enabled(0)
 {
-	m_ram = std::make_unique<UINT8[]>(0x800);
+	m_ram = std::make_unique<uint8_t[]>(0x800);
 	memset(m_ram.get(), 0xff, 0x800);
 }
 
@@ -98,7 +98,7 @@ MC6845_UPDATE_ROW( sv806_device::crtc_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		UINT8 data = m_gfx->u8((m_ram[(ma + i) & 0x7ff] << 4) | ra);
+		uint8_t data = m_gfx->u8((m_ram[(ma + i) & 0x7ff] << 4) | ra);
 
 		if (i == cursor_x)
 			data = 0xff;

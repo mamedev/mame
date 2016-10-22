@@ -66,8 +66,8 @@ Heavy use is made of sprite zooming.
 
 void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
-	UINT32 *spriteram32 = m_spriteram;
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
+	uint32_t *spriteram32 = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -209,9 +209,9 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
-	UINT32 *spriteram32 = m_spriteram;
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
-	UINT8 *spritemapHibit = (UINT8 *)memregion("user2")->base();
+	uint32_t *spriteram32 = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
+	uint8_t *spritemapHibit = (uint8_t *)memregion("user2")->base();
 
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
@@ -345,12 +345,12 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
                 SCREEN REFRESH
 **************************************************************/
 
-UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT8 layer[5];
-	UINT8 scclayer[3];
-	UINT16 priority;
+	uint8_t layer[5];
+	uint8_t scclayer[3];
+	uint16_t priority;
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_X))
@@ -486,12 +486,12 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 }
 
 
-UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT8 layer[5];
-	UINT8 scclayer[3];
-	UINT16 priority;
+	uint8_t layer[5];
+	uint8_t scclayer[3];
+	uint16_t priority;
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_X))

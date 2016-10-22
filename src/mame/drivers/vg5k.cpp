@@ -50,13 +50,14 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "imagedev/printer.h"
-#include "video/ef9345.h"
-#include "sound/dac.h"
-#include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "formats/vg5k_cas.h"
+#include "imagedev/cassette.h"
+#include "imagedev/printer.h"
+#include "machine/ram.h"
+#include "sound/dac.h"
+#include "sound/wave.h"
+#include "sound/volt_reg.h"
+#include "video/ef9345.h"
 #include "softlist.h"
 
 class vg5k_state : public driver_device
@@ -74,7 +75,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_device<printer_image_device> m_printer;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -138,7 +139,7 @@ READ8_MEMBER ( vg5k_state::cassette_r )
 
 WRITE8_MEMBER ( vg5k_state::cassette_w )
 {
-	m_dac->write_unsigned8(data <<2);
+	m_dac->write(BIT(data, 3));
 
 	if (data == 0x03)
 		m_cassette->output(+1);
@@ -296,7 +297,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::z80_irq)
 
 TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::vg5k_scanline)
 {
-	m_ef9345->update_scanline((UINT16)param);
+	m_ef9345->update_scanline((uint16_t)param);
 }
 
 
@@ -330,8 +331,8 @@ GFXDECODE_END
 
 DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 {
-	UINT8 *FNT = memregion("ef9345")->base();
-	UINT16 a,b,c,d,dest=0x2000;
+	uint8_t *FNT = memregion("ef9345")->base();
+	uint16_t a,b,c,d,dest=0x2000;
 
 	/* Unscramble the chargen rom as the format is too complex for gfxdecode to handle unaided */
 	for (a = 0; a < 8192; a+=4096)
@@ -343,8 +344,8 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 
 	/* install expansion memory*/
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
-	UINT16 ram_size = m_ram->size();
+	uint8_t *ram = m_ram->pointer();
+	uint16_t ram_size = m_ram->size();
 
 	if (ram_size > 0x4000)
 		program.install_ram(0x8000, 0x3fff + ram_size, ram);
@@ -377,13 +378,14 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cassette */
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(vg5k_cassette_formats)

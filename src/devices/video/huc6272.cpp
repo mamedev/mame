@@ -42,7 +42,7 @@ const address_space_config *huc6272_device::memory_space_config(address_spacenum
 //  read_dword - read a dword at the given address
 //-------------------------------------------------
 
-inline UINT32 huc6272_device::read_dword(offs_t address)
+inline uint32_t huc6272_device::read_dword(offs_t address)
 {
 	return space().read_dword(address << 2);
 }
@@ -52,7 +52,7 @@ inline UINT32 huc6272_device::read_dword(offs_t address)
 //  write_dword - write a dword at the given address
 //-------------------------------------------------
 
-inline void huc6272_device::write_dword(offs_t address, UINT32 data)
+inline void huc6272_device::write_dword(offs_t address, uint32_t data)
 {
 	space().write_dword(address << 2, data);
 }
@@ -65,7 +65,7 @@ inline void huc6272_device::write_dword(offs_t address, UINT32 data)
 //  huc6272_device - constructor
 //-------------------------------------------------
 
-huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, huc6272, "huc6272", tag, owner, clock, "huc6272", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 32, 32, 0, nullptr, *ADDRESS_MAP_NAME(huc6272_vram))
@@ -107,7 +107,7 @@ void huc6272_device::device_reset()
 
 READ32_MEMBER( huc6272_device::read )
 {
-	UINT32 res = 0;
+	uint32_t res = 0;
 
 	if((offset & 1) == 0)
 	{

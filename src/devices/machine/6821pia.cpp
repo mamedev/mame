@@ -49,7 +49,7 @@ const device_type PIA6821 = &device_creator<pia6821_device>;
 //  pia6821_device - constructor
 //-------------------------------------------------
 
-pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PIA6821, "6821 PIA", tag, owner, clock, "pia6821", __FILE__),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),
@@ -218,10 +218,10 @@ void pia6821_device::update_interrupts()
 //  get_in_a_value
 //-------------------------------------------------
 
-UINT8 pia6821_device::get_in_a_value()
+uint8_t pia6821_device::get_in_a_value()
 {
-	UINT8 port_a_data = 0;
-	UINT8 ret;
+	uint8_t port_a_data = 0;
+	uint8_t ret;
 
 	// update the input
 	if (!m_in_a_handler.isnull())
@@ -262,9 +262,9 @@ UINT8 pia6821_device::get_in_a_value()
 //  get_in_b_value
 //-------------------------------------------------
 
-UINT8 pia6821_device::get_in_b_value()
+uint8_t pia6821_device::get_in_b_value()
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	if (m_ddr_b == 0xff)
 	{
@@ -273,7 +273,7 @@ UINT8 pia6821_device::get_in_b_value()
 	}
 	else
 	{
-		UINT8 port_b_data;
+		uint8_t port_b_data;
 
 		// update the input
 		if (!m_in_b_handler.isnull())
@@ -311,9 +311,9 @@ UINT8 pia6821_device::get_in_b_value()
 //  get_out_a_value
 //-------------------------------------------------
 
-UINT8 pia6821_device::get_out_a_value()
+uint8_t pia6821_device::get_out_a_value()
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	if (m_ddr_a == 0xff)
 	{
@@ -334,7 +334,7 @@ UINT8 pia6821_device::get_out_a_value()
 //  get_out_b_value
 //-------------------------------------------------
 
-UINT8 pia6821_device::get_out_b_value()
+uint8_t pia6821_device::get_out_b_value()
 {
 	// input pins are high-impedance - we just send them as zeros for backwards compatibility
 	return m_out_b & m_ddr_b;
@@ -404,9 +404,9 @@ void pia6821_device::set_out_cb2(int data)
 //  port_a_r
 //-------------------------------------------------
 
-UINT8 pia6821_device::port_a_r()
+uint8_t pia6821_device::port_a_r()
 {
-	UINT8 ret = get_in_a_value();
+	uint8_t ret = get_in_a_value();
 
 	// IRQ flags implicitly cleared by a read
 	m_irq_a1 = FALSE;
@@ -436,9 +436,9 @@ UINT8 pia6821_device::port_a_r()
 //  ddr_a_r
 //-------------------------------------------------
 
-UINT8 pia6821_device::ddr_a_r()
+uint8_t pia6821_device::ddr_a_r()
 {
-	UINT8 ret = m_ddr_a;
+	uint8_t ret = m_ddr_a;
 
 	LOG(("PIA #%s: DDR A read = %02X\n", tag(), ret));
 
@@ -450,9 +450,9 @@ UINT8 pia6821_device::ddr_a_r()
 //  port_b_r
 //-------------------------------------------------
 
-UINT8 pia6821_device::port_b_r()
+uint8_t pia6821_device::port_b_r()
 {
-	UINT8 ret = get_in_b_value();
+	uint8_t ret = get_in_b_value();
 
 	// This read will implicitly clear the IRQ B1 flag.  If CB2 is in write-strobe
 	// mode with CB1 restore, and a CB1 active transition set the flag,
@@ -478,9 +478,9 @@ UINT8 pia6821_device::port_b_r()
 //  ddr_b_r
 //-------------------------------------------------
 
-UINT8 pia6821_device::ddr_b_r()
+uint8_t pia6821_device::ddr_b_r()
 {
-	UINT8 ret = m_ddr_b;
+	uint8_t ret = m_ddr_b;
 
 	LOG(("PIA #%s: DDR B read = %02X\n", tag(), ret));
 
@@ -492,9 +492,9 @@ UINT8 pia6821_device::ddr_b_r()
 //  control_a_r
 //-------------------------------------------------
 
-UINT8 pia6821_device::control_a_r()
+uint8_t pia6821_device::control_a_r()
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	// update CA1 & CA2 if callback exists, these in turn may update IRQ's
 	if (!m_in_ca1_handler.isnull())
@@ -541,9 +541,9 @@ UINT8 pia6821_device::control_a_r()
 //  control_b_r
 //-------------------------------------------------
 
-UINT8 pia6821_device::control_b_r()
+uint8_t pia6821_device::control_b_r()
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	// update CB1 & CB2 if callback exists, these in turn may update IRQ's
 	if(!m_in_cb1_handler.isnull())
@@ -586,9 +586,9 @@ UINT8 pia6821_device::control_b_r()
 //  read
 //-------------------------------------------------
 
-UINT8 pia6821_device::reg_r(UINT8 offset)
+uint8_t pia6821_device::reg_r(uint8_t offset)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	switch (offset & 0x03)
 	{
@@ -636,7 +636,7 @@ UINT8 pia6821_device::reg_r(UINT8 offset)
 void pia6821_device::send_to_out_a_func(const char* message)
 {
 	// input pins are pulled high
-	UINT8 data = get_out_a_value();
+	uint8_t data = get_out_a_value();
 
 	LOG(("PIA #%s: %s = %02X\n", tag(), message, data));
 
@@ -663,7 +663,7 @@ void pia6821_device::send_to_out_a_func(const char* message)
 void pia6821_device::send_to_out_b_func(const char* message)
 {
 	// input pins are high-impedance - we just send them as zeros for backwards compatibility
-	UINT8 data = get_out_b_value();
+	uint8_t data = get_out_b_value();
 
 	LOG(("PIA #%s: %s = %02X\n", tag(), message, data));
 
@@ -687,7 +687,7 @@ void pia6821_device::send_to_out_b_func(const char* message)
 //  port_a_w
 //-------------------------------------------------
 
-void pia6821_device::port_a_w(UINT8 data)
+void pia6821_device::port_a_w(uint8_t data)
 {
 	// buffer the output value
 	m_out_a = data;
@@ -700,7 +700,7 @@ void pia6821_device::port_a_w(UINT8 data)
 //  ddr_a_w
 //-------------------------------------------------
 
-void pia6821_device::ddr_a_w(UINT8 data)
+void pia6821_device::ddr_a_w(uint8_t data)
 {
 	if(data == 0x00)
 	{
@@ -729,7 +729,7 @@ void pia6821_device::ddr_a_w(UINT8 data)
 //  port_b_w
 //-------------------------------------------------
 
-void pia6821_device::port_b_w(UINT8 data)
+void pia6821_device::port_b_w(uint8_t data)
 {
 	// buffer the output value
 	m_out_b = data;
@@ -755,7 +755,7 @@ void pia6821_device::port_b_w(UINT8 data)
 //  ddr_b_w
 //-------------------------------------------------
 
-void pia6821_device::ddr_b_w(UINT8 data)
+void pia6821_device::ddr_b_w(uint8_t data)
 {
 	if (data == 0x00)
 	{
@@ -784,7 +784,7 @@ void pia6821_device::ddr_b_w(UINT8 data)
 //  control_a_w
 //-------------------------------------------------
 
-void pia6821_device::control_a_w(UINT8 data)
+void pia6821_device::control_a_w(uint8_t data)
 {
 	// bit 7 and 6 are read only
 	data &= 0x3f;
@@ -822,7 +822,7 @@ void pia6821_device::control_a_w(UINT8 data)
 //  control_b_w
 //-------------------------------------------------
 
-void pia6821_device::control_b_w(UINT8 data)
+void pia6821_device::control_b_w(uint8_t data)
 {
 	int temp;
 
@@ -856,7 +856,7 @@ void pia6821_device::control_b_w(UINT8 data)
 //  write
 //-------------------------------------------------
 
-void pia6821_device::reg_w(UINT8 offset, UINT8 data)
+void pia6821_device::reg_w(uint8_t offset, uint8_t data)
 {
 	switch (offset & 0x03)
 	{
@@ -898,7 +898,7 @@ void pia6821_device::reg_w(UINT8 offset, UINT8 data)
 //  set_a_input
 //-------------------------------------------------
 
-void pia6821_device::set_a_input(UINT8 data, UINT8 z_mask)
+void pia6821_device::set_a_input(uint8_t data, uint8_t z_mask)
 {
 	assert_always(m_in_a_handler.isnull(), "pia6821_porta_w() called when in_a_func implemented");
 
@@ -914,7 +914,7 @@ void pia6821_device::set_a_input(UINT8 data, UINT8 z_mask)
 //  pia6821_porta_w
 //-------------------------------------------------
 
-void pia6821_device::porta_w(UINT8 data)
+void pia6821_device::porta_w(uint8_t data)
 {
 	set_a_input(data, 0);
 }
@@ -924,7 +924,7 @@ void pia6821_device::porta_w(UINT8 data)
 //  a_output
 //-------------------------------------------------
 
-UINT8 pia6821_device::a_output()
+uint8_t pia6821_device::a_output()
 {
 	m_out_a_needs_pulled = false;
 
@@ -1021,7 +1021,7 @@ int pia6821_device::ca2_output_z()
 //  portb_w
 //-------------------------------------------------
 
-void pia6821_device::portb_w(UINT8 data)
+void pia6821_device::portb_w(uint8_t data)
 {
 	assert_always(m_in_b_handler.isnull(), "pia_set_input_b() called when in_b_func implemented");
 
@@ -1036,7 +1036,7 @@ void pia6821_device::portb_w(UINT8 data)
 //  b_output
 //-------------------------------------------------
 
-UINT8 pia6821_device::b_output()
+uint8_t pia6821_device::b_output()
 {
 	m_out_b_needs_pulled = false;
 

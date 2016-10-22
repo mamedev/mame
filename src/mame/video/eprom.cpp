@@ -23,7 +23,7 @@ void eprom_state::update_palette()
 	for (color = 0; color < 0x800; ++color)
 	{
 		int i, r, g, b;
-		UINT16 const data = m_generic_paletteram_16[color];
+		uint16_t const data = m_generic_paletteram_16[color];
 
 		/* FIXME this is only a very crude approximation of the palette output.
 		 * The circuit involves a dozen transistors and probably has an output
@@ -53,7 +53,7 @@ void eprom_state::update_palette()
 
 TILE_GET_INFO_MEMBER(eprom_state::get_alpha_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
@@ -63,8 +63,8 @@ TILE_GET_INFO_MEMBER(eprom_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(eprom_state::get_playfield_tile_info)
 {
-	UINT16 data1 = tilemap.basemem_read(tile_index);
-	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
+	uint16_t data1 = tilemap.basemem_read(tile_index);
+	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -73,8 +73,8 @@ TILE_GET_INFO_MEMBER(eprom_state::get_playfield_tile_info)
 
 TILE_GET_INFO_MEMBER(eprom_state::guts_get_playfield_tile_info)
 {
-	UINT16 data1 = tilemap.basemem_read(tile_index);
-	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
+	uint16_t data1 = tilemap.basemem_read(tile_index);
+	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO_MEMBER(2, code, color, (data1 >> 15) & 1);
@@ -200,7 +200,7 @@ void eprom_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_video_disable)
 	{
@@ -221,8 +221,8 @@ UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bit
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap.pix16(y);
-			UINT16 *pf = &bitmap.pix16(y);
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{
@@ -327,8 +327,8 @@ UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bit
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap.pix16(y);
-			UINT16 *pf = &bitmap.pix16(y);
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{
@@ -347,7 +347,7 @@ UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-UINT32 eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_video_disable)
 	{
@@ -368,8 +368,8 @@ UINT32 eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitm
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap.pix16(y);
-			UINT16 *pf = &bitmap.pix16(y);
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{
@@ -393,8 +393,8 @@ UINT32 eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitm
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap.pix16(y);
-			UINT16 *pf = &bitmap.pix16(y);
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{

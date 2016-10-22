@@ -76,7 +76,7 @@ struct floppy_t
 	unsigned int loadedtrack_dirty : 1; /* has data in track buffer been modified? */
 	size_t loadedtrack_size;        /* size of loaded track */
 	size_t loadedtrack_pos;         /* position within loaded track */
-	UINT8 *loadedtrack_data;        /* pointer to track buffer */
+	uint8_t *loadedtrack_data;        /* pointer to track buffer */
 
 	int is_fdhd;                /* is drive an FDHD? */
 	int is_400k;                /* drive is single-sided, which means 400K */
@@ -106,7 +106,7 @@ static void load_track_data(device_t *device,int floppy_select)
 {
 	int track_size;
 	legacy_floppy_image_device *cur_image;
-	UINT8 *new_data;
+	uint8_t *new_data;
 	floppy_t *f;
 
 	f = &sony.floppy[floppy_select];
@@ -121,7 +121,7 @@ static void load_track_data(device_t *device,int floppy_select)
 
 	track_size = floppy_get_track_size(fimg, f->head, cur_image->floppy_drive_get_current_track());
 	if (f->loadedtrack_data) auto_free(device->machine(),f->loadedtrack_data);
-	new_data = auto_alloc_array(device->machine(),UINT8,track_size);
+	new_data = auto_alloc_array(device->machine(),uint8_t,track_size);
 	if (!new_data)
 	{
 		return;
@@ -156,9 +156,9 @@ static void save_track_data(device_t *device, int floppy_select)
 
 
 
-UINT8 sony_read_data(device_t *device)
+uint8_t sony_read_data(device_t *device)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 	legacy_floppy_image_device *cur_image;
 	floppy_t *f;
 
@@ -184,7 +184,7 @@ UINT8 sony_read_data(device_t *device)
 
 
 
-void sony_write_data(device_t *device,UINT8 data)
+void sony_write_data(device_t *device,uint8_t data)
 {
 	device_image_interface *cur_image;
 	floppy_t *f;
@@ -462,7 +462,7 @@ static void sony_doaction(device_t *device)
 	}
 }
 
-void sony_set_lines(device_t *device,UINT8 lines)
+void sony_set_lines(device_t *device,uint8_t lines)
 {
 	int old_sony_lines = sony.lines;
 
@@ -531,7 +531,7 @@ const device_type FLOPPY_SONY = &device_creator<sonydriv_floppy_image_device>;
 //  sonydriv_floppy_image_device - constructor
 //-------------------------------------------------
 
-sonydriv_floppy_image_device::sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sonydriv_floppy_image_device::sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: legacy_floppy_image_device(mconfig, FLOPPY_SONY, "Floppy Disk [Sony]", tag, owner, clock, "floppy_sonny", __FILE__)
 {
 }

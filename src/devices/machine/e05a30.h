@@ -46,7 +46,7 @@
 class e05a30_device : public device_t
 {
 public:
-	e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~e05a30_device() {}
 
 	template<class _Object> static devcb_base &set_printhead_wr_callback(device_t &device, _Object object) { return downcast<e05a30_device &>(device).m_write_printhead.set_callback(object); }
@@ -90,24 +90,24 @@ private:
 	devcb_write_line m_write_centronics_fault;
 	devcb_write_line m_write_centronics_select;
 
-	void update_printhead(int pos, UINT8 data);
-	void update_pf_stepper(UINT8 data);
-	void update_cr_stepper(UINT8 data);
+	void update_printhead(int pos, uint8_t data);
+	void update_pf_stepper(uint8_t data);
+	void update_cr_stepper(uint8_t data);
 
 	/* port 0x05 and 0x06 (9-bit) */
-	UINT16 m_printhead;
+	uint16_t m_printhead;
 	/* port 0x07 (4-bit) */
-	UINT8 m_pf_stepper;
+	uint8_t m_pf_stepper;
 	/* port 0x08 (4-bit) */
-	UINT8 m_cr_stepper;
+	uint8_t m_cr_stepper;
 
 	/* Centronics stuff */
-	UINT8 m_centronics_data;
+	uint8_t m_centronics_data;
 	int m_centronics_busy;
 	int m_centronics_nack;
-	UINT8 m_centronics_strobe;
-	UINT8 m_centronics_data_latch;
-	UINT8 m_centronics_data_latched;
+	uint8_t m_centronics_strobe;
+	uint8_t m_centronics_data_latch;
+	uint8_t m_centronics_data_latched;
 };
 
 extern const device_type E05A30;

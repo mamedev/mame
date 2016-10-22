@@ -49,7 +49,7 @@ ioport_constructor neogeo_irrmaze_device::device_input_ports() const
 //  neogeo_irrmaze_device - constructor
 //-------------------------------------------------
 
-neogeo_irrmaze_device::neogeo_irrmaze_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_irrmaze_device::neogeo_irrmaze_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, NEOGEO_IRRMAZE, "SNK Neo Geo Irritating Maze Analog Controller", tag, owner, clock, "neogeo_irrmaze", __FILE__),
 					device_neogeo_ctrl_edge_interface(mconfig, *this),
 					m_tx(*this, "TRACK_X"),
@@ -85,7 +85,7 @@ void neogeo_irrmaze_device::device_reset()
 
 READ8_MEMBER(neogeo_irrmaze_device::in0_r)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 	if (m_ctrl_sel & 0x01)
 		res = m_ty->read();
 	else
@@ -107,7 +107,7 @@ READ8_MEMBER(neogeo_irrmaze_device::in1_r)
 //  write_ctrlsel
 //-------------------------------------------------
 
-void neogeo_irrmaze_device::write_ctrlsel(UINT8 data)
+void neogeo_irrmaze_device::write_ctrlsel(uint8_t data)
 {
 	m_ctrl_sel = data;
 }

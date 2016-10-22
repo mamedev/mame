@@ -27,7 +27,7 @@ class bbc_cumanafdc_device :
 {
 public:
 	// construction/destruction
-	bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -57,7 +57,7 @@ private:
 class bbc_cumana1_device : public bbc_cumanafdc_device
 {
 public:
-	bbc_cumana1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_cumana1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -66,7 +66,7 @@ public:
 class bbc_cumana2_device : public bbc_cumanafdc_device
 {
 public:
-	bbc_cumana2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_cumana2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;

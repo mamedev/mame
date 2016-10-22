@@ -437,7 +437,7 @@ ROM_END
 
 READ32_MEMBER( beathead_state::speedup_r )
 {
-	UINT32 result = *m_speedup_data;
+	uint32_t result = *m_speedup_data;
 	if ((space.device().safe_pcbase() & 0xfffff) == 0x006f0 && result == space.device().state().state_int(ASAP_R3))
 		space.device().execute().spin_until_interrupt();
 	return result;
@@ -450,8 +450,8 @@ READ32_MEMBER( beathead_state::movie_speedup_r )
 	if ((space.device().safe_pcbase() & 0xfffff) == 0x00a88 && (space.device().state().state_int(ASAP_R28) & 0xfffff) == 0x397c0 &&
 		m_movie_speedup_data[4] == space.device().state().state_int(ASAP_R1))
 	{
-		UINT32 temp = (INT16)result + m_movie_speedup_data[4] * 262;
-		if (temp - (UINT32)space.device().state().state_int(ASAP_R15) < (UINT32)space.device().state().state_int(ASAP_R23))
+		uint32_t temp = (int16_t)result + m_movie_speedup_data[4] * 262;
+		if (temp - (uint32_t)space.device().state().state_int(ASAP_R15) < (uint32_t)space.device().state().state_int(ASAP_R23))
 			space.device().execute().spin_until_interrupt();
 	}
 	return result;

@@ -45,7 +45,7 @@ ADDRESS_MAP_END
 
 
 // device definitions
-mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mn10200_device(mconfig, MN1020012A, "MN1020012A", tag, owner, clock, ADDRESS_MAP_NAME(mn1020012a_internal_map), "mn1020012a", __FILE__)
 { }
 
@@ -72,7 +72,7 @@ void mn10200_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-offs_t mn10200_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t mn10200_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( mn10200 );
 	return CPU_DISASSEMBLE_NAME(mn10200)(this, buffer, pc, oprom, opram, options);
@@ -328,7 +328,7 @@ void mn10200_device::check_ext_irq()
 void mn10200_device::execute_set_input(int irqnum, int state)
 {
 	// take an external IRQ
-	assert(((UINT32)irqnum) < MN10200_MAX_EXT_IRQ);
+	assert(((uint32_t)irqnum) < MN10200_MAX_EXT_IRQ);
 
 	int pin = state ? 0 : 1;
 	int old = m_p4 >> irqnum & 1;
@@ -449,15 +449,15 @@ TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 //  opcode helpers
 //-------------------------------------------------
 
-void mn10200_device::illegal(UINT8 prefix, UINT8 op)
+void mn10200_device::illegal(uint8_t prefix, uint8_t op)
 {
 	logerror("MN10200: illegal opcode %x %x @ PC=%x\n", prefix, op, m_pc);
 	m_nmicr |= 2;
 }
 
-UINT32 mn10200_device::do_add(UINT32 a, UINT32 b, UINT32 c)
+uint32_t mn10200_device::do_add(uint32_t a, uint32_t b, uint32_t c)
 {
-	UINT32 r = (a & 0xffffff) + (b & 0xffffff) + c;
+	uint32_t r = (a & 0xffffff) + (b & 0xffffff) + c;
 
 	m_psw &= 0xff00;
 	if ((a^r) & (b^r) & 0x00800000)
@@ -480,9 +480,9 @@ UINT32 mn10200_device::do_add(UINT32 a, UINT32 b, UINT32 c)
 	return r;
 }
 
-UINT32 mn10200_device::do_sub(UINT32 a, UINT32 b, UINT32 c)
+uint32_t mn10200_device::do_sub(uint32_t a, uint32_t b, uint32_t c)
 {
-	UINT32 r = (a & 0xffffff) - (b & 0xffffff) - c;
+	uint32_t r = (a & 0xffffff) - (b & 0xffffff) - c;
 
 	m_psw &= 0xff00;
 	if ((a^b) & (a^r) & 0x00800000)
@@ -505,7 +505,7 @@ UINT32 mn10200_device::do_sub(UINT32 a, UINT32 b, UINT32 c)
 	return r;
 }
 
-void mn10200_device::test_nz16(UINT16 v)
+void mn10200_device::test_nz16(uint16_t v)
 {
 	m_psw &= 0xfff0;
 	if (v & 0x8000)
@@ -514,7 +514,7 @@ void mn10200_device::test_nz16(UINT16 v)
 		m_psw |= FLAG_ZF;
 }
 
-void mn10200_device::do_jsr(UINT32 to, UINT32 ret)
+void mn10200_device::do_jsr(uint32_t to, uint32_t ret)
 {
 	m_a[3] -= 4;
 	write_mem24(m_a[3], ret);
@@ -526,7 +526,7 @@ void mn10200_device::do_branch(int condition)
 	if (condition)
 	{
 		m_cycles -= 1;
-		change_pc(m_pc + (INT8)read_arg8(m_pc));
+		change_pc(m_pc + (int8_t)read_arg8(m_pc));
 	}
 }
 
@@ -550,7 +550,7 @@ void mn10200_device::execute_run()
 	debugger_instruction_hook(this, m_pc);
 
 	m_cycles -= 1;
-	UINT8 op = read_arg8(m_pc);
+	uint8_t op = read_arg8(m_pc);
 	m_pc += 1;
 
 	// main opcodes
@@ -571,7 +571,7 @@ void mn10200_device::execute_run()
 		// mov (an), dm
 		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-			m_d[op&3] = (INT16)read_mem16(m_a[op>>2&3]);
+			m_d[op&3] = (int16_t)read_mem16(m_a[op>>2&3]);
 			break;
 
 		// movbu (an), dm
@@ -583,7 +583,7 @@ void mn10200_device::execute_run()
 		// mov dm, (d8, an)
 		case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
 		case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-			write_mem16((m_a[op>>2&3] + (INT8)read_arg8(m_pc)), m_d[op&3]);
+			write_mem16((m_a[op>>2&3] + (int8_t)read_arg8(m_pc)), m_d[op&3]);
 			m_pc += 1;
 			break;
 
@@ -591,14 +591,14 @@ void mn10200_device::execute_run()
 		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
 		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 			m_cycles -= 1;
-			write_mem24((m_a[op>>2&3] + (INT8)read_arg8(m_pc)), m_a[op&3]);
+			write_mem24((m_a[op>>2&3] + (int8_t)read_arg8(m_pc)), m_a[op&3]);
 			m_pc += 1;
 			break;
 
 		// mov (d8, an), dm
 		case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
 		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-			m_d[op&3] = (INT16)read_mem16(m_a[op>>2&3] + (INT8)read_arg8(m_pc));
+			m_d[op&3] = (int16_t)read_mem16(m_a[op>>2&3] + (int8_t)read_arg8(m_pc));
 			m_pc += 1;
 			break;
 
@@ -606,7 +606,7 @@ void mn10200_device::execute_run()
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			m_cycles -= 1;
-			m_a[op&3] = read_mem24(m_a[op>>2&3] + (INT8)read_arg8(m_pc));
+			m_a[op&3] = read_mem24(m_a[op>>2&3] + (int8_t)read_arg8(m_pc));
 			m_pc += 1;
 			break;
 
@@ -618,7 +618,7 @@ void mn10200_device::execute_run()
 
 		// mov imm8, dn
 		case 0x80: case 0x85: case 0x8a: case 0x8f:
-			m_d[op&3] = (INT8)read_arg8(m_pc);
+			m_d[op&3] = (int8_t)read_arg8(m_pc);
 			m_pc += 1;
 			break;
 
@@ -636,22 +636,22 @@ void mn10200_device::execute_run()
 
 		// extx dn
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
-			m_d[op&3] = (INT16)m_d[op&3];
+			m_d[op&3] = (int16_t)m_d[op&3];
 			break;
 
 		// extxu dn
 		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
-			m_d[op&3] = (UINT16)m_d[op&3];
+			m_d[op&3] = (uint16_t)m_d[op&3];
 			break;
 
 		// extxb dn
 		case 0xb8: case 0xb9: case 0xba: case 0xbb:
-			m_d[op&3] = (INT8)m_d[op&3];
+			m_d[op&3] = (int8_t)m_d[op&3];
 			break;
 
 		// extxbu dn
 		case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-			m_d[op&3] = (UINT8)m_d[op&3];
+			m_d[op&3] = (uint8_t)m_d[op&3];
 			break;
 
 		// mov dn, (abs16)
@@ -668,7 +668,7 @@ void mn10200_device::execute_run()
 
 		// mov (abs16), dn
 		case 0xc8: case 0xc9: case 0xca: case 0xcb:
-			m_d[op&3] = (INT16)read_mem16(read_arg16(m_pc));
+			m_d[op&3] = (int16_t)read_mem16(read_arg16(m_pc));
 			m_pc += 2;
 			break;
 
@@ -680,19 +680,19 @@ void mn10200_device::execute_run()
 
 		// add imm8, an
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
-			m_a[op&3] = do_add(m_a[op&3], (INT8)read_arg8(m_pc));
+			m_a[op&3] = do_add(m_a[op&3], (int8_t)read_arg8(m_pc));
 			m_pc += 1;
 			break;
 
 		// add imm8, dn
 		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
-			m_d[op&3] = do_add(m_d[op&3], (INT8)read_arg8(m_pc));
+			m_d[op&3] = do_add(m_d[op&3], (int8_t)read_arg8(m_pc));
 			m_pc += 1;
 			break;
 
 		// cmp imm8, dn
 		case 0xd8: case 0xd9: case 0xda: case 0xdb:
-			do_sub(m_d[op&3], (INT8)read_arg8(m_pc));
+			do_sub(m_d[op&3], (int8_t)read_arg8(m_pc));
 			m_pc += 1;
 			break;
 
@@ -789,20 +789,20 @@ void mn10200_device::execute_run()
 
 		// mov imm16, dn
 		case 0xf8: case 0xf9: case 0xfa: case 0xfb:
-			m_d[op&3] = (INT16)read_arg16(m_pc);
+			m_d[op&3] = (int16_t)read_arg16(m_pc);
 			m_pc += 2;
 			break;
 
 		// jmp label16
 		case 0xfc:
 			m_cycles -= 1;
-			change_pc(m_pc + 2 + (INT16)read_arg16(m_pc));
+			change_pc(m_pc + 2 + (int16_t)read_arg16(m_pc));
 			break;
 
 		// jsr label16
 		case 0xfd:
 			m_cycles -= 3;
-			do_jsr(m_pc + 2 + (INT16)read_arg16(m_pc), m_pc + 2);
+			do_jsr(m_pc + 2 + (int16_t)read_arg16(m_pc), m_pc + 2);
 			break;
 
 		// rts
@@ -844,7 +844,7 @@ void mn10200_device::execute_run()
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 		{
 			m_cycles -= 3;
-			UINT8 v = read_mem8(m_a[op>>2&3]);
+			uint8_t v = read_mem8(m_a[op>>2&3]);
 			test_nz16(v & m_d[op&3]);
 			write_mem8(m_a[op>>2&3], v | m_d[op&3]);
 			break;
@@ -855,7 +855,7 @@ void mn10200_device::execute_run()
 		case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 		{
 			m_cycles -= 3;
-			UINT8 v = read_mem8(m_a[op>>2&3]);
+			uint8_t v = read_mem8(m_a[op>>2&3]);
 			test_nz16(v & m_d[op&3]);
 			write_mem8(m_a[op>>2&3], v & ~m_d[op&3]);
 			break;
@@ -870,7 +870,7 @@ void mn10200_device::execute_run()
 		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			m_d[op&3] = (INT8)read_mem8(m_a[op>>2&3] + m_d[op>>4&3]);
+			m_d[op&3] = (int8_t)read_mem8(m_a[op>>2&3] + m_d[op>>4&3]);
 			break;
 
 		// movbu (di, an), dm
@@ -922,7 +922,7 @@ void mn10200_device::execute_run()
 
 		// mov (di, an), dm
 		case 0x40:
-			m_d[op&3] = (INT16)read_mem16(m_a[op>>2&3] + m_d[op>>4&3]);
+			m_d[op&3] = (int16_t)read_mem16(m_a[op>>2&3] + m_d[op>>4&3]);
 			break;
 
 		// mov am, (di, an)
@@ -991,7 +991,7 @@ void mn10200_device::execute_run()
 		// addc dn, dm
 		case 0x80:
 		{
-			UINT16 mask0 = ~FLAG_ZF | (m_psw & FLAG_ZF);
+			uint16_t mask0 = ~FLAG_ZF | (m_psw & FLAG_ZF);
 			m_d[op&3] = do_add(m_d[op&3], m_d[op>>2&3], (m_psw & FLAG_CF) ? 1 : 0);
 			m_psw &= mask0; // ZF can only be set if it was set before the operation
 			break;
@@ -1000,7 +1000,7 @@ void mn10200_device::execute_run()
 		// subc dn, dm
 		case 0x90:
 		{
-			UINT16 mask0 = ~FLAG_ZF | (m_psw & FLAG_ZF);
+			uint16_t mask0 = ~FLAG_ZF | (m_psw & FLAG_ZF);
 			m_d[op&3] = do_sub(m_d[op&3], m_d[op>>2&3], (m_psw & FLAG_CF) ? 1 : 0);
 			m_psw &= mask0; // ZF can only be set if it was set before the operation
 			break;
@@ -1064,7 +1064,7 @@ void mn10200_device::execute_run()
 		// rol dn
 		case 0x30: case 0x31: case 0x32: case 0x33:
 		{
-			UINT32 d = m_d[op&3];
+			uint32_t d = m_d[op&3];
 			test_nz16(m_d[op&3] = (d & 0xff0000) | ((d << 1) & 0x00fffe) | ((m_psw & FLAG_CF) ? 1 : 0));
 			if (d & 0x8000)
 				m_psw |= FLAG_CF;
@@ -1074,7 +1074,7 @@ void mn10200_device::execute_run()
 		// ror dn
 		case 0x34: case 0x35: case 0x36: case 0x37:
 		{
-			UINT32 d = m_d[op&3];
+			uint32_t d = m_d[op&3];
 			test_nz16(m_d[op&3] = (d & 0xff0000) | ((d >> 1) & 0x007fff) | ((m_psw & FLAG_CF) ? 0x8000 : 0));
 			if (d & 1)
 				m_psw |= FLAG_CF;
@@ -1084,7 +1084,7 @@ void mn10200_device::execute_run()
 		// asr dn
 		case 0x38: case 0x39: case 0x3a: case 0x3b:
 		{
-			UINT32 d = m_d[op&3];
+			uint32_t d = m_d[op&3];
 			test_nz16(m_d[op&3] = (d & 0xff8000) | ((d >> 1) & 0x007fff));
 			if (d & 1)
 				m_psw |= FLAG_CF;
@@ -1094,7 +1094,7 @@ void mn10200_device::execute_run()
 		// lsr dn
 		case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 		{
-			UINT32 d = m_d[op&3];
+			uint32_t d = m_d[op&3];
 			test_nz16(m_d[op&3] = (d & 0xff0000) | ((d >> 1) & 0x007fff));
 			if (d & 1)
 				m_psw |= FLAG_CF;
@@ -1106,7 +1106,7 @@ void mn10200_device::execute_run()
 		case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
 		{
 			m_cycles -= 10;
-			UINT32 res = ((INT16)m_d[op&3]) * ((INT16)m_d[op>>2&3]);
+			uint32_t res = ((int16_t)m_d[op&3]) * ((int16_t)m_d[op>>2&3]);
 			m_d[op&3] = res & 0xffffff;
 			m_psw &= 0xff00; // f4 is undefined
 			if (res & 0x80000000)
@@ -1122,7 +1122,7 @@ void mn10200_device::execute_run()
 		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 		{
 			m_cycles -= 10;
-			UINT32 res = ((UINT16)m_d[op&3]) * ((UINT16)m_d[op>>2&3]);
+			uint32_t res = ((uint16_t)m_d[op&3]) * ((uint16_t)m_d[op>>2&3]);
 			m_d[op&3] = res & 0xffffff;
 			m_psw &= 0xff00; // f4 is undefined
 			if (res & 0x80000000)
@@ -1137,12 +1137,12 @@ void mn10200_device::execute_run()
 		case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
 		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 		{
-			UINT32 n, d, q, r;
+			uint32_t n, d, q, r;
 			m_cycles -= 11;
 			m_psw &= 0xff00; // f7 may be undefined
 
-			n = (m_mdr << 16) | (UINT16)m_d[op&3];
-			d = (UINT16)m_d[op>>2&3];
+			n = (m_mdr << 16) | (uint16_t)m_d[op&3];
+			d = (uint16_t)m_d[op>>2&3];
 			if (d == 0)
 			{
 				// divide by 0
@@ -1308,7 +1308,7 @@ void mn10200_device::execute_run()
 		// mov (d24, an), dm
 		case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-			m_d[op&3] = (INT16)read_mem16(m_a[op>>2&3] + read_arg24(m_pc));
+			m_d[op&3] = (int16_t)read_mem16(m_a[op>>2&3] + read_arg24(m_pc));
 			break;
 
 		// movbu (d24, an), dm
@@ -1320,7 +1320,7 @@ void mn10200_device::execute_run()
 		// movb (d24, an), dm
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
-			m_d[op&3] = (INT8)read_mem8(m_a[op>>2&3] + read_arg24(m_pc));
+			m_d[op&3] = (int8_t)read_mem8(m_a[op>>2&3] + read_arg24(m_pc));
 			break;
 
 		// movx (d24, an), dm
@@ -1332,12 +1332,12 @@ void mn10200_device::execute_run()
 
 		// mov (abs24), dn
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
-			m_d[op&3] = (INT16)read_mem16(read_arg24(m_pc));
+			m_d[op&3] = (int16_t)read_mem16(read_arg24(m_pc));
 			break;
 
 		// movb (abs24), dn
 		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
-			m_d[op&3] = (INT8)read_mem8(read_arg24(m_pc));
+			m_d[op&3] = (int8_t)read_mem8(read_arg24(m_pc));
 			break;
 
 		// movbu (abs24), dn
@@ -1405,39 +1405,39 @@ void mn10200_device::execute_run()
 
 		// addnf imm8, an
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			m_a[op&3] = m_a[op&3] + (INT8)read_arg8(m_pc);
+			m_a[op&3] = m_a[op&3] + (int8_t)read_arg8(m_pc);
 			break;
 
 		// movb dm, (d8, an)
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			write_mem8(m_a[op>>2&3] + (INT8)read_arg8(m_pc), m_d[op&3]);
+			write_mem8(m_a[op>>2&3] + (int8_t)read_arg8(m_pc), m_d[op&3]);
 			break;
 
 		// movb (d8, an), dm
 		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-			m_d[op&3] = (INT8)read_mem8(m_a[op>>2&3] + (INT8)read_arg8(m_pc));
+			m_d[op&3] = (int8_t)read_mem8(m_a[op>>2&3] + (int8_t)read_arg8(m_pc));
 			break;
 
 		// movbu (d8, an), dm
 		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 		case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-			m_d[op&3] = read_mem8(m_a[op>>2&3] + (INT8)read_arg8(m_pc));
+			m_d[op&3] = read_mem8(m_a[op>>2&3] + (int8_t)read_arg8(m_pc));
 			break;
 
 		// movx dm, (d8, an)
 		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
 		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 			m_cycles -= 1;
-			write_mem24(m_a[op>>2&3] + (INT8)read_arg8(m_pc), m_d[op&3]);
+			write_mem24(m_a[op>>2&3] + (int8_t)read_arg8(m_pc), m_d[op&3]);
 			break;
 
 		// movx (d8, an), dm
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			m_cycles -= 1;
-			m_d[op&3] = read_mem24(m_a[op>>2&3] + (INT8)read_arg8(m_pc));
+			m_d[op&3] = read_mem24(m_a[op>>2&3] + (int8_t)read_arg8(m_pc));
 			break;
 
 		// bltx label8
@@ -1560,12 +1560,12 @@ void mn10200_device::execute_run()
 
 		// add imm16, an
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
-			m_a[op&3] = do_add(m_a[op&3], (INT16)read_arg16(m_pc));
+			m_a[op&3] = do_add(m_a[op&3], (int16_t)read_arg16(m_pc));
 			break;
 
 		// sub imm16, an
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			m_a[op&3] = do_sub(m_a[op&3], (INT16)read_arg16(m_pc));
+			m_a[op&3] = do_sub(m_a[op&3], (int16_t)read_arg16(m_pc));
 			break;
 
 		// and imm16, psw
@@ -1583,12 +1583,12 @@ void mn10200_device::execute_run()
 
 		// add imm16, dn
 		case 0x18: case 0x19: case 0x1a: case 0x1b:
-			m_d[op&3] = do_add(m_d[op&3], (INT16)read_arg16(m_pc));
+			m_d[op&3] = do_add(m_d[op&3], (int16_t)read_arg16(m_pc));
 			break;
 
 		// sub imm16, dn
 		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			m_d[op&3] = do_sub(m_d[op&3], (INT16)read_arg16(m_pc));
+			m_d[op&3] = do_sub(m_d[op&3], (int16_t)read_arg16(m_pc));
 			break;
 
 		// mov an, (abs16)
@@ -1610,7 +1610,7 @@ void mn10200_device::execute_run()
 
 		// cmp imm16, dn
 		case 0x48: case 0x49: case 0x4a: case 0x4b:
-			do_sub(m_d[op&3], (INT16)read_arg16(m_pc));
+			do_sub(m_d[op&3], (int16_t)read_arg16(m_pc));
 			break;
 
 		// xor imm16, dn
@@ -1621,59 +1621,59 @@ void mn10200_device::execute_run()
 		// movbu (d16, an), dm
 		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
 		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-			m_d[op&3] = read_mem8(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
+			m_d[op&3] = read_mem8(m_a[op>>2&3] + (int16_t)read_arg16(m_pc));
 			break;
 
 		// movx dm, (d16, an)
 		case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
 		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 			m_cycles -= 1;
-			write_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc), m_d[op&3]);
+			write_mem24(m_a[op>>2&3] + (int16_t)read_arg16(m_pc), m_d[op&3]);
 			break;
 
 		// movx (d16, an), dm
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			m_cycles -= 1;
-			m_d[op&3] = read_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
+			m_d[op&3] = read_mem24(m_a[op>>2&3] + (int16_t)read_arg16(m_pc));
 			break;
 
 		// mov dm, (d16, an)
 		case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-			write_mem16(m_a[op>>2&3] + (INT16)read_arg16(m_pc), m_d[op&3]);
+			write_mem16(m_a[op>>2&3] + (int16_t)read_arg16(m_pc), m_d[op&3]);
 			break;
 
 		// movb dm, (d16, an)
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
-			write_mem8(m_a[op>>2&3] + (INT16)read_arg16(m_pc), m_d[op&3]);
+			write_mem8(m_a[op>>2&3] + (int16_t)read_arg16(m_pc), m_d[op&3]);
 			break;
 
 		// mov am, (d16, an)
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 			m_cycles -= 1;
-			write_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc), m_a[op&3]);
+			write_mem24(m_a[op>>2&3] + (int16_t)read_arg16(m_pc), m_a[op&3]);
 			break;
 
 		// mov (d16, an), am
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 			m_cycles -= 1;
-			m_a[op&3] = read_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
+			m_a[op&3] = read_mem24(m_a[op>>2&3] + (int16_t)read_arg16(m_pc));
 			break;
 
 		// mov (d16, an), dm
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 		case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
-			m_d[op&3] = (INT16)read_mem16(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
+			m_d[op&3] = (int16_t)read_mem16(m_a[op>>2&3] + (int16_t)read_arg16(m_pc));
 			break;
 
 		// movb (d16, an), dm
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 		case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
-			m_d[op&3] = (INT8)read_mem8(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
+			m_d[op&3] = (int8_t)read_mem8(m_a[op>>2&3] + (int16_t)read_arg16(m_pc));
 			break;
 
 		default:

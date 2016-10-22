@@ -32,8 +32,8 @@
 
 class h83337_device : public h8_device {
 public:
-	h83337_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h83337_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(wscr_r);
 	DECLARE_WRITE8_MEMBER(wscr_w);
@@ -64,13 +64,13 @@ protected:
 	required_device<h8_sci_device> sci1;
 	required_device<h8_watchdog_device> watchdog;
 
-	UINT8 syscr;
-	UINT32 ram_start;
+	uint8_t syscr;
+	uint32_t ram_start;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
 	virtual void irq_setup() override;
-	virtual void internal_update(UINT64 current_time) override;
+	virtual void internal_update(uint64_t current_time) override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	DECLARE_ADDRESS_MAP(map, 16);
 
@@ -81,12 +81,12 @@ protected:
 
 class h83334_device : public h83337_device {
 public:
-	h83334_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h83334_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class h83336_device : public h83337_device {
 public:
-	h83336_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h83336_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type H83334;

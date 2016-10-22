@@ -21,26 +21,26 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<tmsprom_device> m_tmsprom;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_video_enable;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_video_enable;
+	required_shared_ptr<uint8_t> m_spriteram;
 
-	UINT8 m_irq_mask;
-	UINT8 m_ls259_buf[8];
-	UINT8 m_p1_res;
-	UINT8 m_p1_old_val;
-	UINT8 m_p2_res;
-	UINT8 m_p2_old_val;
+	uint8_t m_irq_mask;
+	uint8_t m_ls259_buf[8];
+	uint8_t m_p1_res;
+	uint8_t m_p1_old_val;
+	uint8_t m_p2_res;
+	uint8_t m_p2_old_val;
 
 	/*table holds outputs of all ANDs (after AND map)*/
-	UINT8 m_andmap[64];
+	uint8_t m_andmap[64];
 
 	/*table holds inputs (ie. not x, x, not q, q) to the AND map*/
-	UINT8 m_columnvalue[32];
+	uint8_t m_columnvalue[32];
 
 	/*8 output pins (actually 6 output and 2 input/output)*/
-	UINT8 m_outvalue[8];
+	uint8_t m_outvalue[8];
 
 	tilemap_t *m_bg_tilemap;
 
@@ -72,7 +72,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_pal();
 };

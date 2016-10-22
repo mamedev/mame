@@ -49,8 +49,8 @@ public:
 	optional_device<generic_slot_device> m_card2;
 
 	emu_timer *m_kb_timer;
-	UINT8 m_kb_matrix;
-	UINT8 m_gatearray[2];
+	uint8_t m_kb_matrix;
+	uint8_t m_gatearray[2];
 
 	memory_region *m_rom_reg;
 	memory_region *m_card1_reg;
@@ -67,7 +67,7 @@ public:
 	DECLARE_READ8_MEMBER( pb1000_port_r );
 	DECLARE_READ8_MEMBER( pb2000c_port_r );
 	DECLARE_WRITE8_MEMBER( port_w );
-	UINT16 read_touchscreen(UINT8 line);
+	uint16_t read_touchscreen(uint8_t line);
 	DECLARE_PALETTE_INIT(pb1000);
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
 };
@@ -348,10 +348,10 @@ WRITE8_MEMBER( pb1000_state::lcd_data_w )
 }
 
 
-UINT16 pb1000_state::read_touchscreen(UINT8 line)
+uint16_t pb1000_state::read_touchscreen(uint8_t line)
 {
-	UINT8 x = ioport("POSX")->read()/0x40;
-	UINT8 y = ioport("POSY")->read()/0x40;
+	uint8_t x = ioport("POSX")->read()/0x40;
+	uint8_t y = ioport("POSY")->read()/0x40;
 
 	if (ioport("TOUCH")->read())
 	{
@@ -366,7 +366,7 @@ UINT16 pb1000_state::read_touchscreen(UINT8 line)
 READ16_MEMBER( pb1000_state::pb1000_kb_r )
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	if ((m_kb_matrix & 0x0f) == 0x0d)
 	{
@@ -390,7 +390,7 @@ READ16_MEMBER( pb1000_state::pb1000_kb_r )
 READ16_MEMBER( pb1000_state::pb2000c_kb_r )
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	if ((m_kb_matrix & 0x0f) == 0x0d)
 	{

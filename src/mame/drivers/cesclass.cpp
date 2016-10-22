@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE16_MEMBER(outputs_w);
 
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(cesclassic);
 protected:
 
@@ -52,7 +52,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 
-	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<uint16_t> m_vram;
 	required_device<palette_device> m_palette;
 	// driver_device overrides
 	virtual void video_start() override;
@@ -64,7 +64,7 @@ void cesclassic_state::video_start()
 {
 }
 
-UINT32 cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,xi;
 
@@ -77,7 +77,7 @@ UINT32 cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 			{
 				for(xi=0;xi<16;xi++)
 				{
-					UINT8 color;
+					uint8_t color;
 
 					color = (((m_vram[x+y*16+0x400])>>(15-xi)) & 1);
 					color |= (((m_vram[x+y*16])>>(15-xi)) & 1)<<1;

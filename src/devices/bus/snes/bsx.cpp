@@ -24,7 +24,7 @@ const device_type SNS_HIROM_BSX = &device_creator<sns_rom_bsxhi_device>;
 const device_type SNS_BSMEMPAK = &device_creator<sns_rom_bsmempak_device>;
 
 
-sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: sns_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_base_unit(nullptr),
 	access_00_1f(0),
@@ -37,7 +37,7 @@ sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, device_typ
 {
 }
 
-sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: sns_rom_device(mconfig, SNS_ROM_BSX, "SNES BS-X Cart", tag, owner, clock, "sns_rom_bsx", __FILE__),
 	m_base_unit(nullptr),
 	access_00_1f(0),
@@ -50,19 +50,19 @@ sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, const char
 {
 }
 
-sns_rom_bsxlo_device::sns_rom_bsxlo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom_bsxlo_device::sns_rom_bsxlo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: sns_rom_device(mconfig, SNS_LOROM_BSX, "SNES Cart (LoROM) +  BS-X slot", tag, owner, clock, "sns_rom_bsxlo", __FILE__),
 						m_slot(*this, "bs_slot")
 {
 }
 
-sns_rom_bsxhi_device::sns_rom_bsxhi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom_bsxhi_device::sns_rom_bsxhi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: sns_rom21_device(mconfig, SNS_HIROM_BSX, "SNES Cart (HiROM) +  BS-X slot", tag, owner, clock, "sns_rom_bsxhi", __FILE__),
 						m_slot(*this, "bs_slot")
 {
 }
 
-sns_rom_bsmempak_device::sns_rom_bsmempak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom_bsmempak_device::sns_rom_bsmempak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: sns_rom_device(mconfig, SNS_BSMEMPAK, "SNES BS-X Memory packs", tag, owner, clock, "sns_bsmempak", __FILE__), m_command(0), m_write_old(0), m_write_new(0), m_flash_enable(0), m_read_enable(0), m_write_enable(0)
 				{
 }
@@ -145,7 +145,7 @@ void BSX_base::init()
 }
 
 
-UINT8 BSX_base::read(UINT32 offset)
+uint8_t BSX_base::read(uint32_t offset)
 {
 	offset &= 0xffff;
 	if (offset < 0x2188 || offset >= 0x21a0)
@@ -159,7 +159,7 @@ UINT8 BSX_base::read(UINT32 offset)
 		// no 218b? no 218d? no 2191? no 2195? no 219a-219f?
 		case 0x2192:
 		{
-			UINT8 counter = r2192_counter++;
+			uint8_t counter = r2192_counter++;
 			if (r2192_counter >= 18)
 				r2192_counter = 0;
 
@@ -207,7 +207,7 @@ UINT8 BSX_base::read(UINT32 offset)
 }
 
 
-void BSX_base::write(UINT32 offset, UINT8 data)
+void BSX_base::write(uint32_t offset, uint8_t data)
 {
 	offset &= 0xffff;
 	if (offset < 0x2188 || offset >= 0x21a0)
@@ -436,7 +436,7 @@ READ8_MEMBER(sns_rom_bsx_device::chip_read)
 
 	if ((offset & 0xf0ffff) == 0x005000)    //$[00-0f]:5000 reg access
 	{
-		UINT8 n = (offset >> 16) & 0x0f;
+		uint8_t n = (offset >> 16) & 0x0f;
 		return m_cart_regs[n];
 	}
 
@@ -455,7 +455,7 @@ WRITE8_MEMBER(sns_rom_bsx_device::chip_write)
 
 	if ((offset & 0xf0ffff) == 0x005000)    //$[00-0f]:5000 reg access
 	{
-		UINT8 n = (offset >> 16) & 0x0f;
+		uint8_t n = (offset >> 16) & 0x0f;
 		m_cart_regs[n] = data;
 		if (n == 0x0e && data & 0x80)
 			access_update();

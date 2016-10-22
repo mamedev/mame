@@ -64,9 +64,9 @@ public:
 	DECLARE_READ8_MEMBER(portb_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
 private:
-	UINT8 m_u14;
-	UINT8 m_digit;
-	UINT8 m_segment[16];
+	uint8_t m_u14;
+	uint8_t m_digit;
+	uint8_t m_segment[16];
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -530,7 +530,7 @@ WRITE8_MEMBER( gp_2_state::porta_w )
 		}
 	}
 
-	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 	if (m_digit == 7)
 		m_segment[m_u14] = data & 15;
 	else

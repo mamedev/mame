@@ -24,15 +24,15 @@ class a2bus_lang_device:
 {
 public:
 	// construction/destruction
-	a2bus_lang_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2bus_lang_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2bus_lang_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_lang_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
 
 private:
 	void langcard_touch(offs_t offset);

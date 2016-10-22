@@ -21,23 +21,23 @@ public:
 		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<UINT8> m_palette_bank;
-	required_shared_ptr<UINT8> m_flipscreen_x;
-	required_shared_ptr<UINT8> m_flipscreen_y;
-	required_shared_ptr<UINT8> m_scroll_x;
-	required_shared_ptr<UINT8> m_scroll_y;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_bg_colorram;
-	required_shared_ptr<UINT8> m_fg_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_palette_bank;
+	required_shared_ptr<uint8_t> m_flipscreen_x;
+	required_shared_ptr<uint8_t> m_flipscreen_y;
+	required_shared_ptr<uint8_t> m_scroll_x;
+	required_shared_ptr<uint8_t> m_scroll_y;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_bg_colorram;
+	required_shared_ptr<uint8_t> m_fg_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	UINT8 m_sub_irq_mask;
+	uint8_t m_sub_irq_mask;
 	DECLARE_READ8_MEMBER(tp84_sh_timer_r);
 	DECLARE_WRITE8_MEMBER(tp84_filter_w);
 	DECLARE_WRITE8_MEMBER(tp84_sh_irqtrigger_w);
@@ -49,7 +49,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tp84);
-	UINT32 screen_update_tp84(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tp84(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

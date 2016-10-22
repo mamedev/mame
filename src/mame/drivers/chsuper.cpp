@@ -22,8 +22,9 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/ramdac.h"
 #include "chsuper.lh"
 
@@ -41,14 +42,14 @@ public:
 	DECLARE_WRITE8_MEMBER(chsuper_outportb_w);
 
 	int m_tilexor;
-	UINT8 m_blacklamp;
-	UINT8 m_redlamp;
-	std::unique_ptr<UINT8[]> m_vram;
+	uint8_t m_blacklamp;
+	uint8_t m_redlamp;
+	std::unique_ptr<uint8_t[]> m_vram;
 
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// driver_device overrides
@@ -70,10 +71,10 @@ public:
 
 void chsuper_state::video_start()
 {
-	m_vram = make_unique_clear<UINT8[]>(1 << 14);
+	m_vram = make_unique_clear<uint8_t[]>(1 << 14);
 }
 
-UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
@@ -218,7 +219,7 @@ static ADDRESS_MAP_START( chsuper_portmap, AS_IO, 8, chsuper_state )
 	AM_RANGE( 0x00fd, 0x00fd ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
 	AM_RANGE( 0x00fe, 0x00fe ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 	AM_RANGE( 0x8300, 0x8300 ) AM_READ_PORT("IN2")  // valid input port present in test mode.
-	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE("dac", dac_device, write_unsigned8) // unk writes
+	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE("dac", dac_byte_interface, write) // unk writes
 ADDRESS_MAP_END
 
 /* About Sound...
@@ -371,10 +372,11 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -464,13 +466,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 {
-	std::unique_ptr<UINT8[]> buffer;
-	UINT8 *rom = memregion("gfx1")->base();
+	std::unique_ptr<uint8_t[]> buffer;
+	uint8_t *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x7f00;
 
-	buffer = std::make_unique<UINT8[]>(0x100000);
+	buffer = std::make_unique<uint8_t[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -486,13 +488,13 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 
 DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 {
-	std::unique_ptr<UINT8[]> buffer;
-	UINT8 *rom = memregion("gfx1")->base();
+	std::unique_ptr<uint8_t[]> buffer;
+	uint8_t *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x0e00;
 
-	buffer = std::make_unique<UINT8[]>(0x100000);
+	buffer = std::make_unique<uint8_t[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -508,13 +510,13 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 
 DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 {
-	std::unique_ptr<UINT8[]> buffer;
-	UINT8 *rom = memregion("gfx1")->base();
+	std::unique_ptr<uint8_t[]> buffer;
+	uint8_t *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x1800;
 
-	buffer = std::make_unique<UINT8[]>(0x100000);
+	buffer = std::make_unique<uint8_t[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{

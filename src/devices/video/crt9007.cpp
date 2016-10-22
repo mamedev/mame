@@ -233,7 +233,7 @@ ADDRESS_MAP_END
 //  readbyte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT8 crt9007_t::readbyte(offs_t address)
+inline uint8_t crt9007_t::readbyte(offs_t address)
 {
 	return space().read_byte(address);
 }
@@ -449,7 +449,7 @@ inline void crt9007_t::recompute_parameters()
 //  crt9007_t - constructor
 //-------------------------------------------------
 
-crt9007_t::crt9007_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+crt9007_t::crt9007_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CRT9007, "SMC CRT9007", tag, owner, clock, "crt9007", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -668,7 +668,7 @@ const address_space_config *crt9007_t::memory_space_config(address_spacenum spac
 
 READ8_MEMBER( crt9007_t::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{

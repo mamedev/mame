@@ -27,7 +27,7 @@ class ie15_device : public cpu_device
 {
 public:
 	// construction/destruction
-	ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -35,8 +35,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -48,21 +48,21 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual void execute_one(int opcode);
 
-	UINT8 rop();
-	UINT8 get_reg_lo(UINT8 reg);
-	UINT16 get_reg(UINT8 reg);
-	void set_reg(UINT8 reg, UINT16 val);
-	UINT8 arg();
-	void update_flags(UINT8 val);
-	UINT8 do_condition(UINT8 val);
-	UINT16 get_addr(UINT8 val);
-	void illegal(UINT8 opcode);
+	uint8_t rop();
+	uint8_t get_reg_lo(uint8_t reg);
+	uint16_t get_reg(uint8_t reg);
+	void set_reg(uint8_t reg, uint16_t val);
+	uint8_t arg();
+	void update_flags(uint8_t val);
+	uint8_t do_condition(uint8_t val);
+	uint16_t get_addr(uint8_t val);
+	void illegal(uint8_t opcode);
 
 	int m_icount;
 
@@ -70,13 +70,13 @@ protected:
 	const address_space_config      m_program_config;
 	const address_space_config      m_io_config;
 
-	UINT8   m_A;
+	uint8_t   m_A;
 	PAIR    m_PC;
-	UINT16  m_REGS[32]; // General registers (2 pages of 16)
-	UINT8   m_CF; // Carry flag
-	UINT8   m_ZF; // Zero flag
-	UINT8   m_RF; // Current register page
-	UINT8   m_flags; // temporary I/O only
+	uint16_t  m_REGS[32]; // General registers (2 pages of 16)
+	uint8_t   m_CF; // Carry flag
+	uint8_t   m_ZF; // Zero flag
+	uint8_t   m_RF; // Current register page
+	uint8_t   m_flags; // temporary I/O only
 
 	address_space *m_program;
 	address_space *m_io;

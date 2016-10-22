@@ -34,10 +34,11 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
+#include "imagedev/cassette.h"
 #include "machine/ins8154.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "sound/wave.h"
-#include "imagedev/cassette.h"
 #include "mk14.lh"
 
 
@@ -62,7 +63,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<8> m_keyboard;
 	required_device<cassette_image_device> m_cass;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 };
 
 /*
@@ -172,7 +173,7 @@ WRITE8_MEMBER( mk14_state::port_a_w )
 WRITE_LINE_MEMBER( mk14_state::cass_w )
 {
 	m_cass->output(state ? -1.0 : +1.0);
-	m_dac->write_unsigned8(state ? 0x40 : 0);
+	m_dac->write(state);
 }
 
 READ_LINE_MEMBER( mk14_state::cass_r )
@@ -195,16 +196,19 @@ static MACHINE_CONFIG_START( mk14, mk14_state )
 	MCFG_DEFAULT_LAYOUT(layout_mk14)
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_SOUND_ADD("dac8", ZN425E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // Ferranti ZN425E
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_DEVICE_ADD("ic8", INS8154, 0)
 	MCFG_INS8154_OUT_A_CB(WRITE8(mk14_state, port_a_w))
-	MCFG_INS8154_OUT_B_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_INS8154_OUT_B_CB(DEVWRITE8("dac8", dac_byte_interface, write))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END

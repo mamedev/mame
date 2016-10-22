@@ -60,14 +60,14 @@ public:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void ichibanjyan_state::video_start()
 {
 }
 
-UINT32 ichibanjyan_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t ichibanjyan_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }
@@ -103,7 +103,7 @@ GFXDECODE_END
 
 void ichibanjyan_state::machine_start()
 {
-	UINT8 *ROM = memregion("code")->base();
+	uint8_t *ROM = memregion("code")->base();
 
 	membank("bank1")->configure_entries(0, 4, ROM, 0x8000);
 }

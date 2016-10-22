@@ -26,8 +26,8 @@
 #include "emu.h"
 #include <ctype.h>
 
-static const UINT8 *rombase;
-static const UINT8 *rambase;
+static const uint8_t *rombase;
+static const uint8_t *rambase;
 static offs_t pcbase;
 #define READOP16(A)  (rombase[(A) - pcbase] | (rombase[(A) + 1 - pcbase] << 8))
 #define READARG16(A) (rambase[(A) - pcbase] | (rambase[(A) + 1 - pcbase] << 8))
@@ -135,7 +135,7 @@ static void InitDasm16C5x(void)
 			fatalerror("not enough bits in encoding '%s %s' %d\n",
 				ops[0],ops[1],bit);
 		}
-		while (isspace((UINT8)*p)) p++;
+		while (isspace((uint8_t)*p)) p++;
 		if (*p) Op[i].extcode = *p;
 		Op[i].bits = bits;
 		Op[i].mask = mask;
@@ -159,7 +159,7 @@ CPU_DISASSEMBLE( pic16c5x )
 	int bit;
 	//char *buffertmp;
 	const char *cp;             /* character pointer in OpFormats */
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 
 	rombase = oprom;
 	rambase = opram;

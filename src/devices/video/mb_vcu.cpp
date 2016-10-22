@@ -109,7 +109,7 @@ const address_space_config *mb_vcu_device::memory_space_config(address_spacenum 
 //  read_byte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT8 mb_vcu_device::read_byte(offs_t address)
+inline uint8_t mb_vcu_device::read_byte(offs_t address)
 {
 	return space(AS_0).read_byte(address);
 }
@@ -118,7 +118,7 @@ inline UINT8 mb_vcu_device::read_byte(offs_t address)
 //  write_byte - write a byte at the given address
 //-------------------------------------------------
 
-inline void mb_vcu_device::write_byte(offs_t address, UINT8 data)
+inline void mb_vcu_device::write_byte(offs_t address, uint8_t data)
 {
 	space(AS_0).write_byte(address, data);
 }
@@ -127,7 +127,7 @@ inline void mb_vcu_device::write_byte(offs_t address, UINT8 data)
 //  read_byte - read a byte at the given i/o
 //-------------------------------------------------
 
-inline UINT8 mb_vcu_device::read_io(offs_t address)
+inline uint8_t mb_vcu_device::read_io(offs_t address)
 {
 	return space(AS_1).read_byte(address);
 }
@@ -136,7 +136,7 @@ inline UINT8 mb_vcu_device::read_io(offs_t address)
 //  write_byte - write a byte at the given i/o
 //-------------------------------------------------
 
-inline void mb_vcu_device::write_io(offs_t address, UINT8 data)
+inline void mb_vcu_device::write_io(offs_t address, uint8_t data)
 {
 	space(AS_1).write_byte(address, data);
 }
@@ -150,7 +150,7 @@ inline void mb_vcu_device::write_io(offs_t address, UINT8 data)
 //  mb_vcu_device - constructor
 //-------------------------------------------------
 
-mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MB_VCU, "Mazer Blazer custom VCU", tag, owner, clock, "mb_vcu", __FILE__)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -178,8 +178,8 @@ void mb_vcu_device::device_validity_check(validity_checker &valid) const
 void mb_vcu_device::device_start()
 {
 	// TODO: m_screen_tag
-	m_ram = make_unique_clear<UINT8[]>(0x800);
-	m_palram = make_unique_clear<UINT8[]>(0x100);
+	m_ram = make_unique_clear<uint8_t[]>(0x800);
+	m_palram = make_unique_clear<uint8_t[]>(0x100);
 
 	{
 		static const int resistances_r[2]  = { 4700, 2200 };
@@ -230,7 +230,7 @@ void mb_vcu_device::device_reset()
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
-//  UINT8 *pcg = memregion("sub2")->base();
+//  uint8_t *pcg = memregion("sub2")->base();
 
 READ8_MEMBER( mb_vcu_device::read_ram )
 {
@@ -280,10 +280,10 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 {
 	int xi,yi;
 	int dstx,dsty;
-	UINT8 dot;
+	uint8_t dot;
 	int bits = 0;
-	UINT8 pen = 0;
-	UINT8 cur_layer;
+	uint8_t pen = 0;
+	uint8_t cur_layer;
 
 //  cur_layer = (m_mode & 0x3);
 	cur_layer = 0;
@@ -386,7 +386,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 {
 	int xi,yi;
 	int dstx,dsty;
-//  UINT8 dot;
+//  uint8_t dot;
 	int bits = 0;
 	if(m_mode == 0x13 || m_mode == 0x03)
 	{
@@ -497,10 +497,10 @@ WRITE8_MEMBER( mb_vcu_device::vbank_w )
 //  update_screen -
 //-------------------------------------------------
 
-UINT32 mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
-	UINT8 dot;
+	uint8_t dot;
 
 	bitmap.fill(0x100,cliprect);
 

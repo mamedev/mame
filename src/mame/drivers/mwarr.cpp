@@ -69,16 +69,16 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_mlow_videoram;
-	required_shared_ptr<UINT16> m_mhigh_videoram;
-	required_shared_ptr<UINT16> m_tx_videoram;
-	required_shared_ptr<UINT16> m_bg_scrollram;
-	required_shared_ptr<UINT16> m_mlow_scrollram;
-	required_shared_ptr<UINT16> m_mhigh_scrollram;
-	required_shared_ptr<UINT16> m_vidattrram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_mwarr_ram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_mlow_videoram;
+	required_shared_ptr<uint16_t> m_mhigh_videoram;
+	required_shared_ptr<uint16_t> m_tx_videoram;
+	required_shared_ptr<uint16_t> m_bg_scrollram;
+	required_shared_ptr<uint16_t> m_mlow_scrollram;
+	required_shared_ptr<uint16_t> m_mhigh_scrollram;
+	required_shared_ptr<uint16_t> m_vidattrram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_mwarr_ram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -89,7 +89,7 @@ public:
 	/* misc */
 	int m_which;
 
-	UINT16 m_sprites_buffer[0x800];
+	uint16_t m_sprites_buffer[0x800];
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(mlow_videoram_w);
 	DECLARE_WRITE16_MEMBER(mhigh_videoram_w);
@@ -104,7 +104,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki2;
@@ -415,8 +415,8 @@ void mwarr_state::video_start()
 
 void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT16 *source = m_sprites_buffer + 0x800 - 4;
-	const UINT16 *finish = m_sprites_buffer;
+	const uint16_t *source = m_sprites_buffer + 0x800 - 4;
+	const uint16_t *finish = m_sprites_buffer;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int x, y, color, flipx, dy, pri, pri_mask, i;
 
@@ -479,7 +479,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 }
 
-UINT32 mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

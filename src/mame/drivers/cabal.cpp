@@ -882,7 +882,7 @@ DRIVER_INIT_MEMBER(cabal_state,cabal)
 
 DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
 {
-	UINT8 *decrypt = m_seibu_sound->get_custom_decrypt();
+	uint8_t *decrypt = m_seibu_sound->get_custom_decrypt();
 	memcpy(decrypt,        memregion("audiocpu")->base()+0x2000, 0x2000);
 	memcpy(decrypt+0x8000, memregion("audiocpu")->base()+0x8000, 0x8000);
 	m_adpcm1->decrypt();

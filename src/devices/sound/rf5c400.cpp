@@ -65,7 +65,7 @@ const device_type RF5C400 = &device_creator<rf5c400_device>;
 //  rf5c400_device - constructor
 //-------------------------------------------------
 
-rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RF5C400, "RF5C400", tag, owner, clock, "rf5c400", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),
@@ -94,11 +94,11 @@ void rf5c400_device::device_start()
 void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	int i, ch;
-	INT16 *rom = m_rom;
-	UINT32 end, loop;
-	UINT64 pos;
-	UINT8 vol, lvol, rvol, type;
-	UINT8 env_phase;
+	int16_t *rom = m_rom;
+	uint32_t end, loop;
+	uint64_t pos;
+	uint8_t vol, lvol, rvol, type;
+	uint8_t env_phase;
 	double env_level, env_step, env_rstep;
 
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -126,8 +126,8 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		for (i=0; i < samples; i++)
 		{
-			INT16 tmp;
-			INT32 sample;
+			int16_t tmp;
+			int32_t sample;
 
 			if (env_phase == PHASE_NONE) break;
 
@@ -138,10 +138,10 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 					sample = tmp;
 					break;
 				case TYPE_8LOW:
-					sample = (INT16)(tmp << 8);
+					sample = (int16_t)(tmp << 8);
 					break;
 				case TYPE_8HIGH:
-					sample = (INT16)(tmp & 0xFF00);
+					sample = (int16_t)(tmp & 0xFF00);
 					break;
 				default:
 					sample = 0;
@@ -217,7 +217,7 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 /*****************************************************************************/
 
-UINT8 rf5c400_device::decode80(UINT8 val)
+uint8_t rf5c400_device::decode80(uint8_t val)
 {
 	if (val & 0x80)
 	{
@@ -235,7 +235,7 @@ void rf5c400_device::rf5c400_init_chip()
 	{
 		double max=255.0;
 		for (i = 0; i < 256; i++) {
-			volume_table[i]=(UINT16)max;
+			volume_table[i]=(uint16_t)max;
 			max /= pow(10.0,(double)((4.5/(256.0/16.0))/20));
 		}
 		for(i = 0; i < 0x48; i++) {
@@ -340,7 +340,7 @@ void rf5c400_device::rf5c400_init_chip()
 
 /*****************************************************************************/
 
-static UINT16 rf5c400_status = 0;
+static uint16_t rf5c400_status = 0;
 READ16_MEMBER( rf5c400_device::rf5c400_r )
 {
 	switch(offset)
@@ -427,7 +427,7 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 			case 0x12:      // memory r/w address, bits 23 - 16
 			{
 				m_ext_mem_address &= 0xffff;
-				m_ext_mem_address |= (UINT32)(data) << 16;
+				m_ext_mem_address |= (uint32_t)(data) << 16;
 				break;
 			}
 			case 0x13:      // memory write data

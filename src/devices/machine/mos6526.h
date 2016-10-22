@@ -108,8 +108,8 @@ class mos6526_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_tod_clock(device_t &device, int clock) { downcast<mos6526_device &>(device).m_tod_clock = clock; }
 
@@ -125,9 +125,9 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	UINT8 pa_r() { return m_pa; }
+	uint8_t pa_r() { return m_pa; }
 	DECLARE_READ8_MEMBER( pa_r ) { return pa_r(); }
-	UINT8 pb_r() { return m_pb; }
+	uint8_t pb_r() { return m_pb; }
 	DECLARE_READ8_MEMBER( pb_r ) { return pb_r(); }
 
 	DECLARE_READ_LINE_MEMBER( sp_r ) { return m_sp; }
@@ -160,17 +160,17 @@ protected:
 	inline void update_interrupt();
 	inline void update_pa();
 	inline void update_pb();
-	inline void set_cra(UINT8 data);
-	inline void set_crb(UINT8 data);
+	inline void set_cra(uint8_t data);
+	inline void set_crb(uint8_t data);
 	inline void serial_input();
 	inline void serial_output();
 	inline void clock_ta();
 	inline void clock_tb();
 	inline void clock_pipeline();
-	inline UINT8 bcd_increment(UINT8 value);
+	inline uint8_t bcd_increment(uint8_t value);
 	virtual inline void clock_tod();
-	inline UINT8 read_tod(int offset);
-	inline void write_tod(int offset, UINT8 data);
+	inline uint8_t read_tod(int offset);
+	inline void write_tod(int offset, uint8_t data);
 	inline void synchronize();
 
 	devcb_write_line   m_write_irq;
@@ -186,27 +186,27 @@ protected:
 	bool m_irq;
 	int m_ir0;
 	int m_ir1;
-	UINT8 m_icr;
-	UINT8 m_imr;
+	uint8_t m_icr;
+	uint8_t m_imr;
 	bool m_icr_read;
 
 	// peripheral ports
 	int m_pc;
 	int m_flag;
-	UINT8 m_pra;
-	UINT8 m_prb;
-	UINT8 m_ddra;
-	UINT8 m_ddrb;
-	UINT8 m_pa;
-	UINT8 m_pb;
-	UINT8 m_pa_in;
-	UINT8 m_pb_in;
+	uint8_t m_pra;
+	uint8_t m_prb;
+	uint8_t m_ddra;
+	uint8_t m_ddrb;
+	uint8_t m_pa;
+	uint8_t m_pb;
+	uint8_t m_pa_in;
+	uint8_t m_pb_in;
 
 	// serial
 	int m_sp;
 	int m_cnt;
-	UINT8 m_sdr;
-	UINT8 m_shift;
+	uint8_t m_sdr;
+	uint8_t m_shift;
 	bool m_sdr_empty;
 	int m_bits;
 
@@ -231,18 +231,18 @@ protected:
 	int m_load_b1;
 	int m_load_b2;
 	int m_oneshot_b0;
-	UINT16 m_ta;
-	UINT16 m_tb;
-	UINT16 m_ta_latch;
-	UINT16 m_tb_latch;
-	UINT8 m_cra;
-	UINT8 m_crb;
+	uint16_t m_ta;
+	uint16_t m_tb;
+	uint16_t m_ta_latch;
+	uint16_t m_tb_latch;
+	uint8_t m_cra;
+	uint8_t m_crb;
 
 	// time-of-day
 	int m_tod_count;
-	UINT32 m_tod;
-	UINT32 m_tod_latch;
-	UINT32 m_alarm;
+	uint32_t m_tod;
+	uint32_t m_tod_latch;
+	uint32_t m_alarm;
 	bool m_tod_stopped;
 	bool m_tod_latched;
 	emu_timer *m_tod_timer;
@@ -254,7 +254,7 @@ protected:
 class mos6526a_device : public mos6526_device
 {
 public:
-	mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -263,7 +263,7 @@ public:
 class mos8520_device : public mos6526_device
 {
 public:
-	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -278,7 +278,7 @@ protected:
 class mos5710_device : public mos6526_device
 {
 public:
-	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	//DECLARE_READ8_MEMBER( read );
 	//DECLARE_WRITE8_MEMBER( write );

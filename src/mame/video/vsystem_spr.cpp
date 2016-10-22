@@ -71,7 +71,7 @@ Abstracts the VS9210
 
 const device_type VSYSTEM_SPR = &device_creator<vsystem_spr_device>;
 
-vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VSYSTEM_SPR, "Video System Sprites", tag, owner, clock, "vsystem_spr", __FILE__)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
@@ -98,7 +98,7 @@ void vsystem_spr_device::static_set_gfxdecode_tag(device_t &device, const char *
 	downcast<vsystem_spr_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
-UINT32 vsystem_spr_device::tile_callback_noindirect(UINT32 tile)
+uint32_t vsystem_spr_device::tile_callback_noindirect(uint32_t tile)
 {
 	return tile;
 }
@@ -186,7 +186,7 @@ void vsystem_spr_device::device_reset()
 {
 }
 
-void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
+void vsystem_spr_device::get_sprite_attributes(uint16_t* ram)
 {
 	/*
 	    attr_start + 0x0000
@@ -291,7 +291,7 @@ void vsystem_spr_device::common_sprite_drawgfx(bitmap_ind16 &bitmap, const recta
 
 
 
-void vsystem_spr_device::draw_sprites( UINT16* spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask, int prihack_val )
+void vsystem_spr_device::draw_sprites( uint16_t* spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask, int prihack_val )
 {
 	int offs;
 	int end = 0;

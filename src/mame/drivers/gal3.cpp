@@ -144,13 +144,13 @@ public:
 		m_rso_shared_ram(*this, "rso_shared_ram"),
 		m_generic_paletteram_16(*this, "paletteram") { }
 
-	UINT32 *m_mpSharedRAM0;
-	//UINT32 *m_mpSharedRAM1;
-	UINT16 m_namcos21_video_enable;
-	required_shared_ptr<UINT16> m_rso_shared_ram;
-	optional_shared_ptr<UINT16> m_generic_paletteram_16;
-	UINT32 m_led_mst;
-	UINT32 m_led_slv;
+	uint32_t *m_mpSharedRAM0;
+	//uint32_t *m_mpSharedRAM1;
+	uint16_t m_namcos21_video_enable;
+	required_shared_ptr<uint16_t> m_rso_shared_ram;
+	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
+	uint32_t m_led_mst;
+	uint32_t m_led_slv;
 	DECLARE_READ32_MEMBER(led_mst_r);
 	DECLARE_WRITE32_MEMBER(led_mst_w);
 	DECLARE_READ32_MEMBER(led_slv_r);
@@ -162,7 +162,7 @@ public:
 	DECLARE_READ32_MEMBER(rso_r);
 	DECLARE_WRITE32_MEMBER(rso_w);
 	DECLARE_VIDEO_START(gal3);
-	UINT32 screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette(  );
 };
 
@@ -186,7 +186,7 @@ VIDEO_START_MEMBER(gal3_state,gal3)
 void gal3_state::update_palette(  )
 {
 	int i;
-	INT16 data1,data2;
+	int16_t data1,data2;
 	int r,g,b;
 
 	for( i=0; i<NAMCOS21_NUM_COLORS; i++ )
@@ -202,7 +202,7 @@ void gal3_state::update_palette(  )
 	}
 } /* update_palette */
 
-UINT32 gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	char mst[18], slv[18];
@@ -287,7 +287,7 @@ READ32_MEMBER(gal3_state::paletteram32_r)
 
 WRITE32_MEMBER(gal3_state::paletteram32_w)
 {
-	UINT32 v;
+	uint32_t v;
 	offset *= 2;
 	v = (m_generic_paletteram_16[offset]<<16)|m_generic_paletteram_16[offset+1];
 	COMBINE_DATA( &v );
@@ -302,7 +302,7 @@ READ32_MEMBER(gal3_state::namcos21_video_enable_r)
 
 WRITE32_MEMBER(gal3_state::namcos21_video_enable_w)
 {
-	UINT32 v;
+	uint32_t v;
 	v = m_namcos21_video_enable<<16;
 	COMBINE_DATA( &v ); // 0xff53, instead of 0x40 in namcos21
 	m_namcos21_video_enable = v>>16;
@@ -320,7 +320,7 @@ READ32_MEMBER(gal3_state::rso_r)
 
 WRITE32_MEMBER(gal3_state::rso_w)
 {
-	UINT32 v;
+	uint32_t v;
 	offset *= 2;
 	v = (m_rso_shared_ram[offset]<<16)|m_rso_shared_ram[offset+1];
 	COMBINE_DATA( &v );

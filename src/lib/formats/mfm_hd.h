@@ -151,10 +151,10 @@ public:
 	virtual ~mfmhd_image_format_t() {};
 
 	// Load the image.
-	virtual chd_error load(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head) = 0;
+	virtual chd_error load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) = 0;
 
 	// Save the image.
-	virtual chd_error save(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head) = 0;
+	virtual chd_error save(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) = 0;
 
 	// Return the original parameters of the image
 	mfmhd_layout_params* get_initial_params() { return &m_param_old; }
@@ -179,16 +179,16 @@ protected:
 
 	mfmhd_layout_params m_param, m_param_old;
 
-	void    mfm_encode(UINT16* trackimage, int& position, UINT8 byte, int count=1);
-	void    mfm_encode_a1(UINT16* trackimage, int& position);
-	void    mfm_encode_mask(UINT16* trackimage, int& position, UINT8 byte, int count, int mask);
-	UINT8   mfm_decode(UINT16 raw);
+	void    mfm_encode(uint16_t* trackimage, int& position, uint8_t byte, int count=1);
+	void    mfm_encode_a1(uint16_t* trackimage, int& position);
+	void    mfm_encode_mask(uint16_t* trackimage, int& position, uint8_t byte, int count, int mask);
+	uint8_t   mfm_decode(uint16_t raw);
 
 	// Deliver defaults.
 	virtual int get_default(mfmhd_param_t type) =0;
 
 	// Debugging
-	void    showtrack(UINT16* enctrack, int length);
+	void    showtrack(uint16_t* enctrack, int length);
 	virtual const char* tag() { return m_devtag.c_str(); }
 };
 
@@ -196,15 +196,15 @@ class mfmhd_generic_format : public mfmhd_image_format_t
 {
 public:
 	mfmhd_generic_format() { m_devtag = std::string("mfmhd_generic_format"); };
-	chd_error load(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head) override;
-	chd_error save(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head) override;
+	chd_error load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) override;
+	chd_error save(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) override;
 
 	// Yes, we want to save all parameters
 	virtual bool save_param(mfmhd_param_t type) override { return true; }
 	virtual int get_default(mfmhd_param_t type) override;
 
 protected:
-	virtual UINT8   cylinder_to_ident(int cylinder);
+	virtual uint8_t   cylinder_to_ident(int cylinder);
 	virtual int     chs_to_lba(int cylinder, int head, int sector);
 };
 

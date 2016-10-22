@@ -130,7 +130,7 @@ void avi_write::video_frame(bitmap_rgb32& snap)
 	}
 }
 
-void avi_write::audio_frame(const INT16 *buffer, int samples_this_frame)
+void avi_write::audio_frame(const int16_t *buffer, int samples_this_frame)
 {
 	// only record if we have a file
 	if (m_output_file != nullptr)

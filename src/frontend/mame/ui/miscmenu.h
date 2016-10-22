@@ -75,11 +75,11 @@ private:
 	/* internal crosshair menu item data */
 	struct crosshair_item_data
 	{
-		UINT8   type;
-		UINT8   player;
-		UINT8   min, max;
-		UINT8   cur;
-		UINT8   defvalue;
+		uint8_t   type;
+		uint8_t   player;
+		uint8_t   min, max;
+		uint8_t   cur;
+		uint8_t   defvalue;
 		char    last_name[CROSSHAIR_PIC_NAME_LENGTH + 1];
 		char    next_name[CROSSHAIR_PIC_NAME_LENGTH + 1];
 	};

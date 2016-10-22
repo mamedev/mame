@@ -79,14 +79,14 @@ additional control from extra RAM:
 
 
 
-static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
+static void K053936_zoom_draw(int chip,uint16_t *ctrl,uint16_t *linectrl, screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,uint32_t priority, int glfgreat_hack)
 {
 	if (!tmap)
 		return;
 
 	if (ctrl[0x07] & 0x0040)
 	{
-		UINT32 startx,starty;
+		uint32_t startx,starty;
 		int incxx,incxy;
 		rectangle my_clip;
 		int y,maxy;
@@ -127,13 +127,13 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, screen_dev
 
 		while (y <= maxy)
 		{
-			UINT16 *lineaddr = linectrl + 4*((y - K053936_offset[chip][1]) & 0x1ff);
+			uint16_t *lineaddr = linectrl + 4*((y - K053936_offset[chip][1]) & 0x1ff);
 			my_clip.min_y = my_clip.max_y = y;
 
-			startx = 256 * (INT16)(lineaddr[0] + ctrl[0x00]);
-			starty = 256 * (INT16)(lineaddr[1] + ctrl[0x01]);
-			incxx  =       (INT16)(lineaddr[2]);
-			incxy  =       (INT16)(lineaddr[3]);
+			startx = 256 * (int16_t)(lineaddr[0] + ctrl[0x00]);
+			starty = 256 * (int16_t)(lineaddr[1] + ctrl[0x01]);
+			incxx  =       (int16_t)(lineaddr[2]);
+			incxy  =       (int16_t)(lineaddr[3]);
 
 			if (ctrl[0x06] & 0x8000) incxx *= 256;
 			if (ctrl[0x06] & 0x0080) incxy *= 256;
@@ -151,15 +151,15 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, screen_dev
 	}
 	else    /* "simple" mode */
 	{
-		UINT32 startx,starty;
+		uint32_t startx,starty;
 		int incxx,incxy,incyx,incyy;
 
-		startx = 256 * (INT16)(ctrl[0x00]);
-		starty = 256 * (INT16)(ctrl[0x01]);
-		incyx  =       (INT16)(ctrl[0x02]);
-		incyy  =       (INT16)(ctrl[0x03]);
-		incxx  =       (INT16)(ctrl[0x04]);
-		incxy  =       (INT16)(ctrl[0x05]);
+		startx = 256 * (int16_t)(ctrl[0x00]);
+		starty = 256 * (int16_t)(ctrl[0x01]);
+		incyx  =       (int16_t)(ctrl[0x02]);
+		incyy  =       (int16_t)(ctrl[0x03]);
+		incxx  =       (int16_t)(ctrl[0x04]);
+		incxy  =       (int16_t)(ctrl[0x05]);
 
 		if (ctrl[0x06] & 0x4000) { incyx *= 256; incyy *= 256; }
 		if (ctrl[0x06] & 0x0040) { incxx *= 256; incxy *= 256; }
@@ -199,10 +199,10 @@ if (machine.input().code_pressed(KEYCODE_D))
 }
 
 
-void K053936_0_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
+void K053936_0_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,uint32_t priority, int glfgreat_hack)
 {
-	UINT16 *ctrl = reinterpret_cast<UINT16 *>(tmap->machine().root_device().memshare("k053936_0_ctrl")->ptr());
-	UINT16 *linectrl = reinterpret_cast<UINT16 *>(tmap->machine().root_device().memshare("k053936_0_line")->ptr());
+	uint16_t *ctrl = reinterpret_cast<uint16_t *>(tmap->machine().root_device().memshare("k053936_0_ctrl")->ptr());
+	uint16_t *linectrl = reinterpret_cast<uint16_t *>(tmap->machine().root_device().memshare("k053936_0_line")->ptr());
 	K053936_zoom_draw(0,ctrl,linectrl,screen,bitmap,cliprect,tmap,flags,priority, glfgreat_hack);
 }
 
@@ -229,7 +229,7 @@ void K053936_set_offset(int chip, int xoffs, int yoffs)
 
 const device_type K053936 = &device_creator<k053936_device>;
 
-k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K053936, "K053936 Video Controller", tag, owner, clock, "k053936", __FILE__),
 	m_ctrl(nullptr),
 	m_linectrl(nullptr),
@@ -245,8 +245,8 @@ k053936_device::k053936_device(const machine_config &mconfig, const char *tag, d
 
 void k053936_device::device_start()
 {
-	m_ctrl = make_unique_clear<UINT16[]>(0x20);
-	m_linectrl = make_unique_clear<UINT16[]>(0x4000);
+	m_ctrl = make_unique_clear<uint16_t[]>(0x20);
+	m_linectrl = make_unique_clear<uint16_t[]>(0x4000);
 
 	save_pointer(NAME(m_ctrl.get()), 0x20);
 	save_pointer(NAME(m_linectrl.get()), 0x4000);
@@ -288,14 +288,14 @@ READ16_MEMBER( k053936_device::linectrl_r )
 
 // there is another implementation of this in  video/konamigx.c (!)
 //  why? shall they be merged?
-void k053936_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
+void k053936_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, uint32_t priority, int glfgreat_hack )
 {
 	if (!tmap)
 		return;
 
 	if (m_ctrl[0x07] & 0x0040)
 	{
-		UINT32 startx, starty;
+		uint32_t startx, starty;
 		int incxx, incxy;
 		rectangle my_clip;
 		int y, maxy;
@@ -335,14 +335,14 @@ void k053936_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, con
 
 		while (y <= maxy)
 		{
-			UINT16 *lineaddr = m_linectrl.get() + 4 * ((y - m_yoff) & 0x1ff);
+			uint16_t *lineaddr = m_linectrl.get() + 4 * ((y - m_yoff) & 0x1ff);
 
 			my_clip.min_y = my_clip.max_y = y;
 
-			startx = 256 * (INT16)(lineaddr[0] + m_ctrl[0x00]);
-			starty = 256 * (INT16)(lineaddr[1] + m_ctrl[0x01]);
-			incxx  =       (INT16)(lineaddr[2]);
-			incxy  =       (INT16)(lineaddr[3]);
+			startx = 256 * (int16_t)(lineaddr[0] + m_ctrl[0x00]);
+			starty = 256 * (int16_t)(lineaddr[1] + m_ctrl[0x01]);
+			incxx  =       (int16_t)(lineaddr[2]);
+			incxy  =       (int16_t)(lineaddr[3]);
 
 			if (m_ctrl[0x06] & 0x8000)
 				incxx *= 256;
@@ -363,15 +363,15 @@ void k053936_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 	else    /* "simple" mode */
 	{
-		UINT32 startx, starty;
+		uint32_t startx, starty;
 		int incxx, incxy, incyx, incyy;
 
-		startx = 256 * (INT16)(m_ctrl[0x00]);
-		starty = 256 * (INT16)(m_ctrl[0x01]);
-		incyx  =       (INT16)(m_ctrl[0x02]);
-		incyy  =       (INT16)(m_ctrl[0x03]);
-		incxx  =       (INT16)(m_ctrl[0x04]);
-		incxy  =       (INT16)(m_ctrl[0x05]);
+		startx = 256 * (int16_t)(m_ctrl[0x00]);
+		starty = 256 * (int16_t)(m_ctrl[0x01]);
+		incyx  =       (int16_t)(m_ctrl[0x02]);
+		incyy  =       (int16_t)(m_ctrl[0x03]);
+		incxx  =       (int16_t)(m_ctrl[0x04]);
+		incxy  =       (int16_t)(m_ctrl[0x05]);
 
 		if (m_ctrl[0x06] & 0x4000)
 		{
@@ -435,7 +435,7 @@ void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy)
 static inline void K053936GP_copyroz32clip( running_machine &machine,
 		bitmap_rgb32 &dst_bitmap, bitmap_ind16 &src_bitmap,
 		const rectangle &dst_cliprect, const rectangle &src_cliprect,
-		UINT32 _startx,UINT32 _starty,int _incxx,int _incxy,int _incyx,int _incyy,
+		uint32_t _startx,uint32_t _starty,int _incxx,int _incxy,int _incyx,int _incyy,
 		int tilebpp, int blend, int alpha, int clip, int pixeldouble_output, palette_device &palette )
 {
 	static const int colormask[8]={1,3,7,0xf,0x1f,0x3f,0x7f,0xff};
@@ -443,7 +443,7 @@ static inline void K053936GP_copyroz32clip( running_machine &machine,
 	int ecx;
 	int src_pitch, incxy, incxx;
 	int src_minx, src_maxx, src_miny, src_maxy, cmask;
-	UINT16 *src_base;
+	uint16_t *src_base;
 	size_t src_size;
 
 	const pen_t *pal_base;
@@ -452,7 +452,7 @@ static inline void K053936GP_copyroz32clip( running_machine &machine,
 	int dst_base2;
 
 	int tx, dst_pitch;
-	UINT32 *dst_base;
+	uint32_t *dst_base;
 	int starty, incyy, startx, incyx, ty, sx, sy;
 
 	incxy = _incxy; incxx = _incxx; incyy = _incyy; incyx = _incyx;
@@ -506,7 +506,7 @@ static inline void K053936GP_copyroz32clip( running_machine &machine,
 				int srcx = (cx >> 16) & 0x1fff;
 				int srcy = (cy >> 16) & 0x1fff;
 				int pixel;
-				UINT32 offs;
+				uint32_t offs;
 				offs = srcy * src_pitch + srcx;
 
 				cx += incxx;
@@ -549,7 +549,7 @@ static inline void K053936GP_copyroz32clip( running_machine &machine,
 				int srcx = (cx >> 16) & 0x1fff;
 				int srcy = (cy >> 16) & 0x1fff;
 				int pixel;
-				UINT32 offs;
+				uint32_t offs;
 
 				offs = srcy * src_pitch + srcx;
 
@@ -588,14 +588,14 @@ static inline void K053936GP_copyroz32clip( running_machine &machine,
 
 // adapted from generic K053936_zoom_draw()
 static void K053936GP_zoom_draw(running_machine &machine,
-		int chip, UINT16 *ctrl, UINT16 *linectrl,
+		int chip, uint16_t *ctrl, uint16_t *linectrl,
 		bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tmap,
 		int tilebpp, int blend, int alpha, int pixeldouble_output, palette_device &palette)
 {
-	UINT16 *lineaddr;
+	uint16_t *lineaddr;
 
 	rectangle my_clip;
-	UINT32 startx, starty;
+	uint32_t startx, starty;
 	int incxx, incxy, incyx, incyy, y, maxy, clip;
 
 	bitmap_ind16 &src_bitmap = tmap->pixmap();
@@ -614,10 +614,10 @@ static void K053936GP_zoom_draw(running_machine &machine,
 			lineaddr = linectrl + ( ((y - K053936_offset[chip][1]) & 0x1ff) << 2);
 			my_clip.min_y = my_clip.max_y = y;
 
-			startx = (INT16)(lineaddr[0] + ctrl[0x00]) << 8;
-			starty = (INT16)(lineaddr[1] + ctrl[0x01]) << 8;
-			incxx  = (INT16)(lineaddr[2]);
-			incxy  = (INT16)(lineaddr[3]);
+			startx = (int16_t)(lineaddr[0] + ctrl[0x00]) << 8;
+			starty = (int16_t)(lineaddr[1] + ctrl[0x01]) << 8;
+			incxx  = (int16_t)(lineaddr[2]);
+			incxy  = (int16_t)(lineaddr[3]);
 
 			if (ctrl[0x06] & 0x8000) incxx <<= 8;
 			if (ctrl[0x06] & 0x0080) incxy <<= 8;
@@ -634,12 +634,12 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	}
 	else    /* "simple" mode */
 	{
-		startx = (INT16)(ctrl[0x00]) << 8;
-		starty = (INT16)(ctrl[0x01]) << 8;
-		incyx  = (INT16)(ctrl[0x02]);
-		incyy  = (INT16)(ctrl[0x03]);
-		incxx  = (INT16)(ctrl[0x04]);
-		incxy  = (INT16)(ctrl[0x05]);
+		startx = (int16_t)(ctrl[0x00]) << 8;
+		starty = (int16_t)(ctrl[0x01]) << 8;
+		incyx  = (int16_t)(ctrl[0x02]);
+		incyy  = (int16_t)(ctrl[0x03]);
+		incxx  = (int16_t)(ctrl[0x04]);
+		incxy  = (int16_t)(ctrl[0x05]);
 
 		if (ctrl[0x06] & 0x4000) { incyx <<= 8; incyy <<= 8; }
 		if (ctrl[0x06] & 0x0040) { incxx <<= 8; incxy <<= 8; }
@@ -658,7 +658,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 }
 
 void K053936GP_0_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output, UINT16* temp_m_k053936_0_ctrl_16, UINT16* temp_m_k053936_0_linectrl_16,UINT16* temp_m_k053936_0_ctrl, UINT16* temp_m_k053936_0_linectrl, palette_device &palette)
+		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output, uint16_t* temp_m_k053936_0_ctrl_16, uint16_t* temp_m_k053936_0_linectrl_16,uint16_t* temp_m_k053936_0_ctrl, uint16_t* temp_m_k053936_0_linectrl, palette_device &palette)
 {
 	if (temp_m_k053936_0_ctrl_16)
 	{

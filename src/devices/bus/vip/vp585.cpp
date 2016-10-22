@@ -79,7 +79,7 @@ ioport_constructor vp585_device::device_input_ports() const
 //  vp585_device - constructor
 //-------------------------------------------------
 
-vp585_device::vp585_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vp585_device::vp585_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VP585, "VP585", tag, owner, clock, "vp585", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_j1(*this, "J1"),
@@ -103,7 +103,7 @@ void vp585_device::device_start()
 //  vip_io_w - I/O write
 //-------------------------------------------------
 
-void vp585_device::vip_io_w(address_space &space, offs_t offset, UINT8 data)
+void vp585_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset == 0x02)
 	{

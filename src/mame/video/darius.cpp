@@ -7,8 +7,8 @@
 
 TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
 {
-	UINT16 code = (m_fg_ram[tile_index + 0x2000] & 0x7ff);
-	UINT16 attr = m_fg_ram[tile_index];
+	uint16_t code = (m_fg_ram[tile_index + 0x2000] & 0x7ff);
+	uint16_t attr = m_fg_ram[tile_index];
 
 	SET_TILE_INFO_MEMBER(2,
 			code,
@@ -39,10 +39,10 @@ WRITE16_MEMBER(darius_state::darius_fg_layer_w)
 
 void darius_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs, curx, cury;
-	UINT16 code, data, sx, sy;
-	UINT8 flipx, flipy, color, priority;
+	uint16_t code, data, sx, sy;
+	uint8_t flipx, flipy, color, priority;
 
 	for (offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
@@ -82,7 +82,7 @@ void darius_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 
 
-UINT32 darius_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs)
+uint32_t darius_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs)
 {
 	m_pc080sn->tilemap_update();
 
@@ -104,6 +104,6 @@ UINT32 darius_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-UINT32 darius_state::screen_update_darius_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 0); }
-UINT32 darius_state::screen_update_darius_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 1); }
-UINT32 darius_state::screen_update_darius_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 2); }
+uint32_t darius_state::screen_update_darius_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 0); }
+uint32_t darius_state::screen_update_darius_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 1); }
+uint32_t darius_state::screen_update_darius_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 2); }

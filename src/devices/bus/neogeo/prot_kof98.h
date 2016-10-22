@@ -17,13 +17,13 @@ class kof98_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
+	void decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
 	DECLARE_WRITE16_MEMBER(protection_w);
 	DECLARE_READ16_MEMBER(protection_r);
 	int m_prot_state;
-	UINT16 m_default_rom[2];
+	uint16_t m_default_rom[2];
 
 protected:
 	virtual void device_start() override;

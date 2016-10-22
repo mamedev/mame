@@ -8,12 +8,12 @@
     memory
 -------------------------------------------------*/
 
-image_init_result z80bin_load_file(device_image_interface *image, address_space &space, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
+image_init_result z80bin_load_file(device_image_interface *image, address_space &space, const char *file_type, uint16_t *exec_addr, uint16_t *start_addr, uint16_t *end_addr )
 {
 	int ch;
-	UINT16 args[3];
-	UINT16 i=0, j, size;
-	UINT8 data;
+	uint16_t args[3];
+	uint16_t i=0, j, size;
+	uint8_t data;
 	char pgmname[256];
 	char message[256];
 

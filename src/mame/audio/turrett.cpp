@@ -15,7 +15,7 @@
 //  turrett_device - constructor
 //-------------------------------------------------
 
-turrett_device::turrett_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+turrett_device::turrett_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TURRETT, "Turret Tower Sound", tag, owner, clock, "ttsnd", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
@@ -91,21 +91,21 @@ void turrett_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		if (m_channels[ch].m_playing)
 		{
-			UINT32 &addr = m_channels[ch].m_address;
-			INT32 lvol = (m_channels[ch].m_volume >> 16) & 0xff;
-			INT32 rvol = m_channels[ch].m_volume & 0xff;
+			uint32_t &addr = m_channels[ch].m_address;
+			int32_t lvol = (m_channels[ch].m_volume >> 16) & 0xff;
+			int32_t rvol = m_channels[ch].m_volume & 0xff;
 
 			lvol = m_volume_table[lvol];
 			rvol = m_volume_table[rvol];
 
 			// Channels 30 and 31 expect interleaved stereo samples
-			UINT32 incr = (ch >= 30) ? 2 : 1;
+			uint32_t incr = (ch >= 30) ? 2 : 1;
 
 			for (int s = 0; s < samples; ++s)
 			{
-				INT16 sample = m_direct->read_word(addr << 1);
+				int16_t sample = m_direct->read_word(addr << 1);
 
-				if ((UINT16)sample == 0x8000)
+				if ((uint16_t)sample == 0x8000)
 				{
 					m_channels[ch].m_playing = false;
 					break;

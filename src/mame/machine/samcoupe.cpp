@@ -81,7 +81,7 @@ WRITE8_MEMBER(samcoupe_state::sam_bank4_w)
 		sam_bank_write_ptr[3][offset] = data;
 }
 
-void samcoupe_state::samcoupe_update_bank(address_space &space, int bank_num, UINT8 *memory, int is_readonly)
+void samcoupe_state::samcoupe_update_bank(address_space &space, int bank_num, uint8_t *memory, int is_readonly)
 {
 	sam_bank_read_ptr[bank_num-1] = memory;
 	if (!is_readonly)
@@ -111,7 +111,7 @@ void samcoupe_state::samcoupe_update_bank(address_space &space, int bank_num, UI
 
 void samcoupe_state::samcoupe_install_ext_mem(address_space &space)
 {
-	UINT8 *mem;
+	uint8_t *mem;
 
 	/* bank 3 */
 	if (m_lext >> 6 < m_ram->size() >> 20)
@@ -134,8 +134,8 @@ void samcoupe_state::samcoupe_install_ext_mem(address_space &space)
 void samcoupe_state::samcoupe_update_memory(address_space &space)
 {
 	const int page_mask = ((m_ram->size() & 0xfffff) / 0x4000) - 1;
-	UINT8 *rom = m_region_maincpu->base();
-	UINT8 *memory;
+	uint8_t *rom = m_region_maincpu->base();
+	uint8_t *memory;
 	int is_readonly;
 
 	/* BANK1 */
@@ -246,9 +246,9 @@ TIMER_CALLBACK_MEMBER(samcoupe_state::samcoupe_mouse_reset)
 	m_mouse_index = 0;
 }
 
-UINT8 samcoupe_state::samcoupe_mouse_r()
+uint8_t samcoupe_state::samcoupe_mouse_r()
 {
-	UINT8 result;
+	uint8_t result;
 
 	/* on a read, reset the timer */
 	m_mouse_reset->adjust(attotime::from_usec(50));

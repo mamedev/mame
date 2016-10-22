@@ -28,19 +28,19 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* video-related */
-	UINT16   m_blitter_color[2];
-	UINT16   m_blitter_xparam[16];
-	UINT16   m_blitter_yparam[16];
-	UINT16   m_blitter_vidparam[32];
+	uint16_t   m_blitter_color[2];
+	uint16_t   m_blitter_xparam[16];
+	uint16_t   m_blitter_yparam[16];
+	uint16_t   m_blitter_vidparam[32];
 
 	std::unique_ptr<bitmap_ind16> m_dstbitmap;
 	emu_timer *m_blitter_timer;
 
 	/* misc */
-	UINT8    m_irq_state[5];
-	UINT8    m_soundlatch_full;
-	UINT8    m_sound_control;
-	UINT8    m_sound_msb_latch;
+	uint8_t    m_irq_state[5];
+	uint8_t    m_soundlatch_full;
+	uint8_t    m_sound_control;
+	uint8_t    m_sound_msb_latch;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -65,7 +65,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dcheese);
-	UINT32 screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dcheese_vblank);
 	void dcheese_signal_irq(int which);
 	void update_irq_state();

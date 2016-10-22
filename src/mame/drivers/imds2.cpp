@@ -220,7 +220,7 @@ WRITE8_MEMBER(imds2_state::imds2_ipc_control_w)
 	// See A84, pg 28 of [1]
 	// b3 is ~(bit to be written)
 	// b2-b0 is ~(no. of bit to be written)
-	UINT8 mask = (1U << (~data & 0x07));
+	uint8_t mask = (1U << (~data & 0x07));
 
 	if (BIT(data , 3)) {
 		m_ipc_control &= ~mask;
@@ -276,7 +276,7 @@ WRITE8_MEMBER(imds2_state::imds2_miscout_w)
 
 READ8_MEMBER(imds2_state::imds2_miscin_r)
 {
-	UINT8 res = m_ioc_options->read();
+	uint8_t res = m_ioc_options->read();
 	return res | ((m_beeper_timer == 0) << 2);
 }
 
@@ -524,8 +524,8 @@ I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
 {
 	unsigned i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
-	UINT16 pixels;
+	uint8_t chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
+	uint16_t pixels;
 
 	if (lten) {
 		pixels = ~0;
@@ -534,10 +534,10 @@ I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
 	} else {
 		// See [2], pg 58 for the very peculiar way of generating character images
 		// Here each half-pixel is translated into a full pixel
-		UINT16 exp_pix_l;
-		UINT16 exp_pix_r;
+		uint16_t exp_pix_l;
+		uint16_t exp_pix_r;
 
-		exp_pix_l = (UINT16)chargen_byte;
+		exp_pix_l = (uint16_t)chargen_byte;
 		exp_pix_l = ((exp_pix_l & 0x80) << 5) |
 			((exp_pix_l & 0x40) << 4) |
 			((exp_pix_l & 0x20) << 3) |
@@ -633,7 +633,7 @@ void imds2_state::imds2_update_beeper(void)
 void imds2_state::imds2_update_printer(void)
 {
 	// Data to printer is ~P1 when STATUS ENABLE/==1, else 0xff (assuming pull-ups on printer)
-	UINT8 printer_data;
+	uint8_t printer_data;
 	if ((m_pio_port2 & 0x7f) == 0x6c) {
 		printer_data = 0xff;
 	} else {

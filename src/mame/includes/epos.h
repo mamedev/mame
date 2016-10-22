@@ -15,10 +15,10 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	UINT8    m_palette;
+	uint8_t    m_palette;
 
 	/* misc */
 	int      m_counter;
@@ -30,7 +30,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(epos);
 	DECLARE_MACHINE_START(dealer);
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_pens( pen_t *pens );
 	required_device<cpu_device> m_maincpu;
 };

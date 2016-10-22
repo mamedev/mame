@@ -37,7 +37,7 @@ const device_type SWIM = &device_creator<swim_device>;
 //  ctor
 //-------------------------------------------------
 
-swim_device::swim_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+swim_device::swim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: applefdc_base_device(APPLEFDC_SWIM, mconfig, SWIM, "Apple SWIM (Steve Woz Integrated Machine)", tag, owner, clock, "swim", __FILE__)
 {
 }
@@ -71,7 +71,7 @@ void swim_device::device_reset()
 	// call inherited version
 	applefdc_base_device::device_reset();
 
-	static UINT8 swim_default_parms[16] =
+	static uint8_t swim_default_parms[16] =
 	{
 		0x38, 0x18, 0x41, 0x2e, 0x2e, 0x18, 0x18, 0x1b,
 		0x1b, 0x2f, 0x2f, 0x19, 0x19, 0x97, 0x1b, 0x57
@@ -93,9 +93,9 @@ void swim_device::device_reset()
 //  read - reads a byte from the FDC
 //-------------------------------------------------
 
-UINT8 swim_device::read(UINT8 offset)
+uint8_t swim_device::read(uint8_t offset)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	if (m_swim_mode == SWIM_MODE_IWM)
 	{
@@ -127,7 +127,7 @@ UINT8 swim_device::read(UINT8 offset)
 //  write - write a byte to the FDC
 //-------------------------------------------------
 
-void swim_device::write(UINT8 offset, UINT8 data)
+void swim_device::write(uint8_t offset, uint8_t data)
 {
 	if (m_swim_mode == SWIM_MODE_IWM)
 	{
@@ -179,7 +179,7 @@ void swim_device::write(UINT8 offset, UINT8 data)
 //  iwm_modereg_w - changes the mode register
 //-------------------------------------------------
 
-void swim_device::iwm_modereg_w(UINT8 data)
+void swim_device::iwm_modereg_w(uint8_t data)
 {
 	// SWIM mode is unlocked by writing 1/0/1/1 in a row to bit 6 (which is unused on IWM)
 	// when SWIM mode engages, the IWM is disconnected from both the 68k and the drives,

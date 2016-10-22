@@ -452,21 +452,21 @@ public:
 	DECLARE_WRITE16_MEMBER(snspellc_write_r);
 	DECLARE_READ8_MEMBER(tntell_read_k);
 
-	void k28_prepare_display(UINT8 old, UINT8 data);
+	void k28_prepare_display(uint8_t old, uint8_t data);
 	DECLARE_READ8_MEMBER(k28_read_k);
 	DECLARE_WRITE16_MEMBER(k28_write_o);
 	DECLARE_WRITE16_MEMBER(k28_write_r);
 
 	// cartridge
-	UINT32 m_cart_max_size;
-	UINT8* m_cart_base;
+	uint32_t m_cart_max_size;
+	uint8_t* m_cart_base;
 	void init_cartridge();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
 	DECLARE_DRIVER_INIT(snspell);
 	DECLARE_DRIVER_INIT(tntell);
 	DECLARE_DRIVER_INIT(lantutor);
 
-	UINT8 m_overlay;
+	uint8_t m_overlay;
 	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
 
 protected:
@@ -504,7 +504,7 @@ void tispeak_state::init_cartridge()
 
 DEVICE_IMAGE_LOAD_MEMBER(tispeak_state, tispeak_cartridge)
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size > m_cart_max_size)
 	{
@@ -549,7 +549,7 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 void tispeak_state::prepare_display()
 {
-	UINT16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
+	uint16_t gridmask = vfd_filament_on() ? 0xffff : 0x8000;
 	set_display_segmask(0x21ff, 0x3fff);
 	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
@@ -640,7 +640,7 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_o)
 READ8_MEMBER(tispeak_state::snspellc_read_k)
 {
 	// K4: TMS5100 CTL1
-	UINT8 k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
+	uint8_t k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
 
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return k4 | m_inp_matrix[9]->read() | read_inputs(9);
@@ -652,7 +652,7 @@ READ8_MEMBER(tispeak_state::snspellc_read_k)
 READ8_MEMBER(tispeak_state::tntell_read_k)
 {
 	// K8: overlay code from R5,O4-O7
-	UINT8 k8 = (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay) ? 8 : 0;
+	uint8_t k8 = (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay) ? 8 : 0;
 
 	// rest is same as snpellc
 	return k8 | snspellc_read_k(space, offset);
@@ -678,7 +678,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 
 // k28 specific
 
-void tispeak_state::k28_prepare_display(UINT8 old, UINT8 data)
+void tispeak_state::k28_prepare_display(uint8_t old, uint8_t data)
 {
 	// ?
 }
@@ -725,7 +725,7 @@ READ8_MEMBER(tispeak_state::k28_read_k)
 
 INPUT_CHANGED_MEMBER(tispeak_state::power_button)
 {
-	int on = (int)(FPTR)param;
+	int on = (int)(uintptr_t)param;
 
 	if (on && !m_power_on)
 	{

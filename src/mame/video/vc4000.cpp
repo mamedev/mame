@@ -61,9 +61,9 @@ void vc4000_state::video_start()
 	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 }
 
-inline UINT8 vc4000_state::vc4000_joystick_return_to_centre(UINT8 joy)
+inline uint8_t vc4000_state::vc4000_joystick_return_to_centre(uint8_t joy)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (joy > (STICKCENTRE+5))
 		data=joy-5;
@@ -78,7 +78,7 @@ inline UINT8 vc4000_state::vc4000_joystick_return_to_centre(UINT8 joy)
 
 READ8_MEMBER( vc4000_state::vc4000_video_r )
 {
-	UINT8 data=0;
+	uint8_t data=0;
 	if (offset > 0xcf) offset &= 0xcf;  // c0-cf is mirrored at d0-df, e0-ef, f0-ff
 	switch (offset)
 	{
@@ -393,7 +393,7 @@ void vc4000_state::vc4000_draw_digit(bitmap_ind16 &bitmap, int x, int y, int d, 
 	}
 }
 
-inline void vc4000_state::vc4000_collision_plot(UINT8 *collision, UINT8 data, UINT8 color, int scale)
+inline void vc4000_state::vc4000_collision_plot(uint8_t *collision, uint8_t data, uint8_t color, int scale)
 {
 	int i,j,m;
 
@@ -407,7 +407,7 @@ inline void vc4000_state::vc4000_collision_plot(UINT8 *collision, UINT8 data, UI
 }
 
 
-void vc4000_state::vc4000_sprite_update(bitmap_ind16 &bitmap, UINT8 *collision, SPRITE *This)
+void vc4000_state::vc4000_sprite_update(bitmap_ind16 &bitmap, uint8_t *collision, SPRITE *This)
 {
 	int i,j,m;
 
@@ -516,7 +516,7 @@ void vc4000_state::vc4000_sprite_update(bitmap_ind16 &bitmap, UINT8 *collision, 
 	}
 }
 
-inline void vc4000_state::vc4000_draw_grid(UINT8 *collision)
+inline void vc4000_state::vc4000_draw_grid(uint8_t *collision)
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -575,7 +575,7 @@ inline void vc4000_state::vc4000_draw_grid(UINT8 *collision)
 INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 {
 	int x,y,i;
-	UINT8 collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays
+	uint8_t collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays
 	const rectangle &visarea = m_screen->visible_area();
 	assert(ARRAY_LENGTH(collision) >= m_screen->width());
 
@@ -644,7 +644,7 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 		}
 }
 
-UINT32 vc4000_state::screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vc4000_state::screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

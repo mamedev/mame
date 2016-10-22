@@ -41,7 +41,7 @@ const device_type IQ151_AMOS3 = &device_creator<iq151_amos3_device>;
 //  iq151_rom_device - constructor
 //-------------------------------------------------
 
-iq151_rom_device::iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+iq151_rom_device::iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_iq151cart_interface(mconfig, *this), m_rom(nullptr)
 {
@@ -53,7 +53,7 @@ iq151_rom_device::iq151_rom_device(const machine_config &mconfig, device_type ty
 
 void iq151_rom_device::device_start()
 {
-	m_rom = (UINT8*)memregion("rom")->base();
+	m_rom = (uint8_t*)memregion("rom")->base();
 }
 
 //-------------------------------------------------
@@ -69,7 +69,7 @@ const tiny_rom_entry *iq151_rom_device::device_rom_region() const
     get_cart_base
 -------------------------------------------------*/
 
-UINT8* iq151_rom_device::get_cart_base()
+uint8_t* iq151_rom_device::get_cart_base()
 {
 	return m_rom;
 }
@@ -83,7 +83,7 @@ UINT8* iq151_rom_device::get_cart_base()
 //  iq151_basic6_device - constructor
 //-------------------------------------------------
 
-iq151_basic6_device::iq151_basic6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_basic6_device::iq151_basic6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: iq151_rom_device(mconfig, IQ151_BASIC6, "IQ151 BASIC6", tag, owner, clock, "iq151_basic6", __FILE__)
 {
 }
@@ -93,7 +93,7 @@ iq151_basic6_device::iq151_basic6_device(const machine_config &mconfig, const ch
 //  read
 //-------------------------------------------------
 
-void iq151_basic6_device::read(offs_t offset, UINT8 &data)
+void iq151_basic6_device::read(offs_t offset, uint8_t &data)
 {
 	if (offset >= 0xc800 && offset < 0xe800)
 		data = m_rom[offset - 0xc800];
@@ -108,7 +108,7 @@ void iq151_basic6_device::read(offs_t offset, UINT8 &data)
 //  iq151_basicg_device - constructor
 //-------------------------------------------------
 
-iq151_basicg_device::iq151_basicg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_basicg_device::iq151_basicg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: iq151_rom_device(mconfig, IQ151_BASICG, "IQ151 BASICG", tag, owner, clock, "iq151_basicg", __FILE__)
 {
 }
@@ -117,7 +117,7 @@ iq151_basicg_device::iq151_basicg_device(const machine_config &mconfig, const ch
     read
 -------------------------------------------------*/
 
-void iq151_basicg_device::read(offs_t offset, UINT8 &data)
+void iq151_basicg_device::read(offs_t offset, uint8_t &data)
 {
 	if (offset >= 0xb000 && offset < 0xc000)
 		data = m_rom[offset & 0x0fff];
@@ -134,7 +134,7 @@ void iq151_basicg_device::read(offs_t offset, UINT8 &data)
 //  iq151_amos1_device - constructor
 //-------------------------------------------------
 
-iq151_amos1_device::iq151_amos1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_amos1_device::iq151_amos1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: iq151_rom_device(mconfig, IQ151_AMOS1, "IQ151 AMOS cart 1", tag, owner, clock, "iq151_amos1", __FILE__),
 		m_active(true)
 {
@@ -144,7 +144,7 @@ iq151_amos1_device::iq151_amos1_device(const machine_config &mconfig, const char
     read
 -------------------------------------------------*/
 
-void iq151_amos1_device::read(offs_t offset, UINT8 &data)
+void iq151_amos1_device::read(offs_t offset, uint8_t &data)
 {
 	if (offset >= 0x8000 && offset < 0xc000 && m_active)
 		data = m_rom[offset & 0x3fff];
@@ -154,7 +154,7 @@ void iq151_amos1_device::read(offs_t offset, UINT8 &data)
     IO write
 -------------------------------------------------*/
 
-void iq151_amos1_device::io_write(offs_t offset, UINT8 data)
+void iq151_amos1_device::io_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xec && offset < 0xf0)
 		m_active = data == 0x00;
@@ -168,7 +168,7 @@ void iq151_amos1_device::io_write(offs_t offset, UINT8 data)
 //  iq151_amos2_device - constructor
 //-------------------------------------------------
 
-iq151_amos2_device::iq151_amos2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_amos2_device::iq151_amos2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: iq151_rom_device(mconfig, IQ151_AMOS2, "IQ151 AMOS cart 2", tag, owner, clock, "iq151_amos2", __FILE__),
 		m_active(false)
 {
@@ -178,7 +178,7 @@ iq151_amos2_device::iq151_amos2_device(const machine_config &mconfig, const char
     read
 -------------------------------------------------*/
 
-void iq151_amos2_device::read(offs_t offset, UINT8 &data)
+void iq151_amos2_device::read(offs_t offset, uint8_t &data)
 {
 	if (offset >= 0x8000 && offset < 0xc000 && m_active)
 		data = m_rom[offset & 0x3fff];
@@ -188,7 +188,7 @@ void iq151_amos2_device::read(offs_t offset, UINT8 &data)
     IO write
 -------------------------------------------------*/
 
-void iq151_amos2_device::io_write(offs_t offset, UINT8 data)
+void iq151_amos2_device::io_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xec && offset < 0xf0)
 		m_active = data == 0x01;
@@ -202,7 +202,7 @@ void iq151_amos2_device::io_write(offs_t offset, UINT8 data)
 //  iq151_amos3_device - constructor
 //-------------------------------------------------
 
-iq151_amos3_device::iq151_amos3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_amos3_device::iq151_amos3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: iq151_rom_device(mconfig, IQ151_AMOS3, "IQ151 AMOS cart 3", tag, owner, clock, "iq151_amos3", __FILE__),
 		m_active(true)
 {
@@ -212,7 +212,7 @@ iq151_amos3_device::iq151_amos3_device(const machine_config &mconfig, const char
     read
 -------------------------------------------------*/
 
-void iq151_amos3_device::read(offs_t offset, UINT8 &data)
+void iq151_amos3_device::read(offs_t offset, uint8_t &data)
 {
 	if (offset >= 0x8000 && offset < 0xc000 && m_active)
 		data = m_rom[offset & 0x3fff];
@@ -222,7 +222,7 @@ void iq151_amos3_device::read(offs_t offset, UINT8 &data)
     IO write
 -------------------------------------------------*/
 
-void iq151_amos3_device::io_write(offs_t offset, UINT8 data)
+void iq151_amos3_device::io_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xec && offset < 0xf0)
 		m_active = data == 0x02;

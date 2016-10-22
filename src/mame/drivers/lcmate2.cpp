@@ -70,7 +70,7 @@ WRITE8_MEMBER( lcmate2_state::speaker_w )
 // offsets are FE,FD,FB,F7,EF,DF,BF,7F to scan a particular row, or 00 to check if any key pressed
 READ8_MEMBER( lcmate2_state::key_r )
 {
-	UINT8 i,data = 0xff;
+	uint8_t i,data = 0xff;
 	char kbdrow[8];
 
 	for (i=0; i<8; i++)
@@ -202,7 +202,7 @@ PALETTE_INIT_MEMBER(lcmate2_state, lcmate2)
 
 void lcmate2_state::machine_start()
 {
-	membank("rombank")->configure_entries(0, 0x10, (UINT8*)memregion("maincpu")->base(), 0x4000);
+	membank("rombank")->configure_entries(0, 0x10, (uint8_t*)memregion("maincpu")->base(), 0x4000);
 }
 
 static const gfx_layout lcmate2_charlayout =

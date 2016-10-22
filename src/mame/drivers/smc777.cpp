@@ -85,7 +85,7 @@ public:
 	DECLARE_READ8_MEMBER(irq_mask_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_PALETTE_INIT(smc777);
-	UINT32 screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
@@ -111,29 +111,29 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_ipl_rom;
-	std::unique_ptr<UINT8[]> m_work_ram;
-	std::unique_ptr<UINT8[]> m_vram;
-	std::unique_ptr<UINT8[]> m_attr;
-	std::unique_ptr<UINT8[]> m_gvram;
-	std::unique_ptr<UINT8[]> m_pcg;
+	uint8_t *m_ipl_rom;
+	std::unique_ptr<uint8_t[]> m_work_ram;
+	std::unique_ptr<uint8_t[]> m_vram;
+	std::unique_ptr<uint8_t[]> m_attr;
+	std::unique_ptr<uint8_t[]> m_gvram;
+	std::unique_ptr<uint8_t[]> m_pcg;
 
-	UINT8 m_keyb_press;
-	UINT8 m_keyb_press_flag;
-	UINT8 m_shift_press_flag;
-	UINT8 m_backdrop_pen;
-	UINT8 m_display_reg;
-	UINT8 m_fdc_irq_flag;
-	UINT8 m_fdc_drq_flag;
-	UINT8 m_system_data;
-	struct { UINT8 r,g,b; } m_pal;
-	UINT8 m_raminh,m_raminh_pending_change; //bankswitch
-	UINT8 m_raminh_prefetch;
-	UINT8 m_irq_mask;
-	UINT8 m_pal_mode;
-	UINT8 m_keyb_cmd;
-	UINT8 m_crtc_vreg[0x20];
-	UINT8 m_crtc_addr;
+	uint8_t m_keyb_press;
+	uint8_t m_keyb_press_flag;
+	uint8_t m_shift_press_flag;
+	uint8_t m_backdrop_pen;
+	uint8_t m_display_reg;
+	uint8_t m_fdc_irq_flag;
+	uint8_t m_fdc_drq_flag;
+	uint8_t m_system_data;
+	struct { uint8_t r,g,b; } m_pal;
+	uint8_t m_raminh,m_raminh_pending_change; //bankswitch
+	uint8_t m_raminh_prefetch;
+	uint8_t m_irq_mask;
+	uint8_t m_pal_mode;
+	uint8_t m_keyb_cmd;
+	uint8_t m_crtc_vreg[0x20];
+	uint8_t m_crtc_addr;
 };
 
 
@@ -145,10 +145,10 @@ void smc777_state::video_start()
 {
 }
 
-UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,yi;
-	UINT16 count;
+	uint16_t count;
 	int x_width;
 
 //  popmessage("%d %d %d %d",mc6845_v_char_total,mc6845_v_total_adj,mc6845_v_display,mc6845_v_sync_pos);
@@ -165,7 +165,7 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 		{
 			for(x=0;x<160;x++)
 			{
-				UINT16 color;
+				uint16_t color;
 
 				color = (m_gvram[count] & 0xf0) >> 4;
 				/* todo: clean this up! */
@@ -304,7 +304,7 @@ WRITE8_MEMBER(smc777_state::mc6845_w)
 
 READ8_MEMBER(smc777_state::vram_r)
 {
-	UINT16 vram_index;
+	uint16_t vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
@@ -314,7 +314,7 @@ READ8_MEMBER(smc777_state::vram_r)
 
 READ8_MEMBER(smc777_state::attr_r)
 {
-	UINT16 vram_index;
+	uint16_t vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
@@ -324,7 +324,7 @@ READ8_MEMBER(smc777_state::attr_r)
 
 READ8_MEMBER(smc777_state::pcg_r)
 {
-	UINT16 vram_index;
+	uint16_t vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
@@ -334,7 +334,7 @@ READ8_MEMBER(smc777_state::pcg_r)
 
 WRITE8_MEMBER(smc777_state::vram_w)
 {
-	UINT16 vram_index;
+	uint16_t vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
@@ -344,7 +344,7 @@ WRITE8_MEMBER(smc777_state::vram_w)
 
 WRITE8_MEMBER(smc777_state::attr_w)
 {
-	UINT16 vram_index;
+	uint16_t vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
@@ -354,7 +354,7 @@ WRITE8_MEMBER(smc777_state::attr_w)
 
 WRITE8_MEMBER(smc777_state::pcg_w)
 {
-	UINT16 vram_index;
+	uint16_t vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
@@ -366,7 +366,7 @@ WRITE8_MEMBER(smc777_state::pcg_w)
 
 READ8_MEMBER(smc777_state::fbuf_r)
 {
-	UINT16 vram_index;
+	uint16_t vram_index;
 
 	vram_index  = ((offset & 0x007f) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
@@ -376,7 +376,7 @@ READ8_MEMBER(smc777_state::fbuf_r)
 
 WRITE8_MEMBER(smc777_state::fbuf_w)
 {
-	UINT16 vram_index;
+	uint16_t vram_index;
 
 	vram_index  = ((offset & 0x00ff) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
@@ -396,7 +396,7 @@ WRITE8_MEMBER( smc777_state::fdc_w )
 
 READ8_MEMBER( smc777_state::fdc_request_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= !m_fdc_drq_flag << 6;
 	data |= m_fdc_irq_flag << 7;
@@ -512,7 +512,7 @@ WRITE8_MEMBER(smc777_state::system_output_w)
 	{
 		case 0x00:
 			m_raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
-			m_raminh_prefetch = (UINT8)(space.device().state().state_int(Z80_R)) & 0x7f;
+			m_raminh_prefetch = (uint8_t)(space.device().state().state_int(Z80_R)) & 0x7f;
 			break;
 		case 0x02: printf("Interlace %s\n",data & 0x10 ? "on" : "off"); break;
 		case 0x05: m_beeper->set_state(data & 0x10); break;
@@ -531,7 +531,7 @@ WRITE8_MEMBER(smc777_state::color_mode_w)
 
 WRITE8_MEMBER(smc777_state::ramdac_w)
 {
-	UINT8 pal_index;
+	uint8_t pal_index;
 	pal_index = (offset & 0xf00) >> 8;
 
 	if(data & 0x0f)
@@ -564,11 +564,11 @@ WRITE8_MEMBER(smc777_state::display_reg_w)
 
 READ8_MEMBER(smc777_state::smc777_mem_r)
 {
-	UINT8 z80_r;
+	uint8_t z80_r;
 
 	if(m_raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
 	{
-		z80_r = (UINT8)space.device().state().state_int(Z80_R);
+		z80_r = (uint8_t)space.device().state().state_int(Z80_R);
 
 		if(z80_r == ((m_raminh_prefetch+2) & 0x7f))
 		{
@@ -831,7 +831,7 @@ INPUT_PORTS_END
     "M" row 3 / / ? = 0x2f / 0x3f
 */
 
-static const UINT8 smc777_keytable[2][0xa0] =
+static const uint8_t smc777_keytable[2][0xa0] =
 {
 	/* normal*/
 	{
@@ -868,8 +868,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(smc777_state::keyboard_callback)
 {
 	static const char *const portnames[11] = { "key0","key1","key2","key3","key4","key5","key6","key7", "key8", "key9", "keya" };
 	int i,port_i,scancode;
-	UINT8 shift_mod = ioport("key_mod")->read() & 1;
-	UINT8 kana_mod = ioport("key_mod")->read() & 0x10;
+	uint8_t shift_mod = ioport("key_mod")->read() & 1;
+	uint8_t kana_mod = ioport("key_mod")->read() & 0x10;
 	scancode = 0;
 
 	for(port_i=0;port_i<11;port_i++)
@@ -903,11 +903,11 @@ static const gfx_layout smc777_charlayout =
 void smc777_state::machine_start()
 {
 	m_ipl_rom = memregion("ipl")->base();
-	m_work_ram = make_unique_clear<UINT8[]>(0x10000);
-	m_vram = make_unique_clear<UINT8[]>(0x800);
-	m_attr = make_unique_clear<UINT8[]>(0x800);
-	m_gvram = make_unique_clear<UINT8[]>(0x8000);
-	m_pcg = make_unique_clear<UINT8[]>(0x800);
+	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
+	m_vram = make_unique_clear<uint8_t[]>(0x800);
+	m_attr = make_unique_clear<uint8_t[]>(0x800);
+	m_gvram = make_unique_clear<uint8_t[]>(0x8000);
+	m_pcg = make_unique_clear<uint8_t[]>(0x800);
 
 	save_pointer(NAME(m_work_ram.get()), 0x10000);
 	save_pointer(NAME(m_vram.get()), 0x800);
@@ -936,7 +936,7 @@ PALETTE_INIT_MEMBER(smc777_state, smc777)
 
 	for(i=0x10;i<0x18;i++)
 	{
-		UINT8 r,g,b;
+		uint8_t r,g,b;
 
 		r = (i & 4) >> 2;
 		g = (i & 2) >> 1;

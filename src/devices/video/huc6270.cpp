@@ -94,9 +94,9 @@ ALLOW_SAVE_TYPE(huc6270_device::huc6270_h_state);
 const device_type HUC6270 = &device_creator<huc6270_device>;
 
 
-const UINT8 huc6270_device::vram_increments[4] = { 1, 32, 64, 128 };
+const uint8_t huc6270_device::vram_increments[4] = { 1, 32, 64, 128 };
 
-huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HUC6270, "HuC6270 VDC", tag, owner, clock, "huc6270", __FILE__),
 	m_vram_size(0),
 	m_irq_changed_cb(*this)
@@ -109,7 +109,7 @@ huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, d
 */
 inline void huc6270_device::fetch_bat_tile_row()
 {
-	UINT16 bat_data, data1, data2, data3, data4, tile_palette;
+	uint16_t bat_data, data1, data2, data3, data4, tile_palette;
 	int i;
 
 	bat_data = m_vram[ m_bat_address & m_vram_mask ];
@@ -122,7 +122,7 @@ inline void huc6270_device::fetch_bat_tile_row()
 
 	for ( i = 7; i >= 0; i-- )
 	{
-		UINT16 c = ( data1 & 0x01 ) | ( data2 & 0x02 ) | ( data3 & 0x04 ) | ( data4 & 0x08 );
+		uint16_t c = ( data1 & 0x01 ) | ( data2 & 0x02 ) | ( data3 & 0x04 ) | ( data4 & 0x08 );
 
 		/* Colour 0 for background tiles is always taken from palette 0 */
 		if ( c )
@@ -144,7 +144,7 @@ void huc6270_device::add_sprite( int index, int x, int pattern, int line, int fl
 
 	if ( i < 16 )
 	{
-		UINT32 b0, b1, b2, b3;
+		uint32_t b0, b1, b2, b3;
 		int j;
 
 		if ( flip_x )
@@ -177,7 +177,7 @@ void huc6270_device::add_sprite( int index, int x, int pattern, int line, int fl
 
 		for ( j = 15; j >= 0; j-- )
 		{
-			UINT8 data = ( b3 & 0x08 ) | ( b2 & 0x04 ) | ( b1 & 0x02 ) | ( b0 & 0x01 );
+			uint8_t data = ( b3 & 0x08 ) | ( b2 & 0x04 ) | ( b1 & 0x02 ) | ( b0 & 0x01 );
 
 			if ( data )
 			{
@@ -369,7 +369,7 @@ inline void huc6270_device::next_horz_state()
 		m_horz_to_go = ( m_hdr & 0x7F ) + 1;
 		{
 			static const int width_shift[4] = { 5, 6, 7, 7 };
-			UINT16 v;
+			uint16_t v;
 
 			v = ( m_byr_latched ) & ( ( m_mwr & 0x40 ) ? 0x1FF : 0xFF );
 			m_bat_row = v & 7;
@@ -409,7 +409,7 @@ inline void huc6270_device::next_horz_state()
 
 READ16_MEMBER( huc6270_device::next_pixel )
 {
-	UINT16 data = HUC6270_SPRITE;
+	uint16_t data = HUC6270_SPRITE;
 
 	/* Check if we're on an active display line */
 	if ( m_vert_state == HUC6270_VDW )
@@ -417,7 +417,7 @@ READ16_MEMBER( huc6270_device::next_pixel )
 		/* Check if we're in active display area */
 		if ( m_horz_state == HUC6270_HDW )
 		{
-			UINT8 sprite_data = m_sprite_row[ m_sprite_row_index ] & 0x00FF;
+			uint8_t sprite_data = m_sprite_row[ m_sprite_row_index ] & 0x00FF;
 			int collission = ( m_sprite_row[ m_sprite_row_index ] & 0x8000 ) ? 1 : 0;
 
 			if ( m_cr & 0x80 )
@@ -511,7 +511,7 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 
 				if (LOG) logerror("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr );
 				do {
-					UINT16 data = m_vram[ m_sour & m_vram_mask ];
+					uint16_t data = m_vram[ m_sour & m_vram_mask ];
 					m_vram[ m_desr & m_vram_mask ] = data;
 					m_sour += sour_inc;
 					m_desr += desr_inc;
@@ -579,7 +579,7 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 
 READ8_MEMBER( huc6270_device::read )
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	switch ( offset & 3 )
 	{
@@ -804,10 +804,10 @@ void huc6270_device::device_start()
 	/* Resolve callbacks */
 	m_irq_changed_cb.resolve_safe();
 
-	m_vram = make_unique_clear<UINT16[]>(m_vram_size/sizeof(UINT16));
+	m_vram = make_unique_clear<uint16_t[]>(m_vram_size/sizeof(uint16_t));
 	m_vram_mask = (m_vram_size >> 1) - 1;
 
-	save_pointer(NAME(m_vram.get()), m_vram_size/sizeof(UINT16));
+	save_pointer(NAME(m_vram.get()), m_vram_size/sizeof(uint16_t));
 
 	save_item(NAME(m_register_index));
 	save_item(NAME(m_mawr));

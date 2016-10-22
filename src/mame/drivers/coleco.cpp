@@ -229,9 +229,9 @@ READ8_MEMBER( coleco_state::cart_r )
 	return m_cart->bd_r(space, offset & 0x7fff, 0, 0, 0, 0, 0);
 }
 
-UINT8 coleco_state::coleco_scan_paddles(UINT8 *joy_status0, UINT8 *joy_status1)
+uint8_t coleco_state::coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1)
 {
-	UINT8 ctrl_sel = m_ctrlsel.read_safe(0);
+	uint8_t ctrl_sel = m_ctrlsel.read_safe(0);
 
 	/* which controller shall we read? */
 	if ((ctrl_sel & 0x07) == 0x02)          // Super Action Controller P1
@@ -258,18 +258,18 @@ UINT8 coleco_state::coleco_scan_paddles(UINT8 *joy_status0, UINT8 *joy_status1)
 }
 
 
-UINT8 coleco_state::coleco_paddle_read(int port, int joy_mode, UINT8 joy_status)
+uint8_t coleco_state::coleco_paddle_read(int port, int joy_mode, uint8_t joy_status)
 {
-	UINT8 ctrl_sel = m_ctrlsel.read_safe(0);
-	UINT8 ctrl_extra = ctrl_sel & 0x80;
+	uint8_t ctrl_sel = m_ctrlsel.read_safe(0);
+	uint8_t ctrl_extra = ctrl_sel & 0x80;
 	ctrl_sel = ctrl_sel >> (port*4) & 7;
 
 	/* Keypad and fire 1 (SAC Yellow Button) */
 	if (joy_mode == 0)
 	{
 		/* No key pressed by default */
-		UINT8 data = 0x0f;
-		UINT16 ipt = 0xffff;
+		uint8_t data = 0x0f;
+		uint16_t ipt = 0xffff;
 
 		if (ctrl_sel == 0)          // ColecoVision Controller
 			ipt = port ? m_std_keypad2->read() : m_std_keypad1->read();
@@ -300,7 +300,7 @@ UINT8 coleco_state::coleco_paddle_read(int port, int joy_mode, UINT8 joy_status)
 	/* Joystick and fire 2 (SAC Red Button) */
 	else
 	{
-		UINT8 data = 0x7f;
+		uint8_t data = 0x7f;
 
 		if (ctrl_sel == 0)          // ColecoVision Controller
 			data = port ? m_std_joy2->read() : m_std_joy1->read();
@@ -352,7 +352,7 @@ void coleco_state::machine_reset()
 	m_last_nmi_state = 0;
 }
 
-//static image_verify_result coleco_cart_verify(const UINT8 *cartdata, size_t size)
+//static image_verify_result coleco_cart_verify(const uint8_t *cartdata, size_t size)
 //{
 //  int retval = image_verify_result::FAIL;
 //

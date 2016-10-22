@@ -373,7 +373,7 @@ Quick review of the system16 hardware:
 
 const device_type SEGAIC16VID = &device_creator<segaic16_video_device>;
 
-segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGAIC16VID, "Sega 16-bit Video", tag, owner, clock, "segaic16_video", __FILE__),
 		device_video_interface(mconfig, *this)
 	, m_display_enable(0)
@@ -445,7 +445,7 @@ void segaic16_video_device::set_display_enable(int enable)
  *
  *************************************/
 
-void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority)
+void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t pages, uint16_t xscroll, uint16_t yscroll, uint32_t flags, uint32_t priority)
 {
 	int leftmin = -1, leftmax = -1, rightmin = -1, rightmax = -1;
 	int topmin = -1, topmax = -1, bottommin = -1, bottommax = -1;
@@ -665,7 +665,7 @@ void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitm
 TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_tile_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
-	UINT16 data = info->rambase[tile_index];
+	uint16_t data = info->rambase[tile_index];
 	int code = ((data >> 1) & 0x1000) | (data & 0xfff);
 	int color = (data >> 5) & 0x7f;
 
@@ -677,7 +677,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_tile_info )
 TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_text_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
-	UINT16 data = info->rambase[tile_index];
+	uint16_t data = info->rambase[tile_index];
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
@@ -688,13 +688,13 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_text_info )
 
 void tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority)
 {
-	UINT16 *textram = info->textram;
+	uint16_t *textram = info->textram;
 
 	/* note that the scrolling for these games can only scroll as much as the top-left */
 	/* page; in order to scroll beyond that they swap pages and reset the scroll value */
-	UINT16 xscroll = textram[0xff8/2 + which] & 0x1ff;
-	UINT16 yscroll = textram[0xf24/2 + which] & 0x0ff;
-	UINT16 pages = textram[(info->flip ? 0xe8e/2 : 0xe9e/2) - which];
+	uint16_t xscroll = textram[0xff8/2 + which] & 0x1ff;
+	uint16_t yscroll = textram[0xf24/2 + which] & 0x0ff;
+	uint16_t pages = textram[(info->flip ? 0xe8e/2 : 0xe9e/2) - which];
 	int x, y;
 
 	/* pages are swapped along the X direction, and there are only 8 of them */
@@ -720,7 +720,7 @@ void tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info *info, bi
 			/* loop over column chunks */
 			for (x = cliprect.min_x & ~15; x <= cliprect.max_x; x += 16)
 			{
-				UINT16 effxscroll, effyscroll;
+				uint16_t effxscroll, effyscroll;
 
 				/* adjust to clip this column only */
 				rowcolclip.min_x = (x < cliprect.min_x) ? cliprect.min_x : x;
@@ -749,7 +749,7 @@ void tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info *info, bi
 		for (x = cliprect.min_x & ~15; x <= cliprect.max_x; x += 16)
 		{
 			rectangle colclip = cliprect;
-			UINT16 effxscroll, effyscroll;
+			uint16_t effxscroll, effyscroll;
 
 			/* adjust to clip this row only */
 			colclip.min_x = (x < cliprect.min_x) ? cliprect.min_x : x;
@@ -778,7 +778,7 @@ void tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info *info, bi
 		{
 			int rowscrollindex = (info->flip ? (216 - y) : y) / 8;
 			rectangle rowclip = cliprect;
-			UINT16 effxscroll, effyscroll;
+			uint16_t effxscroll, effyscroll;
 
 			/* adjust to clip this row only */
 			rowclip.min_y = (y < cliprect.min_y) ? cliprect.min_y : y;
@@ -877,7 +877,7 @@ void tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info *info, bi
 TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_tile_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
-	UINT16 data = info->rambase[tile_index];
+	uint16_t data = info->rambase[tile_index];
 	int color = (data >> 6) & 0x7f;
 	int code = data & 0x1fff;
 
@@ -891,7 +891,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_tile_info )
 TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_text_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
-	UINT16 data = info->rambase[tile_index];
+	uint16_t data = info->rambase[tile_index];
 	int bank = info->bank[0];
 	int color = (data >> 9) & 0x07;
 	int code = data & 0x1ff;
@@ -904,7 +904,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_text_info )
 TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_tile_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
-	UINT16 data = info->rambase[tile_index];
+	uint16_t data = info->rambase[tile_index];
 	int color = (data >> 5) & 0x7f;
 	int code = data & 0x1fff;
 
@@ -918,7 +918,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_tile_info )
 TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_text_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
-	UINT16 data = info->rambase[tile_index];
+	uint16_t data = info->rambase[tile_index];
 	int bank = info->bank[0];
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
@@ -930,8 +930,8 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_text_info )
 
 void tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority)
 {
-	UINT16 *textram = info->textram;
-	UINT16 xscroll, yscroll, pages;
+	uint16_t *textram = info->textram;
+	uint16_t xscroll, yscroll, pages;
 	int x, y;
 
 	/* get global values */
@@ -957,8 +957,8 @@ void tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info *info, bi
 			/* loop over column chunks */
 			for (x = ((cliprect.min_x + 8) & ~15) - 8; x <= cliprect.max_x; x += 16)
 			{
-				UINT16 effxscroll, effyscroll, rowscroll;
-				UINT16 effpages = pages;
+				uint16_t effxscroll, effyscroll, rowscroll;
+				uint16_t effpages = pages;
 
 				/* adjust to clip this column only */
 				rowcolclip.min_x = (x < cliprect.min_x) ? cliprect.min_x : x;
@@ -993,8 +993,8 @@ void tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info *info, bi
 		{
 			int rowscrollindex = (info->flip ? (216 - y) : y) / 8;
 			rectangle rowclip = cliprect;
-			UINT16 effxscroll, effyscroll, rowscroll;
-			UINT16 effpages = pages;
+			uint16_t effxscroll, effyscroll, rowscroll;
+			uint16_t effpages = pages;
 
 			/* adjust to clip this row only */
 			rowclip.min_y = (y < cliprect.min_y) ? cliprect.min_y : y;
@@ -1024,7 +1024,7 @@ void tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info *info, bi
 
 
 
-void segaic16_video_device::tilemap_16b_fill_latch(int i, UINT16* latched_pageselect, UINT16* latched_yscroll, UINT16* latched_xscroll, UINT16* textram)
+void segaic16_video_device::tilemap_16b_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram)
 {
 	latched_pageselect[i] = textram[0xe80 / 2 + i];
 	latched_yscroll[i] = textram[0xe90/2 + i];
@@ -1035,7 +1035,7 @@ void segaic16_video_device::tilemap_16b_fill_latch(int i, UINT16* latched_pagese
 TIMER_CALLBACK_MEMBER( segaic16_video_device::tilemap_16b_latch_values )
 {
 	struct tilemap_info *info = &m_bg_tilemap[param];
-	UINT16 *textram = info->textram;
+	uint16_t *textram = info->textram;
 	int i;
 
 	/* latch the scroll and page select values */
@@ -1377,10 +1377,10 @@ void segaic16_video_device::rotate_init(int which, int type, int colorbase)
 	}
 
 	/* allocate a buffer for swapping */
-	info->buffer = std::make_unique<UINT16[]>(info->ramsize/2);
+	info->buffer = std::make_unique<uint16_t[]>(info->ramsize/2);
 
 	save_item(NAME(info->colorbase), which);
-	save_pointer(NAME((UINT8 *) info->buffer.get()), info->ramsize, which);
+	save_pointer(NAME((uint8_t *) info->buffer.get()), info->ramsize, which);
 }
 
 
@@ -1394,12 +1394,12 @@ void segaic16_video_device::rotate_init(int which, int type, int colorbase)
 void segaic16_video_device::rotate_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, bitmap_ind16 &srcbitmap)
 {
 	struct rotate_info *info = &m_rotate[which];
-	INT32 currx = (info->buffer[0x3f0] << 16) | info->buffer[0x3f1];
-	INT32 curry = (info->buffer[0x3f2] << 16) | info->buffer[0x3f3];
-	INT32 dyy = (info->buffer[0x3f4] << 16) | info->buffer[0x3f5];
-	INT32 dxx = (info->buffer[0x3f6] << 16) | info->buffer[0x3f7];
-	INT32 dxy = (info->buffer[0x3f8] << 16) | info->buffer[0x3f9];
-	INT32 dyx = (info->buffer[0x3fa] << 16) | info->buffer[0x3fb];
+	int32_t currx = (info->buffer[0x3f0] << 16) | info->buffer[0x3f1];
+	int32_t curry = (info->buffer[0x3f2] << 16) | info->buffer[0x3f3];
+	int32_t dyy = (info->buffer[0x3f4] << 16) | info->buffer[0x3f5];
+	int32_t dxx = (info->buffer[0x3f6] << 16) | info->buffer[0x3f7];
+	int32_t dxy = (info->buffer[0x3f8] << 16) | info->buffer[0x3f9];
+	int32_t dyx = (info->buffer[0x3fa] << 16) | info->buffer[0x3fb];
 	int x, y;
 
 	/* advance forward based on the clip rect */
@@ -1409,11 +1409,11 @@ void segaic16_video_device::rotate_draw(int which, bitmap_ind16 &bitmap, const r
 	/* loop over screen Y coordinates */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dest = &bitmap.pix16(y);
-		UINT16 *src = &srcbitmap.pix16(0);
-		UINT8 *pri = &priority_bitmap.pix8(y);
-		INT32 tx = currx;
-		INT32 ty = curry;
+		uint16_t *dest = &bitmap.pix16(y);
+		uint16_t *src = &srcbitmap.pix16(0);
+		uint8_t *pri = &priority_bitmap.pix8(y);
+		int32_t tx = currx;
+		int32_t ty = curry;
 
 		/* loop over screen X coordinates */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -1460,14 +1460,14 @@ READ16_MEMBER( segaic16_video_device::rotate_control_r )
 
 	if (info->buffer)
 	{
-		UINT32 *src = (UINT32 *)info->rotateram;
-		UINT32 *dst = (UINT32 *)info->buffer.get();
+		uint32_t *src = (uint32_t *)info->rotateram;
+		uint32_t *dst = (uint32_t *)info->buffer.get();
 		int i;
 
 		/* swap the halves of the rotation RAM */
 		for (i = 0; i < info->ramsize/4; i++)
 		{
-			UINT32 temp = *src;
+			uint32_t temp = *src;
 			*src++ = *dst;
 			*dst++ = temp;
 		}

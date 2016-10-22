@@ -6,7 +6,7 @@
 class pc090oj_device : public device_t
 {
 public:
-	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~pc090oj_device() {}
 
 	// static configuration
@@ -24,7 +24,7 @@ public:
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 
-	void set_sprite_ctrl(UINT16 sprctrl);
+	void set_sprite_ctrl(uint16_t sprctrl);
 	void eof_callback();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_type);
 
@@ -44,11 +44,11 @@ private:
 
 */
 
-	UINT16     m_ctrl;
-	UINT16     m_sprite_ctrl;
+	uint16_t     m_ctrl;
+	uint16_t     m_sprite_ctrl;
 
-	std::unique_ptr<UINT16[]>  m_ram;
-	std::unique_ptr<UINT16[]>  m_ram_buffered;
+	std::unique_ptr<uint16_t[]>  m_ram;
+	std::unique_ptr<uint16_t[]>  m_ram_buffered;
 
 	int        m_gfxnum;
 	int        m_x_offset, m_y_offset;

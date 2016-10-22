@@ -48,9 +48,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_fg_tilemapram;
-	required_shared_ptr<UINT16> m_bg_tilemapram;
-	UINT16 *  m_sprites;
+	required_shared_ptr<uint16_t> m_fg_tilemapram;
+	required_shared_ptr<uint16_t> m_bg_tilemapram;
+	uint16_t *  m_sprites;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -60,7 +60,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -101,7 +101,7 @@ void good_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0xf);
 }
 
-UINT32 good_state::screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t good_state::screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

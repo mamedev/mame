@@ -76,14 +76,14 @@ const tiny_rom_entry *a2bus_thunderclock_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_upd1990ac(*this, THUNDERCLOCK_UPD1990_TAG), m_rom(nullptr), m_dataout(0)
 {
 }
 
-a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_THUNDERCLOCK, "ThunderWare ThunderClock Plus", tag, owner, clock, "a2thunpl", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_upd1990ac(*this, THUNDERCLOCK_UPD1990_TAG), m_rom(nullptr), m_dataout(0)
@@ -114,7 +114,7 @@ void a2bus_thunderclock_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_thunderclock_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_thunderclock_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	return (m_dataout << 7);
 }
@@ -124,7 +124,7 @@ UINT8 a2bus_thunderclock_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_thunderclock_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_thunderclock_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	// uPD1990AC hookup:
 	// bit 0 = DATA IN?
@@ -151,7 +151,7 @@ void a2bus_thunderclock_device::write_c0nx(address_space &space, UINT8 offset, U
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_thunderclock_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_thunderclock_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	// ROM is primarily a c800 image, but the first page is also the CnXX ROM
 	return m_rom[offset];
@@ -161,7 +161,7 @@ UINT8 a2bus_thunderclock_device::read_cnxx(address_space &space, UINT8 offset)
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-UINT8 a2bus_thunderclock_device::read_c800(address_space &space, UINT16 offset)
+uint8_t a2bus_thunderclock_device::read_c800(address_space &space, uint16_t offset)
 {
 	return m_rom[offset];
 }

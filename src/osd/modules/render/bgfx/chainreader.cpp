@@ -39,7 +39,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 	if (value.HasMember("sliders"))
 	{
 		const Value& slider_array = value["sliders"];
-		for (UINT32 i = 0; i < slider_array.Size(); i++)
+		for (uint32_t i = 0; i < slider_array.Size(); i++)
 		{
 			std::vector<bgfx_slider*> expanded_sliders = slider_reader::read_from_value(slider_array[i], prefix + "sliders[" + std::to_string(i) + "]: ", chains, screen_index);
 			if (expanded_sliders.size() == 0)
@@ -72,7 +72,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 	if (value.HasMember("parameters"))
 	{
 		const Value& param_array = value["parameters"];
-		for (UINT32 i = 0; i < param_array.Size(); i++)
+		for (uint32_t i = 0; i < param_array.Size(); i++)
 		{
 			bgfx_parameter* parameter = parameter_reader::read_from_value(param_array[i], prefix + "parameters[" + std::to_string(i) + "]; ", chains);
 			if (parameter == nullptr)
@@ -96,7 +96,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 	{
 		const Value& target_array = value["targets"];
 		// TODO: Move into its own reader
-		for (UINT32 i = 0; i < target_array.Size(); i++)
+		for (uint32_t i = 0; i < target_array.Size(); i++)
 		{
 			bgfx_target* target = target_reader::read_from_value(target_array[i], prefix + "targets[" + std::to_string(i) + "]: ", chains, screen_index);
 			if (target == nullptr)
@@ -112,7 +112,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 	if (value.HasMember("passes"))
 	{
 		const Value& entry_array = value["passes"];
-		for (UINT32 i = 0; i < entry_array.Size(); i++)
+		for (uint32_t i = 0; i < entry_array.Size(); i++)
 		{
 			bgfx_chain_entry* entry = chain_entry_reader::read_from_value(entry_array[i], prefix + "passes[" + std::to_string(i) + "]: ", chains, slider_map, param_map, screen_index);
 			if (entry == nullptr)

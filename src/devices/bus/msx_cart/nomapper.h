@@ -13,7 +13,7 @@ class msx_cart_nomapper : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_nomapper(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_nomapper(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -23,8 +23,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
 
 private:
-	UINT32 m_start_address;
-	UINT32 m_end_address;
+	uint32_t m_start_address;
+	uint32_t m_end_address;
 };
 
 #endif

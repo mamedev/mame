@@ -61,10 +61,10 @@ protected:
 private:
 	// internal map types
 	typedef std::unordered_map<std::string,const game_driver *> game_driver_map;
-	typedef std::unordered_map<std::string,FPTR> int_map;
+	typedef std::unordered_map<std::string,uintptr_t> int_map;
 
 	// internal helpers
-	const char *ioport_string_from_index(UINT32 index);
+	const char *ioport_string_from_index(uint32_t index);
 	int get_defstr_index(const char *string, bool suppress_error = false);
 
 	// core helpers
@@ -90,10 +90,10 @@ private:
 	void output_indented_errors(std::string &text, const char *header);
 
 	// random number generation
-	INT32 random_i32();
-	UINT32 random_u32();
-	INT64 random_i64();
-	UINT64 random_u64();
+	int32_t random_i32();
+	uint32_t random_u32();
+	int64_t random_i64();
+	uint64_t random_u64();
 
 	// internal driver list
 	driver_enumerator       m_drivlist;

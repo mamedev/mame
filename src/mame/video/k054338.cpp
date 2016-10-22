@@ -20,7 +20,7 @@
 
 const device_type K054338 = &device_creator<k054338_device>;
 
-k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K054338, "K054338 Mixer", tag, owner, clock, "k054338", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_alpha_inv(0),
@@ -48,7 +48,7 @@ void k054338_device::device_start()
 
 void k054338_device::device_reset()
 {
-	memset(m_regs, 0, sizeof(UINT16)*32);
+	memset(m_regs, 0, sizeof(uint16_t)*32);
 	memset(m_shd_rgb, 0, sizeof(int)*9);
 }
 
@@ -104,7 +104,7 @@ void k054338_device::update_all_shadows( int rushingheroes_hack, palette_device 
 // k054338 BG color fill
 void k054338_device::fill_solid_bg( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	UINT32 bgcolor = (register_r(K338_REG_BGC_R) & 0xff) << 16;
+	uint32_t bgcolor = (register_r(K338_REG_BGC_R) & 0xff) << 16;
 	bgcolor |= register_r(K338_REG_BGC_GB);
 
 	bitmap.fill(bgcolor, cliprect);
@@ -119,7 +119,7 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 	}
 	else
 	{
-		UINT32 *dst_ptr = &bitmap.pix32(cliprect.min_y);
+		uint32_t *dst_ptr = &bitmap.pix32(cliprect.min_y);
 		int dst_pitch = bitmap.rowpixels();
 
 		if ((mode & 0x01) == 0) // vertical gradient fill
@@ -138,7 +138,7 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 		}
 		else    // horizontal gradient fill
 		{
-			int width = cliprect.width() * sizeof(UINT32);
+			int width = cliprect.width() * sizeof(uint32_t);
 			pal_ptr += cliprect.min_x;
 			dst_ptr += cliprect.min_x;
 			for(int y = cliprect.min_y; y<= cliprect.max_y; y++)
@@ -153,7 +153,7 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 // addition blending unimplemented (requires major changes to drawgfx and tilemap.c)
 int k054338_device::set_alpha_level( int pblend )
 {
-	UINT16 *regs;
+	uint16_t *regs;
 	int ctrl, mixpri, mixset, mixlv;
 
 	if (pblend <= 0 || pblend > 3)

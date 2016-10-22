@@ -2197,26 +2197,26 @@ ROM_END
 #define EXPAND_NONE     0x3f
 #define SWAP_HALVES     0x80
 
-void balsente_state::expand_roms(UINT8 cd_rom_mask)
+void balsente_state::expand_roms(uint8_t cd_rom_mask)
 {
 	/* load AB bank data from 0x10000-0x20000 */
 	/* load CD bank data from 0x20000-0x2e000 */
 	/* load EF           from 0x2e000-0x30000 */
 	/* ROM region must be 0x40000 total */
 
-	dynamic_buffer temp(0x20000);
+	std::vector<uint8_t> temp(0x20000);
 	{
-		UINT8 *rom = memregion("maincpu")->base();
-		UINT32 len = memregion("maincpu")->bytes();
-		UINT32 base;
+		uint8_t *rom = memregion("maincpu")->base();
+		uint32_t len = memregion("maincpu")->bytes();
+		uint32_t base;
 
 		for (base = 0x10000; base < len; base += 0x30000)
 		{
-			UINT8 *ab_base = &temp[0x00000];
-			UINT8 *cd_base = &temp[0x10000];
-			UINT8 *cd_common = &temp[0x1c000];
-			UINT8 *ef_common = &temp[0x1e000];
-			UINT32 dest;
+			uint8_t *ab_base = &temp[0x00000];
+			uint8_t *cd_base = &temp[0x10000];
+			uint8_t *cd_common = &temp[0x1c000];
+			uint8_t *ef_common = &temp[0x1e000];
+			uint32_t dest;
 
 			for (dest = 0x00000; dest < 0x20000; dest += 0x02000)
 			{
@@ -2261,7 +2261,7 @@ void balsente_state::expand_roms(UINT8 cd_rom_mask)
 	}
 }
 
-inline void balsente_state::config_shooter_adc(UINT8 shooter, UINT8 adc_shift)
+inline void balsente_state::config_shooter_adc(uint8_t shooter, uint8_t adc_shift)
 {
 	m_shooter = shooter;
 	m_adc_shift = adc_shift;
@@ -2288,7 +2288,7 @@ DRIVER_INIT_MEMBER(balsente_state,stocker)   { expand_roms(EXPAND_ALL);  config_
 DRIVER_INIT_MEMBER(balsente_state,triviag1)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0 /* noanalog */); }
 DRIVER_INIT_MEMBER(balsente_state,triviag2)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	memcpy(&rom[0x20000], &rom[0x28000], 0x4000);
 	memcpy(&rom[0x24000], &rom[0x28000], 0x4000);
 	expand_roms(EXPAND_NONE); config_shooter_adc(FALSE, 0 /* noanalog */);

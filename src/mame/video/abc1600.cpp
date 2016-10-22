@@ -125,7 +125,7 @@ const tiny_rom_entry *abc1600_mover_device::device_rom_region() const
 //  mc6845
 //-------------------------------------------------
 
-inline UINT16 abc1600_mover_device::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
+inline uint16_t abc1600_mover_device::get_crtca(uint16_t ma, uint8_t ra, uint8_t column)
 {
 	/*
 
@@ -150,8 +150,8 @@ inline UINT16 abc1600_mover_device::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
 
 	*/
 
-	UINT8 cc = (ma & 0xff) + column;
-	UINT8 cr = ma >> 8;
+	uint8_t cc = (ma & 0xff) + column;
+	uint8_t cr = ma >> 8;
 
 	return (cr << 10) | ((ra & 0x0f) << 6) | ((cc << 1) & 0x3c);
 }
@@ -163,12 +163,12 @@ MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 
 	for (int column = 0; column < x_count; column += 2)
 	{
-		UINT16 dma = get_crtca(ma, ra, column);
+		uint16_t dma = get_crtca(ma, ra, column);
 
 		// data is read out of video RAM in nibble mode by strobing CAS 4 times
 		for (int cas = 0; cas < 4; cas++)
 		{
-			UINT16 data = read_videoram(dma + cas);
+			uint16_t data = read_videoram(dma + cas);
 
 			for (int bit = 0; bit < 16; bit++)
 			{
@@ -227,7 +227,7 @@ machine_config_constructor abc1600_mover_device::device_mconfig_additions() cons
 //  abc1600_mover_device - constructor
 //-------------------------------------------------
 
-abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC1600_MOVER, "ABC 1600 Mover", tag, owner, clock, "abc1600mover", __FILE__),
 	device_memory_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 16, 18, -1, *ADDRESS_MAP_NAME(mover_map)),
@@ -301,7 +301,7 @@ const address_space_config *abc1600_mover_device::memory_space_config(address_sp
 //  read_videoram -
 //-------------------------------------------------
 
-inline UINT16 abc1600_mover_device::read_videoram(offs_t offset)
+inline uint16_t abc1600_mover_device::read_videoram(offs_t offset)
 {
 	return space().read_word((offset & VIDEORAM16_MASK) << 1);
 }
@@ -311,9 +311,9 @@ inline UINT16 abc1600_mover_device::read_videoram(offs_t offset)
 //  write_videoram -
 //-------------------------------------------------
 
-inline void abc1600_mover_device::write_videoram(offs_t offset, UINT16 data, UINT16 mask)
+inline void abc1600_mover_device::write_videoram(offs_t offset, uint16_t data, uint16_t mask)
 {
-	UINT16 old_data = read_videoram(offset);
+	uint16_t old_data = read_videoram(offset);
 
 	space().write_word((offset & VIDEORAM16_MASK) << 1, (data & mask) | (old_data & (mask ^ 0xffff)));
 }
@@ -326,7 +326,7 @@ inline void abc1600_mover_device::write_videoram(offs_t offset, UINT16 data, UIN
 READ8_MEMBER( abc1600_mover_device::video_ram_r )
 {
 	offs_t addr = (offset & VIDEORAM8_MASK) >> 1;
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset & 0x01)
 	{
@@ -411,7 +411,7 @@ READ8_MEMBER( abc1600_mover_device::iord0_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// monitor orientation (portrait/landscape)
 	data |= machine().render().first_target()->view() << 1;
@@ -924,8 +924,8 @@ WRITE8_MEMBER( abc1600_mover_device::endisp_w )
 
 inline void abc1600_mover_device::clock_mfa_x()
 {
-	UINT16 mfa_y = m_mfa >> 6;
-	UINT8 mfa_x = m_mfa & 0x3f;
+	uint16_t mfa_y = m_mfa >> 6;
+	uint8_t mfa_x = m_mfa & 0x3f;
 
 	if (!HOLD_FX)
 	{
@@ -943,8 +943,8 @@ inline void abc1600_mover_device::clock_mfa_x()
 
 inline void abc1600_mover_device::clock_mfa_y()
 {
-	UINT16 mfa_y = m_mfa >> 6;
-	UINT8 mfa_x = m_mfa & 0x3f;
+	uint16_t mfa_y = m_mfa >> 6;
+	uint8_t mfa_x = m_mfa & 0x3f;
 
 	if (!HOLD_FY)
 	{
@@ -962,8 +962,8 @@ inline void abc1600_mover_device::clock_mfa_y()
 
 inline void abc1600_mover_device::clock_mta_x()
 {
-	UINT16 mta_y = m_mta >> 6;
-	UINT8 mta_x = m_mta & 0x3f;
+	uint16_t mta_y = m_mta >> 6;
+	uint8_t mta_x = m_mta & 0x3f;
 
 	mta_x += m_udx ? 1 : -1;
 	mta_x &= 0x3f;
@@ -978,8 +978,8 @@ inline void abc1600_mover_device::clock_mta_x()
 
 inline void abc1600_mover_device::clock_mta_y()
 {
-	UINT16 mta_y = m_mta >> 6;
-	UINT8 mta_x = m_mta & 0x3f;
+	uint16_t mta_y = m_mta >> 6;
+	uint8_t mta_x = m_mta & 0x3f;
 
 	mta_y += m_udy ? 1 : -1;
 	mta_y &= 0xfff;
@@ -994,8 +994,8 @@ inline void abc1600_mover_device::clock_mta_y()
 
 inline void abc1600_mover_device::load_mfa_x()
 {
-	UINT16 mfa_y = m_mfa >> 6;
-	UINT8 mfa_x = m_xfrom >> 4;
+	uint16_t mfa_y = m_mfa >> 6;
+	uint8_t mfa_x = m_xfrom >> 4;
 
 	m_mfa = (mfa_y << 6) | mfa_x;
 }
@@ -1007,8 +1007,8 @@ inline void abc1600_mover_device::load_mfa_x()
 
 inline void abc1600_mover_device::load_mta_x()
 {
-	UINT16 mta_y = m_mta >> 6;
-	UINT8 mta_x = m_xto >> 4;
+	uint16_t mta_y = m_mta >> 6;
+	uint8_t mta_x = m_xto >> 4;
 
 	m_mta = (mta_y << 6) | mta_x;
 }
@@ -1022,7 +1022,7 @@ inline void abc1600_mover_device::load_xy_reg()
 {
 	if (L_P) return;
 
-	UINT16 sum = m_xto + m_xsize;
+	uint16_t sum = m_xto + m_xsize;
 
 	m_xto = sum & 0x3ff;
 	m_yto = m_ty & 0xfff;
@@ -1036,8 +1036,8 @@ inline void abc1600_mover_device::load_xy_reg()
 
 inline void abc1600_mover_device::compare_mta_x()
 {
-	UINT8 mta_x_end = ((m_xto + m_xsize) >> 4) & 0x3f;
-	UINT8 mta_x = m_mta & 0x3f;
+	uint8_t mta_x_end = ((m_xto + m_xsize) >> 4) & 0x3f;
+	uint8_t mta_x = m_mta & 0x3f;
 
 	if (mta_x == mta_x_end)
 	{
@@ -1055,7 +1055,7 @@ inline void abc1600_mover_device::compare_mta_x()
 inline void abc1600_mover_device::compare_mta_y()
 {
 	int mta_y_end = (m_yto + m_ysize) & 0xfff;
-	UINT16 mta_y = m_mta >> 6;
+	uint16_t mta_y = m_mta >> 6;
 
 	if (mta_y == mta_y_end)
 	{
@@ -1086,8 +1086,8 @@ inline void abc1600_mover_device::get_shinf()
 
 	*/
 
-	UINT16 shinf_addr = (m_udx << 8) | ((m_xto & 0x0f) << 4) | (m_xfrom & 0x0f);
-	UINT8 shinf = m_shinf_rom[shinf_addr];
+	uint16_t shinf_addr = (m_udx << 8) | ((m_xto & 0x0f) << 4) | (m_xfrom & 0x0f);
+	uint8_t shinf = m_shinf_rom[shinf_addr];
 
 	m_sh = shinf & 0x0f;
 	m_hold_1w_cyk = BIT(shinf, 5);
@@ -1098,7 +1098,7 @@ inline void abc1600_mover_device::get_shinf()
 //  get_drmsk -
 //-------------------------------------------------
 
-inline UINT16 abc1600_mover_device::get_drmsk()
+inline uint16_t abc1600_mover_device::get_drmsk()
 {
 	/*
 
@@ -1112,7 +1112,7 @@ inline UINT16 abc1600_mover_device::get_drmsk()
 
 	*/
 
-	UINT16 drmsk_addr = (m_udx << 4) | (m_sh & 0x0f);
+	uint16_t drmsk_addr = (m_udx << 4) | (m_sh & 0x0f);
 	return m_drmsk_rom[drmsk_addr];
 }
 
@@ -1121,7 +1121,7 @@ inline UINT16 abc1600_mover_device::get_drmsk()
 //  get_wrmsk - get mover write mask
 //-------------------------------------------------
 
-inline UINT16 abc1600_mover_device::get_wrmsk()
+inline uint16_t abc1600_mover_device::get_wrmsk()
 {
 	/*
 
@@ -1142,7 +1142,7 @@ inline UINT16 abc1600_mover_device::get_wrmsk()
 
 	*/
 
-	UINT16 wrmsk_addr = (m_wrms1 << 11) | (m_wrms0 << 10) | ((!m_wrms1 && !m_wrms0) << 9) | (m_udx << 8) | ((m_xsize & 0x0f) << 4) | (m_xto & 0x0f);
+	uint16_t wrmsk_addr = (m_wrms1 << 11) | (m_wrms0 << 10) | ((!m_wrms1 && !m_wrms0) << 9) | (m_udx << 8) | ((m_xsize & 0x0f) << 4) | (m_xto & 0x0f);
 	return m_wrmsk_rom[wrmsk_addr] ^ 0xffff;
 }
 
@@ -1151,9 +1151,9 @@ inline UINT16 abc1600_mover_device::get_wrmsk()
 //  barrel_shift -
 //-------------------------------------------------
 
-inline UINT16 abc1600_mover_device::barrel_shift(UINT16 gmdr)
+inline uint16_t abc1600_mover_device::barrel_shift(uint16_t gmdr)
 {
-	UINT16 rot = gmdr;
+	uint16_t rot = gmdr;
 
 	for (int sh = 0; sh < m_sh; sh++)
 	{
@@ -1170,10 +1170,10 @@ inline UINT16 abc1600_mover_device::barrel_shift(UINT16 gmdr)
 //  word_mixer -
 //-------------------------------------------------
 
-inline UINT16 abc1600_mover_device::word_mixer(UINT16 rot)
+inline uint16_t abc1600_mover_device::word_mixer(uint16_t rot)
 {
-	UINT16 drmsk = get_drmsk();
-	UINT16 gmdi = (rot & drmsk) | (m_mdor & (drmsk ^ 0xffff));
+	uint16_t drmsk = get_drmsk();
+	uint16_t gmdi = (rot & drmsk) | (m_mdor & (drmsk ^ 0xffff));
 
 	if (COMP_MOVE)
 	{
@@ -1211,8 +1211,8 @@ void abc1600_mover_device::mover()
 		if (m_hold_1w_cyk)
 		{
 			// read one word in advance
-			UINT16 gmdr = read_videoram(m_mfa);
-			UINT16 rot = barrel_shift(gmdr);
+			uint16_t gmdr = read_videoram(m_mfa);
+			uint16_t rot = barrel_shift(gmdr);
 			word_mixer(rot);
 
 			clock_mfa_x();
@@ -1222,10 +1222,10 @@ void abc1600_mover_device::mover()
 		{
 			compare_mta_x();
 
-			UINT16 gmdr = read_videoram(m_mfa);
-			UINT16 rot = barrel_shift(gmdr);
-			UINT16 gmdi = word_mixer(rot);
-			UINT16 mask = get_wrmsk();
+			uint16_t gmdr = read_videoram(m_mfa);
+			uint16_t rot = barrel_shift(gmdr);
+			uint16_t gmdi = word_mixer(rot);
+			uint16_t mask = get_wrmsk();
 
 			write_videoram(m_mta, gmdi, mask);
 
@@ -1246,7 +1246,7 @@ void abc1600_mover_device::mover()
 	m_amm = 0;
 }
 
-UINT32 abc1600_mover_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t abc1600_mover_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_endisp)
 	{

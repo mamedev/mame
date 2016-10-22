@@ -75,7 +75,7 @@ class i8155_device :    public device_t,
 {
 public:
 	// construction/destruction
-	i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object)  { return downcast<i8155_device &>(device).m_in_pa_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object)  { return downcast<i8155_device &>(device).m_in_pb_cb.set_callback(object); }
@@ -103,14 +103,14 @@ protected:
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
-	inline UINT8 get_timer_mode();
+	inline uint8_t get_timer_mode();
 	inline void timer_output();
 	inline void pulse_timer_output();
 	inline int get_port_mode(int port);
-	inline UINT8 read_port(int port);
-	inline void write_port(int port, UINT8 data);
+	inline uint8_t read_port(int port);
+	inline void write_port(int port, uint8_t data);
 
-	void register_w(int offset, UINT8 data);
+	void register_w(int offset, uint8_t data);
 
 private:
 	devcb_read8        m_in_pa_cb;
@@ -126,16 +126,16 @@ private:
 
 	// CPU interface
 	int m_io_m;                 // I/O or memory select
-	UINT8 m_ad;                 // address
+	uint8_t m_ad;                 // address
 
 	// registers
-	UINT8 m_command;            // command register
-	UINT8 m_status;             // status register
-	UINT8 m_output[3];          // output latches
+	uint8_t m_command;            // command register
+	uint8_t m_status;             // status register
+	uint8_t m_output[3];          // output latches
 
 	// counter
-	UINT16 m_count_length;      // count length register
-	UINT16 m_counter;           // counter register
+	uint16_t m_count_length;      // count length register
+	uint16_t m_counter;           // counter register
 	int m_to;                   // timer output
 
 	// timers

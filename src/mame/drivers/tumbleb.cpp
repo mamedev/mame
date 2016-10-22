@@ -471,7 +471,7 @@ static const int tumbleb_sound_lookup[256] = {
 /* we use channels 1,2,3 for sound effects, and channel 4 for music */
 void tumbleb_state::tumbleb2_set_music_bank( int bank )
 {
-	UINT8 *oki = memregion("oki")->base();
+	uint8_t *oki = memregion("oki")->base();
 	memcpy(&oki[0x38000], &oki[0x80000 + 0x38000 + 0x8000 * bank], 0x8000);
 }
 
@@ -748,7 +748,7 @@ WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
 
 WRITE8_MEMBER(tumbleb_state::oki_sound_bank_w)
 {
-	UINT8 *oki = memregion("oki")->base();
+	uint8_t *oki = memregion("oki")->base();
 	memcpy(&oki[0x30000], &oki[(data * 0x10000) + 0x40000], 0x10000);
 }
 
@@ -794,8 +794,8 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(tumbleb_state::jumpkids_oki_bank_w)
 {
-	UINT8* sound1 = memregion("oki")->base();
-	UINT8* sound2 = memregion("oki2")->base();
+	uint8_t* sound1 = memregion("oki")->base();
+	uint8_t* sound2 = memregion("oki2")->base();
 	int bank = data & 0x03;
 
 	memcpy(sound1 + 0x20000, sound2 + bank * 0x20000, 0x20000);
@@ -824,7 +824,7 @@ WRITE8_MEMBER(tumbleb_state::prot_io_w)
 	{
 		case 0x00:
 		{
-			UINT16 word = m_mainram[(m_protbase/2) + m_semicom_prot_offset];
+			uint16_t word = m_mainram[(m_protbase/2) + m_semicom_prot_offset];
 			word = (word & 0xff00) | (data << 0);
 			m_mainram[(m_protbase/2) + m_semicom_prot_offset] = word;
 
@@ -833,7 +833,7 @@ WRITE8_MEMBER(tumbleb_state::prot_io_w)
 
 		case 0x01:
 		{
-			UINT16 word = m_mainram[(m_protbase/2) + m_semicom_prot_offset];
+			uint16_t word = m_mainram[(m_protbase/2) + m_semicom_prot_offset];
 			word = (word & 0x00ff) | (data << 8);
 			m_mainram[(m_protbase/2) + m_semicom_prot_offset] = word;
 
@@ -2208,7 +2208,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 	if (memregion("user1") != nullptr)
 	{
 		/* copy protection data every reset */
-		UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
+		uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 		int i, len = memregion("user1")->bytes();
 
 		for (i = 0; i < len / 2; i++)
@@ -3414,10 +3414,10 @@ ROM_END
 /******************************************************************************/
 
 #if TUMBLEP_HACK
-void tumbleb_state::tumblepb_patch_code(UINT16 offset)
+void tumbleb_state::tumblepb_patch_code(uint16_t offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
 }
@@ -3426,7 +3426,7 @@ void tumbleb_state::tumblepb_patch_code(UINT16 offset)
 
 void tumbleb_state::tumblepb_gfx_rearrange(int rgn)
 {
-	UINT8* rom;
+	uint8_t* rom;
 	int len;
 
 	if (rgn == 1)
@@ -3499,7 +3499,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,fncywld)
 	#if FNCYWLD_HACK
 	/* This is a hack to allow you to use the extra features
 	   of the 2 first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 	RAM[0x0005fa/2] = 0x4e71;
 	RAM[0x00060a/2] = 0x4e71;
 	#endif
@@ -3523,7 +3523,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,bcstory)
 
 DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
 {
-	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
+	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i, len = memregion("user1")->bytes();
 	/* simulate RAM initialization done by the protection MCU */
 
@@ -3537,8 +3537,8 @@ DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
 
 void tumbleb_state::suprtrio_decrypt_code()
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
-	std::vector<UINT16> buf(0x80000/2);
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	std::vector<uint16_t> buf(0x80000/2);
 	int i;
 
 	/* decrypt main ROMs */
@@ -3554,8 +3554,8 @@ void tumbleb_state::suprtrio_decrypt_code()
 
 void tumbleb_state::suprtrio_decrypt_gfx()
 {
-	UINT16 *rom = (UINT16 *)memregion("tilegfx")->base();
-	std::vector<UINT16> buf(0x100000/2);
+	uint16_t *rom = (uint16_t *)memregion("tilegfx")->base();
+	std::vector<uint16_t> buf(0x100000/2);
 	int i;
 
 	/* decrypt tiles */

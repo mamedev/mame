@@ -206,7 +206,7 @@ const device_type TMS32025 = &device_creator<tms32025_device>;
 const device_type TMS32026 = &device_creator<tms32026_device>;
 
 
-tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS32025, "TMS32025", tag, owner, clock, "tms32025", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1)
@@ -221,7 +221,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag,
 }
 
 
-tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1)
@@ -236,23 +236,23 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 }
 
 
-tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms32025_device(mconfig, TMS32026, "TMS32026", tag, owner, clock, "tms32026", __FILE__)
 {
 }
 
 
-offs_t tms32025_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tms32025_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms32025 );
 	return CPU_DISASSEMBLE_NAME(tms32025)(this, buffer, pc, oprom, opram, options);
 }
 
 
-void tms32025_device::CLR0(UINT16 flag) { m_STR0 &= ~flag; m_STR0 |= 0x0400; }
-void tms32025_device::SET0(UINT16 flag) { m_STR0 |=  flag; m_STR0 |= 0x0400; }
-void tms32025_device::CLR1(UINT16 flag) { m_STR1 &= ~flag; m_STR1 |= 0x0180; }
-void tms32025_device::SET1(UINT16 flag) { m_STR1 |=  flag; m_STR1 |= 0x0180; }
+void tms32025_device::CLR0(uint16_t flag) { m_STR0 &= ~flag; m_STR0 |= 0x0400; }
+void tms32025_device::SET0(uint16_t flag) { m_STR0 |=  flag; m_STR0 |= 0x0400; }
+void tms32025_device::CLR1(uint16_t flag) { m_STR1 &= ~flag; m_STR1 |= 0x0180; }
+void tms32025_device::SET1(uint16_t flag) { m_STR1 |=  flag; m_STR1 |= 0x0180; }
 
 void tms32025_device::MODIFY_DP(int data)
 {
@@ -276,36 +276,36 @@ void tms32025_device::MODIFY_ARP(int data)
 	m_STR0 |= 0x0400;
 }
 
-UINT16 tms32025_device::M_RDROM(offs_t addr)
+uint16_t tms32025_device::M_RDROM(offs_t addr)
 {
-	UINT16 *ram;
+	uint16_t *ram;
 	addr &= 0xffff;
 	ram = m_pgmmap[addr >> 7];
 	if (ram) return ram[addr & 0x7f];
 	return m_program->read_word(addr << 1);
 }
 
-void tms32025_device::M_WRTROM(offs_t addr, UINT16 data)
+void tms32025_device::M_WRTROM(offs_t addr, uint16_t data)
 {
-	UINT16 *ram;
+	uint16_t *ram;
 	addr &= 0xffff;
 	ram = m_pgmmap[addr >> 7];
 	if (ram) { ram[addr & 0x7f] = data; }
 	else m_program->write_word(addr << 1, data);
 }
 
-UINT16 tms32025_device::M_RDRAM(offs_t addr)
+uint16_t tms32025_device::M_RDRAM(offs_t addr)
 {
-	UINT16 *ram;
+	uint16_t *ram;
 	addr &= 0xffff;
 	ram = m_datamap[addr >> 7];
 	if (ram) return ram[addr & 0x7f];
 	return m_data->read_word(addr << 1);
 }
 
-void tms32025_device::M_WRTRAM(offs_t addr, UINT16 data)
+void tms32025_device::M_WRTRAM(offs_t addr, uint16_t data)
 {
-	UINT16 *ram;
+	uint16_t *ram;
 	addr &= 0xffff;
 	ram = m_datamap[addr >> 7];
 	if (ram) {
@@ -321,9 +321,9 @@ void tms32025_device::M_WRTRAM(offs_t addr, UINT16 data)
 }
 
 
-UINT16 tms32025_device::reverse_carry_add(UINT16 arg0, UINT16 arg1 )
+uint16_t tms32025_device::reverse_carry_add(uint16_t arg0, uint16_t arg1 )
 {
-	UINT16 result = 0;
+	uint16_t result = 0;
 	int carry = 0;
 	int count;
 	for( count=0; count<16; count++ )
@@ -383,7 +383,7 @@ void tms32025_device::MODIFY_AR_ARP()
 
 void tms32025_device::CALCULATE_ADD_CARRY()
 {
-	if ( (UINT32)(m_oldacc.d) > (UINT32)(m_ACC.d) ) {
+	if ( (uint32_t)(m_oldacc.d) > (uint32_t)(m_ACC.d) ) {
 		SET1(C_FLAG);
 	}
 	else {
@@ -393,7 +393,7 @@ void tms32025_device::CALCULATE_ADD_CARRY()
 
 void tms32025_device::CALCULATE_SUB_CARRY()
 {
-	if ( (UINT32)(m_oldacc.d) < (UINT32)(m_ACC.d) ) {
+	if ( (uint32_t)(m_oldacc.d) < (uint32_t)(m_ACC.d) ) {
 		CLR1(C_FLAG);
 	}
 	else {
@@ -401,32 +401,32 @@ void tms32025_device::CALCULATE_SUB_CARRY()
 	}
 }
 
-void tms32025_device::CALCULATE_ADD_OVERFLOW(INT32 addval)
+void tms32025_device::CALCULATE_ADD_OVERFLOW(int32_t addval)
 {
-	if ((INT32)((m_ACC.d ^ addval) & (m_oldacc.d ^ m_ACC.d)) < 0)
+	if ((int32_t)((m_ACC.d ^ addval) & (m_oldacc.d ^ m_ACC.d)) < 0)
 	{
 		SET0(OV_FLAG);
 		if (OVM)
 		{
-			m_ACC.d = ((INT32)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+			m_ACC.d = ((int32_t)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 		}
 	}
 }
-void tms32025_device::CALCULATE_SUB_OVERFLOW(INT32 subval)
+void tms32025_device::CALCULATE_SUB_OVERFLOW(int32_t subval)
 {
-	if ((INT32)((m_oldacc.d ^ subval) & (m_oldacc.d ^ m_ACC.d)) < 0)
+	if ((int32_t)((m_oldacc.d ^ subval) & (m_oldacc.d ^ m_ACC.d)) < 0)
 	{
 		SET0(OV_FLAG);
 		if (OVM)
 		{
-			m_ACC.d = ((INT32)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+			m_ACC.d = ((int32_t)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 		}
 	}
 }
 
-UINT16 tms32025_device::POP_STACK()
+uint16_t tms32025_device::POP_STACK()
 {
-	UINT16 data = m_STACK[7];
+	uint16_t data = m_STACK[7];
 	m_STACK[7] = m_STACK[6];
 	m_STACK[6] = m_STACK[5];
 	m_STACK[5] = m_STACK[4];
@@ -436,7 +436,7 @@ UINT16 tms32025_device::POP_STACK()
 	m_STACK[1] = m_STACK[0];
 	return data;
 }
-void tms32025_device::PUSH_STACK(UINT16 data)
+void tms32025_device::PUSH_STACK(uint16_t data)
 {
 	m_STACK[0] = m_STACK[1];
 	m_STACK[1] = m_STACK[2];
@@ -480,15 +480,15 @@ void tms32025_device::GETDATA(int shift,int signext)
 		m_external_mem_access = 0;
 	}
 
-	m_ALU.d = (UINT16)M_RDRAM(m_memaccess);
-	if (signext) m_ALU.d = (INT16)m_ALU.d;
+	m_ALU.d = (uint16_t)M_RDRAM(m_memaccess);
+	if (signext) m_ALU.d = (int16_t)m_ALU.d;
 	m_ALU.d <<= shift;
 
 	/* next ARP */
 	if (m_opcode.b.l & 0x80) MODIFY_AR_ARP();
 }
 
-void tms32025_device::PUTDATA(UINT16 data)
+void tms32025_device::PUTDATA(uint16_t data)
 {
 	if (m_opcode.b.l & 0x80) {
 		if (m_memaccess >= 0x800) m_external_mem_access = 1;    /* Pause if hold pin is active */
@@ -504,7 +504,7 @@ void tms32025_device::PUTDATA(UINT16 data)
 		M_WRTRAM(DMA, data);
 	}
 }
-void tms32025_device::PUTDATA_SST(UINT16 data)
+void tms32025_device::PUTDATA_SST(uint16_t data)
 {
 	if (m_opcode.b.l & 0x80) m_memaccess = IND;
 	else m_memaccess = DMApg0;
@@ -537,7 +537,7 @@ void tms32025_device::illegal()
 
 void tms32025_device::abst()
 {
-	if ( (INT32)(m_ACC.d) < 0 ) {
+	if ( (int32_t)(m_ACC.d) < 0 ) {
 		m_ACC.d = -m_ACC.d;
 		if (m_ACC.d == 0x80000000) {
 			SET0(OV_FLAG);
@@ -569,18 +569,18 @@ void tms32025_device::addh()
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
 	m_ACC.w.h += m_ALU.w.l;
-	if ( (UINT16)(m_oldacc.w.h) > (UINT16)(m_ACC.w.h) ) {
+	if ( (uint16_t)(m_oldacc.w.h) > (uint16_t)(m_ACC.w.h) ) {
 		SET1(C_FLAG); /* Carry flag is not cleared, if no carry occurred */
 	}
-	if ((INT16)((m_ACC.w.h ^ m_ALU.w.l) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
+	if ((int16_t)((m_ACC.w.h ^ m_ALU.w.l) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
 		SET0(OV_FLAG);
-		if (OVM) m_ACC.w.h = ((INT16)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+		if (OVM) m_ACC.w.h = ((int16_t)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
 	}
 }
 void tms32025_device::addk()
 {
 	m_oldacc.d = m_ACC.d;
-	m_ALU.d = (UINT8)m_opcode.b.l;
+	m_ALU.d = (uint8_t)m_opcode.b.l;
 	m_ACC.d += m_ALU.d;
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
@@ -604,8 +604,8 @@ void tms32025_device::addt()
 void tms32025_device::adlk()
 {
 	m_oldacc.d = m_ACC.d;
-	if (SXM) m_ALU.d =  (INT16)M_RDOP_ARG(m_PC);
-	else     m_ALU.d = (UINT16)M_RDOP_ARG(m_PC);
+	if (SXM) m_ALU.d =  (int16_t)M_RDOP_ARG(m_PC);
+	else     m_ALU.d = (uint16_t)M_RDOP_ARG(m_PC);
 	m_PC++;
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d += m_ALU.d;
@@ -624,7 +624,7 @@ void tms32025_device::and_()
 void tms32025_device::andk()
 {
 	m_oldacc.d = m_ACC.d;
-	m_ALU.d = (UINT16)M_RDOP_ARG(m_PC);
+	m_ALU.d = (uint16_t)M_RDOP_ARG(m_PC);
 	m_PC++;
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d &= m_ALU.d;
@@ -672,13 +672,13 @@ void tms32025_device::bc()
 }
 void tms32025_device::bgez()
 {
-	if ( (INT32)(m_ACC.d) >= 0 ) SET_PC(M_RDOP_ARG(m_PC));
+	if ( (int32_t)(m_ACC.d) >= 0 ) SET_PC(M_RDOP_ARG(m_PC));
 	else m_PC++ ;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bgz()
 {
-	if ( (INT32)(m_ACC.d) > 0 ) SET_PC(M_RDOP_ARG(m_PC));
+	if ( (int32_t)(m_ACC.d) > 0 ) SET_PC(M_RDOP_ARG(m_PC));
 	else m_PC++ ;
 	MODIFY_AR_ARP();
 }
@@ -702,7 +702,7 @@ void tms32025_device::bitt()
 }
 void tms32025_device::blez()
 {
-	if ( (INT32)(m_ACC.d) <= 0 ) SET_PC(M_RDOP_ARG(m_PC));
+	if ( (int32_t)(m_ACC.d) <= 0 ) SET_PC(M_RDOP_ARG(m_PC));
 	else m_PC++ ;
 	MODIFY_AR_ARP();
 }
@@ -730,7 +730,7 @@ void tms32025_device::blkp()
 }
 void tms32025_device::blz()
 {
-	if ( (INT32)(m_ACC.d) <  0 ) SET_PC(M_RDOP_ARG(m_PC));
+	if ( (int32_t)(m_ACC.d) <  0 ) SET_PC(M_RDOP_ARG(m_PC));
 	else m_PC++ ;
 	MODIFY_AR_ARP();
 }
@@ -790,16 +790,16 @@ void tms32025_device::cmpr()
 {
 	switch (m_opcode.b.l & 3)
 	{
-		case 00:    if ( (UINT16)(m_AR[ARP]) == (UINT16)(m_AR[0]) ) SET1(TC_FLAG);
+		case 00:    if ( (uint16_t)(m_AR[ARP]) == (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
 					else CLR1(TC_FLAG);
 					break;
-		case 01:    if ( (UINT16)(m_AR[ARP]) <  (UINT16)(m_AR[0]) ) SET1(TC_FLAG);
+		case 01:    if ( (uint16_t)(m_AR[ARP]) <  (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
 					else CLR1(TC_FLAG);
 					break;
-		case 02:    if ( (UINT16)(m_AR[ARP])  > (UINT16)(m_AR[0]) ) SET1(TC_FLAG);
+		case 02:    if ( (uint16_t)(m_AR[ARP])  > (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
 					else CLR1(TC_FLAG);
 					break;
-		case 03:    if ( (UINT16)(m_AR[ARP]) != (UINT16)(m_AR[0]) ) SET1(TC_FLAG);
+		case 03:    if ( (uint16_t)(m_AR[ARP]) != (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
 					else CLR1(TC_FLAG);
 					break;
 	}
@@ -968,7 +968,7 @@ void tms32025_device::lac()
 }
 void tms32025_device::lack()      /* ZAC is a subset of this instruction */
 {
-	m_ACC.d = (UINT8)m_opcode.b.l;
+	m_ACC.d = (uint8_t)m_opcode.b.l;
 }
 void tms32025_device::lact()
 {
@@ -977,8 +977,8 @@ void tms32025_device::lact()
 }
 void tms32025_device::lalk()
 {
-	if (SXM) m_ALU.d =  (INT16)M_RDOP_ARG(m_PC);
-	else     m_ALU.d = (UINT16)M_RDOP_ARG(m_PC);
+	if (SXM) m_ALU.d =  (int16_t)M_RDOP_ARG(m_PC);
+	else     m_ALU.d = (uint16_t)M_RDOP_ARG(m_PC);
 	m_PC++;
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d = m_ALU.d;
@@ -1015,7 +1015,7 @@ void tms32025_device::lph()
 }
 void tms32025_device::lrlk()
 {
-	m_ALU.d = (UINT16)M_RDOP_ARG(m_PC);
+	m_ALU.d = (uint16_t)M_RDOP_ARG(m_PC);
 	m_PC++;
 	m_AR[m_opcode.b.h & 7] = m_ALU.w.l;
 }
@@ -1098,7 +1098,7 @@ void tms32025_device::mac()           /** RAM blocks B0,B1,B2 may be important !
 	CALCULATE_ADD_CARRY();
 	GETDATA(0, 0);
 	m_Treg = m_ALU.w.l;
-	m_Preg.d = ( (INT16)m_ALU.w.l * (INT16)M_RDROM(m_PFC) );
+	m_Preg.d = ( (int16_t)m_ALU.w.l * (int16_t)M_RDROM(m_PFC) );
 	m_PFC++;
 	m_tms32025_dec_cycles += (2*CLK);
 }
@@ -1118,7 +1118,7 @@ void tms32025_device::macd()          /** RAM blocks B0,B1,B2 may be important !
 		M_WRTRAM((m_memaccess+1), m_ALU.w.l);
 	}
 	m_Treg = m_ALU.w.l;
-	m_Preg.d = ( (INT16)m_ALU.w.l * (INT16)M_RDROM(m_PFC) );
+	m_Preg.d = ( (int16_t)m_ALU.w.l * (int16_t)M_RDROM(m_PFC) );
 	m_PFC++;
 	m_tms32025_dec_cycles += (2*CLK);
 }
@@ -1129,7 +1129,7 @@ void tms32025_device::mar()       /* LARP and NOP are a subset of this instructi
 void tms32025_device::mpy()
 {
 	GETDATA(0, 0);
-	m_Preg.d = (INT16)(m_ALU.w.l) * (INT16)(m_Treg);
+	m_Preg.d = (int16_t)(m_ALU.w.l) * (int16_t)(m_Treg);
 }
 void tms32025_device::mpya()
 {
@@ -1139,11 +1139,11 @@ void tms32025_device::mpya()
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 	GETDATA(0, 0);
-	m_Preg.d = (INT16)(m_ALU.w.l) * (INT16)(m_Treg);
+	m_Preg.d = (int16_t)(m_ALU.w.l) * (int16_t)(m_Treg);
 }
 void tms32025_device::mpyk()
 {
-	m_Preg.d = (INT16)m_Treg * ((INT16)(m_opcode.w.l << 3) >> 3);
+	m_Preg.d = (int16_t)m_Treg * ((int16_t)(m_opcode.w.l << 3) >> 3);
 
 }
 void tms32025_device::mpys()
@@ -1154,12 +1154,12 @@ void tms32025_device::mpys()
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 	CALCULATE_SUB_CARRY();
 	GETDATA(0, 0);
-	m_Preg.d = (INT16)(m_ALU.w.l) * (INT16)(m_Treg);
+	m_Preg.d = (int16_t)(m_ALU.w.l) * (int16_t)(m_Treg);
 }
 void tms32025_device::mpyu()
 {
 	GETDATA(0, 0);
-	m_Preg.d = (UINT16)(m_ALU.w.l) * (UINT16)(m_Treg);
+	m_Preg.d = (uint16_t)(m_ALU.w.l) * (uint16_t)(m_Treg);
 }
 void tms32025_device::neg()
 {
@@ -1176,7 +1176,7 @@ void tms32025_device::nop() { }   // NOP is a subset of the MAR instruction
 */
 void tms32025_device::norm()
 {
-	if (m_ACC.d !=0 && (INT32)(m_ACC.d ^ (m_ACC.d << 1)) >= 0)
+	if (m_ACC.d !=0 && (int32_t)(m_ACC.d ^ (m_ACC.d << 1)) >= 0)
 	{
 		CLR1(TC_FLAG);
 		m_ACC.d <<= 1;
@@ -1191,7 +1191,7 @@ void tms32025_device::or_()
 }
 void tms32025_device::ork()
 {
-	m_ALU.d = (UINT16)M_RDOP_ARG(m_PC);
+	m_ALU.d = (uint16_t)M_RDOP_ARG(m_PC);
 	m_PC++;
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d |=  (m_ALU.d);
@@ -1208,11 +1208,11 @@ void tms32025_device::pac()
 }
 void tms32025_device::pop()
 {
-	m_ACC.d = (UINT16)POP_STACK();
+	m_ACC.d = (uint16_t)POP_STACK();
 }
 void tms32025_device::popd()
 {
-	m_ALU.d = (UINT16)POP_STACK();
+	m_ALU.d = (uint16_t)POP_STACK();
 	PUTDATA(m_ALU.w.l);
 }
 void tms32025_device::pshd()
@@ -1310,8 +1310,8 @@ void tms32025_device::sar_ar7()   { PUTDATA(m_AR[7]); }
 void tms32025_device::sblk()
 {
 	m_oldacc.d = m_ACC.d;
-	if (SXM) m_ALU.d =  (INT16)M_RDOP_ARG(m_PC);
-	else     m_ALU.d = (UINT16)M_RDOP_ARG(m_PC);
+	if (SXM) m_ALU.d =  (int16_t)M_RDOP_ARG(m_PC);
+	else     m_ALU.d = (uint16_t)M_RDOP_ARG(m_PC);
 	m_PC++;
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d -= m_ALU.d;
@@ -1386,7 +1386,7 @@ void tms32025_device::sqra()
 	CALCULATE_ADD_CARRY();
 	GETDATA(0, 0);
 	m_Treg = m_ALU.w.l;
-	m_Preg.d = ((INT16)m_ALU.w.l * (INT16)m_ALU.w.l);
+	m_Preg.d = ((int16_t)m_ALU.w.l * (int16_t)m_ALU.w.l);
 }
 void tms32025_device::sqrs()
 {
@@ -1397,7 +1397,7 @@ void tms32025_device::sqrs()
 	CALCULATE_SUB_CARRY();
 	GETDATA(0, 0);
 	m_Treg = m_ALU.w.l;
-	m_Preg.d = ((INT16)m_ALU.w.l * (INT16)m_ALU.w.l);
+	m_Preg.d = ((int16_t)m_ALU.w.l * (int16_t)m_ALU.w.l);
 }
 void tms32025_device::sst()
 {
@@ -1442,7 +1442,7 @@ void tms32025_device::subc()
 	m_oldacc.d = m_ACC.d;
 	GETDATA(15, SXM);
 	m_ACC.d -= m_ALU.d;     /* Temporary switch to ACC. Actual calculation is done as (ACC)-[mem] -> ALU, will be preserved later on. */
-	if ((INT32)((m_oldacc.d ^ m_ALU.d) & (m_oldacc.d ^ m_ACC.d)) < 0) {
+	if ((int32_t)((m_oldacc.d ^ m_ALU.d) & (m_oldacc.d ^ m_ACC.d)) < 0) {
 		SET0(OV_FLAG);            /* Not affected by OVM */
 	}
 	CALCULATE_SUB_CARRY();
@@ -1460,18 +1460,18 @@ void tms32025_device::subh()
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
 	m_ACC.w.h -= m_ALU.w.l;
-	if ( (UINT16)(m_oldacc.w.h) < (UINT16)(m_ACC.w.h) ) {
+	if ( (uint16_t)(m_oldacc.w.h) < (uint16_t)(m_ACC.w.h) ) {
 		CLR1(C_FLAG); /* Carry flag is not affected, if no borrow occurred */
 	}
-	if ((INT16)((m_oldacc.w.h ^ m_ALU.w.l) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
+	if ((int16_t)((m_oldacc.w.h ^ m_ALU.w.l) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
 		SET0(OV_FLAG);
-		if (OVM) m_ACC.w.h = ((INT16)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+		if (OVM) m_ACC.w.h = ((int16_t)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
 	}
 }
 void tms32025_device::subk()
 {
 	m_oldacc.d = m_ACC.d;
-	m_ALU.d = (UINT8)m_opcode.b.l;
+	m_ALU.d = (uint8_t)m_opcode.b.l;
 	m_ACC.d -= m_ALU.b.l;
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 	CALCULATE_SUB_CARRY();
@@ -1503,7 +1503,7 @@ void tms32025_device::tblr()
 		m_PFC = m_ACC.w.l;
 	}
 	m_ALU.w.l = M_RDROM(m_PFC);
-	if ( (CNF0) && ( (UINT16)(m_PFC) >= 0xff00 ) ) {}   /** TMS32025 only */
+	if ( (CNF0) && ( (uint16_t)(m_PFC) >= 0xff00 ) ) {}   /** TMS32025 only */
 	else m_tms32025_dec_cycles += (1*CLK);
 	PUTDATA(m_ALU.w.l);
 	m_PFC++;
@@ -2127,7 +2127,7 @@ void tms32025_device::execute_run()
 				}
 				m_init_load_addr = 0;
 				m_RPTC-- ;
-			} while ((INT8)(m_RPTC) != -1);
+			} while ((int8_t)(m_RPTC) != -1);
 			m_RPTC = 0;
 			m_PFC = m_PC;
 			m_init_load_addr = 1;
@@ -2179,7 +2179,7 @@ void tms32025_device::execute_set_input(int irqline, int state)
 /****************************************************************************
  *  Opcode fetcher
  ****************************************************************************/
-bool tms32025_device::memory_readop(offs_t offset, int size, UINT64 &value)
+bool tms32025_device::memory_readop(offs_t offset, int size, uint64_t &value)
 {
 	void *ptr;
 
@@ -2187,13 +2187,13 @@ bool tms32025_device::memory_readop(offs_t offset, int size, UINT64 &value)
 	if (!m_pgmmap[offset >> 8])
 		return 0;
 
-	ptr = &((UINT8 *)&m_pgmmap[offset >> 8])[offset & 0xff];
+	ptr = &((uint8_t *)&m_pgmmap[offset >> 8])[offset & 0xff];
 	switch (size)
 	{
-		case 1: value = *((UINT8 *) ptr);
-		case 2: value = *((UINT16 *) ptr);
-		case 4: value = *((UINT32 *) ptr);
-		case 8: value = *((UINT64 *) ptr);
+		case 1: value = *((uint8_t *) ptr);
+		case 2: value = *((uint16_t *) ptr);
+		case 4: value = *((uint32_t *) ptr);
+		case 8: value = *((uint64_t *) ptr);
 	}
 	return 1;
 }
@@ -2202,10 +2202,10 @@ bool tms32025_device::memory_readop(offs_t offset, int size, UINT64 &value)
 /****************************************************************************
  *  Memory reader
  ****************************************************************************/
-bool tms32025_device::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
+bool tms32025_device::memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value)
 {
 	void *ptr;
-	UINT64 temp = 0;
+	uint64_t temp = 0;
 
 	switch (spacenum)
 	{
@@ -2229,10 +2229,10 @@ bool tms32025_device::memory_read(address_spacenum spacenum, offs_t offset, int 
 	switch (size)
 	{
 		case 1:
-			value = ((UINT8 *)ptr)[BYTE_XOR_BE(offset & 0xff)];
+			value = ((uint8_t *)ptr)[BYTE_XOR_BE(offset & 0xff)];
 			break;
 		case 2:
-			value = ((UINT16 *)ptr)[(offset & 0xff) / 2];
+			value = ((uint16_t *)ptr)[(offset & 0xff) / 2];
 			break;
 		case 4:
 			memory_read(spacenum, offset + 0, 2, temp);
@@ -2254,7 +2254,7 @@ bool tms32025_device::memory_read(address_spacenum spacenum, offs_t offset, int 
 /****************************************************************************
  *  Memory writer
  ****************************************************************************/
-bool tms32025_device::memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value)
+bool tms32025_device::memory_write(address_spacenum spacenum, offs_t offset, int size, uint64_t value)
 {
 	void *ptr;
 
@@ -2280,10 +2280,10 @@ bool tms32025_device::memory_write(address_spacenum spacenum, offs_t offset, int
 	switch (size)
 	{
 		case 1:
-			((UINT8 *)ptr)[BYTE_XOR_BE(offset & 0xff)] = value;
+			((uint8_t *)ptr)[BYTE_XOR_BE(offset & 0xff)] = value;
 			break;
 		case 2:
-			((UINT16 *)ptr)[(offset & 0xff) / 2] = value;
+			((uint16_t *)ptr)[(offset & 0xff) / 2] = value;
 			break;
 		case 4:
 			memory_write(spacenum, offset + 0, 2, value >> 16);

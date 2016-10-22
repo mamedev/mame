@@ -92,7 +92,7 @@
 
 const device_type UPD71071 = &device_creator<upd71071_device>;
 
-upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, UPD71071, "NEC uPD71071", tag, owner, clock, "upd71071", __FILE__),
 				m_upd_clock(0),
 				m_out_hreq_cb(*this),
@@ -172,7 +172,7 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 {
 	// single byte or word transfer
 	int channel = param;
-	UINT16 data = 0;  // data to transfer
+	uint16_t data = 0;  // data to transfer
 
 	switch (m_reg.mode_control[channel] & 0x0c)
 	{
@@ -336,7 +336,7 @@ int upd71071_device::dmarq(int state, int channel)
 
 READ8_MEMBER(upd71071_device::read)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	logerror("DMA: read from register %02x\n",offset);
 	switch(offset)

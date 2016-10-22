@@ -273,7 +273,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(vicdual_state::depthch_io_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (offset & 0x01)  ret = m_in0->read();
 	if (offset & 0x08)  ret = m_in1->read();
@@ -354,7 +354,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(vicdual_state::safari_io_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (offset & 0x01)  ret = m_in0->read();
 	if (offset & 0x08)  ret = m_in1->read();
@@ -437,7 +437,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(vicdual_state::frogs_io_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (offset & 0x01)  ret = m_in0->read();
 	if (offset & 0x08)  ret = m_in1->read();
@@ -548,7 +548,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(vicdual_state::headon_io_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (offset & 0x01)  ret = m_in0->read();
 	if (offset & 0x08)  ret = m_in1->read();
@@ -559,7 +559,7 @@ READ8_MEMBER(vicdual_state::headon_io_r)
 
 READ8_MEMBER(vicdual_state::sspaceat_io_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (offset & 0x01)  ret = m_in0->read();
 	if (offset & 0x04)  ret = m_in1->read();
@@ -807,7 +807,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(vicdual_state::headon2_io_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (offset & 0x01)  ret = m_in0->read();
 	if (offset & 0x02) { /* schematics show this as in input port, but never read from */ }
@@ -1299,10 +1299,10 @@ ADDRESS_MAP_END
 CUSTOM_INPUT_MEMBER(vicdual_state::fake_lives_r)
 {
 	/* use the low byte for the bitmask */
-	UINT8 bit_mask = ((FPTR)param) & 0xff;
+	uint8_t bit_mask = ((uintptr_t)param) & 0xff;
 
 	/* and use d8 for the port */
-	int port = ((FPTR)param) >> 8 & 1;
+	int port = ((uintptr_t)param) >> 8 & 1;
 	return (m_fake_lives[port].read_safe(0) & bit_mask) ? 0 : 1;
 }
 
@@ -2106,8 +2106,8 @@ WRITE8_MEMBER(vicdual_state::samurai_protection_w)
 
 CUSTOM_INPUT_MEMBER(vicdual_state::samurai_protection_r)
 {
-	int offset = (FPTR)param;
-	UINT32 answer = 0;
+	int offset = (uintptr_t)param;
+	uint32_t answer = 0;
 
 	if (m_samurai_protection_data == 0xab)
 		answer = 0x02;
@@ -2232,7 +2232,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(vicdual_state::nsub_io_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (offset & 0x01)  ret = m_in0->read();
 	if (offset & 0x08)  ret = m_in1->read();
@@ -2282,7 +2282,7 @@ INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
 {
 	if (newval)
 	{
-		int which = (int)(FPTR)param;
+		int which = (int)(uintptr_t)param;
 		int coinage = m_coinage->read();
 
 		switch (which)
@@ -2413,7 +2413,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(vicdual_state::invinco_io_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (offset & 0x01)  ret = m_in0->read();
 	if (offset & 0x02)  ret = m_in1->read();

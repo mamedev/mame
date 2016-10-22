@@ -84,12 +84,20 @@ static const char *GetModeText(int cpsr)
  *                            Main CPU Funcs
  ***************************************************************************/
 
+void arm7_cpu_device::update_irq_state()
+{
+	m_pending_interrupt = m_pendingAbtD || m_pendingAbtP || m_pendingUnd || m_pendingSwi || m_pendingFiq || m_pendingIrq;
+}
+
 // CPU CHECK IRQ STATE
 // Note: couldn't find any exact cycle counts for most of these exceptions
 void arm7_cpu_device::arm7_check_irq_state()
 {
-	UINT32 cpsr = m_r[eCPSR];   /* save current CPSR */
-	UINT32 pc = m_r[eR15] + 4;      /* save old pc (already incremented in pipeline) */;
+	if (!m_pending_interrupt)
+		return;
+
+	uint32_t cpsr = m_r[eCPSR];   /* save current CPSR */
+	uint32_t pc = m_r[eR15] + 4;      /* save old pc (already incremented in pipeline) */;
 
 	/* Exception priorities:
 
@@ -103,118 +111,128 @@ void arm7_cpu_device::arm7_check_irq_state()
 	*/
 
 	// Data Abort
-	if (m_pendingAbtD) {
+	if (m_pendingAbtD)
+	{
 		if (MODE26) fatalerror( "pendingAbtD (todo)\n");
 		SwitchMode(eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
-		SET_REGISTER(14, pc - 8 + 8);                   /* save PC to R14 */
-		SET_REGISTER(SPSR, cpsr);               /* Save current CPSR */
-		SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
-		SET_CPSR(GET_CPSR & ~T_MASK);
+		SetRegister(14, pc - 8 + 8);                   /* save PC to R14 */
+		SetRegister(SPSR, cpsr);               /* Save current CPSR */
+		set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
+		set_cpsr(GET_CPSR & ~T_MASK);
 		R15 = 0x10;                             /* IRQ Vector address */
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
-		m_pendingAbtD = 0;
+		m_pendingAbtD = false;
+		update_irq_state();
 		return;
 	}
 
 	// FIQ
-	if (m_pendingFiq && (cpsr & F_MASK) == 0) {
+	if (m_pendingFiq && (cpsr & F_MASK) == 0)
+	{
 		if (MODE26) fatalerror( "pendingFiq (todo)\n");
 		SwitchMode(eARM7_MODE_FIQ);             /* Set FIQ mode so PC is saved to correct R14 bank */
-		SET_REGISTER(14, pc - 4 + 4);                   /* save PC to R14 */
-		SET_REGISTER(SPSR, cpsr);               /* Save current CPSR */
-		SET_CPSR(GET_CPSR | I_MASK | F_MASK);   /* Mask both IRQ & FIQ */
-		SET_CPSR(GET_CPSR & ~T_MASK);
+		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
+		SetRegister(SPSR, cpsr);               /* Save current CPSR */
+		set_cpsr(GET_CPSR | I_MASK | F_MASK);   /* Mask both IRQ & FIQ */
+		set_cpsr(GET_CPSR & ~T_MASK);
 		R15 = 0x1c;                             /* IRQ Vector address */
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
 		return;
 	}
 
 	// IRQ
-	if (m_pendingIrq && (cpsr & I_MASK) == 0) {
+	if (m_pendingIrq && (cpsr & I_MASK) == 0)
+	{
 		SwitchMode(eARM7_MODE_IRQ);             /* Set IRQ mode so PC is saved to correct R14 bank */
-		SET_REGISTER(14, pc - 4 + 4);                   /* save PC to R14 */
+		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
 		if (MODE32)
 		{
-			SET_REGISTER(SPSR, cpsr);               /* Save current CPSR */
-			SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
-			SET_CPSR(GET_CPSR & ~T_MASK);
+			SetRegister(SPSR, cpsr);               /* Save current CPSR */
+			set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
+			set_cpsr(GET_CPSR & ~T_MASK);
 			R15 = 0x18;                             /* IRQ Vector address */
 		}
 		else
 		{
-			UINT32 temp;
+			uint32_t temp;
 			R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x18 | 0x00000002 /* IRQ */ | 0x08000000 /* I */;
 			temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
-			SET_CPSR(temp);            /* Mask IRQ */
+			set_cpsr(temp);            /* Mask IRQ */
 		}
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
 		return;
 	}
 
 	// Prefetch Abort
-	if (m_pendingAbtP) {
+	if (m_pendingAbtP)
+	{
 		if (MODE26) fatalerror( "pendingAbtP (todo)\n");
 		SwitchMode(eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
-		SET_REGISTER(14, pc - 4 + 4);                   /* save PC to R14 */
-		SET_REGISTER(SPSR, cpsr);               /* Save current CPSR */
-		SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
-		SET_CPSR(GET_CPSR & ~T_MASK);
+		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
+		SetRegister(SPSR, cpsr);               /* Save current CPSR */
+		set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
+		set_cpsr(GET_CPSR & ~T_MASK);
 		R15 = 0x0c;                             /* IRQ Vector address */
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
-		m_pendingAbtP = 0;
+		m_pendingAbtP = false;
+		update_irq_state();
 		return;
 	}
 
 	// Undefined instruction
-	if (m_pendingUnd) {
+	if (m_pendingUnd)
+	{
 		if (MODE26) fatalerror( "pendingUnd (todo)\n");
 		SwitchMode(eARM7_MODE_UND);             /* Set UND mode so PC is saved to correct R14 bank */
 		// compensate for prefetch (should this also be done for normal IRQ?)
 		if (T_IS_SET(GET_CPSR))
 		{
-				SET_REGISTER(14, pc - 4 + 2);         /* save PC to R14 */
+			SetRegister(14, pc - 4 + 2);         /* save PC to R14 */
 		}
 		else
 		{
-				SET_REGISTER(14, pc - 4 + 4 - 4);           /* save PC to R14 */
+			SetRegister(14, pc - 4 + 4 - 4);           /* save PC to R14 */
 		}
-		SET_REGISTER(SPSR, cpsr);               /* Save current CPSR */
-		SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
-		SET_CPSR(GET_CPSR & ~T_MASK);
+		SetRegister(SPSR, cpsr);               /* Save current CPSR */
+		set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
+		set_cpsr(GET_CPSR & ~T_MASK);
 		R15 = 0x04;                             /* IRQ Vector address */
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
-		m_pendingUnd = 0;
+		m_pendingUnd = false;
+		update_irq_state();
 		return;
 	}
 
 	// Software Interrupt
-	if (m_pendingSwi) {
+	if (m_pendingSwi)
+	{
 		SwitchMode(eARM7_MODE_SVC);             /* Set SVC mode so PC is saved to correct R14 bank */
 		// compensate for prefetch (should this also be done for normal IRQ?)
 		if (T_IS_SET(GET_CPSR))
 		{
-				SET_REGISTER(14, pc - 4 + 2);         /* save PC to R14 */
+			SetRegister(14, pc - 4 + 2);         /* save PC to R14 */
 		}
 		else
 		{
-				SET_REGISTER(14, pc - 4 + 4);           /* save PC to R14 */
+			SetRegister(14, pc - 4 + 4);           /* save PC to R14 */
 		}
 		if (MODE32)
 		{
-			SET_REGISTER(SPSR, cpsr);               /* Save current CPSR */
-			SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
-			SET_CPSR(GET_CPSR & ~T_MASK);           /* Go to ARM mode */
+			SetRegister(SPSR, cpsr);               /* Save current CPSR */
+			set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
+			set_cpsr(GET_CPSR & ~T_MASK);           /* Go to ARM mode */
 			R15 = 0x08;                             /* Jump to the SWI vector */
 		}
 		else
 		{
-			UINT32 temp;
+			uint32_t temp;
 			R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x08 | 0x00000003 /* SVC */ | 0x08000000 /* I */;
 			temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
-			SET_CPSR(temp);            /* Mask IRQ */
+			set_cpsr(temp);            /* Mask IRQ */
 		}
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
-		m_pendingSwi = 0;
+		m_pendingSwi = false;
+		update_irq_state();
 		return;
 	}
 }

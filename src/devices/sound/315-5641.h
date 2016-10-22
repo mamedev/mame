@@ -11,15 +11,15 @@
 class sega_315_5641_pcm_device : public upd7759_device
 {
 public:
-	sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	UINT8 get_fifo_space();
+	uint8_t get_fifo_space();
 	void advance_state() override;
 	virtual DECLARE_WRITE8_MEMBER(port_w) override;
 
-	UINT8       m_fifo_data[0x40];
-	UINT8       m_fifo_read;    // last read offset (will read in m_fifo_read+1)
-	UINT8       m_fifo_write;   // write offset
+	uint8_t       m_fifo_data[0x40];
+	uint8_t       m_fifo_read;    // last read offset (will read in m_fifo_read+1)
+	uint8_t       m_fifo_write;   // write offset
 
 protected:
 	// device-level overrides

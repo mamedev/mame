@@ -76,9 +76,9 @@ public:
 	DECLARE_READ8_MEMBER(psg_b_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(key_r);
-	UINT8 m_term_data;
-	UINT8 m_key_row;
-	UINT8 m_2;
+	uint8_t m_term_data;
+	uint8_t m_key_row;
+	uint8_t m_2;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -243,7 +243,7 @@ READ8_MEMBER( sbc6510_state::psg_b_r )
 
 READ8_MEMBER( sbc6510_state::key_r )
 {
-	UINT8 data=0;
+	uint8_t data=0;
 
 	for (int i = 0; i < 8; i++)
 	{

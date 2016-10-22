@@ -137,11 +137,11 @@ public:
 		m_eeprom(*this, "eeprom")
 		{ }
 
-	UINT16 m_eeprom_data;
-	UINT16 m_pntpzl_200000;
-	UINT16 m_serial;
-	UINT16 m_serial_out;
-	UINT16 m_read_count;
+	uint16_t m_eeprom_data;
+	uint16_t m_pntpzl_200000;
+	uint16_t m_serial;
+	uint16_t m_serial_out;
+	uint16_t m_read_count;
 	int m_touchscr[5];
 
 	required_device<cpu_device> m_maincpu;
@@ -312,7 +312,7 @@ INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 {
 	/* TODO: change this! */
 	if(newval)
-		generic_pulse_irq_line(*m_maincpu, (UINT8)(FPTR)param, 1);
+		generic_pulse_irq_line(*m_maincpu, (uint8_t)(uintptr_t)param, 1);
 }
 
 static INPUT_PORTS_START( pntnpuzl )
@@ -368,7 +368,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
 {
-//  UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
 

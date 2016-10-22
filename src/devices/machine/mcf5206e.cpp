@@ -206,7 +206,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::ICR13_w )
 }
 
 
-inline UINT16 mcf5206e_peripheral_device::CSAR_r(int which, int offset, UINT16 mem_mask)
+inline uint16_t mcf5206e_peripheral_device::CSAR_r(int which, int offset, uint16_t mem_mask)
 {
 	if (offset==0)
 	{
@@ -220,7 +220,7 @@ inline UINT16 mcf5206e_peripheral_device::CSAR_r(int which, int offset, UINT16 m
 	}
 }
 
-inline void mcf5206e_peripheral_device::CSAR_w(int which, int offset, UINT16 data, UINT16 mem_mask)
+inline void mcf5206e_peripheral_device::CSAR_w(int which, int offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset==0)
 	{
@@ -233,19 +233,19 @@ inline void mcf5206e_peripheral_device::CSAR_w(int which, int offset, UINT16 dat
 	}
 }
 
-inline UINT32 mcf5206e_peripheral_device::CSMR_r(int which, UINT32 mem_mask)
+inline uint32_t mcf5206e_peripheral_device::CSMR_r(int which, uint32_t mem_mask)
 {
 	debuglog("%s: CSMR%d_r\n", this->machine().describe_context(), which);
 	return m_CSMR[0];
 }
 
-inline void mcf5206e_peripheral_device::CSMR_w(int which, UINT32 data, UINT32 mem_mask)
+inline void mcf5206e_peripheral_device::CSMR_w(int which, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_CSMR[0] );
 	debuglog("%s: CSMR%d_w %08x\n", this->machine().describe_context(), which, data);
 }
 
-inline UINT16 mcf5206e_peripheral_device::CSCR_r(int which, int offset, UINT16 mem_mask)
+inline uint16_t mcf5206e_peripheral_device::CSCR_r(int which, int offset, uint16_t mem_mask)
 {
 	if (offset==1)
 	{
@@ -259,7 +259,7 @@ inline UINT16 mcf5206e_peripheral_device::CSCR_r(int which, int offset, UINT16 m
 	}
 }
 
-inline void mcf5206e_peripheral_device::CSCR_w(int which, int offset, UINT16 data, UINT16 mem_mask)
+inline void mcf5206e_peripheral_device::CSCR_w(int which, int offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset==1)
 	{
@@ -649,7 +649,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::IMR_w)
 	}
 }
 
-void mcf5206e_peripheral_device::ICR_info(UINT8 ICR)
+void mcf5206e_peripheral_device::ICR_info(uint8_t ICR)
 {
 	debuglog("  (AutoVector) AVEC : %01x | ", (ICR&0x80)>>7);
 	debuglog("(Interrupt Level) IL : %01x | ", (ICR&0x1c)>>2); // if autovector (AVEC) is used then the vectors referenced are at +24 (+0x18) + IL, ie the standard 68k autovectors, otherwise vector must be provided by device
@@ -661,7 +661,7 @@ void mcf5206e_peripheral_device::ICR_info(UINT8 ICR)
 
 TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
 {
-	UINT8 ICR = m_ICR[ICR9];
+	uint8_t ICR = m_ICR[ICR9];
 
 	// technically we should do the vector check in the IRQ callback as well as various checks based on the IRQ masks before asserting the interrupt
 	if (ICR & 0x80) // AVEC
@@ -828,7 +828,7 @@ const device_type MCF5206E_PERIPHERAL = &device_creator<mcf5206e_peripheral_devi
 //  mcf5206e_peripheral_device - constructor
 //-------------------------------------------------
 
-mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MCF5206E_PERIPHERAL, "MCF5206E Peripheral", tag, owner, clock, "mcf5206e_peripheral", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, nullptr, *ADDRESS_MAP_NAME(coldfire_regs_map))

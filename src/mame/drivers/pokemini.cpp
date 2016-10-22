@@ -20,17 +20,17 @@ The LCD is likely to be a SSD1828 LCD.
 
 struct PRC
 {
-	UINT8       colors_inverted;
-	UINT8       background_enabled;
-	UINT8       sprites_enabled;
-	UINT8       copy_enabled;
-	UINT8       map_size;
-	UINT8       map_size_x;
-	UINT8       frame_count;
-	UINT8       max_frame_count;
-	UINT32      bg_tiles;
-	UINT32      spr_tiles;
-	UINT8       count;
+	uint8_t       colors_inverted;
+	uint8_t       background_enabled;
+	uint8_t       sprites_enabled;
+	uint8_t       copy_enabled;
+	uint8_t       map_size;
+	uint8_t       map_size_x;
+	uint8_t       frame_count;
+	uint8_t       max_frame_count;
+	uint32_t      bg_tiles;
+	uint32_t      spr_tiles;
+	uint8_t       count;
 	emu_timer   *count_timer;
 };
 
@@ -61,14 +61,14 @@ public:
 		m_inputs(*this, "INPUTS")
 	{ }
 
-	UINT8 m_pm_reg[0x100];
+	uint8_t m_pm_reg[0x100];
 	PRC m_prc;
 	TIMERS m_timers;
 	bitmap_ind16 m_bitmap;
 	virtual void video_start() override;
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(pokemini);
 	DECLARE_WRITE8_MEMBER(hwreg_w);
 	DECLARE_READ8_MEMBER(hwreg_r);
@@ -92,7 +92,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<generic_slot_device> m_cart;
@@ -1476,7 +1476,7 @@ WRITE8_MEMBER(pokemini_state::hwreg_w)
 
 READ8_MEMBER(pokemini_state::hwreg_r)
 {
-	UINT8 data = m_pm_reg[offset];
+	uint8_t data = m_pm_reg[offset];
 
 	switch( offset )
 	{
@@ -1500,7 +1500,7 @@ READ8_MEMBER(pokemini_state::hwreg_r)
 
 DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	/* Verify that the image is big enough */
 	if (size <= 0x2100)
@@ -1546,7 +1546,7 @@ void pokemini_state::prc_counter_callback()
 				int x, y;
 				for ( y = 0; y < 8; y++ ) {
 					for ( x = 0; x < 12; x++ ) {
-						UINT8 tile = m_p_ram[ 0x360 + ( y * m_prc.map_size_x ) + x ];
+						uint8_t tile = m_p_ram[ 0x360 + ( y * m_prc.map_size_x ) + x ];
 						int i;
 						for( i = 0; i < 8; i++ ) {
 							m_p_ram[ ( y * 96 ) + ( x * 8 ) + i ] = space.read_byte( m_prc.bg_tiles + ( tile * 8 ) + i );
@@ -1558,19 +1558,19 @@ void pokemini_state::prc_counter_callback()
 			/* Check if the sprites should be drawn */
 			if ( m_prc.sprites_enabled )
 			{
-				UINT16  spr;
+				uint16_t  spr;
 
 				for ( spr = 0x35C; spr >= 0x300; spr -= 4 )
 				{
 					int     spr_x = ( m_p_ram[ spr + 0 ] & 0x7F ) - 16;
 					int     spr_y = ( m_p_ram[ spr + 1 ] & 0x7F ) - 16;
-					UINT8   spr_tile = m_p_ram[ spr + 2 ];
-					UINT8   spr_flag = m_p_ram[ spr + 3 ];
+					uint8_t   spr_tile = m_p_ram[ spr + 2 ];
+					uint8_t   spr_flag = m_p_ram[ spr + 3 ];
 
 					if ( spr_flag & 0x08 )
 					{
-						UINT16  gfx, mask;
-						UINT32  spr_base = m_prc.spr_tiles + spr_tile * 64;
+						uint16_t  gfx, mask;
+						uint32_t  spr_base = m_prc.spr_tiles + spr_tile * 64;
 						int     i, j;
 
 						for ( i = 0; i < 16; i++ )
@@ -1578,7 +1578,7 @@ void pokemini_state::prc_counter_callback()
 							if ( spr_x + i >= 0 && spr_x + i < 96 )
 							{
 								int rel_x = ( spr_flag & 0x01 ) ? 15 - i : i;
-								UINT32  s = spr_base + ( ( rel_x & 0x08 ) << 2 ) + ( rel_x & 0x07 );
+								uint32_t  s = spr_base + ( ( rel_x & 0x08 ) << 2 ) + ( rel_x & 0x07 );
 
 								mask = ~ ( space.read_byte( s ) | ( space.read_byte( s + 8 ) << 8 ) );
 								gfx = space.read_byte( s + 16 ) | ( space.read_byte( s + 24 ) << 8 );
@@ -1593,7 +1593,7 @@ void pokemini_state::prc_counter_callback()
 								{
 									if ( spr_y + j >= 0 && spr_y + j < 64 )
 									{
-										UINT16  ram_addr = ( ( ( spr_y + j ) >> 3 ) * 96 ) + spr_x + i;
+										uint16_t  ram_addr = ( ( ( spr_y + j ) >> 3 ) * 96 ) + spr_x + i;
 
 										if ( spr_flag & 0x02 )
 										{
@@ -1640,7 +1640,7 @@ void pokemini_state::prc_counter_callback()
 
 				for( y = 0; y < 64; y += 8 ) {
 					for( x = 0; x < 96; x++ ) {
-						UINT8 data = m_p_ram[ ( y * 12 ) + x ];
+						uint8_t data = m_p_ram[ ( y * 12 ) + x ];
 
 						m_bitmap.pix16(y + 0, x) = ( data & 0x01 ) ? 3 : 0;
 						m_bitmap.pix16(y + 1, x) = ( data & 0x02 ) ? 3 : 0;
@@ -1736,7 +1736,7 @@ void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-static const INT16 speaker_levels[] = {-32768, 0, 32767};
+static const int16_t speaker_levels[] = {-32768, 0, 32767};
 
 void pokemini_state::video_start()
 {
@@ -1744,7 +1744,7 @@ void pokemini_state::video_start()
 }
 
 
-UINT32 pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

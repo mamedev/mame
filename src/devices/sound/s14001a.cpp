@@ -109,7 +109,7 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 // device definition
 const device_type S14001A = &device_creator<s14001a_device>;
 
-s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, S14001A, "S14001A", tag, owner, clock, "s14001a", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_SpeechRom(*this, DEVICE_SELF),
@@ -190,7 +190,7 @@ void s14001a_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	for (int i = 0; i < samples; i++)
 	{
 		Clock();
-		INT16 sample = m_uOutputP2 - 7; // range -7..8
+		int16_t sample = m_uOutputP2 - 7; // range -7..8
 		outputs[0][i] = sample * 0xf00;
 	}
 }
@@ -230,7 +230,7 @@ WRITE_LINE_MEMBER(s14001a_device::start_w)
 	if (m_bStart) m_uStateP1 = WORDWAIT;
 }
 
-void s14001a_device::set_clock(UINT32 clock)
+void s14001a_device::set_clock(uint32_t clock)
 {
 	m_stream->update();
 	m_stream->set_sample_rate(clock);
@@ -241,7 +241,7 @@ void s14001a_device::set_clock(UINT32 clock)
     Device emulation
 **************************************************************************/
 
-UINT8 s14001a_device::readmem(UINT16 offset, bool phase)
+uint8_t s14001a_device::readmem(uint16_t offset, bool phase)
 {
 	offset &= 0xfff; // 11-bit internal
 	return ((m_ext_read_handler.isnull()) ? m_SpeechRom[offset & (m_SpeechRom.bytes() - 1)] : m_ext_read_handler(offset));
@@ -387,8 +387,8 @@ bool s14001a_device::Clock()
 		// end statistics
 
 		// modify output
-		UINT8 uDeltaP2;     // signal line
-		UINT8 uIncrementP2; // signal lines
+		uint8_t uDeltaP2;     // signal line
+		uint8_t uIncrementP2; // signal lines
 		bool bAddP2;        // signal line
 		uDeltaP2 = Mux8To2(m_bVoicedP2,
 					m_uLengthP2 & 0x03,     // pitch period quater counter
@@ -471,7 +471,7 @@ bool s14001a_device::Clock()
 	return true;
 }
 
-UINT8 s14001a_device::Mux8To2(bool bVoicedP2, UINT8 uPPQtrP2, UINT8 uDeltaAdrP2, UINT8 uRomDataP2)
+uint8_t s14001a_device::Mux8To2(bool bVoicedP2, uint8_t uPPQtrP2, uint8_t uDeltaAdrP2, uint8_t uRomDataP2)
 {
 	// pick two bits of rom data as delta
 
@@ -494,7 +494,7 @@ UINT8 s14001a_device::Mux8To2(bool bVoicedP2, UINT8 uPPQtrP2, UINT8 uDeltaAdrP2,
 	return 0xFF;
 }
 
-void s14001a_device::CalculateIncrement(bool bVoicedP2, UINT8 uPPQtrP2, bool bPPQStartP2, UINT8 uDelta, UINT8 uDeltaOldP2, UINT8 &uDeltaOldP1, UINT8 &uIncrementP2, bool &bAddP2)
+void s14001a_device::CalculateIncrement(bool bVoicedP2, uint8_t uPPQtrP2, bool bPPQStartP2, uint8_t uDelta, uint8_t uDeltaOldP2, uint8_t &uDeltaOldP1, uint8_t &uIncrementP2, bool &bAddP2)
 {
 	// uPPQtr, pitch period quarter counter; 2 lsb of uLength
 	// bPPStart, start of a pitch period
@@ -505,7 +505,7 @@ void s14001a_device::CalculateIncrement(bool bVoicedP2, UINT8 uPPQtrP2, bool bPP
 	{
 		uDeltaOldP2 = 0x02;
 	}
-	static const UINT8 uIncrements[4][4] =
+	static const uint8_t uIncrements[4][4] =
 	{
 	//    00  01  10  11
 		{ 3,  3,  1,  1,}, // 00
@@ -532,11 +532,11 @@ void s14001a_device::CalculateIncrement(bool bVoicedP2, UINT8 uPPQtrP2, bool bPP
 	if (bVoicedP2 && bPPQStartP2 && MIRROR) uIncrementP2 = 0; // no change when first starting mirroring
 }
 
-UINT8 s14001a_device::CalculateOutput(bool bVoiced, bool bXSilence, UINT8 uPPQtr, bool bPPQStart, UINT8 uLOutput, UINT8 uIncrementP2, bool bAddP2)
+uint8_t s14001a_device::CalculateOutput(bool bVoiced, bool bXSilence, uint8_t uPPQtr, bool bPPQStart, uint8_t uLOutput, uint8_t uIncrementP2, bool bAddP2)
 {
 	// implemented to mimic silicon (a bit)
 	// limits output to 0x00 and 0x0f
-	UINT8 uTmp; // used for subtraction
+	uint8_t uTmp; // used for subtraction
 
 #define SILENCE (uPPQtr&0x02)
 
@@ -569,7 +569,7 @@ void s14001a_device::ClearStatistics()
 	m_uNControlWords = 0;
 }
 
-void s14001a_device::GetStatistics(UINT32 &uNPitchPeriods, UINT32 &uNVoiced, UINT32 &uNControlWords)
+void s14001a_device::GetStatistics(uint32_t &uNPitchPeriods, uint32_t &uNVoiced, uint32_t &uNControlWords)
 {
 	uNPitchPeriods = m_uNPitchPeriods;
 	uNVoiced = m_uNVoiced;

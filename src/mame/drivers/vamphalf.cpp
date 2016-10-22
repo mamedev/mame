@@ -95,23 +95,23 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	optional_shared_ptr<UINT16> m_tiles;
-	optional_shared_ptr<UINT16> m_wram;
-	optional_shared_ptr<UINT32> m_tiles32;
-	optional_shared_ptr<UINT32> m_wram32;
+	optional_shared_ptr<uint16_t> m_tiles;
+	optional_shared_ptr<uint16_t> m_wram;
+	optional_shared_ptr<uint32_t> m_tiles32;
+	optional_shared_ptr<uint32_t> m_wram32;
 
 	// driver init configuration
 	int m_flip_bit;
 	int m_palshift;
 	int m_has_extra_gfx;
-	UINT16 m_semicom_prot_data[2];
+	uint16_t m_semicom_prot_data[2];
 
 	int m_flipscreen;
 	int m_semicom_prot_idx;
 	int m_semicom_prot_which;
-	UINT16 m_finalgdr_backupram_bank;
-	std::unique_ptr<UINT8[]> m_finalgdr_backupram;
-	UINT8 m_qs1000_data;
+	uint16_t m_finalgdr_backupram_bank;
+	std::unique_ptr<uint8_t[]> m_finalgdr_backupram;
+	uint8_t m_qs1000_data;
 
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
 	DECLARE_WRITE32_MEMBER(flipscreen32_w);
@@ -189,8 +189,8 @@ public:
 	DECLARE_DRIVER_INIT(yorijori);
 	DECLARE_DRIVER_INIT(mrkicker);
 
-	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap);
 	void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap);
 	void handle_flipped_visible_area(screen_device &screen);
@@ -612,7 +612,7 @@ void vamphalf_state::video_start()
 void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT32 cnt;
+	uint32_t cnt;
 	int block, offs;
 	int code,color,x,y,fx,fy;
 	rectangle clip;
@@ -697,7 +697,7 @@ void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 void vamphalf_state::draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT32 cnt;
+	uint32_t cnt;
 	int block, offs;
 	int code,color,x,y,fx,fy;
 	rectangle clip;
@@ -773,7 +773,7 @@ void vamphalf_state::handle_flipped_visible_area( screen_device &screen )
 }
 
 
-UINT32 vamphalf_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vamphalf_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	handle_flipped_visible_area(screen);
 	bitmap.fill(0, cliprect);
@@ -781,7 +781,7 @@ UINT32 vamphalf_state::screen_update_common(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 vamphalf_state::screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vamphalf_state::screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  handle_flipped_visible_area(screen); // not on this?
 	bitmap.fill(0, cliprect);
@@ -791,8 +791,8 @@ UINT32 vamphalf_state::screen_update_aoh(screen_device &screen, bitmap_ind16 &bi
 
 CUSTOM_INPUT_MEMBER(vamphalf_state::boonggab_photo_sensors_r)
 {
-	static const UINT16 photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
-	UINT8 res = ioport("PHOTO_SENSORS")->read();
+	static const uint16_t photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
+	uint8_t res = ioport("PHOTO_SENSORS")->read();
 
 	switch(res)
 	{
@@ -2465,7 +2465,7 @@ ROM_END
 
 static int irq_active(address_space &space)
 {
-	UINT32 FCR = space.device().state().state_int(27);
+	uint32_t FCR = space.device().state().state_int(27);
 	if( !(FCR&(1<<29)) ) // int 2 (irq 4)
 		return 1;
 	else
@@ -2657,7 +2657,7 @@ READ32_MEMBER(vamphalf_state::finalgdr_speedup_r)
 
 READ32_MEMBER(vamphalf_state::mrkickera_speedup_r)
 {
-	UINT32 pc = space.device().safe_pc();
+	uint32_t pc = space.device().safe_pc();
 	if(pc == 0x469de || pc == 0x46a36)
 	{
 //      if(irq_active(space))
@@ -2671,7 +2671,7 @@ READ32_MEMBER(vamphalf_state::mrkickera_speedup_r)
 
 READ16_MEMBER(vamphalf_state::mrkicker_speedup_r)
 {
-	UINT32 pc = space.device().safe_pc();
+	uint32_t pc = space.device().safe_pc();
 	if(pc == 0x41ec6)
 	{
 		space.device().execute().eat_cycles(50);
@@ -2876,7 +2876,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 1;
 
-//  UINT8 *romx = (UINT8 *)memregion("user1")->base();
+//  uint8_t *romx = (uint8_t *)memregion("user1")->base();
 	// prevent code dying after a trap 33 by patching it out, why?
 //  romx[BYTE4_XOR_BE(0x8ff0)] = 3;
 //  romx[BYTE4_XOR_BE(0x8ff1)] = 0;
@@ -2891,7 +2891,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 {
 	m_finalgdr_backupram_bank = 1;
-	m_finalgdr_backupram = std::make_unique<UINT8[]>(0x80*0x100);
+	m_finalgdr_backupram = std::make_unique<uint8_t[]>(0x80*0x100);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x005e874, 0x005e877, read32_delegate(FUNC(vamphalf_state::finalgdr_speedup_r), this));
 	machine().device<nvram_device>("nvram")->set_base(m_finalgdr_backupram.get(), 0x80*0x100);
 
@@ -2912,7 +2912,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
 {
 	// backup ram isn't used
 	m_finalgdr_backupram_bank = 1;
-	m_finalgdr_backupram = std::make_unique<UINT8[]>(0x80*0x100);
+	m_finalgdr_backupram = std::make_unique<uint8_t[]>(0x80*0x100);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00701a4, 0x00701a7, read32_delegate(FUNC(vamphalf_state::mrkickera_speedup_r), this));
 	machine().device<nvram_device>("nvram")->set_base(m_finalgdr_backupram.get(), 0x80*0x100);
 

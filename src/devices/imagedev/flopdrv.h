@@ -55,10 +55,10 @@
 
 struct floppy_type_t
 {
-	UINT8 media_size;
-	UINT8 head_number;
-	UINT8 max_track_number;
-	UINT8 max_density;
+	uint8_t media_size;
+	uint8_t head_number;
+	uint8_t max_track_number;
+	uint8_t max_density;
 };
 
 // ======================> floppy_interface
@@ -93,8 +93,8 @@ class legacy_floppy_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~legacy_floppy_image_device();
 
 	static void static_set_floppy_config(device_t &device, const floppy_interface *config) { downcast<legacy_floppy_image_device &>(device).m_config = config; }
@@ -132,7 +132,7 @@ public:
 	void floppy_install_unload_proc(void (*proc)(device_image_interface &image));
 	void floppy_drive_set_index_pulse_callback(void (*callback)(device_t *controller,device_t *image, int state));
 	int floppy_drive_get_current_track();
-	UINT64 floppy_drive_get_current_track_size(int head);
+	uint64_t floppy_drive_get_current_track_size(int head);
 	void floppy_drive_set_rpm(float rpm);
 	void floppy_drive_set_controller(device_t *controller);
 	int floppy_get_drive_type();

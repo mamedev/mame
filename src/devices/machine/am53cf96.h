@@ -41,7 +41,7 @@ class am53cf96_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<am53cf96_device &>(device).m_irq_handler.set_callback(object); }
@@ -49,8 +49,8 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void dma_read_data(int bytes, UINT8 *pData);
-	void dma_write_data(int bytes, UINT8 *pData);
+	void dma_read_data(int bytes, uint8_t *pData);
+	void dma_write_data(int bytes, uint8_t *pData);
 
 protected:
 	// device-level overrides
@@ -60,11 +60,11 @@ protected:
 private:
 	static const device_timer_id TIMER_TRANSFER = 0;
 
-	UINT8 scsi_regs[32];
-	UINT8 fifo[16];
-	UINT8 fptr;
-	UINT8 xfer_state;
-	UINT8 last_id;
+	uint8_t scsi_regs[32];
+	uint8_t fifo[16];
+	uint8_t fptr;
+	uint8_t xfer_state;
+	uint8_t last_id;
 
 	emu_timer* m_transfer_timer;
 	devcb_write_line m_irq_handler;

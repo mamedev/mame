@@ -111,7 +111,7 @@ note: if ROM is not mounted its area readed as 0xFF
 
 const device_type NAOMI_M2_BOARD = &device_creator<naomi_m2_board>;
 
-naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_M2_BOARD, "Sega NAOMI M2 Board", tag, owner, clock, "naomi_m2_board", __FILE__),
 	m_cryptdevice(*this, "segam2crypt"),
 	m_region(*this, DEVICE_SELF)
@@ -122,7 +122,7 @@ void naomi_m2_board::device_start()
 {
 	naomi_board::device_start();
 
-	ram = std::make_unique<UINT8[]>(RAM_SIZE);
+	ram = std::make_unique<uint8_t[]>(RAM_SIZE);
 
 	save_item(NAME(rom_cur_address));
 	save_pointer(NAME(ram.get()), RAM_SIZE);
@@ -137,12 +137,12 @@ void naomi_m2_board::device_reset()
 	rom_cur_address = 0;
 }
 
-void naomi_m2_board::board_setup_address(UINT32 address, bool is_dma)
+void naomi_m2_board::board_setup_address(uint32_t address, bool is_dma)
 {
 	rom_cur_address = address;
 }
 
-void naomi_m2_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
+void naomi_m2_board::board_get_buffer(uint8_t *&base, uint32_t &limit)
 {
 	if(rom_cur_address & 0x40000000) {
 		if(rom_cur_address == 0x4001fffe) {
@@ -157,19 +157,19 @@ void naomi_m2_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 			base = m_region->base() + (rom_cur_address & 0x1fffffff);
 			limit = m_region->bytes() - (rom_cur_address & 0x1fffffff);
 		} else {
-			UINT32 offset4mb = (rom_cur_address & 0x103FFFFF) | ((rom_cur_address & 0x07C00000) << 1);
+			uint32_t offset4mb = (rom_cur_address & 0x103FFFFF) | ((rom_cur_address & 0x07C00000) << 1);
 			base = m_region->base() + offset4mb;
 			limit = std::min(m_region->bytes() - offset4mb, 0x00400000 - (offset4mb & 0x003FFFFF));
 		}
 	}
 }
 
-void naomi_m2_board::board_advance(UINT32 size)
+void naomi_m2_board::board_advance(uint32_t size)
 {
 	rom_cur_address += size;
 }
 
-void naomi_m2_board::board_write(offs_t offset, UINT16 data)
+void naomi_m2_board::board_write(offs_t offset, uint16_t data)
 {
 	if(offset & 0x40000000) {
 		if(offset & 0x00020000) {
@@ -187,7 +187,7 @@ void naomi_m2_board::board_write(offs_t offset, UINT16 data)
 	logerror("NAOMIM2: unhandled board write %08x, %04x\n", offset, data);
 }
 
-UINT16 naomi_m2_board::read_callback(UINT32 addr)
+uint16_t naomi_m2_board::read_callback(uint32_t addr)
 {
 	if ((addr & 0xffff0000) == 0x01000000) {
 		int base = 2*(addr & 0x7fff);
@@ -195,7 +195,7 @@ UINT16 naomi_m2_board::read_callback(UINT32 addr)
 
 	}
 	else {
-		const UINT8 *base = &m_region->u8(2*addr);
+		const uint8_t *base = &m_region->u8(2*addr);
 		return base[1] | (base[0] << 8);
 	}
 }

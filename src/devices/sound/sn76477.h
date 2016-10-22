@@ -93,7 +93,7 @@ class sn76477_device : public device_t,
 						public device_sound_interface
 {
 public:
-	sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~sn76477_device() {}
 
 	static void set_noise_params(device_t &device, double clock_res, double filter_res, double filter_cap)
@@ -132,21 +132,21 @@ public:
 		dev.m_one_shot_cap = cap;
 		dev.m_one_shot_res = res;
 	}
-	static void set_vco_mode(device_t &device, UINT32 mode) { downcast<sn76477_device &>(device).m_vco_mode = mode; }
-	static void set_mixer_params(device_t &device, UINT32 a, UINT32 b, UINT32 c)
+	static void set_vco_mode(device_t &device, uint32_t mode) { downcast<sn76477_device &>(device).m_vco_mode = mode; }
+	static void set_mixer_params(device_t &device, uint32_t a, uint32_t b, uint32_t c)
 	{
 		sn76477_device &dev = downcast<sn76477_device &>(device);
 		dev.m_mixer_a = a;
 		dev.m_mixer_b = b;
 		dev.m_mixer_c = c;
 	}
-	static void set_envelope_params(device_t &device, UINT32 env1, UINT32 env2)
+	static void set_envelope_params(device_t &device, uint32_t env1, uint32_t env2)
 	{
 		sn76477_device &dev = downcast<sn76477_device &>(device);
 		dev.m_envelope_1 = env1;
 		dev.m_envelope_2 = env2;
 	}
-	static void set_enable(device_t &device, UINT32 enable) { downcast<sn76477_device &>(device).m_enable = enable; }
+	static void set_enable(device_t &device, uint32_t enable) { downcast<sn76477_device &>(device).m_enable = enable; }
 
 
 	/* these functions take 0 or 1 as a logic input */
@@ -199,35 +199,35 @@ protected:
 
 private:
 	/* chip's external interface */
-	UINT32 m_enable;
-	UINT32 m_envelope_mode;
-	UINT32 m_vco_mode;
-	UINT32 m_mixer_mode;
+	uint32_t m_enable;
+	uint32_t m_envelope_mode;
+	uint32_t m_vco_mode;
+	uint32_t m_mixer_mode;
 
 	double m_one_shot_res;
 	double m_one_shot_cap;
-	UINT32 m_one_shot_cap_voltage_ext;
+	uint32_t m_one_shot_cap_voltage_ext;
 
 	double m_slf_res;
 	double m_slf_cap;
-	UINT32 m_slf_cap_voltage_ext;
+	uint32_t m_slf_cap_voltage_ext;
 
 	double m_vco_voltage;
 	double m_vco_res;
 	double m_vco_cap;
-	UINT32 m_vco_cap_voltage_ext;
+	uint32_t m_vco_cap_voltage_ext;
 
 	double m_noise_clock_res;
-	UINT32 m_noise_clock_ext;
-	UINT32 m_noise_clock;
+	uint32_t m_noise_clock_ext;
+	uint32_t m_noise_clock;
 	double m_noise_filter_res;
 	double m_noise_filter_cap;
-	UINT32 m_noise_filter_cap_voltage_ext;
+	uint32_t m_noise_filter_cap_voltage_ext;
 
 	double m_attack_res;
 	double m_decay_res;
 	double m_attack_decay_cap;
-	UINT32 m_attack_decay_cap_voltage_ext;
+	uint32_t m_attack_decay_cap_voltage_ext;
 
 	double m_amplitude_res;
 	double m_feedback_res;
@@ -235,30 +235,30 @@ private:
 
 	// internal state
 	double m_one_shot_cap_voltage;        /* voltage on the one-shot cap */
-	UINT32 m_one_shot_running_ff;         /* 1 = one-shot running, 0 = stopped */
+	uint32_t m_one_shot_running_ff;         /* 1 = one-shot running, 0 = stopped */
 
 	double m_slf_cap_voltage;             /* voltage on the SLF cap */
-	UINT32 m_slf_out_ff;                  /* output of the SLF */
+	uint32_t m_slf_out_ff;                  /* output of the SLF */
 
 	double m_vco_cap_voltage;             /* voltage on the VCO cap */
-	UINT32 m_vco_out_ff;                  /* output of the VCO */
-	UINT32 m_vco_alt_pos_edge_ff;         /* keeps track of the # of positive edges for VCO Alt envelope */
+	uint32_t m_vco_out_ff;                  /* output of the VCO */
+	uint32_t m_vco_alt_pos_edge_ff;         /* keeps track of the # of positive edges for VCO Alt envelope */
 
 	double m_noise_filter_cap_voltage;    /* voltage on the noise filter cap */
-	UINT32 m_real_noise_bit_ff;           /* the current noise bit before filtering */
-	UINT32 m_filtered_noise_bit_ff;       /* the noise bit after filtering */
-	UINT32 m_noise_gen_count;             /* noise freq emulation */
+	uint32_t m_real_noise_bit_ff;           /* the current noise bit before filtering */
+	uint32_t m_filtered_noise_bit_ff;       /* the noise bit after filtering */
+	uint32_t m_noise_gen_count;             /* noise freq emulation */
 
 	double m_attack_decay_cap_voltage;    /* voltage on the attack/decay cap */
 
-	UINT32 m_rng;                         /* current value of the random number generator */
+	uint32_t m_rng;                         /* current value of the random number generator */
 
 	// configured by the drivers and used to setup m_mixer_mode & m_envelope_mode at start
-	UINT32 m_mixer_a;
-	UINT32 m_mixer_b;
-	UINT32 m_mixer_c;
-	UINT32 m_envelope_1;
-	UINT32 m_envelope_2;
+	uint32_t m_mixer_a;
+	uint32_t m_mixer_b;
+	uint32_t m_mixer_c;
+	uint32_t m_envelope_1;
+	uint32_t m_envelope_2;
 
 	/* others */
 	sound_stream *m_channel;              /* returned by stream_create() */
@@ -272,7 +272,7 @@ private:
 	double compute_slf_cap_discharging_rate();
 	double compute_vco_cap_charging_discharging_rate();
 	double compute_vco_duty_cycle();
-	UINT32 compute_noise_gen_freq();
+	uint32_t compute_noise_gen_freq();
 	double compute_noise_filter_cap_charging_rate();
 	double compute_noise_filter_cap_discharging_rate();
 	double compute_attack_decay_cap_charging_rate();
@@ -298,10 +298,10 @@ private:
 
 	void open_wav_file();
 	void close_wav_file();
-	void add_wav_data(INT16 data_l, INT16 data_r);
+	void add_wav_data(int16_t data_l, int16_t data_r);
 
 	void intialize_noise();
-	inline UINT32 generate_next_real_noise_bit();
+	inline uint32_t generate_next_real_noise_bit();
 
 	void state_save_register();
 };

@@ -36,6 +36,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 class go2000_state : public driver_device
 {
@@ -52,8 +53,8 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_videoram2;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_videoram2;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -67,7 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(go2000_pcm_1_bankswitch_w);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -104,7 +105,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( go2000_sound_io, AS_IO, 8, go2000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x03, 0x03) AM_WRITE(go2000_pcm_1_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -189,7 +190,7 @@ void go2000_state::video_start()
 {
 }
 
-UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 
@@ -319,7 +320,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 
 void go2000_state::machine_start()
 {
-	UINT8 *SOUND = memregion("soundcpu")->base();
+	uint8_t *SOUND = memregion("soundcpu")->base();
 	int i;
 
 	for (i = 0; i < 8; i++)
@@ -354,13 +355,12 @@ static MACHINE_CONFIG_START( go2000, go2000_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( go2000 )

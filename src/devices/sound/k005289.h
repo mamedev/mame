@@ -22,7 +22,7 @@ class k005289_device : public device_t,
 						public device_sound_interface
 {
 public:
-	k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k005289_device() { }
 
 protected:
@@ -43,20 +43,20 @@ public:
 private:
 	void make_mixer_table(int voices);
 
-	required_region_ptr<UINT8> m_sound_prom;
+	required_region_ptr<uint8_t> m_sound_prom;
 	sound_stream *m_stream;
 	int m_rate;
 
 	/* mixer tables and internal buffers */
-	std::unique_ptr<INT16[]> m_mixer_table;
-	INT16 *m_mixer_lookup;
+	std::unique_ptr<int16_t[]> m_mixer_table;
+	int16_t *m_mixer_lookup;
 	std::unique_ptr<short[]> m_mixer_buffer;
 
-	UINT32 m_counter[2];
-	UINT16 m_frequency[2];
-	UINT16 m_freq_latch[2];
-	UINT16 m_waveform[2];
-	UINT8 m_volume[2];
+	uint32_t m_counter[2];
+	uint16_t m_frequency[2];
+	uint16_t m_freq_latch[2];
+	uint16_t m_waveform[2];
+	uint8_t m_volume[2];
 };
 
 extern const device_type K005289;

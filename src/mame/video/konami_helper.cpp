@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "konami_helper.h"
 
-void konami_decode_gfx(device_gfx_interface &gfxdecode, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp)
+void konami_decode_gfx(device_gfx_interface &gfxdecode, int gfx_index, uint8_t *data, uint32_t total, const gfx_layout *layout, int bpp)
 {
 	gfx_layout gl;
 	palette_device &palette = gfxdecode.palette();

@@ -100,7 +100,7 @@ INLINE floatx80 propagateFloatx80NaNOneArg(floatx80 a)
 | `zSigPtr', respectively.
 *----------------------------------------------------------------------------*/
 
-INLINE void normalizeFloatx80Subnormal(UINT64 aSig, INT32 *zExpPtr, UINT64 *zSigPtr)
+INLINE void normalizeFloatx80Subnormal(uint64_t aSig, int32_t *zExpPtr, uint64_t *zSigPtr)
 {
 	int shiftCount = countLeadingZeros64(aSig);
 	*zSigPtr = aSig<<shiftCount;
@@ -115,7 +115,7 @@ INLINE void normalizeFloatx80Subnormal(UINT64 aSig, INT32 *zExpPtr, UINT64 *zSig
 
 INLINE int floatx80_is_nan(floatx80 a)
 {
-	return ((a.high & 0x7FFF) == 0x7FFF) && (INT64) (a.low<<1);
+	return ((a.high & 0x7FFF) == 0x7FFF) && (int64_t) (a.low<<1);
 }
 
 /*----------------------------------------------------------------------------
@@ -253,18 +253,18 @@ static float128 poly_l2p1(float128 x)
 
 static floatx80 fyl2x(floatx80 a, floatx80 b)
 {
-	UINT64 aSig = extractFloatx80Frac(a);
-	INT32 aExp = extractFloatx80Exp(a);
+	uint64_t aSig = extractFloatx80Frac(a);
+	int32_t aExp = extractFloatx80Exp(a);
 	int aSign = extractFloatx80Sign(a);
-	UINT64 bSig = extractFloatx80Frac(b);
-	INT32 bExp = extractFloatx80Exp(b);
+	uint64_t bSig = extractFloatx80Frac(b);
+	int32_t bExp = extractFloatx80Exp(b);
 	int bSign = extractFloatx80Sign(b);
 
 	int zSign = bSign ^ 1;
 
 	if (aExp == 0x7FFF) {
-		if ((UINT64) (aSig<<1)
-				|| ((bExp == 0x7FFF) && (UINT64) (bSig<<1)))
+		if ((uint64_t) (aSig<<1)
+				|| ((bExp == 0x7FFF) && (uint64_t) (bSig<<1)))
 		{
 			return propagateFloatx80NaN(a, b);
 		}
@@ -284,14 +284,14 @@ invalid:
 	}
 	if (bExp == 0x7FFF)
 	{
-		if ((UINT64) (bSig<<1)) return propagateFloatx80NaN(a, b);
-		if (aSign && (UINT64)(aExp | aSig)) goto invalid;
+		if ((uint64_t) (bSig<<1)) return propagateFloatx80NaN(a, b);
+		if (aSign && (uint64_t)(aExp | aSig)) goto invalid;
 		if (aSig && (aExp == 0))
 			float_raise(float_flag_denormal);
 		if (aExp < 0x3FFF) {
 			return packFloatx80(zSign, 0x7FFF, U64(0x8000000000000000));
 		}
-		if (aExp == 0x3FFF && ((UINT64) (aSig<<1) == 0)) goto invalid;
+		if (aExp == 0x3FFF && ((uint64_t) (aSig<<1) == 0)) goto invalid;
 		return packFloatx80(bSign, 0x7FFF, U64(0x8000000000000000));
 	}
 	if (aExp == 0) {
@@ -313,7 +313,7 @@ invalid:
 		float_raise(float_flag_denormal);
 		normalizeFloatx80Subnormal(bSig, &bExp, &bSig);
 	}
-	if (aExp == 0x3FFF && ((UINT64) (aSig<<1) == 0))
+	if (aExp == 0x3FFF && ((uint64_t) (aSig<<1) == 0))
 		return packFloatx80(bSign, 0, 0);
 
 	float_raise(float_flag_inexact);
@@ -329,11 +329,11 @@ invalid:
 	/* using float128 for approximation */
 	/* ******************************** */
 
-	UINT64 zSig0, zSig1;
+	uint64_t zSig0, zSig1;
 	shift128Right(aSig<<1, 0, 16, &zSig0, &zSig1);
 	float128 x = packFloat128(0, aExp+0x3FFF, zSig0, zSig1);
 	x = poly_l2(x);
-	x = float128_add(x, int64_to_float128((INT64) ExpDiff));
+	x = float128_add(x, int64_to_float128((int64_t) ExpDiff));
 	return floatx80_mul(b, float128_to_floatx80(x));
 }
 
@@ -364,8 +364,8 @@ invalid:
 
 floatx80 fyl2xp1(floatx80 a, floatx80 b)
 {
-	INT32 aExp, bExp;
-	UINT64 aSig, bSig, zSig0, zSig1, zSig2;
+	int32_t aExp, bExp;
+	uint64_t aSig, bSig, zSig0, zSig1, zSig2;
 	int aSign, bSign;
 
 	aSig = extractFloatx80Frac(a);
@@ -377,8 +377,8 @@ floatx80 fyl2xp1(floatx80 a, floatx80 b)
 	int zSign = aSign ^ bSign;
 
 	if (aExp == 0x7FFF) {
-		if ((UINT64) (aSig<<1)
-				|| ((bExp == 0x7FFF) && (UINT64) (bSig<<1)))
+		if ((uint64_t) (aSig<<1)
+				|| ((bExp == 0x7FFF) && (uint64_t) (bSig<<1)))
 		{
 			return propagateFloatx80NaN(a, b);
 		}
@@ -398,7 +398,7 @@ invalid:
 	}
 	if (bExp == 0x7FFF)
 	{
-		if ((UINT64) (bSig<<1))
+		if ((uint64_t) (bSig<<1))
 			return propagateFloatx80NaN(a, b);
 
 		if (aExp == 0) {
@@ -436,17 +436,17 @@ invalid:
 	if (aExp < EXP_BIAS-70)
 	{
 		// first order approximation, return (a*b)/ln(2)
-		INT32 zExp = aExp + FLOAT_LN2INV_EXP - 0x3FFE;
+		int32_t zExp = aExp + FLOAT_LN2INV_EXP - 0x3FFE;
 
 	mul128By64To192(FLOAT_LN2INV_HI, FLOAT_LN2INV_LO, aSig, &zSig0, &zSig1, &zSig2);
-		if (0 < (INT64) zSig0) {
+		if (0 < (int64_t) zSig0) {
 			shortShift128Left(zSig0, zSig1, 1, &zSig0, &zSig1);
 			--zExp;
 		}
 
 		zExp = zExp + bExp - 0x3FFE;
 	mul128By64To192(zSig0, zSig1, bSig, &zSig0, &zSig1, &zSig2);
-		if (0 < (INT64) zSig0) {
+		if (0 < (int64_t) zSig0) {
 			shortShift128Left(zSig0, zSig1, 1, &zSig0, &zSig1);
 			--zExp;
 		}

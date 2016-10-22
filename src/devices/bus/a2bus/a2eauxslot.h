@@ -47,8 +47,8 @@ class a2eauxslot_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -71,8 +71,8 @@ class a2eauxslot_device : public device_t
 {
 public:
 	// construction/destruction
-	a2eauxslot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2eauxslot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2eauxslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2eauxslot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
@@ -118,11 +118,11 @@ public:
 	device_a2eauxslot_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a2eauxslot_card_interface();
 
-	virtual UINT8 read_auxram(UINT16 offset) { printf("a2eauxslot: unhandled auxram read @ %04x\n", offset); return 0xff; }
-	virtual void write_auxram(UINT16 offset, UINT8 data) { printf("a2eauxslot: unhandled auxram write %02x @ %04x\n", data, offset); }
-	virtual void write_c07x(address_space &space, UINT8 offset, UINT8 data) {}
-	virtual UINT8 *get_vram_ptr() = 0;
-	virtual UINT8 *get_auxbank_ptr() = 0;
+	virtual uint8_t read_auxram(uint16_t offset) { printf("a2eauxslot: unhandled auxram read @ %04x\n", offset); return 0xff; }
+	virtual void write_auxram(uint16_t offset, uint8_t data) { printf("a2eauxslot: unhandled auxram write %02x @ %04x\n", data, offset); }
+	virtual void write_c07x(address_space &space, uint8_t offset, uint8_t data) {}
+	virtual uint8_t *get_vram_ptr() = 0;
+	virtual uint8_t *get_auxbank_ptr() = 0;
 	virtual bool allow_dhr() { return true; }
 
 	device_a2eauxslot_card_interface *next() const { return m_next; }

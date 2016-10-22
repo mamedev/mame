@@ -87,7 +87,7 @@ bool suppressor_reader::get_values(const Value& value, std::string prefix, std::
 {
 	const char* name_str = name.c_str();
 	const Value& value_array = value[name_str];
-	for (UINT32 i = 0; i < value_array.Size() && i < count; i++)
+	for (uint32_t i = 0; i < value_array.Size() && i < count; i++)
 	{
 		if (!READER_CHECK(value_array[i].IsInt(), (prefix + "value[" + std::to_string(i) + "] must be an integer\n").c_str())) return false;
 		values[i] = value_array[i].GetInt();

@@ -56,11 +56,11 @@ device_sat_cart_interface::~device_sat_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sat_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_sat_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(SATSLOT_ROM_REGION_TAG).c_str(), size, 4, ENDIANNESS_LITTLE)->base();
+		m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(SATSLOT_ROM_REGION_TAG).c_str(), size, 4, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -70,7 +70,7 @@ void device_sat_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //  bram_alloc - alloc the space for the Backup RAM
 //-------------------------------------------------
 
-void device_sat_cart_interface::bram_alloc(UINT32 size)
+void device_sat_cart_interface::bram_alloc(uint32_t size)
 {
 	m_ext_bram.resize(size);
 	device().save_item(NAME(m_ext_bram));
@@ -81,15 +81,15 @@ void device_sat_cart_interface::bram_alloc(UINT32 size)
 //  dram*_alloc - alloc the space for the DRAM
 //-------------------------------------------------
 
-void device_sat_cart_interface::dram0_alloc(UINT32 size)
+void device_sat_cart_interface::dram0_alloc(uint32_t size)
 {
-	m_ext_dram0.resize(size/sizeof(UINT32));
+	m_ext_dram0.resize(size/sizeof(uint32_t));
 	device().save_item(NAME(m_ext_dram0));
 }
 
-void device_sat_cart_interface::dram1_alloc(UINT32 size)
+void device_sat_cart_interface::dram1_alloc(uint32_t size)
 {
-	m_ext_dram1.resize(size/sizeof(UINT32));
+	m_ext_dram1.resize(size/sizeof(uint32_t));
 	device().save_item(NAME(m_ext_dram1));
 }
 
@@ -101,7 +101,7 @@ void device_sat_cart_interface::dram1_alloc(UINT32 size)
 //-------------------------------------------------
 //  sat_cart_slot_device - constructor
 //-------------------------------------------------
-sat_cart_slot_device::sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sat_cart_slot_device::sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, SATURN_CART_SLOT, "Saturn Cartridge Slot", tag, owner, clock, "sat_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr)
@@ -154,8 +154,8 @@ image_init_result sat_cart_slot_device::call_load()
 		if (is_rom)
 		{
 			// from fullpath, only ROM carts
-			UINT32 len = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
-			UINT32 *ROM;
+			uint32_t len = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
+			uint32_t *ROM;
 
 			m_cart->rom_alloc(len, tag());
 			ROM = m_cart->get_rom_base();
@@ -169,8 +169,8 @@ image_init_result sat_cart_slot_device::call_load()
 			for (int i = 0; i < len/4; i ++)
 				ROM[i] = BITSWAP32(ROM[i],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
 //          {
-//              UINT8 tempa = ROM[i+0];
-//              UINT8 tempb = ROM[i+1];
+//              uint8_t tempa = ROM[i+0];
+//              uint8_t tempb = ROM[i+1];
 //              ROM[i+1] = ROM[i+2];
 //              ROM[i+0] = ROM[i+3];
 //              ROM[i+3] = tempa;

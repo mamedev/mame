@@ -5,7 +5,7 @@
 #include "imagedev/chd_cd.h"
 
 
-typedef device_delegate<void (int&, UINT8*, UINT16&, UINT16&)> segacd_dma_delegate;
+typedef device_delegate<void (int&, uint8_t*, uint16_t&, uint16_t&)> segacd_dma_delegate;
 
 typedef device_delegate<void (void)> interrupt_delegate;
 
@@ -147,7 +147,7 @@ typedef device_delegate<void (void)> interrupt_delegate;
 class lc89510_temp_device : public device_t
 {
 public:
-	lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// HACK for DMA handling
 	segacd_dma_delegate segacd_dma_callback;
@@ -155,7 +155,7 @@ public:
 	interrupt_delegate type2_interrupt_callback;
 	interrupt_delegate type3_interrupt_callback;
 
-	void Fake_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
+	void Fake_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, uint16_t &dma_addrc, uint16_t &destination );
 	static void set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback);
 
 	void dummy_interrupt_callback(void);
@@ -175,39 +175,39 @@ public:
 	{
 		cdrom_file  *cd;
 		const cdrom_toc   *toc;
-		UINT32 current_frame;
+		uint32_t current_frame;
 	};
 
 
 	segacd_t segacd;
 
-	UINT8    SCD_BUFFER[2560];
+	uint8_t    SCD_BUFFER[2560];
 
-	UINT32   SCD_STATUS;
-	UINT32   SCD_STATUS_CDC;
-	INT32    SCD_CURLBA;
-	UINT8    SCD_CURTRK;
-
-
-	UINT16 CDC_DECODE;
-	UINT16 CDC_REG0;
-	UINT16 CDC_REG1;
-
-	UINT8 CDC_BUFFER[LC89510_EXTERNAL_BUFFER_SIZE];
+	uint32_t   SCD_STATUS;
+	uint32_t   SCD_STATUS_CDC;
+	int32_t    SCD_CURLBA;
+	uint8_t    SCD_CURTRK;
 
 
-	UINT8 CDD_RX[10];
-	UINT8 CDD_TX[10];
+	uint16_t CDC_DECODE;
+	uint16_t CDC_REG0;
+	uint16_t CDC_REG1;
 
-	UINT32 CDD_STATUS;
-	UINT32 CDD_MIN;
-	UINT32 CDD_SEC;
-	UINT32 CDD_FRAME;
-	UINT32 CDD_EXT;
+	uint8_t CDC_BUFFER[LC89510_EXTERNAL_BUFFER_SIZE];
 
-	UINT16 CDD_CONTROL;
 
-	INT16  CDD_DONE;
+	uint8_t CDD_RX[10];
+	uint8_t CDD_TX[10];
+
+	uint32_t CDD_STATUS;
+	uint32_t CDD_MIN;
+	uint32_t CDD_SEC;
+	uint32_t CDD_FRAME;
+	uint32_t CDD_EXT;
+
+	uint16_t CDD_CONTROL;
+
+	int16_t  CDD_DONE;
 
 	inline int to_bcd(int val, bool byte);
 	void set_data_audio_mode(void);
@@ -226,7 +226,7 @@ public:
 	void CDD_FirstLast(void);
 	void CDD_GetTrackAdr(void);
 	void CDD_GetTrackType(void);
-	UINT32 getmsf_from_regs(void);
+	uint32_t getmsf_from_regs(void);
 	void CDD_Play(running_machine &machine);
 	void CDD_Seek(void);
 	void CDD_Pause(running_machine &machine);
@@ -242,9 +242,9 @@ public:
 	void lc89510_Reset(void);
 	void CDC_End_Transfer(running_machine& machine);
 	void CDC_Do_DMA(running_machine& machine, int rate);
-	UINT16 CDC_Host_r(running_machine& machine, UINT16 type);
-	UINT8 CDC_Reg_r(void);
-	void CDC_Reg_w(UINT8 data);
+	uint16_t CDC_Host_r(running_machine& machine, uint16_t type);
+	uint8_t CDC_Reg_r(void);
+	void CDC_Reg_w(uint8_t data);
 	void CDD_Process(running_machine& machine, int reason);
 	void CDD_Handle_TOC_Commands(void);
 	bool CDD_Import(running_machine& machine);
@@ -268,42 +268,42 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( segacd_access_timer_callback );
 
-	UINT16 get_segacd_irq_mask(void) { return segacd_irq_mask; }
-	UINT16 segacd_irq_mask;
+	uint16_t get_segacd_irq_mask(void) { return segacd_irq_mask; }
+	uint16_t segacd_irq_mask;
 	cdda_device* m_cdda;
 
 	/* NeoCD */
-	UINT16 nff0002;
-	UINT16 nff0016;
+	uint16_t nff0002;
+	uint16_t nff0016;
 
 
-	INT32 LC8951RegistersR[16];
-	INT32 LC8951RegistersW[16];
+	int32_t LC8951RegistersR[16];
+	int32_t LC8951RegistersW[16];
 
 
 
 	bool bNeoCDCommsClock;
 
-	INT32 NeoCDCommsWordCount;
+	int32_t NeoCDCommsWordCount;
 
-	INT32 NeoCD_StatusHack;
-
-
+	int32_t NeoCD_StatusHack;
 
 
-	void NeoCDCommsControl(UINT8 clock, UINT8 send);
+
+
+	void NeoCDCommsControl(uint8_t clock, uint8_t send);
 	void LC8951UpdateHeader();
 	char* LC8915InitTransfer(int NeoCDDMACount);
 	void LC8915EndTransfer();
 
-	void neocd_cdd_tx_w(UINT8 data);
-	UINT8 neocd_cdd_rx_r();
+	void neocd_cdd_tx_w(uint8_t data);
+	uint8_t neocd_cdd_rx_r();
 	void NeoCDCommsReset();
 
 
-	UINT16 nff0016_r(void);
-	void nff0016_set(UINT16 wordValue);
-	void nff0002_set(UINT16 wordValue);
+	uint16_t nff0016_r(void);
+	void nff0016_set(uint16_t wordValue);
+	void nff0002_set(uint16_t wordValue);
 
 protected:
 	virtual void device_start() override;

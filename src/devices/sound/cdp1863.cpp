@@ -46,7 +46,7 @@ const device_type CDP1863 = &device_creator<cdp1863_device>;
 //  cdp1863_device - constructor
 //-------------------------------------------------
 
-cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDP1863, "CDP1863", tag, owner, clock, "cdp1863", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -97,7 +97,7 @@ void cdp1863_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 
-	INT16 signal = m_signal;
+	int16_t signal = m_signal;
 	stream_sample_t *buffer = outputs[0];
 
 	memset( buffer, 0, samples * sizeof(*buffer) );
@@ -162,7 +162,7 @@ WRITE8_MEMBER( cdp1863_device::str_w )
 //  str_w - latch write
 //-------------------------------------------------
 
-void cdp1863_device::str_w(UINT8 data)
+void cdp1863_device::str_w(uint8_t data)
 {
 	m_latch = data;
 }

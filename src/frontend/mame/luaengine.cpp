@@ -283,7 +283,7 @@ void lua_engine::resume(lua_State *L, int nparam, lua_State *root)
 	}
 }
 
-void lua_engine::resume(void *lua, INT32 param)
+void lua_engine::resume(void *lua, int32_t param)
 {
 	resume(static_cast<lua_State *>(lua));
 }
@@ -380,7 +380,7 @@ int lua_engine::l_emu_time(lua_State *L)
 	return 1;
 }
 
-void lua_engine::emu_after_done(void *_h, INT32 param)
+void lua_engine::emu_after_done(void *_h, int32_t param)
 {
 	hook *h = static_cast<hook *>(_h);
 	h->call(this, h->precall(), 0);
@@ -413,7 +413,7 @@ int lua_engine::l_emu_wait(lua_State *L)
 	return luaThis->emu_wait(L);
 }
 
-void lua_engine::output_notifier(const char *outname, INT32 value)
+void lua_engine::output_notifier(const char *outname, int32_t value)
 {
 	if (hook_output_cb.active()) {
 		lua_State *L = hook_output_cb.precall();
@@ -423,7 +423,7 @@ void lua_engine::output_notifier(const char *outname, INT32 value)
 	}
 }
 
-void lua_engine::s_output_notifier(const char *outname, INT32 value, void *param)
+void lua_engine::s_output_notifier(const char *outname, int32_t value, void *param)
 {
 	static_cast<lua_engine *>(param)->output_notifier(outname, value);
 }
@@ -828,16 +828,16 @@ int lua_engine::lua_item::l_item_read(lua_State *L)
 	{
 		case 1:
 		default:
-			ret = ((UINT8 *)l_item_base)[offset];
+			ret = ((uint8_t *)l_item_base)[offset];
 			break;
 		case 2:
-			ret = ((UINT16 *)l_item_base)[offset];
+			ret = ((uint16_t *)l_item_base)[offset];
 			break;
 		case 4:
-			ret = ((UINT32 *)l_item_base)[offset];
+			ret = ((uint32_t *)l_item_base)[offset];
 			break;
 		case 8:
-			ret = ((UINT64 *)l_item_base)[offset];
+			ret = ((uint64_t *)l_item_base)[offset];
 			break;
 	}
 	lua_pushunsigned(L, ret);
@@ -849,23 +849,23 @@ int lua_engine::lua_item::l_item_write(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
 	int offset = lua_tounsigned(L, 2);
-	UINT64 value = lua_tounsigned(L, 3);
+	uint64_t value = lua_tounsigned(L, 3);
 	if(!l_item_base || (offset > l_item_count))
 		return 1;
 	switch(l_item_size)
 	{
 		case 1:
 		default:
-			((UINT8 *)l_item_base)[offset] = (UINT8)value;
+			((uint8_t *)l_item_base)[offset] = (uint8_t)value;
 			break;
 		case 2:
-			((UINT16 *)l_item_base)[offset] = (UINT16)value;
+			((uint16_t *)l_item_base)[offset] = (uint16_t)value;
 			break;
 		case 4:
-			((UINT32 *)l_item_base)[offset] = (UINT32)value;
+			((uint32_t *)l_item_base)[offset] = (uint32_t)value;
 			break;
 		case 8:
-			((UINT64 *)l_item_base)[offset] = (UINT64)value;
+			((uint64_t *)l_item_base)[offset] = (uint64_t)value;
 			break;
 	}
 	return 1;
@@ -894,7 +894,7 @@ int lua_engine::lua_item::l_item_read_block(lua_State *L)
 //  -> manager:machine().devices[":maincpu"].state["PC"].value
 //-------------------------------------------------
 
-UINT64 lua_engine::l_state_get_value(const device_state_entry *d)
+uint64_t lua_engine::l_state_get_value(const device_state_entry *d)
 {
 	device_state_interface *state = d->parent_state();
 	if(state) {
@@ -910,7 +910,7 @@ UINT64 lua_engine::l_state_get_value(const device_state_entry *d)
 //  -> manager:machine().devices[":maincpu"].state["D0"].value = 0x0c00
 //-------------------------------------------------
 
-void lua_engine::l_state_set_value(device_state_entry *d, UINT64 val)
+void lua_engine::l_state_set_value(device_state_entry *d, uint64_t val)
 {
 	device_state_interface *state = d->parent_state();
 	if(state) {
@@ -1147,7 +1147,7 @@ int lua_engine::lua_addr_space::l_direct_mem_read(lua_State *L)
 	for(int i = 0; i < sizeof(T); i++)
 	{
 		int addr = sp.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
-		UINT8 *base = (UINT8 *)sp.get_read_ptr(sp.address_to_byte(addr & ~lowmask));
+		uint8_t *base = (uint8_t *)sp.get_read_ptr(sp.address_to_byte(addr & ~lowmask));
 		if(!base)
 			continue;
 		mem_content <<= 8;
@@ -1184,7 +1184,7 @@ int lua_engine::lua_addr_space::l_direct_mem_write(lua_State *L)
 	for(int i = 0; i < sizeof(T); i++)
 	{
 		int addr = sp.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
-		UINT8 *base = (UINT8 *)sp.get_read_ptr(sp.address_to_byte(addr & ~lowmask));
+		uint8_t *base = (uint8_t *)sp.get_read_ptr(sp.address_to_byte(addr & ~lowmask));
 		if(!base)
 			continue;
 		if(sp.endianness() == ENDIANNESS_BIG)
@@ -1273,7 +1273,7 @@ int lua_engine::lua_memory_share::l_share_read(lua_State *L)
 	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
 	offs_t lowmask = share.bytewidth() - 1;
-	UINT8* ptr = (UINT8*)share.ptr();
+	uint8_t* ptr = (uint8_t*)share.ptr();
 	for(int i = 0; i < sizeof(T); i++)
 	{
 		int addr = share.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
@@ -1309,7 +1309,7 @@ int lua_engine::lua_memory_share::l_share_write(lua_State *L)
 	offs_t address = lua_tounsigned(L, 2);
 	T val = lua_tounsigned(L, 3);
 	offs_t lowmask = share.bytewidth() - 1;
-	UINT8* ptr = (UINT8*)share.ptr();
+	uint8_t* ptr = (uint8_t*)share.ptr();
 	for(int i = 0; i < sizeof(T); i++)
 	{
 		int addr = share.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
@@ -1479,7 +1479,7 @@ int lua_engine::lua_screen::l_width(lua_State *L)
 
 int lua_engine::lua_screen::l_orientation(lua_State *L)
 {
-	UINT32 flags = (luaThis->machine().system().flags & ORIENTATION_MASK);
+	uint32_t flags = (luaThis->machine().system().flags & ORIENTATION_MASK);
 
 	int rotation_angle = 0;
 	switch (flags)
@@ -1626,8 +1626,8 @@ int lua_engine::lua_screen::l_draw_box(lua_State *L)
 	y1 = std::min(std::max(0.0f, (float) lua_tonumber(L, 3)), float(sc_height-1)) / float(sc_height);
 	x2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 4)), float(sc_width-1)) / float(sc_width);
 	y2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 5)), float(sc_height-1)) / float(sc_height);
-	UINT32 bgcolor = lua_tounsigned(L, 6);
-	UINT32 fgcolor = lua_tounsigned(L, 7);
+	uint32_t bgcolor = lua_tounsigned(L, 6);
+	uint32_t fgcolor = lua_tounsigned(L, 7);
 
 	// draw the box
 	render_container &rc = sc->container();
@@ -1663,7 +1663,7 @@ int lua_engine::lua_screen::l_draw_line(lua_State *L)
 	y1 = std::min(std::max(0.0f, (float) lua_tonumber(L, 3)), float(sc_height-1)) / float(sc_height);
 	x2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 4)), float(sc_width-1)) / float(sc_width);
 	y2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 5)), float(sc_height-1)) / float(sc_height);
-	UINT32 color = lua_tounsigned(L, 6);
+	uint32_t color = lua_tounsigned(L, 6);
 
 	// draw the line
 	sc->container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -1738,7 +1738,7 @@ int lua_engine::lua_emu_file::l_emu_file_read(lua_State *L)
 int lua_engine::lua_ui_input::l_ui_input_find_mouse(lua_State *L)
 {
 	ui_input_manager *ui_input = luabridge::Stack<ui_input_manager *>::get(L, 1);
-	INT32 x, y;
+	int32_t x, y;
 	bool button;
 	render_target *target = ui_input->find_mouse(&x, &y, &button);
 	lua_pushnumber(L, x);
@@ -2429,7 +2429,7 @@ void lua_engine::initialize()
 				.addFunction ("set_value", &ioport_field::set_value)
 				.addProperty ("device", &ioport_field::device)
 				.addProperty ("name", &ioport_field::name)
-				.addProperty <UINT8, UINT8> ("player", &ioport_field::player, &ioport_field::set_player)
+				.addProperty <uint8_t, uint8_t> ("player", &ioport_field::player, &ioport_field::set_player)
 				.addProperty ("mask", &ioport_field::mask)
 				.addProperty ("defvalue", &ioport_field::defvalue)
 				.addProperty ("sensitivity", &ioport_field::sensitivity)
@@ -2491,54 +2491,54 @@ void lua_engine::initialize()
 			.endClass()
 			.beginClass <lua_addr_space> ("lua_addr_space")
 				.addConstructor <void (*)(address_space *, device_memory_interface *)> ()
-				.addCFunction ("read_i8", &lua_addr_space::l_mem_read<INT8>)
-				.addCFunction ("read_u8", &lua_addr_space::l_mem_read<UINT8>)
-				.addCFunction ("read_i16", &lua_addr_space::l_mem_read<INT16>)
-				.addCFunction ("read_u16", &lua_addr_space::l_mem_read<UINT16>)
-				.addCFunction ("read_i32", &lua_addr_space::l_mem_read<INT32>)
-				.addCFunction ("read_u32", &lua_addr_space::l_mem_read<UINT32>)
-				.addCFunction ("read_i64", &lua_addr_space::l_mem_read<INT64>)
-				.addCFunction ("read_u64", &lua_addr_space::l_mem_read<UINT64>)
-				.addCFunction ("write_i8", &lua_addr_space::l_mem_write<INT8>)
-				.addCFunction ("write_u8", &lua_addr_space::l_mem_write<UINT8>)
-				.addCFunction ("write_i16", &lua_addr_space::l_mem_write<INT16>)
-				.addCFunction ("write_u16", &lua_addr_space::l_mem_write<UINT16>)
-				.addCFunction ("write_i32", &lua_addr_space::l_mem_write<INT32>)
-				.addCFunction ("write_u32", &lua_addr_space::l_mem_write<UINT32>)
-				.addCFunction ("write_i64", &lua_addr_space::l_mem_write<INT64>)
-				.addCFunction ("write_u64", &lua_addr_space::l_mem_write<UINT64>)
-				.addCFunction ("read_log_i8", &lua_addr_space::l_log_mem_read<INT8>)
-				.addCFunction ("read_log_u8", &lua_addr_space::l_log_mem_read<UINT8>)
-				.addCFunction ("read_log_i16", &lua_addr_space::l_log_mem_read<INT16>)
-				.addCFunction ("read_log_u16", &lua_addr_space::l_log_mem_read<UINT16>)
-				.addCFunction ("read_log_i32", &lua_addr_space::l_log_mem_read<INT32>)
-				.addCFunction ("read_log_u32", &lua_addr_space::l_log_mem_read<UINT32>)
-				.addCFunction ("read_log_i64", &lua_addr_space::l_log_mem_read<INT64>)
-				.addCFunction ("read_log_u64", &lua_addr_space::l_log_mem_read<UINT64>)
-				.addCFunction ("write_log_i8", &lua_addr_space::l_log_mem_write<INT8>)
-				.addCFunction ("write_log_u8", &lua_addr_space::l_log_mem_write<UINT8>)
-				.addCFunction ("write_log_i16", &lua_addr_space::l_log_mem_write<INT16>)
-				.addCFunction ("write_log_u16", &lua_addr_space::l_log_mem_write<UINT16>)
-				.addCFunction ("write_log_i32", &lua_addr_space::l_log_mem_write<INT32>)
-				.addCFunction ("write_log_u32", &lua_addr_space::l_log_mem_write<UINT32>)
-				.addCFunction ("write_log_i64", &lua_addr_space::l_log_mem_write<INT64>)
-				.addCFunction ("write_log_u64", &lua_addr_space::l_log_mem_write<UINT64>)
-				.addCFunction ("read_direct_i8", &lua_addr_space::l_direct_mem_read<INT8>)
-				.addCFunction ("read_direct_u8", &lua_addr_space::l_direct_mem_read<UINT8>)
-				.addCFunction ("read_direct_i16", &lua_addr_space::l_direct_mem_read<INT16>)
-				.addCFunction ("read_direct_u16", &lua_addr_space::l_direct_mem_read<UINT16>)
-				.addCFunction ("read_direct_i32", &lua_addr_space::l_direct_mem_read<INT32>)
-				.addCFunction ("read_direct_u32", &lua_addr_space::l_direct_mem_read<UINT32>)
-				.addCFunction ("read_direct_i64", &lua_addr_space::l_direct_mem_read<INT64>)
-				.addCFunction ("read_direct_u64", &lua_addr_space::l_direct_mem_read<UINT64>)
-				.addCFunction ("write_direct_i8", &lua_addr_space::l_direct_mem_write<INT8>)
-				.addCFunction ("write_direct_u8", &lua_addr_space::l_direct_mem_write<UINT8>)
-				.addCFunction ("write_direct_i16", &lua_addr_space::l_direct_mem_write<INT16>)
-				.addCFunction ("write_direct_u16", &lua_addr_space::l_direct_mem_write<UINT16>)
-				.addCFunction ("write_direct_i32", &lua_addr_space::l_direct_mem_write<INT32>)
-				.addCFunction ("write_direct_u32", &lua_addr_space::l_direct_mem_write<UINT32>)
-				.addCFunction ("write_direct_i64", &lua_addr_space::l_direct_mem_write<INT64>)
-				.addCFunction ("write_direct_u64", &lua_addr_space::l_direct_mem_write<UINT64>)
+				.addCFunction ("read_i8", &lua_addr_space::l_mem_read<int8_t>)
+				.addCFunction ("read_u8", &lua_addr_space::l_mem_read<uint8_t>)
+				.addCFunction ("read_i16", &lua_addr_space::l_mem_read<int16_t>)
+				.addCFunction ("read_u16", &lua_addr_space::l_mem_read<uint16_t>)
+				.addCFunction ("read_i32", &lua_addr_space::l_mem_read<int32_t>)
+				.addCFunction ("read_u32", &lua_addr_space::l_mem_read<uint32_t>)
+				.addCFunction ("read_i64", &lua_addr_space::l_mem_read<int64_t>)
+				.addCFunction ("read_u64", &lua_addr_space::l_mem_read<uint64_t>)
+				.addCFunction ("write_i8", &lua_addr_space::l_mem_write<int8_t>)
+				.addCFunction ("write_u8", &lua_addr_space::l_mem_write<uint8_t>)
+				.addCFunction ("write_i16", &lua_addr_space::l_mem_write<int16_t>)
+				.addCFunction ("write_u16", &lua_addr_space::l_mem_write<uint16_t>)
+				.addCFunction ("write_i32", &lua_addr_space::l_mem_write<int32_t>)
+				.addCFunction ("write_u32", &lua_addr_space::l_mem_write<uint32_t>)
+				.addCFunction ("write_i64", &lua_addr_space::l_mem_write<int64_t>)
+				.addCFunction ("write_u64", &lua_addr_space::l_mem_write<uint64_t>)
+				.addCFunction ("read_log_i8", &lua_addr_space::l_log_mem_read<int8_t>)
+				.addCFunction ("read_log_u8", &lua_addr_space::l_log_mem_read<uint8_t>)
+				.addCFunction ("read_log_i16", &lua_addr_space::l_log_mem_read<int16_t>)
+				.addCFunction ("read_log_u16", &lua_addr_space::l_log_mem_read<uint16_t>)
+				.addCFunction ("read_log_i32", &lua_addr_space::l_log_mem_read<int32_t>)
+				.addCFunction ("read_log_u32", &lua_addr_space::l_log_mem_read<uint32_t>)
+				.addCFunction ("read_log_i64", &lua_addr_space::l_log_mem_read<int64_t>)
+				.addCFunction ("read_log_u64", &lua_addr_space::l_log_mem_read<uint64_t>)
+				.addCFunction ("write_log_i8", &lua_addr_space::l_log_mem_write<int8_t>)
+				.addCFunction ("write_log_u8", &lua_addr_space::l_log_mem_write<uint8_t>)
+				.addCFunction ("write_log_i16", &lua_addr_space::l_log_mem_write<int16_t>)
+				.addCFunction ("write_log_u16", &lua_addr_space::l_log_mem_write<uint16_t>)
+				.addCFunction ("write_log_i32", &lua_addr_space::l_log_mem_write<int32_t>)
+				.addCFunction ("write_log_u32", &lua_addr_space::l_log_mem_write<uint32_t>)
+				.addCFunction ("write_log_i64", &lua_addr_space::l_log_mem_write<int64_t>)
+				.addCFunction ("write_log_u64", &lua_addr_space::l_log_mem_write<uint64_t>)
+				.addCFunction ("read_direct_i8", &lua_addr_space::l_direct_mem_read<int8_t>)
+				.addCFunction ("read_direct_u8", &lua_addr_space::l_direct_mem_read<uint8_t>)
+				.addCFunction ("read_direct_i16", &lua_addr_space::l_direct_mem_read<int16_t>)
+				.addCFunction ("read_direct_u16", &lua_addr_space::l_direct_mem_read<uint16_t>)
+				.addCFunction ("read_direct_i32", &lua_addr_space::l_direct_mem_read<int32_t>)
+				.addCFunction ("read_direct_u32", &lua_addr_space::l_direct_mem_read<uint32_t>)
+				.addCFunction ("read_direct_i64", &lua_addr_space::l_direct_mem_read<int64_t>)
+				.addCFunction ("read_direct_u64", &lua_addr_space::l_direct_mem_read<uint64_t>)
+				.addCFunction ("write_direct_i8", &lua_addr_space::l_direct_mem_write<int8_t>)
+				.addCFunction ("write_direct_u8", &lua_addr_space::l_direct_mem_write<uint8_t>)
+				.addCFunction ("write_direct_i16", &lua_addr_space::l_direct_mem_write<int16_t>)
+				.addCFunction ("write_direct_u16", &lua_addr_space::l_direct_mem_write<uint16_t>)
+				.addCFunction ("write_direct_i32", &lua_addr_space::l_direct_mem_write<int32_t>)
+				.addCFunction ("write_direct_u32", &lua_addr_space::l_direct_mem_write<uint32_t>)
+				.addCFunction ("write_direct_i64", &lua_addr_space::l_direct_mem_write<int64_t>)
+				.addCFunction ("write_direct_u64", &lua_addr_space::l_direct_mem_write<uint64_t>)
 				.addProperty <const char *> ("name", &lua_addr_space::name)
 				.addProperty <luabridge::LuaRef, void> ("map", &lua_engine::l_addr_space_map)
 			.endClass()
@@ -2613,7 +2613,7 @@ void lua_engine::initialize()
 			.endClass()
 			.beginClass <device_state_entry> ("dev_space")
 				.addFunction ("name", &device_state_entry::symbol)
-				.addProperty <UINT64, UINT64> ("value", &lua_engine::l_state_get_value, &lua_engine::l_state_set_value)
+				.addProperty <uint64_t, uint64_t> ("value", &lua_engine::l_state_get_value, &lua_engine::l_state_set_value)
 				.addFunction ("is_visible", &device_state_entry::visible)
 				.addFunction ("is_divider", &device_state_entry::divider)
 			.endClass()
@@ -2623,43 +2623,43 @@ void lua_engine::initialize()
 				.addProperty <luabridge::LuaRef, void> ("shares", &lua_engine::l_memory_get_shares)
 			.endClass()
 			.beginClass <lua_memory_region> ("lua_region")
-				.addCFunction ("read_i8", &lua_memory_region::l_region_read<INT8>)
-				.addCFunction ("read_u8", &lua_memory_region::l_region_read<UINT8>)
-				.addCFunction ("read_i16", &lua_memory_region::l_region_read<INT16>)
-				.addCFunction ("read_u16", &lua_memory_region::l_region_read<UINT16>)
-				.addCFunction ("read_i32", &lua_memory_region::l_region_read<INT32>)
-				.addCFunction ("read_u32", &lua_memory_region::l_region_read<UINT32>)
-				.addCFunction ("read_i64", &lua_memory_region::l_region_read<INT64>)
-				.addCFunction ("read_u64", &lua_memory_region::l_region_read<UINT64>)
-				.addCFunction ("write_i8", &lua_memory_region::l_region_write<INT8>)
-				.addCFunction ("write_u8", &lua_memory_region::l_region_write<UINT8>)
-				.addCFunction ("write_i16", &lua_memory_region::l_region_write<INT16>)
-				.addCFunction ("write_u16", &lua_memory_region::l_region_write<UINT16>)
-				.addCFunction ("write_i32", &lua_memory_region::l_region_write<INT32>)
-				.addCFunction ("write_u32", &lua_memory_region::l_region_write<UINT32>)
-				.addCFunction ("write_i64", &lua_memory_region::l_region_write<INT64>)
-				.addCFunction ("write_u64", &lua_memory_region::l_region_write<UINT64>)
+				.addCFunction ("read_i8", &lua_memory_region::l_region_read<int8_t>)
+				.addCFunction ("read_u8", &lua_memory_region::l_region_read<uint8_t>)
+				.addCFunction ("read_i16", &lua_memory_region::l_region_read<int16_t>)
+				.addCFunction ("read_u16", &lua_memory_region::l_region_read<uint16_t>)
+				.addCFunction ("read_i32", &lua_memory_region::l_region_read<int32_t>)
+				.addCFunction ("read_u32", &lua_memory_region::l_region_read<uint32_t>)
+				.addCFunction ("read_i64", &lua_memory_region::l_region_read<int64_t>)
+				.addCFunction ("read_u64", &lua_memory_region::l_region_read<uint64_t>)
+				.addCFunction ("write_i8", &lua_memory_region::l_region_write<int8_t>)
+				.addCFunction ("write_u8", &lua_memory_region::l_region_write<uint8_t>)
+				.addCFunction ("write_i16", &lua_memory_region::l_region_write<int16_t>)
+				.addCFunction ("write_u16", &lua_memory_region::l_region_write<uint16_t>)
+				.addCFunction ("write_i32", &lua_memory_region::l_region_write<int32_t>)
+				.addCFunction ("write_u32", &lua_memory_region::l_region_write<uint32_t>)
+				.addCFunction ("write_i64", &lua_memory_region::l_region_write<int64_t>)
+				.addCFunction ("write_u64", &lua_memory_region::l_region_write<uint64_t>)
 			.endClass()
 			.deriveClass <memory_region, lua_memory_region> ("region")
-				.addProperty <UINT32> ("size", &memory_region::bytes)
+				.addProperty <uint32_t> ("size", &memory_region::bytes)
 			.endClass()
 			.beginClass <lua_memory_share> ("lua_share")
-				.addCFunction ("read_i8", &lua_memory_share::l_share_read<INT8>)
-				.addCFunction ("read_u8", &lua_memory_share::l_share_read<UINT8>)
-				.addCFunction ("read_i16", &lua_memory_share::l_share_read<INT16>)
-				.addCFunction ("read_u16", &lua_memory_share::l_share_read<UINT16>)
-				.addCFunction ("read_i32", &lua_memory_share::l_share_read<INT32>)
-				.addCFunction ("read_u32", &lua_memory_share::l_share_read<UINT32>)
-				.addCFunction ("read_i64", &lua_memory_share::l_share_read<INT64>)
-				.addCFunction ("read_u64", &lua_memory_share::l_share_read<UINT64>)
-				.addCFunction ("write_i8", &lua_memory_share::l_share_write<INT8>)
-				.addCFunction ("write_u8", &lua_memory_share::l_share_write<UINT8>)
-				.addCFunction ("write_i16", &lua_memory_share::l_share_write<INT16>)
-				.addCFunction ("write_u16", &lua_memory_share::l_share_write<UINT16>)
-				.addCFunction ("write_i32", &lua_memory_share::l_share_write<INT32>)
-				.addCFunction ("write_u32", &lua_memory_share::l_share_write<UINT32>)
-				.addCFunction ("write_i64", &lua_memory_share::l_share_write<INT64>)
-				.addCFunction ("write_u64", &lua_memory_share::l_share_write<UINT64>)
+				.addCFunction ("read_i8", &lua_memory_share::l_share_read<int8_t>)
+				.addCFunction ("read_u8", &lua_memory_share::l_share_read<uint8_t>)
+				.addCFunction ("read_i16", &lua_memory_share::l_share_read<int16_t>)
+				.addCFunction ("read_u16", &lua_memory_share::l_share_read<uint16_t>)
+				.addCFunction ("read_i32", &lua_memory_share::l_share_read<int32_t>)
+				.addCFunction ("read_u32", &lua_memory_share::l_share_read<uint32_t>)
+				.addCFunction ("read_i64", &lua_memory_share::l_share_read<int64_t>)
+				.addCFunction ("read_u64", &lua_memory_share::l_share_read<uint64_t>)
+				.addCFunction ("write_i8", &lua_memory_share::l_share_write<int8_t>)
+				.addCFunction ("write_u8", &lua_memory_share::l_share_write<uint8_t>)
+				.addCFunction ("write_i16", &lua_memory_share::l_share_write<int16_t>)
+				.addCFunction ("write_u16", &lua_memory_share::l_share_write<uint16_t>)
+				.addCFunction ("write_i32", &lua_memory_share::l_share_write<int32_t>)
+				.addCFunction ("write_u32", &lua_memory_share::l_share_write<uint32_t>)
+				.addCFunction ("write_i64", &lua_memory_share::l_share_write<int64_t>)
+				.addCFunction ("write_u64", &lua_memory_share::l_share_write<uint64_t>)
 			.endClass()
 			.deriveClass <memory_share, lua_memory_share> ("region")
 				.addProperty <size_t> ("size", &memory_share::bytes)
@@ -2693,7 +2693,7 @@ void lua_engine::initialize()
 				.addCFunction ("read", &lua_emu_file::l_emu_file_read)
 			.endClass()
 			.deriveClass <emu_file, lua_emu_file> ("file")
-				.addConstructor <void (*)(const char *, UINT32)> ()
+				.addConstructor <void (*)(const char *, uint32_t)> ()
 				.addFunction ("open", static_cast<osd_file::error (emu_file::*)(const std::string &)>(&emu_file::open))
 				.addFunction ("open_next", &emu_file::open_next)
 				.addFunction ("seek", &emu_file::seek)
@@ -2830,6 +2830,28 @@ namespace luabridge {
 
 		static inline unsigned long long get (lua_State* L, int index) {
 			return static_cast <unsigned long long> (luaL_checkunsigned (L, index));
+		}
+	};
+
+	template <>
+	struct Stack <char16_t> {
+		static inline void push(lua_State* L, char16_t value) {
+			lua_pushunsigned(L, static_cast <lua_Unsigned> (value));
+		}
+
+		static inline char16_t get(lua_State* L, int index) {
+			return static_cast <char16_t> (luaL_checkunsigned(L, index));
+		}
+	};
+
+	template <>
+	struct Stack <char32_t> {
+		static inline void push(lua_State* L, char32_t value) {
+			lua_pushunsigned(L, static_cast <lua_Unsigned> (value));
+		}
+
+		static inline char32_t get(lua_State* L, int index) {
+			return static_cast <char32_t> (luaL_checkunsigned(L, index));
 		}
 	};
 }

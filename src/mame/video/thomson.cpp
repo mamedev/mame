@@ -32,7 +32,7 @@
 int thomson_state::thom_update_screen_size()
 {
 	const rectangle &visarea = m_screen->visible_area();
-	UINT8 p = m_io_vconfig->read();
+	uint8_t p = m_io_vconfig->read();
 	int new_w, new_h, changed = 0;
 
 	switch ( p & 3 )
@@ -275,7 +275,7 @@ void thomson_state::thom_set_border_color( unsigned index )
 
 
 
-void thomson_state::thom_set_palette( unsigned index, UINT16 color )
+void thomson_state::thom_set_palette( unsigned index, uint16_t color )
 {
 	assert( index < 16 );
 
@@ -330,21 +330,21 @@ void thomson_state::thom_set_video_page( unsigned page )
 
 
 
-typedef void ( thomson_state::*thom_scandraw ) ( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
+typedef void ( thomson_state::*thom_scandraw ) ( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 
 
 
 #define UPDATE( name, res )                     \
 	void thomson_state::name##_scandraw_##res ( \
-						UINT8* vram, UINT16* dst,   UINT16* pal, \
+						uint8_t* vram, uint16_t* dst,   uint16_t* pal, \
 						int org, int len )      \
 	{                               \
 		unsigned gpl;                       \
 		vram += org;                        \
 		dst += org * res;                   \
 		for ( gpl = 0; gpl < len; gpl++, dst += res, vram++ ) { \
-			UINT8 rama = vram[ 0      ];            \
-			UINT8 ramb = vram[ 0x2000 ];
+			uint8_t rama = vram[ 0      ];            \
+			uint8_t ramb = vram[ 0x2000 ];
 
 #define END_UPDATE                          \
 		}                           \
@@ -898,7 +898,7 @@ void thomson_state::thom_floppy_active( int write )
 
 
 
-UINT32 thomson_state::screen_update_thom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t thomson_state::screen_update_thom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, ypos;
 	const int scale = m_thom_hires ? 2 : 1;
@@ -908,7 +908,7 @@ UINT32 thomson_state::screen_update_thom(screen_device &screen, bitmap_ind16 &bi
 	const int xwidth = THOM_ACTIVE_WIDTH * scale;
 	const int yup = THOM_BORDER_HEIGHT + THOM_ACTIVE_HEIGHT;
 	const int ybot = THOM_BORDER_HEIGHT + m_thom_bheight + 200;
-	UINT16* v = m_thom_vbody;
+	uint16_t* v = m_thom_vbody;
 	pen_t border = 0;
 	rectangle wrect(0, xright - 1, 0, 0);
 	rectangle lrect(0, xbleft - 1, 0, 0);
@@ -1028,7 +1028,7 @@ void thomson_state::thom_vblank( screen_device &screen, bool state )
 	{
 		int fnew, fold = FLOP_STATE;
 		int i;
-		UINT16 b = 0;
+		uint16_t b = 0;
 		struct thom_vsignal l = thom_get_lightpen_vsignal( 0, -1, 0 );
 
 		LOG (( "%f thom: video eof called\n", machine().time().as_double() ));
@@ -1089,7 +1089,7 @@ void thomson_state::thom_vblank( screen_device &screen, bool state )
    without further information, we assume that the hardcoded values
    are the same as those setup by the TO8/TO9+/MO6 when booting up
  */
-static const UINT16 thom_pal_init[16] =
+static const uint16_t thom_pal_init[16] =
 {
 	0x1000, /* 0: black */        0x000f, /* 1: red */
 	0x00f0, /* 2: geen */         0x00ff, /* 3: yellow */
@@ -1104,7 +1104,7 @@ static const UINT16 thom_pal_init[16] =
 /* MO5 palette, hardcoded in a ROM
    values are from "Manuel Technique du MO5", p.19
  */
-static const UINT16 mo5_pal_init[16] =
+static const uint16_t mo5_pal_init[16] =
 {
 	0x1000, /* 0: black */        0x055f, /* 1: red */
 	0x00f0, /* 2: geen */         0x00ff, /* 3: yellow */
@@ -1181,17 +1181,17 @@ VIDEO_START_MEMBER( thomson_state, thom )
 
 
 /* sets the fixed palette (for MO5,TO7,TO7/70) and gamma correction */
-void thomson_state::thom_configure_palette(double gamma, const UINT16* pal, palette_device& palette)
+void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, palette_device& palette)
 {
 	memcpy( m_thom_last_pal, pal, 32 );
 	memcpy( m_thom_pal, pal, 32 );
 
 	for ( int i = 0; i < 4097; i++ )
 	{
-		UINT8 r = 255. * pow( (i & 15) / 15., gamma );
-		UINT8 g = 255. * pow( ((i>> 4) & 15) / 15., gamma );
-		UINT8 b = 255. * pow( ((i >> 8) & 15) / 15., gamma );
-		/* UINT8 alpha = i & 0x1000 ? 0 : 255;  TODO: transparency */
+		uint8_t r = 255. * pow( (i & 15) / 15., gamma );
+		uint8_t g = 255. * pow( ((i>> 4) & 15) / 15., gamma );
+		uint8_t b = 255. * pow( ((i >> 8) & 15) / 15., gamma );
+		/* uint8_t alpha = i & 0x1000 ? 0 : 255;  TODO: transparency */
 		palette.set_pen_color(i, r, g, b );
 	}
 }
@@ -1291,7 +1291,7 @@ WRITE8_MEMBER( thomson_state::to770_vram_w )
 
 WRITE8_MEMBER( thomson_state::to8_sys_lo_w )
 {
-	UINT8* dst = m_thom_vram + offset + 0x6000;
+	uint8_t* dst = m_thom_vram + offset + 0x6000;
 	assert( offset < 0x2000 );
 	if ( *dst == data )
 		return;
@@ -1304,7 +1304,7 @@ WRITE8_MEMBER( thomson_state::to8_sys_lo_w )
 
 WRITE8_MEMBER( thomson_state::to8_sys_hi_w )
 {
-	UINT8* dst = m_thom_vram + offset + 0x4000;
+	uint8_t* dst = m_thom_vram + offset + 0x4000;
 	assert( offset < 0x2000 );
 	if ( *dst == data ) return;
 	*dst = data;
@@ -1318,7 +1318,7 @@ WRITE8_MEMBER( thomson_state::to8_sys_hi_w )
 
 WRITE8_MEMBER( thomson_state::to8_data_lo_w )
 {
-	UINT8* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage + 0x2000 ) & m_ram->mask() );
+	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage + 0x2000 ) & m_ram->mask() );
 	assert( offset < 0x2000 );
 	if ( *dst == data )
 		return;
@@ -1333,7 +1333,7 @@ WRITE8_MEMBER( thomson_state::to8_data_lo_w )
 
 WRITE8_MEMBER( thomson_state::to8_data_hi_w )
 {
-	UINT8* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage ) & m_ram->mask() );
+	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage ) & m_ram->mask() );
 	assert( offset < 0x2000 );
 	if ( *dst == data )
 		return;
@@ -1349,7 +1349,7 @@ WRITE8_MEMBER( thomson_state::to8_data_hi_w )
 /* write to video memory page through cartridge addresses space */
 WRITE8_MEMBER( thomson_state::to8_vcart_w )
 {
-	UINT8* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
+	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x4000 );
 	if ( *dst == data )
 		return;
@@ -1362,7 +1362,7 @@ WRITE8_MEMBER( thomson_state::to8_vcart_w )
 
 WRITE8_MEMBER( thomson_state::mo6_vcart_lo_w )
 {
-	UINT8* dst = m_thom_vram + ( ( offset + 0x3000 + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
+	uint8_t* dst = m_thom_vram + ( ( offset + 0x3000 + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x1000 );
 	if ( *dst == data )
 		return;
@@ -1375,7 +1375,7 @@ WRITE8_MEMBER( thomson_state::mo6_vcart_lo_w )
 
 WRITE8_MEMBER( thomson_state::mo6_vcart_hi_w )
 {
-	UINT8* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
+	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x3000 );
 	if ( *dst == data )
 		return;

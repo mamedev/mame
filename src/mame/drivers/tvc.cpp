@@ -68,7 +68,7 @@ public:
 	void machine_start() override;
 	void machine_reset() override;
 
-	void set_mem_page(UINT8 data);
+	void set_mem_page(uint8_t data);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(vram_bank_w);
 	DECLARE_WRITE8_MEMBER(palette_w);
@@ -93,16 +93,16 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	UINT8       m_video_mode;
-	UINT8       m_keyline;
-	UINT8       m_active_slot;
-	UINT8       m_int_flipflop;
-	UINT8       m_col[4];
-	UINT8       m_bank_type[4];
-	UINT8       m_bank;
-	UINT8       m_vram_bank;
-	UINT8       m_cassette_ff;
-	UINT8       m_centronics_ff;
+	uint8_t       m_video_mode;
+	uint8_t       m_keyline;
+	uint8_t       m_active_slot;
+	uint8_t       m_int_flipflop;
+	uint8_t       m_col[4];
+	uint8_t       m_bank_type[4];
+	uint8_t       m_bank;
+	uint8_t       m_vram_bank;
+	uint8_t       m_cassette_ff;
+	uint8_t       m_centronics_ff;
 	DECLARE_PALETTE_INIT(tvc);
 };
 
@@ -122,7 +122,7 @@ public:
 		m_bank_type[_bank] = TVC_RAM_BANK; \
 	}
 
-void tvc_state::set_mem_page(UINT8 data)
+void tvc_state::set_mem_page(uint8_t data)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	switch (data & 0x18)
@@ -277,7 +277,7 @@ READ8_MEMBER(tvc_state::int_state_r)
 
 	double level = m_cassette->input();
 
-	UINT8 expint = (m_expansions[0]->int_r()<<0) | (m_expansions[1]->int_r()<<1) |
+	uint8_t expint = (m_expansions[0]->int_r()<<0) | (m_expansions[1]->int_r()<<1) |
 					(m_expansions[2]->int_r()<<2) | (m_expansions[3]->int_r()<<3);
 
 	return 0x40 | (m_int_flipflop << 4) | (level > 0.01 ? 0x20 : 0x00) | (m_centronics_ff << 7) | (expint & 0x0f);
@@ -632,9 +632,9 @@ void tvc_state::machine_reset()
 MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
-	UINT8 *vram = m_vram->base() + ((m_vram_bank & 0x30)<<10);
-	UINT16 offset = ((ma*4 + ra*0x40) & 0x3fff);
+	uint32_t  *p = &bitmap.pix32(y);
+	uint8_t *vram = m_vram->base() + ((m_vram_bank & 0x30)<<10);
+	uint16_t offset = ((ma*4 + ra*0x40) & 0x3fff);
 	int i;
 
 	switch(m_video_mode) {
@@ -642,7 +642,7 @@ MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 				//  2 colors mode
 				for ( i = 0; i < x_count; i++ )
 				{
-					UINT8 data = vram[offset + i];
+					uint8_t data = vram[offset + i];
 					*p++ = palette[m_col[BIT(data,7)]];
 					*p++ = palette[m_col[BIT(data,6)]];
 					*p++ = palette[m_col[BIT(data,5)]];
@@ -658,7 +658,7 @@ MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 				// a0 b0 c0 d0 a1 b1 c1 d1
 				for ( i = 0; i < x_count; i++ )
 				{
-					UINT8 data = vram[offset + i];
+					uint8_t data = vram[offset + i];
 					*p++ = palette[m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[m_col[BIT(data,2)*2 + BIT(data,6)]];
@@ -674,9 +674,9 @@ MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 				// IIGG RRBB
 				for ( i = 0; i < x_count; i++ )
 				{
-					UINT8 data = vram[offset + i];
-					UINT8 col0 = ((data & 0x80)>>4) | ((data & 0x20)>>3) | ((data & 0x08)>>2) | ((data & 0x02)>>1);
-					UINT8 col1 = ((data & 0x40)>>3) | ((data & 0x10)>>2) | ((data & 0x04)>>1) | (data & 0x01);
+					uint8_t data = vram[offset + i];
+					uint8_t col0 = ((data & 0x80)>>4) | ((data & 0x20)>>3) | ((data & 0x08)>>2) | ((data & 0x02)>>1);
+					uint8_t col1 = ((data & 0x40)>>3) | ((data & 0x10)>>2) | ((data & 0x04)>>1) | (data & 0x01);
 					*p++ = palette[col0];
 					*p++ = palette[col0];
 					*p++ = palette[col0];
@@ -735,7 +735,7 @@ WRITE_LINE_MEMBER(tvc_state::centronics_ack)
 
 QUICKLOAD_LOAD_MEMBER( tvc_state, tvc64)
 {
-	UINT8 first_byte;
+	uint8_t first_byte;
 
 	image.fread(&first_byte, 1);
 	if (first_byte == 0x11)

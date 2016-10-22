@@ -23,7 +23,7 @@ public:
 	osd_netdev(class device_network_interface *ifdev, int rate);
 	virtual ~osd_netdev();
 
-	virtual int send(UINT8 *buf, int len);
+	virtual int send(uint8_t *buf, int len);
 	virtual void set_mac(const char *mac);
 	virtual void set_promisc(bool promisc);
 
@@ -31,7 +31,7 @@ public:
 	bool get_promisc();
 
 protected:
-	virtual int recv_dev(UINT8 **buf);
+	virtual int recv_dev(uint8_t **buf);
 
 private:
 	void recv(void *ptr, int param);

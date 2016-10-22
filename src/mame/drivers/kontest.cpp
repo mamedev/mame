@@ -38,14 +38,14 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	required_device<palette_device> m_palette;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// driver state
-	UINT8 m_control;
+	uint8_t m_control;
 
 	// member functions
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -70,7 +70,7 @@ public:
 
 PALETTE_INIT_MEMBER(kontest_state, kontest)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -97,12 +97,12 @@ void kontest_state::video_start()
 {
 }
 
-UINT32 kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	int x,y;
 	int xi,yi;
-	UINT16 tile;
-	UINT8 attr;
+	uint16_t tile;
+	uint8_t attr;
 
 	for(y=0;y<32;y++)
 	{
@@ -117,8 +117,8 @@ UINT32 kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 color,pen[2];
-					UINT8 x_step;
+					uint8_t color,pen[2];
+					uint8_t x_step;
 					int res_x,res_y;
 
 					x_step = xi >> 2;

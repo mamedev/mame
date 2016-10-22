@@ -32,7 +32,7 @@ class vrc6snd_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	vrc6snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vrc6snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER(write);
 
@@ -44,11 +44,11 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	UINT8 m_freqctrl, m_pulsectrl[2], m_sawrate;
-	UINT8 m_pulsefrql[2], m_pulsefrqh[2], m_pulseduty[2];
-	UINT8 m_sawfrql, m_sawfrqh, m_sawclock, m_sawaccum;
-	UINT16 m_ticks[3];
-	UINT8 m_output[3];
+	uint8_t m_freqctrl, m_pulsectrl[2], m_sawrate;
+	uint8_t m_pulsefrql[2], m_pulsefrqh[2], m_pulseduty[2];
+	uint8_t m_sawfrql, m_sawfrqh, m_sawclock, m_sawaccum;
+	uint16_t m_ticks[3];
+	uint8_t m_output[3];
 
 	sound_stream *m_stream;
 };

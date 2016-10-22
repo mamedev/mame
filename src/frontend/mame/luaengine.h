@@ -104,10 +104,10 @@ private:
 	void on_machine_resume();
 	void on_machine_frame();
 
-	void output_notifier(const char *outname, INT32 value);
-	static void s_output_notifier(const char *outname, INT32 value, void *param);
+	void output_notifier(const char *outname, int32_t value);
+	static void s_output_notifier(const char *outname, int32_t value, void *param);
 
-	void emu_after_done(void *_h, INT32 param);
+	void emu_after_done(void *_h, int32_t param);
 	int emu_after(lua_State *L);
 	int emu_wait(lua_State *L);
 	void emu_hook_output(lua_State *L);
@@ -154,8 +154,8 @@ private:
 	static luabridge::LuaRef l_ioports_port_get_fields(const ioport_port *i);
 	static luabridge::LuaRef devtree_dfs(device_t *root, luabridge::LuaRef dev_table);
 	static luabridge::LuaRef l_dev_get_states(const device_t *d);
-	static UINT64 l_state_get_value(const device_state_entry *d);
-	static void l_state_set_value(device_state_entry *d, UINT64 v);
+	static uint64_t l_state_get_value(const device_state_entry *d);
+	static void l_state_set_value(device_state_entry *d, uint64_t v);
 	static luabridge::LuaRef l_dev_get_memspaces(const device_t *d);
 	struct lua_machine {
 		int l_popmessage(lua_State *L);
@@ -240,7 +240,7 @@ private:
 		int l_item_write(lua_State *L);
 	};
 
-	void resume(void *L, INT32 param);
+	void resume(void *L, int32_t param);
 	void start();
 	static int luaopen_ioport(lua_State *L);
 	void close();

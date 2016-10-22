@@ -38,7 +38,7 @@ header and leader bytes.
 static int sorcerer_image_size;
 static bool level;
 
-static int sorcerer_put_samples(INT16 *buffer, int sample_pos, int count)
+static int sorcerer_put_samples(int16_t *buffer, int sample_pos, int count)
 {
 	if (buffer)
 	{
@@ -51,7 +51,7 @@ static int sorcerer_put_samples(INT16 *buffer, int sample_pos, int count)
 	return count;
 }
 
-static int sorcerer_output_bit(INT16 *buffer, int sample_pos, bool bit)
+static int sorcerer_output_bit(int16_t *buffer, int sample_pos, bool bit)
 {
 	int samples = 0;
 
@@ -68,10 +68,10 @@ static int sorcerer_output_bit(INT16 *buffer, int sample_pos, bool bit)
 	return samples;
 }
 
-static int sorcerer_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
+static int sorcerer_output_byte(int16_t *buffer, int sample_pos, uint8_t byte)
 {
 	int samples = 0;
-	UINT8 i;
+	uint8_t i;
 
 	/* start */
 	samples += sorcerer_output_bit (buffer, sample_pos + samples, 0);
@@ -87,10 +87,10 @@ static int sorcerer_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
 	return samples;
 }
 
-static int sorcerer_handle_cassette(INT16 *buffer, const UINT8 *bytes)
+static int sorcerer_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 {
-	UINT32 sample_count = 0;
-	UINT32 i;
+	uint32_t sample_count = 0;
+	uint32_t i;
 
 	/* idle */
 	for (i=0; i<2000; i++)
@@ -108,7 +108,7 @@ static int sorcerer_handle_cassette(INT16 *buffer, const UINT8 *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int sorcerer_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int sorcerer_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	return sorcerer_handle_cassette(buffer, bytes);
 }
@@ -117,7 +117,7 @@ static int sorcerer_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
    Calculate the number of samples needed for this tape image
 ********************************************************************/
 
-static int sorcerer_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int sorcerer_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	sorcerer_image_size = length;
 

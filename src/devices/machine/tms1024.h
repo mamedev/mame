@@ -64,8 +64,8 @@ enum
 class tms1024_device : public device_t
 {
 public:
-	tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1024_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms1024_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_write_port1_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port1.set_callback(object); }
@@ -85,9 +85,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	UINT8 m_h;      // 4-bit data latch
-	UINT8 m_s;      // 3-bit port select
-	UINT8 m_std;    // strobe pin
+	uint8_t m_h;      // 4-bit data latch
+	uint8_t m_s;      // 3-bit port select
+	uint8_t m_std;    // strobe pin
 
 	// callbacks
 	devcb_write8 m_write_port1, m_write_port2, m_write_port3, m_write_port4, m_write_port5, m_write_port6, m_write_port7;
@@ -98,7 +98,7 @@ protected:
 class tms1025_device : public tms1024_device
 {
 public:
-	tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

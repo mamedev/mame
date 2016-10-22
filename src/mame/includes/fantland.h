@@ -23,15 +23,15 @@ public:
 		m_spriteram2(*this, "spriteram2", 0)  { }
 
 	/* memory pointers */
-//  UINT8 *    m_spriteram;   // currently directly used in a 16bit map...
-//  UINT8 *    m_spriteram_2; // currently directly used in a 16bit map...
+//  uint8_t *    m_spriteram;   // currently directly used in a 16bit map...
+//  uint8_t *    m_spriteram_2; // currently directly used in a 16bit map...
 
 	/* misc */
-	UINT8      m_nmi_enable;
+	uint8_t      m_nmi_enable;
 	int        m_old_x[2];
 	int        m_old_y[2];
 	int        m_old_f[2];
-	UINT8      m_input_ret[2];
+	uint8_t      m_input_ret[2];
 	int        m_adpcm_playing[4];
 	int        m_adpcm_addr[2][4];
 	int        m_adpcm_nibble[4];
@@ -48,8 +48,8 @@ public:
 	optional_device<msm5205_device> m_msm3;
 	optional_device<msm5205_device> m_msm4;
 
-	optional_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_spriteram2;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_spriteram2;
 	DECLARE_WRITE_LINE_MEMBER(galaxygn_sound_irq);
 	DECLARE_WRITE8_MEMBER(fantland_nmi_enable_w);
 	DECLARE_WRITE16_MEMBER(fantland_nmi_enable_16_w);
@@ -67,7 +67,7 @@ public:
 	DECLARE_MACHINE_RESET(fantland);
 	DECLARE_MACHINE_START(borntofi);
 	DECLARE_MACHINE_RESET(borntofi);
-	UINT32 screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(fantland_irq);
 	INTERRUPT_GEN_MEMBER(fantland_sound_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);

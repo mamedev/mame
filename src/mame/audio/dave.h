@@ -56,7 +56,7 @@ class dave_device : public device_t,
 					public device_sound_interface
 {
 public:
-	dave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<dave_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_lh_wr_callback(device_t &device, _Object object) { return downcast<dave_device &>(device).m_write_lh.set_callback(object); }
@@ -115,16 +115,16 @@ private:
 	devcb_write8 m_write_lh;
 	devcb_write8 m_write_rh;
 
-	UINT8 m_segment[4];
+	uint8_t m_segment[4];
 
-	UINT8 m_irq_status;
-	UINT8 m_irq_enable;
+	uint8_t m_irq_status;
+	uint8_t m_irq_enable;
 
 	emu_timer *m_timer_1hz;
 	emu_timer *m_timer_50hz;
 
 	/* SOUND SYNTHESIS */
-	UINT8 m_regs[32];
+	uint8_t m_regs[32];
 	int m_period[4];
 	int m_count[4];
 	int m_level[4];

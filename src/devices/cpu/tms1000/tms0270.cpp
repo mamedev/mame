@@ -32,7 +32,7 @@ ADDRESS_MAP_END
 
 
 // device definitions
-tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms0980_cpu_device(mconfig, TMS0270, "TMS0270", tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4), "tms0270", __FILE__)
 	, m_read_ctl(*this)
 	, m_write_ctl(*this)
@@ -145,14 +145,14 @@ void tms0270_cpu_device::dynamic_output()
 	}
 }
 
-UINT8 tms0270_cpu_device::read_k_input()
+uint8_t tms0270_cpu_device::read_k_input()
 {
 	// external: TMS5100 CTL port via SEG G,B,C,D
 	if (m_chipsel)
 		return (m_ctl_dir) ? m_ctl_out : m_read_ctl(0, 0xff) & 0xf;
 
 	// standard K-input otherwise
-	UINT8 k = m_read_k(0, 0xff) & 0x1f;
+	uint8_t k = m_read_k(0, 0xff) & 0x1f;
 	return (k & 0x10) ? 0xf : k; // the TMS0270 KF line asserts all K-inputs
 }
 

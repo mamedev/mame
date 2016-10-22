@@ -204,7 +204,7 @@ READ8_MEMBER( d9060_base_t::riot1_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// end or identify in
 	data |= m_bus->eoi_r() << 5;
@@ -270,7 +270,7 @@ READ8_MEMBER( d9060_base_t::riot1_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// device number selection
 	data |= m_slot->get_address() - 8;
@@ -483,7 +483,7 @@ inline void d9060_base_t::update_ieee_signals()
 //  d9060_base_t - constructor
 //-------------------------------------------------
 
-d9060_base_t::d9060_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+d9060_base_t::d9060_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, M6502_DOS_TAG),
@@ -507,7 +507,7 @@ d9060_base_t::d9060_base_t(const machine_config &mconfig, device_type type, cons
 //  d9060_t - constructor
 //-------------------------------------------------
 
-d9060_t::d9060_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+d9060_t::d9060_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: d9060_base_t(mconfig, D9060, "D9060", tag, owner, clock, TYPE_9060, "d9060", __FILE__) { }
 
 
@@ -515,7 +515,7 @@ d9060_t::d9060_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  d9090_t - constructor
 //-------------------------------------------------
 
-d9090_t::d9090_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+d9090_t::d9090_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: d9060_base_t(mconfig, D9090, "D9090", tag, owner, clock, TYPE_9090, "d9090", __FILE__) { }
 
 

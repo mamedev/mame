@@ -1103,11 +1103,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_mux_data;
-	UINT8 m_pia0_PA_data;
+	uint8_t m_mux_data;
+	uint8_t m_pia0_PA_data;
 	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
 	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
 	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
@@ -1154,7 +1154,7 @@ public:
 	DECLARE_PALETTE_INIT(wcrdxtnd);
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_RESET(mondial);
-	UINT32 screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -1225,7 +1225,7 @@ VIDEO_START_MEMBER(goldnpkr_state,wcrdxtnd)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -1233,7 +1233,7 @@ UINT32 goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_ind1
 
 PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.
@@ -1277,7 +1277,7 @@ PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
 
 PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -1325,7 +1325,7 @@ PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
 
 PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 /*
     Using the original intensity line, the PCB has a bridge
     that allow (as default) turn the background dark blue.
@@ -1400,7 +1400,7 @@ READ8_MEMBER(goldnpkr_state::goldnpkr_mux_port_r)
 
 READ8_MEMBER(goldnpkr_state::pottnpkr_mux_port_r)
 {
-	UINT8 pa_0_4 = 0xff, pa_7;  /* Temporary place holder for bits 0 to 4 & 7 */
+	uint8_t pa_0_4 = 0xff, pa_7;  /* Temporary place holder for bits 0 to 4 & 7 */
 
 	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
 	{
@@ -1429,7 +1429,7 @@ WRITE8_MEMBER(goldnpkr_state::mux_port_w)
 
 /* Demuxing ay8910 data/address from Falcon board, PIA portA out */
 
-UINT8 wcfalcon_flag = 0;
+uint8_t wcfalcon_flag = 0;
 
 WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
 {
@@ -4005,13 +4005,13 @@ DISCRETE_SOUND_END
 
 MACHINE_START_MEMBER(goldnpkr_state, mondial)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
 }
 
 MACHINE_RESET_MEMBER(goldnpkr_state, mondial)
 {
-	UINT8 seldsw = (ioport("SELDSW")->read() );
+	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
 
 	membank("bank1")->set_entry(seldsw);
@@ -10495,7 +10495,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, flcnw)
 {
 	/* Attempt to decrypt the MCU program (we're sooo close!) */
 
-	UINT8 *ROM = memregion("mcu")->base();
+	uint8_t *ROM = memregion("mcu")->base();
 	int size = memregion("mcu")->bytes();
 	int start = 0x0000;
 	int i;
@@ -10514,7 +10514,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsa)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe097] = 0xea;
 	ROM[0xe098] = 0xea;
@@ -10526,7 +10526,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsb)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe87b] = 0xea;
 	ROM[0xe87c] = 0xea;
@@ -10538,7 +10538,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsc)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x453a] = 0xea;
 	ROM[0x453b] = 0xea;
@@ -10550,7 +10550,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsww)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xf2c9] = 0xea;
 	ROM[0xf2ca] = 0xea;
@@ -10562,7 +10562,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwa)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xdf80] = 0xea;
 	ROM[0xdf81] = 0xea;
@@ -10574,7 +10574,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwc)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe42f] = 0xea;
 	ROM[0xe430] = 0xea;
@@ -10586,7 +10586,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwd)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe442] = 0xea;
 	ROM[0xe443] = 0xea;
@@ -10598,7 +10598,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwh)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe4d5] = 0xea;
 	ROM[0xe4d6] = 0xea;
@@ -10610,7 +10610,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwl)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe87c] = 0xea;
 	ROM[0xe87d] = 0xea;
@@ -10622,7 +10622,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwo)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe7d5] = 0xea;
 	ROM[0xe7d6] = 0xea;
@@ -10634,7 +10634,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwp)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe7d9] = 0xea;
 	ROM[0xe7da] = 0xea;
@@ -10646,7 +10646,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwr)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe7f7] = 0xea;
 	ROM[0xe7f8] = 0xea;
@@ -10658,7 +10658,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswws)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe8a5] = 0xea;
 	ROM[0xe8a6] = 0xea;
@@ -10670,7 +10670,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwt)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xe955] = 0xea;
 	ROM[0xe956] = 0xea;
@@ -10682,7 +10682,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwu)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xee6b] = 0xea;
 	ROM[0xee6c] = 0xea;
@@ -10694,7 +10694,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwv)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xf052] = 0xea;
 	ROM[0xf053] = 0xea;
@@ -10742,7 +10742,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
 {
 /*
     int i;
-    UINT8 *ROM = memregion("maincpu")->base();
+    uint8_t *ROM = memregion("maincpu")->base();
 
     unsigned char rawData[256] = {
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB,
@@ -10815,7 +10815,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, wstrike)
 	   after compare with a string inside the Dallas TK RAM
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xf2e1] = 0xea;
 	ROM[0xf2e2] = 0xea;
@@ -10826,7 +10826,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, bchancep)
 {
 	/* Attempt to invert the color data from the bipolar PROM */
 
-	UINT8 *ROM = memregion("proms")->base();
+	uint8_t *ROM = memregion("proms")->base();
 	int size = memregion("proms")->bytes();
 	int start = 0x0000;
 	int i;

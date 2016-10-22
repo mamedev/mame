@@ -13,7 +13,7 @@ class neogeo_kof98_cart : public neogeo_rom_device
 {
 public:
 	// construction/destruction
-	neogeo_kof98_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock);
+	neogeo_kof98_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -56,7 +56,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 PALETTE_INIT_MEMBER(galivan_state, galivan)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -82,7 +82,7 @@ PALETTE_INIT_MEMBER(galivan_state, galivan)
 	/* pens 0-7; the top two bits for pens 8-15. */
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry;
+		uint8_t ctabentry;
 
 		if (i & 0x08)
 			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0xc0) >> 2);
@@ -99,7 +99,7 @@ PALETTE_INIT_MEMBER(galivan_state, galivan)
 	/* 8-15 (like for tiles). */
 	for (i = 0; i < 0x1000; i++)
 	{
-		UINT8 ctabentry;
+		uint8_t ctabentry;
 		int i_swapped = ((i & 0x0f) << 8) | ((i & 0xff0) >> 4);
 
 		if (i & 0x80)
@@ -121,7 +121,7 @@ PALETTE_INIT_MEMBER(galivan_state, galivan)
 
 TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
 {
-	UINT8 *BGROM = memregion("gfx4")->base();
+	uint8_t *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO_MEMBER(1,
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
 
 TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
 {
-	UINT8 *BGROM = memregion("gfx4")->base();
+	uint8_t *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO_MEMBER(1,
@@ -287,8 +287,8 @@ WRITE8_MEMBER(galivan_state::galivan_scrolly_w)
 
 void galivan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT8 *spritepalettebank = memregion("user1")->base();
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	const uint8_t *spritepalettebank = memregion("user1")->base();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	int length = m_spriteram->bytes();
 	int flip = flip_screen();
 	gfx_element *gfx = m_gfxdecode->gfx(2);
@@ -325,7 +325,7 @@ void galivan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 galivan_state::screen_update_galivan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galivan_state::screen_update_galivan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_galivan_scrollx[0] + 256 * (m_galivan_scrollx[1] & 0x07));
 	m_bg_tilemap->set_scrolly(0, m_galivan_scrolly[0] + 256 * (m_galivan_scrolly[1] & 0x07));
@@ -351,7 +351,7 @@ UINT32 galivan_state::screen_update_galivan(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 galivan_state::screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galivan_state::screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* (scrollx[1] & 0x40) does something */
 	m_bg_tilemap->set_scrollx(0, m_scrollx);

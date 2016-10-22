@@ -112,7 +112,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -122,18 +122,18 @@ public:
 	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
 
 private:
-	UINT32 draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline);
+	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
 	bitmap_ind16 m_tmpbmp;
 
-	const UINT8 *m_p_chargen;
+	const uint8_t *m_p_chargen;
 	struct {
-		UINT8 line;
-		UINT16 ptr;
+		uint8_t line;
+		uint16_t ptr;
 	} m_video;
 
 protected:
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device>  m_pic8259;
 	required_device<i8251_device> m_i8251line;
@@ -254,10 +254,10 @@ WRITE_LINE_MEMBER(ksm_state::write_line_clock)
     displayed on 3 extra scan lines.
 */
 
-UINT32 ksm_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline)
+uint32_t ksm_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline)
 {
-	UINT8 gfx, fg, bg, ra, blink;
-	UINT16 x, chr;
+	uint8_t gfx, fg, bg, ra, blink;
+	uint16_t x, chr;
 
 	bg = 0; fg = 1; ra = scanline % 8;
 	blink = (m_screen->frame_number() % 10) > 4;
@@ -289,8 +289,8 @@ UINT32 ksm_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline)
 
 TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 {
-	UINT16 y = m_screen->vpos();
-	UINT16 offset;
+	uint16_t y = m_screen->vpos();
+	uint16_t offset;
 
 	DBG_LOG(2,"scanline_cb",
 		("addr %02x frame %d x %.4d y %.3d row %.2d\n",
@@ -309,7 +309,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 	draw_scanline(&m_tmpbmp.pix16(y), offset, y%11);
 }
 
-UINT32 ksm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ksm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_tmpbmp, 0, 0, KSM_HORZ_START, KSM_VERT_START, cliprect);
 	return 0;

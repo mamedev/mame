@@ -96,21 +96,21 @@ const device_type LYNX2_SND = &device_creator<lynx2_sound_device>;
 //  lynx_sound_device - constructor
 //-------------------------------------------------
 
-lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, LYNX_SND, "Mikey", tag, owner, clock, "lynx_sound", __FILE__),
 						device_sound_interface(mconfig, *this)
 {
 	m_timer_delegate = lynx_sound_timer_delegate();
 }
 
-lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sound_interface(mconfig, *this)
 {
 }
 
 
-lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: lynx_sound_device(mconfig, LYNX2_SND, "Mikey (Lynx II)", tag, owner, clock, "lynx2_sound", __FILE__)
 {
 }
@@ -250,7 +250,7 @@ void lynx_sound_device::count_down(int nr)
 
 void lynx_sound_device::shift(int chan_nr)
 {
-	INT16 out_temp;
+	int16_t out_temp;
 	LYNX_AUDIO *channel;
 
 	assert(chan_nr < 4);
@@ -259,7 +259,7 @@ void lynx_sound_device::shift(int chan_nr)
 	//channel->shifter = ((channel->shifter<<1)&0xffe) | (m_shift_xor[ channel->shifter & channel->mask ]&1);
 
 	// alternative method (functionally the same as above)
-	UINT8 xor_out = 0;
+	uint8_t xor_out = 0;
 	for (int bit = 0; bit < 12; bit++)
 	{
 		if ((channel->mask >> bit) & 1)
@@ -278,7 +278,7 @@ void lynx_sound_device::shift(int chan_nr)
 		// clipping
 		if (out_temp > 127) out_temp = 127;
 		if (out_temp < -128) out_temp = -128;
-		channel->reg.output = (INT16)out_temp;
+		channel->reg.output = (int16_t)out_temp;
 	}
 
 	switch (chan_nr)
@@ -350,7 +350,7 @@ void lynx_sound_device::execute(int chan_nr)
 
 READ8_MEMBER(lynx_sound_device::read)
 {
-	UINT8 value = 0;
+	uint8_t value = 0;
 	LYNX_AUDIO *channel = &m_audio[(offset >> 3) & 3];
 
 	m_mixer_channel->update();

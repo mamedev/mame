@@ -35,7 +35,7 @@ class vp575_device : public device_t,
 {
 public:
 	// construction/destruction
-	vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -66,13 +66,13 @@ protected:
 	virtual void device_start() override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) override;
-	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh) override;
-	virtual UINT8 vip_io_r(address_space &space, offs_t offset) override;
-	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data) override;
-	virtual UINT8 vip_dma_r(address_space &space, offs_t offset) override;
-	virtual void vip_dma_w(address_space &space, offs_t offset, UINT8 data) override;
-	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual uint8_t vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) override;
+	virtual void vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh) override;
+	virtual uint8_t vip_io_r(address_space &space, offs_t offset) override;
+	virtual void vip_io_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t vip_dma_r(address_space &space, offs_t offset) override;
+	virtual void vip_dma_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint32_t vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual int vip_ef1_r() override;
 	virtual int vip_ef3_r() override;
 	virtual int vip_ef4_r() override;

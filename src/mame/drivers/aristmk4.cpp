@@ -338,8 +338,8 @@
 #include "gldnpkr.lh"  // Video poker
 #include "fvrpitch.lh"  // 5 line without gamble
 
-UINT8 crtc_cursor_index = 0;
-UINT8 crtc_reg = 0;
+uint8_t crtc_cursor_index = 0;
+uint8_t crtc_reg = 0;
 
 class aristmk4_state : public driver_device
 {
@@ -361,21 +361,21 @@ public:
 	required_device<ay8910_device> m_ay2;
 	required_device<samples_device> m_samples;
 
-	required_shared_ptr<UINT8> m_mkiv_vram;
+	required_shared_ptr<uint8_t> m_mkiv_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;
-	UINT8 *m_shapeRomPtr;
-	UINT8 m_shapeRom[0xc000];
-	std::unique_ptr<UINT8[]> m_nvram;
-	UINT8 m_psg_data;
+	uint8_t *m_shapeRomPtr;
+	uint8_t m_shapeRom[0xc000];
+	std::unique_ptr<uint8_t[]> m_nvram;
+	uint8_t m_psg_data;
 	int m_ay8910_1;
 	int m_ay8910_2;
 	int m_u3_p0_w;
-	UINT8 m_cgdrsw;
-	UINT8 m_ripple;
+	uint8_t m_cgdrsw;
+	uint8_t m_ripple;
 	int m_hopper_motor;
 	int m_inscrd;
 	int m_insnote;
@@ -416,7 +416,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(aristmk4);
 	DECLARE_PALETTE_INIT(lions);
-	UINT32 screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(note_input_reset);
 	TIMER_CALLBACK_MEMBER(coin_input_reset);
 	TIMER_CALLBACK_MEMBER(hopper_reset);
@@ -425,7 +425,7 @@ public:
 };
 
 /* Partial Cashcade protocol */
-static const UINT8 cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xf0};
+static const uint8_t cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xf0};
 
 void aristmk4_state::video_start()
 {
@@ -469,7 +469,7 @@ void aristmk4_state::uBackgroundColour()
 	}
 }
 
-UINT32 aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int x,y;
@@ -676,7 +676,7 @@ WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_cb2)
 //output b
 WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 {
-	UINT8 emet[5];
+	uint8_t emet[5];
 	int i = 0;
 	//pia_data = data;
 	emet[0] = data & 0x01;  /* emet1  -  bit 1 - PB0 */
@@ -1633,7 +1633,7 @@ READ8_MEMBER(aristmk4_state::pc1_r)
 /* same as Casino Winner HW */
 PALETTE_INIT_MEMBER(aristmk4_state, aristmk4)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < palette.entries();i++)
@@ -1659,9 +1659,9 @@ PALETTE_INIT_MEMBER(aristmk4_state, aristmk4)
 
 DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
 {
-	m_shapeRomPtr = (UINT8 *)memregion("tile_gfx")->base();
+	m_shapeRomPtr = (uint8_t *)memregion("tile_gfx")->base();
 	memcpy(m_shapeRom,m_shapeRomPtr,sizeof(m_shapeRom)); // back up
-	m_nvram = std::make_unique<UINT8[]>(0x1000);
+	m_nvram = std::make_unique<uint8_t[]>(0x1000);
 }
 
 void aristmk4_state::machine_start()

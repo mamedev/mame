@@ -27,7 +27,7 @@ class bw2_ramcard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	bw2_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bw2_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -38,16 +38,16 @@ protected:
 	virtual void device_reset() override;
 
 	// device_bw2_expansion_slot_interface overrides
-	virtual UINT8 bw2_cd_r(address_space &space, offs_t offset, UINT8 data, int ram2, int ram3, int ram4, int ram5, int ram6) override;
-	virtual void bw2_cd_w(address_space &space, offs_t offset, UINT8 data, int ram2, int ram3, int ram4, int ram5, int ram6) override;
-	virtual void bw2_slot_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t bw2_cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) override;
+	virtual void bw2_cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) override;
+	virtual void bw2_slot_w(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
 	required_memory_region m_rom;
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 
 	int m_en;
-	UINT8 m_bank;
+	uint8_t m_bank;
 };
 
 

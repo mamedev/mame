@@ -7,8 +7,8 @@
 
 void slapshot_state::video_start()
 {
-	m_spriteram_delayed = std::make_unique<UINT16[]>(m_spriteram.bytes() / 2);
-	m_spriteram_buffered = std::make_unique<UINT16[]>(m_spriteram.bytes() / 2);
+	m_spriteram_delayed = std::make_unique<uint16_t[]>(m_spriteram.bytes() / 2);
+	m_spriteram_buffered = std::make_unique<uint16_t[]>(m_spriteram.bytes() / 2);
 	m_spritelist = auto_alloc_array(machine(), struct slapshot_tempsprite, 0x400);
 
 	m_sprites_disabled = 1;
@@ -87,7 +87,7 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 	int code, color, spritedata, spritecont, flipx, flipy;
 	int xcurrent, ycurrent, big_sprite = 0;
 	int y_no = 0, x_no = 0, xlatch = 0, ylatch = 0, last_continuation_tile = 0;   /* for zooms */
-	UINT32 zoomword, zoomx, zoomy, zx = 0, zy = 0, zoomxlatch = 0, zoomylatch = 0;   /* for zooms */
+	uint32_t zoomword, zoomx, zoomy, zx = 0, zy = 0, zoomxlatch = 0, zoomylatch = 0;   /* for zooms */
 	int scroll1x, scroll1y;
 	int scrollx = 0, scrolly = 0;
 	int curx, cury;
@@ -446,13 +446,13 @@ One exception is the "puck" in early attract which is
 a bg layer given priority over some sprites.
 ********************************************************************/
 
-UINT32 slapshot_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t slapshot_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT8 layer[5];
-	UINT8 tilepri[5];
-	UINT8 spritepri[4];
-	UINT16 priority;
+	uint8_t layer[5];
+	uint8_t tilepri[5];
+	uint8_t spritepri[4];
+	uint16_t priority;
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_Z))

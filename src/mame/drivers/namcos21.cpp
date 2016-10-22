@@ -534,7 +534,7 @@ Filter Board
 #define ENABLE_LOGGING      0
 
 
-INT32 namcos21_state::read_pointrom_data(unsigned offset)
+int32_t namcos21_state::read_pointrom_data(unsigned offset)
 {
 	return m_ptrom24[offset];
 }
@@ -561,7 +561,7 @@ WRITE16_MEMBER(namcos21_state::dspcuskey_w)
 
 READ16_MEMBER(namcos21_state::dspcuskey_r)
 {
-	UINT16 result = 0;
+	uint16_t result = 0;
 	if( m_gametype == NAMCOS21_SOLVALOU )
 	{
 		switch( space.device().safe_pc() )
@@ -600,7 +600,7 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 	return result;
 }
 
-void namcos21_state::transmit_word_to_slave(UINT16 data)
+void namcos21_state::transmit_word_to_slave(uint16_t data)
 {
 	unsigned offs = m_mpDspState->slaveInputStart+m_mpDspState->slaveBytesAvailable++;
 	m_mpDspState->slaveInputBuffer[offs%DSP_BUF_MAX] = data;
@@ -615,7 +615,7 @@ void namcos21_state::transmit_word_to_slave(UINT16 data)
 
 void namcos21_state::transfer_dsp_data()
 {
-	UINT16 addr = m_mpDspState->masterSourceAddr;
+	uint16_t addr = m_mpDspState->masterSourceAddr;
 	int mode = addr&0x8000;
 	addr&=0x7fff;
 	if( addr )
@@ -623,8 +623,8 @@ void namcos21_state::transfer_dsp_data()
 		for(;;)
 		{
 			int i;
-			UINT16 old = addr;
-			UINT16 code = m_dspram16[addr++];
+			uint16_t old = addr;
+			uint16_t code = m_dspram16[addr++];
 			if( code == 0xffff )
 			{
 				if( mode )
@@ -650,7 +650,7 @@ void namcos21_state::transfer_dsp_data()
 				transmit_word_to_slave(code);
 				for( i=0; i<code; i++ )
 				{
-					UINT16 data = m_dspram16[addr++];
+					uint16_t data = m_dspram16[addr++];
 					transmit_word_to_slave(data);
 				}
 			}
@@ -660,16 +660,16 @@ void namcos21_state::transfer_dsp_data()
 				transmit_word_to_slave(code+1);
 				for( i=0; i<code; i++ )
 				{
-					UINT16 data = m_dspram16[addr++];
+					uint16_t data = m_dspram16[addr++];
 					transmit_word_to_slave(data);
 				}
 			}
 			else
 			{
-				INT32 masterAddr = read_pointrom_data(code);
+				int32_t masterAddr = read_pointrom_data(code);
 				if (ENABLE_LOGGING) logerror( "OBJ TFR(0x%x)\n", code );
 				{
-					UINT16 len = m_dspram16[addr++];
+					uint16_t len = m_dspram16[addr++];
 					for(;;)
 					{
 						int subAddr = read_pointrom_data(masterAddr++);
@@ -679,7 +679,7 @@ void namcos21_state::transfer_dsp_data()
 						}
 						else
 						{
-							int primWords = (UINT16)read_pointrom_data(subAddr++);
+							int primWords = (uint16_t)read_pointrom_data(subAddr++);
 							if( primWords>2 )
 							{
 								transmit_word_to_slave(0); /* pad1 */
@@ -692,7 +692,7 @@ void namcos21_state::transfer_dsp_data()
 								transmit_word_to_slave(primWords+1);
 								for( i=0; i<primWords; i++ )
 								{
-									transmit_word_to_slave((UINT16)read_pointrom_data(subAddr+i));
+									transmit_word_to_slave((uint16_t)read_pointrom_data(subAddr+i));
 								}
 							}
 							else
@@ -742,9 +742,9 @@ void namcos21_kickstart(running_machine &machine, int internal)
 	state->m_dspslave->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-UINT16 namcos21_state::read_word_from_slave_input()
+uint16_t namcos21_state::read_word_from_slave_input()
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	if( m_mpDspState->slaveBytesAvailable>0 )
 	{
 		data = m_mpDspState->slaveInputBuffer[m_mpDspState->slaveInputStart++];
@@ -759,7 +759,7 @@ UINT16 namcos21_state::read_word_from_slave_input()
 	return data;
 }
 
-UINT16 namcos21_state::get_input_bytes_advertised_for_slave()
+uint16_t namcos21_state::get_input_bytes_advertised_for_slave()
 {
 	if( m_mpDspState->slaveBytesAdvertised < m_mpDspState->slaveBytesAvailable )
 	{
@@ -802,7 +802,7 @@ WRITE16_MEMBER(namcos21_state::dspram16_w)
 
 int namcos21_state::init_dsp()
 {
-	UINT16 *pMem = (UINT16 *)memregion("dspmaster")->base();
+	uint16_t *pMem = (uint16_t *)memregion("dspmaster")->base();
 	/**
 	 * DSP BIOS tests "CPU ID" on startup
 	 * "JAPAN (C)1990 NAMCO LTD. by H.F "
@@ -822,10 +822,10 @@ int namcos21_state::init_dsp()
 
 READ16_MEMBER(namcos21_state::dsp_port0_r)
 {
-	INT32 data = read_pointrom_data(m_pointrom_idx++);
-	m_mPointRomMSB = (UINT8)(data>>16);
+	int32_t data = read_pointrom_data(m_pointrom_idx++);
+	m_mPointRomMSB = (uint8_t)(data>>16);
 	m_mbPointRomDataAvailable = 1;
-	return (UINT16)data;
+	return (uint16_t)data;
 }
 
 WRITE16_MEMBER(namcos21_state::dsp_port0_w)
@@ -929,8 +929,8 @@ WRITE16_MEMBER(namcos21_state::dsp_portb_w)
 		int color  = m_mpDspState->masterDirectDrawBuffer[0];
 		for( i=0; i<4; i++ )
 		{
-			sx[i] = NAMCOS21_POLY_FRAME_WIDTH/2 + (INT16)m_mpDspState->masterDirectDrawBuffer[i*3+1];
-			sy[i] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (INT16)m_mpDspState->masterDirectDrawBuffer[i*3+2];
+			sx[i] = NAMCOS21_POLY_FRAME_WIDTH/2 + (int16_t)m_mpDspState->masterDirectDrawBuffer[i*3+1];
+			sy[i] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)m_mpDspState->masterDirectDrawBuffer[i*3+2];
 			zcode[i] = m_mpDspState->masterDirectDrawBuffer[i*3+3];
 		}
 		if( color&0x8000 )
@@ -997,7 +997,7 @@ ADDRESS_MAP_END
 
 /************************************************************************************/
 
-void namcos21_state::render_slave_output(UINT16 data)
+void namcos21_state::render_slave_output(uint16_t data)
 {
 	if( m_mpDspState->slaveOutputSize >= 4096 )
 	{
@@ -1008,11 +1008,11 @@ void namcos21_state::render_slave_output(UINT16 data)
 	m_mpDspState->slaveOutputBuffer[m_mpDspState->slaveOutputSize++] = data;
 
 	{
-		UINT16 *pSource = m_mpDspState->slaveOutputBuffer;
-		UINT16 count = *pSource++;
+		uint16_t *pSource = m_mpDspState->slaveOutputBuffer;
+		uint16_t count = *pSource++;
 		if( count && m_mpDspState->slaveOutputSize > count )
 		{
-			UINT16 color = *pSource++;
+			uint16_t color = *pSource++;
 			int sx[4], sy[4],zcode[4];
 			int j;
 			if( color&0x8000 )
@@ -1020,8 +1020,8 @@ void namcos21_state::render_slave_output(UINT16 data)
 				if( count!=13 ) logerror( "?!direct-draw(%d)\n", count );
 				for( j=0; j<4; j++ )
 				{
-					sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2 + (INT16)pSource[3*j+0];
-					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (INT16)pSource[3*j+1];
+					sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2 + (int16_t)pSource[3*j+0];
+					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)pSource[3*j+1];
 					zcode[j] = pSource[3*j+2];
 				}
 				draw_quad(sx, sy, zcode, color&0x7fff);
@@ -1031,13 +1031,13 @@ void namcos21_state::render_slave_output(UINT16 data)
 				int quad_idx = color*6;
 				for(;;)
 				{
-					UINT8 code = m_pointram[quad_idx++];
+					uint8_t code = m_pointram[quad_idx++];
 					color = m_pointram[quad_idx++]|(code<<8);
 					for( j=0; j<4; j++ )
 					{
-						UINT8 vi = m_pointram[quad_idx++];
-						sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (INT16)pSource[vi*3+0];
-						sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (INT16)pSource[vi*3+1];
+						uint8_t vi = m_pointram[quad_idx++];
+						sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (int16_t)pSource[vi*3+0];
+						sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)pSource[vi*3+1];
 						zcode[j] = pSource[vi*3+2];
 					}
 					draw_quad(sx, sy, zcode, color&0x7fff);
@@ -1131,7 +1131,7 @@ ADDRESS_MAP_END
  */
 WRITE16_MEMBER(namcos21_state::pointram_control_w)
 {
-//  UINT16 prev = m_pointram_control;
+//  uint16_t prev = m_pointram_control;
 	COMBINE_DATA( &m_pointram_control );
 
 	/* m_pointram_control&0x20 : bank for depthcue data */
@@ -1142,7 +1142,7 @@ WRITE16_MEMBER(namcos21_state::pointram_control_w)
 		offset,
 		m_pointram_control );
 
-	UINT16 delta = (prev^m_pointram_control)&m_pointram_control;
+	uint16_t delta = (prev^m_pointram_control)&m_pointram_control;
 	if( delta&0x10 )
 	{
 		logerror( " [reset]" );
@@ -1274,13 +1274,13 @@ ADDRESS_MAP_END
 READ16_MEMBER(namcos21_state::winrun_dspcomram_r)
 {
 	int bank = 1-(m_winrun_dspcomram_control[0x4/2]&1);
-	UINT16 *mem = &m_winrun_dspcomram[0x1000*bank];
+	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
 	return mem[offset];
 }
 WRITE16_MEMBER(namcos21_state::winrun_dspcomram_w)
 {
 	int bank = 1-(m_winrun_dspcomram_control[0x4/2]&1);
-	UINT16 *mem = &m_winrun_dspcomram[0x1000*bank];
+	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
 	COMBINE_DATA( &mem[offset] );
 }
 
@@ -1313,8 +1313,8 @@ void namcos21_state::winrun_flush_poly()
 {
 	if( m_winrun_poly_index>0 )
 	{
-		const UINT16 *pSource = m_winrun_poly_buf;
-		UINT16 color;
+		const uint16_t *pSource = m_winrun_poly_buf;
+		uint16_t color;
 		int sx[4], sy[4], zcode[4];
 		int j;
 		color = *pSource++;
@@ -1322,8 +1322,8 @@ void namcos21_state::winrun_flush_poly()
 		{ /* direct-draw */
 			for( j=0; j<4; j++ )
 			{
-				sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (INT16)*pSource++;
-				sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (INT16)*pSource++;
+				sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (int16_t)*pSource++;
+				sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)*pSource++;
 				zcode[j] = *pSource++;
 			}
 			draw_quad(sx, sy, zcode, color&0x7fff);
@@ -1333,13 +1333,13 @@ void namcos21_state::winrun_flush_poly()
 			int quad_idx = color*6;
 			for(;;)
 			{
-				UINT8 code = m_pointram[quad_idx++];
+				uint8_t code = m_pointram[quad_idx++];
 				color = m_pointram[quad_idx++];
 				for( j=0; j<4; j++ )
 				{
-					UINT8 vi = m_pointram[quad_idx++];
-					sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (INT16)pSource[vi*3+0];
-					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (INT16)pSource[vi*3+1];
+					uint8_t vi = m_pointram[quad_idx++];
+					sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (int16_t)pSource[vi*3+0];
+					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)pSource[vi*3+1];
 					zcode[j] = pSource[vi*3+2];
 				}
 				draw_quad(sx, sy, zcode, color&0x7fff);
@@ -1425,7 +1425,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dspbios_w)
 	COMBINE_DATA( &m_winrun_dspbios[offset] );
 	if( offset==0xfff )
 	{
-		UINT16 *mem = (UINT16 *)memregion("dsp")->base();
+		uint16_t *mem = (uint16_t *)memregion("dsp")->base();
 		memcpy( mem, m_winrun_dspbios, 0x2000 );
 		m_winrun_dsp_alive = 1;
 	}
@@ -1439,14 +1439,14 @@ WRITE16_MEMBER(namcos21_state::winrun_dspbios_w)
 READ16_MEMBER(namcos21_state::winrun_68k_dspcomram_r)
 {
 	int bank = m_winrun_dspcomram_control[0x4/2]&1;
-	UINT16 *mem = &m_winrun_dspcomram[0x1000*bank];
+	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
 	return mem[offset];
 }
 
 WRITE16_MEMBER(namcos21_state::winrun_68k_dspcomram_w)
 {
 	int bank = m_winrun_dspcomram_control[0x4/2]&1;
-	UINT16 *mem = &m_winrun_dspcomram[0x1000*bank];
+	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
 	COMBINE_DATA( &mem[offset] );
 }
 
@@ -2443,7 +2443,7 @@ ROM_END
 void namcos21_state::init(int game_type)
 {
 	m_gametype = game_type;
-	m_pointram = std::make_unique<UINT8[]>(PTRAM_SIZE);
+	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	init_dsp();
 	m_mbNeedsKickstart = 20;
 	if( game_type==NAMCOS21_CYBERSLED )
@@ -2454,15 +2454,15 @@ void namcos21_state::init(int game_type)
 
 DRIVER_INIT_MEMBER(namcos21_state,winrun)
 {
-	UINT16 *pMem = (UINT16 *)memregion("dsp")->base();
+	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
 
-	m_winrun_dspcomram = std::make_unique<UINT16[]>(0x1000*2);
+	m_winrun_dspcomram = std::make_unique<uint16_t[]>(0x1000*2);
 
 	m_gametype = NAMCOS21_WINRUN91;
-	m_pointram = std::make_unique<UINT8[]>(PTRAM_SIZE);
+	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	m_pointram_idx = 0;
 	m_mbNeedsKickstart = 0;
 }
@@ -2485,7 +2485,7 @@ DRIVER_INIT_MEMBER(namcos21_state,cybsled)
 
 DRIVER_INIT_MEMBER(namcos21_state,solvalou)
 {
-	UINT16 *mem = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *mem = (uint16_t *)memregion("maincpu")->base();
 	mem[0x20ce4/2+1] = 0x0000; // $200128
 	mem[0x20cf4/2+0] = 0x4e71; // 2nd ptr_booting
 	mem[0x20cf4/2+1] = 0x4e71;
@@ -2496,13 +2496,13 @@ DRIVER_INIT_MEMBER(namcos21_state,solvalou)
 
 DRIVER_INIT_MEMBER(namcos21_state,driveyes)
 {
-	UINT16 *pMem = (UINT16 *)memregion("dsp")->base();
+	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
-	m_winrun_dspcomram = std::make_unique<UINT16[]>(0x1000*2);
+	m_winrun_dspcomram = std::make_unique<uint16_t[]>(0x1000*2);
 	m_gametype = NAMCOS21_DRIVERS_EYES;
-	m_pointram = std::make_unique<UINT8[]>(PTRAM_SIZE);
+	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	m_pointram_idx = 0;
 	m_mbNeedsKickstart = 0;
 }

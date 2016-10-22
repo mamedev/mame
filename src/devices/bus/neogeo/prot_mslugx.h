@@ -17,7 +17,7 @@ class mslugx_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE16_MEMBER( protection_w );
 	DECLARE_READ16_MEMBER( protection_r );
@@ -27,8 +27,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT16     m_counter;
-	UINT16     m_command;
+	uint16_t     m_counter;
+	uint16_t     m_command;
 };
 
 #endif

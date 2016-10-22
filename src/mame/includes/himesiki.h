@@ -24,9 +24,9 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_bg_ram;
-	required_shared_ptr<UINT8> m_spriteram_p103a;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_bg_ram;
+	required_shared_ptr<uint8_t> m_spriteram_p103a;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -51,6 +51,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_himesiki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_himesiki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

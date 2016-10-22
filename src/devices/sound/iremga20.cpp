@@ -46,7 +46,7 @@ const device_type IREMGA20 = &device_creator<iremga20_device>;
 //  iremga20_device - constructor
 //-------------------------------------------------
 
-iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IREMGA20, "Irem GA20", tag, owner, clock, "iremga20", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),
@@ -103,8 +103,8 @@ void iremga20_device::device_reset()
 
 void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	UINT32 rate[4], pos[4], frac[4], end[4], vol[4], play[4];
-	UINT8 *pSamples;
+	uint32_t rate[4], pos[4], frac[4], end[4], vol[4], play[4];
+	uint8_t *pSamples;
 	stream_sample_t *outL, *outR;
 	int i, sampleout;
 

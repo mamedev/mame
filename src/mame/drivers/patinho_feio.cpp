@@ -37,7 +37,7 @@ READ16_MEMBER(patinho_feio_state::buttons_r)
 	return ioport("BUTTONS")->read();
 }
 
-void patinho_feio_state::update_panel(UINT8 ACC, UINT8 opcode, UINT8 mem_data, UINT16 mem_addr, UINT16 PC, UINT8 FLAGS, UINT16 RC, UINT8 mode){
+void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode){
 	char lamp_id[11];
 	const char* button_names[] = {
 		"NORMAL",
@@ -157,15 +157,15 @@ WRITE8_MEMBER(patinho_feio_state::teletype_kbd_input)
    not use this function at all.
 */
 void patinho_feio_state::load_tape(const char* name){
-	UINT8 *RAM = (UINT8 *) memshare("maincpu:internalram")->ptr();
-	UINT8 *data = memregion(name)->base();
+	uint8_t *RAM = (uint8_t *) memshare("maincpu:internalram")->ptr();
+	uint8_t *data = memregion(name)->base();
 	unsigned int data_length = data[0];
 	unsigned int start_address = data[1]*256 + data[2];
-	INT8 expected_checksum = data[data_length + 3];
-	INT8 checksum = 0;
+	int8_t expected_checksum = data[data_length + 3];
+	int8_t checksum = 0;
 
 	for (int i = 0; i < data_length + 3; i++){
-		checksum -= (INT8) data[i];
+		checksum -= (int8_t) data[i];
 	}
 
 	if (checksum != expected_checksum){
@@ -177,8 +177,8 @@ void patinho_feio_state::load_tape(const char* name){
 }
 
 void patinho_feio_state::load_raw_data(const char* name, unsigned int start_address, unsigned int data_length){
-	UINT8 *RAM = (UINT8 *) memshare("maincpu:internalram")->ptr();
-	UINT8 *data = memregion(name)->base();
+	uint8_t *RAM = (uint8_t *) memshare("maincpu:internalram")->ptr();
+	uint8_t *data = memregion(name)->base();
 
 	memcpy(&RAM[start_address], data, data_length);
 }

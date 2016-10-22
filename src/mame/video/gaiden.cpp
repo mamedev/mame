@@ -17,8 +17,8 @@
 
 TILE_GET_INFO_MEMBER(gaiden_state::get_bg_tile_info)
 {
-	UINT16 *videoram1 = &m_videoram3[0x0800];
-	UINT16 *videoram2 = m_videoram3;
+	uint16_t *videoram1 = &m_videoram3[0x0800];
+	uint16_t *videoram2 = m_videoram3;
 	SET_TILE_INFO_MEMBER(1,
 			videoram1[tile_index] & 0x0fff,
 			(videoram2[tile_index] & 0xf0) >> 4,
@@ -27,8 +27,8 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info)
 {
-	UINT16 *videoram1 = &m_videoram2[0x0800];
-	UINT16 *videoram2 = m_videoram2;
+	uint16_t *videoram1 = &m_videoram2[0x0800];
+	uint16_t *videoram2 = m_videoram2;
 	SET_TILE_INFO_MEMBER(2,
 			videoram1[tile_index] & 0x0fff,
 			(videoram2[tile_index] & 0xf0) >> 4,
@@ -37,8 +37,8 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info_raiga)
 {
-	UINT16 *videoram1 = &m_videoram2[0x0800];
-	UINT16 *videoram2 = m_videoram2;
+	uint16_t *videoram1 = &m_videoram2[0x0800];
+	uint16_t *videoram2 = m_videoram2;
 
 	int colour = ((videoram2[tile_index] & 0xf0) >> 4);
 
@@ -54,8 +54,8 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info_raiga)
 
 TILE_GET_INFO_MEMBER(gaiden_state::get_tx_tile_info)
 {
-	UINT16 *videoram1 = &m_videoram[0x0400];
-	UINT16 *videoram2 = m_videoram;
+	uint16_t *videoram1 = &m_videoram[0x0400];
+	uint16_t *videoram2 = m_videoram;
 	SET_TILE_INFO_MEMBER(0,
 			videoram1[tile_index] & 0x07ff,
 			(videoram2[tile_index] & 0xf0) >> 4,
@@ -257,7 +257,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_videoram_w)
 
 void gaiden_state::drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int i, code, color, x, y, flipx, flipy, priority_mask;
 
 	for( i = 0; i < 0x800/2; i += 4 )
@@ -295,14 +295,14 @@ void gaiden_state::drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
-UINT32 gaiden_state::screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gaiden_state::screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen_update_raiga(screen, bitmap, cliprect);
 	return 0;
 
 }
 
-UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_tile_bitmap_bg.fill(0, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);
@@ -322,7 +322,7 @@ UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-UINT32 gaiden_state::screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gaiden_state::screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 

@@ -4,7 +4,7 @@
 
 const device_type MGA2064W = &device_creator<mga2064w_device>;
 
-mga2064w_device::mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mga2064w_device::mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MGA2064W, "Matrox Millennium", tag, owner, clock, "mga2064w", __FILE__)
 {
 }

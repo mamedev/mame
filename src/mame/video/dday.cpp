@@ -49,7 +49,7 @@ void dday_state::start_countdown_timer()
 
 PALETTE_INIT_MEMBER(dday_state, dday)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	palette.set_shadow_factor(1.0 / 8);
@@ -177,7 +177,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_text_tile_info)
 TILE_GET_INFO_MEMBER(dday_state::get_sl_tile_info)
 {
 	int code, sl_flipx, flipx;
-	UINT8* sl_map;
+	uint8_t* sl_map;
 
 	sl_map = &memregion("user1")->base()[(m_sl_image & 0x07) * 0x0200];
 
@@ -294,7 +294,7 @@ WRITE8_MEMBER(dday_state::dday_control_w)
 
 ***************************************************************************/
 
-UINT32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, m_main_bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	m_fg_tilemap->draw(screen, m_main_bitmap, cliprect, 0, 0);
@@ -311,7 +311,7 @@ UINT32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitma
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				UINT16 src_pixel = m_main_bitmap.pix16(y, x);
+				uint16_t src_pixel = m_main_bitmap.pix16(y, x);
 
 				if (sl_bitmap.pix16(y, x) == 0xff)
 					src_pixel += m_palette->entries();

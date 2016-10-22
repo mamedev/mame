@@ -48,7 +48,7 @@ icq3250a-d
 #ifdef UNUSED_FUNCTION
 READ8_MEMBER(comquest_state::comquest_read)
 {
-	UINT8 data=0;
+	uint8_t data=0;
 	logerror("comquest read %.4x %.2x\n",offset,data);
 	return data;
 }
@@ -204,7 +204,7 @@ GFXDECODE_END
 
 void comquest_state::machine_reset()
 {
-//  UINT8 *mem=memregion("user1")->base();
+//  uint8_t *mem=memregion("user1")->base();
 //  membank(1)->set_base(mem+0x00000);
 }
 

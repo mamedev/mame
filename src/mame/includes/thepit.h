@@ -17,18 +17,18 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_attributesram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_attributesram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
-	UINT8 m_graphics_bank;
-	UINT8 m_flip_x;
-	UINT8 m_flip_y;
+	uint8_t m_graphics_bank;
+	uint8_t m_flip_x;
+	uint8_t m_flip_y;
 	tilemap_t *m_solid_tilemap;
 	tilemap_t *m_tilemap;
-	std::unique_ptr<UINT8[]> m_dummy_tile;
-	UINT8 m_nmi_mask;
+	std::unique_ptr<uint8_t[]> m_dummy_tile;
+	uint8_t m_nmi_mask;
 
 	int m_question_address;
 	int m_question_rom;
@@ -56,8 +56,8 @@ public:
 	DECLARE_PALETTE_INIT(thepit);
 	DECLARE_PALETTE_INIT(suprmous);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);

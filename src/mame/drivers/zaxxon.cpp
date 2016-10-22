@@ -350,7 +350,7 @@ READ8_MEMBER(zaxxon_state::razmataz_counter_r)
 
 CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
 {
-	int num = (FPTR)param;
+	int num = (uintptr_t)param;
 	int res;
 
 	int delta = m_dials[num]->read();
@@ -399,14 +399,14 @@ INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 {
 	if (newval)
 	{
-		m_coin_status[(int)(FPTR)param] = m_coin_enable[(int)(FPTR)param];
+		m_coin_status[(int)(uintptr_t)param] = m_coin_enable[(int)(uintptr_t)param];
 	}
 }
 
 
 CUSTOM_INPUT_MEMBER(zaxxon_state::zaxxon_coin_r)
 {
-	return m_coin_status[(int)(FPTR)param];
+	return m_coin_status[(int)(uintptr_t)param];
 }
 
 
@@ -939,7 +939,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( zaxxon, root )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_FRAGMENT_ADD(zaxxon_samples)
 MACHINE_CONFIG_END
 
@@ -976,7 +976,7 @@ static MACHINE_CONFIG_DERIVED( futspye, root )
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_futspy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_FRAGMENT_ADD(zaxxon_samples)
 
 MACHINE_CONFIG_END
@@ -1000,7 +1000,7 @@ static MACHINE_CONFIG_DERIVED( razmataze, root )
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_razmataz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SEGAUSBROM_ADD("usbsnd")
 MACHINE_CONFIG_END
 
@@ -1038,15 +1038,15 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_congo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76489A, SOUND_CLOCK) // schematic shows sn76489A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("sn2", SN76489A, SOUND_CLOCK/4) // schematic shows sn76489A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_FRAGMENT_ADD(congo_samples)
 MACHINE_CONFIG_END
@@ -1506,13 +1506,13 @@ DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
     (e.g. 0xc0 is XORed with H)
     therefore in the following tables we only keep track of A, B, C, D, E, F, G and H.
 */
-	static const UINT8 data_xortable[2][8] =
+	static const uint8_t data_xortable[2][8] =
 	{
 		{ 0x0a,0x0a,0x22,0x22,0xaa,0xaa,0x82,0x82 },    /* ...............0 */
 		{ 0xa0,0xaa,0x28,0x22,0xa0,0xaa,0x28,0x22 },    /* ...............1 */
 	};
 
-	static const UINT8 opcode_xortable[8][8] =
+	static const uint8_t opcode_xortable[8][8] =
 	{
 		{ 0x8a,0x8a,0x02,0x02,0x8a,0x8a,0x02,0x02 },    /* .......0...0...0 */
 		{ 0x80,0x80,0x08,0x08,0xa8,0xa8,0x20,0x20 },    /* .......0...0...1 */
@@ -1524,12 +1524,12 @@ DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 		{ 0x02,0x08,0x2a,0x20,0x20,0x2a,0x08,0x02 }     /* .......1...1...1 */
 	};
 
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int A = 0x0000; A < 0x6000; A++)
 	{
 		int i,j;
-		UINT8 src;
+		uint8_t src;
 
 		src = rom[A];
 

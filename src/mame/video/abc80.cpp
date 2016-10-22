@@ -49,8 +49,8 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	for (int y = 0; y < 312; y++)
 	{
-		UINT8 vsync_data = m_vsync_prom->base()[y];
-		UINT8 l = m_line_prom->base()[y];
+		uint8_t vsync_data = m_vsync_prom->base()[y];
+		uint8_t l = m_line_prom->base()[y];
 		int dv = (vsync_data & ABC80_K2_DV) ? 1 : 0;
 
 		if (!(vsync_data & ABC80_K2_FRAME_RESET))
@@ -61,9 +61,9 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 		for (int sx = 0; sx < 64; sx++)
 		{
-			UINT8 hsync_data = m_hsync_prom->base()[sx];
+			uint8_t hsync_data = m_hsync_prom->base()[sx];
 			int dh = (hsync_data & ABC80_K5_DH) ? 1 : 0;
-			UINT8 data = 0;
+			uint8_t data = 0;
 
 			if (hsync_data & ABC80_K5_LINE_END)
 			{
@@ -88,10 +88,10 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			int a = (c >> 3) & 0x07;
 			int b = ((r >> 1) & 0x0c) | ((r >> 3) & 0x03);
 			int s = (a + b) & 0x0f;
-			UINT16 videoram_addr = ((r & 0x07) << 7) | (s << 3) | (c & 0x07);
-			UINT8 videoram_data = m_latch;
-			UINT8 attr_addr = ((dh & dv) << 7) | (videoram_data & 0x7f);
-			UINT8 attr_data = m_attr_prom->base()[attr_addr];
+			uint16_t videoram_addr = ((r & 0x07) << 7) | (s << 3) | (c & 0x07);
+			uint8_t videoram_data = m_latch;
+			uint8_t attr_addr = ((dh & dv) << 7) | (videoram_data & 0x7f);
+			uint8_t attr_data = m_attr_prom->base()[attr_addr];
 
 			int blank = (attr_data & ABC80_J3_BLANK) ? 1 : 0;
 			int j = (attr_data & ABC80_J3_TEXT) ? 1 : 0;
@@ -123,7 +123,7 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			else
 			{
 				// text mode
-				UINT16 chargen_addr = ((videoram_data & 0x7f) * 10) + l;
+				uint16_t chargen_addr = ((videoram_data & 0x7f) * 10) + l;
 
 				data = m_char_rom->base()[chargen_addr];
 			}
@@ -182,7 +182,7 @@ void abc80_state::video_start()
 }
 
 
-UINT32 abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_screen(bitmap, cliprect);
 

@@ -26,10 +26,10 @@ struct blit_parameters
 {
 	bitmap_rgb32 *      bitmap;
 	rectangle           cliprect;
-	UINT32              tilemap_priority_code;
-	UINT8               mask;
-	UINT8               value;
-	UINT8               alpha;
+	uint32_t              tilemap_priority_code;
+	uint8_t               mask;
+	uint8_t               value;
+	uint8_t               alpha;
 	hng64trans_t        drawformat;
 };
 
@@ -60,16 +60,16 @@ struct polygon
 	float faceNormal[4];        // Normal of the face overall - for calculating visibility and flat-shading...
 	int visible;                // Polygon visibility in scene
 
-	UINT8 texIndex;             // Which texture to draw from (0x00-0x0f)
-	UINT8 texType;              // How to index into the texture
-	UINT8 texPageSmall;         // Does this polygon use 'small' texture pages?
-	UINT8 texPageHorizOffset;   // If it does use small texture pages, how far is this page horizontally offset?
-	UINT8 texPageVertOffset;    // If it does use small texture pages, how far is this page vertically offset?
+	uint8_t texIndex;             // Which texture to draw from (0x00-0x0f)
+	uint8_t texType;              // How to index into the texture
+	uint8_t texPageSmall;         // Does this polygon use 'small' texture pages?
+	uint8_t texPageHorizOffset;   // If it does use small texture pages, how far is this page horizontally offset?
+	uint8_t texPageVertOffset;    // If it does use small texture pages, how far is this page vertically offset?
 
-	UINT32 palOffset;           // The base offset where this object's palette starts.
-	UINT32 palPageSize;         // The size of the palette page that is being pointed to.
+	uint32_t palOffset;           // The base offset where this object's palette starts.
+	uint32_t palPageSize;         // The size of the palette page that is being pointed to.
 
-	UINT32 debugColor;          // Will go away someday.  Used to explicitly color polygons for debugging.
+	uint32_t debugColor;          // Will go away someday.  Used to explicitly color polygons for debugging.
 };
 
 
@@ -96,11 +96,11 @@ typedef frustum_clip_vertex<float, 5> hng64_clip_vertex;
 
 struct hng64_poly_data
 {
-	UINT8 texType;
-	UINT8 texIndex;
-	UINT8 texPageSmall;
-	UINT8 texPageHorizOffset;
-	UINT8 texPageVertOffset;
+	uint8_t texType;
+	uint8_t texIndex;
+	uint8_t texPageSmall;
+	uint8_t texPageHorizOffset;
+	uint8_t texPageVertOffset;
 	int palOffset;
 	int palPageSize;
 	int debugColor;
@@ -114,7 +114,7 @@ public:
 	hng64_poly_renderer(hng64_state& state);
 
 	void drawShaded(polygon *p);
-	void render_scanline(INT32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	void render_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
 
 	hng64_state& state() { return m_state; }
 	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
@@ -163,24 +163,24 @@ public:
 	required_device<cpu_device> m_comm;
 	required_device<msm6242_device> m_rtc;
 
-	required_shared_ptr<UINT32> m_mainram;
-	required_shared_ptr<UINT32> m_cart;
-	required_shared_ptr<UINT32> m_sysregs;
-	required_shared_ptr<UINT32> m_dualport;
-	required_shared_ptr<UINT32> m_rombase;
-	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_spriteregs;
-	required_shared_ptr<UINT32> m_videoram;
-	required_shared_ptr<UINT32> m_videoregs;
-	required_shared_ptr<UINT32> m_tcram;
+	required_shared_ptr<uint32_t> m_mainram;
+	required_shared_ptr<uint32_t> m_cart;
+	required_shared_ptr<uint32_t> m_sysregs;
+	required_shared_ptr<uint32_t> m_dualport;
+	required_shared_ptr<uint32_t> m_rombase;
+	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<uint32_t> m_spriteregs;
+	required_shared_ptr<uint32_t> m_videoram;
+	required_shared_ptr<uint32_t> m_videoregs;
+	required_shared_ptr<uint32_t> m_tcram;
 
-	std::unique_ptr<UINT16[]> m_dl;
-	required_shared_ptr<UINT32> m_3dregs;
-	required_shared_ptr<UINT32> m_3d_1;
-	required_shared_ptr<UINT32> m_3d_2;
+	std::unique_ptr<uint16_t[]> m_dl;
+	required_shared_ptr<uint32_t> m_3dregs;
+	required_shared_ptr<uint32_t> m_3d_1;
+	required_shared_ptr<uint32_t> m_3d_2;
 
-	required_shared_ptr<UINT32> m_com_ram;
-	//required_shared_ptr<UINT8> m_com_mmu_mem;
+	required_shared_ptr<uint32_t> m_com_ram;
+	//required_shared_ptr<uint8_t> m_com_mmu_mem;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -188,30 +188,30 @@ public:
 
 	int m_mcu_type;
 
-	std::unique_ptr<UINT16[]> m_soundram;
-	std::unique_ptr<UINT16[]> m_soundram2;
+	std::unique_ptr<uint16_t[]> m_soundram;
+	std::unique_ptr<uint16_t[]> m_soundram2;
 
 	/* Communications stuff */
-	std::unique_ptr<UINT8[]> m_com_op_base;
-	std::unique_ptr<UINT8[]> m_com_virtual_mem;
-	UINT8 m_com_shared[8];
+	std::unique_ptr<uint8_t[]> m_com_op_base;
+	std::unique_ptr<uint8_t[]> m_com_virtual_mem;
+	uint8_t m_com_shared[8];
 
-	INT32 m_dma_start;
-	INT32 m_dma_dst;
-	INT32 m_dma_len;
+	int32_t m_dma_start;
+	int32_t m_dma_dst;
+	int32_t m_dma_len;
 
-	UINT32 m_mcu_fake_time;
-	UINT16 m_mcu_en;
+	uint32_t m_mcu_fake_time;
+	uint16_t m_mcu_en;
 
-	UINT32 m_activeDisplayList;
-	UINT32 m_no_machine_error_code;
+	uint32_t m_activeDisplayList;
+	uint32_t m_no_machine_error_code;
 
-	UINT32 m_unk_vreg_toggle;
-	UINT32 m_p1_trig;
+	uint32_t m_unk_vreg_toggle;
+	uint32_t m_p1_trig;
 
-	//UINT32 *q2;
+	//uint32_t *q2;
 
-	UINT8 m_screen_dis;
+	uint8_t m_screen_dis;
 
 	struct hng64_tilemap {
 		tilemap_t *m_tilemap_8x8;
@@ -221,11 +221,11 @@ public:
 
 	hng64_tilemap m_tilemap[4];
 
-	UINT8 m_additive_tilemap_debug;
+	uint8_t m_additive_tilemap_debug;
 
-	UINT32 m_old_animmask;
-	UINT32 m_old_animbits;
-	UINT16 m_old_tileflags[4];
+	uint32_t m_old_animmask;
+	uint32_t m_old_animbits;
+	uint16_t m_old_tileflags[4];
 
 	// 3d State
 	int m_paletteState3d;
@@ -287,15 +287,15 @@ public:
 	DECLARE_DRIVER_INIT(hng64_fght);
 	DECLARE_DRIVER_INIT(hng64_reorder_gfx);
 
-	void set_irq(UINT32 irq_vector);
-	UINT32 m_irq_pending;
-	UINT8 *m_comm_rom;
-	std::unique_ptr<UINT8[]> m_comm_ram;
-	UINT8 m_mmu_regs[8];
-	UINT32 m_mmua[6];
-	UINT16 m_mmub[6];
-	UINT8 read_comm_data(UINT32 offset);
-	void write_comm_data(UINT32 offset,UINT8 data);
+	void set_irq(uint32_t irq_vector);
+	uint32_t m_irq_pending;
+	uint8_t *m_comm_rom;
+	std::unique_ptr<uint8_t[]> m_comm_ram;
+	uint8_t m_mmu_regs[8];
+	uint32_t m_mmua[6];
+	uint16_t m_mmub[6];
+	uint8_t read_comm_data(uint32_t offset);
+	void write_comm_data(uint32_t offset,uint8_t data);
 	int m_irq_level;
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_16x16_info);
@@ -308,7 +308,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_hng64(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);
 	void do_dma(address_space &space);
@@ -318,15 +318,15 @@ public:
 	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
 
 	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
+		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
 
 	void hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat);
+		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
+		int wraparound, uint32_t flags, uint8_t priority, hng64trans_t drawformat);
 
 	void hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat);
+		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
+		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
 
 
 
@@ -339,22 +339,22 @@ public:
 
 	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
 
-	UINT8 *m_texturerom;
-	UINT16* m_vertsrom;
+	uint8_t *m_texturerom;
+	uint16_t* m_vertsrom;
 	int m_vertsrom_size;
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
 
 	void clear3d();
-	void hng64_command3d(const UINT16* packet);
+	void hng64_command3d(const uint16_t* packet);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void setCameraTransformation(const UINT16* packet);
-	void setLighting(const UINT16* packet);
-	void set3dFlags(const UINT16* packet);
-	void setCameraProjectionMatrix(const UINT16* packet);
-	void recoverPolygonBlock(const UINT16* packet, int& numPolys);
-	void printPacket(const UINT16* packet, int hex);
-	float uToF(UINT16 input);
+	void setCameraTransformation(const uint16_t* packet);
+	void setLighting(const uint16_t* packet);
+	void set3dFlags(const uint16_t* packet);
+	void setCameraProjectionMatrix(const uint16_t* packet);
+	void recoverPolygonBlock(const uint16_t* packet, int& numPolys);
+	void printPacket(const uint16_t* packet, int hex);
+	float uToF(uint16_t input);
 	void matmul4(float *product, const float *a, const float *b);
 	void vecmatmul4(float *product, const float *a, const float *b);
 	float vecDotProduct(const float *a, const float *b);
@@ -386,6 +386,6 @@ public:
 	DECLARE_WRITE16_MEMBER(main_sound_comms_w);
 	DECLARE_READ16_MEMBER(sound_comms_r);
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
-	UINT16 main_latch[2];
-	UINT16 sound_latch[2];
+	uint16_t main_latch[2];
+	uint16_t sound_latch[2];
 };

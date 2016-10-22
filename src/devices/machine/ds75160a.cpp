@@ -26,7 +26,7 @@ const device_type DS75160A = &device_creator<ds75160a_device>;
 //  ds75160a_device - constructor
 //-------------------------------------------------
 
-ds75160a_device::ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds75160a_device::ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DS75160A, "DS75160A", tag, owner, clock, "ds75160a", __FILE__),
 		m_read(*this),
 		m_write(*this),
@@ -60,7 +60,7 @@ void ds75160a_device::device_start()
 
 READ8_MEMBER( ds75160a_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!m_te)
 	{

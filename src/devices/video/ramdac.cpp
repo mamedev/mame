@@ -40,11 +40,12 @@ const device_type RAMDAC = &device_creator<ramdac_device>;
 //  ramdac_device - constructor
 //-------------------------------------------------
 
-ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RAMDAC, "RAMDAC", tag, owner, clock, "ramdac", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(ramdac_palram)),
 		m_palette(*this, finder_base::DUMMY_TAG),
+		m_color_base(0),
 		m_split_read_reg(0)
 {
 }
@@ -73,7 +74,7 @@ const address_space_config *ramdac_device::memory_space_config(address_spacenum 
 //  readbyte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT8 ramdac_device::readbyte(offs_t address)
+inline uint8_t ramdac_device::readbyte(offs_t address)
 {
 	return space().read_byte(address);
 }
@@ -83,7 +84,7 @@ inline UINT8 ramdac_device::readbyte(offs_t address)
 //  writebyte - write a byte at the given address
 //-------------------------------------------------
 
-inline void ramdac_device::writebyte(offs_t address, UINT8 data)
+inline void ramdac_device::writebyte(offs_t address, uint8_t data)
 {
 	space().write_byte(address, data);
 }
@@ -103,7 +104,7 @@ void ramdac_device::device_validity_check(validity_checker &valid) const
 
 void ramdac_device::device_start()
 {
-	m_palram = make_unique_clear<UINT8[]>(1 << 10);
+	m_palram = make_unique_clear<uint8_t[]>(1 << 10);
 
 }
 
@@ -127,7 +128,7 @@ void ramdac_device::device_reset()
 //  [0] = W register, [1] = R register
 //**************************************************************************
 
-inline void ramdac_device::reg_increment(UINT8 inc_type)
+inline void ramdac_device::reg_increment(uint8_t inc_type)
 {
 	m_int_index[inc_type]++;
 	if(m_int_index[inc_type] == 3)
@@ -156,7 +157,7 @@ WRITE8_MEMBER( ramdac_device::index_r_w )
 
 READ8_MEMBER( ramdac_device::pal_r )
 {
-	UINT8 res;
+	uint8_t res;
 	res = readbyte(m_pal_index[m_split_read_reg] | (m_int_index[m_split_read_reg] << 8));
 	reg_increment(m_split_read_reg);
 	return res;
@@ -185,20 +186,22 @@ READ8_MEMBER( ramdac_device::ramdac_pal_r )
 
 WRITE8_MEMBER( ramdac_device::ramdac_rgb666_w )
 {
-	UINT16 pal_offs;
+	uint16_t pal_offs;
 
 	m_palram[offset] = data & 0x3f;
 	pal_offs = (offset & 0xff);
 
-	m_palette->set_pen_color(offset&0xff,pal6bit(m_palram[pal_offs|0x000]),pal6bit(m_palram[pal_offs|0x100]),pal6bit(m_palram[pal_offs|0x200]));
+	pen_t pen = m_color_base + (offset & 0xff);
+	m_palette->set_pen_color(pen, pal6bit(m_palram[pal_offs|0x000]), pal6bit(m_palram[pal_offs|0x100]), pal6bit(m_palram[pal_offs|0x200]));
 }
 
 WRITE8_MEMBER( ramdac_device::ramdac_rgb888_w )
 {
-	UINT16 pal_offs;
+	uint16_t pal_offs;
 
 	m_palram[offset] = data;
 	pal_offs = (offset & 0xff);
 
-	m_palette->set_pen_color(offset&0xff,m_palram[pal_offs|0x000],m_palram[pal_offs|0x100],m_palram[pal_offs|0x200]);
+	pen_t pen = m_color_base + (offset & 0xff);
+	m_palette->set_pen_color(pen, m_palram[pal_offs|0x000], m_palram[pal_offs|0x100], m_palram[pal_offs|0x200]);
 }

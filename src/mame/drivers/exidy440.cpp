@@ -283,7 +283,7 @@ CUSTOM_INPUT_MEMBER(exidy440_state::firq_vblank_r)
 CUSTOM_INPUT_MEMBER(exidy440_state::hitnmiss_button1_r)
 {
 	/* button 1 shows up in two bits */
-	UINT32 button1 = ioport("HITNMISS_BUTTON1")->read();
+	uint32_t button1 = ioport("HITNMISS_BUTTON1")->read();
 	return (button1 << 1) | button1;
 }
 
@@ -295,7 +295,7 @@ CUSTOM_INPUT_MEMBER(exidy440_state::hitnmiss_button1_r)
  *
  *************************************/
 
-void exidy440_state::exidy440_bank_select(UINT8 bank)
+void exidy440_state::exidy440_bank_select(uint8_t bank)
 {
 	/* for the showdown case, bank 0 is a PLD */
 	if (m_showdown_bank_data[0] != nullptr)
@@ -390,7 +390,7 @@ READ8_MEMBER(exidy440_state::showdown_bank0_r)
 {
 	/* showdown relies on different values from different memory locations */
 	/* yukon relies on multiple reads from the same location returning different values */
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	/* fetch the special data if a bank is selected */
 	if (m_showdown_bank_select >= 0)
@@ -443,7 +443,7 @@ WRITE8_MEMBER(exidy440_state::topsecex_yscroll_w)
 void exidy440_state::machine_start()
 {
 	/* the EEROM lives in the uppermost 8k of the top bank */
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	machine().device<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
 }
@@ -2020,13 +2020,13 @@ DRIVER_INIT_MEMBER(exidy440_state,topsecex)
 
 DRIVER_INIT_MEMBER(exidy440_state,showdown)
 {
-	static const UINT8 bankdata0[0x18] =
+	static const uint8_t bankdata0[0x18] =
 	{
 		0x15,0x40,0xc1,0x8d,0x4c,0x84,0x0e,0xce,
 		0x52,0xd0,0x99,0x48,0x80,0x09,0xc9,0x45,
 		0xc4,0x8e,0x5a,0x92,0x18,0xd8,0x51,0xc0
 	};
-	static const UINT8 bankdata1[0x18] =
+	static const uint8_t bankdata1[0x18] =
 	{
 		0x11,0x51,0xc0,0x89,0x4d,0x85,0x0c,0xcc,
 		0x46,0xd2,0x98,0x59,0x91,0x08,0xc8,0x41,
@@ -2043,13 +2043,13 @@ DRIVER_INIT_MEMBER(exidy440_state,showdown)
 
 DRIVER_INIT_MEMBER(exidy440_state,yukon)
 {
-	static const UINT8 bankdata0[0x18] =
+	static const uint8_t bankdata0[0x18] =
 	{
 		0x31,0x40,0xc1,0x95,0x54,0x90,0x16,0xd6,
 		0x62,0xe0,0xa5,0x44,0x80,0x05,0xc5,0x51,
 		0xd0,0x96,0x66,0xa2,0x24,0xe4,0x61,0xc0
 	};
-	static const UINT8 bankdata1[0x18] =
+	static const uint8_t bankdata1[0x18] =
 	{
 		0x21,0x61,0xc0,0x85,0x55,0x91,0x14,0xd4,
 		0x52,0xe2,0xa4,0x65,0xa1,0x04,0xc4,0x41,

@@ -37,7 +37,7 @@ sparse_dirty_bitmap::sparse_dirty_bitmap(int width, int height, int granularity)
 //  dirty -- dirty a region
 //-------------------------------------------------
 
-void sparse_dirty_bitmap::dirty(INT32 left, INT32 right, INT32 top, INT32 bottom)
+void sparse_dirty_bitmap::dirty(int32_t left, int32_t right, int32_t top, int32_t bottom)
 {
 	// compute a rectangle in dirty space, and fill it with 1
 	rectangle rect(left >> m_granularity, right >> m_granularity, top >> m_granularity, bottom >> m_granularity);
@@ -52,7 +52,7 @@ void sparse_dirty_bitmap::dirty(INT32 left, INT32 right, INT32 top, INT32 bottom
 //  clean a region -- dirty a region
 //-------------------------------------------------
 
-void sparse_dirty_bitmap::clean(INT32 left, INT32 right, INT32 top, INT32 bottom)
+void sparse_dirty_bitmap::clean(int32_t left, int32_t right, int32_t top, int32_t bottom)
 {
 	// if right or bottom intersect the edge of the bitmap, round up
 	int round = (1 << m_granularity) - 1;
@@ -113,7 +113,7 @@ sparse_dirty_rect *sparse_dirty_bitmap::first_dirty_rect(const rectangle &clipre
 	// loop over all grid rows that intersect our cliprect
 	for (int y = sy; y <= ey; y++)
 	{
-		UINT8 *dirtybase = &m_bitmap.pix(y);
+		uint8_t *dirtybase = &m_bitmap.pix(y);
 		sparse_dirty_rect *currect = nullptr;
 
 		// loop over all grid columns that intersect our cliprect

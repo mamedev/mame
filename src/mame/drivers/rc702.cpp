@@ -13,12 +13,7 @@ ToDo:
 - Everything
 
 Issues:
-- Floppy disc isn't being detected.
-
-(bios 1 issues)
-- Daisy chain:
-  - Hitting a key causes CTC to interrupt, even though CTC and PIO are not connected.
-  - After that, IRQ isn't released, causing the system to be stuck in a loop.
+- Floppy disc error.
 
 
 ****************************************************************************************************************/
@@ -78,12 +73,12 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
 private:
-	UINT8 *m_p_chargen;
+	uint8_t *m_p_chargen;
 	bool m_q_state;
 	bool m_qbar_state;
 	bool m_drq_state;
-	UINT16 m_beepcnt;
-	UINT8 m_dack;
+	uint16_t m_beepcnt;
+	uint8_t m_dack;
 	bool m_tc;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
@@ -244,7 +239,7 @@ static const rgb_t our_palette[3] = {
 
 DRIVER_INIT_MEMBER( rc702_state, rc702 )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
@@ -256,7 +251,7 @@ DRIVER_INIT_MEMBER( rc702_state, rc702 )
 I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 gfx = 0;
+	uint8_t gfx = 0;
 
 	if (!vsp)
 		gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];
@@ -353,6 +348,7 @@ static MACHINE_CONFIG_START( rc702, rc702_state )
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_8MHz / 2)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(rc702_state, zc0_w))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio1", z80dart_device, rxtxcb_w))
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_Z80DART_ADD("sio1", XTAL_8MHz / 2, 0, 0, 0, 0 )
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

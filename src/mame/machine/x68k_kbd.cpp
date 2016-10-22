@@ -5,14 +5,14 @@
 #include "machine/keyboard.ipp"
 
 
-x68k_keyboard_device::x68k_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
+x68k_keyboard_device::x68k_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: buffered_rs232_device(mconfig, X68K_KEYBOARD, "X68k Keyboard", tag, owner, 0, "x68k_keyboard", __FILE__)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE")
 {
 }
 
 
-void x68k_keyboard_device::received_byte(UINT8 data)
+void x68k_keyboard_device::received_byte(uint8_t data)
 {
 	/* Keyboard control commands:
 	   00xxxxxx - TV Control
@@ -84,7 +84,7 @@ void x68k_keyboard_device::received_byte(UINT8 data)
 	}
 }
 
-void x68k_keyboard_device::key_make(UINT8 row, UINT8 column)
+void x68k_keyboard_device::key_make(uint8_t row, uint8_t column)
 {
 	// TODO: work out which keys actually repeat (this assumes it's anything other than ctrl/opt/shift)
 	if (row != 0x0eU)
@@ -95,12 +95,12 @@ void x68k_keyboard_device::key_make(UINT8 row, UINT8 column)
 	transmit_byte((row << 3) | column);
 }
 
-void x68k_keyboard_device::key_repeat(UINT8 row, UINT8 column)
+void x68k_keyboard_device::key_repeat(uint8_t row, uint8_t column)
 {
 	transmit_byte((row << 3) | column);
 }
 
-void x68k_keyboard_device::key_break(UINT8 row, UINT8 column)
+void x68k_keyboard_device::key_break(uint8_t row, uint8_t column)
 {
 	device_matrix_keyboard_interface::key_break(row, column);
 

@@ -16,7 +16,7 @@
 
 READ8_MEMBER(ondra_state::ondra_keyboard_r)
 {
-	UINT8 retVal = 0x00;
+	uint8_t retVal = 0x00;
 	double valcas = m_cassette->input();
 
 	if ( valcas < 0.00) {
@@ -44,7 +44,7 @@ READ8_MEMBER(ondra_state::ondra_keyboard_r)
 void ondra_state::ondra_update_banks()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *mem = m_region_maincpu->base();
+	uint8_t *mem = m_region_maincpu->base();
 
 	if (m_bank1_status==0) {
 		space.unmap_write(0x0000, 0x3fff);

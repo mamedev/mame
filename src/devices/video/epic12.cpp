@@ -9,7 +9,7 @@
 
 const device_type EPIC12 = &device_creator<epic12_device>;
 
-epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EPIC12, "EP1C12 Blitter", tag, owner, clock, "epic12", __FILE__),
 		device_video_interface(mconfig, *this), m_ram16(nullptr), m_gfx_size(0), m_bitmaps(nullptr), m_use_ram(nullptr),
 	m_main_ramsize(0), m_main_rammask(0), m_maincpu(nullptr), m_ram16_copy(nullptr), m_work_queue(nullptr)
@@ -45,7 +45,7 @@ void epic12_device::device_start()
 	m_clip = m_bitmaps->cliprect();
 	m_clip.set(0, 0x2000-1, 0, 0x1000-1);
 
-	m_ram16_copy = std::make_unique<UINT16[]>(m_main_ramsize/2);
+	m_ram16_copy = std::make_unique<uint16_t[]>(m_main_ramsize/2);
 
 	m_blitter_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epic12_device::blitter_delay_callback),this));
 	m_blitter_delay_timer->adjust(attotime::never);
@@ -106,15 +106,15 @@ void epic12_device::device_reset()
 }
 
 // todo, get these into the device class without ruining performance
-UINT8 epic12_device_colrtable[0x20][0x40];
-UINT8 epic12_device_colrtable_rev[0x20][0x40];
-UINT8 epic12_device_colrtable_add[0x20][0x20];
-UINT64 epic12_device_blit_delay;
+uint8_t epic12_device_colrtable[0x20][0x40];
+uint8_t epic12_device_colrtable_rev[0x20][0x40];
+uint8_t epic12_device_colrtable_add[0x20][0x20];
+uint64_t epic12_device_blit_delay;
 
-inline UINT16 epic12_device::READ_NEXT_WORD(offs_t *addr)
+inline uint16_t epic12_device::READ_NEXT_WORD(offs_t *addr)
 {
-//  UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticeably slower
-	UINT16 data = m_use_ram[((*addr & m_main_rammask) >> 1) ^ NATIVE_ENDIAN_VALUE_LE_BE(3, 0)];
+//  uint16_t data = space.read_word(*addr); // going through the memory system is 'more correct' but noticeably slower
+	uint16_t data = m_use_ram[((*addr & m_main_rammask) >> 1) ^ NATIVE_ENDIAN_VALUE_LE_BE(3, 0)];
 
 	*addr += 2;
 
@@ -122,10 +122,10 @@ inline UINT16 epic12_device::READ_NEXT_WORD(offs_t *addr)
 	return data;
 }
 
-inline UINT16 epic12_device::COPY_NEXT_WORD(address_space &space, offs_t *addr)
+inline uint16_t epic12_device::COPY_NEXT_WORD(address_space &space, offs_t *addr)
 {
-//  UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticeably slower
-	UINT16 data = m_ram16[((*addr & m_main_rammask) >> 1) ^ NATIVE_ENDIAN_VALUE_LE_BE(3, 0)];
+//  uint16_t data = space.read_word(*addr); // going through the memory system is 'more correct' but noticeably slower
+	uint16_t data = m_ram16[((*addr & m_main_rammask) >> 1) ^ NATIVE_ENDIAN_VALUE_LE_BE(3, 0)];
 	m_ram16_copy[((*addr & m_main_rammask) >> 1) ^ NATIVE_ENDIAN_VALUE_LE_BE(3, 0)] = data;
 
 	*addr += 2;
@@ -137,7 +137,7 @@ inline UINT16 epic12_device::COPY_NEXT_WORD(address_space &space, offs_t *addr)
 
 inline void epic12_device::gfx_upload_shadow_copy(address_space &space, offs_t *addr)
 {
-	UINT32 x,y, dimx,dimy;
+	uint32_t x,y, dimx,dimy;
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
@@ -159,8 +159,8 @@ inline void epic12_device::gfx_upload_shadow_copy(address_space &space, offs_t *
 
 inline void epic12_device::gfx_upload(offs_t *addr)
 {
-	UINT32 x,y, dst_p,dst_x_start,dst_y_start, dimx,dimy;
-	UINT32 *dst;
+	uint32_t x,y, dst_p,dst_x_start,dst_y_start, dimx,dimy;
+	uint32_t *dst;
 
 	// 0x20000000
 	READ_NEXT_WORD(addr);
@@ -189,7 +189,7 @@ inline void epic12_device::gfx_upload(offs_t *addr)
 
 		for (x = 0; x < dimx; x++)
 		{
-			UINT16 pendat = READ_NEXT_WORD(addr);
+			uint16_t pendat = READ_NEXT_WORD(addr);
 			// real hw would upload the gfxword directly, but our VRAM is 32-bit, so convert it.
 			//dst[dst_x_start + x] = pendat;
 			*dst++ = ((pendat&0x8000)<<14) | ((pendat&0x7c00)<<9) | ((pendat&0x03e0)<<6) | ((pendat&0x001f)<<3);  // --t- ---- rrrr r--- gggg g--- bbbb b---  format
@@ -310,10 +310,10 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
-	COPY_NEXT_WORD(space, addr); // UINT16 dst_x_start  =   COPY_NEXT_WORD(space, addr);
-	COPY_NEXT_WORD(space, addr); // UINT16 dst_y_start  =   COPY_NEXT_WORD(space, addr);
-	UINT16 w        =   COPY_NEXT_WORD(space, addr);
-	UINT16 h        =   COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr); // uint16_t dst_x_start  =   COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr); // uint16_t dst_y_start  =   COPY_NEXT_WORD(space, addr);
+	uint16_t w        =   COPY_NEXT_WORD(space, addr);
+	uint16_t h        =   COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
 
@@ -333,16 +333,16 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 	clr_t tint_clr;
 	int tinted = 0;
 
-	UINT16 attr     =   READ_NEXT_WORD(addr);
-	UINT16 alpha    =   READ_NEXT_WORD(addr);
-	UINT16 src_x    =   READ_NEXT_WORD(addr);
-	UINT16 src_y    =   READ_NEXT_WORD(addr);
-	UINT16 dst_x_start  =   READ_NEXT_WORD(addr);
-	UINT16 dst_y_start  =   READ_NEXT_WORD(addr);
-	UINT16 w        =   READ_NEXT_WORD(addr);
-	UINT16 h        =   READ_NEXT_WORD(addr);
-	UINT16 tint_r   =   READ_NEXT_WORD(addr);
-	UINT16 tint_gb  =   READ_NEXT_WORD(addr);
+	uint16_t attr     =   READ_NEXT_WORD(addr);
+	uint16_t alpha    =   READ_NEXT_WORD(addr);
+	uint16_t src_x    =   READ_NEXT_WORD(addr);
+	uint16_t src_y    =   READ_NEXT_WORD(addr);
+	uint16_t dst_x_start  =   READ_NEXT_WORD(addr);
+	uint16_t dst_y_start  =   READ_NEXT_WORD(addr);
+	uint16_t w        =   READ_NEXT_WORD(addr);
+	uint16_t h        =   READ_NEXT_WORD(addr);
+	uint16_t tint_r   =   READ_NEXT_WORD(addr);
+	uint16_t tint_gb  =   READ_NEXT_WORD(addr);
 
 	// 0: +alpha
 	// 1: +source
@@ -362,8 +362,8 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 	flipy   =    attr & 0x0400;
 	flipx   =    attr & 0x0800;
 
-	const UINT8 d_alpha =   ((alpha & 0x00ff)       )>>3;
-	const UINT8 s_alpha =   ((alpha & 0xff00) >> 8  )>>3;
+	const uint8_t d_alpha =   ((alpha & 0x00ff)       )>>3;
+	const uint8_t s_alpha =   ((alpha & 0xff00) >> 8  )>>3;
 
 //  src_p   =   0;
 	src_x   =   src_x & 0x1fff;
@@ -549,7 +549,7 @@ void epic12_device::gfx_create_shadow_copy(address_space &space)
 
 	while (1)
 	{
-		UINT16 data = COPY_NEXT_WORD(space, &addr);
+		uint16_t data = COPY_NEXT_WORD(space, &addr);
 
 		switch( data & 0xf000 )
 		{
@@ -591,7 +591,7 @@ void epic12_device::gfx_exec(void)
 
 	while (1)
 	{
-		UINT16 data = READ_NEXT_WORD(&addr);
+		uint16_t data = READ_NEXT_WORD(&addr);
 
 		switch( data & 0xf000 )
 		{
@@ -633,7 +633,7 @@ void epic12_device::gfx_exec_unsafe(void)
 
 	while (1)
 	{
-		UINT16 data = READ_NEXT_WORD(&addr);
+		uint16_t data = READ_NEXT_WORD(&addr);
 
 		switch( data & 0xf000 )
 		{

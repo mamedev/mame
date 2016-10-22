@@ -20,7 +20,7 @@ WRITE8_MEMBER( decodmd_type3_device::data_w )
 
 READ8_MEMBER( decodmd_type3_device::busy_r )
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	ret = (m_status & 0x0f) << 3;
 
@@ -99,9 +99,9 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_register_w )
 
 MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 {
-	UINT8 *RAM = m_ram->pointer();
-	UINT8 intensity;
-	UINT16 addr = ((ma & 0x7ff) << 2) | ((ra & 0x02) << 12);
+	uint8_t *RAM = m_ram->pointer();
+	uint8_t intensity;
+	uint16_t addr = ((ma & 0x7ff) << 2) | ((ra & 0x02) << 12);
 	addr += ((ra & 0x01) * 24);
 
 	for (int x = 0; x < 192; x += 16)
@@ -159,7 +159,7 @@ machine_config_constructor decodmd_type3_device::device_mconfig_additions() cons
 	return MACHINE_CONFIG_NAME( decodmd3 );
 }
 
-decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECODMD3, "Data East Pinball Dot Matrix Display Type 3", tag, owner, clock, "decodmd3", __FILE__),
 		m_cpu(*this,"dmdcpu"),
 		m_mc6845(*this,"dmd6845"),
@@ -174,8 +174,8 @@ void decodmd_type3_device::device_start()
 
 void decodmd_type3_device::device_reset()
 {
-	UINT8* ROM;
-	UINT8* RAM = m_ram->pointer();
+	uint8_t* ROM;
+	uint8_t* RAM = m_ram->pointer();
 	m_rom = memregion(m_gfxtag);
 
 	ROM = m_rom->base();

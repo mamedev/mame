@@ -38,7 +38,7 @@
 const device_type V810 = &device_creator<v810_device>;
 
 
-v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, V810, "V810", tag, owner, clock, "v810", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
@@ -46,7 +46,7 @@ v810_device::v810_device(const machine_config &mconfig, const char *tag, device_
 }
 
 
-offs_t v810_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t v810_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( v810 );
 	return CPU_DISASSEMBLE_NAME(v810)(this, buffer, pc, oprom, opram, options);
@@ -150,25 +150,25 @@ offs_t v810_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 #define D9(x) ((x&0x1ff)|((x&0x100)?0xfffffe00:0))
 #define SO(opcode) (((opcode)&0xfc00)>>10)
 
-#define CHECK_CY(x) PSW=(PSW & ~8)|(((x) & (((UINT64)1) << 32)) ? 8 : 0)
+#define CHECK_CY(x) PSW=(PSW & ~8)|(((x) & (((uint64_t)1) << 32)) ? 8 : 0)
 #define CHECK_OVADD(x,y,z)  PSW=(PSW & ~0x00000004) |(( ((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 4: 0)
 #define CHECK_OVSUB(x,y,z)  PSW=(PSW & ~0x00000004) |(( ((y) ^ (z)) & ((x) ^ (y)) & 0x80000000) ? 4: 0)
-#define CHECK_ZS(x) PSW=(PSW & ~3)|((UINT32)(x)==0)|(((x)&0x80000000) ? 2: 0)
+#define CHECK_ZS(x) PSW=(PSW & ~3)|((uint32_t)(x)==0)|(((x)&0x80000000) ? 2: 0)
 
 
-#define ADD(dst, src)       { UINT64 res=(UINT64)(dst)+(UINT64)(src); SetCF(res); SetOF_Add(res,src,dst); SetSZPF(res); dst=(UINT32)res; }
-#define SUB(dst, src)       { UINT64 res=(UINT64)(dst)-(INT64)(src); SetCF(res); SetOF_Sub(res,src,dst); SetSZPF(res); dst=(UINT32)res; }
+#define ADD(dst, src)       { uint64_t res=(uint64_t)(dst)+(uint64_t)(src); SetCF(res); SetOF_Add(res,src,dst); SetSZPF(res); dst=(uint32_t)res; }
+#define SUB(dst, src)       { uint64_t res=(uint64_t)(dst)-(int64_t)(src); SetCF(res); SetOF_Sub(res,src,dst); SetSZPF(res); dst=(uint32_t)res; }
 
 
 
 
-void v810_device::SETREG(UINT32 reg,UINT32 val)
+void v810_device::SETREG(uint32_t reg,uint32_t val)
 {
 	if(reg)
 		m_reg[reg]=val;
 }
 
-UINT32 v810_device::GETREG(UINT32 reg)
+uint32_t v810_device::GETREG(uint32_t reg)
 {
 	if(reg)
 		return m_reg[reg];
@@ -176,31 +176,31 @@ UINT32 v810_device::GETREG(UINT32 reg)
 		return 0;
 }
 
-UINT32 v810_device::opUNDEF(UINT32 op)
+uint32_t v810_device::opUNDEF(uint32_t op)
 {
 	logerror("V810: Unknown opcode %x @ %x",op,PC-2);
 	return clkIF;
 }
 
-UINT32 v810_device::opMOVr(UINT32 op) // mov reg1, reg2
+uint32_t v810_device::opMOVr(uint32_t op) // mov reg1, reg2
 {
 	SETREG(GET2,GETREG(GET1));
 	return clkIF;
 }
 
-UINT32 v810_device::opMOVEA(UINT32 op)   // movea imm16, reg1, reg2
+uint32_t v810_device::opMOVEA(uint32_t op)   // movea imm16, reg1, reg2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=R_OP(PC);
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=R_OP(PC);
 	PC+=2;
 	op2=I16(op2);
 	SETREG(GET2,op1+op2);
 	return clkIF;
 }
 
-UINT32 v810_device::opMOVHI(UINT32 op)   // movhi imm16, reg1 ,reg2
+uint32_t v810_device::opMOVHI(uint32_t op)   // movhi imm16, reg1 ,reg2
 {
-	UINT32 op2=R_OP(PC);
+	uint32_t op2=R_OP(PC);
 	PC+=2;
 	op2=UI16(op2);
 	op2<<=16;
@@ -208,17 +208,17 @@ UINT32 v810_device::opMOVHI(UINT32 op)   // movhi imm16, reg1 ,reg2
 	return clkIF;
 }
 
-UINT32 v810_device::opMOVi(UINT32 op)    // mov imm5,r2
+uint32_t v810_device::opMOVi(uint32_t op)    // mov imm5,r2
 {
 	SETREG(GET2,I5(op));
 	return clkIF;
 }
 
-UINT32 v810_device::opADDr(UINT32 op)    // add r1,r2
+uint32_t v810_device::opADDr(uint32_t op)    // add r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=GETREG(GET2);
-	UINT64 res=(UINT64)op2+(UINT64)op1;
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=GETREG(GET2);
+	uint64_t res=(uint64_t)op2+(uint64_t)op1;
 	CHECK_CY(res);
 	CHECK_OVADD(op1,op2,res);
 	CHECK_ZS(res);
@@ -226,11 +226,11 @@ UINT32 v810_device::opADDr(UINT32 op)    // add r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opADDi(UINT32 op)    // add imm5,r2
+uint32_t v810_device::opADDi(uint32_t op)    // add imm5,r2
 {
-	UINT32 op1=I5(op);
-	UINT32 op2=GETREG(GET2);
-	UINT64 res=(UINT64)op2+(UINT64)op1;
+	uint32_t op1=I5(op);
+	uint32_t op2=GETREG(GET2);
+	uint64_t res=(uint64_t)op2+(uint64_t)op1;
 	CHECK_CY(res);
 	CHECK_OVADD(op1,op2,res);
 	CHECK_ZS(res);
@@ -239,14 +239,14 @@ UINT32 v810_device::opADDi(UINT32 op)    // add imm5,r2
 }
 
 
-UINT32 v810_device::opADDI(UINT32 op)    // addi imm16, reg1, reg2
+uint32_t v810_device::opADDI(uint32_t op)    // addi imm16, reg1, reg2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=R_OP(PC);
-	UINT64 res;
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=R_OP(PC);
+	uint64_t res;
 	PC+=2;
 	op2=I16(op2);
-	res=(UINT64)op2+(UINT64)op1;
+	res=(uint64_t)op2+(uint64_t)op1;
 	CHECK_CY(res);
 	CHECK_OVADD(op1,op2,res);
 	CHECK_ZS(res);
@@ -254,11 +254,11 @@ UINT32 v810_device::opADDI(UINT32 op)    // addi imm16, reg1, reg2
 	return clkIF;
 }
 
-UINT32 v810_device::opSUBr(UINT32 op)    // sub r1,r2
+uint32_t v810_device::opSUBr(uint32_t op)    // sub r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=GETREG(GET2);
-	UINT64 res=(UINT64)op2-(UINT64)op1;
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=GETREG(GET2);
+	uint64_t res=(uint64_t)op2-(uint64_t)op1;
 	CHECK_CY(res);
 	CHECK_OVSUB(op1,op2,res);
 	CHECK_ZS(res);
@@ -267,32 +267,32 @@ UINT32 v810_device::opSUBr(UINT32 op)    // sub r1,r2
 }
 
 
-UINT32 v810_device::opCMPr(UINT32 op)    // cmp r1,r2
+uint32_t v810_device::opCMPr(uint32_t op)    // cmp r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=GETREG(GET2);
-	UINT64 res=(UINT64)op2-(UINT64)op1;
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=GETREG(GET2);
+	uint64_t res=(uint64_t)op2-(uint64_t)op1;
 	CHECK_CY(res);
 	CHECK_OVSUB(op1,op2,res);
 	CHECK_ZS(res);
 	return clkIF;
 }
 
-UINT32 v810_device::opCMPi(UINT32 op)    // cmpi imm5,r2
+uint32_t v810_device::opCMPi(uint32_t op)    // cmpi imm5,r2
 {
-	UINT32 op1=I5(op);
-	UINT32 op2=GETREG(GET2);
-	UINT64 res=(UINT64)op2-(UINT64)op1;
+	uint32_t op1=I5(op);
+	uint32_t op2=GETREG(GET2);
+	uint64_t res=(uint64_t)op2-(uint64_t)op1;
 	CHECK_CY(res);
 	CHECK_OVSUB(op1,op2,res);
 	CHECK_ZS(res);
 	return clkIF;
 }
 
-UINT32 v810_device::opSETFi(UINT32 op)   // setf imm5,r2
+uint32_t v810_device::opSETFi(uint32_t op)   // setf imm5,r2
 {
-	UINT32 op1=I5(op);
-	UINT8 res=0;
+	uint32_t op1=I5(op);
+	uint8_t res=0;
 	op1&=0xf;
 	switch(op1)
 	{
@@ -365,10 +365,10 @@ UINT32 v810_device::opSETFi(UINT32 op)   // setf imm5,r2
 }
 
 
-UINT32 v810_device::opANDr(UINT32 op)    // and r1,r2
+uint32_t v810_device::opANDr(uint32_t op)    // and r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=GETREG(GET2);
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=GETREG(GET2);
 	op2&=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
@@ -376,10 +376,10 @@ UINT32 v810_device::opANDr(UINT32 op)    // and r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opANDI(UINT32 op)    // andi imm16,r1,r2
+uint32_t v810_device::opANDI(uint32_t op)    // andi imm16,r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=R_OP(PC);
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=R_OP(PC);
 	PC+=2;
 	op2=UI16(op2);
 	op2&=op1;
@@ -390,10 +390,10 @@ UINT32 v810_device::opANDI(UINT32 op)    // andi imm16,r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opORr(UINT32 op) // or r1,r2
+uint32_t v810_device::opORr(uint32_t op) // or r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=GETREG(GET2);
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=GETREG(GET2);
 	op2|=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
@@ -401,10 +401,10 @@ UINT32 v810_device::opORr(UINT32 op) // or r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opORI(UINT32 op) // ori imm16,r1,r2
+uint32_t v810_device::opORI(uint32_t op) // ori imm16,r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=R_OP(PC);
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=R_OP(PC);
 	PC+=2;
 	op2=UI16(op2);
 	op2|=op1;
@@ -415,10 +415,10 @@ UINT32 v810_device::opORI(UINT32 op) // ori imm16,r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opXORr(UINT32 op)    // xor r1,r2
+uint32_t v810_device::opXORr(uint32_t op)    // xor r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=GETREG(GET2);
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=GETREG(GET2);
 	op2^=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
@@ -427,25 +427,25 @@ UINT32 v810_device::opXORr(UINT32 op)    // xor r1,r2
 }
 
 
-UINT32 v810_device::opLDSR(UINT32 op) // ldsr reg2,regID
+uint32_t v810_device::opLDSR(uint32_t op) // ldsr reg2,regID
 {
-	UINT32 op1=UI5(op);
+	uint32_t op1=UI5(op);
 	SETREG(32+op1,GETREG(GET2));
 	return clkIF;
 }
 
-UINT32 v810_device::opSTSR(UINT32 op) // ldsr regID,reg2
+uint32_t v810_device::opSTSR(uint32_t op) // ldsr regID,reg2
 {
-	UINT32 op1=UI5(op);
+	uint32_t op1=UI5(op);
 	SETREG(GET2,GETREG(32+op1));
 	return clkIF;
 }
 
 
-UINT32 v810_device::opXORI(UINT32 op)    // xori imm16,r1,r2
+uint32_t v810_device::opXORI(uint32_t op)    // xori imm16,r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=R_OP(PC);
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=R_OP(PC);
 	PC+=2;
 	op2=UI16(op2);
 	op2^=op1;
@@ -456,20 +456,20 @@ UINT32 v810_device::opXORI(UINT32 op)    // xori imm16,r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opNOTr(UINT32 op)    // not r1,r2
+uint32_t v810_device::opNOTr(uint32_t op)    // not r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=~op1;
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=~op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
 	SETREG(GET2,op2);
 	return clkIF;
 }
 
-UINT32 v810_device::opSHLr(UINT32 op)    // shl r1,r2
+uint32_t v810_device::opSHLr(uint32_t op)    // shl r1,r2
 {
-	UINT64 tmp;
-	UINT32 count=GETREG(GET1);
+	uint64_t tmp;
+	uint32_t count=GETREG(GET1);
 	count&=0x1f;
 
 	SET_OV(0);
@@ -486,10 +486,10 @@ UINT32 v810_device::opSHLr(UINT32 op)    // shl r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opSHLi(UINT32 op)    // shl imm5,r2
+uint32_t v810_device::opSHLi(uint32_t op)    // shl imm5,r2
 {
-	UINT64 tmp;
-	UINT32 count=UI5(op);
+	uint64_t tmp;
+	uint32_t count=UI5(op);
 
 	SET_OV(0);
 	SET_CY(0);
@@ -505,10 +505,10 @@ UINT32 v810_device::opSHLi(UINT32 op)    // shl imm5,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opSHRr(UINT32 op)    // shr r1,r2
+uint32_t v810_device::opSHRr(uint32_t op)    // shr r1,r2
 {
-	UINT64 tmp;
-	UINT32 count=GETREG(GET1);
+	uint64_t tmp;
+	uint32_t count=GETREG(GET1);
 	count&=0x1f;
 	SET_OV(0);
 	SET_CY(0);
@@ -523,10 +523,10 @@ UINT32 v810_device::opSHRr(UINT32 op)    // shr r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opSHRi(UINT32 op)    // shr imm5,r2
+uint32_t v810_device::opSHRi(uint32_t op)    // shr imm5,r2
 {
-	UINT64 tmp;
-	UINT32 count=UI5(op);
+	uint64_t tmp;
+	uint32_t count=UI5(op);
 	SET_OV(0);
 	SET_CY(0);
 	if(count)
@@ -541,10 +541,10 @@ UINT32 v810_device::opSHRi(UINT32 op)    // shr imm5,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opSARr(UINT32 op)    // sar r1,r2
+uint32_t v810_device::opSARr(uint32_t op)    // sar r1,r2
 {
-	INT32 tmp;
-	UINT32 count=GETREG(GET1);
+	int32_t tmp;
+	uint32_t count=GETREG(GET1);
 	count&=0x1f;
 	SET_OV(0);
 	SET_CY(0);
@@ -560,10 +560,10 @@ UINT32 v810_device::opSARr(UINT32 op)    // sar r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opSARi(UINT32 op)    // sar imm5,r2
+uint32_t v810_device::opSARi(uint32_t op)    // sar imm5,r2
 {
-	INT32 tmp;
-	UINT32 count=UI5(op);
+	int32_t tmp;
+	uint32_t count=UI5(op);
 	SET_OV(0);
 	SET_CY(0);
 	if(count)
@@ -578,23 +578,23 @@ UINT32 v810_device::opSARi(UINT32 op)    // sar imm5,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opJMPr(UINT32 op)
+uint32_t v810_device::opJMPr(uint32_t op)
 {
 	PC=GETREG(GET1)&~1;
 	return clkIF+2;
 }
 
 
-UINT32 v810_device::opJR(UINT32 op)
+uint32_t v810_device::opJR(uint32_t op)
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC=PC-2+(D26(op,tmp)&~1);
 	return clkIF+2;
 }
 
-UINT32 v810_device::opJAL(UINT32 op)
+uint32_t v810_device::opJAL(uint32_t op)
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	R31=PC;
 	PC+=D26(op,tmp);
@@ -604,25 +604,25 @@ UINT32 v810_device::opJAL(UINT32 op)
 }
 
 
-UINT32 v810_device::opEI(UINT32 op)
+uint32_t v810_device::opEI(uint32_t op)
 {
 	SET_ID(0);
 	return clkIF;
 }
 
-UINT32 v810_device::opDI(UINT32 op)
+uint32_t v810_device::opDI(uint32_t op)
 {
 	SET_ID(1);
 	return clkIF;
 }
 
-UINT32 v810_device::opTRAP(UINT32 op)
+uint32_t v810_device::opTRAP(uint32_t op)
 {
 	printf("V810: TRAP @ %X\n",PC-2);
 	return clkIF;
 }
 
-UINT32 v810_device::opRETI(UINT32 op)
+uint32_t v810_device::opRETI(uint32_t op)
 {
 	if(GET_NP) {
 		PC = FEPC;
@@ -634,13 +634,13 @@ UINT32 v810_device::opRETI(UINT32 op)
 	return clkIF;
 }
 
-UINT32 v810_device::opHALT(UINT32 op)
+uint32_t v810_device::opHALT(uint32_t op)
 {
 	printf("V810: HALT @ %X\n",PC-2);
 	return clkIF;
 }
 
-UINT32 v810_device::opB(UINT32 op)
+uint32_t v810_device::opB(uint32_t op)
 {
 	int doBranch=0;
 	switch((op>>9)&0xf)
@@ -716,9 +716,9 @@ UINT32 v810_device::opB(UINT32 op)
 	return clkIF;
 }
 
-UINT32 v810_device::opLDB(UINT32 op) // ld.b disp16[reg1],reg2
+uint32_t v810_device::opLDB(uint32_t op) // ld.b disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -728,9 +728,9 @@ UINT32 v810_device::opLDB(UINT32 op) // ld.b disp16[reg1],reg2
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opLDH(UINT32 op) // ld.h disp16[reg1],reg2
+uint32_t v810_device::opLDH(uint32_t op) // ld.h disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -740,9 +740,9 @@ UINT32 v810_device::opLDH(UINT32 op) // ld.h disp16[reg1],reg2
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opLDW(UINT32 op) // ld.w disp16[reg1],reg2
+uint32_t v810_device::opLDW(uint32_t op) // ld.w disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -751,9 +751,9 @@ UINT32 v810_device::opLDW(UINT32 op) // ld.w disp16[reg1],reg2
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opINB(UINT32 op) // in.b disp16[reg1],reg2
+uint32_t v810_device::opINB(uint32_t op) // in.b disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -762,16 +762,16 @@ UINT32 v810_device::opINB(UINT32 op) // in.b disp16[reg1],reg2
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opCAXI(UINT32 op)    // caxi disp16[reg1],reg2
+uint32_t v810_device::opCAXI(uint32_t op)    // caxi disp16[reg1],reg2
 {
 	printf("V810 CAXI execute\n");
 	PC+=2;
 	return clkIF;
 }
 
-UINT32 v810_device::opINH(UINT32 op) // in.h disp16[reg1],reg2
+uint32_t v810_device::opINH(uint32_t op) // in.h disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -780,9 +780,9 @@ UINT32 v810_device::opINH(UINT32 op) // in.h disp16[reg1],reg2
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opINW(UINT32 op) // in.w disp16[reg1],reg2
+uint32_t v810_device::opINW(uint32_t op) // in.w disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -791,9 +791,9 @@ UINT32 v810_device::opINW(UINT32 op) // in.w disp16[reg1],reg2
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opSTB(UINT32 op) // st.b reg2, disp16[reg1]
+uint32_t v810_device::opSTB(uint32_t op) // st.b reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -801,9 +801,9 @@ UINT32 v810_device::opSTB(UINT32 op) // st.b reg2, disp16[reg1]
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opSTH(UINT32 op) // st.h reg2, disp16[reg1]
+uint32_t v810_device::opSTH(uint32_t op) // st.h reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -811,9 +811,9 @@ UINT32 v810_device::opSTH(UINT32 op) // st.h reg2, disp16[reg1]
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opSTW(UINT32 op) // st.w reg2, disp16[reg1]
+uint32_t v810_device::opSTW(uint32_t op) // st.w reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -821,9 +821,9 @@ UINT32 v810_device::opSTW(UINT32 op) // st.w reg2, disp16[reg1]
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opOUTB(UINT32 op)    // out.b reg2, disp16[reg1]
+uint32_t v810_device::opOUTB(uint32_t op)    // out.b reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -831,9 +831,9 @@ UINT32 v810_device::opOUTB(UINT32 op)    // out.b reg2, disp16[reg1]
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opOUTH(UINT32 op)    // out.h reg2, disp16[reg1]
+uint32_t v810_device::opOUTH(uint32_t op)    // out.h reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -841,9 +841,9 @@ UINT32 v810_device::opOUTH(UINT32 op)    // out.h reg2, disp16[reg1]
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opOUTW(UINT32 op)    // out.w reg2, disp16[reg1]
+uint32_t v810_device::opOUTW(uint32_t op)    // out.w reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
@@ -851,12 +851,12 @@ UINT32 v810_device::opOUTW(UINT32 op)    // out.w reg2, disp16[reg1]
 	return clkIF+clkMEM;
 }
 
-UINT32 v810_device::opMULr(UINT32 op)    // mul r1,r2
+uint32_t v810_device::opMULr(uint32_t op)    // mul r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=GETREG(GET2);
-	UINT64 tmp;
-	tmp=(INT64)(INT32)op1*(INT64)(INT32)op2;
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=GETREG(GET2);
+	uint64_t tmp;
+	tmp=(int64_t)(int32_t)op1*(int64_t)(int32_t)op2;
 	op2=tmp&0xffffffff;
 	tmp>>=32;
 	CHECK_ZS(tmp);//z = bad!
@@ -868,12 +868,12 @@ UINT32 v810_device::opMULr(UINT32 op)    // mul r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opMULUr(UINT32 op)   // mulu r1,r2
+uint32_t v810_device::opMULUr(uint32_t op)   // mulu r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=GETREG(GET2);
-	UINT64 tmp;
-	tmp=(UINT64)op1*(UINT64)op2;
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=GETREG(GET2);
+	uint64_t tmp;
+	tmp=(uint64_t)op1*(uint64_t)op2;
 	op2=tmp&0xffffffff;
 	tmp>>=32;
 	CHECK_ZS(tmp);//z = bad!
@@ -885,14 +885,14 @@ UINT32 v810_device::opMULUr(UINT32 op)   // mulu r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opDIVr(UINT32 op)    // div r1,r2
+uint32_t v810_device::opDIVr(uint32_t op)    // div r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=GETREG(GET2);
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=GETREG(GET2);
 	if(op1)
 	{
-		SETREG(30,(INT32)((INT32)op2%(INT32)op1));
-		SETREG(GET2,(INT32)((INT32)op2/(INT32)op1));
+		SETREG(30,(int32_t)((int32_t)op2%(int32_t)op1));
+		SETREG(GET2,(int32_t)((int32_t)op2/(int32_t)op1));
 		SET_OV((op1^op2^GETREG(GET2)) == 0x80000000);
 		CHECK_ZS(GETREG(GET2));
 	}
@@ -901,14 +901,14 @@ UINT32 v810_device::opDIVr(UINT32 op)    // div r1,r2
 	return clkIF;
 }
 
-UINT32 v810_device::opDIVUr(UINT32 op)   // divu r1,r2
+uint32_t v810_device::opDIVUr(uint32_t op)   // divu r1,r2
 {
-	UINT32 op1=GETREG(GET1);
-	UINT32 op2=GETREG(GET2);
+	uint32_t op1=GETREG(GET1);
+	uint32_t op2=GETREG(GET2);
 	if(op1)
 	{
-		SETREG(30,(INT32)(op2%op1));
-		SETREG(GET2,(INT32)(op2/op1));
+		SETREG(30,(int32_t)(op2%op1));
+		SETREG(GET2,(int32_t)(op2/op1));
 		SET_OV((op1^op2^GETREG(GET2)) == 0x80000000);
 		CHECK_ZS(GETREG(GET2));
 	}
@@ -917,7 +917,7 @@ UINT32 v810_device::opDIVUr(UINT32 op)   // divu r1,r2
 	return clkIF;
 }
 
-void v810_device::opADDF(UINT32 op)
+void v810_device::opADDF(uint32_t op)
 {
 	//TODO: CY
 	float val1=u2f(GETREG(GET1));
@@ -929,7 +929,7 @@ void v810_device::opADDF(UINT32 op)
 	SETREG(GET2,f2u(val2));
 }
 
-void v810_device::opSUBF(UINT32 op)
+void v810_device::opSUBF(uint32_t op)
 {
 	float val1=u2f(GETREG(GET1));
 	float val2=u2f(GETREG(GET2));
@@ -941,7 +941,7 @@ void v810_device::opSUBF(UINT32 op)
 	SETREG(GET2,f2u(val2));
 }
 
-void v810_device::opMULF(UINT32 op)
+void v810_device::opMULF(uint32_t op)
 {
 	//TODO: CY
 	float val1=u2f(GETREG(GET1));
@@ -953,7 +953,7 @@ void v810_device::opMULF(UINT32 op)
 	SETREG(GET2,f2u(val2));
 }
 
-void v810_device::opDIVF(UINT32 op)
+void v810_device::opDIVF(uint32_t op)
 {
 	//TODO: CY
 	float val1=u2f(GETREG(GET1));
@@ -968,16 +968,16 @@ void v810_device::opDIVF(UINT32 op)
 	SETREG(GET2,f2u(val2));
 }
 
-void v810_device::opTRNC(UINT32 op)
+void v810_device::opTRNC(uint32_t op)
 {
 	float val1=u2f(GETREG(GET1));
 	SET_OV(0);
 	SET_Z((val1==0.0f)?1:0);
 	SET_S((val1<0.0f)?1:0);
-	SETREG(GET2,(INT32)val1);
+	SETREG(GET2,(int32_t)val1);
 }
 
-void v810_device::opCMPF(UINT32 op)
+void v810_device::opCMPF(uint32_t op)
 {
 	float val1=u2f(GETREG(GET1));
 	float val2=u2f(GETREG(GET2));
@@ -988,26 +988,26 @@ void v810_device::opCMPF(UINT32 op)
 	SET_S((val2<0.0f)?1:0);
 }
 
-void v810_device::opCVTS(UINT32 op)
+void v810_device::opCVTS(uint32_t op)
 {
 	float val1=u2f(GETREG(GET1));
 	SET_OV(0);
 	SET_Z((val1==0.0f)?1:0);
 	SET_S((val1<0.0f)?1:0);
-	SETREG(GET2,(INT32)val1);
+	SETREG(GET2,(int32_t)val1);
 }
 
-void v810_device::opCVTW(UINT32 op)
+void v810_device::opCVTW(uint32_t op)
 {
 	//TODO: CY
-	float val1=(INT32)GETREG(GET1);
+	float val1=(int32_t)GETREG(GET1);
 	SET_OV(0);
 	SET_Z((val1==0.0f)?1:0);
 	SET_S((val1<0.0f)?1:0);
 	SETREG(GET2,f2u(val1));
 }
 
-void v810_device::opMPYHW(UINT32 op)
+void v810_device::opMPYHW(uint32_t op)
 {
 	int val1=(GETREG(GET1) & 0xffff);
 	int val2=(GETREG(GET2) & 0xffff);
@@ -1018,7 +1018,7 @@ void v810_device::opMPYHW(UINT32 op)
 	SETREG(GET2,val2);
 }
 
-void v810_device::opXB(UINT32 op)
+void v810_device::opXB(uint32_t op)
 {
 	int val=GETREG(GET2);
 	SET_OV(0);
@@ -1029,7 +1029,7 @@ void v810_device::opXB(UINT32 op)
 }
 
 
-void v810_device::opXH(UINT32 op)
+void v810_device::opXH(uint32_t op)
 {
 	int val=GETREG(GET2);
 	SET_OV(0);
@@ -1039,9 +1039,9 @@ void v810_device::opXH(UINT32 op)
 	SETREG(GET2,val);
 }
 
-UINT32 v810_device::opFpoint(UINT32 op)
+uint32_t v810_device::opFpoint(uint32_t op)
 {
-	UINT32 tmp=R_OP(PC);
+	uint32_t tmp=R_OP(PC);
 	PC+=2;
 	switch((tmp&0xfc00)>>10)
 	{
@@ -1063,15 +1063,15 @@ UINT32 v810_device::opFpoint(UINT32 op)
 }
 
 /* TODO: clocks */
-UINT32 v810_device::opBSU(UINT32 op)
+uint32_t v810_device::opBSU(uint32_t op)
 {
 	if(!(op & 8))
 		fatalerror("V810: unknown BSU opcode %04x\n",op);
 
 	{
-		UINT32 srcbit,dstbit,src,dst,size;
-		UINT32 dsttmp,tmp;
-		UINT8 srctmp;
+		uint32_t srcbit,dstbit,src,dst,size;
+		uint32_t dsttmp,tmp;
+		uint8_t srctmp;
 
 //      printf("BDST %08x BSRC %08x SIZE %08x DST %08x SRC %08x\n",R26,R27,R28,R29,R30);
 
@@ -1350,7 +1350,7 @@ void v810_device::take_interrupt()
 	PC = 0xfffffe00 | (m_irq_line << 4);
 	ECR = 0xfe00 | (m_irq_line << 4);
 
-	UINT8 num = m_irq_line + 1;
+	uint8_t num = m_irq_line + 1;
 	if (num==0x10) num=0x0f;
 
 	PSW &= 0xfff0ffff; // clear interrupt level
@@ -1372,7 +1372,7 @@ void v810_device::execute_run()
 	}
 	while(m_icount>0)
 	{
-		UINT32 op;
+		uint32_t op;
 
 		m_PPC=PC;
 		debugger_instruction_hook(this, PC);

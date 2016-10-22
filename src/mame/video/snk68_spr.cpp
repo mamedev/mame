@@ -7,7 +7,7 @@
 
 const device_type SNK68_SPR = &device_creator<snk68_spr_device>;
 
-snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SNK68_SPR, "SNK68 Sprites", tag, owner, clock, "snk68_spr", __FILE__)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_spriteram(*this, "^spriteram")
@@ -68,7 +68,7 @@ READ16_MEMBER(snk68_spr_device::spriteram_r)
 
 WRITE16_MEMBER(snk68_spr_device::spriteram_w)
 {
-	UINT16 newword = m_spriteram[offset];
+	uint16_t newword = m_spriteram[offset];
 
 	if (!(offset & 1))
 		data |= 0xff00;
@@ -88,7 +88,7 @@ WRITE16_MEMBER(snk68_spr_device::spriteram_w)
 
 void snk68_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group)
 {
-	const UINT16* tiledata = &m_spriteram[0x800*group];
+	const uint16_t* tiledata = &m_spriteram[0x800*group];
 
 	bool const flip = m_flipscreen;
 

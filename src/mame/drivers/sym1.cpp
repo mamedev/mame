@@ -49,13 +49,13 @@ public:
 		m_row3(*this, "ROW-3"),
 		m_wp(*this, "WP") { }
 
-	required_shared_ptr<UINT8> m_ram_1k;
-	required_shared_ptr<UINT8> m_ram_2k;
-	required_shared_ptr<UINT8> m_ram_3k;
-	required_shared_ptr<UINT8> m_monitor;
-	required_shared_ptr<UINT8> m_riot_ram;
-	UINT8 m_riot_port_a;
-	UINT8 m_riot_port_b;
+	required_shared_ptr<uint8_t> m_ram_1k;
+	required_shared_ptr<uint8_t> m_ram_2k;
+	required_shared_ptr<uint8_t> m_ram_3k;
+	required_shared_ptr<uint8_t> m_monitor;
+	required_shared_ptr<uint8_t> m_riot_ram;
+	uint8_t m_riot_port_a;
+	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
 	DECLARE_DRIVER_INIT(sym1);
 	virtual void machine_reset() override;

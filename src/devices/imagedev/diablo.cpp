@@ -29,7 +29,7 @@ const device_type DIABLO = &device_creator<diablo_image_device>;
 //  diablo_image_device - constructor
 //-------------------------------------------------
 
-diablo_image_device::diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+diablo_image_device::diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DIABLO, "Diablo", tag, owner, clock, "diablo_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
@@ -111,21 +111,21 @@ image_init_result diablo_image_device::call_load()
 image_init_result diablo_image_device::call_create(int create_format, util::option_resolution *create_args)
 {
 	int err;
-	UINT32 sectorsize, hunksize;
-	UINT32 cylinders, heads, sectors, totalsectors;
+	uint32_t sectorsize, hunksize;
+	uint32_t cylinders, heads, sectors, totalsectors;
 
 	assert_always(create_args != nullptr, "Expected create_args to not be nullptr");
 	cylinders   = create_args->lookup_int('C');
 	heads       = create_args->lookup_int('H');
 	sectors     = create_args->lookup_int('S');
-	sectorsize  = create_args->lookup_int('L') * sizeof(UINT16);
+	sectorsize  = create_args->lookup_int('L') * sizeof(uint16_t);
 	hunksize    = create_args->lookup_int('K');
 
 	totalsectors = cylinders * heads * sectors;
 
 	/* create the CHD file */
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
-	err = m_origchd.create(image_core_file(), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, sectorsize, compression);
+	err = m_origchd.create(image_core_file(), (uint64_t)totalsectors * (uint64_t)sectorsize, hunksize, sectorsize, compression);
 	if (err != CHDERR_NONE)
 		goto error;
 

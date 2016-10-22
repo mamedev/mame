@@ -75,16 +75,16 @@ class comx_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~comx_expansion_slot_device() { }
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<comx_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 
-	UINT8 mrd_r(address_space &space, offs_t offset, int *extrom);
-	void mwr_w(address_space &space, offs_t offset, UINT8 data);
+	uint8_t mrd_r(address_space &space, offs_t offset, int *extrom);
+	void mwr_w(address_space &space, offs_t offset, uint8_t data);
 
-	UINT8 io_r(address_space &space, offs_t offset);
-	void io_w(address_space &space, offs_t offset, UINT8 data);
+	uint8_t io_r(address_space &space, offs_t offset);
+	void io_w(address_space &space, offs_t offset, uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 
@@ -122,12 +122,12 @@ protected:
 	virtual void comx_q_w(int state) { };
 
 	// memory access
-	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom) { return 0; };
-	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual uint8_t comx_mrd_r(address_space &space, offs_t offset, int *extrom) { return 0; };
+	virtual void comx_mwr_w(address_space &space, offs_t offset, uint8_t data) { };
 
 	// I/O access
-	virtual UINT8 comx_io_r(address_space &space, offs_t offset) { return 0; };
-	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual uint8_t comx_io_r(address_space &space, offs_t offset) { return 0; };
+	virtual void comx_io_w(address_space &space, offs_t offset, uint8_t data) { };
 
 	comx_expansion_slot_device *m_slot;
 

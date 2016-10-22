@@ -14,9 +14,9 @@
         6809 Microcomputer Programming & Interfacing with Experiments"
             by Andrew C. Staugaard, Jr.; Howard W. Sams & Co., Inc.
 
-    System dependencies:    UINT16 must be 16 bit unsigned int
-                            UINT8 must be 8 bit unsigned int
-                            UINT32 must be more than 16 bits
+    System dependencies:    uint16_t must be 16 bit unsigned int
+                            uint8_t must be 8 bit unsigned int
+                            uint32_t must be more than 16 bits
                             arrays up to 65536 bytes must be supported
                             machine must be twos complement
 
@@ -111,12 +111,12 @@
 
 /* macros for CC -- CC bits affected should be reset before calling */
 #define SET_Z(a)       if(!a)SEZ
-#define SET_Z8(a)      SET_Z((UINT8)a)
+#define SET_Z8(a)      SET_Z((uint8_t)a)
 #define SET_N8(a)      CC|=((a&0x80)>>5)
 #define SET_H(a,b,r)   CC|=((a^b^r)&0x10)
 #define SET_C8(a)      CC|=((a&0x100)>>8)
 
-const UINT8 m6805_base_device::m_flags8i[256]=   /* increment */
+const uint8_t m6805_base_device::m_flags8i[256]=   /* increment */
 {
 	0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -136,7 +136,7 @@ const UINT8 m6805_base_device::m_flags8i[256]=   /* increment */
 	0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04
 };
 
-const UINT8 m6805_base_device::m_flags8d[256]= /* decrement */
+const uint8_t m6805_base_device::m_flags8d[256]= /* decrement */
 {
 	0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -162,8 +162,8 @@ const UINT8 m6805_base_device::m_flags8d[256]= /* decrement */
 #define SET_NZ8(a)          {SET_N8(a); SET_Z(a);}
 #define SET_FLAGS8(a,b,r)   {SET_N8(r); SET_Z8(r); SET_C8(r);}
 
-/* for treating an unsigned UINT8 as a signed INT16 */
-#define SIGNED(b) ((INT16)(b & 0x80 ? b | 0xff00 : b))
+/* for treating an unsigned uint8_t as a signed int16_t */
+#define SIGNED(b) ((int16_t)(b & 0x80 ? b | 0xff00 : b))
 
 /* Macros for addressing modes */
 #define DIRECT EAD=0; IMMBYTE(m_ea.b.l)
@@ -195,10 +195,10 @@ const UINT8 m6805_base_device::m_flags8d[256]= /* decrement */
 #define IDX1BYTE(b) {INDEXED1; b = RM(EAD);}
 #define IDX2BYTE(b) {INDEXED2; b = RM(EAD);}
 /* Macros for branch instructions */
-#define BRANCH(f) { UINT8 t; IMMBYTE(t); if(f) { PC += SIGNED(t); } }
+#define BRANCH(f) { uint8_t t; IMMBYTE(t); if(f) { PC += SIGNED(t); } }
 
 /* what they say it is ... */
-const UINT8 m6805_base_device::m_cycles1[] =
+const uint8_t m6805_base_device::m_cycles1[] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/ 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
@@ -223,7 +223,7 @@ const UINT8 m6805_base_device::m_cycles1[] =
 /* pre-clear a PAIR union; clearing h2 and h3 only might be faster? */
 #define CLEAR_PAIR(p)   p->d = 0
 
-void m6805_base_device::rd_s_handler_b(UINT8 *b)
+void m6805_base_device::rd_s_handler_b(uint8_t *b)
 {
 	SP_INC;
 	*b = RM( S );
@@ -238,7 +238,7 @@ void m6805_base_device::rd_s_handler_w(PAIR *p)
 	p->b.l = RM( S );
 }
 
-void m6805_base_device::wr_s_handler_b(UINT8 *b)
+void m6805_base_device::wr_s_handler_b(uint8_t *b)
 {
 	WM( S, *b );
 	SP_DEC;
@@ -252,7 +252,7 @@ void m6805_base_device::wr_s_handler_w(PAIR *p)
 	SP_DEC;
 }
 
-void m6805_base_device::RM16(UINT32 addr, PAIR *p)
+void m6805_base_device::RM16(uint32_t addr, PAIR *p)
 {
 	CLEAR_PAIR(p);
 	p->b.h = RM(addr);
@@ -409,7 +409,7 @@ void m6805_base_device::interrupt()
 //  m6809_base_device - constructor
 //-------------------------------------------------
 
-m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width, const char *shortname, const char *source)
+m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_BIG, 8, addr_width)
 {
@@ -518,7 +518,7 @@ void m6805_base_device::state_string_export(const device_state_entry &entry, std
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 m6805_base_device::disasm_min_opcode_bytes() const
+uint32_t m6805_base_device::disasm_min_opcode_bytes() const
 {
 	return 1;
 }
@@ -529,7 +529,7 @@ UINT32 m6805_base_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 m6805_base_device::disasm_max_opcode_bytes() const
+uint32_t m6805_base_device::disasm_max_opcode_bytes() const
 {
 	return 3;
 }
@@ -540,7 +540,7 @@ UINT32 m6805_base_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t m6805_base_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m6805_base_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6805 );
 	return CPU_DISASSEMBLE_NAME(m6805)(this, buffer, pc, oprom, opram, options);
@@ -569,7 +569,7 @@ void m6805_device::execute_set_input(int inputnum, int state)
 //  clock into cycles per second
 //-------------------------------------------------
 
-UINT64 m6805_base_device::execute_clocks_to_cycles(UINT64 clocks) const
+uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const
 {
 	return (clocks + 3) / 4;
 }
@@ -580,7 +580,7 @@ UINT64 m6805_base_device::execute_clocks_to_cycles(UINT64 clocks) const
 //  count back to raw clocks
 //-------------------------------------------------
 
-UINT64 m6805_base_device::execute_cycles_to_clocks(UINT64 cycles) const
+uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const
 {
 	return cycles * 4;
 }
@@ -591,7 +591,7 @@ UINT64 m6805_base_device::execute_cycles_to_clocks(UINT64 cycles) const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 m6805_base_device::execute_min_cycles() const
+uint32_t m6805_base_device::execute_min_cycles() const
 {
 	return 2;
 }
@@ -602,7 +602,7 @@ UINT32 m6805_base_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 m6805_base_device::execute_max_cycles() const
+uint32_t m6805_base_device::execute_max_cycles() const
 {
 	return 10;
 }
@@ -613,7 +613,7 @@ UINT32 m6805_base_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 m6805_base_device::execute_input_lines() const
+uint32_t m6805_base_device::execute_input_lines() const
 {
 	return 9;
 }
@@ -622,7 +622,7 @@ UINT32 m6805_base_device::execute_input_lines() const
 /* execute instructions on this CPU until icount expires */
 void m6805_base_device::execute_run()
 {
-	UINT8 ireg;
+	uint8_t ireg;
 
 	S = SP_ADJUST( S );     /* Taken from CPU_SET_CONTEXT when pointer'afying */
 

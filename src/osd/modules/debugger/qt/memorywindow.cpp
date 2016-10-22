@@ -346,7 +346,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 			const debug_view_memory_source* source = downcast<const debug_view_memory_source*>(memView->source());
 			address_space* addressSpace = source->space();
 			const int nativeDataWidth = addressSpace->data_width() / 8;
-			const UINT64 memValue = source->device()->machine().debugger().cpu().read_memory(*addressSpace,
+			const uint64_t memValue = source->device()->machine().debugger().cpu().read_memory(*addressSpace,
 														addressSpace->address_to_byte(address),
 														nativeDataWidth,
 														true);

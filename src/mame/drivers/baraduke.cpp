@@ -523,7 +523,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(baraduke_state,baraduke)
 {
-	UINT8 *rom;
+	uint8_t *rom;
 	int i;
 
 	/* unpack the third tile ROM */

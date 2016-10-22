@@ -109,29 +109,29 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	UINT8 m_nmi_enable;
+	uint8_t m_nmi_enable;
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
 	tilemap_t *m_reel3_tilemap;
 	tilemap_t *m_reel4_tilemap;
-	required_shared_ptr<UINT8> m_reel1_ram;
-	required_shared_ptr<UINT8> m_reel1_attr;
-	required_shared_ptr<UINT8> m_reel1_scroll;
-	required_shared_ptr<UINT8> m_reel2_ram;
-	required_shared_ptr<UINT8> m_reel2_attr;
-	required_shared_ptr<UINT8> m_reel2_scroll;
-	required_shared_ptr<UINT8> m_reel3_ram;
-	required_shared_ptr<UINT8> m_reel3_attr;
-	required_shared_ptr<UINT8> m_reel3_scroll;
-	required_shared_ptr<UINT8> m_reel4_ram;
-	required_shared_ptr<UINT8> m_reel4_attr;
-	required_shared_ptr<UINT8> m_reel4_scroll;
-	required_shared_ptr<UINT8> m_luck_vram1;
-	required_shared_ptr<UINT8> m_luck_vram2;
-	required_shared_ptr<UINT8> m_luck_vram3;
+	required_shared_ptr<uint8_t> m_reel1_ram;
+	required_shared_ptr<uint8_t> m_reel1_attr;
+	required_shared_ptr<uint8_t> m_reel1_scroll;
+	required_shared_ptr<uint8_t> m_reel2_ram;
+	required_shared_ptr<uint8_t> m_reel2_attr;
+	required_shared_ptr<uint8_t> m_reel2_scroll;
+	required_shared_ptr<uint8_t> m_reel3_ram;
+	required_shared_ptr<uint8_t> m_reel3_attr;
+	required_shared_ptr<uint8_t> m_reel3_scroll;
+	required_shared_ptr<uint8_t> m_reel4_ram;
+	required_shared_ptr<uint8_t> m_reel4_attr;
+	required_shared_ptr<uint8_t> m_reel4_scroll;
+	required_shared_ptr<uint8_t> m_luck_vram1;
+	required_shared_ptr<uint8_t> m_luck_vram2;
+	required_shared_ptr<uint8_t> m_luck_vram3;
 
 	int m_palette_count;
-	UINT8 m_palette_ram[0x10000];
+	uint8_t m_palette_ram[0x10000];
 	DECLARE_WRITE8_MEMBER(luckgrln_reel1_ram_w);
 	DECLARE_WRITE8_MEMBER(luckgrln_reel1_attr_w);
 	DECLARE_WRITE8_MEMBER(luckgrln_reel2_ram_w);
@@ -155,7 +155,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel3_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel4_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(luckgrln_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -293,7 +293,7 @@ void luckgrln_state::video_start()
 	m_reel4_tilemap->set_transparent_pen(0 );
 }
 
-UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x;
 	int count = 0;
@@ -323,12 +323,12 @@ UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind1
 
 		for (x=0;x<64;x++)
 		{
-			UINT16 tile = (m_luck_vram1[count] & 0xff);
-			UINT16 tile_high = (m_luck_vram2[count]);
-			UINT16 tileattr = (m_luck_vram3[count]);
-			UINT8 col = 0;
-			UINT8 region = 0;
-			UINT8 bgenable;
+			uint16_t tile = (m_luck_vram1[count] & 0xff);
+			uint16_t tile_high = (m_luck_vram2[count]);
+			uint16_t tileattr = (m_luck_vram3[count]);
+			uint8_t col = 0;
+			uint8_t region = 0;
+			uint8_t bgenable;
 
 			clip.min_x = x*8;
 			clip.max_x = x*8+8;
@@ -462,7 +462,7 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 	{
 		int r,g,b;
 		int offs;
-		UINT16 dat;
+		uint16_t dat;
 		offs = m_palette_count&~0x1;
 		dat = m_palette_ram[offs] | m_palette_ram[offs+1]<<8;
 
@@ -1017,8 +1017,8 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
 {
 	int i;
-	UINT8 x,v;
-	UINT8* rom = memregion("rom_data")->base();
+	uint8_t x,v;
+	uint8_t* rom = memregion("rom_data")->base();
 
 	for (i=0;i<0x20000;i++)
 	{

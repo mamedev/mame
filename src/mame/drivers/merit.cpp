@@ -97,14 +97,14 @@ public:
 
 	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
 	pen_t m_pens[NUM_PENS];
-	required_shared_ptr<UINT8> m_ram_attr;
-	required_shared_ptr<UINT8> m_ram_video;
-	std::unique_ptr<UINT8[]> m_ram_palette;
-	UINT8 m_lscnblk;
+	required_shared_ptr<uint8_t> m_ram_attr;
+	required_shared_ptr<uint8_t> m_ram_video;
+	std::unique_ptr<uint8_t[]> m_ram_palette;
+	uint8_t m_lscnblk;
 	int m_extra_video_bank_bit;
 	int m_question_address;
 	int m_decryption_key;
-	optional_shared_ptr<UINT8> m_backup_ram;
+	optional_shared_ptr<uint8_t> m_backup_ram;
 	DECLARE_READ8_MEMBER(questions_r);
 	DECLARE_WRITE8_MEMBER(low_offset_w);
 	DECLARE_WRITE8_MEMBER(med_offset_w);
@@ -137,7 +137,7 @@ public:
 void merit_state::machine_start()
 {
 	m_question_address = 0;
-	m_ram_palette = std::make_unique<UINT8[]>(RAM_PALETTE_SIZE);
+	m_ram_palette = std::make_unique<uint8_t[]>(RAM_PALETTE_SIZE);
 
 	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
 	save_item(NAME(m_lscnblk));
@@ -149,7 +149,7 @@ void merit_state::machine_start()
 
 READ8_MEMBER(merit_state::questions_r)
 {
-	UINT8 *questions = memregion("user1")->base();
+	uint8_t *questions = memregion("user1")->base();
 	int address;
 
 	switch(m_question_address >> 16)
@@ -258,8 +258,8 @@ MC6845_BEGIN_UPDATE( merit_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( merit_state::crtc_update_row )
 {
-	UINT8 *gfx[2];
-	UINT16 x = 0;
+	uint8_t *gfx[2];
+	uint16_t x = 0;
 	int rlen;
 
 	gfx[0] = memregion("gfx1")->base();
@@ -267,14 +267,14 @@ MC6845_UPDATE_ROW( merit_state::crtc_update_row )
 	rlen = memregion("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
 		int i;
 		int attr = m_ram_attr[ma & 0x7ff];
 		int region = (attr & 0x40) >> 6;
 		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
-		UINT8   *data;
+		uint8_t   *data;
 
 		addr &= (rlen-1);
 		data = gfx[region];
@@ -1343,7 +1343,7 @@ INPUT_PORTS_END
 void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 {
 	memset(base, 0x00, size);
-	reinterpret_cast<UINT8 *>(base)[0x1040] = 0xc9; /* ret */
+	reinterpret_cast<uint8_t *>(base)[0x1040] = 0xc9; /* ret */
 }
 
 MACHINE_START_MEMBER(merit_state,casino5)
@@ -2382,7 +2382,7 @@ DRIVER_INIT_MEMBER(merit_state,key_7)
 
 DRIVER_INIT_MEMBER(merit_state,couple)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	#if 0 //quick rom compare test
 	{
@@ -2408,7 +2408,7 @@ DRIVER_INIT_MEMBER(merit_state,couple)
 DRIVER_INIT_MEMBER(merit_state,dtrvwz5)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	/* fill b000 - b0ff with ret 0xc9 */
 	for ( i = 0xb000; i < 0xb100; i++ )
 		ROM[i] = 0xc9;

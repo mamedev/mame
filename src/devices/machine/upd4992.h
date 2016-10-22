@@ -32,7 +32,7 @@ class upd4992_device : public device_t,
 {
 public:
 	// construction/destruction
-	upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -55,7 +55,7 @@ private:
 	};
 
 	emu_timer *m_timer_clock;
-	UINT8 m_rtc_regs[8];
+	uint8_t m_rtc_regs[8];
 };
 
 

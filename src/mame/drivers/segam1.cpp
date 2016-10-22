@@ -46,7 +46,7 @@ public:
 		{ }
 
 	virtual void video_start() override;
-	UINT32 screen_update_segam1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_segam1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -54,7 +54,7 @@ void segam1_state::video_start()
 {
 }
 
-UINT32 segam1_state::screen_update_segam1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segam1_state::screen_update_segam1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

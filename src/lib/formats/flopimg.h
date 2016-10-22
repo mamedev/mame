@@ -66,17 +66,17 @@ struct FloppyCallbacks
 	floperr_t (*write_sector)(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
 	floperr_t (*read_indexed_sector)(floppy_image_legacy *floppy, int head, int track, int sector_index, void *buffer, size_t buflen);
 	floperr_t (*write_indexed_sector)(floppy_image_legacy *floppy, int head, int track, int sector_index, const void *buffer, size_t buflen, int ddam);
-	floperr_t (*read_track)(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen);
-	floperr_t (*write_track)(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen);
+	floperr_t (*read_track)(floppy_image_legacy *floppy, int head, int track, uint64_t offset, void *buffer, size_t buflen);
+	floperr_t (*write_track)(floppy_image_legacy *floppy, int head, int track, uint64_t offset, const void *buffer, size_t buflen);
 	floperr_t (*format_track)(floppy_image_legacy *floppy, int head, int track, util::option_resolution *params);
 	floperr_t (*post_format)(floppy_image_legacy *floppy, util::option_resolution *params);
 	int (*get_heads_per_disk)(floppy_image_legacy *floppy);
 	int (*get_tracks_per_disk)(floppy_image_legacy *floppy);
 	int (*get_sectors_per_track)(floppy_image_legacy *floppy, int head, int track);
-	UINT32 (*get_track_size)(floppy_image_legacy *floppy, int head, int track);
-	floperr_t (*get_sector_length)(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length);
-	floperr_t (*get_indexed_sector_info)(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags);
-	floperr_t (*get_track_data_offset)(floppy_image_legacy *floppy, int head, int track, UINT64 *offset);
+	uint32_t (*get_track_size)(floppy_image_legacy *floppy, int head, int track);
+	floperr_t (*get_sector_length)(floppy_image_legacy *floppy, int head, int track, int sector, uint32_t *sector_length);
+	floperr_t (*get_indexed_sector_info)(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, uint32_t *sector_length, unsigned long *flags);
+	floperr_t (*get_track_data_offset)(floppy_image_legacy *floppy, int head, int track, uint64_t *offset);
 };
 
 
@@ -177,8 +177,8 @@ floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *ex
 void *floppy_tag(floppy_image_legacy *floppy);
 void *floppy_create_tag(floppy_image_legacy *floppy, size_t tagsize);
 struct FloppyCallbacks *floppy_callbacks(floppy_image_legacy *floppy);
-UINT8 floppy_get_filler(floppy_image_legacy *floppy);
-void floppy_set_filler(floppy_image_legacy *floppy, UINT8 filler);
+uint8_t floppy_get_filler(floppy_image_legacy *floppy);
+void floppy_set_filler(floppy_image_legacy *floppy, uint8_t filler);
 
 /* calls for accessing disk image data */
 floperr_t floppy_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int offset, void *buffer, size_t buffer_len);
@@ -192,22 +192,22 @@ floperr_t floppy_write_track_data(floppy_image_legacy *floppy, int head, int tra
 floperr_t floppy_format_track(floppy_image_legacy *floppy, int head, int track, util::option_resolution *params);
 int floppy_get_tracks_per_disk(floppy_image_legacy *floppy);
 int floppy_get_heads_per_disk(floppy_image_legacy *floppy);
-UINT32 floppy_get_track_size(floppy_image_legacy *floppy, int head, int track);
-floperr_t floppy_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length);
-floperr_t floppy_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags);
+uint32_t floppy_get_track_size(floppy_image_legacy *floppy, int head, int track);
+floperr_t floppy_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, uint32_t *sector_length);
+floperr_t floppy_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, uint32_t *sector_length, unsigned long *flags);
 floperr_t floppy_get_sector_count(floppy_image_legacy *floppy, int head, int track, int *sector_count);
 floperr_t floppy_load_track(floppy_image_legacy *floppy, int head, int track, int dirtify, void **track_data, size_t *track_length);
 int floppy_is_read_only(floppy_image_legacy *floppy);
-UINT8 floppy_random_byte(floppy_image_legacy *floppy);
+uint8_t floppy_random_byte(floppy_image_legacy *floppy);
 
 /* accessors for meta information about the image */
 const char *floppy_format_description(floppy_image_legacy *floppy);
 
 /* calls for accessing the raw disk image */
-void floppy_image_read(floppy_image_legacy *floppy, void *buffer, UINT64 offset, size_t length);
-void floppy_image_write(floppy_image_legacy *floppy, const void *buffer, UINT64 offset, size_t length);
-void floppy_image_write_filler(floppy_image_legacy *floppy, UINT8 filler, UINT64 offset, size_t length);
-UINT64 floppy_image_size(floppy_image_legacy *floppy);
+void floppy_image_read(floppy_image_legacy *floppy, void *buffer, uint64_t offset, size_t length);
+void floppy_image_write(floppy_image_legacy *floppy, const void *buffer, uint64_t offset, size_t length);
+void floppy_image_write_filler(floppy_image_legacy *floppy, uint8_t filler, uint64_t offset, size_t length);
+uint64_t floppy_image_size(floppy_image_legacy *floppy);
 
 /* misc */
 const char *floppy_error(floperr_t err);
@@ -234,7 +234,7 @@ public:
 	  in floppy_image
 	  @return 1 if image valid, 0 otherwise.
 	*/
-	virtual int identify(io_generic *io, UINT32 form_factor) = 0;
+	virtual int identify(io_generic *io, uint32_t form_factor) = 0;
 
 	/*! @brief Load an image.
 	  The load function opens an image file and converts it to the
@@ -245,7 +245,7 @@ public:
 	  @param image output buffer for data in MESS internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) = 0;
+	virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) = 0;
 
 	/*! @brief Save an image.
 	  The save function writes back an image from the MESS internal
@@ -363,9 +363,9 @@ protected:
 	//! Sector data description
 	struct desc_s {
 		int size;          //!< Sector size, int bytes
-		const UINT8 *data; //!< Sector data
-		UINT8 sector_id;   //!< Sector ID
-		UINT8 sector_info; //!< Sector free byte
+		const uint8_t *data; //!< Sector data
+		uint8_t sector_id;   //!< Sector ID
+		uint8_t sector_info; //!< Sector free byte
 	};
 
 
@@ -387,7 +387,7 @@ protected:
 	    @param track_size in cells, not bytes.
 	    @param image
 	*/
-	void generate_track_from_bitstream(int track, int head, const UINT8 *trackbuf, int track_size, floppy_image *image, int subtrack = 0);
+	void generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack = 0);
 
 	//! @brief Generate a track from cell level values (0/1/W/D/N).
 
@@ -404,14 +404,14 @@ protected:
 	    know. trackbuf may be modified at that position or after.
 	    @param image
 	*/
-	void generate_track_from_levels(int track, int head, std::vector<UINT32> &trackbuf, int splice_pos, floppy_image *image);
+	void generate_track_from_levels(int track, int head, std::vector<uint32_t> &trackbuf, int splice_pos, floppy_image *image);
 
 	//! Normalize the times in a cell buffer to sum up to 200000000
-	void normalize_times(std::vector<UINT32> &buffer);
+	void normalize_times(std::vector<uint32_t> &buffer);
 
 	// Some conversion tables for gcr
-	static const UINT8 gcr5fw_tb[0x10], gcr5bw_tb[0x20];
-	static const UINT8 gcr6fw_tb[0x40], gcr6bw_tb[0x100];
+	static const uint8_t gcr5fw_tb[0x10], gcr5bw_tb[0x20];
+	static const uint8_t gcr6fw_tb[0x40], gcr6bw_tb[0x100];
 
 	// Some useful descriptions shared by multiple formats
 
@@ -484,25 +484,25 @@ protected:
 	 @endverbatim
 	 */
 
-	void generate_bitstream_from_track(int track, int head, int cell_size, UINT8 *trackbuf, int &track_size, floppy_image *image, int subtrack = 0);
+	void generate_bitstream_from_track(int track, int head, int cell_size, uint8_t *trackbuf, int &track_size, floppy_image *image, int subtrack = 0);
 
 	//! Defines a standard sector for extracting.
 	struct desc_xs {
 		int track,  //!< Track for this sector
 			head,   //!< Head for this sector
 			size;   //!< Size of this sector
-		const UINT8 *data; //!< Data within this sector
+		const uint8_t *data; //!< Data within this sector
 	};
 
 	struct desc_pc_sector {
-		UINT8 track, head, sector, size;
+		uint8_t track, head, sector, size;
 		int actual_size;
-		UINT8 *data;
+		uint8_t *data;
 		bool deleted;
 		bool bad_crc;
 	};
 
-	int calc_default_pc_gap3_size(UINT32 form_factor, int sector_size);
+	int calc_default_pc_gap3_size(uint32_t form_factor, int sector_size);
 	void build_wd_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2);
 	void build_wd_track_mfm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2=22);
 	void build_pc_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=40, int gap_1=26, int gap_2=11);
@@ -519,13 +519,13 @@ protected:
 	//! systems.
 
 	//! PC-type sectors with MFM encoding, sector size can go from 128 bytes to 16K.
-	void extract_sectors_from_bitstream_mfm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
+	void extract_sectors_from_bitstream_mfm_pc(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size);
 	//! PC-type sectors with FM encoding
-	void extract_sectors_from_bitstream_fm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
+	void extract_sectors_from_bitstream_fm_pc(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size);
 	//! Commodore type sectors with GCR5 encoding
-	void extract_sectors_from_bitstream_gcr5(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size, int head, int tracks);
+	void extract_sectors_from_bitstream_gcr5(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size, int head, int tracks);
 	//! Victor 9000 type sectors with GCR5 encoding
-	void extract_sectors_from_bitstream_victor_gcr5(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
+	void extract_sectors_from_bitstream_victor_gcr5(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size);
 
 
 	//! @brief Get a geometry (including sectors) from an image.
@@ -538,48 +538,48 @@ protected:
 
 	//!  Regenerate the data for a full track.
 	//!  PC-type sectors with MFM encoding and fixed-size.
-	void get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, UINT8 *sectdata);
+	void get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
 
 	//!  Regenerate the data for a full track.
 	//!  PC-type sectors with FM encoding and fixed-size.
-	void get_track_data_fm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, UINT8 *sectdata);
+	void get_track_data_fm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
 
 	//! Look up a bit in a level-type stream.
-	bool bit_r(const std::vector<UINT32> &buffer, int offset);
+	bool bit_r(const std::vector<uint32_t> &buffer, int offset);
 	//! Look up multiple bits
-	UINT32 bitn_r(const std::vector<UINT32> &buffer, int offset, int count);
+	uint32_t bitn_r(const std::vector<uint32_t> &buffer, int offset, int count);
 	//! Write a bit with a given size.
-	void bit_w(std::vector<UINT32> &buffer, bool val, UINT32 size = 1000);
-	void bit_w(std::vector<UINT32> &buffer, bool val, UINT32 size, int offset);
+	void bit_w(std::vector<uint32_t> &buffer, bool val, uint32_t size = 1000);
+	void bit_w(std::vector<uint32_t> &buffer, bool val, uint32_t size, int offset);
 	//! Calculate a CCITT-type CRC.
-	UINT16 calc_crc_ccitt(const std::vector<UINT32> &buffer, int start, int end);
+	uint16_t calc_crc_ccitt(const std::vector<uint32_t> &buffer, int start, int end);
 	//! Write a series of (raw) bits
-	void raw_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size = 1000);
-	void raw_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size, int offset);
+	void raw_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
+	void raw_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size, int offset);
 	//! FM-encode and write a series of bits
-	void fm_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size = 1000);
-	void fm_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size, int offset);
+	void fm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
+	void fm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size, int offset);
 	//! MFM-encode and write a series of bits
-	void mfm_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size = 1000);
-	void mfm_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size, int offset);
+	void mfm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
+	void mfm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size, int offset);
 	//! MFM-encode every two bits and write
-	void mfm_half_w(std::vector<UINT32> &buffer, int start_bit, UINT32 val, UINT32 size = 1000);
+	void mfm_half_w(std::vector<uint32_t> &buffer, int start_bit, uint32_t val, uint32_t size = 1000);
 	//! GCR5-encode and write a series of bits
-	void gcr5_w(std::vector<UINT32> &buffer, UINT8 val, UINT32 size = 1000);
-	void gcr5_w(std::vector<UINT32> &buffer, UINT8 val, UINT32 size, int offset);
+	void gcr5_w(std::vector<uint32_t> &buffer, uint8_t val, uint32_t size = 1000);
+	void gcr5_w(std::vector<uint32_t> &buffer, uint8_t val, uint32_t size, int offset);
 	//! 8N1-encode and write a series of bits
-	void _8n1_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size = 1000);
+	void _8n1_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
 	//! GCR4 encode (Apple II sector header)
-	UINT16 gcr4_encode(UINT8 va);
+	uint16_t gcr4_encode(uint8_t va);
 	//! GCR4 decode
-	UINT8 gcr4_decode(UINT8 e0, UINT8 e1);
+	uint8_t gcr4_decode(uint8_t e0, uint8_t e1);
 	//! GCR6 encode (Apple II 16-sector and Mac-style GCR)
-	UINT32 gcr6_encode(UINT8 va, UINT8 vb, UINT8 vc);
+	uint32_t gcr6_encode(uint8_t va, uint8_t vb, uint8_t vc);
 	//! GCR6 decode
-	void gcr6_decode(UINT8 e0, UINT8 e1, UINT8 e2, UINT8 e3, UINT8 &va, UINT8 &vb, UINT8 &vc);
+	void gcr6_decode(uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3, uint8_t &va, uint8_t &vb, uint8_t &vc);
 
-	UINT8 sbyte_mfm_r(const UINT8 *bitstream, int &pos, int track_size);
-	UINT8 sbyte_gcr5_r(const UINT8 *bitstream, int &pos, int track_size);
+	uint8_t sbyte_mfm_r(const uint8_t *bitstream, int &pos, int track_size);
+	uint8_t sbyte_gcr5_r(const uint8_t *bitstream, int &pos, int track_size);
 
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD, CRC_FCS, CRC_VICTOR_HDR, CRC_VICTOR_DATA };
@@ -598,19 +598,19 @@ private:
 	bool type_data_mfm(int type, int p1, const gen_crc_info *crcs) const;
 
 	int crc_cells_size(int type) const;
-	void fixup_crc_amiga(std::vector<UINT32> &buffer, const gen_crc_info *crc);
-	void fixup_crc_cbm(std::vector<UINT32> &buffer, const gen_crc_info *crc);
-	void fixup_crc_ccitt(std::vector<UINT32> &buffer, const gen_crc_info *crc);
-	void fixup_crc_ccitt_fm(std::vector<UINT32> &buffer, const gen_crc_info *crc);
-	void fixup_crc_machead(std::vector<UINT32> &buffer, const gen_crc_info *crc);
-	void fixup_crc_fcs(std::vector<UINT32> &buffer, const gen_crc_info *crc);
-	void fixup_crc_victor_header(std::vector<UINT32> &buffer, const gen_crc_info *crc);
-	void fixup_crc_victor_data(std::vector<UINT32> &buffer, const gen_crc_info *crc);
-	void fixup_crcs(std::vector<UINT32> &buffer, gen_crc_info *crcs);
+	void fixup_crc_amiga(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	void fixup_crc_cbm(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	void fixup_crc_ccitt(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	void fixup_crc_ccitt_fm(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	void fixup_crc_machead(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	void fixup_crc_fcs(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	void fixup_crc_victor_header(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	void fixup_crc_victor_data(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	void fixup_crcs(std::vector<uint32_t> &buffer, gen_crc_info *crcs);
 	void collect_crcs(const desc_e *desc, gen_crc_info *crcs) const;
 
-	int sbit_r(const UINT8 *bitstream, int pos);
-	int sbit_rp(const UINT8 *bitstream, int &pos, int track_size);
+	int sbit_r(const uint8_t *bitstream, int pos);
+	int sbit_rp(const uint8_t *bitstream, int &pos, int track_size);
 
 	int calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head);
 };
@@ -717,15 +717,15 @@ public:
 	  @param _heads number of heads.
 	  @param _form_factor form factor of drive (from enum)
 	*/
-	floppy_image(int tracks, int heads, UINT32 form_factor);
+	floppy_image(int tracks, int heads, uint32_t form_factor);
 	virtual ~floppy_image();
 
 	//! @return the form factor.
-	UINT32 get_form_factor() const { return form_factor; }
+	uint32_t get_form_factor() const { return form_factor; }
 	//! @return the variant.
-	UINT32 get_variant() const { return variant; }
+	uint32_t get_variant() const { return variant; }
 	//! @param v the variant.
-	void set_variant(UINT32 v) { variant = v; }
+	void set_variant(uint32_t v) { variant = v; }
 
 	/*!
 	  @param track
@@ -733,7 +733,7 @@ public:
 	  @param head head number
 	  @return a pointer to the data buffer for this track and head
 	*/
-	std::vector<UINT32> &get_buffer(int track, int head, int subtrack = 0) { return track_array[track*4+subtrack][head].cell_data; }
+	std::vector<uint32_t> &get_buffer(int track, int head, int subtrack = 0) { return track_array[track*4+subtrack][head].cell_data; }
 
 	//! Sets the write splice position.
 	//! The "track splice" information indicates where to start writing
@@ -747,9 +747,9 @@ public:
 	    @param head
 	    @param pos the position
 	*/
-	void set_write_splice_position(int track, int head, UINT32 pos, int subtrack = 0) { track_array[track*4+subtrack][head].write_splice = pos; }
+	void set_write_splice_position(int track, int head, uint32_t pos, int subtrack = 0) { track_array[track*4+subtrack][head].write_splice = pos; }
 	//! @return the current write splice position.
-	UINT32 get_write_splice_position(int track, int head, int subtrack = 0) const { return track_array[track*4+subtrack][head].write_splice; }
+	uint32_t get_write_splice_position(int track, int head, int subtrack = 0) const { return track_array[track*4+subtrack][head].write_splice; }
 	//! @return the maximal geometry supported by this format.
 	void get_maximal_geometry(int &tracks, int &heads) const;
 
@@ -763,16 +763,16 @@ public:
 	//! @param form_factor
 	//! @param variant
 	//! @param returns a string containing the variant name.
-	static const char *get_variant_name(UINT32 form_factor, UINT32 variant);
+	static const char *get_variant_name(uint32_t form_factor, uint32_t variant);
 
 private:
 	int tracks, heads;
 
-	UINT32 form_factor, variant;
+	uint32_t form_factor, variant;
 
 	struct track_info {
-		std::vector<UINT32> cell_data;
-		UINT32 write_splice;
+		std::vector<uint32_t> cell_data;
+		uint32_t write_splice;
 
 		track_info() { write_splice = 0; }
 	};

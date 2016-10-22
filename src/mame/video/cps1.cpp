@@ -1699,13 +1699,13 @@ MACHINE_RESET_MEMBER(cps_state,cps)
 		   by the cpu core as a 32-bit branch. This branch would make the
 		   game crash (address error, since it would branch to an odd address)
 		   if location 180ca6 (outside ROM space) isn't 0. Protection check? */
-		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+		uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 		rom[0x11756 / 2] = 0x4e71;
 	}
 	else if (strcmp(gamename, "ghouls") == 0)
 	{
 		/* Patch out self-test... it takes forever */
-		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+		uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 		rom[0x61964 / 2] = 0x4ef9;
 		rom[0x61966 / 2] = 0x0000;
 		rom[0x61968 / 2] = 0x0400;
@@ -1714,7 +1714,7 @@ MACHINE_RESET_MEMBER(cps_state,cps)
 }
 
 
-inline UINT16 *cps_state::cps1_base( int offset, int boundary )
+inline uint16_t *cps_state::cps1_base( int offset, int boundary )
 {
 	int base = m_cps_a_regs[offset] * 256;
 
@@ -1865,10 +1865,10 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 }
 
 
-void cps_state::unshuffle( UINT64 *buf, int len )
+void cps_state::unshuffle( uint64_t *buf, int len )
 {
 	int i;
-	UINT64 t;
+	uint64_t t;
 
 	if (len == 2)
 		return;
@@ -1896,7 +1896,7 @@ void cps_state::cps2_gfx_decode()
 	int i;
 
 	for (i = 0; i < size; i += banksize)
-		unshuffle((UINT64 *)(memregion("gfx")->base() + i), banksize / 8);
+		unshuffle((uint64_t *)(memregion("gfx")->base() + i), banksize / 8);
 }
 
 
@@ -2250,10 +2250,10 @@ VIDEO_START_MEMBER(cps_state,cps)
 	for (i = 0; i < cps1_palette_entries * 16; i++)
 		m_palette->set_pen_color(i, rgb_t(0,0,0));
 
-	m_buffered_obj = make_unique_clear<UINT16[]>(m_obj_size / 2);
+	m_buffered_obj = make_unique_clear<uint16_t[]>(m_obj_size / 2);
 
 	if (m_cps_version == 2)
-		m_cps2_buffered_obj = make_unique_clear<UINT16[]>(m_cps2_obj_size / 2);
+		m_cps2_buffered_obj = make_unique_clear<uint16_t[]>(m_cps2_obj_size / 2);
 
 	/* clear RAM regions */
 	memset(m_gfxram, 0, m_gfxram.bytes());   /* Clear GFX RAM */
@@ -2338,10 +2338,10 @@ VIDEO_START_MEMBER(cps_state,cps2)
 
 ***************************************************************************/
 
-void cps_state::cps1_build_palette( const UINT16* const palette_base )
+void cps_state::cps1_build_palette( const uint16_t* const palette_base )
 {
 	int offset, page;
-	const UINT16 *palette_ram = palette_base;
+	const uint16_t *palette_ram = palette_base;
 	int ctrl = m_cps_b_regs[m_game_config->palette_control/2];
 
 	/*
@@ -2471,7 +2471,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 
 
 	int i, baseadd;
-	UINT16 *base = m_buffered_obj.get();
+	uint16_t *base = m_buffered_obj.get();
 
 	/* some sf2 hacks draw the sprites in reverse order */
 	if ((m_game_config->bootleg_kludge == 1) || (m_game_config->bootleg_kludge == 2) || (m_game_config->bootleg_kludge == 3))
@@ -2644,7 +2644,7 @@ WRITE16_MEMBER(cps_state::cps2_objram2_w)
 		COMBINE_DATA(&m_objram2[offset]);
 }
 
-UINT16 *cps_state::cps2_objbase()
+uint16_t *cps_state::cps2_objbase()
 {
 	int baseptr;
 	baseptr = 0x7000;
@@ -2664,7 +2664,7 @@ UINT16 *cps_state::cps2_objbase()
 void cps_state::cps2_find_last_sprite()    /* Find the offset of last sprite */
 {
 	int offset = 0;
-	UINT16 *base = m_cps2_buffered_obj.get();
+	uint16_t *base = m_cps2_buffered_obj.get();
 
 	/* Locate the end of table marker */
 	while (offset < m_cps2_obj_size / 2)
@@ -2703,7 +2703,7 @@ void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 }
 
 	int i;
-	UINT16 *base = m_cps2_buffered_obj.get();
+	uint16_t *base = m_cps2_buffered_obj.get();
 	int xoffs = 64 - m_output[CPS2_OBJ_XOFFS /2];
 	int yoffs = 16 - m_output[CPS2_OBJ_YOFFS /2];
 
@@ -2832,7 +2832,7 @@ void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
-	UINT8 *stars_rom = m_region_stars->base();
+	uint8_t *stars_rom = m_region_stars->base();
 
 	if (!stars_rom && (m_stars_enabled[0] || m_stars_enabled[1]))
 	{
@@ -2932,7 +2932,7 @@ void cps_state::cps1_render_high_layer( screen_device &screen, bitmap_ind16 &bit
 
 ***************************************************************************/
 
-UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = m_cps_a_regs[CPS1_VIDEOCONTROL];

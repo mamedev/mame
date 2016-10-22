@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sm1800_8255_portc_w);
 	DECLARE_READ8_MEMBER(sm1800_8255_porta_r);
 	DECLARE_READ8_MEMBER(sm1800_8255_portc_r);
-	UINT8 m_irq_state;
+	uint8_t m_irq_state;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(sm1800);
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
@@ -92,8 +92,8 @@ I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *charmap = memregion("chargen")->base();
-	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	uint8_t *charmap = memregion("chargen")->base();
+	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
 		pixels = 0;
 

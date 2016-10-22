@@ -202,10 +202,10 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 {
 	m_spriteram = &m_ram[0x8000/2];
 
-	m_buffer_objectram = std::make_unique<UINT16[]>(0x2000);
-	m_buffer_spriteram16 = std::make_unique<UINT16[]>(0x2000);
-	m_buffer2_objectram = std::make_unique<UINT16[]>(0x2000);
-	m_buffer2_spriteram16 = std::make_unique<UINT16[]>(0x2000);
+	m_buffer_objectram = std::make_unique<uint16_t[]>(0x2000);
+	m_buffer_spriteram16 = std::make_unique<uint16_t[]>(0x2000);
+	m_buffer2_objectram = std::make_unique<uint16_t[]>(0x2000);
+	m_buffer2_spriteram16 = std::make_unique<uint16_t[]>(0x2000);
 
 	m_active_layers = m_sprite_bank = m_screen_flag = m_sprite_flag = 0;
 
@@ -331,17 +331,17 @@ WRITE16_MEMBER(megasys1_state::monkelf_scroll1_w)
 void megasys1_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *decodegfx = m_gfxdecode->gfx(0);
-	UINT16 colorbase = decodegfx->colorbase();
+	uint16_t colorbase = decodegfx->colorbase();
 
 	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
 	{
-		UINT16* srcline = &m_sprite_buffer_bitmap.pix16(y);
-		UINT16* dstline = &bitmap.pix16(y);
-		UINT8 *prio = &screen.priority().pix8(y);
+		uint16_t* srcline = &m_sprite_buffer_bitmap.pix16(y);
+		uint16_t* dstline = &bitmap.pix16(y);
+		uint8_t *prio = &screen.priority().pix8(y);
 
 		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
 		{
-			UINT16 pixel = srcline[x];
+			uint16_t pixel = srcline[x];
 
 			if ((pixel & 0xf) != 0xf)
 			{
@@ -350,7 +350,7 @@ void megasys1_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitm
 
 				if ((priority & (1 << (prio[x] & 0x1f))) == 0)
 				{
-					UINT8 coldat = pixel & 0x3fff;
+					uint8_t coldat = pixel & 0x3fff;
 					dstline[x] = coldat + colorbase;
 
 				}
@@ -359,15 +359,15 @@ void megasys1_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitm
 	}
 }
 
-void megasys1_state::partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 param)
+void megasys1_state::partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t param)
 {
 	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
 	{
-		UINT16* srcline = &m_sprite_buffer_bitmap.pix16(y);
+		uint16_t* srcline = &m_sprite_buffer_bitmap.pix16(y);
 
 		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
 		{
-			UINT16 pixel = srcline[x];
+			uint16_t pixel = srcline[x];
 			srcline[x] = pixel & 0x7fff; // wipe our 'drawn here' marker otherwise trails will always have priority over new sprites, which is incorrect.
 
 			// guess, very unclear from the video refernece we have, used when removing p47 trails
@@ -378,13 +378,13 @@ void megasys1_state::partial_clear_sprite_bitmap(screen_device &screen, bitmap_i
 }
 
 
-inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, INT32 code, INT32 color, INT32 sx, INT32 sy, INT32 flipx, INT32 flipy, UINT8 mosaic, UINT8 mosaicsol, INT32 priority)
+inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, int32_t code, int32_t color, int32_t sx, int32_t sy, int32_t flipx, int32_t flipy, uint8_t mosaic, uint8_t mosaicsol, int32_t priority)
 {
 //  if (sy >= nScreenHeight || sy < -15 || sx >= nScreenWidth || sx < -15) return;
 	gfx_element *decodegfx = m_gfxdecode->gfx(0);
 	sy = sy + 16;
 
-	const UINT8* gfx = decodegfx->get_data(code);
+	const uint8_t* gfx = decodegfx->get_data(code);
 
 	flipy = (flipy) ? 0x0f : 0;
 	flipx = (flipx) ? 0x0f : 0;
@@ -392,17 +392,17 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 	color = color * 16;
 
 
-	for (INT32 y = 0; y < 16; y++, sy++, sx-=16)
+	for (int32_t y = 0; y < 16; y++, sy++, sx-=16)
 	{
-	//  UINT16 *dest = &bitmap.pix16(sy)+ sx;
-	//  UINT8 *prio = &screen.priority().pix8(sy) + sx;
-		UINT16* dest = &m_sprite_buffer_bitmap.pix16(sy)+ sx;
+	//  uint16_t *dest = &bitmap.pix16(sy)+ sx;
+	//  uint8_t *prio = &screen.priority().pix8(sy) + sx;
+		uint16_t* dest = &m_sprite_buffer_bitmap.pix16(sy)+ sx;
 
-		for (INT32 x = 0; x < 16; x++, sx++)
+		for (int32_t x = 0; x < 16; x++, sx++)
 		{
 			if (sx < cliprect.min_x || sy < cliprect.min_y || sx > cliprect.max_x || sy > cliprect.max_y) continue;
 
-			INT32 pxl;
+			int32_t pxl;
 
 			if (mosaicsol) {
 				pxl = gfx[(((y ^ flipy) |  mosaic) * 16) + ((x ^ flipx) |  mosaic)];
@@ -446,36 +446,36 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			partial_clear_sprite_bitmap(screen, bitmap, cliprect, m_sprite_flag&0x0f);
 		}
 
-		INT32 color_mask = (m_sprite_flag & 0x100) ? 0x07 : 0x0f;
+		int32_t color_mask = (m_sprite_flag & 0x100) ? 0x07 : 0x0f;
 
-		UINT16 *objectram = (UINT16*)m_buffer2_objectram.get();
-		UINT16 *spriteram = (UINT16*)m_buffer2_spriteram16.get();
+		uint16_t *objectram = (uint16_t*)m_buffer2_objectram.get();
+		uint16_t *spriteram = (uint16_t*)m_buffer2_spriteram16.get();
 
-		for (INT32 offs = (0x800-8)/2; offs >= 0; offs -= 4)
+		for (int32_t offs = (0x800-8)/2; offs >= 0; offs -= 4)
 		{
-			for (INT32 sprite = 0; sprite < 4 ; sprite ++)
+			for (int32_t sprite = 0; sprite < 4 ; sprite ++)
 			{
-				UINT16 *objectdata = &objectram[offs + (0x800/2) * sprite];
-				UINT16 *spritedata = &spriteram[(objectdata[0] & 0x7f) * 8];
+				uint16_t *objectdata = &objectram[offs + (0x800/2) * sprite];
+				uint16_t *spritedata = &spriteram[(objectdata[0] & 0x7f) * 8];
 
-				INT32 attr = spritedata[4];
+				int32_t attr = spritedata[4];
 				if (((attr & 0xc0) >> 6) != sprite) continue;
 
-				INT32 sx = (spritedata[5] + objectdata[1]) & 0x1ff;
-				INT32 sy = (spritedata[6] + objectdata[2]) & 0x1ff;
+				int32_t sx = (spritedata[5] + objectdata[1]) & 0x1ff;
+				int32_t sy = (spritedata[6] + objectdata[2]) & 0x1ff;
 
 				if (sx > 255) sx -= 512;
 				if (sy > 255) sy -= 512;
 
-				INT32 code  = spritedata[7] + objectdata[3];
-				INT32 color = attr & color_mask;
+				int32_t code  = spritedata[7] + objectdata[3];
+				int32_t color = attr & color_mask;
 
-				INT32 flipx = attr & 0x40;
-				INT32 flipy = attr & 0x80;
-				//INT32 pri  = (attr & 0x08) ? 0x0c : 0x0a;
-				INT32 pri  = (attr & 0x08)>>3;
-				INT32 mosaic = (attr & 0x0f00)>>8;
-				INT32 mossol = (attr & 0x1000)>>8;
+				int32_t flipx = attr & 0x40;
+				int32_t flipy = attr & 0x80;
+				//int32_t pri  = (attr & 0x08) ? 0x0c : 0x0a;
+				int32_t pri  = (attr & 0x08)>>3;
+				int32_t mosaic = (attr & 0x0f00)>>8;
+				int32_t mossol = (attr & 0x1000)>>8;
 
 				code = (code & 0xfff) + ((m_sprite_bank & 1) << 12);
 
@@ -493,13 +493,13 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 	}   /* non Z hw */
 	else
 	{
-		UINT16 *spriteram16 = m_spriteram;
+		uint16_t *spriteram16 = m_spriteram;
 
 		/* MS1-Z just draws Sprite Data, and in reverse order */
 
 		for (sprite = 0x80-1;sprite >= 0;sprite--)
 		{
-			UINT16 *spritedata = &spriteram16[ sprite * 0x10/2];
+			uint16_t *spritedata = &spriteram16[ sprite * 0x10/2];
 
 			attr = spritedata[ 8/2 ];
 
@@ -613,7 +613,7 @@ struct priority
 */
 void megasys1_state::priority_create()
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int pri_code, offset, i, order;
 
 	/* convert PROM to something we can use */
@@ -766,7 +766,7 @@ PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 ***************************************************************************/
 
 
-UINT32 megasys1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t megasys1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, flag, pri, primask;
 	int active_layers;

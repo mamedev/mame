@@ -48,13 +48,14 @@ Shisensho II                            1993  Rev 3.34 M81  Yes
 
 const device_type M72 = &device_creator<m72_audio_device>;
 
-m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, M72, "Irem M72 Audio Custom", tag, owner, clock, "m72_audio", __FILE__)
 	, device_sound_interface(mconfig, *this)
 	, m_irqvector(0)
 	, m_sample_addr(0)
 	, m_samples(*this, "^samples")
 	, m_samples_size(0)
+	, m_dac(*this, "^dac")
 	, m_soundlatch(*this, "^soundlatch")
 {
 }
@@ -77,7 +78,6 @@ void m72_audio_device::device_start()
 {
 	m_samples_size = m_samples.bytes();
 	m_space = &machine().device("soundcpu")->memory().space(AS_IO);
-	m_dac = machine().device<dac_device>("dac");
 
 	save_item(NAME(m_irqvector));
 	save_item(NAME(m_sample_addr));
@@ -216,7 +216,7 @@ READ8_MEMBER( m72_audio_device::sample_r )
 
 WRITE8_MEMBER( m72_audio_device::sample_w )
 {
-	m_dac->write_signed8(data);
+	m_dac->write(data);
 	m_sample_addr = (m_sample_addr + 1) & (m_samples_size - 1);
 }
 

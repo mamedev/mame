@@ -92,7 +92,7 @@ ioport_constructor sms_sports_pad_jp_device::device_input_ports() const
 //  sms_sports_pad_jp_device - constructor
 //-------------------------------------------------
 
-sms_sports_pad_jp_device::sms_sports_pad_jp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sms_sports_pad_jp_device::sms_sports_pad_jp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_SPORTS_PAD_JP, "Sega SMS Sports Pad JP", tag, owner, clock, "sms_sports_pad_jp", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_sports_jp_in(*this, "SPORTS_JP_IN"),
@@ -126,7 +126,7 @@ void sms_sports_pad_jp_device::device_start()
 //  sms_peripheral_r - sports pad read
 //-------------------------------------------------
 
-UINT8 sms_sports_pad_jp_device::peripheral_r()
+uint8_t sms_sports_pad_jp_device::peripheral_r()
 {
 	int num_intervals = (machine().time() - m_start_time).as_double() / m_interval.as_double();
 

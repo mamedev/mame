@@ -26,7 +26,7 @@ class pc9801_26_device : public device_t
 {
 public:
 	// construction/destruction
-	pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -48,7 +48,7 @@ protected:
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
 private:
-	UINT8 m_joy_sel;
+	uint8_t m_joy_sel;
 
 };
 

@@ -30,7 +30,7 @@ class apricot_keyboard_hle_device : public device_t,
 {
 public:
 	// construction/destruction
-	apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// from host
 	virtual void out_w(int state) override;
@@ -44,11 +44,11 @@ protected:
 
 	// device_buffered_serial_interface overrides
 	virtual void tra_callback() override;
-	virtual void received_byte(UINT8 byte) override;
+	virtual void received_byte(uint8_t byte) override;
 
 	// device_matrix_keyboard_interface overrides
-	virtual void key_make(UINT8 row, UINT8 column) override;
-	virtual void key_break(UINT8 row, UINT8 column) override;
+	virtual void key_make(uint8_t row, uint8_t column) override;
+	virtual void key_break(uint8_t row, uint8_t column) override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

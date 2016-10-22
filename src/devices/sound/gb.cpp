@@ -84,20 +84,20 @@ const device_type CGB04_APU = &device_creator<cgb04_apu_device>;
 //  gameboy_sound_device - constructor
 //-------------------------------------------------
 
-gameboy_sound_device::gameboy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+gameboy_sound_device::gameboy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_sound_interface(mconfig, *this)
 {
 }
 
 
-dmg_apu_device::dmg_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmg_apu_device::dmg_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gameboy_sound_device(mconfig, DMG_APU, "LR35902 APU", tag, owner, clock, "dmg_apu", __FILE__)
 {
 }
 
 
-cgb04_apu_device::cgb04_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cgb04_apu_device::cgb04_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gameboy_sound_device(mconfig, CGB04_APU, "CGB04 APU", tag, owner, clock, "cgb04_apu", __FILE__)
 {
 }
@@ -255,10 +255,10 @@ void gameboy_sound_device::tick_length(struct SOUND &snd)
 }
 
 
-INT32 gameboy_sound_device::calculate_next_sweep(struct SOUND &snd)
+int32_t gameboy_sound_device::calculate_next_sweep(struct SOUND &snd)
 {
 	snd.sweep_neg_mode_used = (snd.sweep_direction < 0);
-	INT32 new_frequency = snd.frequency + snd.sweep_direction * (snd.frequency >> snd.sweep_shift);
+	int32_t new_frequency = snd.frequency + snd.sweep_direction * (snd.frequency >> snd.sweep_shift);
 
 	if (new_frequency > 0x7FF)
 	{
@@ -271,7 +271,7 @@ INT32 gameboy_sound_device::calculate_next_sweep(struct SOUND &snd)
 
 void gameboy_sound_device::apply_next_sweep(struct SOUND &snd)
 {
-	INT32 new_frequency = calculate_next_sweep(snd);
+	int32_t new_frequency = calculate_next_sweep(snd);
 
 	if (snd.on && snd.sweep_shift > 0)
 	{
@@ -309,7 +309,7 @@ void gameboy_sound_device::tick_envelope(struct SOUND &snd)
 
 			if (snd.envelope_count)
 			{
-				INT8 new_envelope_value = snd.envelope_value + snd.envelope_direction;
+				int8_t new_envelope_value = snd.envelope_value + snd.envelope_direction;
 
 				if (new_envelope_value >= 0 && new_envelope_value <= 15)
 				{
@@ -331,7 +331,7 @@ bool gameboy_sound_device::dac_enabled(struct SOUND &snd)
 }
 
 
-void gameboy_sound_device::update_square_channel(struct SOUND &snd, UINT64 cycles)
+void gameboy_sound_device::update_square_channel(struct SOUND &snd, uint64_t cycles)
 {
 	if (snd.on)
 	{
@@ -377,7 +377,7 @@ void gameboy_sound_device::update_square_channel(struct SOUND &snd, UINT64 cycle
 }
 
 
-void dmg_apu_device::update_wave_channel(struct SOUND &snd, UINT64 cycles)
+void dmg_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 {
 	if (snd.on)
 	{
@@ -442,7 +442,7 @@ void dmg_apu_device::update_wave_channel(struct SOUND &snd, UINT64 cycles)
 }
 
 
-void cgb04_apu_device::update_wave_channel(struct SOUND &snd, UINT64 cycles)
+void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 {
 	if (snd.on)
 	{
@@ -504,7 +504,7 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, UINT64 cycles)
 }
 
 
-void gameboy_sound_device::update_noise_channel(struct SOUND &snd, UINT64 cycles)
+void gameboy_sound_device::update_noise_channel(struct SOUND &snd, uint64_t cycles)
 {
 	while (cycles > 0)
 	{
@@ -531,7 +531,7 @@ void gameboy_sound_device::update_noise_channel(struct SOUND &snd, UINT64 cycles
 			/* Using a Polynomial Counter (aka Linear Feedback Shift Register)
 			 Mode 4 has a 15 bit counter so we need to shift the
 			 bits around accordingly */
-			UINT16 feedback = ((snd.noise_lfsr >> 1) ^ snd.noise_lfsr) & 1;
+			uint16_t feedback = ((snd.noise_lfsr >> 1) ^ snd.noise_lfsr) & 1;
 			snd.noise_lfsr = (snd.noise_lfsr >> 1) | (feedback << 14);
 			if (snd.noise_short)
 			{
@@ -555,15 +555,15 @@ void gameboy_sound_device::update_state()
 
 	if (m_snd_control.on)
 	{
-		UINT64 cycles = attotime_to_clocks(now - m_last_updated);
+		uint64_t cycles = attotime_to_clocks(now - m_last_updated);
 
-		UINT64 old_cycles = m_snd_control.cycles;
+		uint64_t old_cycles = m_snd_control.cycles;
 		m_snd_control.cycles += cycles;
 
 		if ((old_cycles / FRAME_CYCLES) != (m_snd_control.cycles / FRAME_CYCLES))
 		{
 			// Left over cycles in current frame
-			UINT64 cycles_current_frame = FRAME_CYCLES - (old_cycles & (FRAME_CYCLES - 1));
+			uint64_t cycles_current_frame = FRAME_CYCLES - (old_cycles & (FRAME_CYCLES - 1));
 
 			update_square_channel(m_snd_1, cycles_current_frame);
 			update_square_channel(m_snd_2, cycles_current_frame);
@@ -626,7 +626,7 @@ void gameboy_sound_device::update_state()
 }
 
 
-UINT64 gameboy_sound_device::noise_period_cycles()
+uint64_t gameboy_sound_device::noise_period_cycles()
 {
 	static const int divisor[8] = { 8, 16,32, 48, 64, 80, 96, 112 };
 	return divisor[m_snd_4.reg[3] & 7] << (m_snd_4.reg[3] >> 4);
@@ -663,7 +663,7 @@ READ8_MEMBER( cgb04_apu_device::wave_r )
 
 READ8_MEMBER( gameboy_sound_device::sound_r )
 {
-	static const UINT8 read_mask[0x40] =
+	static const uint8_t read_mask[0x40] =
 	{
 		0x80,0x3F,0x00,0xFF,0xBF,0xFF,0x3F,0x00,0xFF,0xBF,0x7F,0xFF,0x9F,0xFF,0xBF,0xFF,
 		0xFF,0x00,0x00,0xBF,0x00,0x00,0x70,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
@@ -769,10 +769,10 @@ void dmg_apu_device::corrupt_wave_ram()
 }
 
 
-void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
+void gameboy_sound_device::sound_w_internal( int offset, uint8_t data )
 {
 	/* Store the value */
-	UINT8 old_data = m_snd_regs[offset];
+	uint8_t old_data = m_snd_regs[offset];
 
 	if (m_snd_control.on)
 	{

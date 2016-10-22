@@ -54,7 +54,7 @@ WRITE8_MEMBER(shangkid_state::videoram_w)
 	m_background->mark_tile_dirty(offset&0x7ff );
 }
 
-void shangkid_state::draw_sprite(const UINT8 *source, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void shangkid_state::draw_sprite(const uint8_t *source, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx;
 	int transparent_pen;
@@ -166,7 +166,7 @@ void shangkid_state::draw_sprite(const UINT8 *source, bitmap_ind16 &bitmap, cons
 
 void shangkid_state::shangkid_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *source, *finish;
+	const uint8_t *source, *finish;
 
 	finish = m_spriteram;
 	source = m_spriteram+0x200;
@@ -176,7 +176,7 @@ void shangkid_state::shangkid_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-UINT32 shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flipscreen = m_videoreg[1]&0x80;
 	m_background->set_flip(flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
@@ -192,13 +192,13 @@ UINT32 shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_ind1
 
 PALETTE_INIT_MEMBER(shangkid_state,dynamski)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
 	{
-		UINT16 data = (color_prom[i | 0x20] << 8) | color_prom[i];
+		uint16_t data = (color_prom[i | 0x20] << 8) | color_prom[i];
 		rgb_t color = rgb_t(pal5bit(data >> 1), pal5bit(data >> 6), pal5bit(data >> 11));
 
 		palette.set_indirect_color(i, color);
@@ -210,14 +210,14 @@ PALETTE_INIT_MEMBER(shangkid_state,dynamski)
 	/* characters */
 	for (i = 0; i < 0x40; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites */
 	for (i = 0x40; i < 0x80; i++)
 	{
-		UINT8 ctabentry = (color_prom[(i - 0x40) + 0x100] & 0x0f) | 0x10;
+		uint8_t ctabentry = (color_prom[(i - 0x40) + 0x100] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -305,7 +305,7 @@ void shangkid_state::dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-UINT32 shangkid_state::screen_update_dynamski(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t shangkid_state::screen_update_dynamski(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	dynamski_draw_background(bitmap,cliprect, 0 );
 	dynamski_draw_sprites(bitmap,cliprect );

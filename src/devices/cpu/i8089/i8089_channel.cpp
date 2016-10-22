@@ -48,7 +48,7 @@ const device_type I8089_CHANNEL = &device_creator<i8089_channel>;
 //  i8089_channel - constructor
 //-------------------------------------------------
 
-i8089_channel::i8089_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+i8089_channel::i8089_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, I8089_CHANNEL, "Intel 8089 I/O Channel", tag, owner, clock, "i8089_channel", __FILE__),
 	m_write_sintr(*this),
 	m_iop(nullptr),
@@ -109,7 +109,7 @@ void i8089_channel::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-void i8089_channel::set_reg(int reg, UINT32 value, int tag)
+void i8089_channel::set_reg(int reg, uint32_t value, int tag)
 {
 	if((reg == BC) || (reg == IX) || (reg == CC) || (reg == MC))
 	{
@@ -141,27 +141,27 @@ int  i8089_channel::chan_prio()    { return m_prio; }
 bool i8089_channel::chained()      { return CC_CHAIN; }
 bool i8089_channel::lock()         { return CC_LOCK; }
 
-INT16 i8089_channel::displacement(int wb)
+int16_t i8089_channel::displacement(int wb)
 {
-	INT16 displacement = 0;
+	int16_t displacement = 0;
 
 	if (wb == 1)
 	{
-		displacement = (INT16)((INT8)m_iop->read_byte(m_r[TP].t, m_r[TP].w));
+		displacement = (int16_t)((int8_t)m_iop->read_byte(m_r[TP].t, m_r[TP].w));
 		set_reg(TP, m_r[TP].w + 1);
 	}
 	else if (wb == 2)
 	{
-		displacement = (INT16)m_iop->read_word(m_r[TP].t, m_r[TP].w);
+		displacement = (int16_t)m_iop->read_word(m_r[TP].t, m_r[TP].w);
 		set_reg(TP, m_r[TP].w + 2);
 	}
 
 	return displacement;
 }
 
-UINT32 i8089_channel::offset(int aa, int mm, int w)
+uint32_t i8089_channel::offset(int aa, int mm, int w)
 {
-	UINT32 offset = 0;
+	uint32_t offset = 0;
 	switch(aa)
 	{
 		case 0:
@@ -182,16 +182,16 @@ UINT32 i8089_channel::offset(int aa, int mm, int w)
 	return offset & 0xfffff;
 }
 
-INT8 i8089_channel::imm8()
+int8_t i8089_channel::imm8()
 {
-	INT8 imm8 = (INT8)m_iop->read_byte(m_r[TP].t, m_r[TP].w);
+	int8_t imm8 = (int8_t)m_iop->read_byte(m_r[TP].t, m_r[TP].w);
 	set_reg(TP, m_r[TP].w + 1);
 	return imm8;
 }
 
-INT16 i8089_channel::imm16()
+int16_t i8089_channel::imm16()
 {
-	INT16 imm16 = (INT16)m_iop->read_word(m_r[TP].t, m_r[TP].w);
+	int16_t imm16 = (int16_t)m_iop->read_word(m_r[TP].t, m_r[TP].w);
 	set_reg(TP, m_r[TP].w + 2);
 	return imm16;
 }
@@ -414,12 +414,12 @@ int i8089_channel::execute_run()
 			m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;
 
 		// fetch first two instruction bytes
-		UINT16 op = m_iop->read_word(m_r[TP].t, m_r[TP].w);
+		uint16_t op = m_iop->read_word(m_r[TP].t, m_r[TP].w);
 		set_reg(TP, m_r[TP].w + 2);
 
 		// extract parameters
-		UINT8 params = op & 0xff;
-		UINT8 opcode = (op >> 8) & 0xff;
+		uint8_t params = op & 0xff;
+		uint8_t opcode = (op >> 8) & 0xff;
 
 		int brp = (params >> 5) & 0x07;
 		int wb  = (params >> 3) & 0x03;
@@ -431,8 +431,8 @@ int i8089_channel::execute_run()
 		// fix-up so we can use our register array
 		if (mm == BC) mm = PP;
 
-		UINT32 o;
-		UINT16 off, seg;
+		uint32_t o;
+		uint16_t off, seg;
 
 		switch (opc)
 		{
@@ -448,8 +448,8 @@ int i8089_channel::execute_run()
 			break;
 
 		case 0x02: // lpdi
-			off = (UINT16)imm16();
-			seg = (UINT16)imm16();
+			off = (uint16_t)imm16();
+			seg = (uint16_t)imm16();
 			lpdi(brp, seg, off);
 			break;
 
@@ -526,7 +526,7 @@ int i8089_channel::execute_run()
 		case 0x24: // mov(b) m, m
 		{
 			o = offset(aa, mm, w);
-			UINT16 op2 = m_iop->read_word(m_r[TP].t, m_r[TP].w);
+			uint16_t op2 = m_iop->read_word(m_r[TP].t, m_r[TP].w);
 			set_reg(TP, m_r[TP].w + 2);
 			int mm2 = (op2 >> 8) & 0x03;
 
@@ -538,7 +538,7 @@ int i8089_channel::execute_run()
 		case 0x25: // tsl m, i, d
 		{
 			o = offset(aa, mm, w);
-			INT8 i = imm8();
+			int8_t i = imm8();
 			tsl(mm, i, imm8(), o);
 			break;
 		}
@@ -676,7 +676,7 @@ int i8089_channel::execute_run()
 	return m_icount;
 }
 
-void i8089_channel::examine_ccw(UINT8 ccw)
+void i8089_channel::examine_ccw(uint8_t ccw)
 {
 	// priority and bus load limit, bit 7 and 5
 	m_r[PSW].w = (m_r[PSW].w & 0x5f) | (ccw & 0xa0);
@@ -701,7 +701,7 @@ void i8089_channel::examine_ccw(UINT8 ccw)
 void i8089_channel::attention()
 {
 	// examine control byte
-	UINT8 ccw = m_iop->read_byte(m_r[CP].t, m_r[CP].w);
+	uint8_t ccw = m_iop->read_byte(m_r[CP].t, m_r[CP].w);
 
 	switch (ccw & 0x07)
 	{
@@ -729,7 +729,7 @@ void i8089_channel::attention()
 
 		lpd(PP, CP, m_r[CP].w + 2);
 		movp_pm(TP, PP, m_r[PP].w);
-		movbi_mi(CP, (INT8) 0xff, m_r[CP].w + 1);
+		movbi_mi(CP, (int8_t) 0xff, m_r[CP].w + 1);
 		m_r[TP].t = 1;
 
 		m_r[PSW].w |= 1 << 2;
@@ -761,7 +761,7 @@ void i8089_channel::attention()
 
 		lpd(PP, CP, m_r[CP].w + 2);
 		lpd(TP, PP, m_r[PP].w);
-		movbi_mi(CP, (INT8) 0xff, m_r[CP].w + 1);
+		movbi_mi(CP, (int8_t) 0xff, m_r[CP].w + 1);
 
 		m_r[PSW].w |= 1 << 2;
 		m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;
@@ -790,7 +790,7 @@ void i8089_channel::attention()
 		// restore task pointer and parameter block
 		movp_pm(TP, PP, m_r[PP].w);
 		movb_rm(PSW, PP, m_r[PP].w + 3);
-		movbi_mi(CP, (INT8) 0xff, m_r[CP].w + 1);
+		movbi_mi(CP, (int8_t) 0xff, m_r[CP].w + 1);
 
 		m_r[PSW].w |= 1 << 2;
 		m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;

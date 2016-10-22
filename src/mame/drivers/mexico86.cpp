@@ -64,7 +64,7 @@ PS4  J8635      PS4  J8541       PS4  J8648
 
 READ8_MEMBER(mexico86_state::kiki_ym2203_r)
 {
-	UINT8 result = m_ymsnd->read(space, offset);
+	uint8_t result = m_ymsnd->read(space, offset);
 
 	if (offset == 0)
 		result &= 0x7f;
@@ -397,7 +397,7 @@ GFXDECODE_END
 
 void mexico86_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 6, &ROM[0x08000], 0x4000);
 

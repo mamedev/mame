@@ -45,7 +45,7 @@
 */
 PALETTE_INIT_MEMBER(tp84_state, tp84)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 1000, 470, 220, 100 };
 	double weights[4];
 	int i;
@@ -96,7 +96,7 @@ PALETTE_INIT_MEMBER(tp84_state, tp84)
 
 		for (j = 0; j < 8; j++)
 		{
-			UINT8 ctabentry = ((~i & 0x100) >> 1) | (j << 4) | (color_prom[i] & 0x0f);
+			uint8_t ctabentry = ((~i & 0x100) >> 1) | (j << 4) | (color_prom[i] & 0x0f);
 			palette.set_pen_indirect(((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
@@ -171,7 +171,7 @@ void tp84_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 
-UINT32 tp84_state::screen_update_tp84(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tp84_state::screen_update_tp84(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip = cliprect;
 	const rectangle &visarea = screen.visible_area();

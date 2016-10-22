@@ -10,7 +10,7 @@
 #ifndef __SEGAIC16VID_H__
 #define __SEGAIC16VID_H__
 
-typedef device_delegate<void (int, UINT16*, UINT16*, UINT16*, UINT16*)> segaic16_video_pagelatch_delegate;
+typedef device_delegate<void (int, uint16_t*, uint16_t*, uint16_t*, uint16_t*)> segaic16_video_pagelatch_delegate;
 
 #define MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB( _class, _method) \
 	segaic16_video_device::set_pagelatch_cb(*device, segaic16_video_pagelatch_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
@@ -47,45 +47,45 @@ typedef device_delegate<void (int, UINT16*, UINT16*, UINT16*, UINT16*)> segaic16
 
 struct tilemap_callback_info
 {
-	UINT16 *        rambase;                        /* base of RAM for this tilemap page */
-	const UINT8 *   bank;                           /* pointer to bank array */
-	UINT16          banksize;                       /* size of banks */
+	uint16_t *        rambase;                        /* base of RAM for this tilemap page */
+	const uint8_t *   bank;                           /* pointer to bank array */
+	uint16_t          banksize;                       /* size of banks */
 };
 
 
 struct tilemap_info
 {
-	UINT8           index;                          /* index of this structure */
-	UINT8           type;                           /* type of tilemap (see segaic16.h for details) */
-	UINT8           numpages;                       /* number of allocated pages */
-	UINT8           flip;                           /* screen flip? */
-	UINT8           rowscroll, colscroll;           /* are rowscroll/colscroll enabled (if external enables are used) */
-	UINT8           bank[8];                        /* indexes of the tile banks */
-	UINT16          banksize;                       /* number of tiles per bank */
-	UINT16          latched_xscroll[4];             /* latched X scroll values */
-	UINT16          latched_yscroll[4];             /* latched Y scroll values */
-	UINT16          latched_pageselect[4];          /* latched page select values */
-	INT32           xoffs;                          /* X scroll offset */
+	uint8_t           index;                          /* index of this structure */
+	uint8_t           type;                           /* type of tilemap (see segaic16.h for details) */
+	uint8_t           numpages;                       /* number of allocated pages */
+	uint8_t           flip;                           /* screen flip? */
+	uint8_t           rowscroll, colscroll;           /* are rowscroll/colscroll enabled (if external enables are used) */
+	uint8_t           bank[8];                        /* indexes of the tile banks */
+	uint16_t          banksize;                       /* number of tiles per bank */
+	uint16_t          latched_xscroll[4];             /* latched X scroll values */
+	uint16_t          latched_yscroll[4];             /* latched Y scroll values */
+	uint16_t          latched_pageselect[4];          /* latched page select values */
+	int32_t           xoffs;                          /* X scroll offset */
 	tilemap_t *     tilemaps[16];                   /* up to 16 tilemap pages */
 	tilemap_t *     textmap;                        /* a single text tilemap */
 	struct tilemap_callback_info tmap_info[16];     /* callback info for 16 tilemap pages */
 	struct tilemap_callback_info textmap_info;      /* callback info for a single textmap page */
 	void            (*reset)(screen_device &screen, struct tilemap_info *info);/* reset callback */
 	void            (*draw_layer)(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
-	UINT16 *        textram;                        /* pointer to textram pointer */
-	UINT16 *        tileram;                        /* pointer to tileram pointer */
+	uint16_t *        textram;                        /* pointer to textram pointer */
+	uint16_t *        tileram;                        /* pointer to tileram pointer */
 	emu_timer *     latch_timer;                    /* timer for latching 16b tilemap scroll values */
 };
 
 
 struct rotate_info
 {
-	UINT8           index;                          /* index of this structure */
-	UINT8           type;                           /* type of rotate system (see segaic16.h for details) */
-	UINT16          colorbase;                      /* base color index */
-	INT32           ramsize;                        /* size of rotate RAM */
-	UINT16 *        rotateram;                      /* pointer to rotateram pointer */
-	std::unique_ptr<UINT16[]>        buffer;                         /* buffered data */
+	uint8_t           index;                          /* index of this structure */
+	uint8_t           type;                           /* type of rotate system (see segaic16.h for details) */
+	uint16_t          colorbase;                      /* base color index */
+	int32_t           ramsize;                        /* size of rotate RAM */
+	uint16_t *        rotateram;                      /* pointer to rotateram pointer */
+	std::unique_ptr<uint16_t[]>        buffer;                         /* buffered data */
 };
 
 
@@ -99,17 +99,17 @@ class segaic16_video_device :   public device_t,
 								public device_video_interface
 {
 public:
-	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~segaic16_video_device() {}
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_pagelatch_cb(device_t &device,segaic16_video_pagelatch_delegate newtilecb);
 
-	UINT8 m_display_enable;
-	optional_shared_ptr<UINT16> m_tileram;
-	optional_shared_ptr<UINT16> m_textram;
-	optional_shared_ptr<UINT16> m_rotateram;
+	uint8_t m_display_enable;
+	optional_shared_ptr<uint16_t> m_tileram;
+	optional_shared_ptr<uint16_t> m_textram;
+	optional_shared_ptr<uint16_t> m_rotateram;
 
 	void tilemap_set_colscroll(int which, int enable);
 	void tilemap_set_rowscroll(int which, int enable);
@@ -119,11 +119,11 @@ public:
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark);
 //  void tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
 //  void tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
-//  void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority);
+//  void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t pages, uint16_t xscroll, uint16_t yscroll, uint32_t flags, uint32_t priority);
 //  void tilemap_16b_reset(screen_device &screen, struct tilemap_info *info);
 
 	segaic16_video_pagelatch_delegate m_pagelatch_cb;
-	void tilemap_16b_fill_latch(int i, UINT16* latched_pageselect, UINT16* latched_yscroll, UINT16* latched_xscroll, UINT16* textram);
+	void tilemap_16b_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
 	TIMER_CALLBACK_MEMBER( tilemap_16b_latch_values );
 
 	struct rotate_info m_rotate[SEGAIC16_MAX_ROTATE];

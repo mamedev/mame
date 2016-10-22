@@ -25,14 +25,14 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);
 
-	UINT8 *get_cart_base() { return m_rom; }
-	void write_prg_bank(UINT8 bank) { m_bank = bank; }
+	uint8_t *get_cart_base() { return m_rom; }
+	void write_prg_bank(uint8_t bank) { m_bank = bank; }
 
 protected:
 	// internal state
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 	// ROM is accessed via two 16K banks, but only the first one can be switched
-	UINT8 m_bank;
+	uint8_t m_bank;
 };
 
 // ======================> nes_kstudio_slot_device
@@ -43,7 +43,7 @@ class nes_kstudio_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_kstudio_slot_device();
 
 	// device-level overrides
@@ -67,7 +67,7 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	virtual DECLARE_READ8_MEMBER(read);
-	void write_prg_bank(UINT8 bank) { if (m_cart) m_cart->write_prg_bank(bank); }
+	void write_prg_bank(uint8_t bank) { if (m_cart) m_cart->write_prg_bank(bank); }
 
 	kstudio_cart_interface*      m_cart;
 };
@@ -94,11 +94,11 @@ class nes_kstudio_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual UINT8* get_cart_base();
+	virtual uint8_t* get_cart_base();
 
 protected:
 	// device-level overrides
@@ -122,7 +122,7 @@ class nes_karaokestudio_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;

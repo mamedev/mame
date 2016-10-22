@@ -113,7 +113,7 @@ const char *const gorf_sample_names[] =
 
 READ8_MEMBER( astrocde_state::gorf_speech_r )
 {
-	UINT8 data = offset >> 8;
+	uint8_t data = offset >> 8;
 #if USE_FAKE_VOTRAX
 		int Phoneme, Intonation;
 	int i = 0;

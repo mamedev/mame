@@ -9,7 +9,7 @@ class k037122_device : public device_t,
 						public device_gfx_interface
 {
 public:
-	k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k037122_device() {}
 
 	// static configuration
@@ -32,15 +32,15 @@ private:
 	// internal state
 	tilemap_t     *m_layer[2];
 
-	std::unique_ptr<UINT32[]>       m_tile_ram;
-	std::unique_ptr<UINT32[]>       m_char_ram;
-	std::unique_ptr<UINT32[]>       m_reg;
+	std::unique_ptr<uint32_t[]>       m_tile_ram;
+	std::unique_ptr<uint32_t[]>       m_char_ram;
+	std::unique_ptr<uint32_t[]>       m_reg;
 
 	int            m_gfx_index;
 
 	TILE_GET_INFO_MEMBER(tile_info_layer0);
 	TILE_GET_INFO_MEMBER(tile_info_layer1);
-	void update_palette_color( UINT32 palette_base, int color );
+	void update_palette_color( uint32_t palette_base, int color );
 };
 
 extern const device_type K037122;

@@ -63,7 +63,7 @@ device_ieee488_interface::~device_ieee488_interface()
 //  ieee488_slot_device - constructor
 //-------------------------------------------------
 
-ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, IEEE488_SLOT, "IEEE-488 slot", tag, owner, clock, "ieee488_slot", __FILE__),
 		device_slot_interface(mconfig, *this), m_address(0)
 {
@@ -100,7 +100,7 @@ void ieee488_slot_device::device_start()
 //  ieee488_device - constructor
 //-------------------------------------------------
 
-ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IEEE488, "IEEE-488 bus", tag, owner, clock, "ieee488", __FILE__),
 		m_write_eoi(*this),
 		m_write_dav(*this),
@@ -313,7 +313,7 @@ int ieee488_device::get_signal(int signal)
 //  set_data -
 //-------------------------------------------------
 
-void ieee488_device::set_data(device_t *device, UINT8 data)
+void ieee488_device::set_data(device_t *device, uint8_t data)
 {
 	if (device == this)
 	{
@@ -346,9 +346,9 @@ void ieee488_device::set_data(device_t *device, UINT8 data)
 //  get_data -
 //-------------------------------------------------
 
-UINT8 ieee488_device::get_data()
+uint8_t ieee488_device::get_data()
 {
-	UINT8 data = m_dio;
+	uint8_t data = m_dio;
 
 	daisy_entry *entry = m_device_list.first();
 

@@ -10,17 +10,17 @@
 const device_type ATAPI_CDROM = &device_creator<atapi_cdrom_device>;
 const device_type ATAPI_FIXED_CDROM = &device_creator<atapi_fixed_cdrom_device>;
 
-atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_hle_device(mconfig, ATAPI_CDROM, "ATAPI CDROM", tag, owner, clock, "cdrom", __FILE__)
 {
 }
 
-atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	atapi_hle_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_cdrom_device(mconfig, ATAPI_FIXED_CDROM, "ATAPI fixed CDROM", tag, owner, clock, "cdrom_fixed", __FILE__)
 {
 }

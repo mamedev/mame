@@ -322,7 +322,7 @@ public:
 	void process_event(RAWINPUT &rawinput) override
 	{
 		// determine the full DIK-compatible scancode
-		UINT8 scancode = (rawinput.data.keyboard.MakeCode & 0x7f) | ((rawinput.data.keyboard.Flags & RI_KEY_E0) ? 0x80 : 0x00);
+		uint8_t scancode = (rawinput.data.keyboard.MakeCode & 0x7f) | ((rawinput.data.keyboard.Flags & RI_KEY_E0) ? 0x80 : 0x00);
 
 		// scancode 0xaa is a special shift code we need to ignore
 		if (scancode == 0xaa)
@@ -376,7 +376,7 @@ public:
 
 			// update zaxis
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				mouse.lZ += static_cast<INT16>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
+				mouse.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
 
 			// update the button states; always update the corresponding mouse buttons
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) mouse.rgbButtons[0] = 0x80;
@@ -434,7 +434,7 @@ public:
 
 			// update zaxis
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				lightgun.lZ += static_cast<INT16>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
+				lightgun.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
 
 			// update the button states; always update the corresponding mouse buttons
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) lightgun.rgbButtons[0] = 0x80;

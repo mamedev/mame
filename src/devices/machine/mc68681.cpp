@@ -64,7 +64,7 @@ MACHINE_CONFIG_END
 //  LIVE DEVICE
 //**************************************************************************
 
-mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC68681, "MC68681 DUART", tag, owner, clock, "mc68681", __FILE__),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
@@ -250,7 +250,7 @@ double mc68681_device::duart68681_get_ct_rate()
 	return rate;
 }
 
-UINT16 mc68681_device::duart68681_get_ct_count()
+uint16_t mc68681_device::duart68681_get_ct_count()
 {
 	double clock = duart68681_get_ct_rate();
 	return (duart_timer->remaining() * clock).as_double();
@@ -279,7 +279,7 @@ TIMER_CALLBACK_MEMBER( mc68681_device::duart_timer_callback )
 		// timer driving any serial channels?
 		if (BIT(ACR, 7) == 1)
 		{
-			UINT8 csr = m_chanA->get_chan_CSR();
+			uint8_t csr = m_chanA->get_chan_CSR();
 
 			if ((csr & 0xf0) == 0xd0)   // tx is timer driven
 			{
@@ -307,7 +307,7 @@ TIMER_CALLBACK_MEMBER( mc68681_device::duart_timer_callback )
 			update_interrupts();
 		}
 
-		int count = std::max(CTR.w.l, UINT16(1));
+		int count = std::max(CTR.w.l, uint16_t(1));
 		duart68681_start_ct(count);
 	}
 	else
@@ -322,7 +322,7 @@ TIMER_CALLBACK_MEMBER( mc68681_device::duart_timer_callback )
 
 READ8_MEMBER( mc68681_device::read )
 {
-	UINT8 r = 0xff;
+	uint8_t r = 0xff;
 
 	offset &= 0xf;
 
@@ -400,7 +400,7 @@ READ8_MEMBER( mc68681_device::read )
 				half_period = 0;
 			}
 
-			int count = std::max(CTR.w.l, UINT16(1));
+			int count = std::max(CTR.w.l, uint16_t(1));
 			duart68681_start_ct(count);
 			break;
 		}
@@ -439,7 +439,7 @@ WRITE8_MEMBER( mc68681_device::write )
 
 		case 0x04: /* ACR */
 		{
-			UINT8 old_acr = ACR;
+			uint8_t old_acr = ACR;
 			ACR = data;
 
 			//       bits 6-4: Counter/Timer Mode And Clock Source Select
@@ -449,7 +449,7 @@ WRITE8_MEMBER( mc68681_device::write )
 				if (data & 0x40)
 				{
 					// Entering timer mode
-					UINT16 count = std::max(CTR.w.l, UINT16(1));
+					uint16_t count = std::max(CTR.w.l, uint16_t(1));
 					half_period = 0;
 
 					duart68681_start_ct(count);
@@ -518,7 +518,7 @@ WRITE8_MEMBER( mc68681_device::write )
 
 WRITE_LINE_MEMBER( mc68681_device::ip0_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x01) | ((state == ASSERT_LINE) ? 1 : 0);
+	uint8_t newIP = (IP_last_state & ~0x01) | ((state == ASSERT_LINE) ? 1 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -538,7 +538,7 @@ WRITE_LINE_MEMBER( mc68681_device::ip0_w )
 
 WRITE_LINE_MEMBER( mc68681_device::ip1_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x02) | ((state == ASSERT_LINE) ? 2 : 0);
+	uint8_t newIP = (IP_last_state & ~0x02) | ((state == ASSERT_LINE) ? 2 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -558,7 +558,7 @@ WRITE_LINE_MEMBER( mc68681_device::ip1_w )
 
 WRITE_LINE_MEMBER( mc68681_device::ip2_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x04) | ((state == ASSERT_LINE) ? 4 : 0);
+	uint8_t newIP = (IP_last_state & ~0x04) | ((state == ASSERT_LINE) ? 4 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -578,7 +578,7 @@ WRITE_LINE_MEMBER( mc68681_device::ip2_w )
 
 WRITE_LINE_MEMBER( mc68681_device::ip3_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x08) | ((state == ASSERT_LINE) ? 8 : 0);
+	uint8_t newIP = (IP_last_state & ~0x08) | ((state == ASSERT_LINE) ? 8 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -598,14 +598,14 @@ WRITE_LINE_MEMBER( mc68681_device::ip3_w )
 
 WRITE_LINE_MEMBER( mc68681_device::ip4_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x10) | ((state == ASSERT_LINE) ? 0x10 : 0);
+	uint8_t newIP = (IP_last_state & ~0x10) | ((state == ASSERT_LINE) ? 0x10 : 0);
 // TODO: special mode for ip4 (Ch. A Rx clock)
 	IP_last_state = newIP;
 }
 
 WRITE_LINE_MEMBER( mc68681_device::ip5_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x20) | ((state == ASSERT_LINE) ? 0x20 : 0);
+	uint8_t newIP = (IP_last_state & ~0x20) | ((state == ASSERT_LINE) ? 0x20 : 0);
 // TODO: special mode for ip5 (Ch. B Tx clock)
 	IP_last_state = newIP;
 }
@@ -620,7 +620,7 @@ mc68681_channel *mc68681_device::get_channel(int chan)
 	return m_chanB;
 }
 
-int mc68681_device::calc_baud(int ch, UINT8 data)
+int mc68681_device::calc_baud(int ch, uint8_t data)
 {
 	int baud_rate;
 
@@ -676,7 +676,7 @@ void mc68681_device::set_ISR_bits(int mask)
 
 // DUART channel class stuff
 
-mc68681_channel::mc68681_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc68681_channel::mc68681_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC68681_CHANNEL, "MC68681 DUART CHANNEL", tag, owner, clock, "mc68681_channel", __FILE__),
 	device_serial_interface(mconfig, *this),
 	MR1(0),
@@ -908,9 +908,9 @@ void mc68681_channel::update_interrupts()
 	//logerror("DEBUG: 68681 int check: after receiver test, SR%c is %02X, ISR is %02X\n", (ch+0x41), duart68681->channel[ch].SR, duart68681->ISR);
 }
 
-UINT8 mc68681_channel::read_rx_fifo()
+uint8_t mc68681_channel::read_rx_fifo()
 {
-	UINT8 rv;
+	uint8_t rv;
 
 //  printf("read_rx_fifo: rx_fifo_num %d\n", rx_fifo_num);
 
@@ -935,9 +935,9 @@ UINT8 mc68681_channel::read_rx_fifo()
 	return rv;
 }
 
-UINT8 mc68681_channel::read_chan_reg(int reg)
+uint8_t mc68681_channel::read_chan_reg(int reg)
 {
-	UINT8 rv = 0xff;
+	uint8_t rv = 0xff;
 
 	switch (reg)
 	{
@@ -968,7 +968,7 @@ UINT8 mc68681_channel::read_chan_reg(int reg)
 	return rv;
 }
 
-void mc68681_channel::write_chan_reg(int reg, UINT8 data)
+void mc68681_channel::write_chan_reg(int reg, uint8_t data)
 {
 	switch (reg)
 	{
@@ -995,7 +995,7 @@ void mc68681_channel::write_chan_reg(int reg, UINT8 data)
 	}
 }
 
-void mc68681_channel::write_MR(UINT8 data)
+void mc68681_channel::write_MR(uint8_t data)
 {
 	if ( MR_ptr == 0 )
 	{
@@ -1070,7 +1070,7 @@ void mc68681_channel::recalc_framing()
 	set_data_frame(1, (MR1 & 3)+5, parity, stopbits);
 }
 
-void mc68681_channel::write_CR(UINT8 data)
+void mc68681_channel::write_CR(uint8_t data)
 {
 	CR = data;
 
@@ -1148,7 +1148,7 @@ void mc68681_channel::write_CR(UINT8 data)
 	update_interrupts();
 }
 
-void mc68681_channel::write_TX(UINT8 data)
+void mc68681_channel::write_TX(uint8_t data)
 {
 	tx_data = data;
 
@@ -1178,7 +1178,7 @@ void mc68681_channel::ACR_updated()
 	write_chan_reg(1, CSR);
 }
 
-UINT8 mc68681_channel::get_chan_CSR()
+uint8_t mc68681_channel::get_chan_CSR()
 {
 	return CSR;
 }

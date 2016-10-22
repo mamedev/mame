@@ -48,7 +48,7 @@ const device_type MC6852 = &device_creator<mc6852_device>;
 //  mc6852_device - constructor
 //-------------------------------------------------
 
-mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MC6852, "MC6852", tag, owner, clock, "mc6852", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_write_tx_data(*this),
@@ -101,8 +101,8 @@ void mc6852_device::device_start()
 
 void mc6852_device::device_reset()
 {
-	m_rx_fifo = std::queue<UINT8>();
-	m_tx_fifo = std::queue<UINT8>();
+	m_rx_fifo = std::queue<uint8_t>();
+	m_tx_fifo = std::queue<uint8_t>();
 
 	receive_register_reset();
 	transmit_register_reset();
@@ -163,7 +163,7 @@ void mc6852_device::rcv_complete()
 
 READ8_MEMBER( mc6852_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(offset, 0))
 	{

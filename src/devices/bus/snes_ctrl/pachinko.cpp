@@ -44,7 +44,7 @@ ioport_constructor snes_pachinko_device::device_input_ports() const
 //  snes_pachinko_device - constructor
 //-------------------------------------------------
 
-snes_pachinko_device::snes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+snes_pachinko_device::snes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, SNES_PACHINKO, "Sunsoft Pachinko Controller", tag, owner, clock, "snes_pachinko", __FILE__),
 					device_snes_control_port_interface(mconfig, *this),
 					m_dial(*this, "DIAL"),
@@ -81,7 +81,7 @@ void snes_pachinko_device::device_reset()
 
 void snes_pachinko_device::port_poll()
 {
-	UINT8 dial = BITSWAP8(m_dial->read() ^ 0xff,7,6,5,4,3,2,1,0);
+	uint8_t dial = BITSWAP8(m_dial->read() ^ 0xff,7,6,5,4,3,2,1,0);
 	m_latch = m_button->read() | (dial << 25) | 0xee7000;   // add ID
 }
 
@@ -89,9 +89,9 @@ void snes_pachinko_device::port_poll()
 //  read
 //-------------------------------------------------
 
-UINT8 snes_pachinko_device::read_pin4()
+uint8_t snes_pachinko_device::read_pin4()
 {
-	UINT8 ret = m_latch & 1;
+	uint8_t ret = m_latch & 1;
 	m_latch >>= 1;
 	return ret;
 }
@@ -100,7 +100,7 @@ UINT8 snes_pachinko_device::read_pin4()
 //  write
 //-------------------------------------------------
 
-void snes_pachinko_device::write_strobe(UINT8 data)
+void snes_pachinko_device::write_strobe(uint8_t data)
 {
 	int old = m_strobe;
 	m_strobe = data & 0x01;

@@ -84,7 +84,7 @@ public:
 		{
 			if (!m_signalled)
 			{
-				UINT64 msec = timeout * 1000 / osd_ticks_per_second();
+				uint64_t msec = timeout * 1000 / osd_ticks_per_second();
 
 				do {
 					if (m_cond.wait_for(lock, std::chrono::milliseconds(msec)) == std::cv_status::timeout)
@@ -158,8 +158,8 @@ public:
 private:
 	std::mutex               m_mutex;
 	std::condition_variable  m_cond;
-	std::atomic<INT32>       m_autoreset;
-	std::atomic<INT32>       m_signalled;
+	std::atomic<int32_t>       m_autoreset;
+	std::atomic<int32_t>       m_signalled;
 
 };
 

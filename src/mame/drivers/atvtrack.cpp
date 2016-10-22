@@ -116,13 +116,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	inline UINT32 decode64_32(offs_t offset64, UINT64 data, UINT64 mem_mask, offs_t &offset32);
-	void logbinary(UINT32 data,int high,int low);
+	uint32_t screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline uint32_t decode64_32(offs_t offset64, uint64_t data, uint64_t mem_mask, offs_t &offset32);
+	void logbinary(uint32_t data,int high,int low);
 
 	memory_region *m_nandregion;
 	int m_nandcommand[4], m_nandoffset[4], m_nandaddressstep, m_nandaddress[4];
-	UINT32 m_area1_data[4];
+	uint32_t m_area1_data[4];
 
 	required_device<sh4_device> m_maincpu;
 	required_device<sh4_device> m_subcpu;
@@ -141,9 +141,9 @@ public:
 	virtual void machine_reset() override;
 };
 
-void atvtrack_state::logbinary(UINT32 data,int high=31,int low=0)
+void atvtrack_state::logbinary(uint32_t data,int high=31,int low=0)
 {
-	UINT32 s;
+	uint32_t s;
 	int z;
 
 	s=1 << high;
@@ -156,15 +156,15 @@ void atvtrack_state::logbinary(UINT32 data,int high=31,int low=0)
 	}
 }
 
-inline UINT32 atvtrack_state::decode64_32(offs_t offset64, UINT64 data, UINT64 mem_mask, offs_t &offset32)
+inline uint32_t atvtrack_state::decode64_32(offs_t offset64, uint64_t data, uint64_t mem_mask, offs_t &offset32)
 {
 	if (ACCESSING_BITS_0_31) {
 		offset32 = offset64 << 1;
-		return (UINT32)data;
+		return (uint32_t)data;
 	}
 	if (ACCESSING_BITS_32_63) {
 		offset32 = (offset64 << 1)+1;
-		return (UINT32)(data >> 32);
+		return (uint32_t)(data >> 32);
 	}
 	logerror("Wrong word size in external access\n");
 	//machine().debug_break();
@@ -173,7 +173,7 @@ inline UINT32 atvtrack_state::decode64_32(offs_t offset64, UINT64 data, UINT64 m
 
 READ64_MEMBER(atvtrack_state::control_r)
 {
-	UINT32 addr;
+	uint32_t addr;
 
 	addr = 0;
 	decode64_32(offset, 0, mem_mask, addr);
@@ -186,7 +186,7 @@ READ64_MEMBER(atvtrack_state::control_r)
 
 WRITE64_MEMBER(atvtrack_state::control_w)
 {
-	UINT32 addr, dat; //, old;
+	uint32_t addr, dat; //, old;
 
 	addr = 0;
 	dat = decode64_32(offset, data, mem_mask, addr);
@@ -205,7 +205,7 @@ WRITE64_MEMBER(atvtrack_state::control_w)
 
 READ64_MEMBER(atvtrack_state::area2_r)
 {
-	UINT32 addr, dat;
+	uint32_t addr, dat;
 	int c;
 
 	addr = 0;
@@ -229,7 +229,7 @@ READ64_MEMBER(atvtrack_state::area2_r)
 
 WRITE64_MEMBER(atvtrack_state::area2_w)
 {
-//  UINT32 addr, dat;
+//  uint32_t addr, dat;
 
 //  addr = 0;
 //  dat = decode64_32(offset, data, mem_mask, addr);
@@ -241,7 +241,7 @@ WRITE64_MEMBER(atvtrack_state::area2_w)
 
 READ64_MEMBER(atvtrack_state::area3_r)
 {
-//  UINT32 addr, dat;
+//  uint32_t addr, dat;
 
 //  addr = 0;
 //  dat = decode64_32(offset, 0, mem_mask, addr);
@@ -254,7 +254,7 @@ READ64_MEMBER(atvtrack_state::area3_r)
 
 WRITE64_MEMBER(atvtrack_state::area3_w)
 {
-	UINT32 addr; //, dat;
+	uint32_t addr; //, dat;
 	int c;
 
 	addr = 0;
@@ -288,7 +288,7 @@ WRITE64_MEMBER(atvtrack_state::area3_w)
 
 READ64_MEMBER(atvtrack_state::area4_r)
 {
-//  UINT32 addr, dat;
+//  uint32_t addr, dat;
 
 //  addr = 0;
 //  dat = decode64_32(offset, 0, mem_mask, addr);
@@ -301,7 +301,7 @@ READ64_MEMBER(atvtrack_state::area4_r)
 
 WRITE64_MEMBER(atvtrack_state::area4_w)
 {
-	UINT32 addr; //, dat;
+	uint32_t addr; //, dat;
 	int c;
 
 	addr = 0;
@@ -342,7 +342,7 @@ READ64_MEMBER(atvtrack_state::ioport_r)
 WRITE64_MEMBER(atvtrack_state::ioport_w)
 {
 #ifdef SPECIALMODE
-	UINT64 d;
+	uint64_t d;
 	static int cnt=0;
 	sh4_device_dma dm;
 #endif
@@ -353,7 +353,7 @@ WRITE64_MEMBER(atvtrack_state::ioport_w)
 				m_slaverun = true;
 		}
 		logerror("SH4 16bit i/o port write ");
-		logbinary((UINT32)data,15,0);
+		logbinary((uint32_t)data,15,0);
 		logerror("\n");
 	}
 #ifdef SPECIALMODE
@@ -379,19 +379,19 @@ void atvtrack_state::video_start()
 {
 }
 
-UINT32 atvtrack_state::screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t atvtrack_state::screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
 void atvtrack_state::machine_start()
 {
-	UINT8 *src, *dst;
+	uint8_t *src, *dst;
 
 	m_nandaddressstep = 0;
 	m_nandregion = memregion("maincpu");
 	address_space &as = m_maincpu->space(AS_PROGRAM);
-	dst = (UINT8 *)(as.get_write_ptr(0x0c7f0000));
+	dst = (uint8_t *)(as.get_write_ptr(0x0c7f0000));
 	src = m_nandregion->base()+0x10;
 	// copy 0x10000 bytes from region "maincpu" offset 0x10 to 0x0c7f0000
 	memcpy(dst, src, 0x10000);

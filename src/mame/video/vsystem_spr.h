@@ -3,7 +3,7 @@
 // Video System Sprites
 
 
-typedef device_delegate<UINT32 (UINT32)> vsystem_tile_indirection_delegate;
+typedef device_delegate<uint32_t (uint32_t)> vsystem_tile_indirection_delegate;
 
 #define MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( _class, _method) \
 	vsystem_spr_device::set_tile_indirect_cb(*device, vsystem_tile_indirection_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
@@ -23,7 +23,7 @@ typedef device_delegate<UINT32 (UINT32)> vsystem_tile_indirection_delegate;
 class vsystem_spr_device : public device_t
 {
 public:
-	vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -35,17 +35,17 @@ public:
 	static void set_pal_mask(device_t &device, int pal_mask);
 	static void CG10103_set_transpen(device_t &device, int transpen);
 
-	UINT32 tile_callback_noindirect(UINT32 tile);
+	uint32_t tile_callback_noindirect(uint32_t tile);
 	vsystem_tile_indirection_delegate m_newtilecb;
 
 	// inline config
 	int m_xoffs, m_yoffs;
 	bool m_pdraw;
-	UINT16 m_pal_mask;
-	UINT8 m_gfx_region;
-	UINT8 m_transpen;
+	uint16_t m_pal_mask;
+	uint8_t m_gfx_region;
+	uint8_t m_transpen;
 
-	UINT16 m_pal_base;
+	uint16_t m_pal_base;
 
 	struct vsystem_sprite_attributes
 	{
@@ -59,13 +59,13 @@ public:
 		int flipy;
 		int color;
 		int pri;
-		UINT32 map;
+		uint32_t map;
 	} m_curr_sprite;
 
-	void get_sprite_attributes(UINT16* ram);
+	void get_sprite_attributes(uint16_t* ram);
 	void common_sprite_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
-	void draw_sprites(  UINT16* spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask = -1, int prihack_val = -1 );
+	void draw_sprites(  uint16_t* spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask = -1, int prihack_val = -1 );
 	void set_pal_base(int pal_base);
 
 

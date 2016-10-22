@@ -227,7 +227,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_change_color)
 TIMER_CALLBACK_MEMBER(vectrex_state::update_level)
 {
 	if (ptr)
-		* (UINT8 *) ptr = param;
+		* (uint8_t *) ptr = param;
 }
 
 

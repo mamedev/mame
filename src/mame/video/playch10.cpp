@@ -8,7 +8,7 @@
 
 WRITE8_MEMBER(playch10_state::playch10_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	if (m_pc10_sdcs)
 	{
 		videoram[offset] = data;
@@ -18,7 +18,7 @@ WRITE8_MEMBER(playch10_state::playch10_videoram_w)
 
 PALETTE_INIT_MEMBER(playch10_state, playch10)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -66,7 +66,7 @@ void playch10_state::ppu_irq(int *ppu_regs)
 
 TILE_GET_INFO_MEMBER(playch10_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int offs = tile_index * 2;
 	int code = videoram[offs] + ((videoram[offs + 1] & 0x07) << 8);
 	int color = (videoram[offs + 1] >> 3) & 0x1f;
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(playch10_state::get_bg_tile_info)
 
 void playch10_state::video_start()
 {
-	const UINT8 *bios = memregion("maincpu")->base();
+	const uint8_t *bios = memregion("maincpu")->base();
 	m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playch10_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
@@ -85,7 +85,7 @@ void playch10_state::video_start()
 
 VIDEO_START_MEMBER(playch10_state,playch10_hboard)
 {
-	const UINT8 *bios = memregion("maincpu")->base();
+	const uint8_t *bios = memregion("maincpu")->base();
 	m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playch10_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
@@ -98,7 +98,7 @@ VIDEO_START_MEMBER(playch10_state,playch10_hboard)
 
 ***************************************************************************/
 
-UINT32 playch10_state::screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t playch10_state::screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle top_monitor = screen.visible_area();
 
@@ -124,7 +124,7 @@ UINT32 playch10_state::screen_update_playch10_single(screen_device &screen, bitm
 	return 0;
 }
 
-UINT32 playch10_state::screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t playch10_state::screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Single Monitor version */
 	if (m_pc10_bios != 1)
@@ -139,7 +139,7 @@ UINT32 playch10_state::screen_update_playch10_top(screen_device &screen, bitmap_
 	return 0;
 }
 
-UINT32 playch10_state::screen_update_playch10_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t playch10_state::screen_update_playch10_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Single Monitor version */
 	if (m_pc10_bios != 1)

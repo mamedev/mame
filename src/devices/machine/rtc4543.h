@@ -45,8 +45,8 @@ class rtc4543_device :  public device_t,
 
 public:
 	// construction/destruction
-	rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	rtc4543_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *filename);
+	rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtc4543_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *filename);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( wr_w );
@@ -97,7 +97,7 @@ class jrc6355e_device : public rtc4543_device
 {
 public:
 	// construction/destruction
-	jrc6355e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	jrc6355e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// rtc4543 overrides

@@ -25,20 +25,20 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_attributesram;
-	optional_shared_ptr<UINT8> m_background_color;
-	optional_shared_ptr<UINT8> m_imago_fg_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_attributesram;
+	optional_shared_ptr<uint8_t> m_background_color;
+	optional_shared_ptr<uint8_t> m_imago_fg_videoram;
 
 	int m_hardware_type;
-	UINT16 m_charbank;
-	UINT8 m_colorbank;
-	UINT8 m_nmi_mask;
-	UINT8 m_sound_nmi_mask;
-	UINT8 m_imago_sprites[0x800*3];
-	UINT16 m_imago_sprites_address;
-	UINT8 m_imago_sprites_bank;
+	uint16_t m_charbank;
+	uint8_t m_colorbank;
+	uint8_t m_nmi_mask;
+	uint8_t m_sound_nmi_mask;
+	uint8_t m_imago_sprites[0x800*3];
+	uint16_t m_imago_sprites_address;
+	uint8_t m_imago_sprites_bank;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
@@ -88,7 +88,7 @@ public:
 	DECLARE_VIDEO_START(fastfred);
 	DECLARE_VIDEO_START(imago);
 
-	UINT32 screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

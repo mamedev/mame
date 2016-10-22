@@ -52,7 +52,7 @@ WRITE8_MEMBER(pcat_base_state::pc_dma_write_byte)
 
 READ8_MEMBER(pcat_base_state::dma_page_select_r)
 {
-	UINT8 data = m_at_pages[offset % 0x10];
+	uint8_t data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
