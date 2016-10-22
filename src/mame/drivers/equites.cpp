@@ -123,8 +123,8 @@ Notes:
   CABINET     Cocktail                         ON
               Upright                          OFF
 
-- splendorblast2 is different in many areas, most notibly in the title screen and
-  the operation of the missiles which is a power-up pickup rather than a cumulative
+- splndrbt2 is different in many areas, most notibly in the title screen and the
+  operation of the missiles which is a power-up pickup rather than a cumulative
   collecting of missiles that can run out.
 
 
@@ -1806,7 +1806,7 @@ ROM_START( splndrbtb )
 	ROM_LOAD( "s3.8l",  0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END
 
-ROM_START( splendorblast2 )
+ROM_START( splndrbt2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // 68000 ROMs(16k x 4)
 	ROM_LOAD16_BYTE( "1.a16", 0x00001, 0x4000, CRC(0fd3121d) SHA1(f9767af477442a09a70c04e4d427914557fddcd9) ) 
 	ROM_LOAD16_BYTE( "2.c16", 0x00000, 0x4000, CRC(227d8a1b) SHA1(8ce976e6d3dce1236a784e48f4829f42c801249c) ) 
@@ -1973,8 +1973,8 @@ GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state, equites,  RO
 GAME( 1985, gekisou,   0,        gekisou,  gekisou,  equites_state, equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Splendor Blast Hardware
-GAME( 1985, splendorblast2,  0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast II", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, splndrbta, splndrbt, splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, splndrbtb, splndrbt, splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, splndrbt2, 0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast II", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, hvoltage,  0,        hvoltage, hvoltage, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "High Voltage", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
