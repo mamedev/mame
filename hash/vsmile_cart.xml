@@ -727,7 +727,7 @@ Game cartridges
 
     <!-- loads if mapped as Batman TV -->
     <software name="cars" supported="no">
-        <description>Cars - Rev It Up in Radiator Springs (USA)</description>
+        <description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA)</description>
         <year>2006?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092660(US)" />
@@ -743,7 +743,7 @@ Game cartridges
     </software>
 
     <software name="carsg" cloneof="cars" supported="no">
-        <description>Cars - Vollgas in Radiator Springs (Ger)</description>
+        <description>Disney/Pixar Cars - Vollgas in Radiator Springs (Ger)</description>
         <year>2006?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092664(GE)" />
@@ -759,7 +759,7 @@ Game cartridges
     </software>
 
     <software name="carsf" cloneof="cars" supported="no">
-        <description>Cars - Quatre Roues (Fra)</description>
+        <description>Disney/Pixar Cars - Quatre Roues (Fra)</description>
         <year>2006?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092665(FR)" />
@@ -775,7 +775,7 @@ Game cartridges
     </software>
 
     <software name="carsdk" cloneof="cars" supported="no">
-        <description>Biler - Ræs i Kølerkildekøbing (Den)</description>
+        <description>Disney/Pixar Biler - Ræs i Kølerkildekøbing (Den)</description>
         <year>2007?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092673(DK)" />
@@ -791,7 +791,7 @@ Game cartridges
     </software>
 
     <software name="carssw" cloneof="cars" supported="no">
-        <description>Bilar - Kör ikapp i Kylarköping (Swe)</description>
+        <description>Disney/Pixar Bilar - Kör ikapp i Kylarköping (Swe)</description>
         <year>2007?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-092674(SE)" />
