@@ -5,11 +5,6 @@
 #define V30_TYPE 8
 #define V20_TYPE 16
 
-#ifndef FALSE
-#define FALSE 0
-#define TRUE 1
-#endif
-
 /* interrupt vectors */
 enum
 {

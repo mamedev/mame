@@ -279,11 +279,11 @@ inline bool nes_exrom_device::in_split()
 	if (tile < 34)
 	{
 		if (!m_split_rev && tile < m_split_ctrl)
-			return TRUE;
+			return true;
 		if (m_split_rev && tile >= m_split_ctrl)
-			return TRUE;
+			return true;
 	}
-	return FALSE;
+	return false;
 }
 
 READ8_MEMBER(nes_exrom_device::nt_r)

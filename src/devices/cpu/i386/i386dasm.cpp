@@ -2085,7 +2085,7 @@ static char *hexstringpc(uint64_t pc)
 		return hexstring((uint32_t)pc, 0);
 }
 
-static char *shexstring(uint32_t value, int digits, int always)
+static char *shexstring(uint32_t value, int digits, bool always)
 {
 	static char buffer[20];
 	if (value >= 0x80000000)
@@ -2151,17 +2151,17 @@ static void handle_modrm(char* s)
 			s = handle_sib_byte( s, mod );
 		else if ((rm & 7) == 5 && mod == 0) {
 			disp32 = FETCHD32();
-			s += sprintf( s, "rip%s", shexstring(disp32, 0, TRUE) );
+			s += sprintf( s, "rip%s", shexstring(disp32, 0, true) );
 		} else
 			s += sprintf( s, "%s", i386_reg[2][rm]);
 		if( mod == 1 ) {
 			disp8 = FETCHD();
 			if (disp8 != 0)
-				s += sprintf( s, "%s", shexstring((int32_t)disp8, 0, TRUE) );
+				s += sprintf( s, "%s", shexstring((int32_t)disp8, 0, true) );
 		} else if( mod == 2 ) {
 			disp32 = FETCHD32();
 			if (disp32 != 0)
-				s += sprintf( s, "%s", shexstring(disp32, 0, TRUE) );
+				s += sprintf( s, "%s", shexstring(disp32, 0, true) );
 		}
 	} else if (address_size == 1) {
 		if ((rm & 7) == 4)
@@ -2169,7 +2169,7 @@ static void handle_modrm(char* s)
 		else if ((rm & 7) == 5 && mod == 0) {
 			disp32 = FETCHD32();
 			if (curmode == 64)
-				s += sprintf( s, "eip%s", shexstring(disp32, 0, TRUE) );
+				s += sprintf( s, "eip%s", shexstring(disp32, 0, true) );
 			else
 				s += sprintf( s, "%s", hexstring(disp32, 0) );
 		} else
@@ -2177,11 +2177,11 @@ static void handle_modrm(char* s)
 		if( mod == 1 ) {
 			disp8 = FETCHD();
 			if (disp8 != 0)
-				s += sprintf( s, "%s", shexstring((int32_t)disp8, 0, TRUE) );
+				s += sprintf( s, "%s", shexstring((int32_t)disp8, 0, true) );
 		} else if( mod == 2 ) {
 			disp32 = FETCHD32();
 			if (disp32 != 0)
-				s += sprintf( s, "%s", shexstring(disp32, 0, TRUE) );
+				s += sprintf( s, "%s", shexstring(disp32, 0, true) );
 		}
 	} else {
 		switch( rm )
@@ -2205,11 +2205,11 @@ static void handle_modrm(char* s)
 		if( mod == 1 ) {
 			disp8 = FETCHD();
 			if (disp8 != 0)
-				s += sprintf( s, "%s", shexstring((int32_t)disp8, 0, TRUE) );
+				s += sprintf( s, "%s", shexstring((int32_t)disp8, 0, true) );
 		} else if( mod == 2 ) {
 			disp16 = FETCHD16();
 			if (disp16 != 0)
-				s += sprintf( s, "%s", shexstring((int32_t)disp16, 0, TRUE) );
+				s += sprintf( s, "%s", shexstring((int32_t)disp16, 0, true) );
 		}
 	}
 	s += sprintf( s, "]" );
@@ -2378,22 +2378,22 @@ static char* handle_param(char* s, uint32_t param)
 
 		case PARAM_I8:
 			i8 = FETCHD();
-			s += sprintf( s, "%s", shexstring((int8_t)i8, 0, FALSE) );
+			s += sprintf( s, "%s", shexstring((int8_t)i8, 0, false) );
 			break;
 
 		case PARAM_I16:
 			i16 = FETCHD16();
-			s += sprintf( s, "%s", shexstring((int16_t)i16, 0, FALSE) );
+			s += sprintf( s, "%s", shexstring((int16_t)i16, 0, false) );
 			break;
 
 		case PARAM_UI8:
 			i8 = FETCHD();
-			s += sprintf( s, "%s", shexstring((uint8_t)i8, 0, FALSE) );
+			s += sprintf( s, "%s", shexstring((uint8_t)i8, 0, false) );
 			break;
 
 		case PARAM_UI16:
 			i16 = FETCHD16();
-			s += sprintf( s, "%s", shexstring((uint16_t)i16, 0, FALSE) );
+			s += sprintf( s, "%s", shexstring((uint16_t)i16, 0, false) );
 			break;
 
 		case PARAM_IMM64:
