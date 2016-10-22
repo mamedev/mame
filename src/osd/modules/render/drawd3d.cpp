@@ -1381,7 +1381,7 @@ void renderer_d3d9::pick_best_mode()
 //  update_window_size
 //============================================================
 
-int renderer_d3d9::update_window_size()
+bool renderer_d3d9::update_window_size()
 {
 	auto win = assert_window();
 
@@ -1395,22 +1395,22 @@ int renderer_d3d9::update_window_size()
 		// clear out any pending resizing if the area didn't change
 		if (win->m_resize_state == RESIZE_STATE_PENDING)
 			win->m_resize_state = RESIZE_STATE_NORMAL;
-		return FALSE;
+		return false;
 	}
 
 	// if we're in the middle of resizing, leave it alone as well
 	if (win->m_resize_state == RESIZE_STATE_RESIZING)
-		return FALSE;
+		return false;
 
 	// set the new bounds and create the device again
 	m_width = rect_width(&client);
 	m_height = rect_height(&client);
 	if (device_create(win->main_window()->platform_window<HWND>()))
-		return FALSE;
+		return false;
 
 	// reset the resize state to normal, and indicate we made a change
 	win->m_resize_state = RESIZE_STATE_NORMAL;
-	return TRUE;
+	return true;
 }
 
 
@@ -2228,9 +2228,9 @@ void texture_info::compute_size(int texwidth, int texheight)
 	// if we're above the max width/height, do what?
 	if (finalwidth > m_texture_manager->get_max_texture_width() || finalheight > m_texture_manager->get_max_texture_height())
 	{
-		static int printed = FALSE;
+		static bool printed = false;
 		if (!printed) osd_printf_warning("Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth, finalheight, (int)m_texture_manager->get_max_texture_width(), (int)m_texture_manager->get_max_texture_height());
-		printed = TRUE;
+		printed = true;
 	}
 
 	// compute the U/V scale factors

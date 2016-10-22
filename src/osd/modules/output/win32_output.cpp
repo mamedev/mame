@@ -175,7 +175,7 @@ void output_win32::exit()
 
 int output_win32::create_window_class(void)
 {
-	static uint8_t classes_created = FALSE;
+	static bool classes_created = false;
 
 	/* only do this once */
 	if (!classes_created)
@@ -192,7 +192,7 @@ int output_win32::create_window_class(void)
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
 			return 1;
-		classes_created = TRUE;
+		classes_created = true;
 	}
 
 	return 0;
@@ -263,7 +263,7 @@ LRESULT output_win32::register_client(HWND hwnd, LPARAM id)
 LRESULT output_win32::unregister_client(HWND hwnd, LPARAM id)
 {
 	registered_client **client;
-	int found = FALSE;
+	bool found = false;
 
 	// find any matching IDs in the list and remove them
 	for (client = &m_clientlist; *client != nullptr; client = &(*client)->next)
@@ -272,7 +272,7 @@ LRESULT output_win32::unregister_client(HWND hwnd, LPARAM id)
 			registered_client *temp = *client;
 			*client = (*client)->next;
 			global_free(temp);
-			found = TRUE;
+			found = true;
 			break;
 		}
 

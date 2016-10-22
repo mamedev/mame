@@ -335,7 +335,7 @@ int osd_work_queue_items(osd_work_queue *queue)
 //  osd_work_queue_wait
 //============================================================
 
-int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
+bool osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 {
 	// if no threads, no waiting
 	if (queue->threads == 0)
@@ -568,7 +568,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 //  osd_work_item_wait
 //============================================================
 
-int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
+bool osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 {
 	// if we're done already, just return
 	if (item->done)

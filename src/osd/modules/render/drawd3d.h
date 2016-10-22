@@ -85,7 +85,7 @@ public:
 	void                    pick_best_mode();
 	int                     get_adapter_for_monitor();
 
-	int                     update_window_size();
+	bool                    update_window_size();
 
 	int                     pre_window_draw_check();
 	void                    begin_frame();
