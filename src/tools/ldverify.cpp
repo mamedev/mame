@@ -133,7 +133,7 @@ static bool read_avi(void *file, int frame, bitmap_yuy16 &bitmap, int16_t *lsoun
 	// read the frame
 	avi_file::error avierr = avifile->read_video_frame(frame, bitmap);
 	if (avierr != avi_file::error::NONE)
-		return FALSE;
+		return false;
 
 	// read the samples
 	const avi_file::movie_info &aviinfo = avifile->get_movie_info();
@@ -335,7 +335,7 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 			// if we haven't seen lead-in yet, detect it
 			if (!video.saw_leadin)
 			{
-				video.saw_leadin = TRUE;
+				video.saw_leadin = true;
 				printf("%6d.%d: lead-in code detected\n", frame, fieldnum);
 			}
 
@@ -350,7 +350,7 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 			// if we haven't seen lead-in yet, detect it
 			if (!video.saw_leadout)
 			{
-				video.saw_leadout = TRUE;
+				video.saw_leadout = true;
 				printf("%6d.%d: lead-out code detected\n", frame, fieldnum);
 				if (video.last_frame != -1)
 					printf("%6d.%d: final frame number was %d\n", frame, fieldnum, video.last_frame);
@@ -372,7 +372,7 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 			if (!video.saw_leadin)
 			{
 				printf("%6d.%d: detected frame number but never saw any lead-in (WARNING)\n", frame, fieldnum);
-				video.saw_leadin = TRUE;
+				video.saw_leadin = true;
 			}
 
 			// if this is the first frame, make sure it's 1

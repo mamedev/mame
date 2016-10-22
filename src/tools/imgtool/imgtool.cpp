@@ -777,12 +777,12 @@ int imgtool_validitychecks(void)
 	int error = 0;
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
 	imgtool_module_features features;
-	int created_library = FALSE;
+	int created_library = false;
 
 	if (!global_imgtool_library)
 	{
-		imgtool_init(FALSE, nullptr);
-		created_library = TRUE;
+		imgtool_init(false, nullptr);
+		created_library = true;
 	}
 
 	for (const auto &module : global_imgtool_library->modules())
@@ -1160,19 +1160,19 @@ imgtoolerr_t imgtool::partition::cannonicalize_path(uint32_t flags, const char *
 		}
 
 		/* copy the path */
-		in_path_separator = TRUE;
+		in_path_separator = true;
 		i = j = 0;
 		do
 		{
 			if ((s[i] != '\0') && (s[i] != path_separator) && (s[i] != alt_path_separator))
 			{
 				new_path[j++] = s[i];
-				in_path_separator = FALSE;
+				in_path_separator = false;
 			}
 			else if (!in_path_separator)
 			{
 				new_path[j++] = '\0';
-				in_path_separator = TRUE;
+				in_path_separator = true;
 			}
 		}
 		while(s[i++] != '\0');
@@ -1608,7 +1608,7 @@ imgtoolerr_t imgtool::partition::get_chain_string(const char *path, char *buffer
 	uint64_t last_block;
 	uint8_t cur_level = 0;
 	int len, i;
-	int comma_needed = FALSE;
+	int comma_needed = false;
 
 	// determine the last block identifier
 	chain[0].block = ~0;
@@ -1630,7 +1630,7 @@ imgtoolerr_t imgtool::partition::get_chain_string(const char *path, char *buffer
 			buffer += len;
 			buffer_len -= len;
 			cur_level++;
-			comma_needed = FALSE;
+			comma_needed = false;
 		}
 		while(cur_level > chain[i].level)
 		{
@@ -1650,7 +1650,7 @@ imgtoolerr_t imgtool::partition::get_chain_string(const char *path, char *buffer
 		len = snprintf(buffer, buffer_len, "%u", (unsigned) chain[i].block);
 		buffer += len;
 		buffer_len -= len;
-		comma_needed = TRUE;
+		comma_needed = true;
 	}
 
 	do

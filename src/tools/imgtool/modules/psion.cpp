@@ -92,7 +92,7 @@ uint32_t update_pack_index(psion_pack *pack)
 		if(data == 0xff)
 		{
 			pack->eop = pack->stream->tell() - 1;
-			return TRUE;
+			return true;
 		}
 		else if (data == 0x02)
 		{
@@ -129,7 +129,7 @@ uint32_t update_pack_index(psion_pack *pack)
 	} while (pack->stream->size() > pack->stream->tell());
 
 	// corrupted image
-	return FALSE;
+	return false;
 }
 
 int seek_next_record(imgtool::stream &stream, uint8_t id)
@@ -156,7 +156,7 @@ int seek_next_record(imgtool::stream &stream, uint8_t id)
 			if (id == rec_id)
 			{
 				stream.seek(-2, SEEK_CUR);
-				return TRUE;
+				return true;
 			}
 			size = data;
 		}
@@ -166,7 +166,7 @@ int seek_next_record(imgtool::stream &stream, uint8_t id)
 
 	} while (stream.size() > stream.tell());
 
-	return FALSE;
+	return false;
 }
 
 // if there are multiple files with the same name, only the first is found

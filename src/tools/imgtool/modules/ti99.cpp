@@ -376,7 +376,7 @@ static int check_fname(const char filename[10])
 
 
 	/* check and copy file name */
-	space_found_flag = FALSE;
+	space_found_flag = false;
 	for (i=0; i<10; i++)
 	{
 		switch (filename[i])
@@ -388,7 +388,7 @@ static int check_fname(const char filename[10])
 		case ' ':
 			/* illegal in a file name, but file names shorter than 10
 			characters are padded with spaces */
-			space_found_flag = TRUE;
+			space_found_flag = true;
 			break;
 		default:
 			/* all other characters are legal (though non-ASCII characters,
@@ -1980,10 +1980,10 @@ static int win_read_catalog(struct ti99_lvl2_imgref *l2_img, int DDR_AU, ti99_ca
 
     l2_img: image reference
     fpath: path of the file to search
-    parent_ref_valid: set to TRUE if either the file was found or the file was
+    parent_ref_valid: set to true if either the file was found or the file was
         not found but its parent dir was
     parent_ref: reference to parent dir (0 for root)
-    out_is_dir: TRUE if element is a directory
+    out_is_dir: true if element is a directory
     catalog_index: on output, index of file catalog entry (may be NULL)
 */
 static int dsk_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *fpath, int *parent_ref_valid, int *parent_ref, int *out_is_dir, int *catalog_index)
@@ -1993,12 +1993,12 @@ static int dsk_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *f
 	const char *element_start, *element_end;
 	int element_len;
 	char element[10];
-	int is_dir = FALSE;
+	int is_dir = false;
 
 
 	cur_catalog = & l2_img->dsk.catalogs[0];
 	if (parent_ref_valid)
-		(* parent_ref_valid) = FALSE;
+		(* parent_ref_valid) = false;
 	if (parent_ref)
 		*parent_ref = 0;
 
@@ -2012,7 +2012,7 @@ static int dsk_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *f
 			return IMGTOOLERR_BADFILENAME;
 		/* last path element */
 		if ((!element_end) && parent_ref_valid)
-			(* parent_ref_valid) = TRUE;
+			(* parent_ref_valid) = true;
 
 		/* generate file name */
 		memcpy(element, element_start, element_len);
@@ -2023,7 +2023,7 @@ static int dsk_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *f
 		{
 			if (! memcmp(element, cur_catalog->subdirs[i].name, 10))
 			{
-				is_dir = TRUE;
+				is_dir = true;
 				break;
 			}
 		}
@@ -2035,7 +2035,7 @@ static int dsk_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *f
 			{
 				if (! memcmp(element, cur_catalog->files[i].name, 10))
 				{
-					is_dir = FALSE;
+					is_dir = false;
 					break;
 				}
 			}
@@ -2079,11 +2079,11 @@ static int dsk_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *f
 
     l2_img: image reference
     fpath: path of the file to search
-    parent_ref_valid: set to TRUE if either the file was found or the file was
+    parent_ref_valid: set to true if either the file was found or the file was
         not found but its parent dir was
     parent_ddr_AU: parent DDR AU address (0 for root)
     parent_catalog: catalog of parent dir (cannot be NULL)
-    out_is_dir: TRUE if element is a directory
+    out_is_dir: true if element is a directory
     catalog_index: on output, index of file catalog entry (may be NULL)
 */
 static int win_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *fpath,
@@ -2094,11 +2094,11 @@ static int win_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *f
 	const char *element_start, *element_end;
 	int element_len;
 	char element[10];
-	int is_dir = FALSE;
+	int is_dir = false;
 	int errorcode;
 
 	if (parent_ref_valid)
-		(* parent_ref_valid) = FALSE;
+		(* parent_ref_valid) = false;
 	if (parent_ddr_AU)
 		*parent_ddr_AU = 0;
 
@@ -2116,7 +2116,7 @@ static int win_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *f
 			return IMGTOOLERR_BADFILENAME;
 		/* last path element */
 		if ((!element_end) && parent_ref_valid)
-			(* parent_ref_valid) = TRUE;
+			(* parent_ref_valid) = true;
 
 		/* generate file name */
 		memcpy(element, element_start, element_len);
@@ -2127,7 +2127,7 @@ static int win_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *f
 		{
 			if (! memcmp(element, parent_catalog->subdirs[i].name, 10))
 			{
-				is_dir = TRUE;
+				is_dir = true;
 				break;
 			}
 		}
@@ -2139,7 +2139,7 @@ static int win_find_catalog_entry(struct ti99_lvl2_imgref *l2_img, const char *f
 			{
 				if (! memcmp(element, parent_catalog->files[i].name, 10))
 				{
-					is_dir = FALSE;
+					is_dir = false;
 					break;
 				}
 			}
@@ -2338,7 +2338,7 @@ static int win_alloc_sibFDR(ti99_lvl2_fileref_win *win_file)
 {
 	unsigned oldfdr_AU, oldfdr_physrecinAU;
 	unsigned newfdr_AU, newfdr_physrecinAU;
-	int allocated = FALSE;
+	int allocated = false;
 	int errorcode;
 	unsigned cursibFDR_basefphysrec;
 
@@ -2359,7 +2359,7 @@ static int win_alloc_sibFDR(ti99_lvl2_fileref_win *win_file)
 		if (errorcode)
 			return errorcode;
 		newfdr_physrecinAU = 0;
-		allocated = TRUE;
+		allocated = true;
 	}
 
 	set_UINT16BE(&win_file->curfdr.nextsibFDR_AU, newfdr_AU);
@@ -3020,7 +3020,7 @@ static int open_file_lvl2_win(struct ti99_lvl2_imgref *l2_img, const char *fpath
 				{
 					if (get_UINT16BE(cur_fdr->clusters[i][0]) == 0)
 					{
-						pastendoflist_flag = TRUE;
+						pastendoflist_flag = true;
 						break;
 					}
 					sibFDR_AUlen += get_UINT16BE(cur_fdr->clusters[i][1])
@@ -5115,7 +5115,7 @@ static imgtoolerr_t win_image_deletefile(imgtool::partition &partition, const ch
 						if (get_UINT16BE(fdr.clusters[i][0]) == 0)
 						{
 							endsibFDR_index = cursibFDR_index;
-							pastendoflist_flag = TRUE;
+							pastendoflist_flag = true;
 							break;
 						}
 					}

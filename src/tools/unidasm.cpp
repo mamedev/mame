@@ -393,11 +393,11 @@ static const dasm_table_entry dasm_table[] =
 
 static int parse_options(int argc, char *argv[], options *opts)
 {
-	int pending_base = FALSE;
-	int pending_arch = FALSE;
-	int pending_mode = FALSE;
-	int pending_skip = FALSE;
-	int pending_count = FALSE;
+	bool pending_base = false;
+	bool pending_arch = false;
+	bool pending_mode = false;
+	bool pending_skip = false;
+	bool pending_count = false;
 
 	memset(opts, 0, sizeof(*opts));
 
@@ -413,23 +413,23 @@ static int parse_options(int argc, char *argv[], options *opts)
 				goto usage;
 
 			if (tolower((uint8_t)curarg[1]) == 'a')
-				pending_arch = TRUE;
+				pending_arch = true;
 			else if (tolower((uint8_t)curarg[1]) == 'b')
-				pending_base = TRUE;
+				pending_base = true;
 			else if (tolower((uint8_t)curarg[1]) == 'f')
-				opts->flipped = TRUE;
+				opts->flipped = true;
 			else if (tolower((uint8_t)curarg[1]) == 'l')
-				opts->lower = TRUE;
+				opts->lower = true;
 			else if (tolower((uint8_t)curarg[1]) == 'm')
-				pending_mode = TRUE;
+				pending_mode = true;
 			else if (tolower((uint8_t)curarg[1]) == 's')
-				pending_skip = TRUE;
+				pending_skip = true;
 			else if (tolower((uint8_t)curarg[1]) == 'c')
-				pending_count = TRUE;
+				pending_count = true;
 			else if (tolower((uint8_t)curarg[1]) == 'n')
-				opts->norawbytes = TRUE;
+				opts->norawbytes = true;
 			else if (tolower((uint8_t)curarg[1]) == 'u')
-				opts->upper = TRUE;
+				opts->upper = true;
 			else
 				goto usage;
 		}
@@ -446,7 +446,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 				result = sscanf(&curarg[0], "%x", &opts->basepc);
 			if (result != 1)
 				goto usage;
-			pending_base = FALSE;
+			pending_base = false;
 		}
 
 		// mode
@@ -454,7 +454,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		{
 			if (sscanf(curarg, "%d", &opts->mode) != 1)
 				goto usage;
-			pending_mode = FALSE;
+			pending_mode = false;
 		}
 
 		// architecture
@@ -467,7 +467,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 			if (curarch == ARRAY_LENGTH(dasm_table))
 				goto usage;
 			opts->dasm = &dasm_table[curarch];
-			pending_arch = FALSE;
+			pending_arch = false;
 		}
 
 		// skip bytes
@@ -475,7 +475,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		{
 			if (sscanf(curarg, "%d", &opts->skip) != 1)
 				goto usage;
-			pending_skip = FALSE;
+			pending_skip = false;
 		}
 
 		// size
@@ -483,7 +483,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		{
 			if (sscanf(curarg, "%d", &opts->count) != 1)
 				goto usage;
-			pending_count = FALSE;
+			pending_count = false;
 		}
 
 		// filename

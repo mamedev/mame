@@ -282,7 +282,7 @@ static int hash_name(const char *name, int intl)
 }
 
 
-/* Returns TRUE if year is a leap year */
+/* Returns true if year is a leap year */
 static int is_leap(int year)
 {
 	return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
@@ -818,18 +818,18 @@ static disk_type get_disk_type(imgtool::image &img)
 }
 
 
-/* Returns TRUE if the disk is formatted with the FastFileSystem */
+/* Returns true if the disk is formatted with the FastFileSystem */
 static int is_ffs(imgtool::image &img)
 {
 	disk_type t = get_disk_type(img);
 
 	return ((t == DT_FFS ||
 				t == DT_FFS_INTL ||
-				t == DT_FFS_INTL_DIRC) ? TRUE : FALSE);
+				t == DT_FFS_INTL_DIRC) ? true : false);
 }
 
 
-/* Returns TRUE if the disk uses the international mode */
+/* Returns true if the disk uses the international mode */
 static int is_intl(imgtool::image &img)
 {
 	disk_type t = get_disk_type(img);
@@ -837,17 +837,17 @@ static int is_intl(imgtool::image &img)
 	return ((t == DT_OFS_INTL ||
 				t == DT_FFS_INTL ||
 				t == DT_OFS_INTL_DIRC ||
-				t == DT_FFS_INTL_DIRC) ? TRUE : FALSE);
+				t == DT_FFS_INTL_DIRC) ? true : false);
 }
 
 #ifdef UNUSED_FUNCTION
-/* Returns TRUE if the disk uses the directory cache mode */
+/* Returns true if the disk uses the directory cache mode */
 static int is_dirc(imgtool::image *img)
 {
 	disk_type t = get_disk_type(img);
 
 	return ((t == DT_OFS_INTL_DIRC ||
-				t == DT_FFS_INTL_DIRC) ? TRUE : FALSE);
+				t == DT_FFS_INTL_DIRC) ? true : false);
 }
 #endif
 
@@ -1194,13 +1194,13 @@ static imgtoolerr_t fix_chksum(imgtool::image &img, int block, int bitmap)
 
 static imgtoolerr_t fix_block_chksum(imgtool::image &img, int block)
 {
-	return fix_chksum(img, block, FALSE);
+	return fix_chksum(img, block, false);
 }
 
 
 static imgtoolerr_t fix_bitmap_chksum(imgtool::image &img, int block)
 {
-	return fix_chksum(img, block, TRUE);
+	return fix_chksum(img, block, true);
 }
 
 
@@ -1251,13 +1251,13 @@ static imgtoolerr_t bitmap_mark(imgtool::image &img, int block, int used)
 
 static imgtoolerr_t bitmap_mark_used(imgtool::image &img, int block)
 {
-	return bitmap_mark(img, block, TRUE);
+	return bitmap_mark(img, block, true);
 }
 
 
 static imgtoolerr_t bitmap_mark_free(imgtool::image &img, int block)
 {
-	return bitmap_mark(img, block, FALSE);
+	return bitmap_mark(img, block, false);
 }
 
 
@@ -1600,7 +1600,7 @@ static imgtoolerr_t write_file_block_data(imgtool::image &img, int block, int si
 		if (ret) return ret;
 
 		/* Verify data checksum */
-		ret = get_block_chksum(img, block, &chksum, FALSE);
+		ret = get_block_chksum(img, block, &chksum, false);
 		if (ret) return ret;
 
 		if (db.chksum != chksum)
@@ -1707,13 +1707,13 @@ static imgtoolerr_t walk_file_ext_data(imgtool::image &img, int block, int *file
 
 static imgtoolerr_t write_file_ext_data(imgtool::image &img, int block, int *filesize, imgtool::stream *destf)
 {
-	return walk_file_ext_data(img, block, filesize, destf, TRUE);
+	return walk_file_ext_data(img, block, filesize, destf, true);
 }
 
 
 static imgtoolerr_t clear_file_ext_data(imgtool::image &img, int block, int *filesize)
 {
-	return walk_file_ext_data(img, block, filesize, NULL, FALSE);
+	return walk_file_ext_data(img, block, filesize, NULL, false);
 }
 
 

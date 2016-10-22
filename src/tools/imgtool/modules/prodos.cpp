@@ -942,8 +942,8 @@ static imgtoolerr_t prodos_put_dirent(imgtool::image &image,
 	size_t finfo_offset;
 	uint8_t buffer[BLOCK_SIZE];
 	int fork_num;
-	int needs_finfo = FALSE;
-	int needs_xfinfo = FALSE;
+	int needs_finfo = false;
+	int needs_xfinfo = false;
 	uint8_t *info_ptr;
 	uint8_t *finfo;
 	uint8_t *xfinfo;
@@ -1231,7 +1231,7 @@ static imgtoolerr_t prodos_fill_file(imgtool::image &image, uint8_t *bitmap,
 	{
 		/* we are on a recently allocated key block; start fresh */
 		memset(buffer, 0, sizeof(buffer));
-		dirty = TRUE;
+		dirty = true;
 	}
 	else
 	{
@@ -1239,12 +1239,12 @@ static imgtoolerr_t prodos_fill_file(imgtool::image &image, uint8_t *bitmap,
 		err = prodos_load_block(image, key_block, buffer);
 		if (err)
 			return err;
-		dirty = FALSE;
+		dirty = false;
 	}
 
 	for (i = 0; i < 256; i++)
 	{
-		sub_block_allocated = FALSE;
+		sub_block_allocated = false;
 
 		sub_block = buffer[i + 256];
 		sub_block <<= 8;
@@ -1256,7 +1256,7 @@ static imgtoolerr_t prodos_fill_file(imgtool::image &image, uint8_t *bitmap,
 			err = prodos_alloc_block(image, bitmap, &new_sub_block);
 			if (err)
 				return err;
-			sub_block_allocated = TRUE;
+			sub_block_allocated = true;
 		}
 		else if ((block_index >= blockcount) && (sub_block != 0))
 		{
@@ -1268,7 +1268,7 @@ static imgtoolerr_t prodos_fill_file(imgtool::image &image, uint8_t *bitmap,
 		/* did we change the block? */
 		if (new_sub_block != sub_block)
 		{
-			dirty = TRUE;
+			dirty = true;
 			buffer[i + 0] = new_sub_block >> 0;
 			buffer[i + 256] = new_sub_block >> 8;
 			if (sub_block == 0)
@@ -1373,7 +1373,7 @@ static imgtoolerr_t prodos_set_file_block_count(imgtool::image &image, prodos_di
 				if (depth > 2)
 				{
 					/* remove this block's children */
-					err = prodos_fill_file(image, bitmap, block, FALSE, depth - 1, 0, 0);
+					err = prodos_fill_file(image, bitmap, block, false, depth - 1, 0, 0);
 					if (err)
 						return err;
 				}
@@ -1398,7 +1398,7 @@ static imgtoolerr_t prodos_set_file_block_count(imgtool::image &image, prodos_di
 	if (new_blockcount > 0)
 	{
 		/* fill out the file tree */
-		err = prodos_fill_file(image, bitmap, key_pointer, FALSE, depth, new_blockcount, 0);
+		err = prodos_fill_file(image, bitmap, key_pointer, false, depth, new_blockcount, 0);
 		if (err)
 			return err;
 	}
