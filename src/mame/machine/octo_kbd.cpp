@@ -5,20 +5,20 @@
 #include "machine/keyboard.ipp"
 
 
-octopus_keyboard_device::octopus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
+octopus_keyboard_device::octopus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: buffered_rs232_device(mconfig, OCTOPUS_KEYBOARD, "Octopus Keyboard", tag, owner, 0, "octopus_kb", __FILE__)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF")
 {
 }
 
 
-void octopus_keyboard_device::received_byte(UINT8 data)
+void octopus_keyboard_device::received_byte(uint8_t data)
 {
 	// TODO: figure out received data format (used for Shift Lock and Caps Lock LEDs)
 	printf("KBD: Received byte %02x\n",data);
 }
 
-void octopus_keyboard_device::key_make(UINT8 row, UINT8 column)
+void octopus_keyboard_device::key_make(uint8_t row, uint8_t column)
 {
 	if (row != 0x0eU)
 		typematic_start(row, column, attotime::from_msec(m_delay), attotime::from_msec(m_repeat));
@@ -28,12 +28,12 @@ void octopus_keyboard_device::key_make(UINT8 row, UINT8 column)
 	transmit_byte((row << 3) | column);
 }
 
-void octopus_keyboard_device::key_repeat(UINT8 row, UINT8 column)
+void octopus_keyboard_device::key_repeat(uint8_t row, uint8_t column)
 {
 	transmit_byte((row << 3) | column);
 }
 
-void octopus_keyboard_device::key_break(UINT8 row, UINT8 column)
+void octopus_keyboard_device::key_break(uint8_t row, uint8_t column)
 {
 	device_matrix_keyboard_interface::key_break(row, column);
 	transmit_byte(0x80U | (row << 3) | column);

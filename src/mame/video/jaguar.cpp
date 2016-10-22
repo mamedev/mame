@@ -296,9 +296,9 @@ WRITE_LINE_MEMBER( jaguar_state::dsp_cpu_int )
  *
  *************************************/
 
-void jaguar_state::set_palette(UINT16 vmode)
+void jaguar_state::set_palette(uint16_t vmode)
 {
-	static const UINT8 red_lookup[256] =
+	static const uint8_t red_lookup[256] =
 	{
 			0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 			34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 19,  0,
@@ -318,7 +318,7 @@ void jaguar_state::set_palette(UINT16 vmode)
 		255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
 	};
 
-	static const UINT8 grn_lookup[256] =
+	static const uint8_t grn_lookup[256] =
 	{
 			0, 17, 34, 51, 68, 85,102,119,136,153,170,187,204,221,238,255,
 			0, 19, 38, 57, 77, 96,115,134,154,173,182,211,231,250,255,255,
@@ -338,7 +338,7 @@ void jaguar_state::set_palette(UINT16 vmode)
 			0, 17, 34, 51, 68, 85,102,119,136,153,170,187,204,221,238,255
 	};
 
-	static const UINT8 blu_lookup[256] =
+	static const uint8_t blu_lookup[256] =
 	{
 		255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
 		255,255,255,255,255,255,255,255,255,255,255,255,255,255,240,221,
@@ -369,9 +369,9 @@ void jaguar_state::set_palette(UINT16 vmode)
 		case 0x002:
 			for (i = 0; i < 65536; i++)
 			{
-				UINT8 r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
-				UINT8 g = (grn_lookup[i >> 8] * (i & 0xff)) >> 8;
-				UINT8 b = (blu_lookup[i >> 8] * (i & 0xff)) >> 8;
+				uint8_t r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
+				uint8_t g = (grn_lookup[i >> 8] * (i & 0xff)) >> 8;
+				uint8_t b = (blu_lookup[i >> 8] * (i & 0xff)) >> 8;
 				m_pen_table[i] = rgb_t(r, g, b);
 			}
 			break;
@@ -380,9 +380,9 @@ void jaguar_state::set_palette(UINT16 vmode)
 		case 0x100:
 			for (i = 0; i < 65536; i++)
 			{
-				UINT8 r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
-				UINT8 g = (grn_lookup[i >> 8] * (i & 0xff)) >> 8;
-				UINT8 b = (blu_lookup[i >> 8] * (i & 0xff)) >> 8;
+				uint8_t r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
+				uint8_t g = (grn_lookup[i >> 8] * (i & 0xff)) >> 8;
+				uint8_t b = (blu_lookup[i >> 8] * (i & 0xff)) >> 8;
 
 				/* if the low bit is set, treat it as 5-5-5 RGB instead */
 				if (i & 1)
@@ -433,9 +433,9 @@ void jaguar_state::set_palette(UINT16 vmode)
 
 void jaguar_state::blitter_run()
 {
-	UINT32 command = m_blitter_regs[B_CMD] & STATIC_COMMAND_MASK;
-	UINT32 a1flags = m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
-	UINT32 a2flags = m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
+	uint32_t command = m_blitter_regs[B_CMD] & STATIC_COMMAND_MASK;
+	uint32_t a1flags = m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
+	uint32_t a2flags = m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
 
 	g_profiler.start(PROFILER_USER1);
 
@@ -490,8 +490,8 @@ void jaguar_state::blitter_run()
 
 if (LOG_BLITTER_STATS)
 {
-static UINT32 blitter_stats[1000][4];
-static UINT64 blitter_pixels[1000];
+static uint32_t blitter_stats[1000][4];
+static uint64_t blitter_pixels[1000];
 static int blitter_count = 0;
 static int reps = 0;
 int i;
@@ -517,7 +517,7 @@ if (++reps % 100 == 99)
 	for (i = 0; i < blitter_count; i++)
 		osd_printf_debug("  CMD=%08X A1=%08X A2=%08X %6d times, %08X%08X pixels\n",
 				blitter_stats[i][0], blitter_stats[i][1], blitter_stats[i][2],
-				blitter_stats[i][3], (UINT32)(blitter_pixels[i] >> 32), (UINT32)(blitter_pixels[i]));
+				blitter_stats[i][3], (uint32_t)(blitter_pixels[i] >> 32), (uint32_t)(blitter_pixels[i]));
 	osd_printf_debug("---\n");
 }
 }
@@ -579,7 +579,7 @@ READ16_MEMBER( jaguar_state::tom_regs_r )
 
 		case VC:
 		{
-			UINT8 half_line;
+			uint8_t half_line;
 
 			if(m_screen->hpos() >= (m_screen->width() / 2))
 				half_line = 1;
@@ -595,7 +595,7 @@ READ16_MEMBER( jaguar_state::tom_regs_r )
 
 WRITE16_MEMBER( jaguar_state::tom_regs_w )
 {
-	UINT32 reg_store = m_gpu_regs[offset];
+	uint32_t reg_store = m_gpu_regs[offset];
 	attotime sample_period;
 	if (offset < GPU_REGS)
 	{
@@ -751,11 +751,11 @@ void jaguar_state::scanline_update(int param)
 	/* only run if video is enabled and we are past the "display begin" */
 	if ((m_gpu_regs[VMODE] & 1) && vc >= (m_gpu_regs[VDB] & 0x7ff))
 	{
-		UINT32 *dest = &m_screen_bitmap.pix32(vc >> 1);
+		uint32_t *dest = &m_screen_bitmap.pix32(vc >> 1);
 		int maxx = visarea.max_x;
 		int hde = effective_hvalue(m_gpu_regs[HDE]) >> 1;
-		UINT16 x,scanline[760];
-		UINT8 y,pixel_width = ((m_gpu_regs[VMODE]>>10)&3)+1;
+		uint16_t x,scanline[760];
+		uint8_t y,pixel_width = ((m_gpu_regs[VMODE]>>10)&3)+1;
 
 		/* if we are first on this scanline, clear to the border color */
 		if (ENABLE_BORDERS && vc % 2 == 0)
@@ -774,9 +774,9 @@ void jaguar_state::scanline_update(int param)
 			for (x = 0; x < 760 && hdb <= maxx && hdb < hde; x+=2)
 				for (y = 0; y < pixel_width; y++)
 				{
-					UINT8 r = m_pen_table[(scanline[x]&0xff)|256];
-					UINT8 g = m_pen_table[(scanline[x]>>8)|512];
-					UINT8 b = m_pen_table[scanline[x+1]&0xff];
+					uint8_t r = m_pen_table[(scanline[x]&0xff)|256];
+					uint8_t g = m_pen_table[(scanline[x]>>8)|512];
+					uint8_t b = m_pen_table[scanline[x+1]&0xff];
 					dest[hdb++] = rgb_t(r, g, b);
 				}
 		}
@@ -838,7 +838,7 @@ void jaguar_state::device_postload()
  *
  *************************************/
 
-UINT32 jaguar_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t jaguar_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* if not enabled, just blank */
 	if (!(m_gpu_regs[VMODE] & 1))

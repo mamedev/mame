@@ -5,7 +5,7 @@
 
 const device_type NSCSI_CDROM = &device_creator<nscsi_cdrom_device>;
 
-nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_full_device(mconfig, NSCSI_CDROM, "SCSI CDROM", tag, owner, clock, "scsi_cdrom", __FILE__), cdrom(nullptr), bytes_per_sector(0), lba(0), cur_lba(0), blocks(0)
 {
 }
@@ -40,7 +40,7 @@ machine_config_constructor nscsi_cdrom_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(scsi_cdrom);
 }
 
-UINT8 nscsi_cdrom_device::scsi_get_data(int id, int pos)
+uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 {
 	if(id != 2)
 		return nscsi_full_device::scsi_get_data(id, pos);
@@ -136,7 +136,7 @@ void nscsi_cdrom_device::scsi_command()
 
 		logerror("%s: command READ CAPACITY\n", tag());
 
-		UINT32 temp = cdrom_get_track_start(cdrom, 0xaa);
+		uint32_t temp = cdrom_get_track_start(cdrom, 0xaa);
 		temp--; // return the last used block on the disc
 
 		scsi_cmdbuf[0] = (temp>>24) & 0xff;
@@ -185,7 +185,7 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[pos++] = 0x00; // medium type
 		scsi_cmdbuf[pos++] = 0x80; // WP, cache
 
-		UINT32 temp = cdrom_get_track_start(cdrom, 0xaa);
+		uint32_t temp = cdrom_get_track_start(cdrom, 0xaa);
 		temp--; // return the last used block on the disc
 		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
 

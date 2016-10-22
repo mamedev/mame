@@ -67,7 +67,7 @@ void alto2_cpu_device::f2_late_load_ddr()
 	LOG((this,LOG_DWT,2,"    DDR<- BUS (%#o)\n", m_bus));
 	m_dsp.fifo[m_dsp.wa] = m_bus;
 	m_dsp.wa = (m_dsp.wa + 1) % A2_DISP_FIFO;
-	UINT8 a38 = m_disp_a38[m_dsp.ra * 16 + m_dsp.wa];
+	uint8_t a38 = m_disp_a38[m_dsp.ra * 16 + m_dsp.wa];
 	if (FIFO_STOPWAKE(a38))
 		m_task_wakeup &= ~(1 << task_dwt);
 	LOG((this,LOG_DWT,2, "   DWT push %04x into FIFO[%02o]%s\n",

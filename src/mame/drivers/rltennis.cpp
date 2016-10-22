@@ -60,11 +60,12 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 
 ****************************************************************************************/
+
 #include "emu.h"
 #include "includes/rltennis.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/ramdac.h"
 
 #define RLT_REFRESH_RATE   60
@@ -141,8 +142,8 @@ TIMER_CALLBACK_MEMBER(rltennis_state::sample_player)
 	}
 	++m_dac_counter; /* update low address bits */
 
-	m_dac_1->write_signed8(m_samples_1[m_sample_rom_offset_1 + ( m_dac_counter&0x7ff )]);
-	m_dac_2->write_unsigned8(m_samples_2[m_sample_rom_offset_2 + ( m_dac_counter&0x7ff )]);
+	m_dac1->write(m_samples_1[m_sample_rom_offset_1 + (m_dac_counter & 0x7ff)]);
+	m_dac2->write(m_samples_2[m_sample_rom_offset_2 + (m_dac_counter & 0x7ff)]);
 	m_timer->adjust(attotime::from_hz( RLT_TIMER_FREQ ));
 }
 
@@ -198,13 +199,13 @@ static MACHINE_CONFIG_START( rltennis, rltennis_state )
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 	MCFG_RAMDAC_SPLIT_READ(1)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", .5)
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", .5)
-
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( rltennis )

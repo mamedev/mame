@@ -196,8 +196,11 @@ static MACHINE_CONFIG_START( wpc_flip2, wpc_flip2_state )
 	MCFG_WPC_SOUND_DATA(READ8(wpc_dot_state,wpc_sound_data_r),WRITE8(wpc_dot_state,wpc_sound_data_w))
 	MCFG_WPC_DMDBANK(WRITE8(wpc_dot_state,wpc_dmdbank_w))
 
-	MCFG_WMS_WPC_SOUND_ADD("wpcsnd",":sound1")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
+	MCFG_WPC_ROM_REGION(":sound1")
 	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(wpc_dot_state,wpcsnd_reply_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

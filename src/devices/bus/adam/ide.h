@@ -29,7 +29,7 @@ class powermate_ide_device :  public device_t,
 {
 public:
 	// construction/destruction
-	powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -40,14 +40,14 @@ protected:
 	virtual void device_start() override;
 
 	// device_adam_expansion_slot_card_interface overrides
-	virtual UINT8 adam_bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) override;
-	virtual void adam_bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) override;
+	virtual uint8_t adam_bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) override;
+	virtual void adam_bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) override;
 
 private:
 	required_device<ata_interface_device> m_ata;
 	required_device<output_latch_device> m_cent_data_out;
 
-	UINT16 m_ata_data;
+	uint16_t m_ata_data;
 };
 
 

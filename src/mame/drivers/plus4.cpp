@@ -97,7 +97,7 @@ public:
 
 	void check_interrupts();
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
-	UINT8 read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
+	uint8_t read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -141,7 +141,7 @@ public:
 	};
 
 	// memory state
-	UINT8 m_addr;
+	uint8_t m_addr;
 
 	// interrupt state
 	int m_ted_irq;
@@ -149,7 +149,7 @@ public:
 	int m_exp_irq;
 
 	// keyboard state
-	UINT8 m_kb;
+	uint8_t m_kb;
 };
 
 
@@ -210,8 +210,8 @@ void plus4_state::check_interrupts()
 
 void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal)
 {
-	UINT16 i = ras << 15 | BA10 << 14 | BA11 << 13 | BA13 << 12 | BA9 << 11 | BA8 << 10 | BA14 << 9 | mux << 8 | BA12 << 7 | BA7 << 6 | BA6 << 5 | BA5 << 4 | BA4 << 3 | BA15 << 2 | phi0 << 1 | 1;
-/*  UINT8 data = m_pla->read(i);
+	uint16_t i = ras << 15 | BA10 << 14 | BA11 << 13 | BA13 << 12 | BA9 << 11 | BA8 << 10 | BA14 << 9 | mux << 8 | BA12 << 7 | BA7 << 6 | BA6 << 5 | BA5 << 4 | BA4 << 3 | BA15 << 2 | phi0 << 1 | 1;
+/*  uint8_t data = m_pla->read(i);
 
     *scs = BIT(data, 0);
     *phi2 = BIT(data, 1);
@@ -281,10 +281,10 @@ void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal)
+uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal)
 {
 	int cs0 = 1, cs1 = 1, c1l = 1, c1h = 1, c2l = 1, c2h = 1;
-	UINT8 data = m_ted->read(space, offset, cs0, cs1);
+	uint8_t data = m_ted->read(space, offset, cs0, cs1);
 
 	//logerror("offset %04x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
@@ -628,7 +628,7 @@ READ8_MEMBER( plus4_state::cpu_r )
 
 	*/
 
-	UINT8 data = 0x2f;
+	uint8_t data = 0x2f;
 
 	// cassette read
 	data |= m_cassette->read() << 4;
@@ -659,7 +659,7 @@ READ8_MEMBER( c16_state::cpu_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// cassette read
 	data |= m_cassette->read() << 4;
@@ -737,12 +737,12 @@ READ8_MEMBER( plus4_state::ted_k_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	// joystick
 	if (!BIT(offset, 2))
 	{
-		UINT8 joy_a = m_joy1->joy_r();
+		uint8_t joy_a = m_joy1->joy_r();
 
 		data &= (0xf0 | (joy_a & 0x0f));
 		data &= ~(!BIT(joy_a, 5) << 6);
@@ -750,7 +750,7 @@ READ8_MEMBER( plus4_state::ted_k_r )
 
 	if (!BIT(offset, 1))
 	{
-		UINT8 joy_b = m_joy2->joy_r();
+		uint8_t joy_b = m_joy2->joy_r();
 
 		data &= (0xf0 | (joy_b & 0x0f));
 		data &= ~(!BIT(joy_b, 5) << 7);
@@ -817,7 +817,7 @@ SLOT_INTERFACE_END
 void plus4_state::machine_start()
 {
 	// initialize memory
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (offs_t offset = 0; offset < m_ram->size(); offset++)
 	{

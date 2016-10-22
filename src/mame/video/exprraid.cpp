@@ -46,7 +46,7 @@ WRITE8_MEMBER(exprraid_state::exprraid_scrolly_w)
 
 TILE_GET_INFO_MEMBER(exprraid_state::get_bg_tile_info)
 {
-	UINT8 *tilerom = memregion("gfx4")->base();
+	uint8_t *tilerom = memregion("gfx4")->base();
 
 	int data, attr, bank, code, color, flags;
 	int quadrant = 0, offs;
@@ -128,7 +128,7 @@ void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 exprraid_state::screen_update_exprraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t exprraid_state::screen_update_exprraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

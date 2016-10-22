@@ -25,15 +25,15 @@ public:
 	pci_device_interface(const machine_config &mconfig, device_t &device);
 	virtual ~pci_device_interface();
 
-	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask) = 0;
-	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask) = 0;
+	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) = 0;
+	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) = 0;
 };
 
 class pci_connector: public device_t,
 						public device_slot_interface
 {
 public:
-	pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pci_connector();
 
 	pci_device_interface *get_device();
@@ -50,7 +50,7 @@ class pci_bus_device :  public device_t
 {
 public:
 	// construction/destruction
-	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -73,19 +73,19 @@ protected:
 	virtual void device_post_load() override;
 
 private:
-	UINT8               m_busnum;
+	uint8_t               m_busnum;
 
 	const char *        m_devtag[32];
 	pci_device_interface *m_device[32];
 
 	const char *        m_father;
 	pci_bus_device *    m_siblings[8];
-	UINT8               m_siblings_busnum[8];
+	uint8_t               m_siblings_busnum[8];
 	int                 m_siblings_count;
 
 	offs_t              m_address;
-	INT8                m_devicenum; // device number we are addressing
-	INT8                m_busnumber; // pci bus number we are addressing
+	int8_t                m_devicenum; // device number we are addressing
+	int8_t                m_busnumber; // pci bus number we are addressing
 	pci_bus_device *    m_busnumaddr; // pci bus we are addressing
 };
 

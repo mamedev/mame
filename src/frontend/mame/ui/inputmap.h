@@ -53,8 +53,8 @@ protected:
 		const input_seq *   defseq;             /* pointer to the default sequence */
 		const char *        name;               /* pointer to the base name of the item */
 		const char *        owner_name;         /* pointer to the name of the owner of the item */
-		UINT32              sortorder;          /* sorting information */
-		UINT8               type;               /* type of port */
+		uint32_t              sortorder;          /* sorting information */
+		uint8_t               type;               /* type of port */
 		bool                is_optional;        /* true if this input is considered optional */
 	};
 
@@ -66,7 +66,7 @@ protected:
 	input_item_data *   pollingitem;
 
 private:
-	UINT16              last_sortorder;
+	uint16_t              last_sortorder;
 	bool                record_next;
 	input_seq           starting_seq;
 
@@ -103,7 +103,7 @@ private:
 class menu_settings : public menu
 {
 public:
-	menu_settings(mame_ui_manager &mui, render_container &container, UINT32 type);
+	menu_settings(mame_ui_manager &mui, render_container &container, uint32_t type);
 	virtual ~menu_settings() override;
 
 protected:
@@ -112,8 +112,8 @@ protected:
 	{
 		dip_descriptor *    next;
 		const char *        name;
-		UINT32              mask;
-		UINT32              state;
+		uint32_t              mask;
+		uint32_t              state;
 	};
 
 	dip_descriptor *    diplist;
@@ -135,7 +135,7 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	void custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, UINT32 selectedmask);
+	void custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, uint32_t selectedmask);
 };
 
 class menu_settings_driver_config : public menu_settings

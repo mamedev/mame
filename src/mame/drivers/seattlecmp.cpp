@@ -52,7 +52,7 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	bool m_key_available;
 };
 
@@ -77,7 +77,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER( seattle_comp_state::read )
 {
-	UINT16 status = (m_key_available) ? 0x300 : 0x100;
+	uint16_t status = (m_key_available) ? 0x300 : 0x100;
 	m_key_available = 0;
 	return m_term_data | status;
 }

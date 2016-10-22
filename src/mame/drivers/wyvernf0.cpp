@@ -52,29 +52,29 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	// memory pointers
-	required_shared_ptr<UINT8> m_bgram;
-	required_shared_ptr<UINT8> m_fgram;
-	required_shared_ptr<UINT8> m_scrollram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_bgram;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_scrollram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	// video-related
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
-	std::unique_ptr<UINT8[]>      m_objram;
+	std::unique_ptr<uint8_t[]>      m_objram;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(fgram_w);
 	DECLARE_VIDEO_START(wyvernf0);
-	UINT32 screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
 
 	// misc
 	int         m_sound_nmi_enable;
 	int         m_pending_nmi;
-	UINT8       m_rombank;
-	UINT8       m_rambank;
+	uint8_t       m_rombank;
+	uint8_t       m_rambank;
 
 	DECLARE_WRITE8_MEMBER(rambank_w);
 	DECLARE_WRITE8_MEMBER(rombank_w);
@@ -86,7 +86,7 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
 	// MCU
-	UINT8       m_mcu_val, m_mcu_ready;
+	uint8_t       m_mcu_val, m_mcu_ready;
 
 	DECLARE_READ8_MEMBER(fake_mcu_r);
 	DECLARE_WRITE8_MEMBER(fake_mcu_w);
@@ -188,7 +188,7 @@ YY       XX
 yyyyyyyy fccccccc x???pppp xxxxxxxx
 
 */
-	UINT8 *sprram = &m_spriteram[ is_foreground ? m_spriteram.bytes()/2 : 0 ];
+	uint8_t *sprram = &m_spriteram[ is_foreground ? m_spriteram.bytes()/2 : 0 ];
 
 	// sy = 0 -> on the left
 	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
@@ -238,7 +238,7 @@ yyyyyyyy fccccccc x???pppp xxxxxxxx
 	}
 }
 
-UINT32 wyvernf0_state::screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wyvernf0_state::screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -602,11 +602,11 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 {
-	UINT8 *ROM = memregion("rombank")->base();
+	uint8_t *ROM = memregion("rombank")->base();
 	membank("rombank")->configure_entries(0, 8, ROM, 0x2000);
 
 	// sprite codes lookup in banked RAM
-	m_objram = std::make_unique<UINT8[]>(0x1000 * 2);
+	m_objram = std::make_unique<uint8_t[]>(0x1000 * 2);
 	save_pointer(NAME(m_objram.get()), 0x1000 * 2);
 	membank("rambank")->configure_entries(0, 2, m_objram.get(), 0x1000);
 

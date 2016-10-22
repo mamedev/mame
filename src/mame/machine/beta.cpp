@@ -26,7 +26,7 @@ BUGS:
 
 const device_type BETA_DISK = &device_creator<beta_disk_device>;
 
-beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__)
 	, m_betadisk_active(0)
 	, m_wd179x(*this, "wd179x")
@@ -107,7 +107,7 @@ READ8_MEMBER(beta_disk_device::data_r)
 READ8_MEMBER(beta_disk_device::state_r)
 {
 	if (m_betadisk_active==1) {
-		UINT8 result = 0x3F;        // actually open bus
+		uint8_t result = 0x3F;        // actually open bus
 		result |= m_wd179x->drq_r() ? 0x40 : 0;
 		result |= m_wd179x->intrq_r() ? 0x80 : 0;
 		return result;

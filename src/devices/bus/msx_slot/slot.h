@@ -25,16 +25,16 @@ public:
 	virtual ~msx_internal_slot_interface() { }
 
 	// static configuration helpers
-	static void set_start_address(device_t &device, UINT32 start_address);
-	static void set_size(device_t &device, UINT32 size);
+	static void set_start_address(device_t &device, uint32_t start_address);
+	static void set_size(device_t &device, uint32_t size);
 
 	virtual DECLARE_READ8_MEMBER(read) { return 0xFF; }
 	virtual DECLARE_WRITE8_MEMBER(write) { }
 
 protected:
-	UINT32 m_start_address;
-	UINT32 m_size;
-	UINT32 m_end_address;
+	uint32_t m_start_address;
+	uint32_t m_size;
+	uint32_t m_end_address;
 };
 
 #endif

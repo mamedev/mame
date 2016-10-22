@@ -54,7 +54,7 @@
 void xerox820_state::bankswitch(int bank)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (bank)
 	{
@@ -73,7 +73,7 @@ void xerox820_state::bankswitch(int bank)
 void xerox820ii_state::bankswitch(int bank)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (bank)
 	{
@@ -234,7 +234,7 @@ READ8_MEMBER( xerox820_state::kbpio_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// keyboard
 	data |= m_kbpio->rdy_b() << 3;
@@ -415,10 +415,10 @@ WRITE_LINE_MEMBER( xerox820_state::fr_w )
 
 /* Video */
 
-UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=(m_scroll + 1) * 0x80,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=(m_scroll + 1) * 0x80,x;
 	const pen_t *pen=m_palette->pens();
 
 	m_framecnt++;
@@ -429,7 +429,7 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT32 *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{

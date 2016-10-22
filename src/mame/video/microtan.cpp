@@ -22,7 +22,7 @@
 
 WRITE8_MEMBER(microtan_state::microtan_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	if ((videoram[offset] != data) || (m_chunky_buffer[offset] != m_chunky_graphics))
 	{
 		videoram[offset] = data;
@@ -33,7 +33,7 @@ WRITE8_MEMBER(microtan_state::microtan_videoram_w)
 
 TILE_GET_INFO_MEMBER(microtan_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int gfxn = m_chunky_buffer[tile_index];
 	int code = videoram[tile_index];
 
@@ -47,12 +47,12 @@ void microtan_state::video_start()
 			tilemap_get_info_delegate(FUNC(microtan_state::get_bg_tile_info),this),
 			TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
 
-	m_chunky_buffer = std::make_unique<UINT8[]>(0x200);
+	m_chunky_buffer = std::make_unique<uint8_t[]>(0x200);
 	memset(m_chunky_buffer.get(), 0, 0x200);
 	m_chunky_graphics = 0;
 }
 
-UINT32 microtan_state::screen_update_microtan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t microtan_state::screen_update_microtan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

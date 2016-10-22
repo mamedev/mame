@@ -42,7 +42,7 @@ device_vip_byteio_port_interface::device_vip_byteio_port_interface(const machine
 //  vip_byteio_port_device - constructor
 //-------------------------------------------------
 
-vip_byteio_port_device::vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vip_byteio_port_device::vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, VIP_BYTEIO_PORT, "VIP byte I/O port", tag, owner, clock, "vip_byteio_port", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_write_inst(*this), m_cart(nullptr)
@@ -71,8 +71,8 @@ void vip_byteio_port_device::device_reset()
 }
 
 
-UINT8 vip_byteio_port_device::in_r() { UINT8 data = 0xff; if (m_cart != nullptr) data = m_cart->vip_in_r(); return data; }
-void vip_byteio_port_device::out_w(UINT8 data) { if (m_cart != nullptr) m_cart->vip_out_w(data); }
+uint8_t vip_byteio_port_device::in_r() { uint8_t data = 0xff; if (m_cart != nullptr) data = m_cart->vip_in_r(); return data; }
+void vip_byteio_port_device::out_w(uint8_t data) { if (m_cart != nullptr) m_cart->vip_out_w(data); }
 READ_LINE_MEMBER( vip_byteio_port_device::ef3_r ) { int state = CLEAR_LINE; if (m_cart != nullptr) state = m_cart->vip_ef3_r(); return state; }
 READ_LINE_MEMBER( vip_byteio_port_device::ef4_r ) { int state = CLEAR_LINE; if (m_cart != nullptr) state = m_cart->vip_ef4_r(); return state; }
 WRITE_LINE_MEMBER( vip_byteio_port_device::q_w ) { if (m_cart != nullptr) m_cart->vip_q_w(state); }

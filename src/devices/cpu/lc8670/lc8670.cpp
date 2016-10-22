@@ -144,7 +144,7 @@ const lc8670_cpu_device::op_handler lc8670_cpu_device::s_opcode_table[] =
 //  IRQ vectors
 //**************************************************************************
 
-const UINT16 lc8670_cpu_device::s_irq_vectors[] =
+const uint16_t lc8670_cpu_device::s_irq_vectors[] =
 {
 	0x0000, 0x0003, 0x000b, 0x0013, 0x001b, 0x0023, 0x002b, 0x0033,
 	0x003b, 0x0043, 0x004b, 0x004f, 0x0052, 0x0055, 0x005a, 0x005d
@@ -170,7 +170,7 @@ ADDRESS_MAP_END
 //  lc8670_cpu_device - constructor
 //-------------------------------------------------
 
-lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, LC8670, "Sanyo LC8670", tag, owner, clock, "lc8670", __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
 		m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, ADDRESS_MAP_NAME(lc8670_internal_map)),
@@ -554,7 +554,7 @@ void lc8670_cpu_device::execute_set_input(int inputnum, int state)
 //  screen_update - handle updating the screen
 //-------------------------------------------------
 
-UINT32 lc8670_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lc8670_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_lcd_update_func)
 		return m_lcd_update_func(*this, bitmap, cliprect, m_xram, (REG_MCR & 0x08) && (REG_VCCR & 0x80), REG_STAD);
@@ -575,7 +575,7 @@ void lc8670_cpu_device::check_irqs()
 	if (m_irq_flag && !m_after_reti)
 	{
 		int irq = 0;
-		UINT8 priority = 0;
+		uint8_t priority = 0;
 
 		// highest priority IRQ
 		if (!(REG_IE & 0x01) && (m_irq_flag & 0x02))
@@ -663,8 +663,8 @@ void lc8670_cpu_device::base_timer_tick()
 {
 	if (REG_BTCR & 0x40)
 	{
-		UINT16 base_counter_l = m_base_timer[0] + 1;
-		UINT16 base_counter_h = m_base_timer[1];
+		uint16_t base_counter_l = m_base_timer[0] + 1;
+		uint16_t base_counter_h = m_base_timer[1];
 
 		if (REG_BTCR & 0x80)    // 6-bit mode
 			base_counter_h++;
@@ -724,7 +724,7 @@ void lc8670_cpu_device::base_timer_tick()
 
 void lc8670_cpu_device::timer0_prescaler_tick()
 {
-	UINT16 prescaler = m_timer0_prescaler + 1;
+	uint16_t prescaler = m_timer0_prescaler + 1;
 	if (prescaler & 0x100)
 	{
 		if (LOG_TIMERS) logerror("%s: timer0 prescaler overflow\n", tag());
@@ -755,7 +755,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 			// 16-bit timer/counter mode
 			if ((REG_T0CNT & 0xc0) == 0xc0 && (((REG_T0CNT & 0x10) && ext_line) || (!(REG_T0CNT & 0x10) && !ext_line)))
 			{
-				UINT32 timer0 = ((m_timer0[1] << 8) | m_timer0[0]) + 1;
+				uint32_t timer0 = ((m_timer0[1] << 8) | m_timer0[0]) + 1;
 
 				if (timer0 & 0x10000)
 				{
@@ -778,7 +778,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 			// 8-bit timer/counter mode
 			if ((REG_T0CNT & 0x40) && (((REG_T0CNT & 0x10) && ext_line) || (!(REG_T0CNT & 0x10) && !ext_line)))
 			{
-				UINT16 timer0l = m_timer0[0] + 1;
+				uint16_t timer0l = m_timer0[0] + 1;
 
 				if (timer0l & 0x100)
 				{
@@ -795,7 +795,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 			}
 			if ((REG_T0CNT & 0x80)  && !ext_line)
 			{
-				UINT16 timer0h = m_timer0[1] + 1;
+				uint16_t timer0h = m_timer0[1] + 1;
 				if (timer0h & 0x100)
 				{
 					if (LOG_TIMERS) logerror("%s: timer0 high overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,3));
@@ -826,10 +826,10 @@ void lc8670_cpu_device::timer1_tick()
 			if (REG_T1CNT & 0x40)
 			{
 				// 16-bit timer mode
-				UINT16 timer1l = m_timer1[0] + (REG_T1CNT & 0x80 ? 1 : 2);
+				uint16_t timer1l = m_timer1[0] + (REG_T1CNT & 0x80 ? 1 : 2);
 				if (timer1l & 0x100)
 				{
-					UINT16 timer1h = m_timer1[1] + 1;
+					uint16_t timer1h = m_timer1[1] + 1;
 					m_timer1[0] = REG_T1LR;
 					REG_T1CNT |= 0x04;
 
@@ -857,7 +857,7 @@ void lc8670_cpu_device::timer1_tick()
 			// 8-bit timer/pulse generator mode
 			if (REG_T1CNT & 0x40)
 			{
-				UINT16 timer1l = m_timer1[0] + 1;
+				uint16_t timer1l = m_timer1[0] + 1;
 
 				if (timer1l == m_timer1_comparator[0])
 					update_port1(m_p1_data | 0x80);
@@ -878,7 +878,7 @@ void lc8670_cpu_device::timer1_tick()
 			}
 			if (REG_T1CNT & 0x80)
 			{
-				UINT16 timer1h = m_timer1[1] + 1;
+				uint16_t timer1h = m_timer1[1] + 1;
 
 				if (timer1h & 0x100)
 				{
@@ -916,7 +916,7 @@ READ8_MEMBER(lc8670_cpu_device::xram_r)
 {
 	if (!(REG_VCCR & 0x40) || space.debugger_access())  // XRAM access enabled
 	{
-		UINT8 * xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
+		uint8_t * xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
 
 		switch(REG_XBNK & 0x03)
 		{
@@ -939,7 +939,7 @@ WRITE8_MEMBER(lc8670_cpu_device::xram_w)
 {
 	if (!(REG_VCCR & 0x40) || space.debugger_access())  // XRAM access enabled
 	{
-		UINT8 * xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
+		uint8_t * xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
 
 		switch(REG_XBNK & 0x03)
 		{
@@ -976,10 +976,10 @@ READ8_MEMBER(lc8670_cpu_device::regs_r)
 			return m_io->read_byte(LC8670_PORT7) | 0xf0;    // 4-bit read-only port
 		case 0x66:
 		{
-			UINT8 data = m_vtrbf[((REG_VRMAD2<<8) | REG_VRMAD1) & 0x1ff];
+			uint8_t data = m_vtrbf[((REG_VRMAD2<<8) | REG_VRMAD1) & 0x1ff];
 			if (!space.debugger_access() && (REG_VSEL & 0x10))
 			{
-				UINT16 vrmad = (REG_VRMAD1 | (REG_VRMAD2<<8)) + 1;
+				uint16_t vrmad = (REG_VRMAD1 | (REG_VRMAD2<<8)) + 1;
 				REG_VRMAD1 = vrmad & 0xff;
 				REG_VRMAD2 = (vrmad >> 8) & 0x01;
 			}
@@ -1046,7 +1046,7 @@ WRITE8_MEMBER(lc8670_cpu_device::regs_w)
 			m_vtrbf[((REG_VRMAD2<<8) | REG_VRMAD1) & 0x1ff] = data;
 			if (!space.debugger_access() && (REG_VSEL & 0x10))
 			{
-				UINT16 vrmad = (REG_VRMAD1 | (REG_VRMAD2<<8)) + 1;
+				uint16_t vrmad = (REG_VRMAD1 | (REG_VRMAD2<<8)) + 1;
 				REG_VRMAD1 = vrmad & 0xff;
 				REG_VRMAD2 = (vrmad >> 8) & 0x01;
 			}
@@ -1070,26 +1070,26 @@ WRITE8_MEMBER(lc8670_cpu_device::regs_w)
 //  HELPERS
 //**************************************************************************
 
-inline UINT8 lc8670_cpu_device::fetch()
+inline uint8_t lc8670_cpu_device::fetch()
 {
-	UINT8 data = m_direct->read_byte(m_pc);
+	uint8_t data = m_direct->read_byte(m_pc);
 
 	set_pc(m_pc + 1);
 
 	return data;
 }
 
-inline UINT8 lc8670_cpu_device::read_data(UINT16 offset)
+inline uint8_t lc8670_cpu_device::read_data(uint16_t offset)
 {
 	return m_data->read_byte(offset);
 }
 
-inline void lc8670_cpu_device::write_data(UINT16 offset, UINT8 data)
+inline void lc8670_cpu_device::write_data(uint16_t offset, uint8_t data)
 {
 	m_data->write_byte(offset, data);
 }
 
-inline UINT8 lc8670_cpu_device::read_data_latch(UINT16 offset)
+inline uint8_t lc8670_cpu_device::read_data_latch(uint16_t offset)
 {
 	if (offset == 0x144)
 		return REG_P1;
@@ -1099,7 +1099,7 @@ inline UINT8 lc8670_cpu_device::read_data_latch(UINT16 offset)
 		return read_data(offset);
 }
 
-inline void lc8670_cpu_device::write_data_latch(UINT16 offset, UINT8 data)
+inline void lc8670_cpu_device::write_data_latch(uint16_t offset, uint8_t data)
 {
 	if (offset == 0x144)
 		REG_P1 = data;
@@ -1109,34 +1109,34 @@ inline void lc8670_cpu_device::write_data_latch(UINT16 offset, UINT8 data)
 		write_data(offset, data);
 }
 
-inline void lc8670_cpu_device::update_port1(UINT8 data)
+inline void lc8670_cpu_device::update_port1(uint8_t data)
 {
 	m_p1_data = data;
 	m_io->write_byte(LC8670_PORT1, ((REG_P1 | (m_p1_data & REG_P1FCR)) & REG_P1DDR) | (m_io->read_byte(LC8670_PORT1) & (REG_P1DDR ^ 0xff)));
 }
 
-inline void lc8670_cpu_device::set_pc(UINT16 new_pc)
+inline void lc8670_cpu_device::set_pc(uint16_t new_pc)
 {
 	m_pc = new_pc;
 }
 
-inline void lc8670_cpu_device::push(UINT8 data)
+inline void lc8670_cpu_device::push(uint8_t data)
 {
 	REG_SP++;
 	m_mram[REG_SP] = data;
 }
 
-inline UINT8 lc8670_cpu_device::pop()
+inline uint8_t lc8670_cpu_device::pop()
 {
-	UINT8 data =  m_mram[REG_SP];
+	uint8_t data =  m_mram[REG_SP];
 	REG_SP--;
 	return data;
 }
 
-inline UINT16 lc8670_cpu_device::get_addr()
+inline uint16_t lc8670_cpu_device::get_addr()
 {
 	int mode = m_op & 0x0f;
-	UINT16 addr;
+	uint16_t addr;
 
 	if (mode > 0x01 && mode <= 0x03)
 		addr = GET_D9;
@@ -1148,10 +1148,10 @@ inline UINT16 lc8670_cpu_device::get_addr()
 	return addr;
 }
 
-inline UINT8 lc8670_cpu_device::get_data()
+inline uint8_t lc8670_cpu_device::get_data()
 {
 	int mode = m_op & 0x0f;
-	UINT8 data;
+	uint8_t data;
 
 	if (mode == 0x01)
 		data = GET_I8;
@@ -1163,7 +1163,7 @@ inline UINT8 lc8670_cpu_device::get_data()
 
 inline void lc8670_cpu_device::change_clock_source()
 {
-	UINT32 new_clock = 0;
+	uint32_t new_clock = 0;
 
 	switch(REG_OCR & 0x30)
 	{
@@ -1187,7 +1187,7 @@ inline void lc8670_cpu_device::change_clock_source()
 
 inline void lc8670_cpu_device::check_p_flag()
 {
-	UINT8 p_plag = 0;
+	uint8_t p_plag = 0;
 	for(int i=0; i<8; i++)
 		p_plag ^= BIT(REG_A, i);
 
@@ -1216,7 +1216,7 @@ inline void lc8670_cpu_device::set_irq_flag(int source)
 	m_irq_flag |= 1<<source;
 }
 
-int lc8670_cpu_device::decode_op(UINT8 op)
+int lc8670_cpu_device::decode_op(uint8_t op)
 {
 	int idx;
 	switch (op & 0x0f)
@@ -1249,7 +1249,7 @@ int lc8670_cpu_device::op_nop()
 
 int lc8670_cpu_device::op_br()
 {
-	UINT8 r8 = GET_R8;
+	uint8_t r8 = GET_R8;
 	set_pc(m_pc + SIGNED(r8));
 
 	return 2;
@@ -1265,7 +1265,7 @@ int lc8670_cpu_device::op_ld()
 
 int lc8670_cpu_device::op_call()
 {
-	UINT16 new_pc = GET_A12;
+	uint16_t new_pc = GET_A12;
 
 	push((m_pc>>0) & 0xff);
 	push((m_pc>>8) & 0xff);
@@ -1278,7 +1278,7 @@ int lc8670_cpu_device::op_call()
 
 int lc8670_cpu_device::op_callr()
 {
-	UINT16 r16 = fetch();
+	uint16_t r16 = fetch();
 	r16 |= fetch()<<8;
 
 	push((m_pc>>0) & 0xff);
@@ -1290,7 +1290,7 @@ int lc8670_cpu_device::op_callr()
 
 int lc8670_cpu_device::op_brf()
 {
-	UINT16 r16 = fetch();
+	uint16_t r16 = fetch();
 	r16 |= fetch()<<8;
 	set_pc(m_pc - 1 + r16);
 
@@ -1306,7 +1306,7 @@ int lc8670_cpu_device::op_st()
 
 int lc8670_cpu_device::op_callf()
 {
-	UINT16 a16 = fetch()<<8;
+	uint16_t a16 = fetch()<<8;
 	a16 |= fetch();
 
 	push((m_pc>>0) & 0xff);
@@ -1318,7 +1318,7 @@ int lc8670_cpu_device::op_callf()
 
 int lc8670_cpu_device::op_jmpf()
 {
-	UINT16 a16 = fetch()<<8;
+	uint16_t a16 = fetch()<<8;
 	a16 |= fetch();
 	set_pc(a16);
 
@@ -1329,8 +1329,8 @@ int lc8670_cpu_device::op_jmpf()
 
 int lc8670_cpu_device::op_mov()
 {
-	UINT16 addr = get_addr();
-	UINT8 i8 = GET_I8;
+	uint16_t addr = get_addr();
+	uint8_t i8 = GET_I8;
 	write_data(addr, i8);
 
 	return 1;
@@ -1338,7 +1338,7 @@ int lc8670_cpu_device::op_mov()
 
 int lc8670_cpu_device::op_jmp()
 {
-	UINT16 new_pc = GET_A12;
+	uint16_t new_pc = GET_A12;
 	set_pc((m_pc & 0xf000) | new_pc);
 
 	return 2;
@@ -1346,7 +1346,7 @@ int lc8670_cpu_device::op_jmp()
 
 int lc8670_cpu_device::op_mul()
 {
-	UINT32 res = REG_B * ((REG_A<<8) | REG_C);
+	uint32_t res = REG_B * ((REG_A<<8) | REG_C);
 
 	REG_A = (res>>8) & 0xff;
 	REG_B = (res>>16) & 0xff;
@@ -1361,8 +1361,8 @@ int lc8670_cpu_device::op_mul()
 
 int lc8670_cpu_device::op_be()
 {
-	UINT8 data = get_data();
-	UINT8 r8 = GET_R8;
+	uint8_t data = get_data();
+	uint8_t r8 = GET_R8;
 
 	if (REG_A == data)
 		set_pc(m_pc + SIGNED(r8));
@@ -1374,9 +1374,9 @@ int lc8670_cpu_device::op_be()
 
 int lc8670_cpu_device::op_be_ri()
 {
-	UINT8 data = get_data();
-	UINT8 i8 = GET_I8;
-	UINT8 r8 = GET_R8;
+	uint8_t data = get_data();
+	uint8_t i8 = GET_I8;
+	uint8_t r8 = GET_R8;
 
 	if (i8 == data)
 		set_pc(m_pc + SIGNED(r8));
@@ -1389,11 +1389,11 @@ int lc8670_cpu_device::op_be_ri()
 
 int lc8670_cpu_device::op_div()
 {
-	UINT32 res, mod;
+	uint32_t res, mod;
 
 	if (REG_B != 0)
 	{
-		UINT16 v = ((REG_A<<8) | REG_C);
+		uint16_t v = ((REG_A<<8) | REG_C);
 		res = v / REG_B;
 		mod = v % REG_B;
 
@@ -1416,8 +1416,8 @@ int lc8670_cpu_device::op_div()
 
 int lc8670_cpu_device::op_bne()
 {
-	UINT8 data = get_data();
-	UINT8 r8 = GET_R8;
+	uint8_t data = get_data();
+	uint8_t r8 = GET_R8;
 
 	if (REG_A != data)
 		set_pc(m_pc + SIGNED(r8));
@@ -1429,9 +1429,9 @@ int lc8670_cpu_device::op_bne()
 
 int lc8670_cpu_device::op_bne_ri()
 {
-	UINT8 data = get_data();
-	UINT8 i8 = GET_I8;
-	UINT8 r8 = GET_R8;
+	uint8_t data = get_data();
+	uint8_t i8 = GET_I8;
+	uint8_t r8 = GET_R8;
 
 	if (i8 != data)
 		set_pc(m_pc + SIGNED(r8));
@@ -1443,7 +1443,7 @@ int lc8670_cpu_device::op_bne_ri()
 
 int lc8670_cpu_device::op_ldf()
 {
-	UINT16 addr = REG_TRL | (REG_TRH<<8);
+	uint16_t addr = REG_TRL | (REG_TRH<<8);
 
 	m_bankswitch_func(REG_FPR & 0x01 ? 2 : 1);
 	REG_A = m_program->read_byte(addr);
@@ -1455,7 +1455,7 @@ int lc8670_cpu_device::op_ldf()
 
 int lc8670_cpu_device::op_stf()
 {
-	UINT16 addr = REG_TRL | (REG_TRH<<8);
+	uint16_t addr = REG_TRL | (REG_TRH<<8);
 
 	m_bankswitch_func(REG_FPR & 0x01 ? 2 : 1);
 	m_program->write_byte(addr, REG_A);
@@ -1466,9 +1466,9 @@ int lc8670_cpu_device::op_stf()
 
 int lc8670_cpu_device::op_dbnz()
 {
-	UINT16 addr = get_addr();
-	UINT8 r8 = GET_R8;
-	UINT8 data = read_data_latch(addr) - 1;
+	uint16_t addr = get_addr();
+	uint8_t r8 = GET_R8;
+	uint8_t data = read_data_latch(addr) - 1;
 
 	write_data_latch(addr, data);
 
@@ -1480,10 +1480,10 @@ int lc8670_cpu_device::op_dbnz()
 
 int lc8670_cpu_device::op_bpc()
 {
-	UINT8 b3 = GET_B3;
-	UINT16 d9 = GET_D9B3;
-	UINT8 r8 = GET_R8;
-	UINT8 data = read_data_latch(d9);
+	uint8_t b3 = GET_B3;
+	uint16_t d9 = GET_D9B3;
+	uint8_t r8 = GET_R8;
+	uint8_t data = read_data_latch(d9);
 
 	if (data & (1<<b3))
 	{
@@ -1496,7 +1496,7 @@ int lc8670_cpu_device::op_bpc()
 
 int lc8670_cpu_device::op_push()
 {
-	UINT16 d9 = GET_D9;
+	uint16_t d9 = GET_D9;
 	push(read_data(d9));
 
 	return 2;
@@ -1504,8 +1504,8 @@ int lc8670_cpu_device::op_push()
 
 int lc8670_cpu_device::op_inc()
 {
-	UINT16 addr = get_addr();
-	UINT8 data = read_data_latch(addr);
+	uint16_t addr = get_addr();
+	uint8_t data = read_data_latch(addr);
 
 	write_data_latch(addr, data + 1);
 
@@ -1514,9 +1514,9 @@ int lc8670_cpu_device::op_inc()
 
 int lc8670_cpu_device::op_bp()
 {
-	UINT8 b3 = GET_B3;
-	UINT16 d9 = GET_D9B3;
-	UINT8 r8 = GET_R8;
+	uint8_t b3 = GET_B3;
+	uint16_t d9 = GET_D9B3;
+	uint8_t r8 = GET_R8;
 
 	if (read_data(d9) & (1<<b3))
 		set_pc(m_pc + SIGNED(r8));
@@ -1526,7 +1526,7 @@ int lc8670_cpu_device::op_bp()
 
 int lc8670_cpu_device::op_pop()
 {
-	UINT16 d9 = GET_D9;
+	uint16_t d9 = GET_D9;
 	write_data(d9, pop());
 
 	return 2;
@@ -1534,8 +1534,8 @@ int lc8670_cpu_device::op_pop()
 
 int lc8670_cpu_device::op_dec()
 {
-	UINT16 addr = get_addr();
-	UINT8 data = read_data_latch(addr);
+	uint16_t addr = get_addr();
+	uint8_t data = read_data_latch(addr);
 
 	write_data_latch(addr, data - 1);
 
@@ -1544,7 +1544,7 @@ int lc8670_cpu_device::op_dec()
 
 int lc8670_cpu_device::op_bz()
 {
-	UINT8 r8 = GET_R8;
+	uint8_t r8 = GET_R8;
 
 	if (REG_A == 0)
 		set_pc(m_pc + SIGNED(r8));
@@ -1554,8 +1554,8 @@ int lc8670_cpu_device::op_bz()
 
 int lc8670_cpu_device::op_add()
 {
-	UINT8 data = get_data();
-	INT32 res = (REG_A + data);
+	uint8_t data = get_data();
+	int32_t res = (REG_A + data);
 
 	SET_CY(res > 0xff ? 1 : 0);
 	SET_AC(((REG_A & 0x0f) + (data & 0x0f)) > 0x0f ? 1 : 0);
@@ -1569,9 +1569,9 @@ int lc8670_cpu_device::op_add()
 
 int lc8670_cpu_device::op_bn()
 {
-	UINT8 b3 = GET_B3;
-	UINT16 d9 = GET_D9B3;
-	UINT8 r8 = GET_R8;
+	uint8_t b3 = GET_B3;
+	uint16_t d9 = GET_D9B3;
+	uint8_t r8 = GET_R8;
 
 	if (!(read_data(d9) & (1<<b3)))
 		set_pc(m_pc + SIGNED(r8));
@@ -1581,7 +1581,7 @@ int lc8670_cpu_device::op_bn()
 
 int lc8670_cpu_device::op_bnz()
 {
-	UINT8 r8 = GET_R8;
+	uint8_t r8 = GET_R8;
 
 	if (REG_A != 0)
 		set_pc(m_pc + SIGNED(r8));
@@ -1591,8 +1591,8 @@ int lc8670_cpu_device::op_bnz()
 
 int lc8670_cpu_device::op_addc()
 {
-	UINT8 data = get_data();
-	INT32 res = (REG_A + data + GET_CY);
+	uint8_t data = get_data();
+	int32_t res = (REG_A + data + GET_CY);
 
 	SET_CY(res > 0xff ? 1 : 0);
 	SET_AC(((REG_A & 0x0f) + (data & 0x0f) + GET_CY) > 0x0f ? 1 : 0);
@@ -1606,7 +1606,7 @@ int lc8670_cpu_device::op_addc()
 
 int lc8670_cpu_device::op_ret()
 {
-	UINT16 new_pc = pop()<<8;
+	uint16_t new_pc = pop()<<8;
 	new_pc |= pop();
 	set_pc(new_pc);
 
@@ -1615,8 +1615,8 @@ int lc8670_cpu_device::op_ret()
 
 int lc8670_cpu_device::op_sub()
 {
-	UINT8 data = get_data();
-	INT32 res = (REG_A - data);
+	uint8_t data = get_data();
+	int32_t res = (REG_A - data);
 
 	SET_CY(res < 0x00 ? 1 : 0);
 	SET_AC(((REG_A & 0x0f) - (data & 0x0f)) < 0x00 ? 1 : 0);
@@ -1630,8 +1630,8 @@ int lc8670_cpu_device::op_sub()
 
 int lc8670_cpu_device::op_not1()
 {
-	UINT16 d9 = GET_D9B3;
-	UINT8 data = read_data_latch(d9);
+	uint16_t d9 = GET_D9B3;
+	uint8_t data = read_data_latch(d9);
 
 	data ^= (1<<GET_B3);
 	write_data_latch(d9, data);
@@ -1641,7 +1641,7 @@ int lc8670_cpu_device::op_not1()
 
 int lc8670_cpu_device::op_reti()
 {
-	UINT16 new_pc = pop()<<8;
+	uint16_t new_pc = pop()<<8;
 	new_pc |= pop();
 	set_pc(new_pc);
 
@@ -1660,8 +1660,8 @@ int lc8670_cpu_device::op_reti()
 
 int lc8670_cpu_device::op_subc()
 {
-	UINT8 data = get_data();
-	INT32 res = (REG_A - data - GET_CY);
+	uint8_t data = get_data();
+	int32_t res = (REG_A - data - GET_CY);
 
 	SET_CY(res < 0x00 ? 1 : 0);
 	SET_AC(((REG_A & 0x0f) - (data & 0x0f) - GET_CY) < 0x00 ? 1 : 0);
@@ -1691,8 +1691,8 @@ int lc8670_cpu_device::op_ldc()
 
 int lc8670_cpu_device::op_xch()
 {
-	UINT16 addr = get_addr();
-	UINT8 data = read_data(addr);
+	uint16_t addr = get_addr();
+	uint8_t data = read_data(addr);
 
 	write_data(addr, REG_A);
 	REG_A = data;
@@ -1703,8 +1703,8 @@ int lc8670_cpu_device::op_xch()
 
 int lc8670_cpu_device::op_clr1()
 {
-	UINT16 d9 = GET_D9B3;
-	UINT8 data = read_data_latch(d9);
+	uint16_t d9 = GET_D9B3;
+	uint8_t data = read_data_latch(d9);
 
 	data &= ~(1<<GET_B3);
 	write_data_latch(d9, data);
@@ -1714,7 +1714,7 @@ int lc8670_cpu_device::op_clr1()
 
 int lc8670_cpu_device::op_rorc()
 {
-	UINT8 a = (REG_A>>1) | (GET_CY ? 0x80 : 0x00);
+	uint8_t a = (REG_A>>1) | (GET_CY ? 0x80 : 0x00);
 
 	SET_CY(BIT(REG_A,0));
 	REG_A = a;
@@ -1749,8 +1749,8 @@ int lc8670_cpu_device::op_and()
 
 int lc8670_cpu_device::op_set1()
 {
-	UINT16 d9 = GET_D9B3;
-	UINT8 data = read_data_latch(d9);
+	uint16_t d9 = GET_D9B3;
+	uint8_t data = read_data_latch(d9);
 
 	data |= (1<<GET_B3);
 	write_data_latch(d9, data);
@@ -1760,7 +1760,7 @@ int lc8670_cpu_device::op_set1()
 
 int lc8670_cpu_device::op_rolc()
 {
-	UINT8 a = (REG_A<<1) | (GET_CY ? 0x01 : 0x00);
+	uint8_t a = (REG_A<<1) | (GET_CY ? 0x01 : 0x00);
 
 	SET_CY(BIT(REG_A,7));
 	REG_A = a;

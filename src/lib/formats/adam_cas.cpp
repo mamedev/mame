@@ -83,10 +83,10 @@ cassette_image::error coladam_put_byte(cassette_image *cass, int channel, double
 	return err;
 }
 
-cassette_image::error coladam_put_block(cassette_image *cass, int channel, double *time_index, int *prev_sign, int block_index, UINT8 *buffer, int layout_type)
+cassette_image::error coladam_put_block(cassette_image *cass, int channel, double *time_index, int *prev_sign, int block_index, uint8_t *buffer, int layout_type)
 {
 	int i, checksum_16=0;
-	UINT8 header[] = { 0x16, 0x48, 0x45, 0x00, static_cast<UINT8>(block_index), 0xff, static_cast<UINT8>(0xff - block_index), 0x00, 0x80, 0xf4 };
+	uint8_t header[] = { 0x16, 0x48, 0x45, 0x00, static_cast<uint8_t>(block_index), 0xff, static_cast<uint8_t>(0xff - block_index), 0x00, 0x80, 0xf4 };
 	cassette_image::error err;
 	if (layout_type == TYPE_GW)
 	{
@@ -130,7 +130,7 @@ static cassette_image::error coladam_ddp_load( cassette_image *cass )
 {
 	double time = 0.;
 	int i, block, prev_sign=-1;
-	UINT8 buffer[0x400];
+	uint8_t buffer[0x400];
 	cassette_image::error err = cassette_image::error::SUCCESS;
 
 	// It would appear that data packs that originally had the type GW data layout and headers work fine when converted to type

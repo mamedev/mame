@@ -40,9 +40,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 
 private:
-	UINT8 m_digit_sel;
-	UINT8 m_cass_in;
-	UINT16 m_cass_data[4];
+	uint8_t m_digit_sel;
+	uint8_t m_cass_in;
+	uint16_t m_cass_data[4];
 	void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -53,7 +53,7 @@ private:
 TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::timer_p )
 {
 	m_cass_data[1]++;
-	UINT8 cass_ws = ((m_cass)->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = ((m_cass)->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -91,7 +91,7 @@ WRITE8_MEMBER( pro80_state::segment_w )
 
 READ8_MEMBER( pro80_state::kp_r )
 {
-	UINT8 data = 0x0f;
+	uint8_t data = 0x0f;
 
 	if (!BIT(m_digit_sel, 0)) data &= ioport("LINE0")->read();
 	if (!BIT(m_digit_sel, 1)) data &= ioport("LINE1")->read();

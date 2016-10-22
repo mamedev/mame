@@ -24,8 +24,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(unistar);
-	UINT32 screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	const UINT8 *m_p_chargen;
+	uint32_t screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	const uint8_t *m_p_chargen;
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -65,7 +65,7 @@ void unistar_state::video_start()
 {
 }
 
-UINT32 unistar_state::screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t unistar_state::screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

@@ -56,7 +56,7 @@ const address_space_config *ef9364_device::memory_space_config(address_spacenum 
 //  ef9364_device - constructor
 //-------------------------------------------------
 
-ef9364_device::ef9364_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ef9364_device::ef9364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EF9364, "EF9364", tag, owner, clock, "ef9364", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -94,7 +94,7 @@ void ef9364_device::static_set_nb_of_pages(device_t &device, int nb_of_pages )
 //  into the palette
 //-------------------------------------------------
 
-void ef9364_device::set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b )
+void ef9364_device::set_color_entry( int index, uint8_t r, uint8_t g, uint8_t b )
 {
 	if( index < 2 )
 	{
@@ -164,7 +164,7 @@ void ef9364_device::device_reset()
 
 void ef9364_device::set_video_mode(void)
 {
-	UINT16 new_width = bitplane_xres;
+	uint16_t new_width = bitplane_xres;
 
 	if (m_screen->width() != new_width)
 	{
@@ -183,7 +183,7 @@ void ef9364_device::set_video_mode(void)
 //  ( No border for the moment ;) )
 //-------------------------------------------------
 
-void ef9364_device::draw_border(UINT16 line)
+void ef9364_device::draw_border(uint16_t line)
 {
 }
 
@@ -191,7 +191,7 @@ void ef9364_device::draw_border(UINT16 line)
 // screen_update: Framebuffer video ouput
 //-------------------------------------------------
 
-UINT32 ef9364_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ef9364_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,r;
 	unsigned char c;
@@ -234,7 +234,7 @@ UINT32 ef9364_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 // update_scanline: Scanline callback
 //-------------------------------------------------
 
-void ef9364_device::update_scanline(UINT16 scanline)
+void ef9364_device::update_scanline(uint16_t scanline)
 {
 	if (scanline == vsync_scanline_pos)
 	{
@@ -251,7 +251,7 @@ void ef9364_device::update_scanline(UINT16 scanline)
 // data_w: Registers write access callback
 //-------------------------------------------------
 
-void ef9364_device::command_w(UINT8 cmd)
+void ef9364_device::command_w(uint8_t cmd)
 {
 	int x,y,i,j;
 
@@ -353,7 +353,7 @@ void ef9364_device::command_w(UINT8 cmd)
 	}
 }
 
-void ef9364_device::char_latch_w(UINT8 data)
+void ef9364_device::char_latch_w(uint8_t data)
 {
 	char_latch = data;
 }

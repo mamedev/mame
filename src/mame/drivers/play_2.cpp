@@ -70,14 +70,14 @@ public:
 	DECLARE_DRIVER_INIT(zira);
 
 private:
-	UINT16 m_clockcnt;
-	UINT16 m_resetcnt;
-	UINT8 m_kbdrow;
-	UINT8 m_segment[5];
+	uint16_t m_clockcnt;
+	uint16_t m_resetcnt;
+	uint8_t m_kbdrow;
+	uint8_t m_segment[5];
 	bool m_disp_sw;
-	UINT8 m_soundlatch;
-	UINT8 m_psg_latch;
-	UINT8 m_port06;
+	uint8_t m_soundlatch;
+	uint8_t m_psg_latch;
+	uint8_t m_port06;
 	virtual void machine_reset() override;
 	required_device<cosmac_device> m_maincpu;
 	required_device<ttl7474_device> m_4013a;
@@ -191,7 +191,7 @@ void play_2_state::machine_reset()
 	m_kbdrow = 0;
 	m_disp_sw = 0;
 	m_port06 = 0;
-	for (UINT8 i = 0; i < 5; i++)
+	for (uint8_t i = 0; i < 5; i++)
 		m_segment[i] = 0;
 	m_1863->oe_w(1);
 }
@@ -202,9 +202,9 @@ WRITE8_MEMBER( play_2_state::port01_w )
 	if (m_kbdrow && m_disp_sw)
 	{
 		m_disp_sw = 0;
-		for (UINT8 j = 0; j < 6; j++)
+		for (uint8_t j = 0; j < 6; j++)
 			if (BIT(m_kbdrow, j))
-				for (UINT8 i = 0; i < 5; i++)
+				for (uint8_t i = 0; i < 5; i++)
 					output().set_digit_value(j*10 + i, m_segment[i] & 0x7f);
 	}
 	m_1863->set_output_gain(0, BIT(data, 7) ? 1.00 : 0.00);
@@ -227,7 +227,7 @@ WRITE8_MEMBER( play_2_state::port03_w )
 READ8_MEMBER( play_2_state::port04_r )
 {
 	if (m_kbdrow & 0x3f)
-		for (UINT8 i = 0; i < 6; i++)
+		for (uint8_t i = 0; i < 6; i++)
 			if (BIT(m_kbdrow, i))
 				return m_keyboard[i]->read();
 

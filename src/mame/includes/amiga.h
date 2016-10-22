@@ -40,8 +40,8 @@ Ernesto Corvi & Mariusz Wojcieszek
 /* registers in 32-bit natural order. This means we need to XOR the register */
 /* address with 1 on little-endian systems. */
 #define CUSTOM_REG(x)           (state->m_custom_regs[BYTE_XOR_BE(x)])
-#define CUSTOM_REG_SIGNED(x)    ((INT16)CUSTOM_REG(x))
-#define CUSTOM_REG_LONG(x)      (*(UINT32 *)&state->m_custom_regs[x])
+#define CUSTOM_REG_SIGNED(x)    ((int16_t)CUSTOM_REG(x))
+#define CUSTOM_REG_LONG(x)      (*(uint32_t *)&state->m_custom_regs[x])
 
 /*
     A = Angus
@@ -374,32 +374,32 @@ public:
 	{ }
 
 	/* chip RAM access */
-	UINT16 chip_ram_r(offs_t byteoffs)
+	uint16_t chip_ram_r(offs_t byteoffs)
 	{
 		return EXPECTED(byteoffs < m_chip_ram.bytes()) ? m_chip_ram.read(byteoffs >> 1) : 0xffff;
 	}
-	void chip_ram_w(offs_t byteoffs, UINT16 data)
+	void chip_ram_w(offs_t byteoffs, uint16_t data)
 	{
 		if (EXPECTED(byteoffs < m_chip_ram.bytes()))
 			m_chip_ram.write(byteoffs >> 1, data);
 	}
 
 	/* sprite states */
-	UINT8 m_sprite_comparitor_enable_mask;
-	UINT8 m_sprite_dma_reload_mask;
-	UINT8 m_sprite_dma_live_mask;
-	UINT8 m_sprite_ctl_written;
-	UINT32 m_sprite_shiftreg[8];
-	UINT8 m_sprite_remain[8];
+	uint8_t m_sprite_comparitor_enable_mask;
+	uint8_t m_sprite_dma_reload_mask;
+	uint8_t m_sprite_dma_live_mask;
+	uint8_t m_sprite_ctl_written;
+	uint32_t m_sprite_shiftreg[8];
+	uint8_t m_sprite_remain[8];
 
 	/* copper states */
-	UINT32 m_copper_pc;
-	UINT8 m_copper_waiting;
-	UINT8 m_copper_waitblit;
-	UINT16 m_copper_waitval;
-	UINT16 m_copper_waitmask;
-	UINT16 m_copper_pending_offset;
-	UINT16 m_copper_pending_data;
+	uint32_t m_copper_pc;
+	uint8_t m_copper_waiting;
+	uint8_t m_copper_waitblit;
+	uint16_t m_copper_waitval;
+	uint16_t m_copper_waitmask;
+	uint16_t m_copper_pending_offset;
+	uint16_t m_copper_pending_data;
 #if GUESS_COPPER_OFFSET
 	int m_wait_offset;
 #endif
@@ -409,17 +409,17 @@ public:
 	rgb_t m_ham_color;
 
 	/* misc states */
-	UINT16 m_genlock_color;
+	uint16_t m_genlock_color;
 
 	/* separate 6 in-order bitplanes into 2 x 3-bit bitplanes in two nibbles */
-	UINT8 m_separate_bitplanes[2][64];
+	uint8_t m_separate_bitplanes[2][64];
 
 	/* aga */
 	int m_aga_diwhigh_written;
 	rgb_t m_aga_palette[256];
-	UINT64 m_aga_bpldat[8];
-	UINT16 m_aga_sprdata[8][4];
-	UINT16 m_aga_sprdatb[8][4];
+	uint64_t m_aga_bpldat[8];
+	uint16_t m_aga_sprdata[8][4];
+	uint16_t m_aga_sprdatb[8][4];
 	int m_aga_sprite_fetched_words;
 	int m_aga_sprite_dma_used_words[8];
 
@@ -429,8 +429,8 @@ public:
 
 	void render_scanline(bitmap_ind16 &bitmap, int scanline);
 	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
-	UINT32 screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_screenmode();
 
 	TIMER_CALLBACK_MEMBER( scanline_callback );
@@ -494,12 +494,12 @@ public:
 
 	emu_timer *m_blitter_timer;
 
-	UINT16 m_agnus_id;
-	UINT16 m_denise_id;
+	uint16_t m_agnus_id;
+	uint16_t m_denise_id;
 
-	UINT16 m_custom_regs[256];
+	uint16_t m_custom_regs[256];
 
-	void custom_chip_w(UINT16 offset, UINT16 data, UINT16 mem_mask = 0xffff)
+	void custom_chip_w(uint16_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		custom_chip_w(m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
 	}
@@ -546,11 +546,11 @@ protected:
 
 	virtual void vblank();
 
-	virtual void potgo_w(UINT16 data) {};
+	virtual void potgo_w(uint16_t data) {};
 
 	// joystick/mouse
-	virtual UINT16 joy0dat_r();
-	virtual UINT16 joy1dat_r();
+	virtual uint16_t joy0dat_r();
+	virtual uint16_t joy1dat_r();
 
 	// serial
 	virtual void rs232_tx(int state);
@@ -583,7 +583,7 @@ protected:
 	optional_ioport m_hvpos;
 
 	memory_array m_chip_ram;
-	UINT32 m_chip_ram_mask;
+	uint32_t m_chip_ram_mask;
 
 	int m_cia_0_irq;
 	int m_cia_1_irq;
@@ -625,8 +625,8 @@ private:
 	// pot counters
 	int m_pot0x, m_pot1x, m_pot0y, m_pot1y;
 
-	UINT16 m_pot0dat;
-	UINT16 m_pot1dat;
+	uint16_t m_pot0dat;
+	uint16_t m_pot1dat;
 
 	int m_centronics_busy;
 	int m_centronics_perror;
@@ -646,8 +646,8 @@ private:
 	bitmap_ind16 m_flickerfixer;
 	bitmap_ind32 m_flickerfixer32;
 
-	UINT16 m_rx_shift;
-	UINT16 m_tx_shift;
+	uint16_t m_rx_shift;
+	uint16_t m_tx_shift;
 
 	int m_rx_state;
 	int m_tx_state;
@@ -662,7 +662,7 @@ private:
 	void serial_shift();
 	void rx_write(amiga_state *state, int level);
 
-	UINT32 amiga_gethvpos();
+	uint32_t amiga_gethvpos();
 };
 
 
@@ -673,12 +673,12 @@ extern const char *const amiga_custom_names[0x100];
 
 /*----------- defined in video/amiga.c -----------*/
 
-extern const UINT16 amiga_expand_byte[256];
+extern const uint16_t amiga_expand_byte[256];
 
-void amiga_copper_setpc(running_machine &machine, UINT32 pc);
+void amiga_copper_setpc(running_machine &machine, uint32_t pc);
 int amiga_copper_execute_next(running_machine &machine, int xpos);
 
-void amiga_set_genlock_color(running_machine &machine, UINT16 color);
+void amiga_set_genlock_color(running_machine &machine, uint16_t color);
 void amiga_sprite_dma_reset(running_machine &machine, int which);
 void amiga_sprite_enable_comparitor(running_machine &machine, int which, int enable);
 

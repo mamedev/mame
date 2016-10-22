@@ -14,7 +14,7 @@
 
 PALETTE_INIT_MEMBER(fortyl_state, fortyl)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -103,8 +103,8 @@ void fortyl_state::redraw_pixels()
 
 void fortyl_state::video_start()
 {
-	m_pixram1 = make_unique_clear<UINT8[]>(0x4000);
-	m_pixram2 = make_unique_clear<UINT8[]>(0x4000);
+	m_pixram1 = make_unique_clear<uint8_t[]>(0x4000);
+	m_pixram2 = make_unique_clear<uint8_t[]>(0x4000);
 
 	m_tmp_bitmap1 = std::make_unique<bitmap_ind16>(256, 256);
 	m_tmp_bitmap2 = std::make_unique<bitmap_ind16>(256, 256);
@@ -285,8 +285,8 @@ spriteram format (4 bytes per sprite):
 
 void fortyl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
-	UINT8 *spriteram_2 = m_spriteram2;
+	uint8_t *spriteram = m_spriteram;
+	uint8_t *spriteram_2 = m_spriteram2;
 	int offs;
 
 	/* spriteram #1 */
@@ -365,7 +365,7 @@ void fortyl_state::draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		copybitmap(bitmap, *m_tmp_bitmap2, f, f, m_xoffset, 0, cliprect);
 }
 
-UINT32 fortyl_state::screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fortyl_state::screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if(m_screen_disable == true)
 	{

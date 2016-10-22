@@ -123,7 +123,7 @@ WRITE8_MEMBER(wc90_state::txvideoram_w)
 ***************************************************************************/
 
 
-UINT32 wc90_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wc90_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,m_scroll2xlo[0] + 256 * m_scroll2xhi[0]);
 	m_bg_tilemap->set_scrolly(0,m_scroll2ylo[0] + 256 * m_scroll2yhi[0]);

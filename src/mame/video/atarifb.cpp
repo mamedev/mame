@@ -16,7 +16,7 @@
  *
  *************************************/
 
-void atarifb_state::get_tile_info_common( tile_data &tileinfo, tilemap_memory_index tile_index, UINT8 *alpha_videoram )
+void atarifb_state::get_tile_info_common( tile_data &tileinfo, tilemap_memory_index tile_index, uint8_t *alpha_videoram )
 {
 	int code = alpha_videoram[tile_index] & 0x3f;
 	int flip = alpha_videoram[tile_index] & 0x40;
@@ -169,7 +169,7 @@ void atarifb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 atarifb_state::screen_update_atarifb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atarifb_state::screen_update_atarifb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_playfield_and_alpha(bitmap, cliprect, 0, 0);
 
@@ -179,7 +179,7 @@ UINT32 atarifb_state::screen_update_atarifb(screen_device &screen, bitmap_ind16 
 }
 
 
-UINT32 atarifb_state::screen_update_abaseb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atarifb_state::screen_update_abaseb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_playfield_and_alpha(bitmap, cliprect, -8, 0);
 
@@ -189,7 +189,7 @@ UINT32 atarifb_state::screen_update_abaseb(screen_device &screen, bitmap_ind16 &
 }
 
 
-UINT32 atarifb_state::screen_update_soccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atarifb_state::screen_update_soccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_playfield_and_alpha(bitmap, cliprect, 0, 8);
 

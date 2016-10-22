@@ -204,7 +204,7 @@ void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 //  if(SpriteCollision(2,4)) m_CollisionSprite |= 0x01;   /* Not Used */
 }
 
-UINT32 zac2650_state::screen_update_tinvader(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t zac2650_state::screen_update_tinvader(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

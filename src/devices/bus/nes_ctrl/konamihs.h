@@ -26,7 +26,7 @@ class nes_konamihs_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_konamihs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_konamihs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -35,12 +35,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_exp(offs_t offset) override;
-	virtual void write(UINT8 data) override;
+	virtual uint8_t read_exp(offs_t offset) override;
+	virtual void write(uint8_t data) override;
 
 	required_ioport m_ipt_p1;
 	required_ioport m_ipt_p2;
-	UINT32 m_latch_p1, m_latch_p2;
+	uint32_t m_latch_p1, m_latch_p2;
 };
 
 // device type definition

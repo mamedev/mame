@@ -15,13 +15,13 @@
 class messimg_disk_image_device;
 
 struct nbfilectx {
-	UINT32 curcmd;
-	UINT8 filename[128];
-	UINT8 curdir[1024];
+	uint32_t curcmd;
+	uint8_t filename[128];
+	uint8_t curdir[1024];
 		osd::directory::ptr dirp;
 	osd_file::ptr fd;
-	UINT64 filelen;
-	UINT32 bytecount;
+	uint64_t filelen;
+	uint32_t bytecount;
 };
 
 // ======================> nubus_image_device
@@ -32,8 +32,8 @@ class nubus_image_device :
 {
 public:
 		// construction/destruction
-		nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		nubus_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		nubus_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;

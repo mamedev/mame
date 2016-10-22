@@ -57,7 +57,7 @@ READ64_MEMBER(naomi_state::naomi2_biose_idle_skip_r )
 	return dc_ram[0x2b0600/8];
 }
 
-UINT8 naomi_state::asciihex_to_dec(UINT8 in)
+uint8_t naomi_state::asciihex_to_dec(uint8_t in)
 {
 	if (in>=0x30 && in<=0x39)
 	{
@@ -94,8 +94,8 @@ void naomi_state::create_pic_from_retdat()
 
 		if (rgn_hexregion && rgn_newregion)
 		{
-			UINT8* hexregion = rgn_hexregion->base();
-			UINT8* newregion = rgn_newregion->base();
+			uint8_t* hexregion = rgn_hexregion->base();
+			uint8_t* newregion = rgn_newregion->base();
 
 
 			int hexoffs = 0;
@@ -112,11 +112,11 @@ void naomi_state::create_pic_from_retdat()
 
 				for (offs2=0;offs2<0x20;offs2++)
 				{
-					UINT8 ascii1 = hexregion[hexoffs+0];
-					UINT8 ascii2 = hexregion[hexoffs+1];
-					UINT8 dec1 = asciihex_to_dec(ascii1);
-					UINT8 dec2 = asciihex_to_dec(ascii2);
-					UINT8 val = dec1 << 4 | dec2;
+					uint8_t ascii1 = hexregion[hexoffs+0];
+					uint8_t ascii2 = hexregion[hexoffs+1];
+					uint8_t dec1 = asciihex_to_dec(ascii1);
+					uint8_t dec2 = asciihex_to_dec(ascii2);
+					uint8_t val = dec1 << 4 | dec2;
 
 					//printf("%02x%02x", ascii1, ascii2);
 
@@ -137,8 +137,8 @@ void naomi_state::create_pic_from_retdat()
 
 			if (rgn_retregion && rgn_newregion)
 			{
-				UINT8* retregion = rgn_retregion->base();
-				UINT8* newregion = rgn_newregion->base();
+				uint8_t* retregion = rgn_retregion->base();
+				uint8_t* newregion = rgn_newregion->base();
 
 
 				int i;
@@ -177,7 +177,7 @@ void naomi_state::create_pic_from_retdat()
 
 			if (rgn_newregion)
 			{
-				UINT8* newregion = rgn_newregion->base();
+				uint8_t* newregion = rgn_newregion->base();
 
 				FILE *fp;
 				char filename[256];
@@ -223,7 +223,7 @@ INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
 CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 {
 	const char *tagptr = (const char *)param;
-	UINT8 retval = 0;
+	uint8_t retval = 0;
 
 	for (int i = 0x80; i >= 0x08; i >>= 1)
 	{

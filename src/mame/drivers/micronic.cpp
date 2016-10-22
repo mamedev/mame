@@ -119,9 +119,9 @@
 
 READ8_MEMBER( micronic_state::keypad_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
-	for (UINT8 bit = 0; bit < 8; bit++)
+	for (uint8_t bit = 0; bit < 8; bit++)
 	{
 		if (m_kp_matrix & (1 << bit))
 		{
@@ -153,7 +153,7 @@ WRITE8_MEMBER( micronic_state::kp_matrix_w )
 
 WRITE8_MEMBER( micronic_state::beep_w )
 {
-	UINT16 frequency[16] =
+	uint16_t frequency[16] =
 	{
 			0, 4000, 2000, 1333, 1000, 800, 667, 571,
 		500,  444,  400,  364,  333, 308, 286, 267

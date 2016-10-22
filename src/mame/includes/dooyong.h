@@ -40,9 +40,9 @@ public:
 	static void static_set_gfxdecode_tag(device_t &device, char const *tag);
 	static void static_set_gfxnum(device_t &device, int gfxnum);
 
-	void draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, UINT32 flags, UINT8 priority);
+	void draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, uint32_t flags, uint8_t priority);
 
-	void set_palette_bank(UINT16 bank);
+	void set_palette_bank(uint16_t bank);
 
 protected:
 	dooyong_tilemap_device_base(
@@ -51,7 +51,7 @@ protected:
 			char const *name,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock,
+			uint32_t clock,
 			char const *shortname,
 			char const *source);
 
@@ -61,13 +61,13 @@ protected:
 	int m_gfxnum;
 
 	tilemap_t *m_tilemap;
-	UINT16 m_palette_bank;
+	uint16_t m_palette_bank;
 };
 
 class dooyong_rom_tilemap_device : public dooyong_tilemap_device_base
 {
 public:
-	dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
+	dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_tilerom_tag(device_t &device, char const *tag);
 	static void static_set_tilerom_offset(device_t &device, int offset);
@@ -83,7 +83,7 @@ protected:
 			char const *name,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock,
+			uint32_t clock,
 			char const *shortname,
 			char const *source);
 
@@ -97,20 +97,20 @@ protected:
 	int m_rows;
 
 private:
-	required_region_ptr<UINT16> m_tilerom;
+	required_region_ptr<uint16_t> m_tilerom;
 	int m_tilerom_offset;
 	unsigned m_transparent_pen;
 	unsigned m_primella_code_mask;
 	unsigned m_primella_color_mask;
 	unsigned m_primella_color_shift;
 
-	UINT8 m_registers[0x10];
+	uint8_t m_registers[0x10];
 };
 
 class rshark_rom_tilemap_device : public dooyong_rom_tilemap_device
 {
 public:
-	rshark_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
+	rshark_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_colorrom_tag(device_t &device, char const *tag);
 	static void static_set_colorrom_offset(device_t &device, int offset);
@@ -121,14 +121,14 @@ protected:
 	virtual TILE_GET_INFO_MEMBER(tile_info) override;
 
 private:
-	required_region_ptr<UINT8> m_colorrom;
+	required_region_ptr<uint8_t> m_colorrom;
 	int m_colorrom_offset;
 };
 
 class dooyong_ram_tilemap_device : public dooyong_tilemap_device_base
 {
 public:
-	dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
+	dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ16_MEMBER(tileram_r) { return m_tileram[offset & ((64U * 32U) - 1)]; }
 	DECLARE_WRITE16_MEMBER(tileram_w);
@@ -140,7 +140,7 @@ protected:
 private:
 	TILE_GET_INFO_MEMBER(tile_info);
 
-	std::unique_ptr<UINT16[]> m_tileram;
+	std::unique_ptr<uint16_t[]> m_tileram;
 };
 
 
@@ -200,19 +200,19 @@ public:
 	DECLARE_WRITE8_MEMBER(flytiger_ctrl_w);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
-	UINT32 screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_MACHINE_START(cpu_z80);
 	DECLARE_VIDEO_START(bluehawk);
 	DECLARE_VIDEO_START(flytiger);
 	DECLARE_VIDEO_START(primella);
 
-	std::unique_ptr<UINT8[]> m_paletteram_flytiger;
-	UINT8 m_sprites_disabled = 0;
-	UINT8 m_flytiger_pri = 0;
-	UINT8 m_tx_pri = 0;
-	UINT8 m_palette_bank = 0;
+	std::unique_ptr<uint8_t[]> m_paletteram_flytiger;
+	uint8_t m_sprites_disabled = 0;
+	uint8_t m_flytiger_pri = 0;
+	uint8_t m_tx_pri = 0;
+	uint8_t m_palette_bank = 0;
 
 	required_device<dooyong_ram_tilemap_device> m_tx;
 	optional_device<buffered_spriteram8_device> m_spriteram;
@@ -232,9 +232,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_2);
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_MACHINE_RESET(sound_ym2203);
-	UINT32 screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_VIDEO_START(lastday);
 	DECLARE_VIDEO_START(gulfstrm);
 	DECLARE_VIDEO_START(pollux);
@@ -258,7 +258,7 @@ public:
 protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT16 m_bg2_priority = 0;
+	uint16_t m_bg2_priority = 0;
 	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
@@ -270,7 +270,7 @@ public:
 	{
 	}
 
-	UINT32 screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_VIDEO_START(rshark);
 };
 
@@ -285,7 +285,7 @@ public:
 	{
 	}
 
-	UINT32 screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_VIDEO_START(popbingo);
 
 protected:

@@ -24,7 +24,7 @@
 // The YL register is the lower half of the 32 bit Y register
 void* dsp16_device::addressYL()
 {
-	return (void*)(((UINT8*)&m_y) + 2);
+	return (void*)(((uint8_t*)&m_y) + 2);
 }
 
 
@@ -50,7 +50,7 @@ bool dsp16_device::lmv()
 }
 
 
-void dsp16_device::writeRegister(void* reg, const UINT16 &value)
+void dsp16_device::writeRegister(void* reg, const uint16_t &value)
 {
 	// Make sure you're not attempting to write somewhere this function doesn't support.
 	if (reg == &m_p || reg == &m_a0 || reg == &m_a1)
@@ -62,7 +62,7 @@ void dsp16_device::writeRegister(void* reg, const UINT16 &value)
 	if (reg == &m_auc || reg == &m_c0 || reg == &m_c1 || reg == &m_c2)
 	{
 		// 8 bit registers
-		*(UINT8*)reg = value & 0x00ff;
+		*(uint8_t*)reg = value & 0x00ff;
 	}
 	else if (reg == &m_psw)
 	{
@@ -92,12 +92,12 @@ void dsp16_device::writeRegister(void* reg, const UINT16 &value)
 	else
 	{
 		// Everything else
-		*(UINT16*)reg = value;
+		*(uint16_t*)reg = value;
 	}
 }
 
 
-bool dsp16_device::conditionTest(const UINT8& CON)
+bool dsp16_device::conditionTest(const uint8_t& CON)
 {
 	switch (CON)
 	{
@@ -128,7 +128,7 @@ bool dsp16_device::conditionTest(const UINT8& CON)
 }
 
 
-void* dsp16_device::registerFromRImmediateField(const UINT8& R)
+void* dsp16_device::registerFromRImmediateField(const uint8_t& R)
 {
 	switch (R)
 	{
@@ -147,7 +147,7 @@ void* dsp16_device::registerFromRImmediateField(const UINT8& R)
 }
 
 
-void* dsp16_device::registerFromRTable(const UINT8 &R)
+void* dsp16_device::registerFromRTable(const uint8_t &R)
 {
 	switch (R)
 	{
@@ -186,7 +186,7 @@ void* dsp16_device::registerFromRTable(const UINT8 &R)
 }
 
 
-void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& S)
+void dsp16_device::executeF1Field(const uint8_t& F1, const uint8_t& D, const uint8_t& S)
 {
 	// TODO: I'm pretty sure we need to feed X into these as well - Double check
 
@@ -195,7 +195,7 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 	// implementation details  (page 3-9)
 
 	// Where is are the results going?
-	UINT64* destinationReg = nullptr;
+	uint64_t* destinationReg = nullptr;
 	switch (D)
 	{
 		case 0x00: destinationReg = &m_a0; break;
@@ -204,7 +204,7 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 	}
 
 	// Which source is being used?
-	UINT64* sourceReg = nullptr;
+	uint64_t* sourceReg = nullptr;
 	switch (S)
 	{
 		case 0x00: sourceReg = &m_a0; break;
@@ -214,7 +214,7 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 
 
 	// We must compute into an intermediate variable to compute flags on
-	UINT64 result = 0;
+	uint64_t result = 0;
 	bool justATest = false;
 
 	switch (F1)
@@ -235,8 +235,8 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 		{
 			// p = x*y
 			// TODO: What happens to the flags in this operation?
-			const INT16 y = (m_y & 0xffff0000) >> 16;
-			m_p = (INT32)((INT16)m_x * y);
+			const int16_t y = (m_y & 0xffff0000) >> 16;
+			m_p = (int32_t)((int16_t)m_x * y);
 			justATest = true;
 			break;
 		}
@@ -292,11 +292,11 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 		case 0x0b:
 		{
 			// aS-y
-			INT64 aS = *sourceReg;
+			int64_t aS = *sourceReg;
 			if (aS & U64(0x800000000))
 				aS |= U64(0xfffffff000000000);
 
-			INT64 y  = (m_y & 0xffff0000) >> 16;
+			int64_t y  = (m_y & 0xffff0000) >> 16;
 			if (y & 0x8000)
 				y |= U64(0xffffffffffff0000);
 
@@ -313,11 +313,11 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 		case 0x0d:
 		{
 			// Ad = aS+y
-			INT64 aS = *sourceReg;
+			int64_t aS = *sourceReg;
 			if (aS & U64(0x800000000))
 				aS |= U64(0xfffffff000000000);
 
-			INT64 y  = (m_y & 0xffff0000) >> 16;
+			int64_t y  = (m_y & 0xffff0000) >> 16;
 			if (y & 0x8000)
 				y |= U64(0xffffffffffff0000);
 
@@ -333,11 +333,11 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 		case 0x0f:
 		{
 			// Ad = aS-y
-			INT64 aS = *sourceReg;
+			int64_t aS = *sourceReg;
 			if (aS & U64(0x800000000))
 				aS |= U64(0xfffffff000000000);
 
-			INT64 y  = (m_y & 0xffff0000) >> 16;
+			int64_t y  = (m_y & 0xffff0000) >> 16;
 			if (y & 0x8000)
 				y |= U64(0xffffffffffff0000);
 
@@ -371,14 +371,14 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 
 	// If it was a real operation, make sure the data goes where it should
 	if (!justATest)
-		*destinationReg = (UINT64)result & U64(0x0000000fffffffff);
+		*destinationReg = (uint64_t)result & U64(0x0000000fffffffff);
 }
 
 
-UINT16* dsp16_device::registerFromYFieldUpper(const UINT8& Y)
+uint16_t* dsp16_device::registerFromYFieldUpper(const uint8_t& Y)
 {
-	UINT16* destinationReg = nullptr;
-	const UINT8 N = (Y & 0x0c) >> 2;
+	uint16_t* destinationReg = nullptr;
+	const uint8_t N = (Y & 0x0c) >> 2;
 	switch (N)
 	{
 		case 0x00: destinationReg = &m_r0; break;
@@ -391,11 +391,11 @@ UINT16* dsp16_device::registerFromYFieldUpper(const UINT8& Y)
 }
 
 
-void dsp16_device::executeYFieldPost(const UINT8& Y)
+void dsp16_device::executeYFieldPost(const uint8_t& Y)
 {
-	UINT16* opReg = registerFromYFieldUpper(Y);
+	uint16_t* opReg = registerFromYFieldUpper(Y);
 
-	const UINT8 lower = Y & 0x03;
+	const uint8_t lower = Y & 0x03;
 	switch (lower)
 	{
 		case 0x00: /* nop */ break;
@@ -406,9 +406,9 @@ void dsp16_device::executeYFieldPost(const UINT8& Y)
 }
 
 
-void dsp16_device::executeZFieldPartOne(const UINT8& Z, UINT16* rN)
+void dsp16_device::executeZFieldPartOne(const uint8_t& Z, uint16_t* rN)
 {
-	const UINT8 lower = Z & 0x03;
+	const uint8_t lower = Z & 0x03;
 	switch (lower)
 	{
 		case 0x00: /* nop */ break;
@@ -419,9 +419,9 @@ void dsp16_device::executeZFieldPartOne(const UINT8& Z, UINT16* rN)
 }
 
 
-void dsp16_device::executeZFieldPartTwo(const UINT8& Z, UINT16* rN)
+void dsp16_device::executeZFieldPartTwo(const uint8_t& Z, uint16_t* rN)
 {
-	const UINT8 lower = Z & 0x03;
+	const uint8_t lower = Z & 0x03;
 	switch (lower)
 	{
 		case 0x00: (*rN)++; break;
@@ -432,14 +432,14 @@ void dsp16_device::executeZFieldPartTwo(const UINT8& Z, UINT16* rN)
 }
 
 
-void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance)
+void dsp16_device::execute_one(const uint16_t& op, uint8_t& cycles, uint8_t& pcAdvance)
 {
 	cycles = 1;
 	pcAdvance = 0;
 
 // NOTE: pages 3-5 through 3-19 are good english descriptions of what's up
 
-	const UINT8 opcode = (op >> 11) & 0x1f;
+	const uint8_t opcode = (op >> 11) & 0x1f;
 	switch(opcode)
 	{
 		// Format 1: Multiply/ALU Read/Write Group
@@ -447,10 +447,10 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-38")
 			// F1, Y  :  (page 3-38)
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			executeF1Field(F1, D, S);
 			executeYFieldPost(Y);
 			cycles = 1;
@@ -461,14 +461,14 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-40")
 			// F1 Y=a0[1] | F1 Y=a1[1]  :  (page 3-40)
-			const UINT8 Y = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
-			UINT16* destinationReg = registerFromYFieldUpper(Y);
+			const uint8_t Y = (op & 0x000f);
+			//const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
+			uint16_t* destinationReg = registerFromYFieldUpper(Y);
 			// (page 3-18)
-			UINT16 aRegValue = 0x0000;
+			uint16_t aRegValue = 0x0000;
 			if (op & 0xc000)
 			{
 				aRegValue = (m_a0 & U64(0x0ffff0000)) >> 16;
@@ -488,12 +488,12 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-42")
 			// F1, x = Y  :  (page 3-42)
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			executeF1Field(F1, D, S);
-			UINT16* sourceReg = registerFromYFieldUpper(Y);
+			uint16_t* sourceReg = registerFromYFieldUpper(Y);
 			writeRegister(&m_x, data_read(*sourceReg));
 			executeYFieldPost(Y);
 			cycles = 1;
@@ -504,14 +504,14 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-44")
 			// F1, y[l] = Y  :  (page 3-44)
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			executeF1Field(F1, D, S);
-			UINT16* sourceReg = registerFromYFieldUpper(Y);
-			UINT16 sourceValue = data_read(*sourceReg);
+			uint16_t* sourceReg = registerFromYFieldUpper(Y);
+			uint16_t sourceValue = data_read(*sourceReg);
 			switch (X)
 			{
 				case 0x00: writeRegister(addressYL(), sourceValue); break;
@@ -527,13 +527,13 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-46")
 			// F1, y = Y, x = *pt++[i]  :  (page 3-46)
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			executeF1Field(F1, D, S);
-			UINT16* sourceRegR = registerFromYFieldUpper(Y);
+			uint16_t* sourceRegR = registerFromYFieldUpper(Y);
 			writeRegister(&m_y, data_read(*sourceRegR));
 			executeYFieldPost(Y);
 			writeRegister(&m_x, data_read(m_pt));
@@ -550,11 +550,11 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-48")
 			// F1, y = a0|1, x = *pt++[i]  :  (page 3-48)
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			bool useA1 = (opcode == 0x1b);
 			if (Y != 0x00) printf("Unknown opcode @ PC=0x%04x", m_pc);
 			m_y = (useA1) ? (m_a1 & 0xffffffff) : (m_a0 & 0xffffffff);      // TODO: What happens to Ax when it goes 32 bit (pc=3f & pc=47)?
@@ -573,14 +573,14 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-53")
 			// F1, Y = y[l]  :  (page 3-53)
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			executeF1Field(F1, D, S);
-			UINT16* destinationReg = registerFromYFieldUpper(Y);
-			UINT16 yRegValue = 0x0000;
+			uint16_t* destinationReg = registerFromYFieldUpper(Y);
+			uint16_t yRegValue = 0x0000;
 			switch (X)
 			{
 				case 0x00: yRegValue = (m_y & 0x0000ffff); break;
@@ -600,20 +600,20 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			DSP_LINE("3-50")
 			// F1, At[1] = Y  :  (page 3-50)
 			// TODO: What does the X field do here, exactly?
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 aT = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t aT = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			executeF1Field(F1, !aT, S);
-			UINT64* destinationReg = nullptr;
+			uint64_t* destinationReg = nullptr;
 			switch(aT)
 			{
 				case 0: destinationReg = &m_a1; break;
 				case 1: destinationReg = &m_a0; break;
 				default: break;
 			}
-			UINT16 sourceAddress = *(registerFromYFieldUpper(Y));
-			INT64 sourceValueSigned = (INT16)data_read(sourceAddress);
+			uint16_t sourceAddress = *(registerFromYFieldUpper(Y));
+			int64_t sourceValueSigned = (int16_t)data_read(sourceAddress);
 			*destinationReg = sourceValueSigned & U64(0xffffffffff);
 			executeYFieldPost(Y);
 			cycles = 1;
@@ -626,14 +626,14 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-54")
 			// F1, Z : y[l]  :  (page 3-54)
-			const UINT8 Z = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Z = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			executeF1Field(F1, D, S);
-			UINT16 temp = 0x0000;
-			UINT16* rN = registerFromYFieldUpper(Z);
+			uint16_t temp = 0x0000;
+			uint16_t* rN = registerFromYFieldUpper(Z);
 			switch (X)
 			{
 				case 0x00:
@@ -661,11 +661,11 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("?")
 			// F1, Z : y, x=*pt++[i]
-			//const UINT8 Z = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
+			//const uint8_t Z = (op & 0x000f);
+			//const uint8_t X = (op & 0x0010) >> 4;
+			//const uint8_t S = (op & 0x0200) >> 9;
+			//const uint8_t D = (op & 0x0400) >> 10;
+			//const uint8_t F1 = (op & 0x01e0) >> 5;
 			break;
 		}
 
@@ -674,11 +674,11 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("?")
 			// F1, Z : aT[1]
-			//const UINT8 Z = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 aT = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
+			//const uint8_t Z = (op & 0x000f);
+			//const uint8_t X = (op & 0x0010) >> 4;
+			//const uint8_t S = (op & 0x0200) >> 9;
+			//const uint8_t aT = (op & 0x0400) >> 10;
+			//const uint8_t F1 = (op & 0x01e0) >> 5;
 			break;
 		}
 
@@ -688,10 +688,10 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-36")
 			// if|ifc CON F2  (page 3-36)
-			const UINT8 CON = (op & 0x001f);
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F2 = (op & 0x01e0) >> 5;
+			const uint8_t CON = (op & 0x001f);
+			//const uint8_t S = (op & 0x0200) >> 9;
+			//const uint8_t D = (op & 0x0400) >> 10;
+			//const uint8_t F2 = (op & 0x01e0) >> 5;
 			bool conditionFulfilled = conditionTest(CON);
 			if (conditionFulfilled)
 			{
@@ -707,7 +707,7 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-20")
 			// goto JA  :  (page 3-20) (DONE)
-			const UINT16 JA = (op & 0x0fff) | (m_pc & 0xf000);
+			const uint16_t JA = (op & 0x0fff) | (m_pc & 0xf000);
 			m_pc = JA;
 			cycles = 2;
 			pcAdvance = 0;
@@ -718,7 +718,7 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-23")
 			// call JA  :  (page 3-23)
-			const UINT16 JA = (op & 0x0fff) | (m_pc & 0xf000);
+			const uint16_t JA = (op & 0x0fff) | (m_pc & 0xf000);
 			m_pr = m_pc + 1;
 			m_pc = JA;
 			cycles = 2;
@@ -731,7 +731,7 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-21")
 			// goto B  :  (page 3-21)
-			const UINT8 B = (op & 0x0700) >> 8;
+			const uint8_t B = (op & 0x0700) >> 8;
 			switch (B)
 			{
 				case 0x00: m_pc = m_pr; break;
@@ -750,7 +750,7 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-22")
 			// if CON [goto/call/return]  :  (page 3-22)
-			const UINT8 CON = (op & 0x001f);
+			const uint8_t CON = (op & 0x001f);
 			bool conditionFulfilled = conditionTest(CON);
 			cycles = 3;                 // TODO: This may need to interact with the next opcode to make sure it doesn't exceed 3?
 			pcAdvance = 1;
@@ -767,11 +767,11 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			DSP_LINE("3-29")
 			// R = aS  :  (page 3-29)
 			// TODO: Fix register pdxX (pc=338)
-			const UINT8 R = (op & 0x03f0) >> 4;
-			const UINT8 S = (op & 0x1000) >> 12;
+			const uint8_t R = (op & 0x03f0) >> 4;
+			const uint8_t S = (op & 0x1000) >> 12;
 			void* destinationReg = registerFromRTable(R);
-			UINT64* sourceReg = (S) ? &m_a1 : &m_a0;
-			UINT16 sourceValue = (*sourceReg & U64(0x0ffff0000)) >> 16;
+			uint64_t* sourceReg = (S) ? &m_a1 : &m_a0;
+			uint16_t sourceValue = (*sourceReg & U64(0x0ffff0000)) >> 16;
 			writeRegister(destinationReg, sourceValue);
 			cycles = 2;
 			pcAdvance = 1;
@@ -781,9 +781,9 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-30")
 			// aT = R  :  (page 3-30)
-			const UINT8 R  = (op & 0x03f0) >> 4;
-			const UINT8 aT = (op & 0x0400) >> 10;
-			UINT64* destinationReg = nullptr;
+			const uint8_t R  = (op & 0x03f0) >> 4;
+			const uint8_t aT = (op & 0x0400) >> 10;
+			uint64_t* destinationReg = nullptr;
 			switch(aT)
 			{
 				case 0: destinationReg = &m_a1; break;
@@ -792,8 +792,8 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			}
 			void* sourceReg = registerFromRTable(R);
 			*destinationReg &= U64(0x00000ffff);
-			*destinationReg |= (*(UINT16*)sourceReg) << 16;     // TODO: Fix for all registers
-			if (*(UINT16*)sourceReg & 0x8000)
+			*destinationReg |= (*(uint16_t*)sourceReg) << 16;     // TODO: Fix for all registers
+			if (*(uint16_t*)sourceReg & 0x8000)
 				*destinationReg |= U64(0xf00000000);
 			// TODO: Special function encoding
 			cycles = 2;
@@ -804,9 +804,9 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("3-32")
 			// R = Y  :  (page 3-32)
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 R = (op & 0x03f0) >> 4;
-			UINT16* sourceReg = registerFromYFieldUpper(Y);
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t R = (op & 0x03f0) >> 4;
+			uint16_t* sourceReg = registerFromYFieldUpper(Y);
 			void* destinationReg = registerFromRTable(R);
 			writeRegister(destinationReg, data_read(*sourceReg));
 			executeYFieldPost(Y);
@@ -819,10 +819,10 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			DSP_LINE("3-33")
 			// Y = R  :  (page 3-33)
 			// TODO: Zero & Sign extend i, c0, c1, c2, and auc
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 R = (op & 0x03f0) >> 4;
-			UINT16* destinationReg = registerFromYFieldUpper(Y);
-			UINT16* sourceReg = (UINT16*)registerFromRTable(R);     // TODO: This won't work for certain registers!
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t R = (op & 0x03f0) >> 4;
+			uint16_t* destinationReg = registerFromYFieldUpper(Y);
+			uint16_t* sourceReg = (uint16_t*)registerFromRTable(R);     // TODO: This won't work for certain registers!
 			data_write(*destinationReg, *sourceReg);                //       Fix in data_write() maybe?
 			executeYFieldPost(Y);
 			cycles = 2;
@@ -833,8 +833,8 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		{
 			DSP_LINE("?")
 			// Z : R
-			//const UINT8 Z = (op & 0x000f);
-			//const UINT8 R = (op & 0x03f0) >> 4;
+			//const uint8_t Z = (op & 0x000f);
+			//const uint8_t R = (op & 0x03f0) >> 4;
 			break;
 		}
 
@@ -845,8 +845,8 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			// R = N  :  (page 3-28) (DONE)
 			// NOTE: The docs speak of register sources & sign extension, but this is a register
 			// destination, so, typo?  If so, what does one do with the overflow bits?
-			const UINT8 R = (op & 0x03f0) >> 4;
-			const UINT16 iVal = opcode_read(1);
+			const uint8_t R = (op & 0x03f0) >> 4;
+			const uint16_t iVal = opcode_read(1);
 			void* destinationReg = registerFromRTable(R);
 			writeRegister(destinationReg, iVal);
 			cycles = 2;
@@ -860,11 +860,11 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			DSP_LINE("3-27")
 			// R = M  :  (page 3-27)
 			// TODO: Figure out notes about the DSP16A vs the DSP16.  9 bit is very DSP16...
-			const UINT16 M = (op & 0x01ff);
-			const UINT8  R = (op & 0x0e00) >> 9;
+			const uint16_t M = (op & 0x01ff);
+			const uint8_t  R = (op & 0x0e00) >> 9;
 			void* destinationReg = registerFromRImmediateField(R);
 			// Sign extend if the destination is j or k
-			UINT16 mValue = M;
+			uint16_t mValue = M;
 			if (destinationReg == &m_j || destinationReg == &m_k)
 			{
 				if (mValue & 0x0100) mValue |= 0xfe00;
@@ -881,8 +881,8 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			DSP_LINE("3-25/3-26")
 			// do|redo K  :  (pages 3-25 & 3-26)
 			// TODO: The timings are intricate to say the least...
-			const UINT8 K = (op & 0x007f);
-			const UINT8 NI = (op & 0x0780) >> 7;
+			const uint8_t K = (op & 0x007f);
+			const uint8_t NI = (op & 0x0780) >> 7;
 			if (NI != 0)
 			{
 				// Do

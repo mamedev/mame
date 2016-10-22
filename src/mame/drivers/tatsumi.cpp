@@ -1344,9 +1344,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(tatsumi_state,apache3)
 {
-	UINT8 *dst = memregion("gfx1")->base();
-	UINT8 *src1 = memregion("gfx2")->base();
-	UINT8 *src2 = memregion("gfx3")->base();
+	uint8_t *dst = memregion("gfx1")->base();
+	uint8_t *src1 = memregion("gfx2")->base();
+	uint8_t *src2 = memregion("gfx3")->base();
 
 	for (int i=0; i<0x100000; i+=32)
 	{
@@ -1371,9 +1371,9 @@ DRIVER_INIT_MEMBER(tatsumi_state,apache3)
 
 DRIVER_INIT_MEMBER(tatsumi_state,roundup5)
 {
-	UINT8 *dst = memregion("gfx1")->base();
-	UINT8 *src1 = memregion("gfx2")->base();
-	UINT8 *src2 = memregion("gfx3")->base();
+	uint8_t *dst = memregion("gfx1")->base();
+	uint8_t *src1 = memregion("gfx2")->base();
+	uint8_t *src2 = memregion("gfx3")->base();
 
 	for (int i=0; i<0xc0000; i+=32)
 	{
@@ -1396,10 +1396,10 @@ DRIVER_INIT_MEMBER(tatsumi_state,roundup5)
 
 DRIVER_INIT_MEMBER(tatsumi_state,cyclwarr)
 {
-	UINT8 *dst = memregion("gfx1")->base();
-	UINT8 *src1 = memregion("gfx2")->base();
+	uint8_t *dst = memregion("gfx1")->base();
+	uint8_t *src1 = memregion("gfx2")->base();
 	int len1 = memregion("gfx2")->bytes();
-	UINT8 *src2 = memregion("gfx3")->base();
+	uint8_t *src2 = memregion("gfx3")->base();
 	int len2 = memregion("gfx3")->bytes();
 
 	for (int i=0; i<len1; i+=32)

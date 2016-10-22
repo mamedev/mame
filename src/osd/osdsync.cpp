@@ -100,7 +100,7 @@ int osd_get_num_processors(void)
 
 struct work_thread_info
 {
-	work_thread_info(UINT32 aid, osd_work_queue &aqueue)
+	work_thread_info(uint32_t aid, osd_work_queue &aqueue)
 	: queue(aqueue)
 	, handle(nullptr)
 	, wakeevent(FALSE, FALSE)  // auto-reset, not signalled
@@ -118,11 +118,11 @@ struct work_thread_info
 	osd_work_queue &    queue;          // pointer back to the queue
 	std::thread *       handle;         // handle to the thread
 	osd_event           wakeevent;      // wake event for the thread
-	std::atomic<INT32>  active;         // are we actively processing work?
-	UINT32              id;
+	std::atomic<int32_t>  active;         // are we actively processing work?
+	uint32_t              id;
 
 #if KEEP_STATISTICS
-	INT32               itemsdone;
+	int32_t               itemsdone;
 	osd_ticks_t         actruntime;
 	osd_ticks_t         runtime;
 	osd_ticks_t         spintime;
@@ -157,20 +157,20 @@ struct osd_work_queue
 	std::atomic<osd_work_item *> list;  // list of items in the queue
 	osd_work_item ** volatile tailptr;  // pointer to the tail pointer of work items in the queue
 	std::atomic<osd_work_item *> free;  // free list of work items
-	std::atomic<INT32>  items;          // items in the queue
-	std::atomic<INT32>  livethreads;    // number of live threads
-	std::atomic<INT32>  waiting;        // is someone waiting on the queue to complete?
-	std::atomic<INT32>  exiting;        // should the threads exit on their next opportunity?
-	UINT32              threads;        // number of threads in this queue
-	UINT32              flags;          // creation flags
+	std::atomic<int32_t>  items;          // items in the queue
+	std::atomic<int32_t>  livethreads;    // number of live threads
+	std::atomic<int32_t>  waiting;        // is someone waiting on the queue to complete?
+	std::atomic<int32_t>  exiting;        // should the threads exit on their next opportunity?
+	uint32_t              threads;        // number of threads in this queue
+	uint32_t              flags;          // creation flags
 	std::vector<work_thread_info *>  thread;         // array of thread information
 	osd_event           doneevent;      // event signalled when work is complete
 
 #if KEEP_STATISTICS
-	std::atomic<INT32>  itemsqueued;    // total items queued
-	std::atomic<INT32>  setevents;      // number of times we called SetEvent
-	std::atomic<INT32>  extraitems;     // how many extra items we got after the first in the queue loop
-	std::atomic<INT32>  spinloops;      // how many times spinning bought us more items
+	std::atomic<int32_t>  itemsqueued;    // total items queued
+	std::atomic<int32_t>  setevents;      // number of times we called SetEvent
+	std::atomic<int32_t>  extraitems;     // how many extra items we got after the first in the queue loop
+	std::atomic<int32_t>  spinloops;      // how many times spinning bought us more items
 #endif
 };
 
@@ -195,8 +195,8 @@ struct osd_work_item
 	void *              param;          // callback parameter
 	void *              result;         // callback result
 	osd_event *         event;          // event signalled when complete
-	UINT32              flags;          // creation flags
-	std::atomic<INT32>  done;           // is the item done?
+	uint32_t              flags;          // creation flags
+	std::atomic<int32_t>  done;           // is the item done?
 };
 
 //============================================================
@@ -426,7 +426,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 				(double)thread->actruntime * 100.0 / (double)total,
 				(double)thread->spintime * 100.0 / (double)total,
 				(double)thread->waittime * 100.0 / (double)total,
-				(UINT32) total);
+				(uint32_t) total);
 	}
 #endif
 
@@ -471,7 +471,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 //  osd_work_item_queue_multiple
 //============================================================
 
-osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_callback callback, INT32 numitems, void *parambase, INT32 paramstep, UINT32 flags)
+osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_callback callback, int32_t numitems, void *parambase, int32_t paramstep, uint32_t flags)
 {
 	osd_work_item *itemlist = nullptr, *lastitem = nullptr;
 	osd_work_item **item_tailptr = &itemlist;
@@ -515,7 +515,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		lastitem = item;
 		*item_tailptr = item;
 		item_tailptr = &item->next;
-		parambase = (UINT8 *)parambase + paramstep;
+		parambase = (uint8_t *)parambase + paramstep;
 	}
 
 	// enqueue the whole thing within the critical section

@@ -64,7 +64,7 @@ enum status_f
 
 struct subheader
 {
-	UINT8 file, channel, submode, coding;
+	uint8_t file, channel, submode, coding;
 };
 
 enum submode_flags
@@ -85,7 +85,7 @@ enum submode_flags
 
 const device_type PSXCD = &device_creator<psxcd_device>;
 
-psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cdrom_image_device(mconfig, PSXCD, "PSX Cdrom", tag, owner, clock, "psx_cd", __FILE__),
 	m_irq_handler(*this)
 {
@@ -212,7 +212,7 @@ void psxcd_device::call_unload()
 
 READ8_MEMBER( psxcd_device::read )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	switch (offset & 3)
 	{
 		/*
@@ -423,7 +423,7 @@ const psxcd_device::cdcmd psxcd_device::cmd_table[]=
 	&psxcd_device::cdcmd_readtoc
 };
 
-void psxcd_device::write_command(UINT8 byte)
+void psxcd_device::write_command(uint8_t byte)
 {
 	if(byte > 31)
 		illegalcmd(byte);
@@ -600,7 +600,7 @@ void psxcd_device::cdcmd_getparam()
 	send_result(intr_complete,data,6);
 }
 
-UINT32 psxcd_device::sub_loc(CDPOS src1, CDPOS src2)
+uint32_t psxcd_device::sub_loc(CDPOS src1, CDPOS src2)
 {
 	CDPOS dst;
 	int f=src1.b[F]-src2.b[F],
@@ -631,7 +631,7 @@ void psxcd_device::cdcmd_getlocl()
 void psxcd_device::cdcmd_getlocp()
 {
 	CDPOS tloc, start;
-	UINT8 track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(loc.w)) + 1;
+	uint8_t track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(loc.w)) + 1;
 	start.w = (track == 1) ? 0x000200 : lba_to_msf_ps(cdrom_get_track_start(m_cdrom_handle, track - 1));
 	tloc.w = sub_loc(loc, start);
 
@@ -677,8 +677,8 @@ void psxcd_device::cdcmd_gettn()
 
 void psxcd_device::cdcmd_gettd()
 {
-	UINT8 track = bcd_to_decimal(cmdbuf[0]);
-	UINT8 last = cdrom_get_last_track(m_cdrom_handle);
+	uint8_t track = bcd_to_decimal(cmdbuf[0]);
+	uint8_t last = cdrom_get_last_track(m_cdrom_handle);
 	if(track <= last)
 	{
 		CDPOS trkstart;
@@ -730,7 +730,7 @@ void psxcd_device::cdcmd_test()
 	{
 		case 0x20:
 		{
-			static UINT8 data[4]=
+			static uint8_t data[4]=
 			{
 				0x95,
 				0x07,
@@ -755,7 +755,7 @@ void psxcd_device::cdcmd_id()
 
 	if (!open)
 	{
-		UINT8 cdid[8];
+		uint8_t cdid[8];
 		int irq;
 		memset(cdid, '\0', 8);
 
@@ -837,7 +837,7 @@ void psxcd_device::cdcmd_illegal1d()
 	illegalcmd(0x1d); // read q subchannel
 }
 
-void psxcd_device::illegalcmd(UINT8 cmd)
+void psxcd_device::illegalcmd(uint8_t cmd)
 {
 	verboselog(*this, 0, "psxcd: unimplemented cd command %02x\n", cmd);
 
@@ -866,7 +866,7 @@ void psxcd_device::cmd_complete(command_result *res)
 	res->next = nullptr;
 }
 
-psxcd_device::command_result *psxcd_device::prepare_result(UINT8 res, UINT8 *data, int sz, UINT8 errcode)
+psxcd_device::command_result *psxcd_device::prepare_result(uint8_t res, uint8_t *data, int sz, uint8_t errcode)
 {
 	auto cr=global_alloc(command_result);
 
@@ -895,24 +895,24 @@ psxcd_device::command_result *psxcd_device::prepare_result(UINT8 res, UINT8 *dat
 	return cr;
 }
 
-void psxcd_device::send_result(UINT8 res, UINT8 *data, int sz, int delay, UINT8 errcode)
+void psxcd_device::send_result(uint8_t res, uint8_t *data, int sz, int delay, uint8_t errcode)
 {
 	// Avoid returning results after sector read results -
 	// delay the sector read slightly if necessary
 
-	UINT64 systime = m_maincpu->total_cycles();
+	uint64_t systime = m_maincpu->total_cycles();
 	if ((next_read_event != -1) && ((systime+delay)>(next_sector_t)))
 	{
-		UINT32 hz = m_sysclock / (delay + 2000);
+		uint32_t hz = m_sysclock / (delay + 2000);
 		m_timers[next_read_event]->adjust(attotime::from_hz(hz), 0, attotime::never);
 	}
 
 	add_system_event(event_cmd_complete, delay, prepare_result(res, data, sz, errcode));
 }
 
-void psxcd_device::start_dma(UINT8 *mainram, UINT32 size)
+void psxcd_device::start_dma(uint8_t *mainram, uint32_t size)
 {
-	UINT32 sector_size;
+	uint32_t sector_size;
 	verboselog(*this, 1, "psxcd: start dma %d bytes at %d\n", size, m_transcurr);
 
 	if(!m_dmaload)
@@ -952,8 +952,8 @@ void psxcd_device::read_sector()
 	if (status & status_reading)
 	{
 		bool isend = false;
-		UINT32 sector = msf_to_lba_ps(curpos.w);
-		UINT8 *buf = secbuf[sectail];
+		uint32_t sector = msf_to_lba_ps(curpos.w);
+		uint8_t *buf = secbuf[sectail];
 		if (cdrom_read_data(m_cdrom_handle, sector, buf, CD_TRACK_RAW_DONTCARE))
 		{
 			subheader *sub=(subheader *)(buf+16);
@@ -1025,7 +1025,7 @@ void psxcd_device::play_sector()
 
 	if (status&status_playing)
 	{
-		UINT32 sector = msf_to_lba_ps(curpos.w);
+		uint32_t sector = msf_to_lba_ps(curpos.w);
 
 		if(cdrom_read_data(m_cdrom_handle, sector, secbuf[sectail], CD_TRACK_AUDIO))
 		{
@@ -1074,7 +1074,7 @@ void psxcd_device::play_sector()
 		if ((mode&mode_report) && !(sector & 15)) // slow the int rate
 		{
 			auto res=global_alloc(command_result);
-			UINT8 track = cdrom_get_track(m_cdrom_handle, sector) + 1;
+			uint8_t track = cdrom_get_track(m_cdrom_handle, sector) + 1;
 			res->res=intr_dataready;
 
 			res->data[0]=status;
@@ -1111,7 +1111,7 @@ void psxcd_device::play_sector()
 
 void psxcd_device::start_read()
 {
-	UINT32 sector = msf_to_lba_ps(curpos.w);
+	uint32_t sector = msf_to_lba_ps(curpos.w);
 
 	assert((status&(status_reading|status_playing))==0);
 
@@ -1129,7 +1129,7 @@ void psxcd_device::start_read()
 	unsigned int cyc=read_sector_cycles;
 	if (mode&mode_double_speed) cyc>>=1;
 
-	INT64 systime=m_maincpu->total_cycles();
+	int64_t systime=m_maincpu->total_cycles();
 
 	systime+=start_read_delay;
 
@@ -1139,7 +1139,7 @@ void psxcd_device::start_read()
 
 void psxcd_device::start_play()
 {
-	UINT8 track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(curpos.w) + 150);
+	uint8_t track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(curpos.w) + 150);
 
 	if(cdrom_get_track_type(m_cdrom_handle, track) != CD_TRACK_AUDIO)
 		verboselog(*this, 0, "psxcd: playing data track\n");
@@ -1177,7 +1177,7 @@ void psxcd_device::stop_read()
 		next_read_event = -1;
 	}
 
-	UINT32 sector=msf_to_lba_ps(curpos.w);
+	uint32_t sector=msf_to_lba_ps(curpos.w);
 	m_spu->flush_xa(sector);
 	m_spu->flush_cdda(sector);
 }
@@ -1216,10 +1216,10 @@ void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 	}
 }
 
-int psxcd_device::add_system_event(int type, UINT64 t, command_result *ptr)
+int psxcd_device::add_system_event(int type, uint64_t t, command_result *ptr)
 {
 	// t is in maincpu clock cycles
-	UINT32 hz = m_sysclock / t;
+	uint32_t hz = m_sysclock / t;
 	for(int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
 		if(!m_timerinuse[i])

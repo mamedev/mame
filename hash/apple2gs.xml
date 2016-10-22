@@ -47,8 +47,8 @@
 
 	<software name="4thinchs">
 		<description>4th &amp; Inches (clean crack)</description>
-		<!--The Team Construction Set was sold seperatly, but only works with 4th & Inches so it's included as "Disk 2" -->
-		<!--The Team Construction Set disk doesn't check itself for being an original, but runs a nibble count on the 4th & Inches disk -->
+		<!-- The Team Construction Set was sold seperatly, but only works with 4th & Inches so it's included as "Disk 2" -->
+		<!-- The Team Construction Set disk doesn't check itself for being an original, but runs a nibble count on the 4th & Inches disk -->
 		<year>1987</year>
 		<publisher>Accolade</publisher>
 
@@ -781,18 +781,19 @@
 	</software>
 
 	<software name="chsm2100">
-		<description>The Chessmaster 2100</description>
+		<description>The Chessmaster 2100 v1.1 (clean crack)</description>
+		<!-- Version 1.01 known to exist, currently not archived -->
 		<year>1988</year>
 		<publisher>The Software Toolworks</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="fidelity - chessmaster 2100, the (1988)(the software toolworks)(disk 1 of 2).2mg" size="819264" crc="4dfaeaf7" sha1="d2b68d4d1bb3adef2ce0fef546fdf807f332a3ad" offset="0x0000" />
+				<rom name="fidelity - the chessmaster 2100 v1.1 disk 1 of 2 (1988)(the software toolworks)(trex crack).2mg" size="819264" crc="8aaa178d" sha1="73b7962ca9ebf7361b1736277c131a4a11cdfaee" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="fidelity - chessmaster 2100, the (1988)(the software toolworks)(disk 2 of 2).2mg" size="819264" crc="6a25ea51" sha1="0855102a363af5fc00298a23c28b381419ac6503" offset="0x0000" />
+				<rom name="fidelity - the chessmaster 2100 v1.1 disk 2 of 2 (1988)(the software toolworks)(trex crack).2mg" size="819264" crc="d1f47c57" sha1="49f8910fc9acf0c49d7db379bfa9fe8446a0d99e" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -947,6 +948,19 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="cosmocade - the arcade of tomorrow (1990)(pangea software)(sw)(disk 2 of 2).2mg" size="819264" crc="54e59b5c" sha1="233a8455dd9cd421a8f2c1175c20c79a9184a98c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cribgin">
+		<description>Cribbage King / Gin king v1.01 (no OS, not self booting) (clean crack)</description>
+		<!-- Original release - Did NOT come with OS and was NOT self bootable. You must launch from ProDOS 16 or GS/OS -->
+		<year>1989</year>
+		<publisher>The Software Toolworks</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="cribbage king - gin king (1989)(the software toolworks)(trex crack).2mg" size="819264" crc="740f8636" sha1="e74d5758f9708ef99e51902012ddb8f5c51a72a8" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5368,13 +5382,13 @@
 	</software>
 
 	<software name="sshockey">
-		<description>Superstar Ice Hockey [cr Digital Gang]</description>
+		<description>Superstar Ice Hockey (clean crack)</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="superstar ice hockey (1988)(mindscape)[cr].2mg" size="819264" crc="1236d5d9" sha1="ca78ef889957bf6b53d5ed4dbe25dd78d0b0849b" offset="0x0000" />
+				<rom name="superstar ice hockey (1988)(mindscape)(trex crack).2mg" size="819264" crc="0b15cb9d" sha1="055a121ac1d588558e00a2442110e2c1afd0cc46" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6357,7 +6371,7 @@
 		</part>
 	</software>
 
-	<software name="themgr12">
+	<software name="themgr12" cloneof="themgr15">
 		<description>The Manager v1.2</description>
 		<year>1990</year>
 		<publisher>Seven Hills Software</publisher>
@@ -6382,13 +6396,28 @@
 	</software>
 
 	<software name="thexder">
-		<description>Thexder</description>
+		<description>Thexder v2.7 (clean crack)</description>
+		<!-- Self bootable and had Joystick control set as default -->
 		<year>1987</year>
 		<publisher>Sierra</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819271">
-				<rom name="thexder (1987)(sierra).2mg" size="819271" crc="8d763708" sha1="5be96ee3322aa90cda523a087cae2b158e7578d5" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="thexder v2.7 (1987)(sierra on-line in)(trex crack).2mg" size="819264" crc="15862391" sha1="9588be8429081de1ce7b0df88c273b0fedfcdbf3" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thexdero" cloneof="thexder">
+		<description>Thexder v1 (no OS, not self booting) (clean crack)</description>
+		<!-- Original release by Sierra On-Line - Did NOT come with OS and was NOT self bootable -->
+		<!-- The file "othexder" had been undeleted (and cracked) and is closer to v2.7 in how it's demo sounds fade -->
+		<year>1987</year>
+		<publisher>Sierra</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="thexder v1 (1987)(sierra on-line in)(trex crack).2mg" size="819264" crc="5a105720" sha1="31061b4561c967d824936c94ce882f2efcb017da" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6531,7 +6560,7 @@
 	</software>
 
 	<software name="triango">
-		<description>Triango</description>
+		<description>TrianGO</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
 

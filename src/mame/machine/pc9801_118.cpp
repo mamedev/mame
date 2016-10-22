@@ -117,7 +117,7 @@ const tiny_rom_entry *pc9801_118_device::device_rom_region() const
 //  pc9801_118_device - constructor
 //-------------------------------------------------
 
-pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_118, "pc9801_118", tag, owner, clock, "pc9801_118", __FILE__),
 //      m_maincpu(*this, "^maincpu"),
 		m_opn3(*this, "opn3")
@@ -169,7 +169,7 @@ void pc9801_118_device::device_start()
 
 void pc9801_118_device::device_reset()
 {
-	UINT16 port_base = (ioport("OPN3_DSW")->read() & 1) << 8;
+	uint16_t port_base = (ioport("OPN3_DSW")->read() & 1) << 8;
 	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_118_device::pc9801_118_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_w), this) );
 	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_118_device::pc9801_118_ext_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_ext_w), this) );
 	m_ext_reg = 1; // TODO: enabled or disabled?

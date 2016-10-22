@@ -47,29 +47,29 @@ const address_space_config *ef9345_device::memory_space_config(address_spacenum 
 //**************************************************************************
 
 // calculate the internal RAM offset
-inline UINT16 ef9345_device::indexram(UINT8 r)
+inline uint16_t ef9345_device::indexram(uint8_t r)
 {
-	UINT8 x = m_registers[r];
-	UINT8 y = m_registers[r - 1];
+	uint8_t x = m_registers[r];
+	uint8_t y = m_registers[r - 1];
 	if (y < 8)
 		y &= 1;
 	return ((x&0x3f) | ((x & 0x40) << 6) | ((x & 0x80) << 4) | ((y & 0x1f) << 6) | ((y & 0x20) << 8));
 }
 
 // calculate the internal ROM offset
-inline UINT16 ef9345_device::indexrom(UINT8 r)
+inline uint16_t ef9345_device::indexrom(uint8_t r)
 {
-	UINT8 x = m_registers[r];
-	UINT8 y = m_registers[r - 1];
+	uint8_t x = m_registers[r];
+	uint8_t y = m_registers[r - 1];
 	if (y < 8)
 		y &= 1;
 	return((x&0x3f)|((x&0x40)<<6)|((x&0x80)<<4)|((y&0x1f)<<6));
 }
 
 // increment x
-inline void ef9345_device::inc_x(UINT8 r)
+inline void ef9345_device::inc_x(uint8_t r)
 {
-	UINT8 i = (m_registers[r] & 0x3f) + 1;
+	uint8_t i = (m_registers[r] & 0x3f) + 1;
 	if (i > 39)
 	{
 		i -= 40;
@@ -79,9 +79,9 @@ inline void ef9345_device::inc_x(UINT8 r)
 }
 
 // increment y
-inline void ef9345_device::inc_y(UINT8 r)
+inline void ef9345_device::inc_y(uint8_t r)
 {
-	UINT8 i = (m_registers[r] & 0x1f) + 1;
+	uint8_t i = (m_registers[r] & 0x1f) + 1;
 	if (i > 31)
 		i -= 24;
 	m_registers[r] = (m_registers[r] & 0xe0) | i;
@@ -96,7 +96,7 @@ inline void ef9345_device::inc_y(UINT8 r)
 //  ef9345_device - constructor
 //-------------------------------------------------
 
-ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EF9345, "EF9345", tag, owner, clock, "ef9345", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -207,7 +207,7 @@ void ef9345_device::set_busy_flag(int period)
 }
 
 // draw a char in 40 char line mode
-void ef9345_device::draw_char_40(UINT8 *c, UINT16 x, UINT16 y)
+void ef9345_device::draw_char_40(uint8_t *c, uint16_t x, uint16_t y)
 {
 	//verify size limit
 	if (y * 10 >= m_screen->height() || x * 8 >= m_screen->width())
@@ -220,7 +220,7 @@ void ef9345_device::draw_char_40(UINT8 *c, UINT16 x, UINT16 y)
 }
 
 // draw a char in 80 char line mode
-void ef9345_device::draw_char_80(UINT8 *c, UINT16 x, UINT16 y)
+void ef9345_device::draw_char_80(uint8_t *c, uint16_t x, uint16_t y)
 {
 	// verify size limit
 	if (y * 10 >= m_screen->height() || x * 6 >= m_screen->width())
@@ -237,7 +237,7 @@ void ef9345_device::draw_char_80(UINT8 *c, UINT16 x, UINT16 y)
 void ef9345_device::set_video_mode(void)
 {
 	m_char_mode = ((m_pat & 0x80) >> 5) | ((m_tgs & 0xc0) >> 6);
-	UINT16 new_width = (m_char_mode == MODE12x80 || m_char_mode == MODE8x80) ? 492 : 336;
+	uint16_t new_width = (m_char_mode == MODE12x80 || m_char_mode == MODE8x80) ? 492 : 336;
 
 	if (m_screen->width() != new_width)
 	{
@@ -263,7 +263,7 @@ void ef9345_device::set_video_mode(void)
 // initialize the ef9345 accented chars
 void ef9345_device::init_accented_chars(void)
 {
-	UINT16 i, j;
+	uint16_t i, j;
 	for(j = 0; j < 0x10; j++)
 		for(i = 0; i < 0x200; i++)
 			m_acc_char[(j << 9) + i] = m_charset[0x0600 + i];
@@ -296,7 +296,7 @@ void ef9345_device::init_accented_chars(void)
 }
 
 // read a char in charset or in m_videoram
-UINT8 ef9345_device::read_char(UINT8 index, UINT16 addr)
+uint8_t ef9345_device::read_char(uint8_t index, uint16_t addr)
 {
 	if (index < 0x04)
 		return m_charset[0x0800*index + addr];
@@ -309,7 +309,7 @@ UINT8 ef9345_device::read_char(UINT8 index, UINT16 addr)
 }
 
 // calculate the dial position of the char
-UINT8 ef9345_device::get_dial(UINT8 x, UINT8 attrib)
+uint8_t ef9345_device::get_dial(uint8_t x, uint8_t attrib)
 {
 	if (x > 0 && m_last_dial[x-1] == 1)         //top right
 		m_last_dial[x] = 2;
@@ -334,9 +334,9 @@ UINT8 ef9345_device::get_dial(UINT8 x, UINT8 attrib)
 }
 
 // zoom the char
-void ef9345_device::zoom(UINT8 *pix, UINT16 n)
+void ef9345_device::zoom(uint8_t *pix, uint16_t n)
 {
-	UINT8 i, j;
+	uint8_t i, j;
 	if ((n & 0x0a) == 0)
 		for(i = 0; i < 80; i += 8) // 1, 4, 5
 			for(j = 7; j > 0; j--)
@@ -360,9 +360,9 @@ void ef9345_device::zoom(UINT8 *pix, UINT16 n)
 
 
 // calculate the address of the char x,y
-UINT16 ef9345_device::indexblock(UINT16 x, UINT16 y)
+uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 {
-	UINT16 i = x, j;
+	uint16_t i = x, j;
 	j = (y == 0) ? ((m_tgs & 0x20) >> 5) : ((m_ror & 0x1f) + y - 1);
 
 	//right side of a double width character
@@ -377,10 +377,10 @@ UINT16 ef9345_device::indexblock(UINT16 x, UINT16 y)
 }
 
 // draw bichrome character (40 columns)
-void ef9345_device::bichrome40(UINT8 type, UINT16 address, UINT8 dial, UINT16 iblock, UINT16 x, UINT16 y, UINT8 c0, UINT8 c1, UINT8 insert, UINT8 flash, UINT8 hided, UINT8 negative, UINT8 underline)
+void ef9345_device::bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, uint8_t insert, uint8_t flash, uint8_t hided, uint8_t negative, uint8_t underline)
 {
-	UINT16 i;
-	UINT8 pix[80];
+	uint16_t i;
+	uint8_t pix[80];
 
 	if (flash && m_pat & 0x40 && m_blink)
 		c1 = c0;                    //flash
@@ -435,9 +435,9 @@ void ef9345_device::bichrome40(UINT8 type, UINT16 address, UINT8 dial, UINT16 ib
 	// generate the pixel table
 	for(i = 0; i < 40; i+=4)
 	{
-		UINT8 ch = read_char(type, address + i);
+		uint8_t ch = read_char(type, address + i);
 
-		for (UINT8 b=0; b<8; b++)
+		for (uint8_t b=0; b<8; b++)
 			pix[i*2 + b] = (ch & (1<<b)) ? c1 : c0;
 	}
 
@@ -456,7 +456,7 @@ void ef9345_device::bichrome40(UINT8 type, UINT16 address, UINT8 dial, UINT16 ib
 }
 
 // draw quadrichrome character (40 columns)
-void ef9345_device::quadrichrome40(UINT8 c, UINT8 b, UINT8 a, UINT16 x, UINT16 y)
+void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, uint16_t y)
 {
 	//C0-6= character code
 	//B0= insert             not yet implemented !!!
@@ -465,9 +465,9 @@ void ef9345_device::quadrichrome40(UINT8 c, UINT8 b, UINT8 a, UINT16 x, UINT16 y
 	//B3-5 = set number
 	//A0-6 = 4 color palette
 
-	UINT8 i, j, n, col[8], pix[80];
-	UINT8 lowresolution = (b & 0x02) >> 1, ramx, ramy, ramblock;
-	UINT16 ramindex;
+	uint8_t i, j, n, col[8], pix[80];
+	uint8_t lowresolution = (b & 0x02) >> 1, ramx, ramy, ramblock;
+	uint16_t ramindex;
 
 	//quadrichrome don't suppor double size
 	m_last_dial[x] = 0;
@@ -494,7 +494,7 @@ void ef9345_device::quadrichrome40(UINT8 c, UINT8 b, UINT8 a, UINT16 x, UINT16 y
 	//fill pixel table
 	for(i = 0, j = 0; i < 10; i++)
 	{
-		UINT8 ch = read_char(0x0c, ramindex + 4 * (i >> lowresolution));
+		uint8_t ch = read_char(0x0c, ramindex + 4 * (i >> lowresolution));
 		pix[j] = pix[j + 1] = col[(ch & 0x03) >> 0]; j += 2;
 		pix[j] = pix[j + 1] = col[(ch & 0x0c) >> 2]; j += 2;
 		pix[j] = pix[j + 1] = col[(ch & 0x30) >> 4]; j += 2;
@@ -505,10 +505,10 @@ void ef9345_device::quadrichrome40(UINT8 c, UINT8 b, UINT8 a, UINT16 x, UINT16 y
 }
 
 // draw bichrome character (80 columns)
-void ef9345_device::bichrome80(UINT8 c, UINT8 a, UINT16 x, UINT16 y)
+void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y)
 {
-	UINT8 c0, c1, pix[60];
-	UINT16 i, j, d;
+	uint8_t c0, c1, pix[60];
+	uint16_t i, j, d;
 
 	c1 = (a & 1) ? (m_dor >> 4) & 7 : m_dor & 7;    //foreground color = DOR
 	c0 =  m_mat & 7;                                //background color = MAT
@@ -535,8 +535,8 @@ void ef9345_device::bichrome80(UINT8 c, UINT8 a, UINT16 x, UINT16 y)
 
 		for(i=0, j=0; i < 10; i++)
 		{
-			UINT8 ch = read_char(0, d + 4 * i);
-			for (UINT8 b=0; b<6; b++)
+			uint8_t ch = read_char(0, d + 4 * i);
+			for (uint8_t b=0; b<6; b++)
 				pix[j++] = (ch & (1<<b)) ? c1 : c0;
 		}
 
@@ -576,10 +576,10 @@ void ef9345_device::bichrome80(UINT8 c, UINT8 a, UINT16 x, UINT16 y)
 }
 
 // generate 16 bits 40 columns char
-void ef9345_device::makechar_16x40(UINT16 x, UINT16 y)
+void ef9345_device::makechar_16x40(uint16_t x, uint16_t y)
 {
-	UINT8 a, b, c0, c1, i, f, m, n, u, type, dial;
-	UINT16 address, iblock;
+	uint8_t a, b, c0, c1, i, f, m, n, u, type, dial;
+	uint16_t address, iblock;
 
 	iblock = (m_mat & 0x80 && y > 1) ? indexblock(x, y / 2) : indexblock(x, y);
 	a = m_videoram->read_byte(m_block + iblock);
@@ -625,10 +625,10 @@ void ef9345_device::makechar_16x40(UINT16 x, UINT16 y)
 }
 
 // generate 24 bits 40 columns char
-void ef9345_device::makechar_24x40(UINT16 x, UINT16 y)
+void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 {
-	UINT8 a, b, c, c0, c1, i, f, m, n, u, type, dial;
-	UINT16 address, iblock;
+	uint8_t a, b, c, c0, c1, i, f, m, n, u, type, dial;
+	uint16_t address, iblock;
 
 	iblock = (m_mat & 0x80 && y > 1) ? indexblock(x, y / 2) : indexblock(x, y);
 	c = m_videoram->read_byte(m_block + iblock);
@@ -660,14 +660,14 @@ void ef9345_device::makechar_24x40(UINT16 x, UINT16 y)
 }
 
 // generate 12 bits 80 columns char
-void ef9345_device::makechar_12x80(UINT16 x, UINT16 y)
+void ef9345_device::makechar_12x80(uint16_t x, uint16_t y)
 {
-	UINT16 iblock = indexblock(x, y);
+	uint16_t iblock = indexblock(x, y);
 	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1);
 	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1);
 }
 
-void ef9345_device::draw_border(UINT16 line)
+void ef9345_device::draw_border(uint16_t line)
 {
 	if (m_char_mode == MODE12x80 || m_char_mode == MODE8x80)
 		for(int i = 0; i < 82; i++)
@@ -677,7 +677,7 @@ void ef9345_device::draw_border(UINT16 line)
 			draw_char_40(m_border, i, line);
 }
 
-void ef9345_device::makechar(UINT16 x, UINT16 y)
+void ef9345_device::makechar(uint16_t x, uint16_t y)
 {
 	switch (m_char_mode)
 	{
@@ -701,13 +701,13 @@ void ef9345_device::makechar(UINT16 x, UINT16 y)
 }
 
 // Execute EF9345 command
-void ef9345_device::ef9345_exec(UINT8 cmd)
+void ef9345_device::ef9345_exec(uint8_t cmd)
 {
 	m_state = 0;
 	if ((m_registers[5] & 0x3f) == 39) m_state |= 0x10; //S4(LXa) set
 	if ((m_registers[7] & 0x3f) == 39) m_state |= 0x20; //S5(LXm) set
 
-	UINT16 a = indexram(7);
+	uint16_t a = indexram(7);
 
 	switch(cmd)
 	{
@@ -782,21 +782,21 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 			if (cmd&1)
 				inc_x(5);
 			break;
-		case 0x50:  //KRL: 80 UINT8 - 12 bits write
-		case 0x51:  //KRL: 80 UINT8 - 12 bits write + inc
+		case 0x50:  //KRL: 80 uint8_t - 12 bits write
+		case 0x51:  //KRL: 80 uint8_t - 12 bits write + inc
 			set_busy_flag(12.5);
 			m_videoram->write_byte(a, m_registers[1]);
 			switch((a / 0x0800) & 1)
 			{
 				case 0:
 				{
-					UINT8 tmp_data = m_videoram->read_byte(a + 0x1000);
+					uint8_t tmp_data = m_videoram->read_byte(a + 0x1000);
 					m_videoram->write_byte(a + 0x1000, (tmp_data & 0x0f) | (m_registers[3] & 0xf0));
 					break;
 				}
 				case 1:
 				{
-					UINT8 tmp_data = m_videoram->read_byte(a + 0x0800);
+					uint8_t tmp_data = m_videoram->read_byte(a + 0x0800);
 					m_videoram->write_byte(a + 0x0800, (tmp_data & 0xf0) | (m_registers[3] & 0x0f));
 					break;
 				}
@@ -808,8 +808,8 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 				inc_x(7);
 			}
 			break;
-		case 0x58:  //KRL: 80 UINT8 - 12 bits read
-		case 0x59:  //KRL: 80 UINT8 - 12 bits read + inc
+		case 0x58:  //KRL: 80 uint8_t - 12 bits read
+		case 0x59:  //KRL: 80 uint8_t - 12 bits read + inc
 			set_busy_flag(11.5);
 			m_registers[1] = m_videoram->read_byte(a);
 			switch((a / 0x0800) & 1)
@@ -892,10 +892,10 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 		case 0xf9:  //MVT: move triple buffer AP->MP stop
 		case 0xfa:  //MVT: move triple buffer AP->MP nostop
 		{
-			UINT16 i, a1, a2;
-			UINT8 n = (cmd>>4) - 0x0c;
-			UINT8 r1 = (cmd&0x04) ? 7 : 5;
-			UINT8 r2 = (cmd&0x04) ? 5 : 7;
+			uint16_t i, a1, a2;
+			uint8_t n = (cmd>>4) - 0x0c;
+			uint8_t r1 = (cmd&0x04) ? 7 : 5;
+			uint8_t r2 = (cmd&0x04) ? 5 : 7;
 			int busy = 2;
 
 			for(i = 0; i < 1280; i++)
@@ -941,15 +941,15 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
             EF9345 interface
 **************************************************************/
 
-UINT32 ef9345_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ef9345_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_screen_out, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
-void ef9345_device::update_scanline(UINT16 scanline)
+void ef9345_device::update_scanline(uint16_t scanline)
 {
-	UINT16 i;
+	uint16_t i;
 
 	if (scanline == 250)
 		m_state &= 0xfb;

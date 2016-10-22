@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, R. Belmont
-static const char *lookup_trap(UINT16 opcode)
+static const char *lookup_trap(uint16_t opcode)
 {
 	static const struct
 	{
 		const char *name;
-		UINT16 trap;
+		uint16_t trap;
 	} traps[] =
 	{
 		{ "sysTrapMemInit", 0xA000 },
@@ -1162,17 +1162,17 @@ static const char *lookup_trap(UINT16 opcode)
 	return nullptr;
 }
 
-offs_t palm_state::palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+offs_t palm_state::palm_dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
-	UINT16 opcode;
+	uint16_t opcode;
 	unsigned result = 0;
 	const char *trap;
 
-	opcode = *((UINT16 *) oprom);
+	opcode = *((uint16_t *) oprom);
 	opcode = ((opcode >> 8) & 0x00ff) | ((opcode << 8) & 0xff00);
 	if (opcode == 0x4E4F)
 	{
-		UINT16 callnum = *((UINT16 *) (oprom + 2));
+		uint16_t callnum = *((uint16_t *) (oprom + 2));
 		callnum = ((callnum >> 8) & 0x00ff) | ((callnum << 8) & 0xff00);
 		trap = lookup_trap(callnum);
 		result = 2;

@@ -181,7 +181,7 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 
 const device_type K056832 = &device_creator<k056832_device>;
 
-k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K056832, "K056832 Tilemap Generator", tag, owner, clock, "k056832", __FILE__),
 	device_gfx_interface(mconfig, *this),
 	//m_tilemap[K056832_PAGE_COUNT],
@@ -248,7 +248,7 @@ void k056832_device::create_tilemaps()
 	m_linemap_enabled = 0;
 
 
-	memset(m_line_dirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
+	memset(m_line_dirty, 0, sizeof(uint32_t) * K056832_PAGE_COUNT * 8);
 
 	for (i = 0; i < K056832_PAGE_COUNT; i++)
 	{
@@ -485,7 +485,7 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 
 	const struct K056832_SHIFTMASKS *smptr;
 	int layer, flip, fbits, attr, code, color, flags;
-	UINT16 *pMem;
+	uint16_t *pMem;
 
 	pMem  = &m_videoram[(pageIndex << 12) + (tile_index << 1)];
 
@@ -805,7 +805,7 @@ READ16_MEMBER( k056832_device::ram_half_word_r )
 
 READ32_MEMBER( k056832_device::ram_long_r )
 {
-	UINT16 *pMem = &m_videoram[m_selected_page_x4096 + offset * 2];
+	uint16_t *pMem = &m_videoram[m_selected_page_x4096 + offset * 2];
 
 	// reading from tile RAM resets the ROM readback "half" offset
 	m_rom_half = 0;
@@ -815,7 +815,7 @@ READ32_MEMBER( k056832_device::ram_long_r )
 
 READ32_MEMBER( k056832_device::unpaged_ram_long_r )
 {
-	UINT16 *pMem = &m_videoram[offset * 2];
+	uint16_t *pMem = &m_videoram[offset * 2];
 
 	// reading from tile RAM resets the ROM readback "half" offset
 	m_rom_half = 0;
@@ -826,35 +826,35 @@ READ32_MEMBER( k056832_device::unpaged_ram_long_r )
 /* special 8-bit handlers for Lethal Enforcers */
 READ8_MEMBER( k056832_device::ram_code_lo_r )
 {
-	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
+	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
 	return *adr & 0xff;
 }
 
 READ8_MEMBER( k056832_device::ram_code_hi_r )
 {
-	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
+	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
 	return *adr >> 8;
 }
 
 READ8_MEMBER( k056832_device::ram_attr_lo_r )
 {
-	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
+	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
 	return *adr & 0xff;
 }
 
 READ8_MEMBER( k056832_device::ram_attr_hi_r )
 {
-	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
+	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
 	return *adr >> 8;
 }
 
 WRITE8_MEMBER( k056832_device::ram_code_lo_w )
 {
-	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
+	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
 	*adr &= 0xff00;
 	*adr |= data;
@@ -870,7 +870,7 @@ WRITE8_MEMBER( k056832_device::ram_code_lo_w )
 
 WRITE8_MEMBER( k056832_device::ram_code_hi_w )
 {
-	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
+	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
 	*adr &= 0x00ff;
 	*adr |= data << 8;
@@ -886,7 +886,7 @@ WRITE8_MEMBER( k056832_device::ram_code_hi_w )
 
 WRITE8_MEMBER( k056832_device::ram_attr_lo_w )
 {
-	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
+	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
 	*adr &= 0xff00;
 	*adr |= data;
@@ -902,7 +902,7 @@ WRITE8_MEMBER( k056832_device::ram_attr_lo_w )
 
 WRITE8_MEMBER( k056832_device::ram_attr_hi_w )
 {
-	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
+	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
 	*adr &= 0x00ff;
 	*adr |= data << 8;
@@ -918,8 +918,8 @@ WRITE8_MEMBER( k056832_device::ram_attr_hi_w )
 
 WRITE16_MEMBER( k056832_device::ram_word_w )
 {
-	UINT16 *tile_ptr;
-	UINT16 old_mask, old_data;
+	uint16_t *tile_ptr;
+	uint16_t old_mask, old_data;
 
 	tile_ptr = &m_videoram[m_selected_page_x4096 + offset];
 	old_mask = ~mem_mask;
@@ -942,8 +942,8 @@ WRITE16_MEMBER( k056832_device::ram_word_w )
 
 WRITE16_MEMBER( k056832_device::ram_half_word_w )
 {
-	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (((offset << 1) & 0xffe) | 1)];
-	UINT16 old = *adr;
+	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (((offset << 1) & 0xffe) | 1)];
+	uint16_t old = *adr;
 
 	COMBINE_DATA(adr);
 	if(*adr != old)
@@ -961,12 +961,12 @@ WRITE16_MEMBER( k056832_device::ram_half_word_w )
 
 WRITE32_MEMBER( k056832_device::ram_long_w )
 {
-	UINT16 *tile_ptr;
-	UINT32 old_mask, old_data;
+	uint16_t *tile_ptr;
+	uint32_t old_mask, old_data;
 
 	tile_ptr = &m_videoram[m_selected_page_x4096 + offset * 2];
 	old_mask = ~mem_mask;
-	old_data = (UINT32)tile_ptr[0] << 16 | (UINT32)tile_ptr[1];
+	old_data = (uint32_t)tile_ptr[0] << 16 | (uint32_t)tile_ptr[1];
 	data = (data & mem_mask) | (old_data & old_mask);
 
 	if (data != old_data)
@@ -986,12 +986,12 @@ WRITE32_MEMBER( k056832_device::ram_long_w )
 
 WRITE32_MEMBER( k056832_device::unpaged_ram_long_w )
 {
-	UINT16 *tile_ptr;
-	UINT32 old_mask, old_data;
+	uint16_t *tile_ptr;
+	uint32_t old_mask, old_data;
 
 	tile_ptr = &m_videoram[offset * 2];
 	old_mask = ~mem_mask;
-	old_data = (UINT32)tile_ptr[0] << 16 | (UINT32)tile_ptr[1];
+	old_data = (uint32_t)tile_ptr[0] << 16 | (uint32_t)tile_ptr[1];
 	data = (data & mem_mask) | (old_data & old_mask);
 
 	if (data != old_data)
@@ -1009,7 +1009,7 @@ WRITE32_MEMBER( k056832_device::unpaged_ram_long_w )
 WRITE16_MEMBER( k056832_device::word_w )
 {
 	int layer, flip, mask, i;
-	UINT32 old_data, new_data;
+	uint32_t old_data, new_data;
 
 	old_data = m_regs[offset];
 	COMBINE_DATA(&m_regs[offset]);
@@ -1114,12 +1114,12 @@ WRITE16_MEMBER( k056832_device::word_w )
 
 				if (offset >= 0x20/2 && offset <= 0x26/2)
 				{
-					m_dy[layer] = (INT16)new_data;
+					m_dy[layer] = (int16_t)new_data;
 				} else
 
 				if (offset >= 0x28/2 && offset <= 0x2e/2)
 				{
-					m_dx[layer] = (INT16)new_data;
+					m_dx[layer] = (int16_t)new_data;
 				}
 			break;
 		}
@@ -1193,9 +1193,9 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 	{
 		rectangle zerorect;
 		tilemap_t *tmap;
-		UINT32 *dirty;
+		uint32_t *dirty;
 		int all_dirty;
-		UINT8 *xprdata;
+		uint8_t *xprdata;
 
 		tmap = m_tilemap[page];
 		bitmap_ind8 &xprmap  = tmap->flagsmap();
@@ -1230,12 +1230,12 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 		{
 			bitmap_ind16 *pixmap;
 
-			UINT8 code_transparent, code_opaque;
+			uint8_t code_transparent, code_opaque;
 			const pen_t *pal_ptr;
-			const UINT8  *src_ptr;
-			UINT8  *xpr_ptr;
-			UINT16 *dst_ptr;
-			UINT16 pen, basepen;
+			const uint8_t  *src_ptr;
+			uint8_t  *xpr_ptr;
+			uint16_t *dst_ptr;
+			uint16_t pen, basepen;
 			int count, src_pitch, src_modulo;
 			int dst_pitch;
 			int line;
@@ -1303,9 +1303,9 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 }
 
 template<class _BitmapClass>
-void k056832_device::tilemap_draw_common( screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_device::tilemap_draw_common( screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
 {
-	UINT32 last_dx, last_visible, new_colorbase, last_active;
+	uint32_t last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
 	int clipw, clipx, cliph, clipy, clipmaxy;
 	int line_height, line_endy, line_starty, line_y;
@@ -1315,8 +1315,8 @@ void k056832_device::tilemap_draw_common( screen_device &screen, _BitmapClass &b
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
 	tilemap_t *tmap;
-	UINT16 *p_scroll_data;
-	UINT16 ram16[2];
+	uint16_t *p_scroll_data;
+	uint16_t ram16[2];
 
 	int rowstart = m_y[layer];
 	int colstart = m_x[layer];
@@ -1624,16 +1624,16 @@ printf("\nend\n");
 	m_active_layer = last_active;
 } // end of function
 
-void k056832_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
 { tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority); }
 
-void k056832_device::tilemap_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_device::tilemap_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
 { tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority); }
 
 
-void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
 {
-	UINT32 last_dx, last_visible, new_colorbase, last_active;
+	uint32_t last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
 	int clipw, clipx, cliph, clipy, clipmaxy;
 	int line_height, line_endy, line_starty, line_y;
@@ -1643,8 +1643,8 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
 	tilemap_t *tmap;
-	UINT16 *p_scroll_data;
-	UINT16 ram16[2];
+	uint16_t *p_scroll_data;
+	uint16_t ram16[2];
 
 	int rowstart = m_y[layer];
 	int colstart = m_x[layer];
@@ -1982,7 +1982,7 @@ void k056832_device::create_gfx()
 {
 	int gfx_index = 0;
 	int i;
-	UINT32 total;
+	uint32_t total;
 
 	static const gfx_layout charlayout8 =
 	{
@@ -2112,9 +2112,9 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 	{
 		rectangle zerorect;
 		tilemap_t *tmap;
-		UINT32 *dirty;
+		uint32_t *dirty;
 		int all_dirty;
-		UINT8 *xprdata;
+		uint8_t *xprdata;
 
 		tmap = m_tilemap[page];
 		bitmap_ind8 &xprmap  = tmap->flagsmap();
@@ -2148,12 +2148,12 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 		{
 			bitmap_ind16 *pixmap;
 
-			UINT8 code_transparent, code_opaque;
+			uint8_t code_transparent, code_opaque;
 			const pen_t *pal_ptr;
-			const UINT8  *src_ptr;
-			UINT8  *xpr_ptr;
-			UINT16 *dst_ptr;
-			UINT16 pen, basepen;
+			const uint8_t  *src_ptr;
+			uint8_t  *xpr_ptr;
+			uint16_t *dst_ptr;
+			uint16_t pen, basepen;
 			int count, src_pitch, src_modulo;
 			int dst_pitch;
 			int line;
@@ -2220,9 +2220,9 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 	return(0);
 }
 
-void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority)
+void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority)
 {
-	UINT32 last_dx, last_visible, new_colorbase, last_active;
+	uint32_t last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
 	int clipw, clipx, cliph, clipy, clipmaxy;
 	int line_height, line_endy, line_starty, line_y;
@@ -2232,8 +2232,8 @@ void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap,
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
 	tilemap_t *tmap;
-	UINT16 *pScrollData;
-	UINT16 ram16[2];
+	uint16_t *pScrollData;
+	uint16_t ram16[2];
 
 	int rowstart = m_y[layer];
 	int colstart = m_x[layer];

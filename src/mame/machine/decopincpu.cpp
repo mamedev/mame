@@ -128,7 +128,7 @@ WRITE8_MEMBER( decocpu_type1_device::lamp1_w )
 
 READ8_MEMBER( decocpu_type1_device::display_strobe_r )
 {
-	UINT8 ret = 0x80;
+	uint8_t ret = 0x80;
 
 	if(BIT(ioport("DIAGS")->read(), 4))  // W7 Jumper
 		ret &= ~0x80;
@@ -262,7 +262,7 @@ ioport_constructor decocpu_type1_device::device_input_ports() const
 	return INPUT_PORTS_NAME( decocpu1 );
 }
 
-decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECOCPU1, "Data East Pinball CPU Board Type 1", tag, owner, clock, "decocpu1", __FILE__),
 		m_cpu(*this,"maincpu"),
 		m_pia21(*this, "pia21"),
@@ -281,7 +281,7 @@ decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, const 
 		m_write_solenoid(*this)
 {}
 
-decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_cpu(*this,"maincpu"),
 		m_pia21(*this, "pia21"),
@@ -302,7 +302,7 @@ decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device
 
 void decocpu_type1_device::device_start()
 {
-	UINT8* ROM = memregion(m_cputag)->base();
+	uint8_t* ROM = memregion(m_cputag)->base();
 
 	// resolve callbacks
 	m_read_display.resolve_safe(0);
@@ -327,11 +327,11 @@ void decocpu_type1_device::static_set_cpuregion(device_t &device, const char *ta
 	cpuboard.m_cputag = tag;
 }
 
-decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: decocpu_type1_device(mconfig, DECOCPU2, "Data East Pinball CPU Board Type 2", tag, owner, clock, "decocpu2", __FILE__)
 {}
 
-decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: decocpu_type1_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {}
 
@@ -345,11 +345,11 @@ void decocpu_type2_device::device_start()
 	decocpu_type1_device::device_start();
 }
 
-decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: decocpu_type2_device(mconfig, DECOCPU3, "Data East Pinball CPU Board Type 3", tag, owner, clock, "decocpu3", __FILE__)
 {}
 
-decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: decocpu_type2_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {}
 
@@ -358,7 +358,7 @@ void decocpu_type3_device::device_start()
 	decocpu_type1_device::device_start();
 }
 
-decocpu_type3b_device::decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+decocpu_type3b_device::decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: decocpu_type3_device(mconfig, DECOCPU3, "Data East Pinball CPU Board Type 3B", tag, owner, clock, "decocpu3b", __FILE__)
 {}
 

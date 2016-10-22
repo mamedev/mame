@@ -27,7 +27,7 @@ const device_type MPCC68561 = &device_creator<mpcc68561_t>;
     IMPLEMENTATION
 ***************************************************************************/
 
-mpcc68561_t::mpcc68561_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mpcc68561_t::mpcc68561_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MPCC68561, "Rockwell 68561 MPCC", tag, owner, clock, "mpcc68561", __FILE__), mode(0), reg(0), status(0), IRQV(0), MasterIRQEnable(0), lastIRQStat(0), IRQType(),
 	intrq_cb(*this)
 {
@@ -211,7 +211,7 @@ void mpcc68561_t::acknowledge()
     mpcc_getreg
 -------------------------------------------------*/
 
-UINT8 mpcc68561_t::getreg()
+uint8_t mpcc68561_t::getreg()
 {
 	/* Not yet implemented */
 	#if LOG_MPCC
@@ -220,7 +220,7 @@ UINT8 mpcc68561_t::getreg()
 
 	if (reg == 0)
 	{
-		UINT8 rv = 0;
+		uint8_t rv = 0;
 
 		Chan *ourCh = &channel[0];
 
@@ -241,7 +241,7 @@ UINT8 mpcc68561_t::getreg()
     mpcc_putreg
 -------------------------------------------------*/
 
-void mpcc68561_t::putreg(int ch, UINT8 data)
+void mpcc68561_t::putreg(int ch, uint8_t data)
 {
 	Chan *pChan = &channel[ch];
 
@@ -367,7 +367,7 @@ void mpcc68561_t::putreg(int ch, UINT8 data)
     mpcc68561_get_reg_a
 -------------------------------------------------*/
 
-UINT8 mpcc68561_t::get_reg_a(int reg)
+uint8_t mpcc68561_t::get_reg_a(int reg)
 {
 	return channel[0].reg_val[reg];
 }
@@ -378,7 +378,7 @@ UINT8 mpcc68561_t::get_reg_a(int reg)
     mpcc68561_set_reg_a
 -------------------------------------------------*/
 
-void mpcc68561_t::set_reg_a(int reg, UINT8 data)
+void mpcc68561_t::set_reg_a(int reg, uint8_t data)
 {
 	channel[0].reg_val[reg] = data;
 }
@@ -391,7 +391,7 @@ void mpcc68561_t::set_reg_a(int reg, UINT8 data)
 
 READ8_MEMBER( mpcc68561_t::reg_r)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	offset %= 4;
 

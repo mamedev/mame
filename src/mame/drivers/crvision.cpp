@@ -496,9 +496,9 @@ WRITE8_MEMBER( crvision_state::pia_pa_w )
 	m_cassette->output( BIT(data, 7) ? +1.0 : -1.0);
 }
 
-UINT8 crvision_state::read_keyboard(int pa)
+uint8_t crvision_state::read_keyboard(int pa)
 {
-	UINT8 value = 0;
+	uint8_t value = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -535,7 +535,7 @@ READ8_MEMBER( crvision_state::pia_pa_r )
 	    PA7     Cassette data in/out
 	*/
 
-	UINT8 data = 0x7f;
+	uint8_t data = 0x7f;
 
 	if ((m_cassette)->input() > -0.1469) data |= 0x80;
 
@@ -557,7 +557,7 @@ READ8_MEMBER( crvision_state::pia_pb_r )
 	    PB7     Keyboard input
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 4; i++)
 		if (m_keylatch >> i & 1)
@@ -581,7 +581,7 @@ READ8_MEMBER( laser2001_state::pia_pa_r )
 	    PA7     Keyboard column 7
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 		if (~m_keylatch >> i & 1)
@@ -608,7 +608,7 @@ WRITE8_MEMBER( laser2001_state::pia_pa_w )
 
 READ8_MEMBER( laser2001_state::pia_pb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 4; i++)
 		if (~m_joylatch >> i & 1)

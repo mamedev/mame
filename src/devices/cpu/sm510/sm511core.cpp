@@ -35,7 +35,7 @@ ADDRESS_MAP_END
 
 
 // disasm
-offs_t sm511_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t sm511_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(sm511);
 	return CPU_DISASSEMBLE_NAME(sm511)(this, buffer, pc, oprom, opram, options);
@@ -43,15 +43,15 @@ offs_t sm511_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 
 
 // device definitions
-sm511_device::sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sm511_device::sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sm510_base_device(mconfig, SM511, "SM511", tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_4k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4), "sm511", __FILE__)
 { }
 
-sm511_device::sm511_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+sm511_device::sm511_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 	: sm510_base_device(mconfig, type, name, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data, shortname, source)
 { }
 
-sm512_device::sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sm512_device::sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sm511_device(mconfig, SM512, "SM512", tag, owner, clock, 2, 12, ADDRESS_MAP_NAME(program_4k), 7, ADDRESS_MAP_NAME(data_80_48x4), "sm512", __FILE__)
 { }
 

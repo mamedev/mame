@@ -30,13 +30,13 @@ public:
 	device_c64_floppy_parallel_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_c64_floppy_parallel_interface();
 
-	virtual void parallel_data_w(UINT8 data) = 0;
+	virtual void parallel_data_w(uint8_t data) = 0;
 	virtual void parallel_strobe_w(int state) = 0;
 
 	device_c64_floppy_parallel_interface *m_other;
 
 protected:
-	UINT8 m_parallel_data;
+	uint8_t m_parallel_data;
 };
 
 
@@ -48,14 +48,14 @@ class c64_bn1541_device : public device_t,
 {
 public:
 	// construction/destruction
-	c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(UINT8 data) override;
+	virtual void parallel_data_w(uint8_t data) override;
 	virtual void parallel_strobe_w(int state) override;
 
 	// device_pet_user_port_interface overrides
@@ -71,7 +71,7 @@ protected:
 
 private:
 	void update_output();
-	UINT8 m_parallel_output;
+	uint8_t m_parallel_output;
 };
 
 

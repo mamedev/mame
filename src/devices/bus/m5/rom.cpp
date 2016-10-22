@@ -21,20 +21,20 @@ const device_type M5_ROM_STD = &device_creator<m5_rom_device>;
 const device_type M5_ROM_RAM = &device_creator<m5_ram_device>;
 
 
-m5_rom_device::m5_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+m5_rom_device::m5_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_m5_cart_interface( mconfig, *this )
 {
 }
 
-m5_rom_device::m5_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m5_rom_device::m5_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, M5_ROM_STD, "M5 Standard ROM Carts", tag, owner, clock, "m5_rom", __FILE__),
 						device_m5_cart_interface( mconfig, *this )
 {
 }
 
 
-m5_ram_device::m5_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m5_ram_device::m5_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: m5_rom_device(mconfig, M5_ROM_RAM, "M5 Expansion memory cart", tag, owner, clock, "m5_ram", __FILE__)
 {
 }

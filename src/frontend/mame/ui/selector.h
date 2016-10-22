@@ -31,8 +31,8 @@ public:
 		SOFTWARE
 	};
 
-	menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> const &_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
-	menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> &&_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
+	menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> const &_sel, uint16_t &_actual, int _category = 0, int _hover = 0);
+	menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> &&_sel, uint16_t &_actual, int _category = 0, int _hover = 0);
 	virtual ~menu_selector() override;
 
 protected:
@@ -48,7 +48,7 @@ private:
 	void find_matches(const char *str);
 
 	std::string                m_search;
-	UINT16                     &m_selector;
+	uint16_t                     &m_selector;
 	int                        m_category, m_hover;
 	bool                       m_first_pass;
 	std::vector<std::string>   m_str_items;

@@ -48,11 +48,11 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<timer_device> m_analog_timer;
 	required_ioport_array<2> m_analog_input;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_spriteram2;
-	required_shared_ptr<UINT8> m_paletteram;
-	required_shared_ptr<UINT8> m_spyhunt_alpharam;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_spyhunt_alpharam;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -62,14 +62,14 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
 
-	UINT8 m_spyhunt_sprite_color_mask;
-	INT16 m_spyhunt_scroll_offset;
-	INT16 m_spyhunt_scrollx;
-	INT16 m_spyhunt_scrolly;
+	uint8_t m_spyhunt_sprite_color_mask;
+	int16_t m_spyhunt_scroll_offset;
+	int16_t m_spyhunt_scrollx;
+	int16_t m_spyhunt_scrolly;
 
 	int mcr_cocktail_flip;
 
@@ -78,7 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
 	DECLARE_DRIVER_INIT(spyhuntertec);
 //  DECLARE_VIDEO_START(spyhuntertec);
-//  UINT32 screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+//  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_fd00_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);
@@ -106,8 +106,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(analog_count_callback);
 	void reset_analog_timer();
 
-	UINT8 m_analog_select;
-	UINT8 m_analog_count;
+	uint8_t m_analog_select;
+	uint8_t m_analog_count;
 };
 
 WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
@@ -156,7 +156,7 @@ READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
 
 WRITE8_MEMBER(spyhuntertec_state::spyhunt_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -214,7 +214,7 @@ TILEMAP_MAPPER_MEMBER(spyhuntertec_state::spyhunt_bg_scan)
 
 TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
 	SET_TILE_INFO_MEMBER(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
@@ -249,7 +249,7 @@ void spyhuntertec_state::video_start()
 
 void spyhuntertec_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	m_screen->priority().fill(1, cliprect);
@@ -316,7 +316,7 @@ void spyhuntertec_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16
 }
 
 
-UINT32 spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
@@ -418,7 +418,7 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 
 READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
 {
-	UINT8 ret = ioport("IN3")->read();
+	uint8_t ret = ioport("IN3")->read();
 //  printf("%04x spyhuntertec_in3_r\n", space.device().safe_pc());
 	return ret;
 }
@@ -619,7 +619,7 @@ const gfx_layout spyhuntertec_sprite_layout =
 };
 
 
-static const UINT32 spyhuntp_charlayout_xoffset[64] =
+static const uint32_t spyhuntp_charlayout_xoffset[64] =
 {
 		0x0000*8,0x0000*8,   0x0000*8+1,0x0000*8+1,   0x0000*8+2,0x0000*8+2,   0x0000*8+3,0x0000*8+3,   0x0000*8+4,0x0000*8+4,   0x0000*8+5,0x0000*8+5,   0x0000*8+6,0x0000*8+6,   0x0000*8+7,0x0000*8+7,
 		0x1000*8,0x1000*8,   0x1000*8+1,0x1000*8+1,   0x1000*8+2,0x1000*8+2,   0x1000*8+3,0x1000*8+3,   0x1000*8+4,0x1000*8+4,   0x1000*8+5,0x1000*8+5,   0x1000*8+6,0x1000*8+6,   0x1000*8+7,0x1000*8+7,

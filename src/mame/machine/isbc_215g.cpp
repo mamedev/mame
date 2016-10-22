@@ -10,7 +10,7 @@
 
 const device_type ISBC_215G = &device_creator<isbc_215g_device>;
 
-isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISBC_215G, "ISBC 215G Winchester Disk Controller", tag, owner, clock, "isbc_215g", __FILE__),
 	m_dmac(*this, "u84"),
 	m_hdd0(*this, "drive0"),
@@ -30,8 +30,8 @@ void isbc_215g_device::find_sector()
 	// 1:     cyl low
 	// 2:     head
 	// 3:     sector
-	UINT16 cyl = ((m_idcompare[0] & 0xf) << 8) | m_idcompare[1];
-	UINT16 bps = 128 << ((m_idcompare[0] >> 4) & 3);
+	uint16_t cyl = ((m_idcompare[0] & 0xf) << 8) | m_idcompare[1];
+	uint16_t bps = 128 << ((m_idcompare[0] >> 4) & 3);
 
 	if(!m_geom[m_drive])
 		return;
@@ -57,9 +57,9 @@ void isbc_215g_device::find_sector()
 	return;
 }
 
-UINT16 isbc_215g_device::read_sector()
+uint16_t isbc_215g_device::read_sector()
 {
-	UINT16 wps = 64 << ((m_idcompare[0] >> 4) & 3);
+	uint16_t wps = 64 << ((m_idcompare[0] >> 4) & 3);
 	harddisk_image_device *drive = (m_drive ? m_hdd1 : m_hdd0);
 	if(!m_secoffset)
 		hard_disk_read(drive->get_hard_disk_file(), m_lba[m_drive], m_sector);
@@ -68,9 +68,9 @@ UINT16 isbc_215g_device::read_sector()
 	return m_sector[m_secoffset++];
 }
 
-bool isbc_215g_device::write_sector(UINT16 data)
+bool isbc_215g_device::write_sector(uint16_t data)
 {
-	UINT16 wps = 64 << ((m_idcompare[0] >> 4) & 3);
+	uint16_t wps = 64 << ((m_idcompare[0] >> 4) & 3);
 	harddisk_image_device *drive = (m_drive ? m_hdd1 : m_hdd0);
 	if(m_secoffset >= wps)
 		return true;
@@ -85,7 +85,7 @@ bool isbc_215g_device::write_sector(UINT16 data)
 
 READ16_MEMBER(isbc_215g_device::io_r)
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	switch(offset)
 	{
 		case 0x00:

@@ -40,7 +40,7 @@ public:
 	virtual ~device_compucolor_floppy_port_interface() { }
 
 	virtual void rw_w(int state) = 0;
-	virtual void stepper_w(UINT8 data) = 0;
+	virtual void stepper_w(uint8_t data) = 0;
 	virtual void select_w(int state) = 0;
 };
 
@@ -50,11 +50,11 @@ public:
 class compucolor_floppy_port_device : public rs232_port_device
 {
 public:
-	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~compucolor_floppy_port_device() { }
 
 	DECLARE_WRITE_LINE_MEMBER( rw_w ) { if (m_dev) m_dev->rw_w(state); }
-	void stepper_w(UINT8 data) { if (m_dev) m_dev->stepper_w(data); }
+	void stepper_w(uint8_t data) { if (m_dev) m_dev->stepper_w(data); }
 	DECLARE_WRITE_LINE_MEMBER( select_w ) { if (m_dev) m_dev->select_w(state); }
 
 protected:
@@ -74,7 +74,7 @@ class compucolor_floppy_device : public device_t,
 {
 public:
 	// construction/destruction
-	compucolor_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	compucolor_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -87,11 +87,11 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial_port_interface overrides
-	virtual void tx(UINT8 state);
+	virtual void tx(uint8_t state);
 
 	// device_compucolor_floppy_port_interface overrides
 	virtual void rw_w(int state) override;
-	virtual void stepper_w(UINT8 data) override;
+	virtual void stepper_w(uint8_t data) override;
 	virtual void select_w(int state) override;
 
 private:

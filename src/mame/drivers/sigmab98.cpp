@@ -138,32 +138,32 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<buffered_spriteram8_device> m_buffered_spriteram;   // not on sammymdl?
-	optional_shared_ptr<UINT8> m_spriteram; // optional as some games allocate it themselves (due to banking)
-	optional_shared_ptr<UINT8> m_vregs;     // optional as some games allocate it themselves (due to banking)
-	optional_shared_ptr<UINT8> m_vtable;    // optional as some games allocate it themselves (due to banking)
-	required_shared_ptr<UINT8> m_nvram;
+	optional_shared_ptr<uint8_t> m_spriteram; // optional as some games allocate it themselves (due to banking)
+	optional_shared_ptr<uint8_t> m_vregs;     // optional as some games allocate it themselves (due to banking)
+	optional_shared_ptr<uint8_t> m_vtable;    // optional as some games allocate it themselves (due to banking)
+	required_shared_ptr<uint8_t> m_nvram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
-	std::vector<UINT8> m_paletteram;
+	std::vector<uint8_t> m_paletteram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 
-	UINT8 m_reg;
-	UINT8 m_rombank;
-	UINT8 m_reg2;
-	UINT8 m_rambank;
-	UINT8 m_c0;
-	UINT8 m_c4;
-	UINT8 m_c6;
-	UINT8 m_c8;
-	UINT8 m_vblank;
-	UINT8 m_out[3];
+	uint8_t m_reg;
+	uint8_t m_rombank;
+	uint8_t m_reg2;
+	uint8_t m_rambank;
+	uint8_t m_c0;
+	uint8_t m_c4;
+	uint8_t m_c6;
+	uint8_t m_c8;
+	uint8_t m_vblank;
+	uint8_t m_out[3];
 
-	UINT8 m_vblank_vector;
-	UINT8 m_timer0_vector;
-	UINT8 m_timer1_vector;
+	uint8_t m_vblank_vector;
+	uint8_t m_timer0_vector;
+	uint8_t m_timer1_vector;
 
 	DECLARE_WRITE8_MEMBER(gegege_regs_w);
 	DECLARE_READ8_MEMBER(gegege_regs_r);
@@ -246,7 +246,7 @@ public:
 	DECLARE_MACHINE_RESET(sammymdl);
 
 	virtual void video_start() override;
-	UINT32 screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sammymdl(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_irq);
@@ -312,8 +312,8 @@ inline int integer_part(int x)
 
 void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask)
 {
-	UINT8 *end      =   (m_buffered_spriteram ? m_buffered_spriteram->buffer() : m_spriteram) - 0x10;
-	UINT8 *s        =   end + 0x1000;
+	uint8_t *end      =   (m_buffered_spriteram ? m_buffered_spriteram->buffer() : m_spriteram) - 0x10;
+	uint8_t *s        =   end + 0x1000;
 
 	for ( ; s != end; s -= 0x10 )
 	{
@@ -426,13 +426,13 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		dstdyy /= 2;
 
 		// Transform the source image while drawing to the screen
-		UINT16 *src = &m_sprite_bitmap->pix16(0);
-		UINT16 *dst = &bitmap.pix16(0);
+		uint16_t *src = &m_sprite_bitmap->pix16(0);
+		uint16_t *dst = &bitmap.pix16(0);
 
 		int src_rowpixels = m_sprite_bitmap->rowpixels();
 		int dst_rowpixels = bitmap.rowpixels();
 
-		UINT16 penmask = gfx ? 0xff : 0x0f;
+		uint16_t penmask = gfx ? 0xff : 0x0f;
 
 		// Scan source image top to bottom
 		srcy = 0;
@@ -460,7 +460,7 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 						if (px >= cliprect.min_x && px <= cliprect.max_x && py >= cliprect.min_y && py <= cliprect.max_y)
 						{
-							UINT16 pen = src[fy * src_rowpixels + fx];
+							uint16_t pen = src[fy * src_rowpixels + fx];
 							if (pen & penmask)
 								dst[py * dst_rowpixels + px] = pen;
 						}
@@ -485,7 +485,7 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 sigmab98_state::screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sigmab98_state::screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -1018,7 +1018,7 @@ WRITE8_MEMBER(sigmab98_state::animalc_rombank_w)
 		return;
 	}
 
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	switch ( m_reg )
 	{
 		case 0x0f:
@@ -1194,7 +1194,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_hopper_w)
 
 READ8_MEMBER(sigmab98_state::sammymdl_coin_hopper_r)
 {
-	UINT8 ret = ioport("COIN")->read();
+	uint8_t ret = ioport("COIN")->read();
 
 //  if ( !machine().device<ticket_dispenser_device>("hopper")->read(0) )
 //      ret &= ~0x01;
@@ -1496,7 +1496,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 		return;
 	}
 
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	switch ( m_reg )
 	{
 		case 0x0d:
@@ -2332,11 +2332,11 @@ ROM_END
 DRIVER_INIT_MEMBER(sigmab98_state,dodghero)
 {
 	// ROM banks
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	membank("rombank")->configure_entries(0, 0x18*2, rom + 0x8000, 0x800);
 
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
+	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
 	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
 }
 
@@ -2408,7 +2408,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,gegege)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// Related to d013
 //  rom[0x0bdd] = 0xc9;
@@ -2430,7 +2430,7 @@ DRIVER_INIT_MEMBER(sigmab98_state,gegege)
 	membank("rombank")->set_entry(0);
 
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
+	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
 
 	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
 	membank("rambank")->set_entry(0);
@@ -2456,7 +2456,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,b3rinsya)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// EEPROM timing checks
 	rom[0x8138] = 0x00;
@@ -2470,7 +2470,7 @@ DRIVER_INIT_MEMBER(sigmab98_state,b3rinsya)
 	membank("rombank")->set_entry(0);
 
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
+	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
 	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
 	membank("rambank")->set_entry(0);
 }
@@ -2495,7 +2495,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,pepsiman)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// Related to d013
 //  rom[0x058a] = 0xc9;
@@ -2517,7 +2517,7 @@ DRIVER_INIT_MEMBER(sigmab98_state,pepsiman)
 	membank("rombank")->set_entry(0);
 
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
+	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
 
 	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
 	membank("rambank")->set_entry(0);
@@ -2545,7 +2545,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,tbeastw2)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// EEPROM timing checks
 	rom[0x8138] = 0x00;
@@ -2559,7 +2559,7 @@ DRIVER_INIT_MEMBER(sigmab98_state,tbeastw2)
 	membank("rombank")->set_entry(0);
 
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
+	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
 	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
 	membank("rambank")->set_entry(0);
 }
@@ -2586,7 +2586,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,ucytokyu)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// Related to d013
 //  rom[0x0bfa] = 0xc9;
@@ -2608,7 +2608,7 @@ DRIVER_INIT_MEMBER(sigmab98_state,ucytokyu)
 	membank("rombank")->set_entry(0);
 
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
+	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
 
 	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
 	membank("rambank")->set_entry(0);
@@ -2635,7 +2635,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,dashhero)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// EEPROM timing checks
 	rom[0x8138] = 0x00;
@@ -2649,7 +2649,7 @@ DRIVER_INIT_MEMBER(sigmab98_state,dashhero)
 	membank("rombank")->set_entry(0);
 
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 4);
+	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 4);
 	membank("rambank")->configure_entries(0, 4, bankedram, 0x800);
 	membank("rambank")->set_entry(0);
 }
@@ -2738,7 +2738,7 @@ ROM_END
 DRIVER_INIT_MEMBER(sigmab98_state,animalc)
 {
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x1000 * 5);
+	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x1000 * 5);
 	membank("rambank")->configure_entry(0, m_nvram);
 	membank("rambank")->configure_entries(1, 4, bankedram, 0x1000);
 	membank("rambank")->set_entry(0);
@@ -2778,7 +2778,7 @@ ROM_END
 DRIVER_INIT_MEMBER(sigmab98_state,itazuram)
 {
 	// ROM banks
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	membank("rombank0")->set_base(rom + 0x3400);
 	membank("rombank1")->set_base(rom + 0x4400);
 	m_rombank = 0x0f;

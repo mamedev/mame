@@ -14,7 +14,7 @@ void deco_karnovsprites_device::set_gfx_region(device_t &device, int region)
 
 const device_type DECO_KARNOVSPRITES = &device_creator<deco_karnovsprites_device>;
 
-deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO_KARNOVSPRITES, "DECO Karnov Sprites", tag, owner, clock, "deco_karnovsprites", __FILE__)
 	, m_gfxregion(0)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
@@ -39,7 +39,7 @@ void deco_karnovsprites_device::device_reset()
 {
 }
 
-void deco_karnovsprites_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int size, int priority )
+void deco_karnovsprites_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int size, int priority )
 {
 	int offs;
 

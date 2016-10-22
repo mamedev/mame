@@ -129,7 +129,7 @@ class z80sio_channel : public device_t,
 	friend class z80sio_device;
 
 public:
-	z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -143,28 +143,28 @@ public:
 	virtual void rcv_complete() override;
 
 	// read register handlers
-	UINT8 do_sioreg_rr0();
-	UINT8 do_sioreg_rr1();
-	UINT8 do_sioreg_rr2();
+	uint8_t do_sioreg_rr0();
+	uint8_t do_sioreg_rr1();
+	uint8_t do_sioreg_rr2();
 
 	// write register handlers
-	void do_sioreg_wr0(UINT8 data);
-	void do_sioreg_wr0_resets(UINT8 data);
-	void do_sioreg_wr1(UINT8 data);
-	void do_sioreg_wr2(UINT8 data);
-	void do_sioreg_wr3(UINT8 data);
-	void do_sioreg_wr4(UINT8 data);
-	void do_sioreg_wr5(UINT8 data);
-	void do_sioreg_wr6(UINT8 data);
-	void do_sioreg_wr7(UINT8 data);
+	void do_sioreg_wr0(uint8_t data);
+	void do_sioreg_wr0_resets(uint8_t data);
+	void do_sioreg_wr1(uint8_t data);
+	void do_sioreg_wr2(uint8_t data);
+	void do_sioreg_wr3(uint8_t data);
+	void do_sioreg_wr4(uint8_t data);
+	void do_sioreg_wr5(uint8_t data);
+	void do_sioreg_wr6(uint8_t data);
+	void do_sioreg_wr7(uint8_t data);
 
-	UINT8 control_read();
-	void control_write(UINT8 data);
+	uint8_t control_read();
+	void control_write(uint8_t data);
 
-	UINT8 data_read();
-	void data_write(UINT8 data);
+	uint8_t data_read();
+	void data_write(uint8_t data);
 
-	void receive_data(UINT8 data);
+	void receive_data(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
@@ -179,18 +179,18 @@ public:
 
 	// Register state
 		// read registers     enum
-	UINT8 m_rr0; // REG_RR0_STATUS
-	UINT8 m_rr1; // REG_RR1_SPEC_RCV_COND
-	UINT8 m_rr2; // REG_RR2_INTERRUPT_VECT
+	uint8_t m_rr0; // REG_RR0_STATUS
+	uint8_t m_rr1; // REG_RR1_SPEC_RCV_COND
+	uint8_t m_rr2; // REG_RR2_INTERRUPT_VECT
 		// write registers    enum
-	UINT8 m_wr0; // REG_WR0_COMMAND_REGPT
-	UINT8 m_wr1; // REG_WR1_INT_DMA_ENABLE
-	UINT8 m_wr2; // REG_WR2_INT_VECTOR
-	UINT8 m_wr3; // REG_WR3_RX_CONTROL
-	UINT8 m_wr4; // REG_WR4_RX_TX_MODES
-	UINT8 m_wr5; // REG_WR5_TX_CONTROL
-	UINT8 m_wr6; // REG_WR6_SYNC_OR_SDLC_A
-	UINT8 m_wr7; // REG_WR7_SYNC_OR_SDLC_F
+	uint8_t m_wr0; // REG_WR0_COMMAND_REGPT
+	uint8_t m_wr1; // REG_WR1_INT_DMA_ENABLE
+	uint8_t m_wr2; // REG_WR2_INT_VECTOR
+	uint8_t m_wr3; // REG_WR3_RX_CONTROL
+	uint8_t m_wr4; // REG_WR4_RX_TX_MODES
+	uint8_t m_wr5; // REG_WR5_TX_CONTROL
+	uint8_t m_wr6; // REG_WR6_SYNC_OR_SDLC_A
+	uint8_t m_wr7; // REG_WR7_SYNC_OR_SDLC_F
 
 	int m_variant; // Set in device
 
@@ -366,15 +366,15 @@ protected:
 	int get_tx_word_length();
 
 	// receiver state
-	UINT8 m_rx_data_fifo[3];    // receive data FIFO
-	UINT8 m_rx_error_fifo[3];   // receive error FIFO
-	UINT8 m_rx_error;       // current receive error
+	uint8_t m_rx_data_fifo[3];    // receive data FIFO
+	uint8_t m_rx_error_fifo[3];   // receive error FIFO
+	uint8_t m_rx_error;       // current receive error
 	int m_rx_fifo;      // receive FIFO pointer
 
 	int m_rx_clock;     // receive clock pulse count
 	int m_rx_first;     // first character received
 	int m_rx_break;     // receive break condition
-	UINT8 m_rx_rr0_latch;   // read register 0 latched
+	uint8_t m_rx_rr0_latch;   // read register 0 latched
 
 	int m_rxd;
 	int m_sh;           // sync hunt
@@ -382,14 +382,14 @@ protected:
 	int m_dcd;          // data carrier detect latch
 
 	// transmitter state
-	UINT8 m_tx_data;        // transmit data register
+	uint8_t m_tx_data;        // transmit data register
 	int m_tx_clock;     // transmit clock pulse count
 
 	int m_dtr;          // data terminal ready
 	int m_rts;          // request to send
 
 	// synchronous state
-	UINT16 m_sync;      // sync character
+	uint16_t m_sync;      // sync character
 
 	int m_index;
 	z80sio_device *m_uart;
@@ -405,8 +405,8 @@ class z80sio_device :  public device_t,
 
 	public:
 	// construction/destruction
-	z80sio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_txda_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_txda_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dtra_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_dtra_cb.set_callback(object); }

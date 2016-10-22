@@ -15,12 +15,12 @@ void pp01_state::video_start()
 {
 }
 
-UINT32 pp01_state::screen_update_pp01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pp01_state::screen_update_pp01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code_r,code_g,code_b;
-	UINT8 col;
+	uint8_t code_r,code_g,code_b;
+	uint8_t col;
 	int y, x, b;
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	for (y = 0; y < 256; y++)
 	{

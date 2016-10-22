@@ -50,7 +50,7 @@ const tiny_rom_entry *cst_ql_disc_interface_t::device_rom_region() const
 //  cst_ql_disc_interface_t - constructor
 //-------------------------------------------------
 
-cst_ql_disc_interface_t::cst_ql_disc_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cst_ql_disc_interface_t::cst_ql_disc_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CST_QL_DISC_INTERFACE, "CST QL Disc Interface", tag, owner, clock, "ql_qdisc", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this)
 {
@@ -70,7 +70,7 @@ void cst_ql_disc_interface_t::device_start()
 //  read -
 //-------------------------------------------------
 
-UINT8 cst_ql_disc_interface_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t cst_ql_disc_interface_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -80,6 +80,6 @@ UINT8 cst_ql_disc_interface_t::read(address_space &space, offs_t offset, UINT8 d
 //  write -
 //-------------------------------------------------
 
-void cst_ql_disc_interface_t::write(address_space &space, offs_t offset, UINT8 data)
+void cst_ql_disc_interface_t::write(address_space &space, offs_t offset, uint8_t data)
 {
 }

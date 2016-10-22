@@ -6,7 +6,7 @@
 
 PALETTE_INIT_MEMBER(mermaid_state, mermaid)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x40; i++)
@@ -34,7 +34,7 @@ PALETTE_INIT_MEMBER(mermaid_state, mermaid)
 
 PALETTE_INIT_MEMBER(mermaid_state,rougien)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x40; i++)
@@ -179,7 +179,7 @@ void mermaid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	const rectangle spritevisiblearea(0 * 8, 26 * 8 - 1, 2 * 8, 30 * 8 - 1);
 	const rectangle flip_spritevisiblearea(6 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1);
 
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
@@ -215,7 +215,7 @@ void mermaid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 mermaid_state::screen_update_mermaid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mermaid_state::screen_update_mermaid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -223,9 +223,9 @@ UINT32 mermaid_state::screen_update_mermaid(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT8 mermaid_state::collision_check( rectangle& rect )
+uint8_t mermaid_state::collision_check( rectangle& rect )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	int x;
 	int y;
@@ -233,8 +233,8 @@ UINT8 mermaid_state::collision_check( rectangle& rect )
 	for (y = rect.min_y; y <= rect.max_y; y++)
 		for (x = rect.min_x; x <= rect.max_x; x++)
 		{
-			UINT16 a = m_palette->pen_indirect(m_helper.pix16(y, x)) & 0x3f;
-			UINT16 b = m_palette->pen_indirect(m_helper2.pix16(y, x)) & 0x3f;
+			uint16_t a = m_palette->pen_indirect(m_helper.pix16(y, x)) & 0x3f;
+			uint16_t b = m_palette->pen_indirect(m_helper2.pix16(y, x)) & 0x3f;
 
 			if (b)
 				if (a)
@@ -250,7 +250,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 	if (state)
 	{
 		const rectangle &visarea = m_screen->visible_area();
-		UINT8 *spriteram = m_spriteram;
+		uint8_t *spriteram = m_spriteram;
 
 		int offs, offs2;
 

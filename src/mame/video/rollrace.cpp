@@ -63,7 +63,7 @@ WRITE8_MEMBER(rollrace_state::cram_w)
 ***************************************************************************/
 PALETTE_INIT_MEMBER(rollrace_state, rollrace)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < palette.entries();i++)
@@ -134,12 +134,12 @@ WRITE8_MEMBER(rollrace_state::flipx_w)
 	m_fg_tilemap->set_flip(m_flipx ? TILEMAP_FLIPX|TILEMAP_FLIPY : 0);
 }
 
-UINT32 rollrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rollrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 	int sx, sy;
-	const UINT8 *mem = memregion("user1")->base();
+	const uint8_t *mem = memregion("user1")->base();
 
 	/* fill in background colour*/
 	bitmap.fill(m_bkgpen, cliprect);

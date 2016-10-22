@@ -67,17 +67,17 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
-	required_shared_ptr<UINT8> m_ram;
-	required_shared_ptr<UINT8> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_bg_scroll;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	std::unique_ptr<UINT8[]> m_ram_1;
-	std::unique_ptr<UINT8[]> m_ram_2;
-	UINT8 m_ram_bank;
+	std::unique_ptr<uint8_t[]> m_ram_1;
+	std::unique_ptr<uint8_t[]> m_ram_2;
+	uint8_t m_ram_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT8 m_port_last;
-	UINT8 m_port_last2;
+	uint8_t m_port_last;
+	uint8_t m_port_last2;
 
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(ram_r);
@@ -88,7 +88,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(safarir);
-	UINT32 screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 {
 	int color;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 code = ram_r(space,tile_index | 0x400);
+	uint8_t code = ram_r(space,tile_index | 0x400);
 
 	if (code & 0x80)
 		color = 6;  /* yellow */
@@ -185,7 +185,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
 {
 	int color, flags;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 code = ram_r(space,tile_index);
+	uint8_t code = ram_r(space,tile_index);
 
 	if (code & 0x80)
 		color = 7;  /* white */
@@ -207,7 +207,7 @@ void safarir_state::video_start()
 }
 
 
-UINT32 safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, *m_bg_scroll);
 
@@ -245,7 +245,7 @@ UINT32 safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind16 
 
 WRITE8_MEMBER(safarir_state::safarir_audio_w)
 {
-	UINT8 rising_bits = data & ~m_port_last;
+	uint8_t rising_bits = data & ~m_port_last;
 
 	if (rising_bits == 0x12) m_samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1_1);
 	if (rising_bits == 0x02) m_samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1_2);
@@ -316,8 +316,8 @@ MACHINE_CONFIG_END
 
 void safarir_state::machine_start()
 {
-	m_ram_1 = std::make_unique<UINT8[]>(m_ram.bytes());
-	m_ram_2 = std::make_unique<UINT8[]>(m_ram.bytes());
+	m_ram_1 = std::make_unique<uint8_t[]>(m_ram.bytes());
+	m_ram_2 = std::make_unique<uint8_t[]>(m_ram.bytes());
 	m_port_last = 0;
 	m_port_last2 = 0;
 

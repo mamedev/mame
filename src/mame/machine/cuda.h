@@ -60,7 +60,7 @@ class cuda_device :  public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
 	static void static_set_type(device_t &device, int type);
@@ -86,12 +86,12 @@ public:
 	DECLARE_WRITE8_MEMBER( pram_w );
 
 	// VIA interface routines
-	UINT8 get_treq() { return treq; }
-	void set_tip(UINT8 val) { tip = val; }
-	void set_byteack(UINT8 val) { byteack = val; }
-	UINT8 get_via_data() { return via_data; }
-	void set_via_data(UINT8 dat) { via_data = dat; }
-	UINT8 get_via_clock() { return via_clock; }
+	uint8_t get_treq() { return treq; }
+	void set_tip(uint8_t val) { tip = val; }
+	void set_byteack(uint8_t val) { byteack = val; }
+	uint8_t get_via_data() { return via_data; }
+	void set_via_data(uint8_t dat) { via_data = dat; }
+	uint8_t get_via_clock() { return via_clock; }
 	void set_adb_line(int linestate) { adb_in = (linestate == ASSERT_LINE) ? true : false; }
 	int get_adb_dtime() { return m_adb_dtime; }
 
@@ -116,23 +116,23 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	UINT8 ddrs[3];
-	UINT8 ports[3];
-	UINT8 pll_ctrl;
-	UINT8 timer_ctrl;
-	UINT8 timer_counter, ripple_counter;
-	UINT8 onesec;
-	UINT8 treq, byteack, tip, via_data, via_clock, last_adb;
-	UINT64 last_adb_time;
+	uint8_t ddrs[3];
+	uint8_t ports[3];
+	uint8_t pll_ctrl;
+	uint8_t timer_ctrl;
+	uint8_t timer_counter, ripple_counter;
+	uint8_t onesec;
+	uint8_t treq, byteack, tip, via_data, via_clock, last_adb;
+	uint64_t last_adb_time;
 	bool cuda_controls_power;
 	bool adb_in;
 	int reset_line;
 	int m_adb_dtime;
 	emu_timer *m_timer, *m_prog_timer;
-	UINT8 pram[0x100], disk_pram[0x100];
+	uint8_t pram[0x100], disk_pram[0x100];
 	bool pram_loaded;
 
-	void send_port(address_space &space, UINT8 offset, UINT8 data);
+	void send_port(address_space &space, uint8_t offset, uint8_t data);
 };
 
 // device type definition

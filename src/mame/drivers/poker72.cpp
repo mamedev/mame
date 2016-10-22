@@ -34,9 +34,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_vram;
-	required_shared_ptr<UINT8> m_pal;
-	UINT8 m_tile_bank;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_pal;
+	uint8_t m_tile_bank;
 	DECLARE_WRITE8_MEMBER(poker72_paletteram_w);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(tile_bank_w);
@@ -44,7 +44,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(poker72);
-	UINT32 screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -55,7 +55,7 @@ void poker72_state::video_start()
 {
 }
 
-UINT32 poker72_state::screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t poker72_state::screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 
@@ -409,7 +409,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(poker72_state,poker72)
 {
-	UINT8 *rom = memregion("roms")->base();
+	uint8_t *rom = memregion("roms")->base();
 
 	// configure and intialize bank 1
 	membank("bank1")->configure_entries(0, 4, memregion("roms")->base(), 0x8000);

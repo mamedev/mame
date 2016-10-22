@@ -11,7 +11,7 @@
 
 PALETTE_INIT_MEMBER(shootout_state, shootout)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 
@@ -89,7 +89,7 @@ void shootout_state::video_start()
 void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	const UINT8 *source = m_spriteram+127*4;
+	const uint8_t *source = m_spriteram+127*4;
 	int count;
 
 	m_bFlicker = !m_bFlicker;
@@ -164,7 +164,7 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
-UINT32 shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -174,7 +174,7 @@ UINT32 shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 shootout_state::screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t shootout_state::screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 

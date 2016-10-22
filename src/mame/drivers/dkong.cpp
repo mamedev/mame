@@ -470,7 +470,7 @@ MACHINE_START_MEMBER(dkong_state,dkong2b)
 
 MACHINE_START_MEMBER(dkong_state,s2650)
 {
-	UINT8   *p = memregion("user1")->base();
+	uint8_t   *p = memregion("user1")->base();
 	const char *game_name = machine().system().name;
 	int i;
 
@@ -527,7 +527,7 @@ MACHINE_RESET_MEMBER(dkong_state,dkong)
 
 MACHINE_RESET_MEMBER(dkong_state,strtheat)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	MACHINE_RESET_CALL_MEMBER(dkong);
 
@@ -539,7 +539,7 @@ MACHINE_RESET_MEMBER(dkong_state,strtheat)
 
 MACHINE_RESET_MEMBER(dkong_state,drakton)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	MACHINE_RESET_CALL_MEMBER(dkong);
 
@@ -615,8 +615,8 @@ WRITE8_MEMBER(dkong_state::p8257_drq_w)
 READ8_MEMBER(dkong_state::dkong_in2_r)
 {
 	/* mcu status (sound feedback) is inverted bit4 from port B (8039) */
-	UINT8 mcustatus = m_dev_vp2->bit4_q_r(space, 0);
-	UINT8 r;
+	uint8_t mcustatus = m_dev_vp2->bit4_q_r(space, 0);
+	uint8_t r;
 
 	r = (ioport("IN2")->read() & 0xBF) | (mcustatus << 6);
 	machine().bookkeeping().coin_counter_w(offset, r >> 7);
@@ -629,7 +629,7 @@ READ8_MEMBER(dkong_state::dkongjr_in2_r)
 {
 	/* dkongjr does not have the mcu line connected */
 
-	UINT8 r;
+	uint8_t r;
 
 	r = (ioport("IN2")->read() & 0xBF) | 0x40;
 	machine().bookkeeping().coin_counter_w(offset, r >> 7);
@@ -1659,12 +1659,12 @@ WRITE8_MEMBER(dkong_state::braze_eeprom_w)
 	m_eeprom->clk_write(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void dkong_state::braze_decrypt_rom(UINT8 *dest)
+void dkong_state::braze_decrypt_rom(uint8_t *dest)
 {
-	UINT8 oldbyte,newbyte;
-	UINT8 *ROM;
-	UINT32 mem;
-	UINT32 newmem;
+	uint8_t oldbyte,newbyte;
+	uint8_t *ROM;
+	uint32_t mem;
+	uint32_t newmem;
 
 	ROM = memregion("braze")->base();
 
@@ -3197,10 +3197,10 @@ ROM_END
  *
  *************************************/
 
-void dkong_state::drakton_decrypt_rom(UINT8 mod, int offs, int *bs)
+void dkong_state::drakton_decrypt_rom(uint8_t mod, int offs, int *bs)
 {
-	UINT8 oldbyte,newbyte;
-	UINT8 *ROM;
+	uint8_t oldbyte,newbyte;
+	uint8_t *ROM;
 	int mem;
 
 	ROM = memregion("maincpu")->base();
@@ -3229,7 +3229,7 @@ void dkong_state::drakton_decrypt_rom(UINT8 mod, int offs, int *bs)
 DRIVER_INIT_MEMBER(dkong_state,herodk)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* swap data lines D3 and D4 */
 	for (A = 0;A < 0x8000;A++)
@@ -3296,7 +3296,7 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_decrypted = std::make_unique<UINT8[]>(0x10000);
+	m_decrypted = std::make_unique<uint8_t[]>(0x10000);
 
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, "bank1" );
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, "bank2" );
@@ -3316,7 +3316,7 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 
 DRIVER_INIT_MEMBER(dkong_state,dkingjr)
 {
-	UINT8 *prom = memregion("proms")->base();
+	uint8_t *prom = memregion("proms")->base();
 	for( int i=0; i<0x200; ++i)
 	{
 		prom[i]^=0xff; // invert color data

@@ -140,7 +140,7 @@ static int bytedecode(int src,int swap_key1,int swap_key2,int xor_key,int select
 	return src;
 }
 
-static void kabuki_decode(UINT8 *src,UINT8 *dest_op,UINT8 *dest_data,
+static void kabuki_decode(uint8_t *src,uint8_t *dest_op,uint8_t *dest_data,
 		int base_addr,int length,int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
 	int A;
@@ -160,7 +160,7 @@ static void kabuki_decode(UINT8 *src,UINT8 *dest_op,UINT8 *dest_data,
 
 
 
-static void mitchell_decode(UINT8 *src, UINT8 *dst, int size, int swap_key1,int swap_key2,int addr_key,int xor_key)
+static void mitchell_decode(uint8_t *src, uint8_t *dst, int size, int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
 	int numbanks = (size - 0x10000) / 0x4000;
 
@@ -172,25 +172,25 @@ static void mitchell_decode(UINT8 *src, UINT8 *dst, int size, int swap_key1,int 
 		kabuki_decode(src+i*0x4000,dst+i*0x4000,src+i*0x4000,0x8000,0x4000, swap_key1,swap_key2,addr_key,xor_key);
 }
 
-void mgakuen2_decode(UINT8 *src, UINT8 *dst, int size) { mitchell_decode(src,dst,size,0x76543210,0x01234567,0xaa55,0xa5); }
-void pang_decode(UINT8 *src, UINT8 *dst, int size)     { mitchell_decode(src,dst,size,0x01234567,0x76543210,0x6548,0x24); }
-void cworld_decode(UINT8 *src, UINT8 *dst, int size)   { mitchell_decode(src,dst,size,0x04152637,0x40516273,0x5751,0x43); }
-void hatena_decode(UINT8 *src, UINT8 *dst, int size)   { mitchell_decode(src,dst,size,0x45670123,0x45670123,0x5751,0x43); }
-void spang_decode(UINT8 *src, UINT8 *dst, int size)    { mitchell_decode(src,dst,size,0x45670123,0x45670123,0x5852,0x43); }
-void spangj_decode(UINT8 *src, UINT8 *dst, int size)   { mitchell_decode(src,dst,size,0x45123670,0x67012345,0x55aa,0x5a); }
-void sbbros_decode(UINT8 *src, UINT8 *dst, int size)   { mitchell_decode(src,dst,size,0x45670123,0x45670123,0x2130,0x12); }
-void marukin_decode(UINT8 *src, UINT8 *dst, int size)  { mitchell_decode(src,dst,size,0x54321076,0x54321076,0x4854,0x4f); }
-void qtono1_decode(UINT8 *src, UINT8 *dst, int size)   { mitchell_decode(src,dst,size,0x12345670,0x12345670,0x1111,0x11); }
-void qsangoku_decode(UINT8 *src, UINT8 *dst, int size) { mitchell_decode(src,dst,size,0x23456701,0x23456701,0x1828,0x18); }
-void block_decode(UINT8 *src, UINT8 *dst, int size)    { mitchell_decode(src,dst,size,0x02461357,0x64207531,0x0002,0x01); }
+void mgakuen2_decode(uint8_t *src, uint8_t *dst, int size) { mitchell_decode(src,dst,size,0x76543210,0x01234567,0xaa55,0xa5); }
+void pang_decode(uint8_t *src, uint8_t *dst, int size)     { mitchell_decode(src,dst,size,0x01234567,0x76543210,0x6548,0x24); }
+void cworld_decode(uint8_t *src, uint8_t *dst, int size)   { mitchell_decode(src,dst,size,0x04152637,0x40516273,0x5751,0x43); }
+void hatena_decode(uint8_t *src, uint8_t *dst, int size)   { mitchell_decode(src,dst,size,0x45670123,0x45670123,0x5751,0x43); }
+void spang_decode(uint8_t *src, uint8_t *dst, int size)    { mitchell_decode(src,dst,size,0x45670123,0x45670123,0x5852,0x43); }
+void spangj_decode(uint8_t *src, uint8_t *dst, int size)   { mitchell_decode(src,dst,size,0x45123670,0x67012345,0x55aa,0x5a); }
+void sbbros_decode(uint8_t *src, uint8_t *dst, int size)   { mitchell_decode(src,dst,size,0x45670123,0x45670123,0x2130,0x12); }
+void marukin_decode(uint8_t *src, uint8_t *dst, int size)  { mitchell_decode(src,dst,size,0x54321076,0x54321076,0x4854,0x4f); }
+void qtono1_decode(uint8_t *src, uint8_t *dst, int size)   { mitchell_decode(src,dst,size,0x12345670,0x12345670,0x1111,0x11); }
+void qsangoku_decode(uint8_t *src, uint8_t *dst, int size) { mitchell_decode(src,dst,size,0x23456701,0x23456701,0x1828,0x18); }
+void block_decode(uint8_t *src, uint8_t *dst, int size)    { mitchell_decode(src,dst,size,0x02461357,0x64207531,0x0002,0x01); }
 
 
-static void cps1_decode(UINT8 *src, UINT8 *dst,int swap_key1,int swap_key2,int addr_key,int xor_key)
+static void cps1_decode(uint8_t *src, uint8_t *dst,int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
 	kabuki_decode(src,dst,src,0x0000,0x8000, swap_key1,swap_key2,addr_key,xor_key);
 }
 
-void wof_decode(UINT8 *src, UINT8 *dst)      { cps1_decode(src,dst,0x01234567,0x54163072,0x5151,0x51); }
-void dino_decode(UINT8 *src, UINT8 *dst)     { cps1_decode(src,dst,0x76543210,0x24601357,0x4343,0x43); }
-void punisher_decode(UINT8 *src, UINT8 *dst) { cps1_decode(src,dst,0x67452103,0x75316024,0x2222,0x22); }
-void slammast_decode(UINT8 *src, UINT8 *dst) { cps1_decode(src,dst,0x54321076,0x65432107,0x3131,0x19); }
+void wof_decode(uint8_t *src, uint8_t *dst)      { cps1_decode(src,dst,0x01234567,0x54163072,0x5151,0x51); }
+void dino_decode(uint8_t *src, uint8_t *dst)     { cps1_decode(src,dst,0x76543210,0x24601357,0x4343,0x43); }
+void punisher_decode(uint8_t *src, uint8_t *dst) { cps1_decode(src,dst,0x67452103,0x75316024,0x2222,0x22); }
+void slammast_decode(uint8_t *src, uint8_t *dst) { cps1_decode(src,dst,0x54321076,0x65432107,0x3131,0x19); }

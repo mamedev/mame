@@ -29,7 +29,7 @@
 
 const device_type TMS34061 = &device_creator<tms34061_device>;
 
-tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMS34061, "TMS34061 VSC", tag, owner, clock, "tms34061", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_rowshift(0),
@@ -61,10 +61,10 @@ void tms34061_device::device_start()
 	m_vrammask = m_vramsize - 1;
 
 	/* allocate memory for VRAM */
-	m_vram = auto_alloc_array_clear(machine(), UINT8, m_vramsize + 256 * 2);
+	m_vram = auto_alloc_array_clear(machine(), uint8_t, m_vramsize + 256 * 2);
 
 	/* allocate memory for latch RAM */
-	m_latchram = auto_alloc_array_clear(machine(), UINT8, m_vramsize + 256 * 2);
+	m_latchram = auto_alloc_array_clear(machine(), uint8_t, m_vramsize + 256 * 2);
 
 	/* add some buffer space for VRAM and latch RAM */
 	m_vram += 256;
@@ -168,7 +168,7 @@ TIMER_CALLBACK_MEMBER( tms34061_device::interrupt )
  *
  *************************************/
 
-void tms34061_device::register_w(address_space &space, offs_t offset, UINT8 data)
+void tms34061_device::register_w(address_space &space, offs_t offset, uint8_t data)
 {
 	int scanline;
 	int regnum = offset >> 2;
@@ -239,10 +239,10 @@ void tms34061_device::register_w(address_space &space, offs_t offset, UINT8 data
  *
  *************************************/
 
-UINT8 tms34061_device::register_r(address_space &space, offs_t offset)
+uint8_t tms34061_device::register_r(address_space &space, offs_t offset)
 {
 	int regnum = offset >> 2;
-	UINT16 result;
+	uint16_t result;
 
 	/* extract the correct portion of the register */
 	if (regnum < ARRAY_LENGTH(m_regs))
@@ -361,7 +361,7 @@ void tms34061_device::adjust_xyaddress(int offset)
 }
 
 
-void tms34061_device::xypixel_w(address_space &space, int offset, UINT8 data)
+void tms34061_device::xypixel_w(address_space &space, int offset, uint8_t data)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = m_regs[TMS34061_XYADDRESS];
@@ -381,7 +381,7 @@ void tms34061_device::xypixel_w(address_space &space, int offset, UINT8 data)
 }
 
 
-UINT8 tms34061_device::xypixel_r(address_space &space, int offset)
+uint8_t tms34061_device::xypixel_r(address_space &space, int offset)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = m_regs[TMS34061_XYADDRESS];
@@ -406,7 +406,7 @@ UINT8 tms34061_device::xypixel_r(address_space &space, int offset)
  *
  *************************************/
 
-void tms34061_device::write(address_space &space, int col, int row, int func, UINT8 data)
+void tms34061_device::write(address_space &space, int col, int row, int func, uint8_t data)
 {
 	offs_t offs;
 
@@ -468,7 +468,7 @@ void tms34061_device::write(address_space &space, int col, int row, int func, UI
 }
 
 
-UINT8 tms34061_device::read(address_space &space, int col, int row, int func)
+uint8_t tms34061_device::read(address_space &space, int col, int row, int func)
 {
 	int result = 0;
 	offs_t offs;

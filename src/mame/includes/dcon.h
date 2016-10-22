@@ -18,11 +18,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_back_data;
-	required_shared_ptr<UINT16> m_fore_data;
-	required_shared_ptr<UINT16> m_mid_data;
-	required_shared_ptr<UINT16> m_textram;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_back_data;
+	required_shared_ptr<uint16_t> m_fore_data;
+	required_shared_ptr<uint16_t> m_mid_data;
+	required_shared_ptr<uint16_t> m_textram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	tilemap_t *m_background_layer;
 	tilemap_t *m_foreground_layer;
@@ -31,8 +31,8 @@ public:
 
 	int m_gfx_bank_select;
 	int m_last_gfx_bank;
-	UINT16 m_scroll_ram[6];
-	UINT16 m_layer_en;
+	uint16_t m_scroll_ram[6];
+	uint16_t m_layer_en;
 
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
@@ -50,7 +50,7 @@ public:
 	DECLARE_DRIVER_INIT(sdgndmps);
 	virtual void video_start() override;
 
-	UINT32 screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

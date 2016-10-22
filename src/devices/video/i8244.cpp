@@ -20,7 +20,7 @@ const device_type I8245 = &device_creator<i8245_device>;
 
 // Kevtris verified that the data below matches a dump
 // taken from a real chip.
-static const UINT8 c_shape[0x40 * 8] =
+static const uint8_t c_shape[0x40 * 8] =
 {
 	0x7C,0xC6,0xC6,0xC6,0xC6,0xC6,0x7C,0x00, // 0
 	0x18,0x38,0x18,0x18,0x18,0x18,0x3C,0x00,
@@ -91,7 +91,7 @@ static const UINT8 c_shape[0x40 * 8] =
 // Background and grid information is stored in RGB format
 // while the character and sprite colors are stored in BGR
 // format.
-static const UINT8 bgr2rgb[8] =
+static const uint8_t bgr2rgb[8] =
 {
 	0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
 };
@@ -101,7 +101,7 @@ static const UINT8 bgr2rgb[8] =
 //  i8244_device - constructor
 //-------------------------------------------------
 
-i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I8244, "I8244", tag, owner, clock, "i8244", __FILE__)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -114,7 +114,7 @@ i8244_device::i8244_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int lines, const char *shortname, const char *source)
+i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int lines, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -127,7 +127,7 @@ i8244_device::i8244_device(const machine_config &mconfig, device_type type, cons
 }
 
 
-i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8244_device(mconfig, I8245, "I8245", tag, owner, clock, i8245_device::LINES, "i8245", __FILE__)
 {
 }
@@ -184,7 +184,7 @@ void i8244_device::device_reset()
 
 PALETTE_INIT_MEMBER(i8244_device, i8244)
 {
-	static const UINT8 i8244_colors[3*16] =
+	static const uint8_t i8244_colors[3*16] =
 	{
 		0x00, 0x00, 0x00, // i r g b
 		0x00, 0x00, 0xAA, // i r g B
@@ -285,7 +285,7 @@ offs_t i8244_device::fix_register_mirrors( offs_t offset )
 
 READ8_MEMBER(i8244_device::read)
 {
-	UINT8 data;
+	uint8_t data;
 
 	offset = fix_register_mirrors( offset );
 
@@ -398,16 +398,16 @@ READ_LINE_MEMBER(i8244_device::hblank)
 void i8244_device::render_scanline(int vpos)
 {
 	// Some local constants for this method
-	//static const UINT8 COLLISION_SPRITE_0        = 0x01;
-	//static const UINT8 COLLISION_SPRITE_1        = 0x02;
-	//static const UINT8 COLLISION_SPRITE_2        = 0x04;
-	//static const UINT8 COLLISION_SPRITE_3        = 0x08;
-	static const UINT8 COLLISION_VERTICAL_GRID   = 0x10;
-	static const UINT8 COLLISION_HORIZ_GRID_DOTS = 0x20;
-	//static const UINT8 COLLISION_EXTERNAL_UNUSED = 0x40;
-	static const UINT8 COLLISION_CHARACTERS      = 0x80;
+	//static const uint8_t COLLISION_SPRITE_0        = 0x01;
+	//static const uint8_t COLLISION_SPRITE_1        = 0x02;
+	//static const uint8_t COLLISION_SPRITE_2        = 0x04;
+	//static const uint8_t COLLISION_SPRITE_3        = 0x08;
+	static const uint8_t COLLISION_VERTICAL_GRID   = 0x10;
+	static const uint8_t COLLISION_HORIZ_GRID_DOTS = 0x20;
+	//static const uint8_t COLLISION_EXTERNAL_UNUSED = 0x40;
+	static const uint8_t COLLISION_CHARACTERS      = 0x80;
 
-	UINT8   collision_map[160];
+	uint8_t   collision_map[160];
 
 	if ( vpos == m_start_vpos )
 	{
@@ -431,7 +431,7 @@ void i8244_device::render_scanline(int vpos)
 		/* Display grid if enabled */
 		if ( m_vdc.s.control & 0x08 )
 		{
-			UINT16 color = ( m_vdc.s.color & 7 ) | ( ( m_vdc.s.color >> 3 ) & 0x08 );
+			uint16_t color = ( m_vdc.s.color & 7 ) | ( ( m_vdc.s.color >> 3 ) & 0x08 );
 			int    x_grid_offset = 8;
 			int    y_grid_offset = 24;
 			int    width = 16;
@@ -510,12 +510,12 @@ void i8244_device::render_scanline(int vpos)
 
 				if ( y >= 0x0E && y <= scanline && scanline < y + height * 2 )
 				{
-					UINT16 color = 8 + bgr2rgb[ ( ( m_vdc.s.foreground[i].color >> 1 ) & 0x07 ) ];
+					uint16_t color = 8 + bgr2rgb[ ( ( m_vdc.s.foreground[i].color >> 1 ) & 0x07 ) ];
 					int    offset = ( m_vdc.s.foreground[i].ptr | ( ( m_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
-					UINT8  chr = c_shape[ offset & 0x1FF ];
+					uint8_t  chr = c_shape[ offset & 0x1FF ];
 					int    x = m_vdc.s.foreground[i].x;
 
-					for ( UINT8 m = 0x80; m > 0; m >>= 1, x++ )
+					for ( uint8_t m = 0x80; m > 0; m >>= 1, x++ )
 					{
 						if ( chr & m )
 						{
@@ -557,11 +557,11 @@ void i8244_device::render_scanline(int vpos)
 					{
 						if ( y <= scanline && scanline < y + char_height * 2 )
 						{
-							UINT16 color = 8 + bgr2rgb[ ( ( m_vdc.s.quad[i].single[j].color >> 1 ) & 0x07 ) ];
+							uint16_t color = 8 + bgr2rgb[ ( ( m_vdc.s.quad[i].single[j].color >> 1 ) & 0x07 ) ];
 							int offset = ( m_vdc.s.quad[i].single[j].ptr | ( ( m_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
-							UINT8 chr = c_shape[ offset & 0x1FF ];
+							uint8_t chr = c_shape[ offset & 0x1FF ];
 
-							for ( UINT8 m = 0x80; m > 0; m >>= 1, x++ )
+							for ( uint8_t m = 0x80; m > 0; m >>= 1, x++ )
 							{
 								if ( chr & m )
 								{
@@ -603,8 +603,8 @@ void i8244_device::render_scanline(int vpos)
 					/* Zoomed sprite */
 					if ( y <= scanline && scanline < y + height * 4 )
 					{
-						UINT16 color = 8 + bgr2rgb[ ( ( m_vdc.s.sprites[i].color >> 3 ) & 0x07 ) ];
-						UINT8  chr = m_vdc.s.shape[i][ ( ( scanline - y ) >> 2 ) ];
+						uint16_t color = 8 + bgr2rgb[ ( ( m_vdc.s.sprites[i].color >> 3 ) & 0x07 ) ];
+						uint8_t  chr = m_vdc.s.shape[i][ ( ( scanline - y ) >> 2 ) ];
 						int    x = m_vdc.s.sprites[i].x;
 						int    x_shift = 0;
 
@@ -622,7 +622,7 @@ void i8244_device::render_scanline(int vpos)
 						}
 						x_shift <<= 1;
 
-						for ( UINT8 m = 0x01; m > 0; m <<= 1, x += 2 )
+						for ( uint8_t m = 0x01; m > 0; m <<= 1, x += 2 )
 						{
 							if ( chr & m )
 							{
@@ -670,8 +670,8 @@ void i8244_device::render_scanline(int vpos)
 					/* Regular sprite */
 					if ( y <= scanline && scanline < y + height * 2 )
 					{
-						UINT16 color = 8 + bgr2rgb[ ( ( m_vdc.s.sprites[i].color >> 3 ) & 0x07 ) ];
-						UINT8  chr = m_vdc.s.shape[i][ ( ( scanline - y ) >> 1 ) ];
+						uint16_t color = 8 + bgr2rgb[ ( ( m_vdc.s.sprites[i].color >> 3 ) & 0x07 ) ];
+						uint8_t  chr = m_vdc.s.shape[i][ ( ( scanline - y ) >> 1 ) ];
 						int    x = m_vdc.s.sprites[i].x;
 						int    x_shift = 0;
 
@@ -688,7 +688,7 @@ void i8244_device::render_scanline(int vpos)
 								break;
 						}
 
-						for ( UINT8 m = 0x01; m > 0; m <<= 1, x++ )
+						for ( uint8_t m = 0x01; m > 0; m <<= 1, x++ )
 						{
 							if ( chr & m )
 							{
@@ -734,7 +734,7 @@ void i8244_device::render_scanline(int vpos)
 
 void i8244_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	UINT32 old_signal, signal;
+	uint32_t old_signal, signal;
 	int ii;
 	int period;
 	stream_sample_t *buffer = outputs[0];
@@ -758,7 +758,7 @@ void i8244_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 				if ( m_vdc.s.sound & 0x10 )
 				{
 					/* Noise tap is on bits 0 and 5 and fed back to bits 15 (and 23!) */
-					UINT32 new_bit = ( ( old_signal ) ^ ( old_signal >> 5 ) ) & 0x01;
+					uint32_t new_bit = ( ( old_signal ) ^ ( old_signal >> 5 ) ) & 0x01;
 					signal = ( old_signal & 0xFF0000 ) | ( ( old_signal & 0xFFFF ) >> 1 ) | ( new_bit << 15 ) | ( new_bit << 23 );
 				}
 				m_vdc.s.shift3 = signal & 0xFF;
@@ -790,7 +790,7 @@ void i8244_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 }
 
 
-UINT32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap( bitmap, m_tmp_bitmap, 0, 0, 0, 0, cliprect );
 

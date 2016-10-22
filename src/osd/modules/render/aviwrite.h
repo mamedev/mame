@@ -24,7 +24,7 @@ public:
 
 	void record(const char *name);
 	void stop();
-	void audio_frame(const INT16 *buffer, int samples_this_frame);
+	void audio_frame(const int16_t *buffer, int samples_this_frame);
 	void video_frame(bitmap_rgb32& snap);
 
 	// Getters

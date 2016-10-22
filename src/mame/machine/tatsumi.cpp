@@ -113,7 +113,7 @@ READ8_MEMBER(tatsumi_state::apache3_adc_r)
 		case 1: return ioport("STICK_Y")->read();
 		case 2: return 0; // VSP1
 		case 3: return 0;
-		case 4: return (UINT8)((255./100) * (100 - ioport("VR1")->read()));
+		case 4: return (uint8_t)((255./100) * (100 - ioport("VR1")->read()));
 		case 5: return ioport("THROTTLE")->read();
 		case 6: return 0; // RPSNC
 		case 7: return 0; // LPSNC
@@ -294,7 +294,7 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_control_w)
 
 READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 {
-	const UINT16* rom=(UINT16*)memregion("sub")->base();
+	const uint16_t* rom=(uint16_t*)memregion("sub")->base();
 
 logerror("%05X:68000_r(%04X),cw=%04X\n", space.device().safe_pc(), offset*2, m_control_word);
 	/* Read from 68k RAM */
@@ -303,7 +303,7 @@ logerror("%05X:68000_r(%04X),cw=%04X\n", space.device().safe_pc(), offset*2, m_c
 		// hack to make roundup 5 boot
 		if (space.device().safe_pc()==0xec575)
 		{
-			UINT8 *dst = memregion("maincpu")->base();
+			uint8_t *dst = memregion("maincpu")->base();
 			dst[BYTE_XOR_LE(0xec57a)]=0x46;
 			dst[BYTE_XOR_LE(0xec57b)]=0x46;
 

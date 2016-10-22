@@ -32,7 +32,7 @@ public:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /* Memory Maps */
@@ -56,7 +56,7 @@ void tek4107a_state::video_start()
 {
 }
 
-UINT32 tek4107a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tek4107a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

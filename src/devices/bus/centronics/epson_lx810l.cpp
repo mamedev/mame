@@ -26,6 +26,8 @@
  */
 
 #include "epson_lx810l.h"
+#include "sound/volt_reg.h"
+
 //extern const char layout_lx800[]; /* use layout from lx800 */
 
 //#define LX810LDEBUG
@@ -130,7 +132,7 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_UPD7810_AN6(READ8(epson_lx810l_t, an6_r))
 	MCFG_UPD7810_AN7(READ8(epson_lx810l_t, an7_r))
 	MCFG_UPD7810_CO0(WRITELINE(epson_lx810l_t, co0_w))
-	MCFG_UPD7810_CO1(WRITELINE(epson_lx810l_t, co1_w))
+	MCFG_UPD7810_CO1(DEVWRITELINE("dac", dac_bit_interface, write))
 
 //  MCFG_DEFAULT_LAYOUT(layout_lx800)
 
@@ -143,9 +145,10 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_SCREEN_UPDATE_DRIVER(epson_lx810l_t, screen_update_lx810l)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* gate array */
 	MCFG_DEVICE_ADD("e05a30", E05A30, 0)
@@ -285,14 +288,13 @@ INPUT_CHANGED_MEMBER(epson_lx810l_t::online_sw)
 //  epson_lx810l_t - constructor
 //-------------------------------------------------
 
-epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EPSON_LX810L, "Epson LX-810L", tag, owner, clock, "lx810l", __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
-	m_dac(*this, "dac"),
 	m_e05a30(*this, "e05a30"),
 	m_screen(*this, "screen"),
 	m_93c06_clk(0),
@@ -306,14 +308,13 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, d
 {
 }
 
-epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
-	m_dac(*this, "dac"),
 	m_e05a30(*this, "e05a30"),
 	m_screen(*this, "screen"),
 	m_93c06_clk(0),
@@ -327,7 +328,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 {
 }
 
-epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: epson_lx810l_t(mconfig, EPSON_AP2000, "Epson ActionPrinter 2000", tag, owner, clock, "ap2000", __FILE__)
 { }
 
@@ -352,7 +353,6 @@ void epson_lx810l_t::device_start()
 
 void epson_lx810l_t::device_reset()
 {
-	m_dac->write_unsigned8(0);
 }
 
 
@@ -410,9 +410,9 @@ WRITE8_MEMBER(epson_lx810l_t::fakemem_w)
  */
 READ8_MEMBER( epson_lx810l_t::porta_r )
 {
-	UINT8 result = 0;
-	UINT8 hp_sensor = m_cr_pos_abs <= 0 ? 0 : 1;
-	UINT8 pe_sensor = m_pf_pos_abs <= 0 ? 1 : 0;
+	uint8_t result = 0;
+	uint8_t hp_sensor = m_cr_pos_abs <= 0 ? 0 : 1;
+	uint8_t pe_sensor = m_pf_pos_abs <= 0 ? 1 : 0;
 
 	result |= hp_sensor; /* home position */
 	result |= pe_sensor << 1; /* paper end */
@@ -441,11 +441,11 @@ WRITE8_MEMBER( epson_lx810l_t::porta_w )
  */
 READ8_MEMBER( epson_lx810l_t::portb_r )
 {
-	UINT8 result = ~ioport("DIPSW1")->read();
+	uint8_t result = ~ioport("DIPSW1")->read();
 
 	/* if 93C06 is selected */
 	if (m_93c06_cs) {
-		UINT8 do_r = m_eeprom->do_read();
+		uint8_t do_r = m_eeprom->do_read();
 		result &= 0xfe;
 		result |= do_r;
 	}
@@ -457,7 +457,7 @@ READ8_MEMBER( epson_lx810l_t::portb_r )
 
 WRITE8_MEMBER( epson_lx810l_t::portb_w )
 {
-	UINT8 data_in = BIT(data, 1);
+	uint8_t data_in = BIT(data, 1);
 
 	/* if 93C06 is selected */
 	if (m_93c06_cs)
@@ -478,7 +478,7 @@ WRITE8_MEMBER( epson_lx810l_t::portb_w )
  */
 READ8_MEMBER( epson_lx810l_t::portc_r )
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	/* result |= ioport("serial")->read() << 1; */
 	result |= !ioport("ONLINE")->read() << 3;
@@ -561,7 +561,7 @@ WRITE_LINE_MEMBER( epson_lx810l_t::e05a30_ready )
     Video hardware (simulates paper)
 ***************************************************************************/
 
-UINT32 epson_lx810l_t::screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t epson_lx810l_t::screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int scrolly = -bitmap_line(9);
 	copyscrollbitmap(bitmap, m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
@@ -602,11 +602,6 @@ WRITE_LINE_MEMBER( epson_lx810l_t::co0_w )
 	}
 }
 
-WRITE_LINE_MEMBER( epson_lx810l_t::co1_w )
-{
-	m_dac->write_unsigned8(0 - !state);
-}
-
 
 /***************************************************************************
     ADC
@@ -614,25 +609,25 @@ WRITE_LINE_MEMBER( epson_lx810l_t::co1_w )
 
 READ8_MEMBER(epson_lx810l_t::an0_r)
 {
-	UINT8 res = !!(ioport("DIPSW2")->read() & 0x01);
+	uint8_t res = !!(ioport("DIPSW2")->read() & 0x01);
 	return res - 1; /* DIPSW2.1 */
 }
 
 READ8_MEMBER(epson_lx810l_t::an1_r)
 {
-	UINT8 res = !!(ioport("DIPSW2")->read() & 0x02);
+	uint8_t res = !!(ioport("DIPSW2")->read() & 0x02);
 	return res - 1; /* DIPSW2.2 */
 }
 
 READ8_MEMBER(epson_lx810l_t::an2_r)
 {
-	UINT8 res = !!(ioport("DIPSW2")->read() & 0x04);
+	uint8_t res = !!(ioport("DIPSW2")->read() & 0x04);
 	return res - 1; /* DIPSW2.3 */
 }
 
 READ8_MEMBER(epson_lx810l_t::an3_r)
 {
-	UINT8 res = !!(ioport("DIPSW2")->read() & 0x08);
+	uint8_t res = !!(ioport("DIPSW2")->read() & 0x08);
 	return res - 1; /* DIPSW2.4 */
 }
 
@@ -648,7 +643,7 @@ READ8_MEMBER(epson_lx810l_t::an5_r)
 
 READ8_MEMBER(epson_lx810l_t::an6_r)
 {
-	UINT8 res = !ioport("LOADEJECT")->read();
+	uint8_t res = !ioport("LOADEJECT")->read();
 	return res - 1;
 }
 

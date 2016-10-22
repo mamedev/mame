@@ -44,19 +44,19 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
-	std::vector<UINT8> m_objram;           /* Sprite RAM */
+	std::vector<uint8_t> m_objram;           /* Sprite RAM */
 	int        m_flipscreen;
 	int        m_video_bank;
 	int        m_paletteram_bank;
-	std::vector<UINT8> m_paletteram;
+	std::vector<uint8_t> m_paletteram;
 
 	/* sound-related */
 	int        m_sample_buffer;
@@ -68,9 +68,9 @@ public:
 	int        m_dial_selected;
 	int        m_dir[2];
 	int        m_keymatrix;
-	UINT8       m_dummy_nvram;
+	uint8_t       m_dummy_nvram;
 
-	UINT8 m_irq_source;
+	uint8_t m_irq_source;
 	DECLARE_READ8_MEMBER(pang_port5_r);
 	DECLARE_WRITE8_MEMBER(pang_bankswitch_w);
 	DECLARE_READ8_MEMBER(block_input_r);
@@ -122,10 +122,10 @@ public:
 	DECLARE_MACHINE_START(mitchell);
 	DECLARE_MACHINE_RESET(mitchell);
 	DECLARE_VIDEO_START(pang);
-	UINT32 screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mitchell_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void bootleg_decode();
-	void configure_banks(void (*decode)(UINT8 *src, UINT8 *dst, int size));
+	void configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, int size));
 	DECLARE_WRITE_LINE_MEMBER(spangbl_adpcm_int);
 };

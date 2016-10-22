@@ -25,7 +25,7 @@ class tmp68301_device : public device_t,
 						public device_memory_interface
 {
 public:
-	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tmp68301_device() {}
 
 	template<class _Object> static devcb_base &set_in_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(object); }
@@ -63,25 +63,25 @@ private:
 	devcb_write16        m_out_parallel_cb;
 
 	// internal state
-	UINT16 m_regs[0x400];
+	uint16_t m_regs[0x400];
 
-	UINT8 m_IE[3];        // 3 External Interrupt Lines
+	uint8_t m_IE[3];        // 3 External Interrupt Lines
 	emu_timer *m_tmp68301_timer[3];        // 3 Timers
 
-	UINT16 m_irq_vector[8];
+	uint16_t m_irq_vector[8];
 
 	TIMER_CALLBACK_MEMBER( timer_callback );
 	void update_timer( int i );
 	void update_irq_state();
 
-	UINT16 m_imr;
-	UINT16 m_iisr;
-	UINT16 m_scr;
-	UINT16 m_pdir;
-	UINT16 m_pdr;
+	uint16_t m_imr;
+	uint16_t m_iisr;
+	uint16_t m_scr;
+	uint16_t m_pdir;
+	uint16_t m_pdr;
 
-	inline UINT16 read_word(offs_t address);
-	inline void write_word(offs_t address, UINT16 data);
+	inline uint16_t read_word(offs_t address);
+	inline void write_word(offs_t address, uint16_t data);
 	const address_space_config      m_space_config;
 };
 

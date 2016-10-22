@@ -38,7 +38,7 @@ ADDRESS_MAP_END
 //  sh7604_wdt_device - constructor
 //-------------------------------------------------
 
-sh7604_wdt_device::sh7604_wdt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sh7604_wdt_device::sh7604_wdt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SH7604_WDT, "sh7604_wdt_longname", tag, owner, clock, "sh7604_wdt", __FILE__),
 	device_memory_interface(mconfig, *this),
 	m_space_config("regs", ENDIANNESS_BIG, 8, 4, 0, nullptr, *ADDRESS_MAP_NAME(wdt_regs))
@@ -76,7 +76,7 @@ READ8_MEMBER( sh7604_wdt_device::read )
 
 WRITE16_MEMBER( sh7604_wdt_device::write )
 {
-	UINT8 id_param = data >> 8;
+	uint8_t id_param = data >> 8;
 	switch(id_param)
 	{
 		case 0xa5: space.write_byte(offset*2+0,data & 0xff); break;

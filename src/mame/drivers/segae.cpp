@@ -336,23 +336,23 @@ public:
 	required_device<sega315_5124_device> m_vdp1;
 	required_device<sega315_5124_device> m_vdp2;
 
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_memory_region m_maincpu_region;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
 
 	// Analog input related
-	UINT8 m_port_select;
-	UINT16 m_last1;
-	UINT16 m_last2;
-	UINT16 m_diff1;
-	UINT16 m_diff2;
+	uint8_t m_port_select;
+	uint16_t m_last1;
+	uint16_t m_last2;
+	uint16_t m_diff1;
+	uint16_t m_diff2;
 
 	// Video RAM
-	UINT8 m_vram[2][0x4000 * 2];
+	uint8_t m_vram[2][0x4000 * 2];
 
-	UINT32 screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -458,7 +458,7 @@ void systeme_state::machine_start()
 /*- Hang On Jr. Specific -*/
 READ8_MEMBER( systeme_state::hangonjr_port_f8_read )
 {
-	UINT8 temp;
+	uint8_t temp;
 
 	temp = 0;
 
@@ -971,7 +971,7 @@ ROM_START( opaopa )
 ROM_END
 
 
-UINT32 systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 &vdp1_bitmap = m_vdp1->get_bitmap();
 	bitmap_rgb32 &vdp2_bitmap = m_vdp2->get_bitmap();
@@ -979,10 +979,10 @@ UINT32 systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 
 
 	for( int y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
-		UINT32 *dest_ptr = &bitmap.pix32(y);
-		UINT32 *vdp1_ptr = &vdp1_bitmap.pix32(y);
-		UINT32 *vdp2_ptr = &vdp2_bitmap.pix32(y);
-		UINT8 *y1_ptr = &vdp2_y1.pix8(y);
+		uint32_t *dest_ptr = &bitmap.pix32(y);
+		uint32_t *vdp1_ptr = &vdp1_bitmap.pix32(y);
+		uint32_t *vdp2_ptr = &vdp2_bitmap.pix32(y);
+		uint8_t *y1_ptr = &vdp2_y1.pix8(y);
 
 		for ( int x = cliprect.min_x; x <= cliprect.max_x; x++ )
 		{
@@ -1061,7 +1061,7 @@ DRIVER_INIT_MEMBER(systeme_state, ridleofp)
 
 DRIVER_INIT_MEMBER(systeme_state, opaopa)
 {
-	UINT8 *banked_decrypted_opcodes = auto_alloc_array(machine(), UINT8, m_maincpu_region->bytes());
+	uint8_t *banked_decrypted_opcodes = auto_alloc_array(machine(), uint8_t, m_maincpu_region->bytes());
 	mc8123_decode(m_maincpu_region->base(), banked_decrypted_opcodes, memregion("key")->base(), m_maincpu_region->bytes());
 
 	m_bank0d->set_base(banked_decrypted_opcodes);

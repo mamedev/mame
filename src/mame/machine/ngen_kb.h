@@ -10,21 +10,21 @@
 class ngen_keyboard_device : public serial_keyboard_device
 {
 public:
-	ngen_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ngen_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void rcv_complete() override;
-	virtual void key_make(UINT8 row, UINT8 column) override;
-	virtual void key_break(UINT8 row, UINT8 column) override;
+	virtual void key_make(uint8_t row, uint8_t column) override;
+	virtual void key_break(uint8_t row, uint8_t column) override;
 
 private:
-	void write(UINT8 data);
+	void write(uint8_t data);
 
-	UINT8 m_keys_down;
-	UINT8 m_last_reset;
+	uint8_t m_keys_down;
+	uint8_t m_last_reset;
 };
 
 extern const device_type NGEN_KEYBOARD;

@@ -142,8 +142,8 @@ public:
 			m_psg(*this, "sn"),
 			m_meters(*this, "meters")
 	{ }
-	UINT8 m_sound_buffer;
-	UINT8 m_psg_latch;
+	uint8_t m_sound_buffer;
+	uint8_t m_psg_latch;
 	virtual void machine_reset() override;
 
 protected:

@@ -31,7 +31,7 @@ class c1551_t :  public device_t,
 {
 public:
 	// construction/destruction
-	c1551_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1551_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -61,8 +61,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_plus4_expansion_card_interface overrides
-	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
-	virtual void plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+	virtual uint8_t plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+	virtual void plus4_cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
 
 private:
 	enum
@@ -83,7 +83,7 @@ private:
 	required_ioport m_jp1;
 
 	// TCBM bus
-	UINT8 m_tcbm_data;                      // data
+	uint8_t m_tcbm_data;                      // data
 	int m_status;                           // status
 	int m_dav;                              // data valid
 	int m_ack;                              // acknowledge

@@ -18,8 +18,8 @@
 /*****************************/
 CPU_DISASSEMBLE( dsp56k )
 {
-	const UINT16 w0 = oprom[0] | (oprom[1] << 8);
-	const UINT16 w1 = oprom[2] | (oprom[3] << 8);
+	const uint16_t w0 = oprom[0] | (oprom[1] << 8);
+	const uint16_t w1 = oprom[2] | (oprom[3] << 8);
 
 	// Decode and disassemble.
 	DSP56K::Opcode op(w0, w1);

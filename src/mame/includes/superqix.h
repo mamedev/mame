@@ -25,43 +25,43 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_mcu;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_bitmapram;
-	optional_shared_ptr<UINT8> m_bitmapram2;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_bitmapram;
+	optional_shared_ptr<uint8_t> m_bitmapram2;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	std::unique_ptr<INT16[]> m_samplebuf;
+	std::unique_ptr<int16_t[]> m_samplebuf;
 	// MCU HLE and/or 8751 related
-	UINT8 m_port1;          // HLE-related for superqix
-	UINT8 m_port2;          // HLE-related for superqix
-	UINT8 m_port3;          // HLE-related for superqix
-	UINT8 m_port3_latch;    // HLE-related for superqix
-	UINT8 m_fromZ80pending; // HLE-related for superqix, to add a delay to z80->mcu comms
+	uint8_t m_port1;          // HLE-related for superqix
+	uint8_t m_port2;          // HLE-related for superqix
+	uint8_t m_port3;          // HLE-related for superqix
+	uint8_t m_port3_latch;    // HLE-related for superqix
+	uint8_t m_fromZ80pending; // HLE-related for superqix, to add a delay to z80->mcu comms
 	int m_curr_player;      // HLE-related for prebillian
 
 	// commmon 68705/8751/HLE
-	UINT8 m_fromMCU;        // byte latch for 68705/8751->z80 comms
-	UINT8 m_fromZ80;        // byte latch for z80->68705/8751 comms
+	uint8_t m_fromMCU;        // byte latch for 68705/8751->z80 comms
+	uint8_t m_fromZ80;        // byte latch for z80->68705/8751 comms
 	bool m_Z80HasWritten;   // z80 has written to latch flag
 	bool m_MCUHasWritten;   // 68705/8751 has written to latch flag
 
 	// 68705 related
-	UINT8 m_portA_in;      // actual input to pins
-	//UINT8 m_portB_in;      //
-	//UINT8 m_portC_in;      //
-	//UINT8 m_portA_out;     // actual output on pins (post ddr)
-	UINT8 m_portB_out;     //
-	UINT8 m_portC_out;     //
+	uint8_t m_portA_in;      // actual input to pins
+	//uint8_t m_portB_in;      //
+	//uint8_t m_portC_in;      //
+	//uint8_t m_portA_out;     // actual output on pins (post ddr)
+	uint8_t m_portB_out;     //
+	uint8_t m_portC_out;     //
 
-	//UINT8 m_portA_internal;// output before applying ddr
-	UINT8 m_portB_internal;//
-	UINT8 m_portC_internal;//
-	UINT8 m_ddrA;
-	UINT8 m_ddrB;
-	UINT8 m_ddrC;
+	//uint8_t m_portA_internal;// output before applying ddr
+	uint8_t m_portB_internal;//
+	uint8_t m_portC_internal;//
+	uint8_t m_ddrA;
+	uint8_t m_ddrB;
+	uint8_t m_ddrC;
 
 	//general machine stuff
 	bool m_invert_coin_lockout;
@@ -123,8 +123,8 @@ public:
 	DECLARE_MACHINE_START(superqix);
 	DECLARE_VIDEO_START(superqix);
 	DECLARE_PALETTE_DECODER(BBGGRRII);
-	UINT32 screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sqix_timer_irq);
 	TIMER_CALLBACK_MEMBER(mcu_acknowledge_callback);

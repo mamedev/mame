@@ -57,25 +57,25 @@ public:
 	required_device<pce220_serial_device> m_serial;
 
 	// HD61202 LCD controller
-	UINT8 m_lcd_index_row;
-	UINT8 m_lcd_index_col;
-	UINT8 m_lcd_start_line;
-	UINT8 m_lcd_on;
+	uint8_t m_lcd_index_row;
+	uint8_t m_lcd_index_col;
+	uint8_t m_lcd_start_line;
+	uint8_t m_lcd_on;
 
 	//basic machine
-	UINT8 m_bank_num;
-	UINT8 m_irq_mask;
-	UINT8 m_irq_flag;
-	UINT8 m_timer_status;
-	UINT16 m_kb_matrix;
-	UINT8 *m_vram;
+	uint8_t m_bank_num;
+	uint8_t m_irq_mask;
+	uint8_t m_irq_flag;
+	uint8_t m_timer_status;
+	uint16_t m_kb_matrix;
+	uint8_t *m_vram;
 
-	UINT8 m_port15;
-	UINT8 m_port18;
+	uint8_t m_port15;
+	uint8_t m_port18;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( lcd_status_r );
 	DECLARE_WRITE8_MEMBER( lcd_control_w );
 	DECLARE_READ8_MEMBER( lcd_data_r );
@@ -109,14 +109,14 @@ public:
 		: pce220_state(mconfig, type, tag)
 		{ }
 
-	UINT8 m_g850v_bank_num;
-	UINT8 m_lcd_effects;
-	UINT8 m_lcd_contrast;
-	UINT8 m_lcd_read_mode;
+	uint8_t m_g850v_bank_num;
+	uint8_t m_lcd_effects;
+	uint8_t m_lcd_contrast;
+	uint8_t m_lcd_read_mode;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( g850v_bank_r );
 	DECLARE_WRITE8_MEMBER( g850v_bank_w );
 	DECLARE_READ8_MEMBER( g850v_lcd_status_r );
@@ -125,9 +125,9 @@ public:
 	DECLARE_WRITE8_MEMBER( g850v_lcd_data_w );
 };
 
-UINT32 pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 lcd_symbols[4];
+	uint8_t lcd_symbols[4];
 
 	if (m_lcd_on)
 	{
@@ -188,9 +188,9 @@ UINT32 pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-UINT32 pcg850v_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pcg850v_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 lcd_symbols[6];
+	uint8_t lcd_symbols[6];
 	int color0 = 0;
 	int color1 = 1;
 
@@ -276,7 +276,7 @@ READ8_MEMBER( pce220_state::lcd_status_r )
 	--x- ---- LCD on/off
 	---x ---- Reset
 	*/
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data &= (m_lcd_on<<5);
 
@@ -314,8 +314,8 @@ READ8_MEMBER( pce220_state::rom_bank_r )
 
 WRITE8_MEMBER( pce220_state::rom_bank_w )
 {
-	UINT8 bank4 = data & 0x07; // bits 0,1,2
-	UINT8 bank3 = (data & 0x70) >> 4; // bits 4,5,6
+	uint8_t bank4 = data & 0x07; // bits 0,1,2
+	uint8_t bank3 = (data & 0x70) >> 4; // bits 4,5,6
 
 	m_bank_num = data;
 
@@ -325,7 +325,7 @@ WRITE8_MEMBER( pce220_state::rom_bank_w )
 
 WRITE8_MEMBER( pce220_state::ram_bank_w )
 {
-	UINT8 bank = BIT(data,2);
+	uint8_t bank = BIT(data,2);
 
 	membank("bank1")->set_entry(bank);
 	membank("bank2")->set_entry(bank);
@@ -399,7 +399,7 @@ READ8_MEMBER( pce220_state::port1f_r )
 	---- ---x DIN
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_serial->in_din()<<0;
 	data |= m_serial->in_ack()<<1;
@@ -425,7 +425,7 @@ WRITE8_MEMBER( pce220_state::kb_matrix_w )
 
 READ8_MEMBER( pce220_state::kb_r )
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	if (m_kb_matrix & 0x01)
 		data |= ioport("LINE0")->read();
@@ -499,7 +499,7 @@ READ8_MEMBER( pcg850v_state::g850v_lcd_status_r )
 	x--- ---- Busy (not emulated)
 	--x- ---- LCD on/off
 	*/
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data &= (m_lcd_on<<5);
 
@@ -551,7 +551,7 @@ WRITE8_MEMBER( pcg850v_state::g850v_lcd_control_w )
 
 READ8_MEMBER( pcg850v_state::g850v_lcd_data_r )
 {
-	UINT8 data = m_vram[(m_lcd_index_row*0x100 + m_lcd_index_col - 1) & 0x7ff];
+	uint8_t data = m_vram[(m_lcd_index_row*0x100 + m_lcd_index_col - 1) & 0x7ff];
 
 	if (m_lcd_read_mode == 1)
 		m_lcd_index_col++;
@@ -848,30 +848,30 @@ INPUT_PORTS_END
 
 void pce220_state::machine_start()
 {
-	UINT8 *rom = memregion("user1")->base();
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *rom = memregion("user1")->base();
+	uint8_t *ram = m_ram->pointer();
 
 	membank("bank1")->configure_entries(0, 2, ram + 0x0000, 0x8000);
 	membank("bank2")->configure_entries(0, 2, ram + 0x4000, 0x8000);
 	membank("bank3")->configure_entries(0, 8, rom, 0x4000);
 	membank("bank4")->configure_entries(0, 8, rom, 0x4000);
 
-	m_vram = (UINT8*)memregion("lcd_vram")->base();
+	m_vram = (uint8_t*)memregion("lcd_vram")->base();
 
 	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 
 void pcg850v_state::machine_start()
 {
-	UINT8 *rom = memregion("user1")->base();
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *rom = memregion("user1")->base();
+	uint8_t *ram = m_ram->pointer();
 
 	membank("bank1")->configure_entries(0, 2, ram + 0x0000, 0x8000);
 	membank("bank2")->configure_entries(0, 2, ram + 0x4000, 0x8000);
 	membank("bank3")->configure_entries(0, 22, rom, 0x4000);
 	membank("bank4")->configure_entries(0, 22, rom, 0x4000);
 
-	m_vram = (UINT8*)memregion("lcd_vram")->base();
+	m_vram = (uint8_t*)memregion("lcd_vram")->base();
 	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 

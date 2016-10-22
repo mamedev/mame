@@ -34,15 +34,15 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_vidregs;
-	required_shared_ptr<UINT32> m_bgpen_1;
-	required_shared_ptr<UINT32> m_bgpen_2;
-	required_shared_ptr<UINT32> m_paletteram;
+	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<uint32_t> m_vidregs;
+	required_shared_ptr<uint32_t> m_bgpen_1;
+	required_shared_ptr<uint32_t> m_bgpen_2;
+	required_shared_ptr<uint32_t> m_paletteram;
 
 	memory_bank *m_ymf_bank[4];
-	UINT8 m_ymf_max_bank;
-	UINT8 m_io_select;
+	uint8_t m_ymf_max_bank;
+	uint8_t m_io_select;
 
 	/* video-related */
 	double         m_oldbrt1;
@@ -71,8 +71,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_psikyo4_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_psikyo4_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 scr);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr);
 };

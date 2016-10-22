@@ -74,9 +74,10 @@ NOTE: Trivia Question rom names are the internal names used. IE: read from the f
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/ticket.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 class gei_state : public driver_device
@@ -90,23 +91,23 @@ public:
 		m_screen(*this, "screen") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	optional_device<ticket_dispenser_device> m_ticket;
 	required_device<screen_device> m_screen;
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	bitmap_ind16 m_bitmap;
 
-	UINT8 m_drawctrl[3];
-	UINT8 m_color[8];
+	uint8_t m_drawctrl[3];
+	uint8_t m_color[8];
 	int m_prevoffset;
 	int m_yadd;
 	int m_signature_answer;
 	int m_signature_pos;
-	UINT8 m_nmi_mask;
+	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(gei_drawctrl_w);
 	DECLARE_WRITE8_MEMBER(gei_bitmap_w);
 	DECLARE_READ8_MEMBER(catchall);
@@ -180,7 +181,7 @@ void gei_state::video_start()
 	m_screen->register_screen_bitmap(m_bitmap);
 }
 
-UINT32 gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -216,7 +217,7 @@ WRITE8_MEMBER(gei_state::sound_w)
 	m_nmi_mask = data & 0x40;
 
 	/* bit 7 goes directly to the sound amplifier */
-	m_dac->write_unsigned8(((data & 0x80) >> 7) * 255);
+	m_dac->write(BIT(data, 7));
 }
 
 WRITE8_MEMBER(gei_state::sound2_w)
@@ -233,7 +234,7 @@ WRITE8_MEMBER(gei_state::sound2_w)
 	output().set_led_value(12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
-	m_dac->write(((data & 0x80) >> 7) * 255);
+	m_dac->write(BIT(data, 7));
 }
 
 WRITE8_MEMBER(gei_state::lamps2_w)
@@ -402,7 +403,7 @@ WRITE8_MEMBER(gei_state::signature_w)
 	if (data == 0) m_signature_pos = 0;
 	else
 	{
-		static const UINT8 signature[8] = { 0xff, 0x01, 0xfd, 0x05, 0xf5, 0x15, 0xd5, 0x55 };
+		static const uint8_t signature[8] = { 0xff, 0x01, 0xfd, 0x05, 0xf5, 0x15, 0xd5, 0x55 };
 
 		m_signature_answer = signature[m_signature_pos++];
 
@@ -415,7 +416,7 @@ WRITE8_MEMBER(gei_state::signature2_w)
 	if (data == 0) m_signature_pos = 0;
 	else
 	{
-		static const UINT8 signature[8] = { 0xff, 0x01, 0xf7, 0x11, 0xd7, 0x51, 0x57, 0x51 };
+		static const uint8_t signature[8] = { 0xff, 0x01, 0xf7, 0x11, 0xd7, 0x51, 0x57, 0x51 };
 
 		m_signature_answer = signature[m_signature_pos++];
 
@@ -1053,10 +1054,10 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( findout, getrivia )

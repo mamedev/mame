@@ -28,7 +28,7 @@ static void tvc64_emit_level(cassette_image *cass, double &time, int freq, int l
 	time += period;
 }
 
-static cassette_image::error tvc64_output_byte(cassette_image *cass, double &time, UINT8 byte)
+static cassette_image::error tvc64_output_byte(cassette_image *cass, double &time, uint8_t byte)
 {
 	for (int i=0; i<8; i++)
 	{
@@ -58,15 +58,15 @@ static int tvc64_output_predata(cassette_image *cass, double &time, int number)
 	return (int)cassette_image::error::SUCCESS;
 }
 
-static UINT16 tvc64_calc_crc(const UINT8 *bytes, int size)
+static uint16_t tvc64_calc_crc(const uint8_t *bytes, int size)
 {
-	UINT16 crc = 0;
+	uint16_t crc = 0;
 
 	for (int i=0; i<size; i++)
 	{
 		for (int b=0; b<8; b++)
 		{
-			UINT8 al = (bytes[i] & (1<<b)) ? 0x80 : 0x00;
+			uint8_t al = (bytes[i] & (1<<b)) ? 0x80 : 0x00;
 
 			al ^= ((crc>>8) & 0xff);
 
@@ -84,13 +84,13 @@ static UINT16 tvc64_calc_crc(const UINT8 *bytes, int size)
 
 static cassette_image::error tvc64_cassette_load(cassette_image *cassette)
 {
-	UINT8 tmp_buff[512];
+	uint8_t tmp_buff[512];
 	int buff_idx = 0;
 	double time = 0.0;
 
-	UINT8 header[TVC64_HEADER_BYTES];
+	uint8_t header[TVC64_HEADER_BYTES];
 	cassette_image_read(cassette, header, 0, TVC64_HEADER_BYTES);
-	UINT16 cas_size = (header[0x83]<<8) | header[0x82];
+	uint16_t cas_size = (header[0x83]<<8) | header[0x82];
 
 	// tape header
 	tmp_buff[buff_idx++] = 0x00;
@@ -117,7 +117,7 @@ static cassette_image::error tvc64_cassette_load(cassette_image *cassette)
 	tmp_buff[buff_idx++] = 0x00;    // no last sector
 
 	// updates the header CRC
-	UINT16 crc = tvc64_calc_crc(tmp_buff, buff_idx);
+	uint16_t crc = tvc64_calc_crc(tmp_buff, buff_idx);
 	tmp_buff[buff_idx++] = crc & 0xff;
 	tmp_buff[buff_idx++] = (crc>>8) & 0xff;
 
@@ -155,9 +155,9 @@ static cassette_image::error tvc64_cassette_load(cassette_image *cassette)
 	tmp_buff[buff_idx++] = 0x00;        // data sector
 	tmp_buff[buff_idx++] = 0x11;        // not puffered
 	tmp_buff[buff_idx++] = 0x00;        // not write protected
-	tmp_buff[buff_idx++] = (UINT8)((cas_size / 256) + ((cas_size % 256) > 0 ? 1 : 0));  // number of sectors
+	tmp_buff[buff_idx++] = (uint8_t)((cas_size / 256) + ((cas_size % 256) > 0 ? 1 : 0));  // number of sectors
 
-	UINT8 sect_num = 1;
+	uint8_t sect_num = 1;
 	int sector_num = cas_size / 256;
 	for (int i=0; i<=sector_num; i++)
 	{
@@ -202,7 +202,7 @@ static cassette_image::error tvc64_cassette_load(cassette_image *cassette)
 
 static cassette_image::error tvc64_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
-	UINT8 byte;
+	uint8_t byte;
 	cassette_image_read(cassette, &byte, 0, 1);
 
 	if (byte == 0x11)

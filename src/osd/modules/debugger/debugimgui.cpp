@@ -175,8 +175,8 @@ private:
 	static int history_set(ImGuiTextEditCallbackData* data);
 
 	running_machine* m_machine;
-	INT32            m_mouse_x;
-	INT32            m_mouse_y;
+	int32_t            m_mouse_x;
+	int32_t            m_mouse_y;
 	bool             m_mouse_button;
 	bool             m_prev_mouse_button;
 	bool             m_running;
@@ -184,7 +184,7 @@ private:
 	float            font_size;
 	ImVec2           m_text_size;  // size of character (assumes monospaced font is in use)
 	ImguiFontHandle  m_font;
-	UINT8            m_key_char;
+	uint8_t            m_key_char;
 	bool             m_hide;
 	int              m_win_count;  // number of active windows, does not decrease, used to ID individual windows
 	bool             m_has_images; // true if current system has any image devices
@@ -859,7 +859,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 				bool physical = mem->physical();
 				bool rev = mem->reverse();
 				int format = mem->get_data_format();
-				UINT32 chunks = mem->chunks_per_row();
+				uint32_t chunks = mem->chunks_per_row();
 
 				if(ImGui::MenuItem("1-byte chunks", nullptr,(format == 1) ? true : false))
 					mem->set_data_format(1);
@@ -1478,8 +1478,8 @@ void debug_imgui::init_debugger(running_machine &machine)
 
 void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 {
-	UINT32 width = m_machine->render().ui_target().width();
-	UINT32 height = m_machine->render().ui_target().height();
+	uint32_t width = m_machine->render().ui_target().width();
+	uint32_t height = m_machine->render().ui_target().height();
 	if(firststop && !m_initialised)
 	{
 		view_main_console = dview_alloc(device.machine(), DVT_CONSOLE);
@@ -1526,8 +1526,8 @@ void debug_imgui::debugger_update()
 {
 	if (m_machine && (m_machine->phase() == MACHINE_PHASE_RUNNING) && !m_machine->debugger().cpu().is_stopped() && !m_hide)
 	{
-		UINT32 width = m_machine->render().ui_target().width();
-		UINT32 height = m_machine->render().ui_target().height();
+		uint32_t width = m_machine->render().ui_target().width();
+		uint32_t height = m_machine->render().ui_target().height();
 		handle_mouse();
 		handle_keys();
 		imguiBeginFrame(m_mouse_x,m_mouse_y,m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height, m_key_char);

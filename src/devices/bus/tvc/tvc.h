@@ -71,9 +71,9 @@ public:
 	virtual ~device_tvcexp_interface();
 
 	// reading and writing
-	virtual UINT8 id_r() { return 0x00; }   // ID_A and ID_B lines
+	virtual uint8_t id_r() { return 0x00; }   // ID_A and ID_B lines
 	virtual void int_ack() { }
-	virtual UINT8 int_r() { return 1; }
+	virtual uint8_t int_r() { return 1; }
 	virtual DECLARE_READ8_MEMBER(read) { return 0x00; }
 	virtual DECLARE_WRITE8_MEMBER(write) {}
 	virtual DECLARE_READ8_MEMBER(io_read) { return 0x00; }
@@ -87,7 +87,7 @@ class tvcexp_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~tvcexp_slot_device();
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<tvcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
@@ -97,9 +97,9 @@ public:
 	virtual void device_start() override;
 
 	// reading and writing
-	virtual UINT8 id_r();
+	virtual uint8_t id_r();
 	virtual void int_ack();
-	virtual UINT8 int_r();
+	virtual uint8_t int_r();
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
 	virtual DECLARE_READ8_MEMBER(io_read);

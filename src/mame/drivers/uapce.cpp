@@ -109,11 +109,11 @@ public:
 		: pce_common_state(mconfig, type, tag),
 		m_discrete(*this, "discrete") { }
 
-	UINT8 m_jamma_if_control_latch;
+	uint8_t m_jamma_if_control_latch;
 	DECLARE_WRITE8_MEMBER(jamma_if_control_latch_w);
 	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
 	DECLARE_READ8_MEMBER(jamma_if_read_dsw);
-	virtual UINT8 joy_read() override;
+	virtual uint8_t joy_read() override;
 	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
 };
@@ -130,7 +130,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(uapce_state::jamma_if_control_latch_w)
 {
-	UINT8 diff = data ^ m_jamma_if_control_latch;
+	uint8_t diff = data ^ m_jamma_if_control_latch;
 	m_jamma_if_control_latch = data;
 
 /*  D7 : Controls relay which connects the PCE R-AUDIO output to the common audio path.
@@ -178,7 +178,7 @@ READ8_MEMBER(uapce_state::jamma_if_control_latch_r)
 
 READ8_MEMBER(uapce_state::jamma_if_read_dsw)
 {
-	UINT8 dsw_val;
+	uint8_t dsw_val;
 
 	dsw_val = ioport("DSW" )->read();
 
@@ -218,7 +218,7 @@ READ8_MEMBER(uapce_state::jamma_if_read_dsw)
 	return dsw_val & 1;
 }
 
-UINT8 uapce_state::joy_read()
+uint8_t uapce_state::joy_read()
 {
 	if ( m_jamma_if_control_latch & 0x10 )
 	{

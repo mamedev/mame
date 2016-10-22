@@ -282,7 +282,7 @@ std::string from_wstring(const WCHAR *s)
 //  osd_uchar_from_osdchar
 //============================================================
 
-int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
+int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 {
 	WCHAR wch;
 	CPINFO cp;
@@ -311,7 +311,7 @@ error:
 //  osd_uchar_from_osdchar
 //============================================================
 
-int osd_uchar_from_osdchar(unicode_char *uchar, const char *osdchar, size_t count)
+int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 {
 	wchar_t wch;
 

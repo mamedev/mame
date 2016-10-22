@@ -73,7 +73,7 @@ ADDRESS_MAP_END
 READ8_MEMBER(mos6532_t::io_r)
 {
 	offset &= 0x1f;
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (offset == 0x00 || offset == 0x08 || offset == 0x10 || offset == 0x18) ret = pa_data_r(space, 0);
 	if (offset == 0x01 || offset == 0x09 || offset == 0x11 || offset == 0x19) ret = pa_ddr_r(space, 0);
@@ -113,7 +113,7 @@ WRITE8_MEMBER(mos6532_t::io_w)
 //  mos6530_base_t - constructor
 //-------------------------------------------------
 
-mos6530_base_t::mos6530_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+mos6530_base_t::mos6530_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_ram(*this, finder_base::DUMMY_TAG),
 	m_rom(*this, DEVICE_SELF),
@@ -177,7 +177,7 @@ mos6530_base_t::mos6530_base_t(const machine_config &mconfig, device_type type, 
 //  mos6530_t - constructor
 //-------------------------------------------------
 
-mos6530_t::mos6530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6530_t::mos6530_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos6530_base_t(mconfig, MOS6530n, "MOS6530n", tag, owner, clock, "mos6530n", __FILE__) { }
 
 
@@ -185,7 +185,7 @@ mos6530_t::mos6530_t(const machine_config &mconfig, const char *tag, device_t *o
 //  mos6532_t - constructor
 //-------------------------------------------------
 
-mos6532_t::mos6532_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6532_t::mos6532_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos6530_base_t(mconfig, MOS6532n, "MOS6532n", tag, owner, clock, "mos6532n", __FILE__) { }
 
 
@@ -322,9 +322,9 @@ void mos6530_base_t::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void mos6530_base_t::update_pa()
 {
-	UINT8 out = m_pa_out;
-	UINT8 ddr = m_pa_ddr;
-	UINT8 data = (out & ddr) | (ddr ^ 0xff);
+	uint8_t out = m_pa_out;
+	uint8_t ddr = m_pa_ddr;
+	uint8_t data = (out & ddr) | (ddr ^ 0xff);
 
 	if (m_out_pa_cb.isnull())
 	{
@@ -350,9 +350,9 @@ void mos6530_base_t::update_pa()
 
 void mos6530_base_t::update_pb()
 {
-	UINT8 out = m_pb_out;
-	UINT8 ddr = m_pb_ddr;
-	UINT8 data = (out & ddr) | (ddr ^ 0xff);
+	uint8_t out = m_pb_out;
+	uint8_t ddr = m_pb_ddr;
+	uint8_t data = (out & ddr) | (ddr ^ 0xff);
 
 	if (m_out_pb_cb.isnull())
 	{
@@ -373,9 +373,9 @@ void mos6530_base_t::update_pb()
 
 void mos6530_t::update_pb()
 {
-	UINT8 out = m_pb_out;
-	UINT8 ddr = m_pb_ddr;
-	UINT8 data = (out & ddr) | (ddr ^ 0xff);
+	uint8_t out = m_pb_out;
+	uint8_t ddr = m_pb_ddr;
+	uint8_t data = (out & ddr) | (ddr ^ 0xff);
 
 	if (m_ie_timer)
 	{
@@ -428,9 +428,9 @@ void mos6530_t::update_irq()
 //  get_irq_flags -
 //-------------------------------------------------
 
-UINT8 mos6530_base_t::get_irq_flags()
+uint8_t mos6530_base_t::get_irq_flags()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_irq_timer) data |= IRQ_TIMER;
 	if (m_irq_edge) data |= IRQ_EDGE;
@@ -438,9 +438,9 @@ UINT8 mos6530_base_t::get_irq_flags()
 	return data;
 }
 
-UINT8 mos6530_t::get_irq_flags()
+uint8_t mos6530_t::get_irq_flags()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_irq_timer) data |= IRQ_TIMER;
 
@@ -454,9 +454,9 @@ UINT8 mos6530_t::get_irq_flags()
 
 void mos6530_base_t::edge_detect()
 {
-	UINT8 ddr_out = m_pa_ddr;
-	UINT8 ddr_in = m_pa_ddr ^ 0xff;
-	UINT8 data = (m_pa_out & ddr_out) | (m_pa_in & ddr_in);
+	uint8_t ddr_out = m_pa_ddr;
+	uint8_t ddr_in = m_pa_ddr ^ 0xff;
+	uint8_t data = (m_pa_out & ddr_out) | (m_pa_in & ddr_in);
 	int state = BIT(data, 7);
 
 	if ((m_pa7 ^ state) && (m_pa7_dir ^ state) == 0)
@@ -505,7 +505,7 @@ void mos6530_base_t::pb_w(int bit, int state)
 
 READ8_MEMBER( mos6530_base_t::pa_data_r )
 {
-	UINT8 in = 0;
+	uint8_t in = 0;
 
 	if (m_in_pa_cb.isnull())
 	{
@@ -523,10 +523,10 @@ READ8_MEMBER( mos6530_base_t::pa_data_r )
 		in = m_in_pa_cb();
 	}
 
-	UINT8 out = m_pa_out;
-	UINT8 ddr_out = m_pa_ddr;
-	UINT8 ddr_in = m_pa_ddr ^ 0xff;
-	UINT8 data = (out & ddr_out) | (in & ddr_in);
+	uint8_t out = m_pa_out;
+	uint8_t ddr_out = m_pa_ddr;
+	uint8_t ddr_in = m_pa_ddr ^ 0xff;
+	uint8_t data = (out & ddr_out) | (in & ddr_in);
 
 	if (LOG) logerror("%s %s %s '%s' Port A Data In %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
@@ -570,7 +570,7 @@ WRITE8_MEMBER( mos6530_base_t::pa_ddr_w )
 
 READ8_MEMBER( mos6530_base_t::pb_data_r )
 {
-	UINT8 in = 0;
+	uint8_t in = 0;
 
 	if (m_in_pb_cb.isnull())
 	{
@@ -588,10 +588,10 @@ READ8_MEMBER( mos6530_base_t::pb_data_r )
 		in = m_in_pb_cb();
 	}
 
-	UINT8 out = m_pb_out;
-	UINT8 ddr_out = m_pb_ddr;
-	UINT8 ddr_in = m_pb_ddr ^ 0xff;
-	UINT8 data = (out & ddr_out) | (in & ddr_in);
+	uint8_t out = m_pb_out;
+	uint8_t ddr_out = m_pb_ddr;
+	uint8_t ddr_in = m_pb_ddr ^ 0xff;
+	uint8_t data = (out & ddr_out) | (in & ddr_in);
 
 	if (LOG) logerror("%s %s %s '%s' Port B Data In %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
@@ -647,9 +647,9 @@ READ8_MEMBER( mos6530_base_t::timer_on_r )
 	return timer_r(true);
 }
 
-UINT8 mos6530_base_t::timer_r(bool ie)
+uint8_t mos6530_base_t::timer_r(bool ie)
 {
-	UINT8 data;
+	uint8_t data;
 
 	live_sync();
 
@@ -676,7 +676,7 @@ UINT8 mos6530_base_t::timer_r(bool ie)
 
 READ8_MEMBER( mos6530_base_t::irq_r )
 {
-	UINT8 data = get_irq_flags();
+	uint8_t data = get_irq_flags();
 
 	if (!space.debugger_access()) {
 		if (m_irq_edge) {
@@ -703,7 +703,7 @@ WRITE8_MEMBER( mos6530_base_t::timer_on_w )
 	timer_w(offset, data, true);
 }
 
-void mos6530_base_t::timer_w(offs_t offset, UINT8 data, bool ie)
+void mos6530_base_t::timer_w(offs_t offset, uint8_t data, bool ie)
 {
 	live_sync();
 

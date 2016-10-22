@@ -6,18 +6,18 @@
 
 struct LYNX_AUDIO {
 	struct {
-		INT8 volume;
-		UINT8 feedback;
-		INT8 output;
-		UINT8 shifter;
-		UINT8 bakup;
-		UINT8 control1;
-		UINT8 counter;
-		UINT8 control2;
+		int8_t volume;
+		uint8_t feedback;
+		int8_t output;
+		uint8_t shifter;
+		uint8_t bakup;
+		uint8_t control1;
+		uint8_t counter;
+		uint8_t control2;
 	} reg;
-	UINT8 attenuation;
-	UINT16 mask; // 12-bit
-	UINT16 shifter; // 12-bit
+	uint8_t attenuation;
+	uint16_t mask; // 12-bit
+	uint16_t shifter; // 12-bit
 	float ticks;
 	int count;
 };
@@ -29,8 +29,8 @@ class lynx_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -59,8 +59,8 @@ protected:
 	float m_usec_per_sample;
 	std::unique_ptr<int[]> m_shift_mask;
 	std::unique_ptr<int[]> m_shift_xor;
-	UINT8 m_attenuation_enable;
-	UINT8 m_master_enable;
+	uint8_t m_attenuation_enable;
+	uint8_t m_master_enable;
 	LYNX_AUDIO m_audio[4];
 };
 
@@ -68,7 +68,7 @@ protected:
 class lynx2_sound_device : public lynx_sound_device
 {
 public:
-	lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides

@@ -59,66 +59,66 @@ public:
 
 
 	{ }
-	UINT8 m_int;
+	uint8_t m_int;
 
 	//OUT1
-	UINT8 m_ckmod;
-	UINT8 m_dmod;
-	UINT8 m_emod;
-	UINT8 m_inh;
-	UINT8 m_hop;
-	UINT8 m_seg;
-	UINT8 m_printer;
-	UINT8 m_auxp;
+	uint8_t m_ckmod;
+	uint8_t m_dmod;
+	uint8_t m_emod;
+	uint8_t m_inh;
+	uint8_t m_hop;
+	uint8_t m_seg;
+	uint8_t m_printer;
+	uint8_t m_auxp;
 
 	//helper...
-	UINT8 m_old_ckmod;
-	UINT8 m_old_emod;
+	uint8_t m_old_ckmod;
+	uint8_t m_old_emod;
 
 	//OUT2
-	UINT8 m_bobina_ctrl;
-	UINT8 m_timbre;
-	UINT8 m_coil_1;
-	UINT8 m_coil_2;
-	UINT8 m_coil_3;
-	UINT8 m_cont_ent;
-	UINT8 m_cont_sal;
-	UINT8 m_cont_caj;
+	uint8_t m_bobina_ctrl;
+	uint8_t m_timbre;
+	uint8_t m_coil_1;
+	uint8_t m_coil_2;
+	uint8_t m_coil_3;
+	uint8_t m_cont_ent;
+	uint8_t m_cont_sal;
+	uint8_t m_cont_caj;
 
 	//lamps out
-	UINT64 m_custom_data;
-	UINT8 m_auxs;
-	UINT8 m_anal;
-	UINT8 m_anacl;
-	UINT8 m_anacr;
-	UINT8 m_anar;
-	UINT8 m_pl;
-	UINT8 m_pc;
-	UINT8 m_pr;
-	UINT8 m_luz_250_rul;
-	UINT8 m_luz_100_rul;
-	UINT8 m_luz_50_rlul;
-	UINT8 m_luz_25_lrul;
-	UINT8 m_luz_25_rrul;
-	UINT8 m_fl;
-	UINT8 m_fc;
-	UINT8 m_fr;
-	UINT8 m_insert_coin;
-	UINT8 m_no_cambio;
-	UINT8 m_fuse;
-	UINT8 m_falta;
-	UINT8 m_anag;
-	UINT8 m_cl;
-	UINT8 m_cc;
-	UINT8 m_cr;
-	UINT8 m_premio_s;
-	UINT8 m_100;
-	UINT8 m_200;
-	UINT8 m_300;
-	UINT8 m_500;
-	UINT8 m_ml;
-	UINT8 m_mc;
-	UINT8 m_mr;
+	uint64_t m_custom_data;
+	uint8_t m_auxs;
+	uint8_t m_anal;
+	uint8_t m_anacl;
+	uint8_t m_anacr;
+	uint8_t m_anar;
+	uint8_t m_pl;
+	uint8_t m_pc;
+	uint8_t m_pr;
+	uint8_t m_luz_250_rul;
+	uint8_t m_luz_100_rul;
+	uint8_t m_luz_50_rlul;
+	uint8_t m_luz_25_lrul;
+	uint8_t m_luz_25_rrul;
+	uint8_t m_fl;
+	uint8_t m_fc;
+	uint8_t m_fr;
+	uint8_t m_insert_coin;
+	uint8_t m_no_cambio;
+	uint8_t m_fuse;
+	uint8_t m_falta;
+	uint8_t m_anag;
+	uint8_t m_cl;
+	uint8_t m_cc;
+	uint8_t m_cr;
+	uint8_t m_premio_s;
+	uint8_t m_100;
+	uint8_t m_200;
+	uint8_t m_300;
+	uint8_t m_500;
+	uint8_t m_ml;
+	uint8_t m_mc;
+	uint8_t m_mr;
 
 	DECLARE_READ8_MEMBER(start_read);
 
@@ -210,7 +210,7 @@ void mgavegas_state::update_lamp(){
 
 
 void mgavegas_state::update_custom(){
-UINT64 tmp;
+uint64_t tmp;
 
 	if( (m_ckmod==1) & (m_old_ckmod==0) ){
 		//vadid clock, sample the data
@@ -284,7 +284,7 @@ READ8_MEMBER( mgavegas_state::start_read )
 ****************************/
 READ8_MEMBER(mgavegas_state::r_a0)
 {
-UINT8 ret=0;
+uint8_t ret=0;
 
 
 	switch (offset&0x03)
@@ -335,7 +335,7 @@ WRITE8_MEMBER(mgavegas_state::w_a0)
 
 READ8_MEMBER(mgavegas_state::csoki_r)
 {
-UINT8 ret=0;
+uint8_t ret=0;
 
 	if (LOG_MSM5205)
 		logerror("read from %04X return %02X\n",offset+0xc800,ret);
@@ -392,7 +392,7 @@ WRITE8_MEMBER(mgavegas_state::cso2_w)
 
 READ8_MEMBER(mgavegas_state::ay8910_a_r)
 {
-	UINT8 ret=0xff;
+	uint8_t ret=0xff;
 
 	ret=ioport("INA")->read();
 
@@ -404,7 +404,7 @@ READ8_MEMBER(mgavegas_state::ay8910_a_r)
 
 READ8_MEMBER(mgavegas_state::ay8910_b_r)
 {
-	UINT8 ret=0xff;
+	uint8_t ret=0xff;
 
 	ret=ioport("DSW1")->read();
 

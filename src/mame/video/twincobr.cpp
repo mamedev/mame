@@ -93,9 +93,9 @@ VIDEO_START_MEMBER(twincobr_state,toaplan0)
 
 	twincobr_create_tilemaps();
 
-	m_txvideoram16 = make_unique_clear<UINT16[]>(m_txvideoram_size);
-	m_fgvideoram16 = make_unique_clear<UINT16[]>(m_fgvideoram_size);
-	m_bgvideoram16 = make_unique_clear<UINT16[]>(m_bgvideoram_size);
+	m_txvideoram16 = make_unique_clear<uint16_t[]>(m_txvideoram_size);
+	m_fgvideoram16 = make_unique_clear<uint16_t[]>(m_fgvideoram_size);
+	m_bgvideoram16 = make_unique_clear<uint16_t[]>(m_bgvideoram_size);
 
 	m_display_on = 0;
 
@@ -292,14 +292,14 @@ WRITE8_MEMBER(twincobr_state::wardner_videoram_w)
 
 READ8_MEMBER(twincobr_state::wardner_sprite_r)
 {
-	UINT16 *spriteram16 = reinterpret_cast<UINT16 *>(m_spriteram8->live());
+	uint16_t *spriteram16 = reinterpret_cast<uint16_t *>(m_spriteram8->live());
 	int shift = (offset & 1) * 8;
 	return spriteram16[offset/2] >> shift;
 }
 
 WRITE8_MEMBER(twincobr_state::wardner_sprite_w)
 {
-	UINT16 *spriteram16 = reinterpret_cast<UINT16 *>(m_spriteram8->live());
+	uint16_t *spriteram16 = reinterpret_cast<uint16_t *>(m_spriteram8->live());
 	if (offset & 1)
 		spriteram16[offset/2] = (spriteram16[offset/2] & 0x00ff) | (data << 8);
 	else
@@ -350,12 +350,12 @@ void twincobr_state::twincobr_log_vram()
 }
 
 
-UINT32 twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	twincobr_log_vram();
 
-	UINT16 *buffered_spriteram16;
-	UINT32 bytes;
+	uint16_t *buffered_spriteram16;
+	uint32_t bytes;
 	if (m_spriteram16 != nullptr)
 	{
 		buffered_spriteram16 = m_spriteram16->buffer();
@@ -363,7 +363,7 @@ UINT32 twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind1
 	}
 	else
 	{
-		buffered_spriteram16 = reinterpret_cast<UINT16 *>(m_spriteram8->buffer());
+		buffered_spriteram16 = reinterpret_cast<uint16_t *>(m_spriteram8->buffer());
 		bytes = m_spriteram8->bytes();
 	}
 

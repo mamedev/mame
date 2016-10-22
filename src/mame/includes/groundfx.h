@@ -34,8 +34,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT32> m_ram;
-	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<uint32_t> m_ram;
+	required_shared_ptr<uint32_t> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -44,11 +44,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT16 m_coin_word;
-	UINT16 m_frame_counter;
-	UINT16 m_port_sel;
+	uint16_t m_coin_word;
+	uint16_t m_frame_counter;
+	uint16_t m_port_sel;
 	std::unique_ptr<gfx_tempsprite[]> m_spritelist;
-	UINT16 m_rotate_ctrl[8];
+	uint16_t m_rotate_ctrl[8];
 	rectangle m_hack_cliprect;
 
 	DECLARE_WRITE32_MEMBER(groundfx_input_w);
@@ -61,7 +61,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 	DECLARE_DRIVER_INIT(groundfx);
 	virtual void video_start() override;
-	UINT32 screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(groundfx_interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs);
 

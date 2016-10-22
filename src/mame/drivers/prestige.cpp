@@ -114,26 +114,26 @@ public:
 	required_memory_bank m_bank4;
 	required_memory_bank m_bank5;
 
-	UINT8 m_bank[7];
-	UINT8 m_kb_matrix;
-	UINT8 m_irq_counter;
-	UINT8 m_mousex;
-	UINT8 m_mousey;
-	UINT8 *m_vram;
+	uint8_t m_bank[7];
+	uint8_t m_kb_matrix;
+	uint8_t m_irq_counter;
+	uint8_t m_mousex;
+	uint8_t m_mousey;
+	uint8_t *m_vram;
 	struct
 	{
-		UINT16  addr1;
-		UINT16  addr2;
-		UINT8   lcd_w;
-		UINT8   lcd_h;
-		UINT8   fb_width;
-		UINT8   split_pos;
+		uint16_t  addr1;
+		uint16_t  addr2;
+		uint8_t   lcd_w;
+		uint8_t   lcd_h;
+		uint8_t   fb_width;
+		uint8_t   split_pos;
 	} m_lcdc;
 
 	virtual void machine_start() override;
-	UINT32 screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	memory_region *m_cart_rom;
 
@@ -225,7 +225,7 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 
 READ8_MEMBER( prestige_state::kb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int line=0; line<8; line++)
 		if (!(m_kb_matrix & (1<<line)))
@@ -241,7 +241,7 @@ WRITE8_MEMBER( prestige_state::kb_w )
 
 READ8_MEMBER( prestige_state::mouse_r )
 {
-	INT16 data = 0;
+	int16_t data = 0;
 
 	switch( offset )
 	{
@@ -253,8 +253,8 @@ READ8_MEMBER( prestige_state::mouse_r )
 			break;
 	}
 
-	data = (std::min)(data, INT16(+127));
-	data = (std::max)(data, INT16(-127));
+	data = (std::min)(data, int16_t(+127));
+	data = (std::max)(data, int16_t(-127));
 
 	return 0x80 + data;
 }
@@ -601,7 +601,7 @@ INPUT_PORTS_END
 
 IRQ_CALLBACK_MEMBER(prestige_state::prestige_int_ack)
 {
-	UINT32 vector;
+	uint32_t vector;
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
@@ -624,8 +624,8 @@ void prestige_state::machine_start()
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *cart = nullptr;
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *cart = nullptr;
 	if (m_cart_rom != nullptr)
 	{
 		cart = m_cart_rom->base();
@@ -634,7 +634,7 @@ void prestige_state::machine_start()
 	{
 		cart = rom + 0x40000;   // internal ROM also includes extra contents that are activated by a cartridge that works as a jumper
 	}
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 
 	m_bank1->configure_entries(0, 64, rom,  0x4000);
@@ -670,7 +670,7 @@ PALETTE_INIT_MEMBER(prestige_state, glcolor)
 	palette.set_pen_color(3, rgb_t(0xff,0xdf,0x1f));
 }
 
-UINT32 prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int width = m_lcdc.fb_width + m_lcdc.lcd_w + 1;
 
@@ -684,7 +684,7 @@ UINT32 prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind1
 
 		for (int sx = 0; sx <= m_lcdc.lcd_w; sx++)
 		{
-			UINT8 data = m_vram[(line_start + sx) & 0x1fff];
+			uint8_t data = m_vram[(line_start + sx) & 0x1fff];
 
 			for (int x = 0; x < 8 / bpp; x++)
 			{
@@ -703,12 +703,12 @@ UINT32 prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 prestige_state::screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t prestige_state::screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return screen_update(1, screen, bitmap, cliprect);
 }
 
-UINT32 prestige_state::screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t prestige_state::screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return screen_update(2, screen, bitmap, cliprect);
 }

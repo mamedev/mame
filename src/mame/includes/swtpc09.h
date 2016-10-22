@@ -106,19 +106,19 @@ public:
 	DECLARE_DRIVER_INIT( swtpc09d3 );
 
 	void swtpc09_fdc_dma_transfer();
-	void swtpc09_irq_handler(UINT8 peripheral, UINT8 state);
+	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);
 
-	UINT8 m_term_data;               // terminal keyboard value
-	UINT8 m_pia_counter;             // this is the counter on pia porta
-	UINT8 m_fdc_dma_address_reg;     // dmf2 or dmf3 dma extended address reg
-	UINT8 m_system_type;             // flag to indicate hw and rom combination
-	UINT8 m_fdc_status;              // for floppy controller
-	UINT8 m_via_ca1_input;           // dmf3 fdc interupt is connected here
-	UINT8 m_dmf3_via_porta;
-	UINT8 m_piaide_porta;
-	UINT8 m_piaide_portb;
-	UINT8 m_active_interrupt;
-	UINT8 m_interrupt;
+	uint8_t m_term_data;               // terminal keyboard value
+	uint8_t m_pia_counter;             // this is the counter on pia porta
+	uint8_t m_fdc_dma_address_reg;     // dmf2 or dmf3 dma extended address reg
+	uint8_t m_system_type;             // flag to indicate hw and rom combination
+	uint8_t m_fdc_status;              // for floppy controller
+	uint8_t m_via_ca1_input;           // dmf3 fdc interupt is connected here
+	uint8_t m_dmf3_via_porta;
+	uint8_t m_piaide_porta;
+	uint8_t m_piaide_portb;
+	uint8_t m_active_interrupt;
+	uint8_t m_interrupt;
 
 
 	// TODO: move this in proper device
@@ -129,16 +129,16 @@ public:
 		int active;
 		int address;
 		int counter;
-		UINT8 control;
+		uint8_t control;
 		int start_address;
 		int start_counter;
 	} m6844_channel_data;
 
 	/* 6844 description */
 	m6844_channel_data m_m6844_channel[4];
-	UINT8 m_m6844_priority;
-	UINT8 m_m6844_interrupt;
-	UINT8 m_m6844_chain;
+	uint8_t m_m6844_priority;
+	uint8_t m_m6844_interrupt;
+	uint8_t m_m6844_chain;
 	DECLARE_READ8_MEMBER ( m6844_r );
 	DECLARE_WRITE8_MEMBER ( m6844_w );
 

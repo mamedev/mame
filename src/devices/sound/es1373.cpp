@@ -22,7 +22,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, es1373_device)
 	AM_RANGE(0x00, 0x3f) AM_READWRITE  (reg_r,  reg_w)
 ADDRESS_MAP_END
 
-es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ES1373, "Creative Labs Ensoniq AudioPCI97 ES1373", tag, owner, clock, "es1373", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_eslog(nullptr), m_tempCount(0), m_timer(nullptr), m_memory_space(nullptr), m_cpu_tag(nullptr), m_cpu(nullptr),
@@ -104,8 +104,8 @@ void es1373_device::device_reset()
 	m_stream->update();
 }
 
-void es1373_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+void es1373_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	m_memory_space = memory_space;
 }
@@ -184,7 +184,7 @@ void es1373_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 //-------------------------------------------------
 //  send_audio_out - Sends channel audio output data
 //-------------------------------------------------
-void es1373_device::send_audio_out(chan_info& chan, UINT32 intr_mask, stream_sample_t *outL, stream_sample_t *outR, int samples)
+void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, stream_sample_t *outL, stream_sample_t *outR, int samples)
 {
 	// Only transfer PCI data if bus mastering is enabled
 	// Fill initial half buffer
@@ -192,7 +192,7 @@ void es1373_device::send_audio_out(chan_info& chan, UINT32 intr_mask, stream_sam
 		chan.initialized = true;
 		transfer_pci_audio(chan, ES_PCI_READ);
 	}
-	//UINT32 sample_size = calc_size(chan.format);
+	//uint32_t sample_size = calc_size(chan.format);
 	// Send data to sound stream
 	bool buf_row_done;
 	for (int i=0; i<samples; i++) {
@@ -219,18 +219,18 @@ void es1373_device::send_audio_out(chan_info& chan, UINT32 intr_mask, stream_sam
 						// The sound cache is 32 bit wide fifo, so each entry is two mono 16 bit samples
 						if ((chan.buf_count&0x1)) {
 							// Read high 16 bits
-							outL[i] = outR[i] = (INT16)(m_sound_cache[chan.buf_rptr]>>16);
+							outL[i] = outR[i] = (int16_t)(m_sound_cache[chan.buf_rptr]>>16);
 							chan.buf_rptr++;
 							buf_row_done = true;
 						} else {
 							// Read low 16 bits
-							outL[i] = outR[i] = (INT16)(m_sound_cache[chan.buf_rptr]&0xffff);
+							outL[i] = outR[i] = (int16_t)(m_sound_cache[chan.buf_rptr]&0xffff);
 						}
 					break;
 				case SCTRL_16BIT_STEREO:
 						// The sound cache is 32 bit wide fifo, so each entry is one stereo 16 bit sample
-						outL[i] = (INT16) m_sound_cache[chan.buf_rptr]&0xffff;
-						outR[i] = (INT16) m_sound_cache[chan.buf_rptr]>>16;
+						outL[i] = (int16_t) m_sound_cache[chan.buf_rptr]&0xffff;
+						outR[i] = (int16_t) m_sound_cache[chan.buf_rptr]>>16;
 						chan.buf_rptr++;
 						buf_row_done = true;
 					break;
@@ -269,7 +269,7 @@ void es1373_device::send_audio_out(chan_info& chan, UINT32 intr_mask, stream_sam
 
 void es1373_device::transfer_pci_audio(chan_info& chan, int type)
 {
-	UINT32 pci_addr, data;
+	uint32_t pci_addr, data;
 	pci_addr = chan.pci_addr + (chan.pci_count<<2);
 	if (LOG_ES)
 		logerror("%s: transfer_pci_audio start chan: %X pci_addr: %08X pci_count: %X pci_size: %X buf_rptr: %X buf_wptr: %X\n",
@@ -298,7 +298,7 @@ void es1373_device::transfer_pci_audio(chan_info& chan, int type)
 	}
 }
 
-UINT32 es1373_device::calc_size(const UINT8 &format)
+uint32_t es1373_device::calc_size(const uint8_t &format)
 {
 	switch (format) {
 		case SCTRL_8BIT_MONO:
@@ -320,7 +320,7 @@ UINT32 es1373_device::calc_size(const UINT8 &format)
 
 READ32_MEMBER (es1373_device::reg_r)
 {
-	UINT32 result = m_es_regs[offset];
+	uint32_t result = m_es_regs[offset];
 	switch (offset) {
 		case ES_CODEC:
 			break;

@@ -261,6 +261,8 @@ SOUNDS["ES1373"] = true
 SOUNDS["L7A1045"] = true
 SOUNDS["AD1848"] = true
 --SOUNDS["UPD1771"] = true
+SOUNDS["VOLT_REG"] = true
+--SOUNDS["MEA8000"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -388,6 +390,7 @@ MACHINES["CR589"] = true
 MACHINES["DS1204"] = true
 MACHINES["DS1302"] = true
 --MACHINES["DS1315"] = true
+--MACHINES["DS1386"] = true
 MACHINES["DS2401"] = true
 MACHINES["DS2404"] = true
 MACHINES["DS75160A"] = true
@@ -440,7 +443,6 @@ MACHINES["LPCI"] = true
 --MACHINES["M68307"] = true
 --MACHINES["M68340"] = true
 MACHINES["M6M80011AP"] = true
-MACHINES["MATSUCD"] = true
 MACHINES["MB14241"] = true
 MACHINES["MB3773"] = true
 MACHINES["MB8421"] = true
@@ -4331,6 +4333,12 @@ files {
 	MAME_DIR .. "src/mame/machine/cdislave.h",
 	MAME_DIR .. "src/mame/machine/cdicdic.cpp",
 	MAME_DIR .. "src/mame/machine/cdicdic.h",
+	MAME_DIR .. "src/mame/drivers/cedar_magnet.cpp",
+	MAME_DIR .. "src/mame/drivers/cedar_magnet_sound.cpp",
+	MAME_DIR .. "src/mame/drivers/cedar_magnet_plane.cpp",
+	MAME_DIR .. "src/mame/drivers/cedar_magnet_sprite.cpp",
+	MAME_DIR .. "src/mame/drivers/cedar_magnet_board.cpp",
+	MAME_DIR .. "src/mame/drivers/cedar_magnet_flop.cpp",
 	MAME_DIR .. "src/mame/drivers/cesclass.cpp",
 	MAME_DIR .. "src/mame/drivers/chance32.cpp",
 	MAME_DIR .. "src/mame/drivers/chexx.cpp",

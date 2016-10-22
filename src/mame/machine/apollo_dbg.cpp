@@ -863,9 +863,9 @@ static const char* trap8[] = {
 
 // get parameter string for parameter type and value at addr
 
-static const char *get_param(m68000_base_device *m68k, UINT32 addr, char type)
+static const char *get_param(m68000_base_device *m68k, uint32_t addr, char type)
 {
-	UINT32 value = ~0;
+	uint32_t value = ~0;
 
 	// FIXME:
 	static char sb[256];
@@ -873,7 +873,7 @@ static const char *get_param(m68000_base_device *m68k, UINT32 addr, char type)
 	int i;
 	char ch;
 	int maxlen = sizeof(sb) - 2;
-	UINT32 value1;
+	uint32_t value1;
 
 	sb[0] = 0;
 
@@ -936,8 +936,8 @@ static const char *get_param(m68000_base_device *m68k, UINT32 addr, char type)
 static const char* get_svc_call(m68000_base_device *m68k, int trap_no,
 		int trap_code,  char *sb)
 {
-	UINT32 sp = REG_A(m68k)[7];
-	UINT32 pa;
+	uint32_t sp = REG_A(m68k)[7];
+	uint32_t pa;
 	const char * name = nullptr;
 	const char * param = nullptr;
 
@@ -1035,13 +1035,13 @@ static const char* get_svc_call(m68000_base_device *m68k, int trap_no,
 
 static const char * disassemble(m68000_base_device *m68k, offs_t pc, char* sb)
 {
-	UINT8 oprom[10];
-	UINT8 opram[10];
-	UINT32 options = 0;
+	uint8_t oprom[10];
+	uint8_t opram[10];
+	uint32_t options = 0;
 
 	// remember bus error state
-	UINT32 tmp_buserror_occurred = m68k->mmu_tmp_buserror_occurred;
-	UINT32 tmp_buserror_address = m68k->mmu_tmp_buserror_address;
+	uint32_t tmp_buserror_occurred = m68k->mmu_tmp_buserror_occurred;
+	uint32_t tmp_buserror_address = m68k->mmu_tmp_buserror_address;
 
 	m68k->mmu_tmp_buserror_occurred = 0;
 	m68k->mmu_tmp_rw = 1;
@@ -1070,13 +1070,13 @@ static const char * disassemble(m68000_base_device *m68k, offs_t pc, char* sb)
 	return sb;
 }
 
-static const UINT16 *get_data(m68000_base_device *m68k, offs_t addr)
+static const uint16_t *get_data(m68000_base_device *m68k, offs_t addr)
 {
-	static UINT16 data[4];
+	static uint16_t data[4];
 
 	// remember bus error state
-	UINT32 tmp_buserror_occurred = m68k->mmu_tmp_buserror_occurred;
-	UINT32 tmp_buserror_address = m68k->mmu_tmp_buserror_address;
+	uint32_t tmp_buserror_occurred = m68k->mmu_tmp_buserror_occurred;
+	uint32_t tmp_buserror_address = m68k->mmu_tmp_buserror_address;
 
 	m68k->mmu_tmp_buserror_occurred = 0;
 	m68k->mmu_tmp_rw = 1;
@@ -1103,16 +1103,16 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 {
 	// trap data remembered for next rte
 	static struct {
-		UINT32 pc;
-		UINT32 sp;
-		UINT16 trap_no;
-		UINT16 trap_code;
+		uint32_t pc;
+		uint32_t sp;
+		uint16_t trap_no;
+		uint16_t trap_code;
 	} trap = { 0, 0, 0, 0 };
 
 	if (apollo_config( APOLLO_CONF_TRAP_TRACE | APOLLO_CONF_FPU_TRACE))
 	{
-		UINT32 ppc_save;
-		UINT16 ir;
+		uint32_t ppc_save;
+		uint16_t ir;
 		m68000_base_device *m68k = device;
 		m68k->mmu_tmp_buserror_occurred = 0;
 
@@ -1140,7 +1140,7 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 		}
 		else if (ir == 0x4e73) // RTE
 		{
-			const UINT16 *data = get_data(m68k, REG_A(m68k)[7]);
+			const uint16_t *data = get_data(m68k, REG_A(m68k)[7]);
 			if ( REG_USP(m68k) == 0 && (data[0] & 0x2000) == 0) {
 				DLOG(("%s sp=%08x RTE: sr=%04x pc=%04x%04x v=%04x usp=%08x",
 					apollo_cpu_context(device->machine().firstcpu),

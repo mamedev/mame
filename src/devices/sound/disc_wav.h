@@ -28,11 +28,11 @@ DISCRETE_CLASS_STEP_RESET(dss_counter, 1,
 	int             m_out_type;
 	int             m_is_7492;
 	int             m_last_clock;
-	UINT32          m_last_count;
-	//UINT32          m_last;                 /* Last clock state */
-	UINT32          m_min;
-	UINT32          m_max;
-	UINT32          m_diff;
+	uint32_t          m_last_count;
+	//uint32_t          m_last;                 /* Last clock state */
+	uint32_t          m_min;
+	uint32_t          m_max;
+	uint32_t          m_diff;
 	double          m_t_left;               /* time unused during last sample in seconds */
 );
 
@@ -43,10 +43,10 @@ DISCRETE_CLASS_STEP_RESET(dss_lfsr_noise, 2,
 	double          m_t_left;               /* time unused during last sample in seconds */
 	//double          m_sample_step;
 	//double          m_t;
-	UINT8           m_reset_on_high;
-	UINT8           m_invert_output;
-	UINT8           m_out_is_f0;
-	UINT8           m_out_lfsr_reg;
+	uint8_t           m_reset_on_high;
+	uint8_t           m_invert_output;
+	uint8_t           m_out_is_f0;
+	uint8_t           m_out_lfsr_reg;
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_noise, 2,
@@ -153,10 +153,10 @@ private:
 DISCRETE_CLASS_STEP_RESET(dss_op_amp_osc, 1,
 	const double *  m_r[8];                 /* pointers to resistor values */
 	int             m_type;
-	UINT8           m_flip_flop;            /* flip/flop output state */
-	UINT8           m_flip_flop_xor;        /* flip_flop ^ flip_flop_xor, 0 = discharge, 1 = charge */
-	UINT8           m_output_type;
-	UINT8           m_has_enable;
+	uint8_t           m_flip_flop;            /* flip/flop output state */
+	uint8_t           m_flip_flop_xor;        /* flip_flop ^ flip_flop_xor, 0 = discharge, 1 = charge */
+	uint8_t           m_output_type;
+	uint8_t           m_has_enable;
 	double          m_v_out_high;
 	double          m_threshold_low;        /* falling threshold */
 	double          m_threshold_high;       /* rising threshold */
@@ -181,7 +181,7 @@ DISCRETE_CLASS_STEP_RESET(dss_schmitt_osc, 1,
 	double          m_exponent;
 	int             m_state;                /* state of the output */
 	int             m_enable_type;
-	UINT8           m_input_is_voltage;
+	uint8_t           m_input_is_voltage;
 );
 
 /* Not yet implemented */

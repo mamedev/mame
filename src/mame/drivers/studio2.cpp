@@ -241,7 +241,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( studio2_cart_load );
 
 	/* keyboard state */
-	UINT8 m_keylatch;
+	uint8_t m_keylatch;
 };
 
 class visicom_state : public studio2_state
@@ -253,10 +253,10 @@ public:
 			m_color1_ram(*this, "color1_ram")
 	{ }
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_shared_ptr<UINT8> m_color0_ram;
-	required_shared_ptr<UINT8> m_color1_ram;
+	required_shared_ptr<uint8_t> m_color0_ram;
+	required_shared_ptr<uint8_t> m_color1_ram;
 
 	DECLARE_WRITE8_MEMBER( dma_w );
 };
@@ -282,8 +282,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( gdata_r );
 
 	/* video state */
-	required_shared_ptr<UINT8> m_color_ram;
-	UINT8 m_color;
+	required_shared_ptr<uint8_t> m_color_ram;
+	uint8_t m_color;
 };
 
 
@@ -407,7 +407,7 @@ static const rgb_t VISICOM_PALETTE[] =
 	rgb_t(0xef, 0x45, 0x4a)
 };
 
-UINT32 visicom_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t visicom_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vdc->screen_update(screen, bitmap, cliprect);
 
@@ -458,9 +458,9 @@ WRITE8_MEMBER( visicom_state::dma_w )
 	int sx = m_screen->hpos() + 4;
 	int y = m_screen->vpos();
 
-	UINT8 addr = offset & 0xff;
-	UINT8 color0 = m_color0_ram[addr];
-	UINT8 color1 = m_color1_ram[addr];
+	uint8_t addr = offset & 0xff;
+	uint8_t color0 = m_color0_ram[addr];
+	uint8_t color1 = m_color1_ram[addr];
 
 	for (int x = 0; x < 8; x++)
 	{
@@ -473,7 +473,7 @@ WRITE8_MEMBER( visicom_state::dma_w )
 
 WRITE8_MEMBER( mpt02_state::dma_w )
 {
-	UINT8 addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
+	uint8_t addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
 
 	m_color = m_color_ram[addr];
 
@@ -528,7 +528,7 @@ void mpt02_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 {
-	UINT32 size;
+	uint32_t size;
 
 	// always alloc 3K, even if range $400-$600 is not read by the system (RAM is present there)
 	m_cart->rom_alloc(0xc00, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -537,9 +537,9 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 	{
 		if (image.is_filetype("st2"))
 		{
-			UINT8 header[0x100];
-			UINT8 catalogue[10], title[32], pages[64];
-			UINT8 blocks;
+			uint8_t header[0x100];
+			uint8_t catalogue[10], title[32], pages[64];
+			uint8_t blocks;
 
 			if (image.length() <= 0x100)
 			{
@@ -568,7 +568,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 					logerror("ST2 invalid block %u to %04x\n", block, pages[block] << 8);
 				else
 				{
-					UINT16 offset = (pages[block] << 8) - 0x400;
+					uint16_t offset = (pages[block] << 8) - 0x400;
 					logerror("ST2 Reading block %u to %04x\n", block, offset);
 					image.fread(m_cart->get_rom_base() + offset, 0x100);
 				}

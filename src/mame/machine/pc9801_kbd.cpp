@@ -34,7 +34,7 @@ const device_type PC9801_KBD = &device_creator<pc9801_kbd_device>;
 //  pc9801_kbd_device - constructor
 //-------------------------------------------------
 
-pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC9801_KBD, "pc9801_kbd", tag, owner, clock, "pc9801_kbd_", __FILE__),
 	m_write_irq(*this)
 {
@@ -47,10 +47,10 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 INPUT_CHANGED_MEMBER(pc9801_kbd_device::key_stroke)
 {
 	if(newval && !oldval)
-		m_rx_buf[(UINT8)(FPTR)(param) & 0x7f] = 1;
+		m_rx_buf[(uint8_t)(uintptr_t)(param) & 0x7f] = 1;
 
 	if(oldval && !newval)
-		m_rx_buf[(UINT8)(FPTR)(param) & 0x7f] = 2;
+		m_rx_buf[(uint8_t)(uintptr_t)(param) & 0x7f] = 2;
 }
 
 static INPUT_PORTS_START( pc9801_kbd )

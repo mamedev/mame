@@ -136,8 +136,15 @@ WRITE16_MEMBER(cyberbal_state::sound_68k_w)
 
 WRITE16_MEMBER(cyberbal_state::sound_68k_dac_w)
 {
-	dac_device *dac = (offset & 8) ? m_dac2 : m_dac1;
-	dac->write_unsigned16((((data >> 3) & 0x800) | ((data >> 2) & 0x7ff)) << 4);
+	//int clip = BIT(data, 15);
+	//int off0b = BIT(data, 13) | BIT(data, 14);
+	//int off4b = BIT(data, 13) & BIT(data, 14);
+	uint16 sample = ((data >> 3) & 0x800) | ((data >> 2) & 0x7ff);
+
+	if (offset & 8)
+		m_ldac->write(sample);
+	else
+		m_rdac->write(sample);
 
 	if (m_fast_68k_int)
 	{

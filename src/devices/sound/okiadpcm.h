@@ -23,13 +23,13 @@ public:
 	oki_adpcm_state() { compute_tables(); reset(); }
 
 	void reset();
-	INT16 clock(UINT8 nibble);
+	int16_t clock(uint8_t nibble);
 
-	INT32   m_signal;
-	INT32   m_step;
+	int32_t   m_signal;
+	int32_t   m_step;
 
 private:
-	static const INT8 s_index_shift[8];
+	static const int8_t s_index_shift[8];
 	static int s_diff_lookup[49*16];
 
 	static void compute_tables();
@@ -47,13 +47,13 @@ public:
 	oki_adpcm2_state() { compute_tables(); reset(); }
 
 	void reset();
-	INT16 clock(UINT8 nibble);
+	int16_t clock(uint8_t nibble);
 
-	INT32   m_signal;
-	INT32   m_step;
+	int32_t   m_signal;
+	int32_t   m_step;
 
 private:
-	static const INT8 s_index_shift[8];
+	static const int8_t s_index_shift[8];
 	static int s_diff_lookup[49*16];
 
 	static void compute_tables();

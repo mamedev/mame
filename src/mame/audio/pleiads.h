@@ -44,8 +44,8 @@ class pleiads_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~pleiads_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( control_a_w );
@@ -79,7 +79,7 @@ protected:
 	int m_sound_latch_b;
 	int m_sound_latch_c;    /* part of the videoreg_w latch */
 
-	std::unique_ptr<UINT32[]> m_poly18;
+	std::unique_ptr<uint32_t[]> m_poly18;
 	int m_polybit;
 
 	pl_t_state m_tone1;
@@ -106,7 +106,7 @@ extern const device_type PLEIADS;
 class naughtyb_sound_device : public pleiads_sound_device
 {
 public:
-	naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -123,7 +123,7 @@ extern const device_type NAUGHTYB;
 class popflame_sound_device : public pleiads_sound_device
 {
 public:
-	popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;

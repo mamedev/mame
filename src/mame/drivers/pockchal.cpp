@@ -39,10 +39,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pockchalv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pockchalv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	UINT32  m_rom_size;
+	uint32_t  m_rom_size;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pockchalv1_cart);
 };
 
@@ -59,7 +59,7 @@ void pockchalv1_state::video_start()
 {
 }
 
-UINT32 pockchalv1_state::screen_update_pockchalv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pockchalv1_state::screen_update_pockchalv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

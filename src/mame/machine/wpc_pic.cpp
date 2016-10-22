@@ -6,7 +6,7 @@
 
 const device_type WPC_PIC = &device_creator<wpc_pic_device>;
 
-wpc_pic_device::wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wpc_pic_device::wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_PIC, "Williams Pinball Controller PIC Security", tag, owner, clock, "wpc_pic", __FILE__),
 	swarray(*this, ":SW.%u", 0)
 {
@@ -24,7 +24,7 @@ void wpc_pic_device::set_serial(const char *_serial)
 
 READ8_MEMBER(wpc_pic_device::read)
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 	if(curcmd == 0x0d)
 		data = count;
 
@@ -45,9 +45,9 @@ READ8_MEMBER(wpc_pic_device::read)
 
 void wpc_pic_device::check_game_id()
 {
-	UINT32 cmp = (cmpchk[0] << 16) | (cmpchk[1] << 8) | cmpchk[2];
+	uint32_t cmp = (cmpchk[0] << 16) | (cmpchk[1] << 8) | cmpchk[2];
 	for(int i=0; i<1000; i++) {
-		UINT32 v = (i >> 8) * 0x3133 + (i & 0xff) * 0x3231;
+		uint32_t v = (i >> 8) * 0x3133 + (i & 0xff) * 0x3231;
 		v = v & 0xffffff;
 		if(v == cmp)
 			logerror("%s: Detected game id %03d\n", tag(), i);
@@ -86,10 +86,10 @@ WRITE8_MEMBER(wpc_pic_device::write)
 
 void wpc_pic_device::serial_to_pic()
 {
-	UINT32 no[20];
+	uint32_t no[20];
 	for(int i=0; i<20; i++)
 		no[i] = serial[i] - '0';
-	UINT32 v;
+	uint32_t v;
 
 	mem[10] = 0x12; // Random?
 	mem[ 2] = 0x34; // Random?

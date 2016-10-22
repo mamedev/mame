@@ -181,7 +181,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(avigo_state::key_data_read_r)
 {
-	UINT8 data = 0x0f;
+	uint8_t data = 0x0f;
 
 	if (!(m_key_line & 0x01))
 	{
@@ -370,7 +370,7 @@ WRITE8_MEMBER(avigo_state::ad_control_status_w)
 
 READ8_MEMBER(avigo_state::ad_data_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* original */
 
@@ -689,7 +689,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(avigo_state::avigo_1hz_timer)
 QUICKLOAD_LOAD_MEMBER( avigo_state,avigo)
 {
 	const char *systemname = machine().system().name;
-	UINT32 first_app_page = (0x50000>>14);
+	uint32_t first_app_page = (0x50000>>14);
 	int app_page;
 
 	// german and spanish language are 4 pages bigger than other
@@ -717,7 +717,7 @@ QUICKLOAD_LOAD_MEMBER( avigo_state,avigo)
 	// if there is the required free space installs the application
 	if ((app_page + (image.length()>>14)) < 0x40)
 	{
-		logerror("Application loaded at 0x%05x-0x%05x\n", app_page<<14, (app_page<<14) + (UINT32)image.length());
+		logerror("Application loaded at 0x%05x-0x%05x\n", app_page<<14, (app_page<<14) + (uint32_t)image.length());
 
 		// copy app file into flash memory
 		image.fread(m_flash1->base() + (app_page<<14), image.length());

@@ -18,21 +18,21 @@ struct playfield_t
 	//  int on;
 
 	int count, bit, started;
-	UINT8 data;
+	uint8_t data;
 	attotime time, high_time, low_time;
 	union {
 		struct {
-			UINT8 header[7];
-			UINT8 field[8][8/2];
-			UINT8 unknown[5];
+			uint8_t header[7];
+			uint8_t field[8][8/2];
+			uint8_t unknown[5];
 		} s;
-		UINT8 data[7+8*8/2+5];
+		uint8_t data[7+8*8/2+5];
 	} u;
 };
 
 struct lcd_t
 {
-	UINT8 data[5];
+	uint8_t data[5];
 	int clock;
 	int count;
 };
@@ -53,7 +53,7 @@ public:
 	DECLARE_DRIVER_INIT(ssystem3);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ssystem3);
-	UINT32 screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(ssystem3_via_write_a);
 	DECLARE_READ8_MEMBER(ssystem3_via_read_a);
 	DECLARE_READ8_MEMBER(ssystem3_via_read_b);
@@ -61,15 +61,15 @@ public:
 	void ssystem3_lcd_reset();
 	void ssystem3_lcd_write(int clock, int data);
 	void ssystem3_draw_7segment(bitmap_ind16 &bitmap,int value, int x, int y);
-	void ssystem3_draw_led(bitmap_ind16 &bitmap,INT16 color, int x, int y, int ch);
+	void ssystem3_draw_led(bitmap_ind16 &bitmap,int16_t color, int x, int y, int ch);
 	void ssystem3_playfield_getfigure(int x, int y, int *figure, int *black);
 	void ssystem3_playfield_reset();
 	void ssystem3_playfield_write(int reset, int signal);
 	void ssystem3_playfield_read(int *on, int *ready);
 
 private:
-	UINT8 m_porta;
-	std::unique_ptr<UINT8[]> m_videoram;
+	uint8_t m_porta;
+	std::unique_ptr<uint8_t[]> m_videoram;
 	playfield_t m_playfield;
 	lcd_t m_lcd;
 

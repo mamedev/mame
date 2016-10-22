@@ -54,9 +54,9 @@ void menu_input_groups::populate()
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
 		auto s = string_format("Player %d Controls", player + 1);
-		item_append(s, "", 0, (void *)(FPTR)(IPG_PLAYER1 + player + 1));
+		item_append(s, "", 0, (void *)(uintptr_t)(IPG_PLAYER1 + player + 1));
 	}
-	item_append(_("Other Controls"), "", 0, (void *)(FPTR)(IPG_OTHER + 1));
+	item_append(_("Other Controls"), "", 0, (void *)(uintptr_t)(IPG_OTHER + 1));
 }
 
 menu_input_groups::~menu_input_groups()
@@ -174,7 +174,7 @@ void menu_input_specific::populate()
 			if (field.enabled() && (type_class == INPUT_CLASS_CONTROLLER || type_class == INPUT_CLASS_MISC || type_class == INPUT_CLASS_KEYBOARD))
 			{
 				input_seq_type seqtype;
-				UINT32 sortorder;
+				uint32_t sortorder;
 
 				/* determine the sorting order */
 				if (type_class == INPUT_CLASS_CONTROLLER)
@@ -405,7 +405,7 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 	/* build the menu */
 	for (curitem = 0; curitem < numitems; curitem++)
 	{
-		UINT32 flags = 0;
+		uint32_t flags = 0;
 
 		/* generate the name of the item itself, based off the base name and the type */
 		item = itemarray[curitem];
@@ -485,7 +485,7 @@ void menu_settings::handle()
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		// reset
-		if ((FPTR)menu_event->itemref == 1)
+		if ((uintptr_t)menu_event->itemref == 1)
 		{
 			if (menu_event->iptkey == IPT_UI_SELECT)
 				machine().schedule_hard_reset();
@@ -533,7 +533,7 @@ void menu_settings::handle()
     switches menus
 -------------------------------------------------*/
 
-menu_settings::menu_settings(mame_ui_manager &mui, render_container &container, UINT32 _type) : menu(mui, container), diplist(nullptr), dipcount(0)
+menu_settings::menu_settings(mame_ui_manager &mui, render_container &container, uint32_t _type) : menu(mui, container), diplist(nullptr), dipcount(0)
 {
 	type = _type;
 }
@@ -554,7 +554,7 @@ void menu_settings::populate()
 		for (ioport_field &field : port.second->fields())
 			if (field.type() == type && field.enabled())
 			{
-				UINT32 flags = 0;
+				uint32_t flags = 0;
 
 				/* set the left/right flags appropriately */
 				if (field.has_previous_setting())
@@ -580,7 +580,7 @@ void menu_settings::populate()
 				if (type == IPT_DIPSWITCH && !field.diplocations().empty())
 				{
 					ioport_field::user_settings settings;
-					UINT32 accummask = field.mask();
+					uint32_t accummask = field.mask();
 
 					/* get current settings */
 					field.get_user_settings(settings);
@@ -588,7 +588,7 @@ void menu_settings::populate()
 					/* iterate over each bit in the field */
 					for (const ioport_diplocation &diploc : field.diplocations())
 					{
-						UINT32 mask = accummask & ~(accummask - 1);
+						uint32_t mask = accummask & ~(accummask - 1);
 						dip_descriptor *dip;
 
 						/* find the matching switch name */
@@ -651,10 +651,10 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 	// iterate over DIP switches
 	for (dip_descriptor *dip = diplist; dip != nullptr; dip = dip->next)
 	{
-		UINT32 selectedmask = 0;
+		uint32_t selectedmask = 0;
 
 		// determine the mask of selected bits
-		if ((FPTR)selectedref != 1)
+		if ((uintptr_t)selectedref != 1)
 		{
 			ioport_field *field = (ioport_field *)selectedref;
 
@@ -676,7 +676,7 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
     DIP switch
 -------------------------------------------------*/
 
-void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, UINT32 selectedmask)
+void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, uint32_t selectedmask)
 {
 	float switch_field_width = SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * container().manager().ui_aspect();
 	float switch_width = SINGLE_TOGGLE_SWITCH_WIDTH * container().manager().ui_aspect();
@@ -857,7 +857,7 @@ void menu_analog::populate()
 					if (type != ANALOG_ITEM_CENTERSPEED || use_autocenter)
 					{
 						analog_item_data *data;
-						UINT32 flags = 0;
+						uint32_t flags = 0;
 						std::string text;
 						std::string subtext;
 						if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)

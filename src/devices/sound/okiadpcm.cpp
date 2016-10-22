@@ -18,7 +18,7 @@
 
 // ADPCM state and tables
 bool oki_adpcm_state::s_tables_computed = false;
-const INT8 oki_adpcm_state::s_index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
+const int8_t oki_adpcm_state::s_index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 int oki_adpcm_state::s_diff_lookup[49*16];
 
 //-------------------------------------------------
@@ -38,7 +38,7 @@ void oki_adpcm_state::reset()
 //  changes
 //-------------------------------------------------
 
-INT16 oki_adpcm_state::clock(UINT8 nibble)
+int16_t oki_adpcm_state::clock(uint8_t nibble)
 {
 	// update the signal
 	m_signal += s_diff_lookup[m_step * 16 + (nibble & 15)];
@@ -74,7 +74,7 @@ void oki_adpcm_state::compute_tables()
 	s_tables_computed = true;
 
 	// nibble to bit map
-	static const INT8 nbl2bit[16][4] =
+	static const int8_t nbl2bit[16][4] =
 	{
 		{ 1, 0, 0, 0}, { 1, 0, 0, 1}, { 1, 0, 1, 0}, { 1, 0, 1, 1},
 		{ 1, 1, 0, 0}, { 1, 1, 0, 1}, { 1, 1, 1, 0}, { 1, 1, 1, 1},
@@ -107,7 +107,7 @@ void oki_adpcm_state::compute_tables()
 
 // ADPCM state and tables
 bool oki_adpcm2_state::s_tables_computed = false;
-const INT8 oki_adpcm2_state::s_index_shift[8] = { -2, -2, -2, -2, 2, 6, 9, 11 };
+const int8_t oki_adpcm2_state::s_index_shift[8] = { -2, -2, -2, -2, 2, 6, 9, 11 };
 int oki_adpcm2_state::s_diff_lookup[49*16];
 
 //-------------------------------------------------
@@ -127,7 +127,7 @@ void oki_adpcm2_state::reset()
 //  changes
 //-------------------------------------------------
 
-INT16 oki_adpcm2_state::clock(UINT8 nibble)
+int16_t oki_adpcm2_state::clock(uint8_t nibble)
 {
 	// update the signal
 	m_signal += s_diff_lookup[m_step * 16 + (nibble & 15)];
@@ -163,7 +163,7 @@ void oki_adpcm2_state::compute_tables()
 	s_tables_computed = true;
 
 	// nibble to bit map
-	static const INT8 nbl2bit[16][4] =
+	static const int8_t nbl2bit[16][4] =
 	{
 		{ 1, 0, 0, 0}, { 1, 0, 0, 1}, { 1, 0, 1, 0}, { 1, 0, 1, 1},
 		{ 1, 1, 0, 0}, { 1, 1, 0, 1}, { 1, 1, 1, 0}, { 1, 1, 1, 1},

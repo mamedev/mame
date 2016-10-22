@@ -151,7 +151,7 @@ void tunhunt_state::set_pens()
     0020:   00 f0 f0 f0 b0 b0 00 f0
             00 f0 f0 00 b0 00 f0 f0
 */
-	//const UINT8 *color_prom = memregion( "proms" )->base();
+	//const uint8_t *color_prom = memregion( "proms" )->base();
 	int color;
 	int shade;
 	int red,green,blue;
@@ -216,7 +216,7 @@ void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cl
 	int x,span_data;
 	int color;
 	int count;
-	const UINT8 *source;
+	const uint8_t *source;
 
 	for( line=0; line<64; line++ )
 	{
@@ -363,7 +363,7 @@ void tunhunt_state::draw_shell(bitmap_ind16 &bitmap,
 			255-hposition-16,vstart-32,0 );
 }
 
-UINT32 tunhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tunhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens();
 

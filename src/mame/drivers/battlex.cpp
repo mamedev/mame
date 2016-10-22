@@ -58,7 +58,7 @@ INTERRUPT_GEN_MEMBER(battlex_state::battlex_interrupt)
 
 CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
 {
-	UINT32 ret = m_in0_b4;
+	uint32_t ret = m_in0_b4;
 	if (m_in0_b4)
 	{
 		m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -299,9 +299,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(battlex_state,battlex)
 {
-	UINT8 *colormask = memregion("user1")->base();
-	UINT8 *gfxdata = memregion("user2")->base();
-	UINT8 *dest = memregion("gfx1")->base();
+	uint8_t *colormask = memregion("user1")->base();
+	uint8_t *gfxdata = memregion("user2")->base();
+	uint8_t *dest = memregion("gfx1")->base();
 
 	int tile, line, bit;
 

@@ -41,7 +41,7 @@ public:
 	DECLARE_DRIVER_INIT(dsb46);
 	DECLARE_MACHINE_RESET(dsb46);
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -73,7 +73,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(dsb46_state, dsb46)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("read")->configure_entry(0, &RAM[0x10000]);
 	membank("read")->configure_entry(1, &RAM[0x00000]);
 	membank("write")->configure_entry(0, &RAM[0x00000]);
@@ -99,7 +99,7 @@ READ8_MEMBER( dsb46_state::port01_r )
 
 READ8_MEMBER( dsb46_state::port00_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

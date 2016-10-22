@@ -77,7 +77,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(screen_device &screen, bool state);
 
 protected:
@@ -88,7 +88,7 @@ protected:
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<cassette_image_device> m_cassette;
 	required_device<via6522_device> m_via;
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	optional_memory_region m_rom;
 	required_memory_bank m_bank_c000_r;
 	optional_memory_bank m_bank_e000_r;
@@ -100,8 +100,8 @@ protected:
 	ioport_port *m_kbd_row[8];
 
 	int m_blink_counter;
-	UINT8 m_pattr;
-	UINT8 m_via_a, m_via_b, m_psg_a;
+	uint8_t m_pattr;
+	uint8_t m_via_a, m_via_b, m_psg_a;
 	bool m_via_ca2, m_via_cb2, m_via_irq;
 	bool m_ext_irq;
 
@@ -165,13 +165,13 @@ protected:
 	required_ioport m_joy2;
 
 	floppy_image_device *m_floppies[4];
-	UINT8 m_port_314;
-	UINT8 m_via2_a, m_via2_b;
+	uint8_t m_port_314;
+	uint8_t m_via2_a, m_via2_b;
 	bool m_via2_ca2, m_via2_cb2, m_via2_irq;
 	bool m_acia_irq;
 	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
 
-	UINT8 m_junk_read[0x4000], m_junk_write[0x4000];
+	uint8_t m_junk_read[0x4000], m_junk_write[0x4000];
 
 	virtual void update_irq() override;
 	void remap();
@@ -200,31 +200,31 @@ static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, telestrat_state )
 	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool blink_state = m_blink_counter & 0x20;
 	m_blink_counter = (m_blink_counter + 1) & 0x3f;
 
-	UINT8 pattr = m_pattr;
+	uint8_t pattr = m_pattr;
 
 	for(int y=0; y<224; y++) {
 		// Line attributes and current colors
-		UINT8 lattr = 0;
-		UINT32 fgcol = m_palette->pen_color(7);
-		UINT32 bgcol = m_palette->pen_color(0);
+		uint8_t lattr = 0;
+		uint32_t fgcol = m_palette->pen_color(7);
+		uint32_t bgcol = m_palette->pen_color(0);
 
-		UINT32 *p = &bitmap.pix32(y);
+		uint32_t *p = &bitmap.pix32(y);
 
 		for(int x=0; x<40; x++) {
 			// Lookup the byte and, if needed, the pattern data
-			UINT8 ch, pat;
+			uint8_t ch, pat;
 			if((pattr & PATTR_HIRES) && y < 200)
 				ch = pat = m_ram[0xa000 + y*40 + x];
 
 			else {
 				ch = m_ram[0xbb80 + (y>>3)*40 + x];
 				int off = (lattr & LATTR_DSIZE ? y >> 1 : y ) & 7;
-				const UINT8 *base;
+				const uint8_t *base;
 				if(pattr & PATTR_HIRES)
 					if(lattr & LATTR_ALT)
 						base = m_ram + 0x9c00;
@@ -250,8 +250,8 @@ UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitma
 			}
 
 			// Pick up the colors for the pattern
-			UINT32 c_fgcol = fgcol;
-			UINT32 c_bgcol = bgcol;
+			uint32_t c_fgcol = fgcol;
+			uint32_t c_bgcol = bgcol;
 
 			//    inverse video
 			if(ch & 0x80) {
@@ -435,7 +435,7 @@ WRITE8_MEMBER(telestrat_state::via2_a_w)
 WRITE8_MEMBER(telestrat_state::via2_b_w)
 {
 	m_via2_b = data;
-	UINT8 port = 0xff;
+	uint8_t port = 0xff;
 	if(!(m_via2_b & 0x40))
 		port &= m_joy1->read();
 	if(!(m_via2_b & 0x80))

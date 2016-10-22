@@ -121,7 +121,7 @@ static SLOT_INTERFACE_START( rm380z_floppies )
 	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
 SLOT_INTERFACE_END
 
-UINT32 rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_screen(bitmap);
 	return 0;

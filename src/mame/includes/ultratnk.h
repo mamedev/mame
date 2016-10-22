@@ -27,7 +27,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	int m_da_latch;
 	int m_collision[4];
 	tilemap_t* m_playfield;
@@ -54,7 +54,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ultratnk);
-	UINT32 screen_update_ultratnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ultratnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_ultratnk(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	required_device<cpu_device> m_maincpu;

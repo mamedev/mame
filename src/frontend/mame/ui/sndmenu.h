@@ -39,7 +39,7 @@ private:
 	virtual void populate() override;
 	virtual void handle() override;
 
-	UINT16            m_cur_rates;
+	uint16_t            m_cur_rates;
 	static const int  m_sound_rate[];
 	int               m_sample_rate;
 	bool              m_samples, m_sound;

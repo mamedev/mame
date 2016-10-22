@@ -30,7 +30,7 @@ public:
 
 	virtual bool open(std::string const &font_path, std::string const &name, int &height);
 	virtual void close();
-	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs);
+	virtual bool get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs);
 
 	osd_font_osx &operator=(osd_font_osx &&obj)
 	{
@@ -122,7 +122,7 @@ void osd_font_osx::close()
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool osd_font_osx::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs)
+bool osd_font_osx::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs)
 {
 	UniChar uni_char;
 	CGGlyph glyph;

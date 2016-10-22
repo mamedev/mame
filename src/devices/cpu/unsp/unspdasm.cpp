@@ -59,8 +59,8 @@ static const char *alu[] =
 
 CPU_DISASSEMBLE( unsp )
 {
-	UINT16 op = *(UINT16 *)oprom;
-	UINT16 imm16 = *(UINT16 *)(oprom + 2);
+	uint16_t op = *(uint16_t *)oprom;
+	uint16_t imm16 = *(uint16_t *)(oprom + 2);
 	op = big_endianize_int16(op);
 	imm16 = big_endianize_int16(imm16);
 

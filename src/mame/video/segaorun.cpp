@@ -41,7 +41,7 @@ void segaorun_state::video_start()
 //  VIDEO UPDATE
 //**************************************************************************
 
-UINT32 segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start the sprites drawing
 	m_sprites->draw_async(cliprect);
@@ -74,13 +74,13 @@ UINT32 segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind16
 	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *dest = &bitmap.pix(y);
-			UINT16 *src = &sprites.pix(y);
-			UINT8 *pri = &screen.priority().pix(y);
+			uint16_t *dest = &bitmap.pix(y);
+			uint16_t *src = &sprites.pix(y);
+			uint8_t *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
-				UINT16 pix = src[x];
+				uint16_t pix = src[x];
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority
@@ -103,7 +103,7 @@ UINT32 segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind16
 }
 
 
-UINT32 segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// if no drawing is happening, fill with black and get out
 	if (!m_segaic16vid->m_display_enable)
@@ -141,13 +141,13 @@ UINT32 segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind16 
 	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *dest = &bitmap.pix(y);
-			UINT16 *src = &sprites.pix(y);
-			UINT8 *pri = &screen.priority().pix(y);
+			uint16_t *dest = &bitmap.pix(y);
+			uint16_t *src = &sprites.pix(y);
+			uint8_t *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
-				UINT16 pix = src[x];
+				uint16_t pix = src[x];
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority

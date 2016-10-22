@@ -74,7 +74,7 @@ class coco_fdc_device_base : public coco_family_fdc_device_base
 {
 public:
 	// construction/destruction
-	coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
 	enum class rtc_type
@@ -91,7 +91,7 @@ protected:
 
 	// methods
 	virtual void update_lines() override;
-	void dskreg_w(UINT8 data);
+	void dskreg_w(uint8_t data);
 	rtc_type real_time_clock();
 
 	// devices
@@ -168,7 +168,7 @@ void coco_family_fdc_device_base::device_reset()
 //  coco_family_fdc_device_base::get_cart_base
 //-------------------------------------------------
 
-UINT8* coco_family_fdc_device_base::get_cart_base()
+uint8_t* coco_family_fdc_device_base::get_cart_base()
 {
 	return memregion("eprom")->base();
 }
@@ -182,7 +182,7 @@ UINT8* coco_family_fdc_device_base::get_cart_base()
 //  coco_fdc_device_base - constructor
 //-------------------------------------------------
 
-coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: coco_family_fdc_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_wd17xx(*this, WD_TAG)
 	, m_ds1315(*this, CLOUD9_TAG)
@@ -246,10 +246,10 @@ void coco_fdc_device_base::update_lines()
 //  dskreg_w - function to write to CoCo dskreg
 //-------------------------------------------------
 
-void coco_fdc_device_base::dskreg_w(UINT8 data)
+void coco_fdc_device_base::dskreg_w(uint8_t data)
 {
-	UINT8 drive = 0;
-	UINT8 head;
+	uint8_t drive = 0;
+	uint8_t head;
 
 	if (LOG_FDC)
 	{
@@ -310,7 +310,7 @@ void coco_fdc_device_base::dskreg_w(UINT8 data)
 
 READ8_MEMBER(coco_fdc_device_base::read)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	switch(offset & 0xEF)
 	{
@@ -414,7 +414,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: coco_fdc_device_base(mconfig, COCO_FDC, "CoCo FDC", tag, owner, clock, "coco_fdc", __FILE__)
 		{
 		}
@@ -450,7 +450,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: coco_fdc_device_base(mconfig, COCO_FDC_V11, "CoCo FDC v1.1", tag, owner, clock, "coco_fdc_v11", __FILE__)
 		{
 		}
@@ -485,7 +485,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: coco_fdc_device_base(mconfig, COCO3_HDB1, "CoCo3 HDB-DOS", tag, owner, clock, "coco3_hdb1", __FILE__)
 		{
 		}
@@ -516,7 +516,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: coco_fdc_device_base(mconfig, CP400_FDC, "CP400 FDC", tag, owner, clock, "cp400_fdc", __FILE__)
 		{
 		}

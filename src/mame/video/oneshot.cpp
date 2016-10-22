@@ -94,8 +94,8 @@ void oneshot_state::draw_crosshairs( bitmap_ind16 &bitmap, const rectangle &clip
 
 void oneshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT16 *source = m_sprites;
-	const UINT16 *finish = source + (0x1000 / 2);
+	const uint16_t *source = m_sprites;
+	const uint16_t *finish = source + (0x1000 / 2);
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
 	int xpos, ypos;
@@ -147,7 +147,7 @@ void oneshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 }
 
-UINT32 oneshot_state::screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t oneshot_state::screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -162,7 +162,7 @@ UINT32 oneshot_state::screen_update_oneshot(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 oneshot_state::screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t oneshot_state::screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 

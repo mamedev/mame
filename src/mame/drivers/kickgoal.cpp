@@ -55,7 +55,7 @@ lev 7 : 0x7c : 0000 0000 - x
 */
 
 #ifdef UNUSED_DEFINITION
-static const UINT8 kickgoal_cmd_snd[128] =
+static const uint8_t kickgoal_cmd_snd[128] =
 {
 /*00*/  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 /*08*/  0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x70, 0x71,
@@ -430,7 +430,7 @@ INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
 }
 
 
-static const UINT16 kickgoal_default_eeprom_type1[64] = {
+static const uint16_t kickgoal_default_eeprom_type1[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -766,7 +766,7 @@ ROM_END
 DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
 {
 #if 0 /* we should find a real fix instead  */
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	/* fix "bug" that prevents game from writing to EEPROM */
 	rom[0x12b0/2] = 0x0001;

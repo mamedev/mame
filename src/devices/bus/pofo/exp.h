@@ -97,11 +97,11 @@ public:
 	virtual bool pdet() { return 0; }
 	virtual bool cdet() { return 1; }
 
-	virtual UINT8 iack_r() { return 0xff; }
-	virtual UINT8 eack_r() { return 0xff; }
+	virtual uint8_t iack_r() { return 0xff; }
+	virtual uint8_t eack_r() { return 0xff; }
 
-	virtual UINT8 nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) { return data; };
-	virtual void nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) { };
+	virtual uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return data; };
+	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { };
 
 	DECLARE_WRITE_LINE_MEMBER( iint_w );
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
@@ -120,7 +120,7 @@ class portfolio_expansion_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	portfolio_expansion_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	portfolio_expansion_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~portfolio_expansion_slot_t() { }
 
 	template<class _Object> static devcb_base &set_iint_wr_callback(device_t &device, _Object object) { return downcast<portfolio_expansion_slot_t &>(device).m_write_iint.set_callback(object); }
@@ -133,11 +133,11 @@ public:
 	bool pdet_r() { return (m_card != nullptr) ? m_card->pdet() : 0; }
 	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }
 
-	UINT8 iack_r() { return (m_card != nullptr) ? m_card->iack_r() : 0xff; };
-	UINT8 eack_r() { return (m_card != nullptr) ? m_card->eack_r() : 0xff; };
+	uint8_t iack_r() { return (m_card != nullptr) ? m_card->iack_r() : 0xff; };
+	uint8_t eack_r() { return (m_card != nullptr) ? m_card->eack_r() : 0xff; };
 
-	UINT8 nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) { return (m_card != nullptr) ? m_card->nrdi_r(space, offset, data, iom, bcom, ncc1) : data; }
-	void nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) { if (m_card != nullptr) m_card->nwri_w(space, offset, data, iom, bcom, ncc1); }
+	uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return (m_card != nullptr) ? m_card->nrdi_r(space, offset, data, iom, bcom, ncc1) : data; }
+	void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { if (m_card != nullptr) m_card->nwri_w(space, offset, data, iom, bcom, ncc1); }
 
 	// peripheral interface
 	WRITE_LINE_MEMBER( iint_w ) { m_write_iint(state); }

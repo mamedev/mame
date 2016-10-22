@@ -70,7 +70,7 @@
 
 const device_type PPS4 = &device_creator<pps4_device>;
 
-pps4_device::pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pps4_device::pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, PPS4, "PPS4", tag, owner, clock, "pps4", __FILE__ )
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 12)  // 4bit RAM
@@ -82,9 +82,9 @@ pps4_device::pps4_device(const machine_config &mconfig, const char *tag, device_
  * @brief pps4_device::M Return the memory at address B
  * @return ROM/RAM(B)
  */
-UINT8 pps4_device::M()
+uint8_t pps4_device::M()
 {
-	UINT8 ret = m_data->read_byte(m_B & ~m_SAG);
+	uint8_t ret = m_data->read_byte(m_B & ~m_SAG);
 	m_SAG = 0;
 	return ret;
 }
@@ -94,13 +94,13 @@ UINT8 pps4_device::M()
  * @brief pps4_device::W Write to the memory address at B
  * @return ROM/RAM(B)
  */
-void pps4_device::W(UINT8 data)
+void pps4_device::W(uint8_t data)
 {
 	m_data->write_byte(m_B & ~m_SAG, data);
 	m_SAG = 0;
 }
 
-offs_t pps4_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t pps4_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( pps4 );
 	return CPU_DISASSEMBLE_NAME(pps4)(this, buffer, pc, oprom, opram, options);
@@ -113,9 +113,9 @@ offs_t pps4_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
  * program counter is incremented. The icount is decremented.
  * @return m_I the next opcode
  */
-inline UINT8 pps4_device::ROP()
+inline uint8_t pps4_device::ROP()
 {
-	const UINT8 op = m_direct->read_byte(m_P & 0xFFF);
+	const uint8_t op = m_direct->read_byte(m_P & 0xFFF);
 	m_Ip = m_I1;         // save previous opcode
 	m_P = (m_P + 1) & 0xFFF;
 	m_icount -= 1;
@@ -129,9 +129,9 @@ inline UINT8 pps4_device::ROP()
  * icount is decremented.
  * @return m_I2 the next argument
  */
-inline UINT8 pps4_device::ARG()
+inline uint8_t pps4_device::ARG()
 {
-	const UINT8 arg = m_direct->read_byte(m_P & 0xFFF);
+	const uint8_t arg = m_direct->read_byte(m_P & 0xFFF);
 	m_P = (m_P + 1) & 0xFFF;
 	m_icount -= 1;
 	return arg;
@@ -265,7 +265,7 @@ void pps4_device::iADCSK()
  */
 void pps4_device::iADI()
 {
-	const UINT8 imm = ~m_I1 & 15;
+	const uint8_t imm = ~m_I1 & 15;
 	m_A = m_A + imm;
 	m_Skip = (m_A >> 4) & 1;
 	m_A = m_A & 15;
@@ -490,7 +490,7 @@ void pps4_device::iRF2()
  */
 void pps4_device::iLD()
 {
-	const UINT16 i3c = ~m_I1 & 7;
+	const uint16_t i3c = ~m_I1 & 7;
 	m_A = M();
 	m_B = m_B ^ (i3c << 4);
 }
@@ -513,8 +513,8 @@ void pps4_device::iLD()
  */
 void pps4_device::iEX()
 {
-	const UINT16 i3c = ~m_I1 & 7;
-	const UINT8 mem = M();
+	const uint16_t i3c = ~m_I1 & 7;
+	const uint8_t mem = M();
 	W(m_A);
 	m_A = mem;
 	m_B = m_B ^ (i3c << 4);
@@ -542,9 +542,9 @@ void pps4_device::iEX()
  */
 void pps4_device::iEXD()
 {
-	const UINT8 i3c = ~m_I1 & 7;
-	const UINT8 mem = M();
-	UINT8 bl = m_B & 15;
+	const uint8_t i3c = ~m_I1 & 7;
+	const uint8_t mem = M();
+	uint8_t bl = m_B & 15;
 	W(m_A);
 	m_A = mem;
 	m_B = m_B ^ (i3c << 4);
@@ -696,7 +696,7 @@ void pps4_device::iLBUA()
 void pps4_device::iXABL()
 {
 	// swap A and BL
-	UINT8 bl = m_B & 15;
+	uint8_t bl = m_B & 15;
 	m_B = (m_B & ~15) | m_A;
 	m_A = bl;
 }
@@ -717,7 +717,7 @@ void pps4_device::iXABL()
 void pps4_device::iXBMX()
 {
 	// swap X and BM
-	const UINT8 bm = (m_B >> 4) & 15;
+	const uint8_t bm = (m_B >> 4) & 15;
 	m_B = (m_B & ~(15 << 4)) | (m_X << 4);
 	m_X = bm;
 }
@@ -786,7 +786,7 @@ void pps4_device::iXS()
  */
 void pps4_device::iCYS()
 {
-	const UINT16 sa = (m_SA >> 4) | (m_A << 8);
+	const uint16_t sa = (m_SA >> 4) | (m_A << 8);
 	m_A = m_SA & 15;
 	m_SA = sa;
 }
@@ -893,7 +893,7 @@ void pps4_device::iLBL()
  */
 void pps4_device::iINCB()
 {
-	UINT8 bl = m_B & 15;
+	uint8_t bl = m_B & 15;
 	bl = (bl + 1) & 15;
 	if (0 == bl) {
 		LOG(("%s: skip BL=%x\n", __FUNCTION__, bl));
@@ -919,7 +919,7 @@ void pps4_device::iINCB()
  */
 void pps4_device::iDECB()
 {
-	UINT8 bl = m_B & 15;
+	uint8_t bl = m_B & 15;
 	bl = (bl - 1) & 15;
 	if (15 == bl) {
 		LOG(("%s: skip BL=%x\n", __FUNCTION__, bl));
@@ -945,7 +945,7 @@ void pps4_device::iDECB()
  */
 void pps4_device::iT()
 {
-	const UINT16 p = (m_P & ~63) | (m_I1 & 63);
+	const uint16_t p = (m_P & ~63) | (m_I1 & 63);
 	LOG(("%s: P=%03x I=%02x -> P=%03x\n", __FUNCTION__, m_P, m_I1, p));
 	m_P = p;
 }
@@ -1084,8 +1084,8 @@ void pps4_device::iSKZ()
  */
 void pps4_device::iSKBI()
 {
-	const UINT8 i4 = m_I1 & 15;
-	const UINT8 bl = m_B & 15;
+	const uint8_t i4 = m_I1 & 15;
+	const uint8_t bl = m_B & 15;
 	m_Skip = bl == i4 ? 1 : 0;
 }
 
@@ -1195,7 +1195,7 @@ void pps4_device::iRTNSK()
  */
 void pps4_device::iIOL()
 {
-	UINT8 ac = ((m_B & 15) << 4) | (~m_A & 15);
+	uint8_t ac = ((m_B & 15) << 4) | (~m_A & 15);
 	m_I2 = ARG();
 	m_io->write_byte(m_I2, ac);
 	LOG(("%s: port:%02x <- %x\n", __FUNCTION__, m_I2, ac));

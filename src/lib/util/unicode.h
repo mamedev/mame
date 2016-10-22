@@ -73,39 +73,29 @@
 #define UTF8_DOWN               "\xe2\x86\x93"      /* cursor down */
 
 
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef UINT16 utf16_char;
-typedef UINT32 unicode_char;
-
-
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
 // tests to see if a unicode char is a valid code point
-bool uchar_isvalid(unicode_char uchar);
+bool uchar_isvalid(char32_t uchar);
 
 // tests to see if a unicode char is printable
-bool uchar_is_printable(unicode_char uchar);
+bool uchar_is_printable(char32_t uchar);
 
 // tests to see if a unicode char is a digit
-bool uchar_is_digit(unicode_char uchar);
+bool uchar_is_digit(char32_t uchar);
 
 // converting strings to 32-bit Unicode chars
-int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count);
-int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t count);
-int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t count);
+int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count);
+int uchar_from_utf16(char32_t *uchar, const char16_t *utf16char, size_t count);
+int uchar_from_utf16f(char32_t *uchar, const char16_t *utf16char, size_t count);
 
 // converting 32-bit Unicode chars to strings
-int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar);
-std::string utf8_from_uchar(unicode_char uchar);
-int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
-int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
+int utf8_from_uchar(char *utf8string, size_t count, char32_t uchar);
+std::string utf8_from_uchar(char32_t uchar);
+int utf16_from_uchar(char16_t *utf16string, size_t count, char32_t uchar);
+int utf16f_from_uchar(char16_t *utf16string, size_t count, char32_t uchar);
 
 // misc UTF-8 helpers
 const char *utf8_previous_char(const char *utf8string);

@@ -76,7 +76,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pgm2(screen_device &screen, bool state);
 	required_device<cpu_device> m_maincpu;
 
@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pgm2 )
 INPUT_PORTS_END
 
-UINT32 pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -171,7 +171,7 @@ GFXDECODE_END
 
 void pgm2_state::pgm_create_dummy_internal_arm_region(int addr)
 {
-	UINT16 *temp16 = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
 	int i;
 	for (i=0;i<0x4000/2;i+=2)
 	{
@@ -443,13 +443,13 @@ ROM_START( kov3 )
 ROM_END
 
 
-static void iga_u16_decode(UINT16 *rom, int len, int ixor)
+static void iga_u16_decode(uint16_t *rom, int len, int ixor)
 {
 	int i;
 
 	for (i = 1; i < len / 2; i+=2)
 	{
-		UINT16 x = ixor;
+		uint16_t x = ixor;
 
 		if ( (i>>1) & 0x000001) x ^= 0x0010;
 		if ( (i>>1) & 0x000002) x ^= 0x2004;
@@ -468,13 +468,13 @@ static void iga_u16_decode(UINT16 *rom, int len, int ixor)
 	}
 }
 
-static void iga_u12_decode(UINT16* rom, int len, int ixor)
+static void iga_u12_decode(uint16_t* rom, int len, int ixor)
 {
 	int i;
 
 	for (i = 0; i < len / 2; i+=2)
 	{
-		UINT16 x = ixor;
+		uint16_t x = ixor;
 
 		if ( (i>>1) & 0x000001) x ^= 0x9004;
 		if ( (i>>1) & 0x000002) x ^= 0x0028;
@@ -495,7 +495,7 @@ static void iga_u12_decode(UINT16* rom, int len, int ixor)
 
 DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 {
-	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0x4761);
 	iga_u16_decode(src, 0x2000000, 0xc79f);
@@ -508,7 +508,7 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 {
-	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0xa193);
 	iga_u16_decode(src, 0x2000000, 0xb780);
@@ -521,7 +521,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 {
-	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x800000, 0x1e96);
 	iga_u16_decode(src, 0x800000, 0x869c);
@@ -534,7 +534,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
 {
-	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0x956d);
 	iga_u16_decode(src, 0x2000000, 0x3d17);

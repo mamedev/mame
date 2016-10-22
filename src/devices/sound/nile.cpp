@@ -52,7 +52,7 @@ enum
 
 const device_type NILE = &device_creator<nile_device>;
 
-nile_device::nile_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nile_device::nile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NILE, "NiLe", tag, owner, clock, "nile", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -79,12 +79,12 @@ void nile_device::device_start()
 
 void nile_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	UINT8 *sound_ram = &m_sound_ram[0];
+	uint8_t *sound_ram = &m_sound_ram[0];
 	int v, i, snum;
-	UINT16 *slot;
-	INT32 mix[48000*2];
-	INT32 *mixp;
-	INT16 sample;
+	uint16_t *slot;
+	int32_t mix[48000*2];
+	int32_t *mixp;
+	int16_t sample;
 	int sptr, eptr, freq, lsptr, leptr;
 
 	lsptr=leptr=0;
@@ -110,8 +110,8 @@ void nile_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			{
 				sample = sound_ram[sptr + m_vpos[v]]<<8;
 
-				*mixp++ += (sample * (INT32)slot[NILE_REG_VOL_R]) >> 16;
-				*mixp++ += (sample * (INT32)slot[NILE_REG_VOL_L]) >> 16;
+				*mixp++ += (sample * (int32_t)slot[NILE_REG_VOL_R]) >> 16;
+				*mixp++ += (sample * (int32_t)slot[NILE_REG_VOL_L]) >> 16;
 
 				m_frac[v] += freq;
 				m_vpos[v] += m_frac[v]>>16;
@@ -164,7 +164,7 @@ void nile_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 WRITE16_MEMBER( nile_device::nile_sndctrl_w )
 {
-	UINT16 ctrl=m_ctrl;
+	uint16_t ctrl=m_ctrl;
 
 	m_stream->update();
 

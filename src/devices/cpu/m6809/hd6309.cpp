@@ -19,9 +19,9 @@
         6809 Microcomputer Programming & Interfacing with Experiments"
             by Andrew C. Staugaard, Jr.; Howard W. Sams & Co., Inc.
 
-    System dependencies:    UINT16 must be 16 bit unsigned int
-                            UINT8 must be 8 bit unsigned int
-                            UINT32 must be more than 16 bits
+    System dependencies:    uint16_t must be 16 bit unsigned int
+                            uint8_t must be 8 bit unsigned int
+                            uint32_t must be more than 16 bits
                             arrays up to 65536 bytes must be supported
                             machine must be twos complement
 
@@ -131,7 +131,7 @@ const device_type HD6309 = &device_creator<hd6309_device>;
 //  hd6309_device - constructor
 //-------------------------------------------------
 
-hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6809_base_device(mconfig, "HD6309", tag, owner, clock, HD6309, 4, "hd6309", __FILE__),
 	m_md(0),
 	m_temp_im(0)
@@ -289,7 +289,7 @@ void hd6309_device::device_post_load()
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 hd6309_device::disasm_min_opcode_bytes() const
+uint32_t hd6309_device::disasm_min_opcode_bytes() const
 {
 	return 1;
 }
@@ -301,7 +301,7 @@ UINT32 hd6309_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 hd6309_device::disasm_max_opcode_bytes() const
+uint32_t hd6309_device::disasm_max_opcode_bytes() const
 {
 	return 5;
 }
@@ -313,7 +313,7 @@ UINT32 hd6309_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t hd6309_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t hd6309_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hd6309 );
 	return CPU_DISASSEMBLE_NAME(hd6309)(this, buffer, pc, oprom, opram, options);
@@ -325,7 +325,7 @@ offs_t hd6309_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 //  read_operand
 //-------------------------------------------------
 
-inline UINT8 hd6309_device::read_operand()
+inline uint8_t hd6309_device::read_operand()
 {
 	switch(m_addressing_mode)
 	{
@@ -344,7 +344,7 @@ inline UINT8 hd6309_device::read_operand()
 //  read_operand
 //-------------------------------------------------
 
-inline UINT8 hd6309_device::read_operand(int ordinal)
+inline uint8_t hd6309_device::read_operand(int ordinal)
 {
 	switch(m_addressing_mode)
 	{
@@ -368,7 +368,7 @@ inline UINT8 hd6309_device::read_operand(int ordinal)
 //  write_operand
 //-------------------------------------------------
 
-inline void hd6309_device::write_operand(UINT8 data)
+inline void hd6309_device::write_operand(uint8_t data)
 {
 	switch(m_addressing_mode)
 	{
@@ -387,7 +387,7 @@ inline void hd6309_device::write_operand(UINT8 data)
 //  write_operand
 //-------------------------------------------------
 
-inline void hd6309_device::write_operand(int ordinal, UINT8 data)
+inline void hd6309_device::write_operand(int ordinal, uint8_t data)
 {
 	switch(m_addressing_mode)
 	{
@@ -410,7 +410,7 @@ inline void hd6309_device::write_operand(int ordinal, UINT8 data)
 //  bittest_register
 //-------------------------------------------------
 
-inline UINT8 &hd6309_device::bittest_register()
+inline uint8_t &hd6309_device::bittest_register()
 {
 	switch(m_temp_im & 0xC0)
 	{
@@ -460,9 +460,9 @@ inline void hd6309_device::bittest_set(bool result)
 //  read_exgtfr_register
 //-------------------------------------------------
 
-inline m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_register(UINT8 reg)
+inline m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_register(uint8_t reg)
 {
-	UINT16 value;
+	uint16_t value;
 
 	switch(reg & 0x0F)
 	{
@@ -474,20 +474,20 @@ inline m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_register(UI
 		case  5: value = m_pc.w;                            break;  // PC
 		case  6: value = m_q.r.w;                           break;  // W
 		case  7: value = m_v.w;                             break;  // V
-		case  8: value = ((UINT16) m_q.r.a) << 8 | m_q.r.a; break;  // A
-		case  9: value = ((UINT16) m_q.r.b) << 8 | m_q.r.b; break;  // B
-		case 10: value = ((UINT16) m_cc) << 8 | m_cc;       break;  // CC
-		case 11: value = ((UINT16) m_dp) << 8 | m_dp;       break;  // DP
+		case  8: value = ((uint16_t) m_q.r.a) << 8 | m_q.r.a; break;  // A
+		case  9: value = ((uint16_t) m_q.r.b) << 8 | m_q.r.b; break;  // B
+		case 10: value = ((uint16_t) m_cc) << 8 | m_cc;       break;  // CC
+		case 11: value = ((uint16_t) m_dp) << 8 | m_dp;       break;  // DP
 		case 12: value = 0;                                 break;  // 0
 		case 13: value = 0;                                 break;  // 0
-		case 14: value = ((UINT16) m_q.r.e) << 8 | m_q.r.e; break;  // E
-		case 15: value = ((UINT16) m_q.r.f) << 8 | m_q.r.f; break;  // F
+		case 14: value = ((uint16_t) m_q.r.e) << 8 | m_q.r.e; break;  // E
+		case 15: value = ((uint16_t) m_q.r.f) << 8 | m_q.r.f; break;  // F
 		default:
 			fatalerror("Should not reach here");
 	}
 
 	exgtfr_register result;
-	result.byte_value = (UINT8)value;
+	result.byte_value = (uint8_t)value;
 	result.word_value = value;
 	return result;
 }
@@ -498,7 +498,7 @@ inline m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_register(UI
 //  write_exgtfr_register
 //-------------------------------------------------
 
-inline void hd6309_device::write_exgtfr_register(UINT8 reg, m6809_base_device::exgtfr_register value)
+inline void hd6309_device::write_exgtfr_register(uint8_t reg, m6809_base_device::exgtfr_register value)
 {
 	switch(reg & 0x0F)
 	{
@@ -510,14 +510,14 @@ inline void hd6309_device::write_exgtfr_register(UINT8 reg, m6809_base_device::e
 		case  5: m_pc.w  = value.word_value;                break;  // PC
 		case  6: m_q.r.w = value.word_value;                break;  // W
 		case  7: m_v.w   = value.word_value;                break;  // V
-		case  8: m_q.r.a = (UINT8) (value.word_value >> 8); break;  // A
-		case  9: m_q.r.b = (UINT8) (value.word_value >> 0); break;  // B
-		case 10: m_cc    = (UINT8) (value.word_value >> 0); break;  // CC
-		case 11: m_dp    = (UINT8) (value.word_value >> 8); break;  // DP
+		case  8: m_q.r.a = (uint8_t) (value.word_value >> 8); break;  // A
+		case  9: m_q.r.b = (uint8_t) (value.word_value >> 0); break;  // B
+		case 10: m_cc    = (uint8_t) (value.word_value >> 0); break;  // CC
+		case 11: m_dp    = (uint8_t) (value.word_value >> 8); break;  // DP
 		case 12:                                            break;  // 0
 		case 13:                                            break;  // 0
-		case 14: m_q.r.e = (UINT8) (value.word_value >> 8); break;  // E
-		case 15: m_q.r.f = (UINT8) (value.word_value >> 0); break;  // F
+		case 14: m_q.r.e = (uint8_t) (value.word_value >> 8); break;  // E
+		case 15: m_q.r.f = (uint8_t) (value.word_value >> 0); break;  // F
 		default:
 			fatalerror("Should not reach here");
 	}
@@ -529,7 +529,7 @@ inline void hd6309_device::write_exgtfr_register(UINT8 reg, m6809_base_device::e
 //  tfr_read
 //-------------------------------------------------
 
-inline bool hd6309_device::tfr_read(UINT8 opcode, UINT8 arg, UINT8 &data)
+inline bool hd6309_device::tfr_read(uint8_t opcode, uint8_t arg, uint8_t &data)
 {
 	PAIR16 *reg;
 
@@ -562,7 +562,7 @@ inline bool hd6309_device::tfr_read(UINT8 opcode, UINT8 arg, UINT8 &data)
 //  tfr_write
 //-------------------------------------------------
 
-inline bool hd6309_device::tfr_write(UINT8 opcode, UINT8 arg, UINT8 data)
+inline bool hd6309_device::tfr_write(uint8_t opcode, uint8_t arg, uint8_t data)
 {
 	PAIR16 *reg;
 
@@ -597,7 +597,7 @@ inline bool hd6309_device::tfr_write(UINT8 opcode, UINT8 arg, UINT8 data)
 
 void hd6309_device::register_register_op()
 {
-	UINT8 operand = read_opcode_arg();
+	uint8_t operand = read_opcode_arg();
 
 	// if the 8/16 bit values are mismatched, we need to promote
 	bool promote = ((operand & 0x80) ? true : false) != ((operand & 0x08) ? true : false);
@@ -661,9 +661,9 @@ void hd6309_device::register_register_op()
 
 void hd6309_device::muld()
 {
-	UINT32 result;
-	result = ((INT16) m_q.r.d) * ((INT16) m_temp.w);
-	m_q.q = (set_flags<UINT32>(CC_NZ, result));
+	uint32_t result;
+	result = ((int16_t) m_q.r.d) * ((int16_t) m_temp.w);
+	m_q.q = (set_flags<uint32_t>(CC_NZ, result));
 	m_cc &= ~CC_VC;
 }
 
@@ -674,21 +674,21 @@ void hd6309_device::muld()
 
 bool hd6309_device::divq()
 {
-	INT32 result;
+	int32_t result;
 
 	// check for divide by zero
 	if (m_temp.w == 0)
 		return false;
 
-	INT32 q = m_q.q;
-	INT32 old_q = q;
+	int32_t q = m_q.q;
+	int32_t old_q = q;
 
 	// do the divide/modulo
-	result = q / (INT16) m_temp.w;
-	m_q.r.d = q % (INT16) m_temp.w;
+	result = q / (int16_t) m_temp.w;
+	m_q.r.d = q % (int16_t) m_temp.w;
 
 	// set NZ condition codes
-	m_q.r.w = set_flags<UINT16>(CC_NZ, result);
+	m_q.r.w = set_flags<uint16_t>(CC_NZ, result);
 
 	// set C condition code
 	if (m_q.r.w & 0x0001)
@@ -732,15 +732,15 @@ bool hd6309_device::divd()
 	if (m_temp.b.l == 0)
 		return false;
 
-	INT16 old_d = m_q.r.d;
-	INT16 result;
+	int16_t old_d = m_q.r.d;
+	int16_t result;
 
 	// do the divide/modulo
-	result = ((INT16) m_q.r.d) / (INT8) m_temp.b.l;
-	m_q.r.a = ((INT16) m_q.r.d) % (INT8) m_temp.b.l;
+	result = ((int16_t) m_q.r.d) / (int8_t) m_temp.b.l;
+	m_q.r.a = ((int16_t) m_q.r.d) % (int8_t) m_temp.b.l;
 
 	// set NZ condition codes
-	m_q.r.b = set_flags<UINT8>(CC_NZ, result);
+	m_q.r.b = set_flags<uint8_t>(CC_NZ, result);
 
 	// set C condition code
 	if (m_q.r.b & 0x01)
@@ -756,7 +756,7 @@ bool hd6309_device::divd()
 		if ((result > 256 ) || (result < -255 ))
 		{
 			// hard overflow - division is aborted
-			set_flags<UINT16>(CC_NZ, old_d);
+			set_flags<uint16_t>(CC_NZ, old_d);
 			m_q.r.d = abs(old_d);
 		}
 	}

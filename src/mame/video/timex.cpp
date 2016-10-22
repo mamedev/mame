@@ -20,9 +20,9 @@
 #include "includes/timex.h"
 #include "machine/ram.h"
 
-inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (uint16_t)color;
 }
 
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */
@@ -196,7 +196,7 @@ void spectrum_state::ts2068_lores_scanline(bitmap_ind16 &bitmap, int y, int bord
 	}
 }
 
-UINT32 spectrum_state::screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spectrum_state::screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for now TS2068 will do a full-refresh */
 	int count;
@@ -233,7 +233,7 @@ UINT32 spectrum_state::screen_update_ts2068(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 spectrum_state::screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spectrum_state::screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for now TS2068 will do a full-refresh */
 	int count;

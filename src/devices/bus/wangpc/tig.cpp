@@ -150,7 +150,7 @@ machine_config_constructor wangpc_tig_device::device_mconfig_additions() const
 //  wangpc_tig_device - constructor
 //-------------------------------------------------
 
-wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WANGPC_TIG, "Wang PC TIG Controller", tag, owner, clock, "wangpc_tig", __FILE__),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_hgdc0(*this, UPD7720_0_TAG),
@@ -188,7 +188,7 @@ void wangpc_tig_device::device_reset()
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 wangpc_tig_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t wangpc_tig_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_hgdc0->screen_update(screen, bitmap, cliprect);
 	m_hgdc1->screen_update(screen, bitmap, cliprect);
@@ -201,9 +201,9 @@ UINT32 wangpc_tig_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 //  wangpcbus_iorc_r - I/O read
 //-------------------------------------------------
 
-UINT16 wangpc_tig_device::wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask)
+uint16_t wangpc_tig_device::wangpcbus_iorc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	if (sad(offset))
 	{
@@ -233,7 +233,7 @@ UINT16 wangpc_tig_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 //  wangpcbus_aiowc_w - I/O write
 //-------------------------------------------------
 
-void wangpc_tig_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
+void wangpc_tig_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 	if (sad(offset) && ACCESSING_BITS_0_7)
 	{
@@ -280,9 +280,9 @@ void wangpc_tig_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 //  wangpcbus_dack_r - DMA read
 //-------------------------------------------------
 
-UINT8 wangpc_tig_device::wangpcbus_dack_r(address_space &space, int line)
+uint8_t wangpc_tig_device::wangpcbus_dack_r(address_space &space, int line)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (DMA_GRAPHICS)
 	{
@@ -301,7 +301,7 @@ UINT8 wangpc_tig_device::wangpcbus_dack_r(address_space &space, int line)
 //  wangpcbus_dack_w - DMA write
 //-------------------------------------------------
 
-void wangpc_tig_device::wangpcbus_dack_w(address_space &space, int line, UINT8 data)
+void wangpc_tig_device::wangpcbus_dack_w(address_space &space, int line, uint8_t data)
 {
 	if (DMA_GRAPHICS)
 	{

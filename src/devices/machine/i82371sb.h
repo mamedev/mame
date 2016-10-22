@@ -15,13 +15,13 @@
 
 class i82371sb_isa_device : public pci_device {
 public:
-	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_boot_state_hook(device_t &device, _Object object) { return downcast<i82371sb_isa_device &>(device).m_boot_state_hook.set_callback(object); }
 
 	virtual void reset_all_mappings() override;
-	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-						   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 	DECLARE_ADDRESS_MAP(internal_io_map, 32);
@@ -71,12 +71,12 @@ protected:
 private:
 	devcb_write8 m_boot_state_hook;
 
-	UINT32 see;
-	UINT16 xbcs, mstat, pcsc, smien, smireq;
-	UINT8 iort, pirqrc[4], tom, mbirq0, mbdma[2], apicbase;
-	UINT8 dlc, smicntl, ftmr, ctlmtr, cthmtr;
+	uint32_t see;
+	uint16_t xbcs, mstat, pcsc, smien, smireq;
+	uint8_t iort, pirqrc[4], tom, mbirq0, mbdma[2], apicbase;
+	uint8_t dlc, smicntl, ftmr, ctlmtr, cthmtr;
 
-	void map_bios(address_space *memory_space, UINT32 start, UINT32 end);
+	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 };
 
 extern const device_type I82371SB_ISA;

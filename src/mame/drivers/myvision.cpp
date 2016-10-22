@@ -55,7 +55,7 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	UINT8 m_column;
+	uint8_t m_column;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;
@@ -142,7 +142,7 @@ void myvision_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x4000 && size != 0x6000)
 	{
@@ -159,7 +159,7 @@ DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
 
 READ8_MEMBER( myvision_state::ay_port_a_r )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	if ( ! ( m_column & 0x80 ) )
 	{

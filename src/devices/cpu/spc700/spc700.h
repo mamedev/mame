@@ -10,7 +10,7 @@ class spc700_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -18,9 +18,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 2; }
-	virtual UINT32 execute_max_cycles() const override { return 8; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_min_cycles() const override { return 2; }
+	virtual uint32_t execute_max_cycles() const override { return 8; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -33,78 +33,78 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 3; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
 
-	UINT32 m_a;     /* Accumulator */
-	UINT32 m_x;     /* Index Register X */
-	UINT32 m_y;     /* Index Register Y */
-	UINT32 m_s;     /* Stack Pointer */
-	UINT32 m_pc;    /* Program Counter */
-	UINT32 m_ppc;   /* Previous Program Counter */
-	UINT32 m_flag_n;    /* Negative Flag */
-	UINT32 m_flag_z;    /* Zero flag */
-	UINT32 m_flag_v;    /* Overflow Flag */
-	UINT32 m_flag_p;    /* Direct Page Flag */
-	UINT32 m_flag_b;    /* BRK Instruction Flag */
-	UINT32 m_flag_h;    /* Half-carry Flag */
-	UINT32 m_flag_i;    /* Interrupt Mask Flag */
-	UINT32 m_flag_c;    /* Carry Flag */
-	UINT32 m_line_irq;  /* Status of the IRQ line */
-	UINT32 m_line_nmi;  /* Status of the NMI line */
-	UINT32 m_line_rst;  /* Status of the RESET line */
-	UINT32 m_ir;        /* Instruction Register */
+	uint32_t m_a;     /* Accumulator */
+	uint32_t m_x;     /* Index Register X */
+	uint32_t m_y;     /* Index Register Y */
+	uint32_t m_s;     /* Stack Pointer */
+	uint32_t m_pc;    /* Program Counter */
+	uint32_t m_ppc;   /* Previous Program Counter */
+	uint32_t m_flag_n;    /* Negative Flag */
+	uint32_t m_flag_z;    /* Zero flag */
+	uint32_t m_flag_v;    /* Overflow Flag */
+	uint32_t m_flag_p;    /* Direct Page Flag */
+	uint32_t m_flag_b;    /* BRK Instruction Flag */
+	uint32_t m_flag_h;    /* Half-carry Flag */
+	uint32_t m_flag_i;    /* Interrupt Mask Flag */
+	uint32_t m_flag_c;    /* Carry Flag */
+	uint32_t m_line_irq;  /* Status of the IRQ line */
+	uint32_t m_line_nmi;  /* Status of the NMI line */
+	uint32_t m_line_rst;  /* Status of the RESET line */
+	uint32_t m_ir;        /* Instruction Register */
 	address_space *m_program;
-	UINT32 m_stopped;   /* stopped status */
+	uint32_t m_stopped;   /* stopped status */
 	int m_ICount;
-	UINT32 m_source;
-	UINT32 m_destination;
-	UINT32 m_temp1;
-	UINT32 m_temp2;
-	UINT32 m_temp3;
+	uint32_t m_source;
+	uint32_t m_destination;
+	uint32_t m_temp1;
+	uint32_t m_temp2;
+	uint32_t m_temp3;
 	short m_spc_int16;
 	int m_spc_int32;
 
-	UINT32 m_debugger_temp;
+	uint32_t m_debugger_temp;
 
-	inline UINT32 read_8_normal(UINT32 address);
-	inline UINT32 read_8_immediate(UINT32 address);
-	inline UINT32 read_8_instruction(UINT32 address);
-	inline UINT32 read_8_direct(UINT32 address);
-	inline void write_8_normal(UINT32 address, UINT32 value);
-	inline void write_8_direct(UINT32 address, UINT32 value);
-	inline UINT32 read_16_normal(UINT32 address);
-	inline UINT32 read_16_immediate(UINT32 address);
-	inline UINT32 read_16_direct(UINT32 address);
-	inline void write_16_direct(UINT32 address, UINT32 value);
-	inline UINT32 EA_IMM();
-	inline UINT32 EA_IMM16();
-	inline UINT32 EA_ABS();
-	inline UINT32 EA_ABX();
-	inline UINT32 EA_ABY();
-	inline UINT32 EA_AXI();
-	inline UINT32 EA_DP();
-	inline UINT32 EA_DPX();
-	inline UINT32 EA_DPY();
-	inline UINT32 EA_DXI();
-	inline UINT32 EA_DIY();
-	inline UINT32 EA_XI();
-	inline UINT32 EA_XII();
-	inline UINT32 EA_YI();
-	inline void JUMP(UINT32 address);
-	inline void BRANCH(UINT32 offset);
-	inline void SET_REG_YA(UINT32 value);
-	inline void SET_REG_P(UINT32 value);
-	inline void PUSH_8(UINT32 value);
-	inline UINT32 PULL_8();
-	inline void PUSH_16(UINT32 value);
-	inline UINT32 PULL_16();
+	inline uint32_t read_8_normal(uint32_t address);
+	inline uint32_t read_8_immediate(uint32_t address);
+	inline uint32_t read_8_instruction(uint32_t address);
+	inline uint32_t read_8_direct(uint32_t address);
+	inline void write_8_normal(uint32_t address, uint32_t value);
+	inline void write_8_direct(uint32_t address, uint32_t value);
+	inline uint32_t read_16_normal(uint32_t address);
+	inline uint32_t read_16_immediate(uint32_t address);
+	inline uint32_t read_16_direct(uint32_t address);
+	inline void write_16_direct(uint32_t address, uint32_t value);
+	inline uint32_t EA_IMM();
+	inline uint32_t EA_IMM16();
+	inline uint32_t EA_ABS();
+	inline uint32_t EA_ABX();
+	inline uint32_t EA_ABY();
+	inline uint32_t EA_AXI();
+	inline uint32_t EA_DP();
+	inline uint32_t EA_DPX();
+	inline uint32_t EA_DPY();
+	inline uint32_t EA_DXI();
+	inline uint32_t EA_DIY();
+	inline uint32_t EA_XI();
+	inline uint32_t EA_XII();
+	inline uint32_t EA_YI();
+	inline void JUMP(uint32_t address);
+	inline void BRANCH(uint32_t offset);
+	inline void SET_REG_YA(uint32_t value);
+	inline void SET_REG_P(uint32_t value);
+	inline void PUSH_8(uint32_t value);
+	inline uint32_t PULL_8();
+	inline void PUSH_16(uint32_t value);
+	inline uint32_t PULL_16();
 	inline void CHECK_IRQ();
-	inline void SET_FLAG_I(UINT32 value);
+	inline void SET_FLAG_I(uint32_t value);
 	void SERVICE_IRQ();
 };
 

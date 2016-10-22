@@ -25,7 +25,7 @@ static const char *reg_names[32] =
 };
 
 // determines if right rotate or I/O field length is to be used
-static inline bool is_rot(UINT16 opcode)
+static inline bool is_rot(uint16_t opcode)
 {
 	if((opcode & 0x1000) || (opcode & 0x0010))
 		return false;
@@ -33,7 +33,7 @@ static inline bool is_rot(UINT16 opcode)
 		return true;
 }
 
-static inline bool is_src_rot(UINT16 opcode)
+static inline bool is_src_rot(uint16_t opcode)
 {
 	if((opcode & 0x1000))
 		return false;
@@ -45,8 +45,8 @@ CPU_DISASSEMBLE( n8x300 )
 {
 	char tmp[16];
 	unsigned startpc = pc;
-	UINT16 opcode = (oprom[pc - startpc] << 8) | oprom[pc+1 - startpc];
-	UINT8 inst = opcode >> 13;
+	uint16_t opcode = (oprom[pc - startpc] << 8) | oprom[pc+1 - startpc];
+	uint8_t inst = opcode >> 13;
 	pc+=2;
 
 	// determine instruction

@@ -76,7 +76,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 
-	const UINT8 *m_rom;
+	const uint8_t *m_rom;
 	int m_reset;
 
 	// floppy state

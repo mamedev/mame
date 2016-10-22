@@ -1420,7 +1420,7 @@ DRIVER_INIT_MEMBER(phoenix_state,condor)
 
 DRIVER_INIT_MEMBER(phoenix_state,vautourza)
 {
-	UINT8 *rgn          =   memregion("proms")->base();
+	uint8_t *rgn          =   memregion("proms")->base();
 
 	// expand the 8-bit PROM into the same layout as the 4-bit PROMs used by most versions of the game
 	for (int i = 0; i < 0x100; i++)

@@ -148,7 +148,7 @@ void menu_dats_view::populate()
 //  draw - draw dats menu
 //-------------------------------------------------
 
-void menu_dats_view::draw(UINT32 flags)
+void menu_dats_view::draw(uint32_t flags)
 {
 	auto line_height = ui().get_line_height();
 	auto ud_arrow_width = line_height * machine().render().ui_aspect();
@@ -397,7 +397,7 @@ void menu_dats_view::get_data()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
+		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(uintptr_t)(x + 1));
 	}
 }
 
@@ -415,7 +415,7 @@ void menu_dats_view::get_data_sw()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
+		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(uintptr_t)(x + 1));
 	}
 }
 

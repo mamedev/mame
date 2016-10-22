@@ -412,201 +412,201 @@
 struct mc68328_regs_t
 {
 	// $(FF)FFF000
-	UINT8   scr;        // System Control Register
-	UINT8   unused0[255];
+	uint8_t   scr;        // System Control Register
+	uint8_t   unused0[255];
 
 	// $(FF)FFF100
-	UINT16  grpbasea;   // Chip Select Group A Base Register
-	UINT16  grpbaseb;   // Chip Select Group B Base Register
-	UINT16  grpbasec;   // Chip Select Group C Base Register
-	UINT16  grpbased;   // Chip Select Group D Base Register
-	UINT16  grpmaska;   // Chip Select Group A Mask Register
-	UINT16  grpmaskb;   // Chip Select Group B Mask Register
-	UINT16  grpmaskc;   // Chip Select Group C Mask Register
-	UINT16  grpmaskd;   // Chip Select Group D Mask Register
-	UINT32  csa0;       // Group A Chip Select 0 Register
-	UINT32  csa1;       // Group A Chip Select 1 Register
-	UINT32  csa2;       // Group A Chip Select 2 Register
-	UINT32  csa3;       // Group A Chip Select 3 Register
-	UINT32  csb0;       // Group B Chip Select 0 Register
-	UINT32  csb1;       // Group B Chip Select 1 Register
-	UINT32  csb2;       // Group B Chip Select 2 Register
-	UINT32  csb3;       // Group B Chip Select 3 Register
-	UINT32  csc0;       // Group C Chip Select 0 Register
-	UINT32  csc1;       // Group C Chip Select 1 Register
-	UINT32  csc2;       // Group C Chip Select 2 Register
-	UINT32  csc3;       // Group C Chip Select 3 Register
-	UINT32  csd0;       // Group D Chip Select 0 Register
-	UINT32  csd1;       // Group D Chip Select 1 Register
-	UINT32  csd2;       // Group D Chip Select 2 Register
-	UINT32  csd3;       // Group D Chip Select 3 Register
-	UINT8   unused1[176];
+	uint16_t  grpbasea;   // Chip Select Group A Base Register
+	uint16_t  grpbaseb;   // Chip Select Group B Base Register
+	uint16_t  grpbasec;   // Chip Select Group C Base Register
+	uint16_t  grpbased;   // Chip Select Group D Base Register
+	uint16_t  grpmaska;   // Chip Select Group A Mask Register
+	uint16_t  grpmaskb;   // Chip Select Group B Mask Register
+	uint16_t  grpmaskc;   // Chip Select Group C Mask Register
+	uint16_t  grpmaskd;   // Chip Select Group D Mask Register
+	uint32_t  csa0;       // Group A Chip Select 0 Register
+	uint32_t  csa1;       // Group A Chip Select 1 Register
+	uint32_t  csa2;       // Group A Chip Select 2 Register
+	uint32_t  csa3;       // Group A Chip Select 3 Register
+	uint32_t  csb0;       // Group B Chip Select 0 Register
+	uint32_t  csb1;       // Group B Chip Select 1 Register
+	uint32_t  csb2;       // Group B Chip Select 2 Register
+	uint32_t  csb3;       // Group B Chip Select 3 Register
+	uint32_t  csc0;       // Group C Chip Select 0 Register
+	uint32_t  csc1;       // Group C Chip Select 1 Register
+	uint32_t  csc2;       // Group C Chip Select 2 Register
+	uint32_t  csc3;       // Group C Chip Select 3 Register
+	uint32_t  csd0;       // Group D Chip Select 0 Register
+	uint32_t  csd1;       // Group D Chip Select 1 Register
+	uint32_t  csd2;       // Group D Chip Select 2 Register
+	uint32_t  csd3;       // Group D Chip Select 3 Register
+	uint8_t   unused1[176];
 
 	// $(FF)FFF200
-	UINT16  pllcr;      // PLL Control Register
-	UINT16  pllfsr;     // PLL Frequency Select Register
-	UINT8   pad2[3];
-	UINT8   pctlr;      // Power Control Register
-	UINT8   unused3[248];
+	uint16_t  pllcr;      // PLL Control Register
+	uint16_t  pllfsr;     // PLL Frequency Select Register
+	uint8_t   pad2[3];
+	uint8_t   pctlr;      // Power Control Register
+	uint8_t   unused3[248];
 
 	// $(FF)FFF300
-	UINT8   ivr;        // Interrupt Vector Register
-	UINT8   unused4[1];
-	UINT16  icr;        // Interrupt Control Register
-	UINT32  imr;        // Interrupt Mask Register
-	UINT32  iwr;        // Interrupt Wakeup Enable Register
-	UINT32  isr;        // Interrupt Status Register
-	UINT32  ipr;        // Interrupt Pending Register
-	UINT8   unused5[236];
+	uint8_t   ivr;        // Interrupt Vector Register
+	uint8_t   unused4[1];
+	uint16_t  icr;        // Interrupt Control Register
+	uint32_t  imr;        // Interrupt Mask Register
+	uint32_t  iwr;        // Interrupt Wakeup Enable Register
+	uint32_t  isr;        // Interrupt Status Register
+	uint32_t  ipr;        // Interrupt Pending Register
+	uint8_t   unused5[236];
 
 	// $(FF)FFF400
-	UINT8   padir;      // Port A Direction Register
-	UINT8   padata;     // Port A Data Register
-	UINT8   unused6[1];
-	UINT8   pasel;      // Port A Select Register
-	UINT8   unused7[4];
+	uint8_t   padir;      // Port A Direction Register
+	uint8_t   padata;     // Port A Data Register
+	uint8_t   unused6[1];
+	uint8_t   pasel;      // Port A Select Register
+	uint8_t   unused7[4];
 
-	UINT8   pbdir;      // Port B Direction Register
-	UINT8   pbdata;     // Port B Data Register
-	UINT8   unused8[1];
-	UINT8   pbsel;      // Port B Select Register
-	UINT8   unused9[4];
+	uint8_t   pbdir;      // Port B Direction Register
+	uint8_t   pbdata;     // Port B Data Register
+	uint8_t   unused8[1];
+	uint8_t   pbsel;      // Port B Select Register
+	uint8_t   unused9[4];
 
-	UINT8   pcdir;      // Port C Direction Register
-	UINT8   pcdata;     // Port C Data Register
-	UINT8   unused10[1];
-	UINT8   pcsel;      // Port C Select Register
-	UINT8   unused11[4];
+	uint8_t   pcdir;      // Port C Direction Register
+	uint8_t   pcdata;     // Port C Data Register
+	uint8_t   unused10[1];
+	uint8_t   pcsel;      // Port C Select Register
+	uint8_t   unused11[4];
 
-	UINT8   pddir;      // Port D Direction Register
-	UINT8   pddata;     // Port D Data Register
-	UINT8   pdpuen;     // Port D Pullup Enable Register
-	UINT8   unused12[1];
-	UINT8   pdpol;      // Port D Polarity Register
-	UINT8   pdirqen;    // Port D IRQ Enable Register
-	UINT8   pddataedge; // Port D Data Edge Level
-	UINT8   pdirqedge;  // Port D IRQ Edge Register
+	uint8_t   pddir;      // Port D Direction Register
+	uint8_t   pddata;     // Port D Data Register
+	uint8_t   pdpuen;     // Port D Pullup Enable Register
+	uint8_t   unused12[1];
+	uint8_t   pdpol;      // Port D Polarity Register
+	uint8_t   pdirqen;    // Port D IRQ Enable Register
+	uint8_t   pddataedge; // Port D Data Edge Level
+	uint8_t   pdirqedge;  // Port D IRQ Edge Register
 
-	UINT8   pedir;      // Port E Direction Register
-	UINT8   pedata;     // Port E Data Register
-	UINT8   pepuen;     // Port E Pullup Enable Register
-	UINT8   pesel;      // Port E Select Register
-	UINT8   unused14[4];
+	uint8_t   pedir;      // Port E Direction Register
+	uint8_t   pedata;     // Port E Data Register
+	uint8_t   pepuen;     // Port E Pullup Enable Register
+	uint8_t   pesel;      // Port E Select Register
+	uint8_t   unused14[4];
 
-	UINT8   pfdir;      // Port F Direction Register
-	UINT8   pfdata;     // Port F Data Register
-	UINT8   pfpuen;     // Port F Pullup Enable Register
-	UINT8   pfsel;      // Port F Select Register
-	UINT8   unused15[4];
+	uint8_t   pfdir;      // Port F Direction Register
+	uint8_t   pfdata;     // Port F Data Register
+	uint8_t   pfpuen;     // Port F Pullup Enable Register
+	uint8_t   pfsel;      // Port F Select Register
+	uint8_t   unused15[4];
 
-	UINT8   pgdir;      // Port G Direction Register
-	UINT8   pgdata;     // Port G Data Register
-	UINT8   pgpuen;     // Port G Pullup Enable Register
-	UINT8   pgsel;      // Port G Select Register
-	UINT8   unused16[4];
+	uint8_t   pgdir;      // Port G Direction Register
+	uint8_t   pgdata;     // Port G Data Register
+	uint8_t   pgpuen;     // Port G Pullup Enable Register
+	uint8_t   pgsel;      // Port G Select Register
+	uint8_t   unused16[4];
 
-	UINT8   pjdir;      // Port J Direction Register
-	UINT8   pjdata;     // Port J Data Register
-	UINT8   unused17[1];
-	UINT8   pjsel;      // Port J Select Register
-	UINT8   unused18[4];
-	UINT8   pkdir;      // Port K Direction Register
-	UINT8   pkdata;     // Port K Data Register
-	UINT8   pkpuen;     // Port K Pullup Enable Register
-	UINT8   pksel;      // Port K Select Register
-	UINT8   unused19[4];
+	uint8_t   pjdir;      // Port J Direction Register
+	uint8_t   pjdata;     // Port J Data Register
+	uint8_t   unused17[1];
+	uint8_t   pjsel;      // Port J Select Register
+	uint8_t   unused18[4];
+	uint8_t   pkdir;      // Port K Direction Register
+	uint8_t   pkdata;     // Port K Data Register
+	uint8_t   pkpuen;     // Port K Pullup Enable Register
+	uint8_t   pksel;      // Port K Select Register
+	uint8_t   unused19[4];
 
-	UINT8   pmdir;      // Port M Direction Register
-	UINT8   pmdata;     // Port M Data Register
-	UINT8   pmpuen;     // Port M Pullup Enable Register
-	UINT8   pmsel;      // Port M Select Register
-	UINT8   unused20[180];
+	uint8_t   pmdir;      // Port M Direction Register
+	uint8_t   pmdata;     // Port M Data Register
+	uint8_t   pmpuen;     // Port M Pullup Enable Register
+	uint8_t   pmsel;      // Port M Select Register
+	uint8_t   unused20[180];
 
 	// $(FF)FFF500
-	UINT16  pwmc;       // PWM Control Register
-	UINT16  pwmp;       // PWM Period Register
-	UINT16  pwmw;       // PWM Width Register
-	UINT16  pwmcnt;     // PWN Counter
-	UINT8   unused21[248];
+	uint16_t  pwmc;       // PWM Control Register
+	uint16_t  pwmp;       // PWM Period Register
+	uint16_t  pwmw;       // PWM Width Register
+	uint16_t  pwmcnt;     // PWN Counter
+	uint8_t   unused21[248];
 
 	// $(FF)FFF600
-	UINT16  tctl[2];    // Timer Control Register
-	UINT16  tprer[2];   // Timer Prescaler Register
-	UINT16  tcmp[2];    // Timer Compare Register
-	UINT16  tcr[2];     // Timer Capture Register
-	UINT16  tcn[2];     // Timer Counter
-	UINT16  tstat[2];   // Timer Status
-	UINT16  wctlr;      // Watchdog Control Register
-	UINT16  wcmpr;      // Watchdog Compare Register
-	UINT16  wcn;        // Watchdog Counter
-	UINT8   tclear[2];  // Timer Clearable Status
-	UINT8   unused22[224];
+	uint16_t  tctl[2];    // Timer Control Register
+	uint16_t  tprer[2];   // Timer Prescaler Register
+	uint16_t  tcmp[2];    // Timer Compare Register
+	uint16_t  tcr[2];     // Timer Capture Register
+	uint16_t  tcn[2];     // Timer Counter
+	uint16_t  tstat[2];   // Timer Status
+	uint16_t  wctlr;      // Watchdog Control Register
+	uint16_t  wcmpr;      // Watchdog Compare Register
+	uint16_t  wcn;        // Watchdog Counter
+	uint8_t   tclear[2];  // Timer Clearable Status
+	uint8_t   unused22[224];
 
 	// $(FF)FFF700
-	UINT16  spisr;      // SPIS Register
-	UINT8   unused23[254];
+	uint16_t  spisr;      // SPIS Register
+	uint8_t   unused23[254];
 
 	// $(FF)FFF800
-	UINT16  spimdata;   // SPIM Data Register
-	UINT16  spimcont;   // SPIM Control/Status Register
-	UINT8   unused24[252];
+	uint16_t  spimdata;   // SPIM Data Register
+	uint16_t  spimcont;   // SPIM Control/Status Register
+	uint8_t   unused24[252];
 
 	// $(FF)FFF900
-	UINT16  ustcnt;     // UART Status/Control Register
-	UINT16  ubaud;      // UART Baud Control Register
-	UINT16  urx;        // UART RX Register
-	UINT16  utx;        // UART TX Register
-	UINT16  umisc;      // UART Misc Register
-	UINT8   unused25[246];
+	uint16_t  ustcnt;     // UART Status/Control Register
+	uint16_t  ubaud;      // UART Baud Control Register
+	uint16_t  urx;        // UART RX Register
+	uint16_t  utx;        // UART TX Register
+	uint16_t  umisc;      // UART Misc Register
+	uint8_t   unused25[246];
 
 	// $(FF)FFFA00
-	UINT32  lssa;       // Screen Starting Address Register
-	UINT8   unused26[1];
-	UINT8   lvpw;       // Virtual Page Width Register
-	UINT8   unused27[2];
-	UINT16  lxmax;      // Screen Width Register
-	UINT16  lymax;      // Screen Height Register
-	UINT8   unused28[12];
-	UINT16  lcxp;       // Cursor X Position
-	UINT16  lcyp;       // Cursor Y Position
-	UINT16  lcwch;      // Cursor Width & Height Register
-	UINT8   unused29[1];
-	UINT8   lblkc;      // Blink Control Register
-	UINT8   lpicf;      // Panel Interface Config Register
-	UINT8   lpolcf;     // Polarity Config Register
-	UINT8   unused30[1];
-	UINT8   lacdrc;     // ACD (M) Rate Control Register
-	UINT8   unused31[1];
-	UINT8   lpxcd;      // Pixel Clock Divider Register
-	UINT8   unused32[1];
-	UINT8   lckcon;     // Clocking Control Register
-	UINT8   unused33[1];
-	UINT8   llbar;      // Last Buffer Address Register
-	UINT8   unused34[1];
-	UINT8   lotcr;      // Octet Terminal Count Register
-	UINT8   unused35[1];
-	UINT8   lposr;      // Panning Offset Register
-	UINT8   unused36[3];
-	UINT8   lfrcm;      // Frame Rate Control Modulation Register
-	UINT16  lgpmr;      // Gray Palette Mapping Register
-	UINT8   unused37[204];
+	uint32_t  lssa;       // Screen Starting Address Register
+	uint8_t   unused26[1];
+	uint8_t   lvpw;       // Virtual Page Width Register
+	uint8_t   unused27[2];
+	uint16_t  lxmax;      // Screen Width Register
+	uint16_t  lymax;      // Screen Height Register
+	uint8_t   unused28[12];
+	uint16_t  lcxp;       // Cursor X Position
+	uint16_t  lcyp;       // Cursor Y Position
+	uint16_t  lcwch;      // Cursor Width & Height Register
+	uint8_t   unused29[1];
+	uint8_t   lblkc;      // Blink Control Register
+	uint8_t   lpicf;      // Panel Interface Config Register
+	uint8_t   lpolcf;     // Polarity Config Register
+	uint8_t   unused30[1];
+	uint8_t   lacdrc;     // ACD (M) Rate Control Register
+	uint8_t   unused31[1];
+	uint8_t   lpxcd;      // Pixel Clock Divider Register
+	uint8_t   unused32[1];
+	uint8_t   lckcon;     // Clocking Control Register
+	uint8_t   unused33[1];
+	uint8_t   llbar;      // Last Buffer Address Register
+	uint8_t   unused34[1];
+	uint8_t   lotcr;      // Octet Terminal Count Register
+	uint8_t   unused35[1];
+	uint8_t   lposr;      // Panning Offset Register
+	uint8_t   unused36[3];
+	uint8_t   lfrcm;      // Frame Rate Control Modulation Register
+	uint16_t  lgpmr;      // Gray Palette Mapping Register
+	uint8_t   unused37[204];
 
 	// $(FF)FFFB00
-	UINT32  hmsr;       // RTC Hours Minutes Seconds Register
-	UINT32  alarm;      // RTC Alarm Register
-	UINT8   unused38[4];
-	UINT16  rtcctl;     // RTC Control Register
-	UINT16  rtcisr;     // RTC Interrupt Status Register
-	UINT16  rtcienr;    // RTC Interrupt Enable Register
-	UINT16  stpwtch;    // Stopwatch Minutes
-	UINT8   unused42[1260];
+	uint32_t  hmsr;       // RTC Hours Minutes Seconds Register
+	uint32_t  alarm;      // RTC Alarm Register
+	uint8_t   unused38[4];
+	uint16_t  rtcctl;     // RTC Control Register
+	uint16_t  rtcisr;     // RTC Interrupt Status Register
+	uint16_t  rtcienr;    // RTC Interrupt Enable Register
+	uint16_t  stpwtch;    // Stopwatch Minutes
+	uint8_t   unused42[1260];
 };
 
 
 class mc68328_device : public device_t
 {
 public:
-	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~mc68328_device() {}
 
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<mc68328_device &>(device).m_cpu.set_tag(tag); }
@@ -639,9 +639,9 @@ public:
 	DECLARE_WRITE16_MEMBER(write);
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE_LINE_MEMBER(set_penirq_line);
-	void set_port_d_lines(UINT8 state, int bit);
+	void set_port_d_lines(uint8_t state, int bit);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -650,11 +650,11 @@ protected:
 
 private:
 	// internal state
-	void set_interrupt_line(UINT32 line, UINT32 active);
+	void set_interrupt_line(uint32_t line, uint32_t active);
 	void poll_port_d_interrupts();
-	UINT32 get_timer_frequency(UINT32 index);
-	void maybe_start_timer(UINT32 index, UINT32 new_enable);
-	void timer_compare_event(UINT32 index);
+	uint32_t get_timer_frequency(uint32_t index);
+	void maybe_start_timer(uint32_t index, uint32_t new_enable);
+	void timer_compare_event(uint32_t index);
 
 	void register_state_save();
 

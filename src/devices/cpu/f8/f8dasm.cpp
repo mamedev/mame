@@ -12,7 +12,7 @@ static const char *const rname[16] = {
 CPU_DISASSEMBLE( f8 )
 {
 	unsigned size = 0;
-	UINT8 op = oprom[size++];
+	uint8_t op = oprom[size++];
 
 	switch( op )
 	{
@@ -286,22 +286,22 @@ CPU_DISASSEMBLE( f8 )
 
 	case 0x81: /* 1000 0001 */
 	case 0x85: /* 1000 0101 */
-		sprintf(buffer, "BP   $%04X", pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BP   $%04X", pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0x82: /* 1000 0010 */
-		sprintf(buffer, "BC   $%04X", pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BC   $%04X", pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0x84: /* 1000 0100 */
-		sprintf(buffer, "BZ   $%04X", pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BZ   $%04X", pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0x80: /* 1000 0000 */
 	case 0x83: /* 1000 0011 */
 	case 0x86: /* 1000 0110 */
 	case 0x87: /* 1000 0111 */
-		sprintf(buffer, "BT   $%02X,$%04X", op & 0x07, pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BT   $%02X,$%04X", op & 0x07, pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0x88: /* 1000 1000 */
@@ -333,28 +333,28 @@ CPU_DISASSEMBLE( f8 )
 		break;
 
 	case 0x8f: /* 1000 1111 */
-		sprintf(buffer, "BR7  $%04X", pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BR7  $%04X", pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0x90: /* 1001 0000 */
-		sprintf(buffer, "BR   $%04X", pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BR   $%04X", pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0x91: /* 1001 0001 */
 	case 0x95: /* 1001 0101 */
-		sprintf(buffer, "BM   $%04X", pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BM   $%04X", pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0x92: /* 1001 0010 */
-		sprintf(buffer, "BNC  $%04X", pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BNC  $%04X", pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0x94: /* 1001 0100 */
-		sprintf(buffer, "BNZ  $%04X", pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BNZ  $%04X", pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0x98: /* 1001 1000 */
-		sprintf(buffer, "BNO  $%04X", pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BNO  $%04X", pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0x93: /* 1001 0011 */
@@ -367,12 +367,12 @@ CPU_DISASSEMBLE( f8 )
 	case 0x9d: /* 1001 1101 */
 	case 0x9e: /* 1001 1110 */
 	case 0x9f: /* 1001 1111 */
-		sprintf(buffer, "BF   $%02X,$%04X", op & 0x0f, pc + (INT8)oprom[size++] + 1);
+		sprintf(buffer, "BF   $%02X,$%04X", op & 0x0f, pc + (int8_t)oprom[size++] + 1);
 		break;
 
 	case 0xa0: /* 1010 0000 */
 	case 0xa1: /* 1010 0001 */
-		sprintf(buffer, "INS  $%02X", (unsigned) (INT8) (op & 0x0F));
+		sprintf(buffer, "INS  $%02X", (unsigned) (int8_t) (op & 0x0F));
 		break;
 
 	case 0xa2: /* 1010 0010 */
@@ -392,12 +392,12 @@ CPU_DISASSEMBLE( f8 )
 	case 0xad: /* 1010 1101 */
 	case 0xae: /* 1010 1110 */
 	case 0xaf: /* 1010 1111 */
-		sprintf(buffer, "INS  $%02X", (INT8) op & 0x0f);
+		sprintf(buffer, "INS  $%02X", (int8_t) op & 0x0f);
 		break;
 
 	case 0xb0: /* 1011 0000 */
 	case 0xb1: /* 1011 0001 */
-		sprintf(buffer, "OUTS $%02X", (INT8) op & 0x0f);
+		sprintf(buffer, "OUTS $%02X", (int8_t) op & 0x0f);
 		break;
 
 	case 0xb2: /* 1011 0010 */
@@ -417,7 +417,7 @@ CPU_DISASSEMBLE( f8 )
 	case 0xbd: /* 1011 1101 */
 	case 0xbe: /* 1011 1110 */
 	case 0xbf: /* 1011 1111 */
-		sprintf(buffer, "OUTS $%02X", (unsigned) (INT8) op & 0x0f);
+		sprintf(buffer, "OUTS $%02X", (unsigned) (int8_t) op & 0x0f);
 		break;
 
 	case 0xc0: /* 1100 0000 */

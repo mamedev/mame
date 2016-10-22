@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 
 LSI53C810_FETCH_CB(bebox_state::scsi_fetch)
 {
-	UINT32 result = m_ppc1->space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
+	uint32_t result = m_ppc1->space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
 	return BYTE_REVERSE32(result);
 }
 

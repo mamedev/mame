@@ -15,9 +15,9 @@
 #include "h8_intc.h"
 
 struct h8_dma_state {
-	UINT32 source, dest;
-	INT32 incs, incd;
-	UINT32 count;
+	uint32_t source, dest;
+	int32_t incs, incd;
+	uint32_t count;
 	int id;
 	bool mode_16;
 };
@@ -33,7 +33,7 @@ class h8_dma_channel_device;
 
 class h8_dma_device : public device_t {
 public:
-	h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(dmawer_r);
 	DECLARE_WRITE8_MEMBER(dmawer_w);
@@ -52,8 +52,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	UINT8 dmawer, dmatcr;
-	UINT16 dmabcr;
+	uint8_t dmawer, dmatcr;
+	uint16_t dmabcr;
 };
 
 class h8_dma_channel_device : public device_t {
@@ -73,7 +73,7 @@ public:
 		MODE16_MEM_DACK
 	};
 
-	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_info(const char *intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf);
 
@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dmacr_w);
 
 	void set_id(int id);
-	void set_bcr(bool fae, bool sae, UINT8 dta, UINT8 dte, UINT8 dtie);
+	void set_bcr(bool fae, bool sae, uint8_t dta, uint8_t dte, uint8_t dtie);
 	bool start_test(int vector);
 	void count_done(int submodule);
 protected:
@@ -110,9 +110,9 @@ protected:
 
 	int activation_vectors[16];
 
-	UINT32 mar[2];
-	UINT16 ioar[2], etcr[2], dmacr;
-	UINT8 dta, dte, dtie;
+	uint32_t mar[2];
+	uint16_t ioar[2], etcr[2], dmacr;
+	uint8_t dta, dte, dtie;
 	bool fae, sae;
 
 	virtual void device_start() override;

@@ -61,11 +61,11 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<m68010_device> m_maincpu;
 	required_device<m6502_device> m_fdccpu;
-	required_shared_ptr<UINT16> m_mainram;
-	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<uint16_t> m_mainram;
+	required_shared_ptr<uint16_t> m_vram;
 };
 
 /*************************************
@@ -88,8 +88,8 @@ void tek440x_state::machine_start()
 
 void tek440x_state::machine_reset()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *RAM = (UINT8 *)m_mainram.target();
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *RAM = (uint8_t *)m_mainram.target();
 
 	memcpy(RAM, ROM, 256);
 
@@ -104,11 +104,11 @@ void tek440x_state::machine_reset()
  *
  *************************************/
 
-UINT32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT16 *video_ram;
-	UINT16 word;
-	UINT16 *line;
+	const uint16_t *video_ram;
+	uint16_t word;
+	uint16_t *line;
 	int y, x, b;
 
 	for (y = 0; y < 480; y++)

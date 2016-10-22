@@ -20,8 +20,8 @@ class acorn_ssd_format : public wd177x_format
 public:
 	acorn_ssd_format();
 
-	virtual int find_size(io_generic *io, UINT32 form_factor) override;
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -36,8 +36,8 @@ class acorn_dsd_format : public wd177x_format
 public:
 	acorn_dsd_format();
 
-	virtual int find_size(io_generic *io, UINT32 form_factor) override;
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -52,8 +52,8 @@ class opus_ddos_format : public wd177x_format
 public:
 	opus_ddos_format();
 
-	virtual int find_size(io_generic *io, UINT32 form_factor) override;
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -68,8 +68,8 @@ class acorn_adfs_old_format : public wd177x_format
 public:
 	acorn_adfs_old_format();
 
-	virtual int find_size(io_generic *io, UINT32 form_factor) override;
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -84,8 +84,8 @@ class acorn_adfs_new_format : public wd177x_format
 public:
 	acorn_adfs_new_format();
 
-	virtual int find_size(io_generic *io, UINT32 form_factor) override;
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -100,8 +100,8 @@ class acorn_dos_format : public wd177x_format
 public:
 	acorn_dos_format();
 
-	virtual int find_size(io_generic *io, UINT32 form_factor) override;
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -116,7 +116,7 @@ class acorn_cpm_format : public wd177x_format
 public:
 	acorn_cpm_format();
 
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -131,7 +131,7 @@ class torch_cpn_format : public wd177x_format
 public:
 	torch_cpn_format();
 
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
 	virtual const char *description() const override;

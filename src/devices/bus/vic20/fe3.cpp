@@ -110,7 +110,7 @@ machine_config_constructor vic20_final_expansion_3_t::device_mconfig_additions()
 //  vic20_final_expansion_3_t - constructor
 //-------------------------------------------------
 
-vic20_final_expansion_3_t::vic20_final_expansion_3_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vic20_final_expansion_3_t::vic20_final_expansion_3_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIC20_FE3, "Final Expansion v3", tag, owner, clock, "vic20_fe3", __FILE__),
 	device_vic20_expansion_card_interface(mconfig, *this),
 	m_flash_rom(*this, AM29F040_TAG),
@@ -149,7 +149,7 @@ void vic20_final_expansion_3_t::device_reset()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	switch (m_reg1 & REG1_MODE_MASK)
 	{
@@ -370,7 +370,7 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 //  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	switch (m_reg1 & REG1_MODE_MASK)
 	{
@@ -600,9 +600,9 @@ offs_t vic20_final_expansion_3_t::get_address(int bank, int block, offs_t offset
 //  read_register -
 //-------------------------------------------------
 
-UINT8 vic20_final_expansion_3_t::read_register(offs_t offset)
+uint8_t vic20_final_expansion_3_t::read_register(offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -623,7 +623,7 @@ UINT8 vic20_final_expansion_3_t::read_register(offs_t offset)
 //  write_register -
 //-------------------------------------------------
 
-void vic20_final_expansion_3_t::write_register(offs_t offset, UINT8 data)
+void vic20_final_expansion_3_t::write_register(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

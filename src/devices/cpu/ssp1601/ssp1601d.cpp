@@ -79,10 +79,10 @@ static char *get_cond(int op)
 }
 
 
-static unsigned dasm_ssp1601(char *buffer, unsigned pc, const UINT8 *oprom)
+static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
 {
-	const UINT8 *base_oprom;
-	UINT16 op;
+	const uint8_t *base_oprom;
+	uint16_t op;
 	int size = 1;
 	int flags = 0;
 

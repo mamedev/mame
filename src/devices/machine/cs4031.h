@@ -82,7 +82,7 @@ class cs4031_device : public device_t
 {
 public:
 	// construction/destruction
-	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -108,9 +108,9 @@ public:
 	DECLARE_READ8_MEMBER( dma1_ior1_r ) { return m_read_ior(1); }
 	DECLARE_READ8_MEMBER( dma1_ior2_r ) { return m_read_ior(2); }
 	DECLARE_READ8_MEMBER( dma1_ior3_r ) { return m_read_ior(3); }
-	DECLARE_READ8_MEMBER( dma2_ior1_r ) { UINT16 result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior2_r ) { UINT16 result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior3_r ) { UINT16 result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior1_r ) { uint16_t result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior2_r ) { uint16_t result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior3_r ) { uint16_t result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
 	DECLARE_WRITE8_MEMBER( dma1_iow0_w ) { m_write_iow(0, data, 0xffff); }
 	DECLARE_WRITE8_MEMBER( dma1_iow1_w ) { m_write_iow(1, data, 0xffff); }
 	DECLARE_WRITE8_MEMBER( dma1_iow2_w ) { m_write_iow(2, data, 0xffff); }
@@ -228,9 +228,9 @@ private:
 
 	address_space *m_space;
 	address_space *m_space_io;
-	UINT8 *m_isa;
-	UINT8 *m_bios;
-	UINT8 *m_ram;
+	uint8_t *m_isa;
+	uint8_t *m_bios;
+	uint8_t *m_ram;
 
 	// ipc core devices
 	required_device<am9517a_device> m_dma1;
@@ -241,11 +241,11 @@ private:
 	required_device<ds12885_device> m_rtc;
 
 	int m_dma_eop;
-	UINT8 m_dma_page[0x10];
-	UINT8 m_dma_high_byte;
+	uint8_t m_dma_page[0x10];
+	uint8_t m_dma_high_byte;
 	int m_dma_channel;
 
-	UINT8 m_portb;
+	uint8_t m_portb;
 	int m_refresh_toggle;
 	int m_iochck;
 	int m_nmi_mask;
@@ -276,10 +276,10 @@ private:
 		SOFT_RESET_AND_GATEA20 = 0x1c
 	};
 
-	UINT8 m_address;
+	uint8_t m_address;
 	bool m_address_valid;
 
-	UINT8 m_registers[0x20];
+	uint8_t m_registers[0x20];
 };
 
 

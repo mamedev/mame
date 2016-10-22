@@ -43,7 +43,7 @@ class k7659_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -60,10 +60,10 @@ protected:
 	emu_timer *m_timer;
 
 private:
-	UINT8 key_pos(UINT8 val);
-	UINT8 m_lookup;
-	UINT8 m_key;
-	const UINT8 *m_p_rom;
+	uint8_t key_pos(uint8_t val);
+	uint8_t m_lookup;
+	uint8_t m_key;
+	const uint8_t *m_p_rom;
 };
 
 

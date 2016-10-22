@@ -58,13 +58,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT32> m_mainram;
-	required_shared_ptr<UINT32> m_fg_videoram;
-	required_shared_ptr<UINT32> m_md_videoram;
-	required_shared_ptr<UINT32> m_bg_videoram;
-	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_spriteram2;
-	required_shared_ptr<UINT32> m_videoreg;
+	required_shared_ptr<uint32_t> m_mainram;
+	required_shared_ptr<uint32_t> m_fg_videoram;
+	required_shared_ptr<uint32_t> m_md_videoram;
+	required_shared_ptr<uint32_t> m_bg_videoram;
+	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<uint32_t> m_spriteram2;
+	required_shared_ptr<uint32_t> m_videoreg;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_md_tilemap;
@@ -74,7 +74,7 @@ public:
 	bitmap_ind16 m_sprites_bitmap;
 	bitmap_ind8 m_sprites_bitmap_pri;
 	int m_prev_sprites_count;
-	UINT8 m_spotty_sound_cmd;
+	uint8_t m_spotty_sound_cmd;
 
 	DECLARE_WRITE32_MEMBER(limenko_coincounter_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
@@ -108,9 +108,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	virtual void video_start() override;
-	UINT32 screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int priority);
-	void draw_sprites(UINT32 *sprites, const rectangle &cliprect, int count);
+	uint32_t screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int priority);
+	void draw_sprites(uint32_t *sprites, const rectangle &cliprect, int count);
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 };
 
@@ -322,11 +322,11 @@ TILE_GET_INFO_MEMBER(limenko_state::get_fg_tile_info)
 }
 
 void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
+		uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
 	int pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
+	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 
 	int sprite_screen_height = ((1<<16)*gfx->height()+0x8000)>>16;
 	int sprite_screen_width = ((1<<16)*gfx->width()+0x8000)>>16;
@@ -393,9 +393,9 @@ void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &c
 
 			for( y=sy; y<ey; y++ )
 			{
-				const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-				UINT16 *dest = &dest_bmp.pix16(y);
-				UINT8 *pri = &m_sprites_bitmap_pri.pix8(y);
+				const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
+				uint16_t *dest = &dest_bmp.pix16(y);
+				uint8_t *pri = &m_sprites_bitmap_pri.pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -420,14 +420,14 @@ void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &c
 }
 
 // sprites aren't tile based (except for 8x8 ones)
-void limenko_state::draw_sprites(UINT32 *sprites, const rectangle &cliprect, int count)
+void limenko_state::draw_sprites(uint32_t *sprites, const rectangle &cliprect, int count)
 {
 	int i;
 
-	UINT8 *base_gfx = memregion("gfx1")->base();
-	UINT8 *gfx_max  = base_gfx + memregion("gfx1")->bytes();
+	uint8_t *base_gfx = memregion("gfx1")->base();
+	uint8_t *gfx_max  = base_gfx + memregion("gfx1")->bytes();
 
-	UINT8 *gfxdata;
+	uint8_t *gfxdata;
 
 	for(i = 0; i <= count*2; i += 2)
 	{
@@ -482,10 +482,10 @@ void limenko_state::copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bit
 	int y;
 	for( y=cliprect.min_y; y<=cliprect.max_y; y++ )
 	{
-		UINT16 *source = &sprites_bitmap.pix16(y);
-		UINT16 *dest = &bitmap.pix16(y);
-		UINT8 *dest_pri = &priority_bitmap.pix8(y);
-		UINT8 *source_pri = &m_sprites_bitmap_pri.pix8(y);
+		uint16_t *source = &sprites_bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix16(y);
+		uint8_t *dest_pri = &priority_bitmap.pix8(y);
+		uint8_t *source_pri = &m_sprites_bitmap_pri.pix8(y);
 
 		int x;
 		for( x=cliprect.min_x; x<=cliprect.max_x; x++ )
@@ -515,7 +515,7 @@ void limenko_state::video_start()
 	save_item(NAME(m_prev_sprites_count));
 }
 
-UINT32 limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// m_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
@@ -1139,8 +1139,8 @@ DRIVER_INIT_MEMBER(limenko_state,sb2003)
 
 DRIVER_INIT_MEMBER(limenko_state,spotty)
 {
-	UINT8 *dst    = memregion("gfx1")->base();
-	UINT8 *src    = memregion("user2")->base();
+	uint8_t *dst    = memregion("gfx1")->base();
+	uint8_t *src    = memregion("user2")->base();
 	int x;
 
 	/* expand 4bpp roms to 8bpp space */

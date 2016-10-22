@@ -31,7 +31,7 @@ class sh7604_wdt_device : public device_t,
 {
 public:
 	// construction/destruction
-	sh7604_wdt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh7604_wdt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE16_MEMBER( write );

@@ -92,7 +92,7 @@ class sm510_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	sm510_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	sm510_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
@@ -126,11 +126,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 2 - 1) / 2; } // default 2 cycles per machine cycle
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 2); } // "
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 2; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; } // default 2 cycles per machine cycle
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); } // "
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 2; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 	virtual void execute_one() { } // -> child class
@@ -139,8 +139,8 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 0x40; } // actually 2, but debugger doesn't like non-linear pc
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 0x40; } // actually 2, but debugger doesn't like non-linear pc
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -152,51 +152,51 @@ protected:
 	int m_prgmask;
 	int m_datamask;
 
-	UINT16 m_pc, m_prev_pc;
-	UINT16 m_op, m_prev_op;
-	UINT8 m_param;
+	uint16_t m_pc, m_prev_pc;
+	uint16_t m_op, m_prev_op;
+	uint8_t m_param;
 	int m_stack_levels;
-	UINT16 m_stack[2];
+	uint16_t m_stack[2];
 	int m_icount;
 
-	UINT8 m_acc;
-	UINT8 m_bl;
-	UINT8 m_bm;
+	uint8_t m_acc;
+	uint8_t m_bl;
+	uint8_t m_bm;
 	bool m_sbm;
-	UINT8 m_c;
+	uint8_t m_c;
 	bool m_skip;
-	UINT8 m_w;
-	UINT8 m_r;
+	uint8_t m_w;
+	uint8_t m_r;
 	bool m_k_active;
 	bool m_halt;
 
 	// lcd driver
-	optional_shared_ptr<UINT8> m_lcd_ram_a, m_lcd_ram_b, m_lcd_ram_c;
+	optional_shared_ptr<uint8_t> m_lcd_ram_a, m_lcd_ram_b, m_lcd_ram_c;
 	devcb_write16 m_write_sega, m_write_segb, m_write_segc, m_write_segbs;
 	emu_timer *m_lcd_timer;
-	UINT8 m_l, m_x;
-	UINT8 m_y;
+	uint8_t m_l, m_x;
+	uint8_t m_y;
 	bool m_bp;
 	bool m_bc;
 
-	UINT16 get_lcd_row(int column, UINT8* ram);
+	uint16_t get_lcd_row(int column, uint8_t* ram);
 	TIMER_CALLBACK_MEMBER(lcd_timer_cb);
 	virtual void init_lcd_driver();
 
 	// melody controller
-	optional_region_ptr<UINT8> m_melody_rom;
-	UINT8 m_melody_rd;
-	UINT8 m_melody_step_count;
-	UINT8 m_melody_duty_count;
-	UINT8 m_melody_duty_index;
-	UINT8 m_melody_address;
+	optional_region_ptr<uint8_t> m_melody_rom;
+	uint8_t m_melody_rd;
+	uint8_t m_melody_step_count;
+	uint8_t m_melody_duty_count;
+	uint8_t m_melody_duty_index;
+	uint8_t m_melody_address;
 
 	void clock_melody();
 	void init_melody();
 
 	// interrupt/divider
 	emu_timer *m_div_timer;
-	UINT16 m_div;
+	uint16_t m_div;
 	bool m_1s;
 
 	bool wake_me_up();
@@ -215,12 +215,12 @@ protected:
 	virtual void get_opcode_param() { }
 	virtual void update_w_latch() { }
 
-	UINT8 ram_r();
-	void ram_w(UINT8 data);
+	uint8_t ram_r();
+	void ram_w(uint8_t data);
 	void pop_stack();
 	void push_stack();
-	void do_branch(UINT8 pu, UINT8 pm, UINT8 pl);
-	UINT8 bitmask(UINT16 param);
+	void do_branch(uint8_t pu, uint8_t pm, uint8_t pl);
+	uint8_t bitmask(uint16_t param);
 
 	// opcode handlers
 	virtual void op_lb();
@@ -295,10 +295,10 @@ protected:
 class sm510_device : public sm510_base_device
 {
 public:
-	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 
@@ -309,11 +309,11 @@ protected:
 class sm511_device : public sm510_base_device
 {
 public:
-	sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	sm511_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sm511_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 };
@@ -321,7 +321,7 @@ protected:
 class sm512_device : public sm511_device
 {
 public:
-	sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

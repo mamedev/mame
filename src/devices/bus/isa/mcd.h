@@ -20,7 +20,7 @@ class mcd_isa_device : public cdrom_image_device,
 {
 public:
 	// construction/destruction
-	mcd_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mcd_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -31,33 +31,33 @@ public:
 	DECLARE_READ8_MEMBER(flag_r);
 	DECLARE_WRITE8_MEMBER(cmd_w);
 	DECLARE_WRITE8_MEMBER(reset_w);
-	virtual UINT16 dack16_r(int line) override;
+	virtual uint16_t dack16_r(int line) override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 private:
-	bool read_sector();
+	bool read_sector(bool first = false);
 
 	bool m_change;
 	bool m_newstat;
 	bool m_data;
-	UINT8 m_stat;
-	UINT8 m_buf[2352];
+	uint8_t m_stat;
+	uint8_t m_buf[2352];
 	int m_buf_count;
 	int m_buf_idx;
-	UINT8 m_cmdbuf[16];
+	uint8_t m_cmdbuf[16];
 	int m_cmdbuf_count;
 	int m_cmdrd_count;
 	int m_cmdbuf_idx;
-	UINT8 m_mode;
-	UINT8 m_cmd;
-	UINT8 m_conf;
-	UINT8 m_irq;
-	UINT8 m_dma;
-	UINT16 m_dmalen;
-	UINT32 m_readmsf;
-	UINT8 m_readcount;
+	uint8_t m_mode;
+	uint8_t m_cmd;
+	uint8_t m_conf;
+	uint8_t m_irq;
+	uint8_t m_dma;
+	uint16_t m_dmalen;
+	uint32_t m_readmsf;
+	uint32_t m_readcount;
 	bool m_locked;
 	int m_drvmode;
 	int m_curtoctrk;
@@ -102,7 +102,7 @@ private:
 	enum {
 		FLAG_NODATA = 2,
 		FLAG_NOSTAT = 4,
-		FLAG_DATAREADY = 8, //??
+		FLAG_UNK = 8, //??
 		FLAG_OPEN = 16
 	};
 	enum {

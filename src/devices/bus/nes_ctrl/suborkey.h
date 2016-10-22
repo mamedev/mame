@@ -26,7 +26,7 @@ class nes_suborkey_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -35,12 +35,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_exp(offs_t offset) override;
-	virtual void write(UINT8 data) override;
+	virtual uint8_t read_exp(offs_t offset) override;
+	virtual void write(uint8_t data) override;
 
 private:
 	required_ioport_array<13> m_kbd;
-	UINT8 m_fck_scan, m_fck_mode;
+	uint8_t m_fck_scan, m_fck_mode;
 };
 
 

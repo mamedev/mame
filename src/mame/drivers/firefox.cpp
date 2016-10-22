@@ -60,7 +60,7 @@ public:
 
 	required_device<phillips_22vp931_device> m_laserdisc;
 	required_shared_ptr<unsigned char> m_tileram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<unsigned char> m_sprite_palette;
 	required_shared_ptr<unsigned char> m_tile_palette;
 	int m_n_disc_lock;
@@ -70,8 +70,8 @@ public:
 	x2212_device *m_nvram_1d;
 	tilemap_t *m_bgtiles;
 	int m_control_num;
-	UINT8 m_sound_to_main_flag;
-	UINT8 m_main_to_sound_flag;
+	uint8_t m_sound_to_main_flag;
+	uint8_t m_main_to_sound_flag;
 	int m_sprite_bank;
 	DECLARE_READ8_MEMBER(firefox_disc_status_r);
 	DECLARE_READ8_MEMBER(firefox_disc_data_r);
@@ -110,7 +110,7 @@ public:
 	TILE_GET_INFO_MEMBER(bgtile_get_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
 	void set_rgba( int start, int index, unsigned char *palette_ram );
 	void firq_gen(phillips_22vp931_device &laserdisc, int state);
@@ -154,7 +154,7 @@ fffe=reset e7cc
    */
 READ8_MEMBER(firefox_state::firefox_disc_status_r)
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	result ^= 0x20;
 	if (!m_laserdisc->ready_r())
@@ -237,7 +237,7 @@ void firefox_state::video_start()
 }
 
 
-UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int sprite;
 	int gfxtop = screen.visible_area().min_y;
@@ -246,7 +246,7 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{
-		UINT8 *sprite_data = m_spriteram + ( 0x200 * m_sprite_bank ) + ( sprite * 16 );
+		uint8_t *sprite_data = m_spriteram + ( 0x200 * m_sprite_bank ) + ( sprite * 16 );
 		int flags = sprite_data[ 0 ];
 		int y = sprite_data[ 1 ] + ( 256 * ( ( flags >> 0 ) & 1 ) );
 		int x = sprite_data[ 2 ] + ( 256 * ( ( flags >> 1 ) & 1 ) );

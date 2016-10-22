@@ -100,10 +100,10 @@ public:
 	required_device<am53cf96_device> m_am53cf96;
 	required_device<k056800_device> m_k056800;
 
-	UINT8 *m_p_n_pcmram;
-	UINT8 m_sector_buffer[ 512 ];
-	UINT8 m_sound_ctrl;
-	UINT8 m_sound_intck;
+	uint8_t *m_p_n_pcmram;
+	uint8_t m_sector_buffer[ 512 ];
+	uint8_t m_sound_ctrl;
+	uint8_t m_sound_intck;
 
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(pcmram_w);
@@ -118,13 +118,13 @@ public:
 	INTERRUPT_GEN_MEMBER(tms_sync);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 
-	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
-	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 };
 
 /* EEPROM */
 
-static const UINT16 konamigq_def_eeprom[64] =
+static const uint16_t konamigq_def_eeprom[64] =
 {
 	0x292b, 0x5256, 0x2094, 0x4155, 0x0041, 0x1414, 0x0003, 0x0101,
 	0x0103, 0x0000, 0x0707, 0x0001, 0xaa00, 0xaaaa, 0xaaaa, 0xaaaa,
@@ -253,9 +253,9 @@ WRITE_LINE_MEMBER(konamigq_state::k054539_irq_gen)
 
 /* SCSI */
 
-void konamigq_state::scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void konamigq_state::scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
-	UINT8 *sector_buffer = m_sector_buffer;
+	uint8_t *sector_buffer = m_sector_buffer;
 	int i;
 	int n_this;
 
@@ -287,7 +287,7 @@ void konamigq_state::scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 
 	}
 }
 
-void konamigq_state::scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void konamigq_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 }
 

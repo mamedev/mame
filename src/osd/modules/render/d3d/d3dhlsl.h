@@ -261,7 +261,7 @@ class slider
 public:
 	slider(slider_desc *desc, void *value, bool *dirty) : m_desc(desc), m_value(value) { }
 
-	INT32 update(std::string *str, INT32 newval);
+	int32_t update(std::string *str, int32_t newval);
 
 private:
 	slider_desc *   m_desc;
@@ -298,34 +298,34 @@ public:
 
 	void save_snapshot();
 	void record_movie();
-	void record_audio(const INT16 *buffer, int samples_this_frame);
+	void record_audio(const int16_t *buffer, int samples_this_frame);
 
 	void init_fsfx_quad();
 
 	void                    set_texture(texture_info *info);
 	d3d_render_target *     find_render_target(texture_info *texture);
 	void                    remove_render_target(texture_info *texture);
-	void                    remove_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index);
+	void                    remove_render_target(int source_width, int source_height, uint32_t screen_index, uint32_t page_index);
 	void                    remove_render_target(d3d_render_target *rt);
 
 	int create_resources();
 	void delete_resources();
 
 	// slider-related functions
-	virtual INT32 slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, INT32 newval) override;
-	slider_state* slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, void *arg);
+	virtual int32_t slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, int32_t newval) override;
+	slider_state* slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
 	void init_slider_list();
 	std::vector<ui::menu_item> get_slider_list() { return m_sliders; }
 	void *get_slider_option(int id, int index = 0);
 
 private:
-	void                    blit(IDirect3DSurface9 *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
+	void                    blit(IDirect3DSurface9 *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, uint32_t prim_index, uint32_t prim_count);
 	void                    enumerate_screens();
 
 	void                    render_snapshot(IDirect3DSurface9 *surface);
 
-	d3d_render_target*      find_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index);
-	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
+	d3d_render_target*      find_render_target(int source_width, int source_height, uint32_t screen_index, uint32_t page_index);
+	cache_target *          find_cache_target(uint32_t screen_index, int width, int height);
 	void                    remove_cache_target(cache_target *cache);
 
 	rgb_t                   apply_color_convolution(rgb_t color);

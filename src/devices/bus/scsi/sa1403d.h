@@ -18,7 +18,7 @@ class sa1403d_device  : public scsihd_device
 {
 public:
 	// construction/destruction
-	sa1403d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sa1403d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -26,7 +26,7 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void ExecCommand() override;
-	virtual void WriteData( UINT8 *data, int dataLength ) override;
+	virtual void WriteData( uint8_t *data, int dataLength ) override;
 };
 
 

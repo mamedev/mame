@@ -17,10 +17,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_vram_0;
-	required_shared_ptr<UINT8> m_vram_1;
-	required_shared_ptr<UINT8> m_vregs;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_vram_0;
+	required_shared_ptr<uint8_t> m_vram_1;
+	required_shared_ptr<uint8_t> m_vregs;
 
 	tilemap_t *m_tilemap_0a;
 	tilemap_t *m_tilemap_0b;
@@ -44,6 +44,6 @@ public:
 	DECLARE_PALETTE_INIT(firebatl);
 	DECLARE_VIDEO_START(clshroad);
 	DECLARE_PALETTE_INIT(clshroad);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

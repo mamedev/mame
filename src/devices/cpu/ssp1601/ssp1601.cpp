@@ -101,14 +101,14 @@
 }
 
 #define OP_CMPA(x) { \
-	UINT32 t = rA32 - ((x) << 16); \
+	uint32_t t = rA32 - ((x) << 16); \
 	rST &= ~(SSP_FLAG_L|SSP_FLAG_Z|SSP_FLAG_V|SSP_FLAG_N); \
 	if (!t) rST |= SSP_FLAG_Z; \
 	else    rST |= (t>>16)&SSP_FLAG_N; \
 }
 
 #define OP_CMPA32(x) { \
-	UINT32 t = rA32 - (x); \
+	uint32_t t = rA32 - (x); \
 	rST &= ~(SSP_FLAG_L|SSP_FLAG_Z|SSP_FLAG_V|SSP_FLAG_N); \
 	if (!t) rST |= SSP_FLAG_Z; \
 	else    rST |= (t>>16)&SSP_FLAG_N; \
@@ -192,7 +192,7 @@
 const device_type SSP1601 = &device_creator<ssp1601_device>;
 
 
-ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SSP1601, "SSP1601", tag, owner, clock, "ssp1601", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 4, 0)
@@ -200,7 +200,7 @@ ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-offs_t ssp1601_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t ssp1601_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( ssp1601 );
 	return CPU_DISASSEMBLE_NAME(ssp1601)(this, buffer, pc, oprom, opram, options);
@@ -217,39 +217,39 @@ void ssp1601_device::update_P()
 	rP.d = (m1 * m2 * 2);
 }
 
-UINT32 ssp1601_device::read_unknown(int reg)
+uint32_t ssp1601_device::read_unknown(int reg)
 {
 	logerror("%s:%i FIXME\n", __FILE__, __LINE__);
 	return 0;
 }
 
-void ssp1601_device::write_unknown(int reg, UINT32 d)
+void ssp1601_device::write_unknown(int reg, uint32_t d)
 {
 	logerror("%s:%i FIXME\n", __FILE__, __LINE__);
 }
 
 /* map EXT regs to virtual I/O range of 0x00-0x0f */
-UINT32 ssp1601_device::read_ext(int reg)
+uint32_t ssp1601_device::read_ext(int reg)
 {
 	reg &= 7;
 	return m_io->read_word((reg << 1));
 }
 
-void ssp1601_device::write_ext(int reg, UINT32 d)
+void ssp1601_device::write_ext(int reg, uint32_t d)
 {
 	reg &= 7;
 	m_io->write_word((reg << 1), d);
 }
 
 // 4
-void ssp1601_device::write_ST(int reg, UINT32 d)
+void ssp1601_device::write_ST(int reg, uint32_t d)
 {
 	CHECK_ST(d);
 	rST = d;
 }
 
 // 5
-UINT32 ssp1601_device::read_STACK(int reg)
+uint32_t ssp1601_device::read_STACK(int reg)
 {
 	--rSTACK;
 	if ((signed short)rSTACK < 0) {
@@ -259,7 +259,7 @@ UINT32 ssp1601_device::read_STACK(int reg)
 	return m_stack[rSTACK];
 }
 
-void ssp1601_device::write_STACK(int reg, UINT32 d)
+void ssp1601_device::write_STACK(int reg, uint32_t d)
 {
 	if (rSTACK >= 6) {
 		logerror(__FILE__ " FIXME: stack overflow! (%i) @ %04x\n", rSTACK, GET_PPC_OFFS());
@@ -269,33 +269,33 @@ void ssp1601_device::write_STACK(int reg, UINT32 d)
 }
 
 // 6
-UINT32 ssp1601_device::read_PC(int reg)
+uint32_t ssp1601_device::read_PC(int reg)
 {
 	return rPC;
 }
 
-void ssp1601_device::write_PC(int reg, UINT32 d)
+void ssp1601_device::write_PC(int reg, uint32_t d)
 {
 	rPC = d;
 	m_g_cycles--;
 }
 
 // 7
-UINT32 ssp1601_device::read_P(int reg)
+uint32_t ssp1601_device::read_P(int reg)
 {
 	update_P();
 	return rP.w.h;
 }
 
 // 15
-UINT32 ssp1601_device::read_AL(int reg)
+uint32_t ssp1601_device::read_AL(int reg)
 {
 	/* apparently reading AL causes some effect on EXT bus, VR depends on that.. */
 	read_ext(reg);
 	return rAL;
 }
 
-void ssp1601_device::write_AL(int reg, UINT32 d)
+void ssp1601_device::write_AL(int reg, uint32_t d)
 {
 	write_ext(reg, d);
 	rAL = d;
@@ -343,10 +343,10 @@ const ssp1601_device::write_func_t ssp1601_device::reg_write_handlers[16] =
 //
 #define ptr1_read(op) ptr1_read_(op&3,(op>>6)&4,(op<<1)&0x18)
 
-UINT32 ssp1601_device::ptr1_read_(int ri, int isj2, int modi3)
+uint32_t ssp1601_device::ptr1_read_(int ri, int isj2, int modi3)
 {
 	//int t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
-	UINT32 mask, add = 0, t = ri | isj2 | modi3;
+	uint32_t mask, add = 0, t = ri | isj2 | modi3;
 	unsigned char *rp = nullptr;
 	switch (t)
 	{
@@ -404,7 +404,7 @@ modulo:
 	return t;
 }
 
-void ssp1601_device::ptr1_write(int op, UINT32 d)
+void ssp1601_device::ptr1_write(int op, uint32_t d)
 {
 	int t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	switch (t)
@@ -449,7 +449,7 @@ void ssp1601_device::ptr1_write(int op, UINT32 d)
 	}
 }
 
-UINT32 ssp1601_device::ptr2_read(int op)
+uint32_t ssp1601_device::ptr2_read(int op)
 {
 	int mv, t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	switch (t)
@@ -576,7 +576,7 @@ void ssp1601_device::execute_run()
 	while (m_g_cycles > 0)
 	{
 		int op;
-		UINT32 tmpv;
+		uint32_t tmpv;
 
 		PPC = rPC;
 

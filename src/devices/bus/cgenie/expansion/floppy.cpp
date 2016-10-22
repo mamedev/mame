@@ -103,7 +103,7 @@ machine_config_constructor cgenie_fdc_device::device_mconfig_additions() const
 //  cgenie_fdc_device - constructor
 //-------------------------------------------------
 
-cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CGENIE_FDC, "Floppy Disc Controller", tag, owner, clock, "cgenie_fdc", __FILE__),
 	device_expansion_interface(mconfig, *this),
 	m_fdc(*this, "fd1793"),
@@ -151,7 +151,7 @@ void cgenie_fdc_device::device_reset()
 
 READ8_MEMBER( cgenie_fdc_device::irq_r )
 {
-	UINT8 data = m_irq_status;
+	uint8_t data = m_irq_status;
 
 	m_irq_status &= ~IRQ_TIMER;
 	m_slot->int_w(m_irq_status ? ASSERT_LINE : CLEAR_LINE);
@@ -167,7 +167,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( cgenie_fdc_device::timer_callback )
 
 DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device, socket_load )
 {
-	UINT32 size = m_socket->common_get_size("rom");
+	uint32_t size = m_socket->common_get_size("rom");
 
 	if (size > 0x1000)
 	{

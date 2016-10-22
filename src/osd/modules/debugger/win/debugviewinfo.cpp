@@ -100,20 +100,20 @@ bool debugview_info::is_valid() const
 }
 
 
-UINT32 debugview_info::prefwidth() const
+uint32_t debugview_info::prefwidth() const
 {
 	return (m_view->total_size().x * metrics().debug_font_width()) + metrics().vscroll_width();
 }
 
 
-UINT32 debugview_info::maxwidth()
+uint32_t debugview_info::maxwidth()
 {
-	UINT32 max = m_view->total_size().x;
+	uint32_t max = m_view->total_size().x;
 	debug_view_source const *const cursource = m_view->source();
 	for (const debug_view_source &source : m_view->source_list())
 	{
 		m_view->set_source(source);
-		UINT32 const chars = m_view->total_size().x;
+		uint32_t const chars = m_view->total_size().x;
 		if (max < chars)
 			max = chars;
 	}
@@ -309,7 +309,7 @@ void debugview_info::draw_contents(HDC windc)
 	SetBkMode(dc, TRANSPARENT);
 
 	// iterate over rows and columns
-	for (UINT32 row = 0; row < visarea.y; row++)
+	for (uint32_t row = 0; row < visarea.y; row++)
 	{
 		// loop twice; once to fill the background and once to draw the text
 		for (int iter = 0; iter < 2; iter++)
@@ -332,7 +332,7 @@ void debugview_info::draw_contents(HDC windc)
 				bgbrush = CreateSolidBrush(bgcolor);
 
 			// iterate over columns
-			for (UINT32 col = 0; col < visarea.x; col++)
+			for (uint32_t col = 0; col < visarea.x; col++)
 			{
 				// if the attribute changed, adjust the colors
 				if (viewdata[col].attrib != last_attrib)
@@ -522,7 +522,7 @@ void debugview_info::update()
 }
 
 
-UINT32 debugview_info::process_scroll(WORD type, HWND wnd)
+uint32_t debugview_info::process_scroll(WORD type, HWND wnd)
 {
 	// get the current info
 	SCROLLINFO scrollinfo;
@@ -531,10 +531,10 @@ UINT32 debugview_info::process_scroll(WORD type, HWND wnd)
 	GetScrollInfo(wnd, SB_CTL, &scrollinfo);
 
 	// by default we stay put
-	INT32 result = scrollinfo.nPos;
+	int32_t result = scrollinfo.nPos;
 
 	// determine the maximum value
-	INT32 const maxval = (scrollinfo.nMax > scrollinfo.nPage) ? (scrollinfo.nMax - scrollinfo.nPage + 1) : 0;
+	int32_t const maxval = (scrollinfo.nMax > scrollinfo.nPage) ? (scrollinfo.nMax - scrollinfo.nPage + 1) : 0;
 
 	// handle the message
 	switch (type)
@@ -579,7 +579,7 @@ UINT32 debugview_info::process_scroll(WORD type, HWND wnd)
 	scrollinfo.nPos = result;
 	SetScrollInfo(wnd, SB_CTL, &scrollinfo, TRUE);
 
-	return (UINT32)result;
+	return (uint32_t)result;
 }
 
 
@@ -773,7 +773,7 @@ LRESULT CALLBACK debugview_info::static_view_proc(HWND wnd, UINT message, WPARAM
 		return 0;
 	}
 
-	debugview_info *const info = (debugview_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	debugview_info *const info = (debugview_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	if (info == nullptr)
 		return DefWindowProc(wnd, message, wparam, lparam);
 

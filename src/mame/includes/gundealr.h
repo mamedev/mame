@@ -20,16 +20,16 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_paletteram;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_rambase;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_rambase;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;
 	int        m_flipscreen;
-	UINT8      m_scroll[4];
+	uint8_t      m_scroll[4];
 
 	/* misc */
 	int        m_input_ports_hack;
@@ -46,7 +46,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_gundealr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gundealr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(gundealr_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(yamyam_mcu_sim);
 	required_device<cpu_device> m_maincpu;

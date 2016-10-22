@@ -86,7 +86,7 @@ machine_config_constructor cst_q_plus4_t::device_mconfig_additions() const
 //  cst_q_plus4_t - constructor
 //-------------------------------------------------
 
-cst_q_plus4_t::cst_q_plus4_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cst_q_plus4_t::cst_q_plus4_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CST_Q_PLUS4, "CST Q+4", tag, owner, clock, "ql_qplus4", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_exp1(*this, "exp1"),
@@ -115,7 +115,7 @@ void cst_q_plus4_t::device_start()
 //  read -
 //-------------------------------------------------
 
-UINT8 cst_q_plus4_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t cst_q_plus4_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset >= 0xc000 && offset < 0xc200)
 	{
@@ -135,7 +135,7 @@ UINT8 cst_q_plus4_t::read(address_space &space, offs_t offset, UINT8 data)
 //  write -
 //-------------------------------------------------
 
-void cst_q_plus4_t::write(address_space &space, offs_t offset, UINT8 data)
+void cst_q_plus4_t::write(address_space &space, offs_t offset, uint8_t data)
 {
 	m_exp1->write(space, offset, data);
 	m_exp2->write(space, offset, data);

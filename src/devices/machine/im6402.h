@@ -79,7 +79,7 @@ class im6402_device :  public device_t,
 {
 public:
 	// construction/destruction
-	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_rrc(device_t &device, int rrc) { downcast<im6402_device &>(device).m_rrc = rrc; }
 	static void set_trc(device_t &device, int trc) { downcast<im6402_device &>(device).m_trc = trc; }
@@ -151,12 +151,12 @@ private:
 	int m_pi;
 
 	// receiver
-	UINT8 m_rbr;
+	uint8_t m_rbr;
 	int m_rrc;
 	int m_rrc_count;
 
 	// transmitter
-	UINT8 m_tbr;
+	uint8_t m_tbr;
 	int m_trc;
 	int m_trc_count;
 };

@@ -9,8 +9,8 @@
 void sslam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT16 *source = m_spriteram;
-	UINT16 *finish = source + 0x1000/2;
+	uint16_t *source = m_spriteram;
+	uint16_t *finish = source + 0x1000/2;
 
 	source += 3; // strange
 
@@ -158,7 +158,7 @@ VIDEO_START_MEMBER(sslam_state,powerbls)
 	save_item(NAME(m_sprites_x_offset));
 }
 
-UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!(m_regs[6] & 1))
 	{
@@ -196,7 +196,7 @@ UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-UINT32 sslam_state::screen_update_powerbls(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sslam_state::screen_update_powerbls(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!(m_regs[6] & 1))
 	{

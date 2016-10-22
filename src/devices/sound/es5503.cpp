@@ -39,9 +39,9 @@
 const device_type ES5503 = &device_creator<es5503_device>;
 
 // useful constants
-static const UINT16 wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
-static const UINT32 wavemasks[8] = { 0x1ff00, 0x1fe00, 0x1fc00, 0x1f800, 0x1f000, 0x1e000, 0x1c000, 0x18000 };
-static const UINT32 accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff };
+static const uint16_t wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
+static const uint32_t wavemasks[8] = { 0x1ff00, 0x1fe00, 0x1fc00, 0x1f800, 0x1f000, 0x1e000, 0x1c000, 0x18000 };
+static const uint32_t accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff };
 static const int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 
 //**************************************************************************
@@ -52,7 +52,7 @@ static const int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 //  es5503_device - constructor
 //-------------------------------------------------
 
-es5503_device::es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+es5503_device::es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ES5503, "Ensoniq ES5503", tag, owner, clock, "es5503", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 17),
@@ -95,7 +95,7 @@ void es5503_device::rom_bank_updated()
 // chip = chip ptr
 // onum = oscillator #
 // type = 1 for 0 found in sample data, 0 for hit end of table size
-void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator, int resshift)
+void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int resshift)
 {
 	ES5503Osc *pOsc = &oscillators[onum];
 	ES5503Osc *pPartner = &oscillators[onum^1];
@@ -108,8 +108,8 @@ void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator, int resshi
 	}
 	else    // preserve the relative phase of the oscillator when looping
 	{
-		UINT16 wtsize = pOsc->wtsize - 1;
-		UINT32 altram = (*accumulator) >> resshift;
+		uint16_t wtsize = pOsc->wtsize - 1;
+		uint32_t altram = (*accumulator) >> resshift;
 
 		if (altram > wtsize)
 		{
@@ -142,10 +142,10 @@ void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator, int resshi
 
 void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	static INT32 mix[(44100/60)*2*8];
-	INT32 *mixp;
+	static int32_t mix[(44100/60)*2*8];
+	int32_t *mixp;
 	int osc, snum, i;
-	UINT32 ramptr;
+	uint32_t ramptr;
 
 	assert(samples < (44100/60)*2);
 	memset(mix, 0, sizeof(mix));
@@ -158,15 +158,15 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 			if (!(pOsc->control & 1) && ((pOsc->control >> 4) & (output_channels - 1)) == chan)
 			{
-				UINT32 wtptr = pOsc->wavetblpointer & wavemasks[pOsc->wavetblsize], altram;
-				UINT32 acc = pOsc->accumulator;
-				UINT16 wtsize = pOsc->wtsize - 1;
-				UINT8 ctrl = pOsc->control;
-				UINT16 freq = pOsc->freq;
-				INT16 vol = pOsc->vol;
-				INT8 data = -128;
+				uint32_t wtptr = pOsc->wavetblpointer & wavemasks[pOsc->wavetblsize], altram;
+				uint32_t acc = pOsc->accumulator;
+				uint16_t wtsize = pOsc->wtsize - 1;
+				uint8_t ctrl = pOsc->control;
+				uint16_t freq = pOsc->freq;
+				int16_t vol = pOsc->vol;
+				int8_t data = -128;
 				int resshift = resshifts[pOsc->resolution] - pOsc->wavetblsize;
-				UINT32 sizemask = accmasks[pOsc->wavetblsize];
+				uint32_t sizemask = accmasks[pOsc->wavetblsize];
 				mixp = &mix[0] + chan;
 
 				for (snum = 0; snum < samples; snum++)
@@ -178,7 +178,7 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 					// channel strobe is always valid when reading; this allows potentially banking per voice
 					m_channel_strobe = (ctrl>>4) & 0xf;
-					data = (INT32)read_byte(ramptr + wtptr) ^ 0x80;
+					data = (int32_t)read_byte(ramptr + wtptr) ^ 0x80;
 
 					if (read_byte(ramptr + wtptr) == 0x00)
 					{
@@ -274,7 +274,7 @@ void es5503_device::device_reset()
 
 READ8_MEMBER( es5503_device::read )
 {
-	UINT8 retval;
+	uint8_t retval;
 	int i;
 
 	m_stream->update();

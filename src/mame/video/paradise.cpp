@@ -226,7 +226,7 @@ void paradise_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 ***************************************************************************/
 
-UINT32 paradise_state::screen_update_paradise(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t paradise_state::screen_update_paradise(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -276,7 +276,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 }
 
 /* no pix layer, no tilemap_0, different priority bits */
-UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -306,7 +306,7 @@ UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &
 }
 
 /* I don't know how the priority bits work on this one */
-UINT32 paradise_state::screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t paradise_state::screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_tilemap_0->draw(screen, bitmap, cliprect, 0, 0);

@@ -61,9 +61,9 @@ public:
 	DECLARE_DRIVER_INIT(hamaway);
 
 	// memory mapping
-	void memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index);
-	UINT8 mapper_sound_r();
-	void mapper_sound_w(UINT8 data);
+	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
+	uint8_t mapper_sound_r();
+	void mapper_sound_w(uint8_t data);
 
 	// read/write handlers
 	DECLARE_WRITE8_MEMBER( rom_5874_bank_w );
@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE16_MEMBER( wwally_custom_io_w );
 
 	// video rendering
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_s18);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_s18);
@@ -125,7 +125,7 @@ protected:
 
 	// internal helpers
 	void init_generic(segas18_rom_board rom_board);
-	void set_vdp_mixing(UINT8 mixing);
+	void set_vdp_mixing(uint8_t mixing);
 	void draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 
 	// devices
@@ -143,7 +143,7 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// memory pointers
-	required_shared_ptr<UINT16> m_workram;
+	required_shared_ptr<uint16_t> m_workram;
 
 	// configuration
 	segas18_rom_board   m_romboard;
@@ -153,13 +153,13 @@ protected:
 	// internal state
 	int                 m_grayscale_enable;
 	int                 m_vdp_enable;
-	UINT8               m_vdp_mixing;
+	uint8_t               m_vdp_mixing;
 	bitmap_ind16        m_temp_bitmap;
-	UINT8               m_mcu_data;
+	uint8_t               m_mcu_data;
 
 	// game-specific state
-	UINT8               m_wwally_last_x[3];
-	UINT8               m_wwally_last_y[3];
-	UINT8               m_lghost_value;
-	UINT8               m_lghost_select;
+	uint8_t               m_wwally_last_x[3];
+	uint8_t               m_wwally_last_y[3];
+	uint8_t               m_lghost_value;
+	uint8_t               m_lghost_select;
 };

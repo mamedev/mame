@@ -88,7 +88,7 @@ static const unsigned char intv_colors[] =
 PALETTE_INIT_MEMBER(intv_state, intv)
 {
 	int k = 0;
-	UINT8 r, g, b;
+	uint8_t r, g, b;
 	/* Two copies of everything (why?) */
 
 	for (int i = 0; i < 16; i++)

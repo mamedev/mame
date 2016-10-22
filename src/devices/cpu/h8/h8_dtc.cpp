@@ -24,7 +24,7 @@ const int h8_dtc_device::vector_to_enable[92] = {
 	-1, 40, 41, -1                  // ERI2, RXI2, TXI2, TEI2
 };
 
-h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_DTC, "H8 DTC controller", tag, owner, clock, "h8_dtc", __FILE__),
 	cpu(*this, DEVICE_SELF_OWNER)
 {
@@ -45,7 +45,7 @@ void h8_dtc_device::device_reset()
 {
 	memset(dtcer, 0x00, sizeof(dtcer));
 	memset(states, 0, sizeof(states));
-	for(UINT8 i=0; i<sizeof(states)/sizeof(states[0]); i++)
+	for(uint8_t i=0; i<sizeof(states)/sizeof(states[0]); i++)
 		states[i].id = i;
 	dtvecr = 0x00;
 	cur_active_vector = -1;
@@ -125,11 +125,11 @@ void h8_dtc_device::vector_done(int vector)
 	waiting_vector.erase(wi);
 
 	h8_dtc_state *state = states + vector;
-	UINT32 sra = state->sra;
-	UINT32 dar = state->dar;
-	UINT32 cr = state->cr;
+	uint32_t sra = state->sra;
+	uint32_t dar = state->dar;
+	uint32_t cr = state->cr;
 
-	UINT32 mode = sra & 0x0c000000;
+	uint32_t mode = sra & 0x0c000000;
 	if(V>=1) logerror("regs at %08x sra=%08x dar=%08x cr=%08x %s mode\n", state->base, sra, dar, cr,
 						mode == 0x00000000 || mode == 0x0c000000 ? "normal" : mode == 0x04000000 ? "repeat" : "block");
 	state->incs = sra & 0x80000000 ?

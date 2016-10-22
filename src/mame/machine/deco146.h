@@ -6,8 +6,8 @@
 
 #include "machine/gen_latch.h"
 
-typedef device_delegate<UINT16 (int unused)> deco146_port_read_cb;
-typedef device_delegate<void (address_space &space, UINT16 data, UINT16 mem_mask)> deco146_port_write_cb;
+typedef device_delegate<uint16_t (int unused)> deco146_port_read_cb;
+typedef device_delegate<void (address_space &space, uint16_t data, uint16_t mem_mask)> deco146_port_write_cb;
 
 
 #define MCFG_DECO146_SET_PORTA_CALLBACK( _class, _method) \
@@ -70,7 +70,7 @@ typedef device_delegate<void (address_space &space, UINT16 data, UINT16 mem_mask
 struct deco146port_xx
 {
 	int write_offset;
-	UINT8 mapping[16];
+	uint8_t mapping[16];
 	int use_xor;
 	int use_nand;
 };
@@ -82,17 +82,17 @@ struct deco146port_xx
 class deco_146_base_device : public device_t
 {
 public:
-	//deco_146_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	deco_146_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	//deco_146_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	deco_146_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	void write_data(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags);
-	UINT16 read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags);
+	void write_data(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags);
+	uint16_t read_data(uint16_t address, uint16_t mem_mask, uint8_t &csflags);
 
 	static void set_port_a_cb(device_t &device,deco146_port_read_cb port_cb);
 	static void set_port_b_cb(device_t &device,deco146_port_read_cb port_cb);
 	static void set_port_c_cb(device_t &device,deco146_port_read_cb port_cb);
 	static void set_soundlatch_cb(device_t &device,deco146_port_write_cb port_cb);
-	static void set_interface_scramble(device_t &device,UINT8 a9, UINT8 a8, UINT8 a7, UINT8 a6, UINT8 a5, UINT8 a4, UINT8 a3,UINT8 a2,UINT8 a1,UINT8 a0);
+	static void set_interface_scramble(device_t &device,uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0);
 	static void set_use_magic_read_address_xor(device_t &device, int use_xor);
 
 
@@ -104,22 +104,22 @@ public:
 	deco146_port_read_cb m_port_c_r;
 	deco146_port_write_cb m_soundlatch_w;
 
-	UINT16 port_a_default(int unused);
-	UINT16 port_b_default(int unused);
-	UINT16 port_c_default(int unused);
-	UINT16 port_dummy_cb(int unused);
-	void soundlatch_default(address_space &space, UINT16 data, UINT16 mem_mask);
-	void soundlatch_dummy(address_space &space, UINT16 data, UINT16 mem_mask);
+	uint16_t port_a_default(int unused);
+	uint16_t port_b_default(int unused);
+	uint16_t port_c_default(int unused);
+	uint16_t port_dummy_cb(int unused);
+	void soundlatch_default(address_space &space, uint16_t data, uint16_t mem_mask);
+	void soundlatch_dummy(address_space &space, uint16_t data, uint16_t mem_mask);
 
-	UINT8 m_bankswitch_swap_read_address;
-	UINT16 m_magic_read_address_xor;
+	uint8_t m_bankswitch_swap_read_address;
+	uint16_t m_magic_read_address_xor;
 	int m_magic_read_address_xor_enabled;
-	UINT8 m_xor_port;
-	UINT8 m_mask_port;
-	UINT8 m_soundlatch_port;
+	uint8_t m_xor_port;
+	uint8_t m_mask_port;
+	uint8_t m_soundlatch_port;
 
 
-	UINT8 m_external_addrswap[10];
+	uint8_t m_external_addrswap[10];
 
 	deco146port_xx* m_lookup_table;
 
@@ -137,27 +137,27 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	UINT16 read_protport(UINT16 address, UINT16 mem_mask);
-	virtual void write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask);
-	virtual UINT16 read_data_getloc(UINT16 address, int& location);
+	uint16_t read_protport(uint16_t address, uint16_t mem_mask);
+	virtual void write_protport(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask);
+	virtual uint16_t read_data_getloc(uint16_t address, int& location);
 
-	UINT16 m_rambank0[0x80];
-	UINT16 m_rambank1[0x80];
+	uint16_t m_rambank0[0x80];
+	uint16_t m_rambank1[0x80];
 
 	int m_current_rambank;
 
 
-	UINT16 m_nand;
-	UINT16 m_xor;
-	UINT16 m_soundlatch;
+	uint16_t m_nand;
+	uint16_t m_xor;
+	uint16_t m_soundlatch;
 
-	UINT16 m_latchaddr;
-	UINT16 m_latchdata;
+	uint16_t m_latchaddr;
+	uint16_t m_latchdata;
 
-	UINT8 m_configregion; // which value of upper 4 address lines accesses the config region
+	uint8_t m_configregion; // which value of upper 4 address lines accesses the config region
 	int m_latchflag;
 private:
-	UINT8 region_selects[6];
+	uint8_t region_selects[6];
 	optional_device<generic_latch_8_device> m_sound_latch;
 
 };
@@ -167,7 +167,7 @@ extern const device_type DECO146BASE;
 class deco146_device : public deco_146_base_device
 {
 public:
-	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type DECO146PROT;

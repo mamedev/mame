@@ -48,10 +48,10 @@ TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_dmac_callback )
 	}
 }
 
-int sh34_base_device::sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
+int sh34_base_device::sh4_dma_transfer(int channel, int timermode, uint32_t chcr, uint32_t *sar, uint32_t *dar, uint32_t *dmatcr)
 {
 	int incs, incd, size;
-	UINT32 src, dst, count;
+	uint32_t src, dst, count;
 
 	incd = (chcr & CHCR_DM) >> 14;
 	incs = (chcr & CHCR_SM) >> 12;
@@ -184,10 +184,10 @@ int sh34_base_device::sh4_dma_transfer(int channel, int timermode, UINT32 chcr, 
 	return 1;
 }
 
-int sh34_base_device::sh4_dma_transfer_device(int channel, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
+int sh34_base_device::sh4_dma_transfer_device(int channel, uint32_t chcr, uint32_t *sar, uint32_t *dar, uint32_t *dmatcr)
 {
 	int incs, incd, size, mod;
-	UINT32 src, dst, count;
+	uint32_t src, dst, count;
 
 	incd = (chcr & CHCR_DM) >> 14;
 	incs = (chcr & CHCR_SM) >> 12;
@@ -237,7 +237,7 @@ int sh34_base_device::sh4_dma_transfer_device(int channel, UINT32 chcr, UINT32 *
 
 void sh34_base_device::sh4_dmac_check(int channel)
 {
-	UINT32 dmatcr, chcr, sar, dar;
+	uint32_t dmatcr, chcr, sar, dar;
 
 	switch (channel)
 	{
@@ -295,7 +295,7 @@ void sh34_base_device::sh4_dmac_check(int channel)
 // called by drivers to transfer data in a cpu<->device dma. 'device' must be a SH4 cpu
 int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 {
-	UINT32 pos, len, siz;
+	uint32_t pos, len, siz;
 	int channel = s->channel;
 	void *data = s->buffer;
 
@@ -315,38 +315,38 @@ int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 			case 8:
 				if (m_dma_source_increment[channel] == 2)
 					m_dma_source[channel] -= 8;
-				*(UINT64 *)data = m_program->read_qword(m_dma_source[channel] & ~7);
+				*(uint64_t *)data = m_program->read_qword(m_dma_source[channel] & ~7);
 				if (m_dma_source_increment[channel] == 1)
 					m_dma_source[channel] += 8;
 				break;
 			case 1:
 				if (m_dma_source_increment[channel] == 2)
 					m_dma_source[channel]--;
-				*(UINT8 *)data = m_program->read_byte(m_dma_source[channel]);
+				*(uint8_t *)data = m_program->read_byte(m_dma_source[channel]);
 				if (m_dma_source_increment[channel] == 1)
 					m_dma_source[channel]++;
 				break;
 			case 2:
 				if (m_dma_source_increment[channel] == 2)
 					m_dma_source[channel] -= 2;
-				*(UINT16 *)data = m_program->read_word(m_dma_source[channel] & ~1);
+				*(uint16_t *)data = m_program->read_word(m_dma_source[channel] & ~1);
 				if (m_dma_source_increment[channel] == 1)
 					m_dma_source[channel] += 2;
 				break;
 			case 4:
 				if (m_dma_source_increment[channel] == 2)
 					m_dma_source[channel] -= 4;
-				*(UINT32 *)data = m_program->read_dword(m_dma_source[channel] & ~3);
+				*(uint32_t *)data = m_program->read_dword(m_dma_source[channel] & ~3);
 				if (m_dma_source_increment[channel] == 1)
 					m_dma_source[channel] += 4;
 				break;
 			case 32:
 				if (m_dma_source_increment[channel] == 2)
 					m_dma_source[channel] -= 32;
-				*(UINT64 *)data = m_program->read_qword(m_dma_source[channel] & ~31);
-				*((UINT64 *)data+1) = m_program->read_qword((m_dma_source[channel] & ~31)+8);
-				*((UINT64 *)data+2) = m_program->read_qword((m_dma_source[channel] & ~31)+16);
-				*((UINT64 *)data+3) = m_program->read_qword((m_dma_source[channel] & ~31)+24);
+				*(uint64_t *)data = m_program->read_qword(m_dma_source[channel] & ~31);
+				*((uint64_t *)data+1) = m_program->read_qword((m_dma_source[channel] & ~31)+8);
+				*((uint64_t *)data+2) = m_program->read_qword((m_dma_source[channel] & ~31)+16);
+				*((uint64_t *)data+3) = m_program->read_qword((m_dma_source[channel] & ~31)+24);
 				if (m_dma_source_increment[channel] == 1)
 					m_dma_source[channel] += 32;
 				break;
@@ -373,38 +373,38 @@ int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 			case 8:
 				if (m_dma_destination_increment[channel] == 2)
 					m_dma_destination[channel]-=8;
-				m_program->write_qword(m_dma_destination[channel] & ~7, *(UINT64 *)data);
+				m_program->write_qword(m_dma_destination[channel] & ~7, *(uint64_t *)data);
 				if (m_dma_destination_increment[channel] == 1)
 					m_dma_destination[channel]+=8;
 				break;
 			case 1:
 				if (m_dma_destination_increment[channel] == 2)
 					m_dma_destination[channel]--;
-				m_program->write_byte(m_dma_destination[channel], *(UINT8 *)data);
+				m_program->write_byte(m_dma_destination[channel], *(uint8_t *)data);
 				if (m_dma_destination_increment[channel] == 1)
 					m_dma_destination[channel]++;
 				break;
 			case 2:
 				if (m_dma_destination_increment[channel] == 2)
 					m_dma_destination[channel]-=2;
-				m_program->write_word(m_dma_destination[channel] & ~1, *(UINT16 *)data);
+				m_program->write_word(m_dma_destination[channel] & ~1, *(uint16_t *)data);
 				if (m_dma_destination_increment[channel] == 1)
 					m_dma_destination[channel]+=2;
 				break;
 			case 4:
 				if (m_dma_destination_increment[channel] == 2)
 					m_dma_destination[channel]-=4;
-				m_program->write_dword(m_dma_destination[channel] & ~3, *(UINT32 *)data);
+				m_program->write_dword(m_dma_destination[channel] & ~3, *(uint32_t *)data);
 				if (m_dma_destination_increment[channel] == 1)
 					m_dma_destination[channel]+=4;
 				break;
 			case 32:
 				if (m_dma_destination_increment[channel] == 2)
 					m_dma_destination[channel]-=32;
-				m_program->write_qword(m_dma_destination[channel] & ~31, *(UINT64 *)data);
-				m_program->write_qword((m_dma_destination[channel] & ~31)+8, *((UINT64 *)data+1));
-				m_program->write_qword((m_dma_destination[channel] & ~31)+16, *((UINT64 *)data+2));
-				m_program->write_qword((m_dma_destination[channel] & ~31)+24, *((UINT64 *)data+3));
+				m_program->write_qword(m_dma_destination[channel] & ~31, *(uint64_t *)data);
+				m_program->write_qword((m_dma_destination[channel] & ~31)+8, *((uint64_t *)data+1));
+				m_program->write_qword((m_dma_destination[channel] & ~31)+16, *((uint64_t *)data+2));
+				m_program->write_qword((m_dma_destination[channel] & ~31)+24, *((uint64_t *)data+3));
 				if (m_dma_destination_increment[channel] == 1)
 					m_dma_destination[channel]+=32;
 				break;
@@ -426,10 +426,10 @@ int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 // called by drivers to transfer data in a DDT dma.
 void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 {
-	UINT32 chcr;
-	UINT32 *p32bits;
-	UINT64 *p32bytes;
-	UINT32 pos,len,siz;
+	uint32_t chcr;
+	uint32_t *p32bits;
+	uint64_t *p32bytes;
+	uint32_t pos,len,siz;
 
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_dma_ddt uses m_m[] with SH3\n");
@@ -527,7 +527,7 @@ void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 		if (s->size == 4) {
 			if ((s->direction) == 0) {
 				len = s->length;
-				p32bits = (UINT32 *)(s->buffer);
+				p32bits = (uint32_t *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
 					*p32bits = m_program->read_dword(s->source);
 					p32bits++;
@@ -535,7 +535,7 @@ void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 				}
 			} else {
 				len = s->length;
-				p32bits = (UINT32 *)(s->buffer);
+				p32bits = (uint32_t *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
 					m_program->write_dword(s->destination, *p32bits);
 					p32bits++;
@@ -546,7 +546,7 @@ void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 		if (s->size == 32) {
 			if ((s->direction) == 0) {
 				len = s->length * 4;
-				p32bytes = (UINT64 *)(s->buffer);
+				p32bytes = (uint64_t *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
 					*p32bytes = m_program->read_qword(s->source);
 					p32bytes++;
@@ -554,7 +554,7 @@ void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 				}
 			} else {
 				len = s->length * 4;
-				p32bytes = (UINT64 *)(s->buffer);
+				p32bytes = (uint64_t *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
 					m_program->write_qword(s->destination, *p32bytes);
 					p32bytes++;
@@ -566,93 +566,93 @@ void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 }
 
 
-	void sh34_base_device::sh4_handle_sar0_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_sar0_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_SAR0);
 }
 
-	void sh34_base_device::sh4_handle_sar1_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_sar1_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_SAR1);
 }
 
-	void sh34_base_device::sh4_handle_sar2_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_sar2_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_SAR2);
 }
 
-	void sh34_base_device::sh4_handle_sar3_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_sar3_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_SAR3);
 }
 
-	void sh34_base_device::sh4_handle_dar0_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dar0_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_DAR0);
 }
 
-	void sh34_base_device::sh4_handle_dar1_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dar1_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_DAR1);
 }
 
-	void sh34_base_device::sh4_handle_dar2_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dar2_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_DAR2);
 }
 
-	void sh34_base_device::sh4_handle_dar3_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dar3_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_DAR3);
 }
 
-	void sh34_base_device::sh4_handle_dmatcr0_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dmatcr0_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_DMATCR0);
 }
 
-	void sh34_base_device::sh4_handle_dmatcr1_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dmatcr1_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_DMATCR1);
 }
 
-	void sh34_base_device::sh4_handle_dmatcr2_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dmatcr2_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_DMATCR2);
 }
 
-	void sh34_base_device::sh4_handle_dmatcr3_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dmatcr3_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_DMATCR3);
 }
 
-	void sh34_base_device::sh4_handle_chcr0_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_chcr0_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_CHCR0);
 	sh4_dmac_check(0);
 }
 
-	void sh34_base_device::sh4_handle_chcr1_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_chcr1_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_CHCR1);
 	sh4_dmac_check(1);
 }
 
-	void sh34_base_device::sh4_handle_chcr2_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_chcr2_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_CHCR2);
 	sh4_dmac_check(2);
 }
 
-	void sh34_base_device::sh4_handle_chcr3_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_chcr3_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_CHCR3);
 	sh4_dmac_check(3);
 }
 
-	void sh34_base_device::sh4_handle_dmaor_addr_w(UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dmaor_addr_w(uint32_t data, uint32_t mem_mask)
 {
-	UINT32 old = m_SH4_DMAOR;
+	uint32_t old = m_SH4_DMAOR;
 	COMBINE_DATA(&m_SH4_DMAOR);
 
 	if ((m_SH4_DMAOR & DMAOR_AE) && (~old & DMAOR_AE))

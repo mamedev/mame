@@ -47,8 +47,8 @@ public:
 
 private:
 	bool m_dma_dir;
-	UINT16 m_dma_adr;
-	UINT8 m_term_data;
+	uint16_t m_dma_adr;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -79,7 +79,7 @@ ADDRESS_MAP_END
 // uart in
 READ8_MEMBER( dps1_state::port00_r )
 {
-	UINT8 data = 0x4e;
+	uint8_t data = 0x4e;
 	switch(offset)
 	{
 		case 0:
@@ -191,7 +191,7 @@ MACHINE_RESET_MEMBER( dps1_state, dps1 )
 
 DRIVER_INIT_MEMBER( dps1_state, dps1 )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x0400]);

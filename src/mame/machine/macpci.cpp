@@ -65,7 +65,7 @@ WRITE8_MEMBER(macpci_state::mac_via_out_b)
 
 READ16_MEMBER ( macpci_state::mac_via_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -97,7 +97,7 @@ WRITE16_MEMBER ( macpci_state::mac_via_w )
 
 READ_LINE_MEMBER(macpci_state::mac_adb_via_in_cb2)
 {
-	UINT8 ret;
+	uint8_t ret;
 	ret = m_cuda->get_via_data();
 	#if LOG_ADB
 	printf("PPC: Read VIA_DATA %x\n", ret);
@@ -169,7 +169,7 @@ READ32_MEMBER(macpci_state::mac_read_id)
 READ16_MEMBER ( macpci_state::mac_scc_r )
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
-	UINT16 result;
+	uint16_t result;
 
 	result = scc->reg_r(space, offset);
 	return (result << 8) | result;

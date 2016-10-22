@@ -4,7 +4,7 @@
 
 const device_type M24_Z8000 = &device_creator<m24_z8000_device>;
 
-m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M24_Z8000, "Olivetti M24 Z8000 Adapter", tag, owner, clock, "m24_z8000", __FILE__),
 	m_z8000(*this, "z8000"),
 	m_maincpu(*this, ":maincpu"),
@@ -86,7 +86,7 @@ machine_config_constructor m24_z8000_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( m24_z8000 );
 }
 
-const UINT8 m24_z8000_device::pmem_table[16][4] =
+const uint8_t m24_z8000_device::pmem_table[16][4] =
 	{{0, 1, 2, 3}, {1, 2, 3, 255}, {4, 5, 6, 7}, {46, 40, 41, 42},
 	{255, 255, 255, 255}, {255, 255, 255, 47}, {1, 2, 3, 255}, {255, 255, 255, 255},
 	{1, 2, 8, 9}, {5, 6, 10, 11}, {1, 2, 8, 9}, {12, 13, 14, 15},
@@ -94,8 +94,8 @@ const UINT8 m24_z8000_device::pmem_table[16][4] =
 
 READ16_MEMBER(m24_z8000_device::pmem_r)
 {
-	UINT16 ret;
-	UINT8 hostseg;
+	uint16_t ret;
+	uint8_t hostseg;
 	offset <<= 1;
 	if(!m_z8000_mem)
 		return memregion(subtag("z8000").c_str())->u16(offset >> 1);
@@ -112,7 +112,7 @@ READ16_MEMBER(m24_z8000_device::pmem_r)
 
 WRITE16_MEMBER(m24_z8000_device::pmem_w)
 {
-	UINT8 hostseg;
+	uint8_t hostseg;
 	data = (data << 8) | (data >> 8);
 	offset <<= 1;
 	hostseg = pmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
@@ -124,7 +124,7 @@ WRITE16_MEMBER(m24_z8000_device::pmem_w)
 	m_maincpu->space(AS_PROGRAM).write_word(offset, data, (mem_mask << 8) | (mem_mask >> 8));
 }
 
-const UINT8 m24_z8000_device::dmem_table[16][4] =
+const uint8_t m24_z8000_device::dmem_table[16][4] =
 	{{0, 1, 2, 3}, {4, 5, 6, 7}, {4, 5, 6, 7}, {46, 40, 41, 42},
 	{255, 255, 255, 255}, {1, 2, 3, 47}, {1, 2, 3, 255}, {255, 255, 255, 255},
 	{5, 6, 10, 11}, {5, 6, 10, 11}, {1, 2, 8, 9}, {12, 13, 14, 15},
@@ -132,8 +132,8 @@ const UINT8 m24_z8000_device::dmem_table[16][4] =
 
 READ16_MEMBER(m24_z8000_device::dmem_r)
 {
-	UINT16 ret;
-	UINT8 hostseg;
+	uint16_t ret;
+	uint8_t hostseg;
 	offset <<= 1;
 	hostseg = dmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
 	if(hostseg == 255)
@@ -147,7 +147,7 @@ READ16_MEMBER(m24_z8000_device::dmem_r)
 
 WRITE16_MEMBER(m24_z8000_device::dmem_w)
 {
-	UINT8 hostseg;
+	uint8_t hostseg;
 	data = (data << 8) | (data >> 8);
 	offset <<= 1;
 	hostseg = dmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
@@ -161,7 +161,7 @@ WRITE16_MEMBER(m24_z8000_device::dmem_w)
 
 READ16_MEMBER(m24_z8000_device::i86_io_r)
 {
-	UINT16 ret = m_maincpu->space(AS_IO).read_word(offset << 1, (mem_mask << 8) | (mem_mask >> 8));
+	uint16_t ret = m_maincpu->space(AS_IO).read_word(offset << 1, (mem_mask << 8) | (mem_mask >> 8));
 	return (ret << 8) | (ret >> 8);
 }
 

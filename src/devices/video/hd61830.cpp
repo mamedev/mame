@@ -70,7 +70,7 @@ const int MODE_DISPLAY_ON       = 0x20;
 //  readbyte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT8 hd61830_device::readbyte(offs_t address)
+inline uint8_t hd61830_device::readbyte(offs_t address)
 {
 	return space().read_byte(address);
 }
@@ -80,7 +80,7 @@ inline UINT8 hd61830_device::readbyte(offs_t address)
 //  writebyte - write a byte at the given address
 //-------------------------------------------------
 
-inline void hd61830_device::writebyte(offs_t address, UINT8 data)
+inline void hd61830_device::writebyte(offs_t address, uint8_t data)
 {
 	space().write_byte(address, data);
 }
@@ -95,7 +95,7 @@ inline void hd61830_device::writebyte(offs_t address, UINT8 data)
 //  hd61830_device - constructor
 //-------------------------------------------------
 
-hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HD61830, "HD61830 LCDC", tag, owner, clock, "hd61830", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -218,7 +218,7 @@ WRITE8_MEMBER( hd61830_device::control_w )
 
 READ8_MEMBER( hd61830_device::data_r )
 {
-	UINT8 data = m_dor;
+	uint8_t data = m_dor;
 
 	if (LOG) logerror("HD61830 '%s' Display Data Read %02x\n", tag(), m_dor);
 
@@ -326,7 +326,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 	case INSTRUCTION_CLEAR_BIT:
 		{
 		int bit = data & 0x07;
-		UINT8 md = readbyte(m_cac);
+		uint8_t md = readbyte(m_cac);
 
 		md &= ~(1 << bit);
 
@@ -341,7 +341,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 	case INSTRUCTION_SET_BIT:
 		{
 		int bit = data & 0x07;
-		UINT8 md = readbyte(m_cac);
+		uint8_t md = readbyte(m_cac);
 
 		md |= 1 << bit;
 
@@ -367,12 +367,12 @@ WRITE8_MEMBER( hd61830_device::data_w )
 //  draw_scanline - draw one graphics scanline
 //-------------------------------------------------
 
-UINT16 hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ra)
+uint16_t hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t ra)
 {
 	for (int sx = 0; sx < m_hn; sx+=2)
 	{
-		UINT8 data1 = readbyte(ra++);
-		UINT8 data2 = readbyte(ra++);
+		uint8_t data1 = readbyte(ra++);
+		uint8_t data2 = readbyte(ra++);
 
 		for (int x = 0; x < m_hp; x++)
 		{
@@ -395,8 +395,8 @@ UINT16 hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &clip
 
 void hd61830_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 rac1 = m_dsa;
-	UINT16 rac2 = rac1 + (m_nx * m_hn);
+	uint16_t rac1 = m_dsa;
+	uint16_t rac2 = rac1 + (m_nx * m_hn);
 	for (int y = 0; y < m_nx; y++)
 	{
 		/* draw upper half scanline */
@@ -412,7 +412,7 @@ void hd61830_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &clip
 //  draw_char - draw a char
 //-------------------------------------------------
 
-void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 ma, int x, int y, UINT8 md)
+void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t ma, int x, int y, uint8_t md)
 {
 	for (int cl = 0; cl < m_vp; cl++)
 	{
@@ -420,7 +420,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		{
 			int sy = y * m_vp + cl;
 			int sx = x * m_hp + cr;
-			UINT8 data;
+			uint8_t data;
 
 			if (m_mcr & MODE_EXTERNAL_CG)
 			{
@@ -428,7 +428,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			}
 			else
 			{
-				UINT16 addr = 0;
+				uint16_t addr = 0;
 
 				if (md >= 0x20 && md < 0x80 && cl < 7)
 				{
@@ -485,13 +485,13 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 void hd61830_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 ma = 0;
+	uint16_t ma = 0;
 	for (int y = 0; y < (m_nx / m_vp); y++)
 	{
 		for (int x = 0; x < m_hn; x+=2)
 		{
-			UINT8 md1 = readbyte(ma);
-			UINT8 md2 = readbyte(ma+1);
+			uint8_t md1 = readbyte(ma);
+			uint8_t md2 = readbyte(ma+1);
 
 			draw_char(bitmap, cliprect, ma, x, y, md1);
 			draw_char(bitmap, cliprect, ma+1, x+1, y, md2);
@@ -506,7 +506,7 @@ void hd61830_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect
 //  update_screen - update screen
 //-------------------------------------------------
 
-UINT32 hd61830_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hd61830_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_mcr & MODE_DISPLAY_ON)
 	{

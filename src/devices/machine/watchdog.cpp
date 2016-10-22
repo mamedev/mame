@@ -23,7 +23,7 @@ const device_type WATCHDOG_TIMER = &device_creator<watchdog_timer_device>;
 //  watchdog_timer_device - constructor
 //-------------------------------------------------
 
-watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WATCHDOG_TIMER, "Watchdog timer", tag, owner, clock, "watchdog", __FILE__),
 		m_vblank_count(0),
 		m_time(attotime::zero),
@@ -37,7 +37,7 @@ watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, cons
 //  to set the number of VBLANKs
 //-------------------------------------------------
 
-void watchdog_timer_device::static_set_vblank_count(device_t &device, const char *screen_tag, INT32 count)
+void watchdog_timer_device::static_set_vblank_count(device_t &device, const char *screen_tag, int32_t count)
 {
 	watchdog_timer_device &watchdog = downcast<watchdog_timer_device &>(device);
 	watchdog.m_screen_tag = screen_tag;

@@ -80,17 +80,17 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	// keyboard state
-	UINT8 m_kb;
+	uint8_t m_kb;
 
 	// memory state
-	UINT8 m_bank;
+	uint8_t m_bank;
 
 	// floppy state
 	int m_mtron;
 	int m_mfdbk;
 
 	// video state
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 	DECLARE_PALETTE_INIT(bw2);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);

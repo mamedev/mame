@@ -70,14 +70,14 @@ public:
 private:
 	bool m_timer_r;
 	bool m_clear;
-	UINT8 m_counter;
-	UINT8 m_digit;
-	UINT8 m_game;
-	UINT8 m_out_offs;
-	UINT8 m_port2;
+	uint8_t m_counter;
+	uint8_t m_digit;
+	uint8_t m_game;
+	uint8_t m_out_offs;
+	uint8_t m_port2;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 };
 
 
@@ -266,7 +266,7 @@ READ8_MEMBER( ltd_state:: port1_r )
 {
 	if (~m_port2 & 0x10)
 	{
-		UINT8 row = m_digit >> 4;
+		uint8_t row = m_digit >> 4;
 
 		if (row==0)
 			return ioport("X0")->read();
@@ -299,8 +299,8 @@ WRITE8_MEMBER( ltd_state::port1_w )
 {
 	if (m_port2 & 0x10)
 	{
-		UINT8 row = m_digit & 15;
-		UINT8 segment = BITSWAP8(data, 7, 0, 1, 2, 3, 4, 5, 6);
+		uint8_t row = m_digit & 15;
+		uint8_t segment = BITSWAP8(data, 7, 0, 1, 2, 3, 4, 5, 6);
 
 		switch (m_counter)
 		{
@@ -388,7 +388,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 {
 	m_timer_r ^= 1;
 	m_maincpu->set_input_line(M6802_IRQ_LINE, (m_timer_r) ? CLEAR_LINE : ASSERT_LINE);
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	m_out_offs++;
 	if (m_out_offs > 0x7f) m_out_offs = 0x60;
 

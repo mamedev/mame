@@ -88,7 +88,7 @@ public:
 
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(hx20);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( ksc_w );
 	DECLARE_READ8_MEMBER( krtn07_r );
@@ -125,11 +125,11 @@ public:
 	int m_rtc_irq;
 
 	// keyboard state
-	UINT8 m_ksc;
+	uint8_t m_ksc;
 	int m_kbrequest;
 
 	// video state
-	UINT8 m_lcd_data;
+	uint8_t m_lcd_data;
 
 	// sio state
 	int m_sio_rx;

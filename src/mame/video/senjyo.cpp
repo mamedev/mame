@@ -20,7 +20,7 @@
 
 TILE_GET_INFO_MEMBER(senjyo_state::get_fg_tile_info)
 {
-	UINT8 attr = m_fgcolorram[tile_index];
+	uint8_t attr = m_fgcolorram[tile_index];
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
 
 	if (m_is_senjyo && (tile_index & 0x1f) >= 32-8)
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(senjyo_state::senjyo_bg1_tile_info)
 {
-	UINT8 code = m_bg1videoram[tile_index];
+	uint8_t code = m_bg1videoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(1,
 			code,
@@ -46,8 +46,8 @@ TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
 {
 	/* Star Force has more tiles in bg1, so to get a uniform color code spread */
 	/* they wired bit 7 of the tile code in place of bit 4 to get the color code */
-	static const UINT8 colormap[8] = { 0, 2, 4, 6, 1, 3, 5, 7 };
-	UINT8 code = m_bg1videoram[tile_index];
+	static const uint8_t colormap[8] = { 0, 2, 4, 6, 1, 3, 5, 7 };
+	uint8_t code = m_bg1videoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(1,
 			code,
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
 
 TILE_GET_INFO_MEMBER(senjyo_state::get_bg2_tile_info)
 {
-	UINT8 code = m_bg2videoram[tile_index];
+	uint8_t code = m_bg2videoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(2,
 			code,
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg2_tile_info)
 
 TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
 {
-	UINT8 code = m_bg3videoram[tile_index];
+	uint8_t code = m_bg3videoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(3,
 			code,
@@ -109,10 +109,10 @@ void senjyo_state::video_start()
 
 PALETTE_DECODER_MEMBER( senjyo_state, IIBBGGRR )
 {
-	UINT8 i = (raw >> 6) & 3;
-	UINT8 r = (raw << 2) & 0x0c;
-	UINT8 g = (raw     ) & 0x0c;
-	UINT8 b = (raw >> 2) & 0x0c;
+	uint8_t i = (raw >> 6) & 3;
+	uint8_t r = (raw << 2) & 0x0c;
+	uint8_t g = (raw     ) & 0x0c;
+	uint8_t b = (raw >> 2) & 0x0c;
 
 	return rgb_t(pal4bit(r ? (r | i) : 0), pal4bit(g ? (g | i) : 0), pal4bit(b ? (b | i) : 0));
 }
@@ -265,7 +265,7 @@ void senjyo_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	}
 }
 
-UINT32 senjyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t senjyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int flip = flip_screen();
 
@@ -312,7 +312,7 @@ UINT32 senjyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 #if 0
 {
 	char baf[80];
-	UINT8 *senjyo_scrolly3 = m_scrolly3;
+	uint8_t *senjyo_scrolly3 = m_scrolly3;
 
 	sprintf(baf,"%02x %02x %02x %02x %02x %02x %02x %02x",
 		senjyo_scrolly3[0x00],

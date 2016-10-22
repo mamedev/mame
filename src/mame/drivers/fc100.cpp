@@ -75,7 +75,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 
-	UINT8 *m_p_chargen;
+	uint8_t *m_p_chargen;
 
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
@@ -86,23 +86,23 @@ private:
 	virtual void machine_reset() override;
 
 	// graphics signals
-	UINT8 m_ag;
-	UINT8 m_gm2;
-	UINT8 m_gm1;
-	UINT8 m_gm0;
-	UINT8 m_as;
-	UINT8 m_css;
-	UINT8 m_intext;
-	UINT8 m_inv;
-	UINT8 m_cass_data[4];
+	uint8_t m_ag;
+	uint8_t m_gm2;
+	uint8_t m_gm1;
+	uint8_t m_gm0;
+	uint8_t m_as;
+	uint8_t m_css;
+	uint8_t m_intext;
+	uint8_t m_inv;
+	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
-	UINT8 m_key_pressed;
+	uint8_t m_key_pressed;
 	bool m_banksw_unlocked;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
 	required_device<i8251_device> m_uart;
@@ -290,7 +290,7 @@ READ8_MEMBER( fc100_state::port00_r )
 TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_k)
 {
 	/* scan the keyboard */
-	UINT8 i;
+	uint8_t i;
 
 	for (i = 0; i < 16; i++)
 	{
@@ -359,8 +359,8 @@ READ8_MEMBER( fc100_state::mc6847_videoram_r )
 	}
 
 	// Standard text
-	UINT8 data = m_p_videoram[offset];
-	UINT8 attr = m_p_videoram[offset+0x200];
+	uint8_t data = m_p_videoram[offset];
+	uint8_t attr = m_p_videoram[offset+0x200];
 
 	// unknown bits 1,2,4,7
 	m_vdg->inv_w( BIT( attr, 0 ));
@@ -441,7 +441,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -501,8 +501,8 @@ WRITE8_MEMBER( fc100_state::port70_w )
 
 DRIVER_INIT_MEMBER( fc100_state, fc100 )
 {
-	UINT8 *ram = memregion("ram")->base();
-	UINT8 *cgen = memregion("chargen")->base()+0x800;
+	uint8_t *ram = memregion("ram")->base();
+	uint8_t *cgen = memregion("chargen")->base()+0x800;
 
 	membank("bankr")->configure_entry(0, &cgen[0]);
 	membank("bankw")->configure_entry(0, &ram[0]);

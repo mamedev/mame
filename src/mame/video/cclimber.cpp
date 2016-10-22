@@ -40,7 +40,7 @@
 ***************************************************************************/
 PALETTE_INIT_MEMBER(cclimber_state,cclimber)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -117,7 +117,7 @@ PALETTE_INIT_MEMBER(cclimber_state,cclimber)
 
 PALETTE_INIT_MEMBER(cclimber_state,swimmer)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -186,7 +186,7 @@ PALETTE_INIT_MEMBER(cclimber_state,swimmer)
 
 PALETTE_INIT_MEMBER(cclimber_state,yamato)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* chars - 12 bits RGB */
@@ -254,7 +254,7 @@ PALETTE_INIT_MEMBER(cclimber_state,yamato)
 
 PALETTE_INIT_MEMBER(cclimber_state,toprollr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0xa0; i++)
@@ -497,8 +497,8 @@ void cclimber_state::draw_playfield(screen_device &screen, bitmap_ind16 &bitmap,
 
 void cclimber_state::cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 x = m_bigsprite_control[3] - 8;
-	UINT8 y = m_bigsprite_control[2];
+	uint8_t x = m_bigsprite_control[3] - 8;
+	uint8_t y = m_bigsprite_control[2];
 	int bigsprite_flip_x = (m_bigsprite_control[1] & 0x10) >> 4;
 	int bigsprite_flip_y = (m_bigsprite_control[1] & 0x20) >> 5;
 
@@ -522,8 +522,8 @@ void cclimber_state::cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16
 
 void cclimber_state::toprollr_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 x = m_bigsprite_control[3] - 8;
-	UINT8 y = m_bigsprite_control[2];
+	uint8_t x = m_bigsprite_control[3] - 8;
+	uint8_t y = m_bigsprite_control[2];
 
 	m_bs_tilemap->mark_all_dirty();
 
@@ -650,7 +650,7 @@ void cclimber_state::swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 }
 
 
-UINT32 cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(CCLIMBER_BG_PEN, cliprect);
 	draw_playfield(screen, bitmap, cliprect);
@@ -673,10 +673,10 @@ UINT32 cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_ind1
 }
 
 
-UINT32 cclimber_state::screen_update_yamato(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cclimber_state::screen_update_yamato(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
-	UINT8 *sky_rom = memregion("user1")->base() + 0x1200;
+	uint8_t *sky_rom = memregion("user1")->base() + 0x1200;
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -707,7 +707,7 @@ UINT32 cclimber_state::screen_update_yamato(screen_device &screen, bitmap_ind16 
 }
 
 
-UINT32 cclimber_state::screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cclimber_state::screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	swimmer_set_background_pen();
 
@@ -759,7 +759,7 @@ UINT32 cclimber_state::screen_update_swimmer(screen_device &screen, bitmap_ind16
 }
 
 
-UINT32 cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle scroll_area_clip = cliprect;
 	scroll_area_clip.min_x = 4*8;

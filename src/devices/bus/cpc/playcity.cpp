@@ -52,7 +52,7 @@ machine_config_constructor cpc_playcity_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_playcity_device::cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_playcity_device::cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_PLAYCITY, "PlayCity", tag, owner, clock, "cpc_playcity", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_ctc(*this,"ctc"),
@@ -132,8 +132,8 @@ READ8_MEMBER(cpc_playcity_device::ymz2_data_r)
 void cpc_playcity_device::update_ymz_clock()
 {
 	// Bit of a hack job here, since there is no way currently to connect the CTC channel output directly to the YMZ clocks.
-	UINT8 rate = m_ctc->get_channel_constant(0);
-	UINT32 clk = XTAL_4MHz;
+	uint8_t rate = m_ctc->get_channel_constant(0);
+	uint32_t clk = XTAL_4MHz;
 
 	switch(rate)
 	{

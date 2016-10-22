@@ -354,7 +354,7 @@ ioport_constructor ms7004_device::device_input_ports() const
 //  ms7004_device - constructor
 //-------------------------------------------------
 
-ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MS7004, "MS7004 keyboard", tag, owner, clock, "ms7004", __FILE__),
 	m_maincpu(*this, MS7004_CPU_TAG),
 	m_speaker(*this, MS7004_SPK_TAG),

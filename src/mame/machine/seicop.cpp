@@ -43,7 +43,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::reg_hi_addr_w)
 WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 {
 	//printf("%04x %08x %08x\n",data,m_reg[0],m_reg[1]);
-	UINT8 offs;
+	uint8_t offs;
 
 	offs = (offset & 3) * 4;
 
@@ -61,7 +61,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 		case 0xdde5:
 		{
 			int div;
-			INT16 dir_offset;
+			int16_t dir_offset;
 
 			div = m_host_space->read_word(m_reg[4] + offs);
 			dir_offset = m_host_space->read_word(m_reg[4] + offs + 8);
@@ -157,7 +157,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 		*/
 		case 0x8100:
 		{
-			UINT16 sin_offs; //= m_host_space->read_dword(m_reg[0]+(0x34));
+			uint16_t sin_offs; //= m_host_space->read_dword(m_reg[0]+(0x34));
 			sin_offs = m_host_space->read_byte(m_reg[0]+(0x35));
 			sin_offs |= m_host_space->read_byte(m_reg[0]+(0x37)) << 8;
 			int raw_angle = (m_host_space->read_word(m_reg[0]+(0x34^2)) & 0xff);
@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( seibucopbl_map, AS_0, 16, seibu_cop_bootleg_device )
 	AM_RANGE(0x1b4, 0x1b5) AM_READ(angle_r)
 ADDRESS_MAP_END
 
-seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_COP_BOOTLEG, "Seibu COP (Bootleg)", tag, owner, clock, "seibu_cop_boot", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("regs", ENDIANNESS_LITTLE, 16, 9, 0, nullptr, *ADDRESS_MAP_NAME(seibucopbl_map))
@@ -275,7 +275,7 @@ void seibu_cop_bootleg_device::device_config_complete()
 
 void seibu_cop_bootleg_device::device_start()
 {
-//  m_cop_mcu_ram = reinterpret_cast<UINT16 *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
+//  m_cop_mcu_ram = reinterpret_cast<uint16_t *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
 
 }
 
@@ -289,7 +289,7 @@ void seibu_cop_bootleg_device::device_reset()
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 }
 
-inline UINT16 seibu_cop_bootleg_device::read_word(offs_t address)
+inline uint16_t seibu_cop_bootleg_device::read_word(offs_t address)
 {
 	return space().read_word(address << 1);
 }
@@ -298,7 +298,7 @@ inline UINT16 seibu_cop_bootleg_device::read_word(offs_t address)
 //  write_word - write a word at the given address
 //-------------------------------------------------
 
-inline void seibu_cop_bootleg_device::write_word(offs_t address, UINT16 data)
+inline void seibu_cop_bootleg_device::write_word(offs_t address, uint16_t data)
 {
 	space().write_word(address << 1, data);
 }

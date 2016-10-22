@@ -17,7 +17,7 @@
 
 const device_type K001604 = &device_creator<k001604_device>;
 
-k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K001604, "K001604 2D tilemaps + 2x ROZ", tag, owner, clock, "k001604", __FILE__),
 	device_gfx_interface(mconfig, *this, nullptr),
 	m_layer_size(0),
@@ -61,9 +61,9 @@ void k001604_device::device_start()
 
 	int roz_tile_size;
 
-	m_char_ram = make_unique_clear<UINT32[]>(0x200000 / 4);
-	m_tile_ram = make_unique_clear<UINT32[]>(0x20000 / 4);
-	m_reg = make_unique_clear<UINT32[]>(0x400 / 4);
+	m_char_ram = make_unique_clear<uint32_t[]>(0x200000 / 4);
+	m_tile_ram = make_unique_clear<uint32_t[]>(0x20000 / 4);
+	m_reg = make_unique_clear<uint32_t[]>(0x400 / 4);
 
 	/* create tilemaps */
 	roz_tile_size = m_roz_size ? 16 : 8;
@@ -86,8 +86,8 @@ void k001604_device::device_start()
 	m_layer_8x8[0]->set_transparent_pen(0);
 	m_layer_8x8[1]->set_transparent_pen(0);
 
-	set_gfx(0, std::make_unique<gfx_element>(palette(), k001604_char_layout_layer_8x8, (UINT8*)&m_char_ram[0], 0, palette().entries() / 16, 0));
-	set_gfx(1, std::make_unique<gfx_element>(palette(), k001604_char_layout_layer_16x16, (UINT8*)&m_char_ram[0], 0, palette().entries() / 16, 0));
+	set_gfx(0, std::make_unique<gfx_element>(palette(), k001604_char_layout_layer_8x8, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
+	set_gfx(1, std::make_unique<gfx_element>(palette(), k001604_char_layout_layer_16x16, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
 
 	save_pointer(NAME(m_reg.get()), 0x400 / 4);
 	save_pointer(NAME(m_char_ram.get()), 0x200000 / 4);
@@ -151,7 +151,7 @@ TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_roz_256)
 
 TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_8x8)
 {
-	UINT32 val = m_tile_ram[tile_index];
+	uint32_t val = m_tile_ram[tile_index];
 	int color = (val >> 17) & 0x1f;
 	int tile = (val & 0x7fff);
 	int flags = 0;
@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_8x8)
 
 TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
 {
-	UINT32 val = m_tile_ram[tile_index];
+	uint32_t val = m_tile_ram[tile_index];
 	int flags = 0;
 	int color = (val >> 17) & 0x1f;
 	int tile = m_roz_size ? (val & 0x7ff) : (val & 0x1fff);
@@ -191,15 +191,15 @@ void k001604_device::draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cli
 
 	int tile_size = m_roz_size ? 16 : 8;
 
-	INT32 x  = (INT16)((m_reg[0x08] >> 16) & 0xffff);
-	INT32 y  = (INT16)((m_reg[0x08] >>  0) & 0xffff);
-	INT32 xx = (INT16)((m_reg[0x09] >>  0) & 0xffff);
-	INT32 xy = (INT16)((m_reg[0x09] >> 16) & 0xffff);
-	INT32 yx = (INT16)((m_reg[0x0a] >>  0) & 0xffff);
-	INT32 yy = (INT16)((m_reg[0x0a] >> 16) & 0xffff);
+	int32_t x  = (int16_t)((m_reg[0x08] >> 16) & 0xffff);
+	int32_t y  = (int16_t)((m_reg[0x08] >>  0) & 0xffff);
+	int32_t xx = (int16_t)((m_reg[0x09] >>  0) & 0xffff);
+	int32_t xy = (int16_t)((m_reg[0x09] >> 16) & 0xffff);
+	int32_t yx = (int16_t)((m_reg[0x0a] >>  0) & 0xffff);
+	int32_t yy = (int16_t)((m_reg[0x0a] >> 16) & 0xffff);
 
-	int pivotx = (INT16)((m_reg[0x00] >> 16) & 0xffff);
-	int pivoty = (INT16)((m_reg[0x00] >>  0) & 0xffff);
+	int pivotx = (int16_t)((m_reg[0x00] >> 16) & 0xffff);
+	int pivoty = (int16_t)((m_reg[0x00] >>  0) & 0xffff);
 
 	int startx  = ((x - pivotx) * 256) * 32;
 	int starty  = ((y - pivoty) * 256) * 32;
@@ -245,10 +245,10 @@ void k001604_device::draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cli
 	{
 		// initialize X counters
 		int x = sx;
-		UINT32 cx = startx;
-		UINT32 cy = starty;
+		uint32_t cx = startx;
+		uint32_t cy = starty;
 
-		UINT32 *dest = &bitmap.pix(sy, sx);
+		uint32_t *dest = &bitmap.pix(sy, sx);
 
 		// loop over columns
 		while (x <= ex)
@@ -289,7 +289,7 @@ READ32_MEMBER( k001604_device::tile_r )
 READ32_MEMBER( k001604_device::char_r )
 {
 	int set, bank;
-	UINT32 addr;
+	uint32_t addr;
 
 	set = (m_reg[0x60 / 4] & 0x1000000) ? 0x100000 : 0;
 
@@ -363,7 +363,7 @@ WRITE32_MEMBER( k001604_device::tile_w )
 WRITE32_MEMBER( k001604_device::char_w )
 {
 	int set, bank;
-	UINT32 addr;
+	uint32_t addr;
 
 	set = (m_reg[0x60/4] & 0x1000000) ? 0x100000 : 0;
 

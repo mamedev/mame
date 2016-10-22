@@ -31,18 +31,18 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_charram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_charram;
 
-	UINT8 m_sasuke_counter;
+	uint8_t m_sasuke_counter;
 	int m_charbank;
 	int m_backcolor;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	rgb_t m_palette_val[64];
-	UINT8 m_irq_mask;
+	uint8_t m_irq_mask;
 
 	// common
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -76,7 +76,7 @@ public:
 	DECLARE_MACHINE_RESET(pballoon);
 	DECLARE_VIDEO_START(pballoon);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(satansat_interrupt);
 	INTERRUPT_GEN_MEMBER(snk6502_interrupt);
@@ -97,17 +97,17 @@ struct TONE
 	int offset;
 	int base;
 	int mask;
-	INT32   sample_rate;
-	INT32   sample_step;
-	INT32   sample_cur;
-	INT16   form[16];
+	int32_t   sample_rate;
+	int32_t   sample_step;
+	int32_t   sample_cur;
+	int16_t   form[16];
 };
 
 class snk6502_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~snk6502_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( sasuke_sound_w );
@@ -131,17 +131,17 @@ protected:
 private:
 	// internal state
 	TONE m_tone_channels[CHANNELS];
-	INT32 m_tone_clock_expire;
-	INT32 m_tone_clock;
+	int32_t m_tone_clock_expire;
+	int32_t m_tone_clock;
 	sound_stream * m_tone_stream;
 
 	optional_device<samples_device> m_samples;
-	UINT8 *m_ROM;
+	uint8_t *m_ROM;
 	int m_Sound0StopOnRollover;
-	UINT8 m_LastPort1;
+	uint8_t m_LastPort1;
 
 	int m_hd38880_cmd;
-	UINT32 m_hd38880_addr;
+	uint32_t m_hd38880_addr;
 	int m_hd38880_data_bytes;
 	double m_hd38880_speed;
 
@@ -149,7 +149,7 @@ private:
 	void sasuke_build_waveform(int mask);
 	void satansat_build_waveform(int mask);
 	void build_waveform(int channel, int mask);
-	void speech_w(UINT8 data, const UINT16 *table, int start);
+	void speech_w(uint8_t data, const uint16_t *table, int start);
 };
 
 extern const device_type SNK6502;

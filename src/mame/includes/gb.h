@@ -31,33 +31,33 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_ppu(*this, "ppu") { }
 
-	UINT8       m_gb_io[0x10];
+	uint8_t       m_gb_io[0x10];
 
 	/* Timer related */
-	UINT16      m_divcount;
-	UINT8       m_shift;
-	UINT16      m_shift_cycles;
-	UINT8       m_triggering_irq;
-	UINT8       m_reloading;
+	uint16_t      m_divcount;
+	uint8_t       m_shift;
+	uint16_t      m_shift_cycles;
+	uint8_t       m_triggering_irq;
+	uint8_t       m_reloading;
 
 	/* Serial I/O related */
-	UINT16      m_internal_serial_clock;
-	UINT16      m_internal_serial_frequency;
-	UINT32      m_sio_count;             /* Serial I/O counter */
+	uint16_t      m_internal_serial_clock;
+	uint16_t      m_internal_serial_frequency;
+	uint32_t      m_sio_count;             /* Serial I/O counter */
 
 	/* SGB variables */
-	INT8 m_sgb_packets;
-	UINT8 m_sgb_bitcount;
-	UINT8 m_sgb_bytecount;
-	UINT8 m_sgb_start;
-	UINT8 m_sgb_rest;
-	UINT8 m_sgb_controller_no;
-	UINT8 m_sgb_controller_mode;
-	UINT8 m_sgb_data[0x100];
+	int8_t m_sgb_packets;
+	uint8_t m_sgb_bitcount;
+	uint8_t m_sgb_bytecount;
+	uint8_t m_sgb_start;
+	uint8_t m_sgb_rest;
+	uint8_t m_sgb_controller_no;
+	uint8_t m_sgb_controller_mode;
+	uint8_t m_sgb_data[0x100];
 
 	/* CGB variables */
-	UINT8       *m_gbc_rammap[8];           /* (CGB) Addresses of internal RAM banks */
-	UINT8       m_gbc_rambank;          /* (CGB) Current CGB RAM bank */
+	uint8_t       *m_gbc_rammap[8];           /* (CGB) Addresses of internal RAM banks */
+	uint8_t       m_gbc_rambank;          /* (CGB) Current CGB RAM bank */
 
 	bool m_bios_disable;
 

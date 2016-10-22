@@ -285,7 +285,7 @@ INPUT_PORTS_END
 //  atari_jsa_base_device - constructor
 //-------------------------------------------------
 
-atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int channels)
+atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels)
 	: device_t(mconfig, devtype, name, tag, owner, clock, shortname, __FILE__),
 		device_mixer_interface(mconfig, *this, channels),
 		m_soundcomm(*this, "soundcomm"),
@@ -412,7 +412,7 @@ WRITE_LINE_MEMBER( atari_jsa_base_device::main_int_write_line )
 //  atari_jsa_oki_base_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_oki_base_device::atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int channels)
+atari_jsa_oki_base_device::atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels)
 	: atari_jsa_base_device(mconfig, devtype, name, tag, owner, clock, shortname, channels),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
@@ -628,7 +628,7 @@ void atari_jsa_oki_base_device::update_all_volumes()
 //  atari_jsa_i_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_i_device::atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_jsa_i_device::atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: atari_jsa_base_device(mconfig, ATARI_JSA_I, "Atari JSA I Sound Board", tag, owner, clock, "atjsa1", 2),
 		m_pokey(*this, "pokey"),
 		m_tms5220(*this, "tms"),
@@ -657,7 +657,7 @@ READ8_MEMBER( atari_jsa_i_device::rdio_r )
 	//  0x01 = coin 1
 	//
 
-	UINT8 result = m_jsai->read();
+	uint8_t result = m_jsai->read();
 	if (!m_test_read_cb())
 		result ^= 0x80;
 	if (m_tms5220 != nullptr && m_tms5220->readyq_r() == 0)
@@ -843,7 +843,7 @@ void atari_jsa_i_device::update_all_volumes()
 //  atari_jsa_ii_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_ii_device::atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_jsa_ii_device::atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: atari_jsa_oki_base_device(mconfig, ATARI_JSA_II, "Atari JSA II Sound Board", tag, owner, clock, "atjsa2", 1)
 	, m_jsaii(*this, "JSAII")
 {
@@ -868,7 +868,7 @@ READ8_MEMBER( atari_jsa_ii_device::rdio_r )
 	//  0x01 = coin 1
 	//
 
-	UINT8 result = m_jsaii->read();
+	uint8_t result = m_jsaii->read();
 	if (!m_test_read_cb())
 		result ^= 0x80;
 
@@ -907,13 +907,13 @@ ioport_constructor atari_jsa_ii_device::device_input_ports() const
 //  atari_jsa_iii_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: atari_jsa_oki_base_device(mconfig, ATARI_JSA_III, "Atari JSA III Sound Board", tag, owner, clock, "atjsa3", 1)
 	, m_jsaiii(*this, "JSAIII")
 {
 }
 
-atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int channels)
+atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels)
 	: atari_jsa_oki_base_device(mconfig, devtype, name, tag, owner, clock, shortname, channels)
 	, m_jsaiii(*this, "JSAIII")
 {
@@ -938,7 +938,7 @@ READ8_MEMBER( atari_jsa_iii_device::rdio_r )
 	//  0x01 = coin R (active high)
 	//
 
-	UINT8 result = m_jsaiii->read();
+	uint8_t result = m_jsaiii->read();
 	if (!m_test_read_cb())
 		result ^= 0x90;
 	return result;
@@ -976,7 +976,7 @@ ioport_constructor atari_jsa_iii_device::device_input_ports() const
 //  atari_jsa_iiis_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_iiis_device::atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_jsa_iiis_device::atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: atari_jsa_iii_device(mconfig, ATARI_JSA_IIIS, "Atari JSA IIIs Sound Board", tag, owner, clock, "atjsa3s", 2)
 {
 }

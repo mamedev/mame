@@ -9,7 +9,7 @@
 class nscsi_s1410_device : public nscsi_harddisk_device
 {
 public:
-	nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// SCSI status returns
@@ -65,10 +65,10 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void scsi_command() override;
-	virtual UINT8 scsi_get_data(int id, int pos) override;
-	virtual void scsi_put_data(int buf, int offset, UINT8 data) override;
+	virtual uint8_t scsi_get_data(int id, int pos) override;
+	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
 
-	UINT8 params[8];
+	uint8_t params[8];
 };
 
 extern const device_type NSCSI_S1410;

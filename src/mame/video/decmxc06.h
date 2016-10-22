@@ -7,7 +7,7 @@ class deco_mxc06_device : public device_t,
 								public device_video_interface
 {
 public:
-	deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -20,15 +20,15 @@ public:
 
 
 	void set_gfxregion(int region) { m_gfxregion = region; };
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int pri_mask, int pri_val, int col_mask );
-	void draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram16, int pri_mask, int pri_val, int col_mask );
+	void draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int pri_mask, int pri_val, int col_mask );
 	void set_pri_type( int type ) { m_priority_type = type; }
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	UINT8 m_gfxregion;
+	uint8_t m_gfxregion;
 	int m_priority_type; // just so we can support the existing drivers without converting everything to pdrawgfx just yet
 	int m_ramsize;
 

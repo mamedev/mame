@@ -33,7 +33,7 @@
 class iteagle_fpga_device : public pci_device
 {
 public:
-	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	required_device<nvram_device> m_rtc;
@@ -54,26 +54,26 @@ private:
 	int m_irq_num;
 	int m_serial_irq_num;
 
-	UINT32 m_fpga_regs[0x20 / 4];
-	UINT32 m_rtc_regs[0x800 / 4];
-	UINT32 m_ram[0x20000 / 4];
-	UINT32 m_prev_reg;
+	uint32_t m_fpga_regs[0x20 / 4];
+	uint32_t m_rtc_regs[0x800 / 4];
+	uint32_t m_ram[0x20000 / 4];
+	uint32_t m_prev_reg;
 
 	std::string m_serial_str;
 	std::string m_serial_rx3;
-	UINT8 m_serial_idx;
+	uint8_t m_serial_idx;
 	bool  m_serial_data;
-	UINT8 m_serial_com0[0x10];
-	UINT8 m_serial_com1[0x10];
-	UINT8 m_serial_com2[0x10];
-	UINT8 m_serial_com3[0x10];
+	uint8_t m_serial_com0[0x10];
+	uint8_t m_serial_com1[0x10];
+	uint8_t m_serial_com2[0x10];
+	uint8_t m_serial_com3[0x10];
 
-	UINT32 m_version;
-	UINT32 m_seq_init;
-	UINT32 m_seq;
-	UINT32 m_seq_rem1, m_seq_rem2;
-	void update_sequence(UINT32 data);
-	void update_sequence_eg1(UINT32 data);
+	uint32_t m_version;
+	uint32_t m_seq_init;
+	uint32_t m_seq;
+	uint32_t m_seq_rem1, m_seq_rem2;
+	void update_sequence(uint32_t data);
+	void update_sequence_eg1(uint32_t data);
 
 	DECLARE_ADDRESS_MAP(rtc_map, 32);
 	DECLARE_ADDRESS_MAP(fpga_map, 32);
@@ -90,11 +90,11 @@ private:
 
 class iteagle_eeprom_device : public pci_device {
 public:
-	iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
@@ -105,10 +105,10 @@ protected:
 
 private:
 	address_space *m_memory_space;
-	UINT16 m_sw_version;
-	UINT8 m_hw_version;
+	uint16_t m_sw_version;
+	uint8_t m_hw_version;
 
-	std::array<UINT16, 0x40> m_iteagle_default_eeprom;
+	std::array<uint16_t, 0x40> m_iteagle_default_eeprom;
 
 	DECLARE_ADDRESS_MAP(eeprom_map, 32);
 	DECLARE_READ32_MEMBER( eeprom_r );
@@ -117,7 +117,7 @@ private:
 
 class iteagle_periph_device : public pci_device {
 public:
-	iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
@@ -127,8 +127,8 @@ protected:
 private:
 	optional_device<nvram_device> m_rtc;
 
-	UINT32 m_ctrl_regs[0xd0/4];
-	UINT8 m_rtc_regs[0x100];
+	uint32_t m_ctrl_regs[0xd0/4];
+	uint8_t m_rtc_regs[0x100];
 
 	DECLARE_ADDRESS_MAP(ctrl_map, 32);
 

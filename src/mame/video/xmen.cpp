@@ -67,7 +67,7 @@ VIDEO_START_MEMBER(xmen_state,xmen6p)
 
 ***************************************************************************/
 
-UINT32 xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[3], bg_colorbase;
 
@@ -102,14 +102,14 @@ UINT32 xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-UINT32 xmen_state::screen_update_xmen6p_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t xmen_state::screen_update_xmen6p_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
 	for(y = 0; y < 32 * 8; y++)
 	{
-		UINT16* line_dest = &bitmap.pix16(y);
-		UINT16* line_src = &m_screen_left->pix16(y);
+		uint16_t* line_dest = &bitmap.pix16(y);
+		uint16_t* line_src = &m_screen_left->pix16(y);
 
 		for (x = 12 * 8; x < 52 * 8; x++)
 			line_dest[x] = line_src[x];
@@ -118,14 +118,14 @@ UINT32 xmen_state::screen_update_xmen6p_left(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-UINT32 xmen_state::screen_update_xmen6p_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t xmen_state::screen_update_xmen6p_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
 	for(y = 0; y < 32 * 8; y++)
 	{
-		UINT16* line_dest = &bitmap.pix16(y);
-		UINT16* line_src = &m_screen_right->pix16(y);
+		uint16_t* line_dest = &bitmap.pix16(y);
+		uint16_t* line_src = &m_screen_right->pix16(y);
 
 		for (x = 12 * 8; x < 52 * 8; x++)
 			line_dest[x] = line_src[x];

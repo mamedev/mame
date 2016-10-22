@@ -9,7 +9,7 @@
 
 void volfied_state::video_start()
 {
-	m_video_ram = std::make_unique<UINT16[]>(0x40000);
+	m_video_ram = std::make_unique<uint16_t[]>(0x40000);
 
 	m_video_ctrl = 0;
 	m_video_mask = 0;
@@ -91,7 +91,7 @@ void volfied_state::refresh_pixel_layer( bitmap_ind16 &bitmap )
 
 	*********************************************************/
 
-	UINT16* p = m_video_ram.get();
+	uint16_t* p = m_video_ram.get();
 	int width = m_screen->width();
 	int height = m_screen->height();
 
@@ -121,7 +121,7 @@ void volfied_state::refresh_pixel_layer( bitmap_ind16 &bitmap )
 	}
 }
 
-UINT32 volfied_state::screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t volfied_state::screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	refresh_pixel_layer(bitmap);

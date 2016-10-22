@@ -76,7 +76,7 @@ class svi_slot_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~svi_slot_bus_device();
 
 	// callbacks
@@ -128,7 +128,7 @@ class svi_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
 	static void set_bus(device_t &device, device_t *owner, const char *bus_tag);

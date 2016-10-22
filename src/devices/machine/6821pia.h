@@ -78,7 +78,7 @@ class pia6821_device :  public device_t
 {
 public:
 	// construction/destruction
-	pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	// TODO: REMOVE THESE
@@ -102,13 +102,13 @@ public:
 	DECLARE_READ8_MEMBER( read_alt ) { return reg_r(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
 	DECLARE_WRITE8_MEMBER( write_alt ) { reg_w(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data); }
 
-	UINT8 port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
-	void set_port_a_z_mask(UINT8 data) { m_port_a_z_mask = data; }// see second note in .c
+	uint8_t port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
+	void set_port_a_z_mask(uint8_t data) { m_port_a_z_mask = data; }// see second note in .c
 
 	DECLARE_WRITE8_MEMBER( porta_w ) { porta_w(data); }
-	void porta_w(UINT8 data);
-	void set_a_input(UINT8 data, UINT8 z_mask);
-	UINT8 a_output();
+	void porta_w(uint8_t data);
+	void set_a_input(uint8_t data, uint8_t z_mask);
+	uint8_t a_output();
 
 	DECLARE_WRITE_LINE_MEMBER( ca1_w );
 
@@ -117,8 +117,8 @@ public:
 	int ca2_output_z();
 
 	DECLARE_WRITE8_MEMBER( portb_w ) { portb_w(data); }
-	void portb_w(UINT8 data);
-	UINT8 b_output();
+	void portb_w(uint8_t data);
+	uint8_t b_output();
 
 	DECLARE_WRITE_LINE_MEMBER( cb1_w );
 
@@ -135,39 +135,39 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8 reg_r(UINT8 offset);
-	void reg_w(UINT8 offset, UINT8 data);
+	uint8_t reg_r(uint8_t offset);
+	void reg_w(uint8_t offset, uint8_t data);
 
 	void update_interrupts();
 
-	UINT8 get_in_a_value();
-	UINT8 get_in_b_value();
+	uint8_t get_in_a_value();
+	uint8_t get_in_b_value();
 
-	UINT8 get_out_a_value();
-	UINT8 get_out_b_value();
+	uint8_t get_out_a_value();
+	uint8_t get_out_b_value();
 
 	void set_out_ca2(int data);
 	void set_out_cb2(int data);
 
-	UINT8 port_a_r();
-	UINT8 ddr_a_r();
-	UINT8 control_a_r();
+	uint8_t port_a_r();
+	uint8_t ddr_a_r();
+	uint8_t control_a_r();
 
-	UINT8 port_b_r();
-	UINT8 ddr_b_r();
-	UINT8 control_b_r();
+	uint8_t port_b_r();
+	uint8_t ddr_b_r();
+	uint8_t control_b_r();
 
 	void send_to_out_a_func(const char* message);
 	void send_to_out_b_func(const char* message);
 
-	void port_a_w(UINT8 data);
-	void ddr_a_w(UINT8 data);
+	void port_a_w(uint8_t data);
+	void ddr_a_w(uint8_t data);
 
-	void port_b_w(UINT8 data);
-	void ddr_b_w(UINT8 data);
+	void port_b_w(uint8_t data);
+	void ddr_b_w(uint8_t data);
 
-	void control_a_w(UINT8 data);
-	void control_b_w(UINT8 data);
+	void control_a_w(uint8_t data);
+	void control_b_w(uint8_t data);
 
 	devcb_read8 m_in_a_handler;
 	devcb_read8 m_in_b_handler;
@@ -181,29 +181,29 @@ private:
 	devcb_write_line m_irqa_handler;
 	devcb_write_line m_irqb_handler;
 
-	UINT8 m_in_a;
-	UINT8 m_in_ca1;
-	UINT8 m_in_ca2;
-	UINT8 m_out_a;
-	UINT8 m_out_ca2;
-	UINT8 m_port_a_z_mask;
-	UINT8 m_ddr_a;
-	UINT8 m_ctl_a;
-	UINT8 m_irq_a1;
-	UINT8 m_irq_a2;
-	UINT8 m_irq_a_state;
+	uint8_t m_in_a;
+	uint8_t m_in_ca1;
+	uint8_t m_in_ca2;
+	uint8_t m_out_a;
+	uint8_t m_out_ca2;
+	uint8_t m_port_a_z_mask;
+	uint8_t m_ddr_a;
+	uint8_t m_ctl_a;
+	uint8_t m_irq_a1;
+	uint8_t m_irq_a2;
+	uint8_t m_irq_a_state;
 
-	UINT8 m_in_b;
-	UINT8 m_in_cb1;
-	UINT8 m_in_cb2;
-	UINT8 m_out_b;
-	UINT8 m_out_cb2;
-	UINT8 m_last_out_cb2_z;
-	UINT8 m_ddr_b;
-	UINT8 m_ctl_b;
-	UINT8 m_irq_b1;
-	UINT8 m_irq_b2;
-	UINT8 m_irq_b_state;
+	uint8_t m_in_b;
+	uint8_t m_in_cb1;
+	uint8_t m_in_cb2;
+	uint8_t m_out_b;
+	uint8_t m_out_cb2;
+	uint8_t m_last_out_cb2_z;
+	uint8_t m_ddr_b;
+	uint8_t m_ctl_b;
+	uint8_t m_irq_b1;
+	uint8_t m_irq_b2;
+	uint8_t m_irq_b_state;
 
 	// variables that indicate if access a line externally -
 	// used to for logging purposes ONLY

@@ -31,7 +31,7 @@ class luxor_55_21056_device :  public device_t,
 {
 public:
 	// construction/destruction
-	luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -68,12 +68,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_abcbus_interface overrides
-	virtual void abcbus_cs(UINT8 data) override;
-	virtual UINT8 abcbus_inp() override;
-	virtual void abcbus_out(UINT8 data) override;
-	virtual UINT8 abcbus_stat() override;
-	virtual void abcbus_c1(UINT8 data) override;
-	virtual void abcbus_c3(UINT8 data) override;
+	virtual void abcbus_cs(uint8_t data) override;
+	virtual uint8_t abcbus_inp() override;
+	virtual void abcbus_out(uint8_t data) override;
+	virtual uint8_t abcbus_stat() override;
+	virtual void abcbus_c1(uint8_t data) override;
+	virtual void abcbus_c3(uint8_t data) override;
 
 private:
 	void set_rdy(int state);
@@ -93,10 +93,10 @@ private:
 	int m_sasi_msg;
 	int m_sasi_bsy;
 
-	UINT8 m_inp;
-	UINT8 m_out;
-	UINT8 m_stat;
-	UINT8 m_sasi_data;
+	uint8_t m_inp;
+	uint8_t m_out;
+	uint8_t m_stat;
+	uint8_t m_sasi_data;
 };
 
 

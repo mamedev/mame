@@ -5,7 +5,7 @@
 
 TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
 {
-	UINT8 *rom = memregion("user1")->base();
+	uint8_t *rom = memregion("user1")->base();
 	int code;
 
 	tile_index += 0x40000 * m_glfgreat_roz_rom_bank;
@@ -17,7 +17,7 @@ TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
 
 TILE_GET_INFO_MEMBER(tmnt_state::prmrsocr_get_roz_tile_info)
 {
-	UINT8 *rom = memregion("user1")->base();
+	uint8_t *rom = memregion("user1")->base();
 	int code = rom[tile_index + 0x20000] + 256 * rom[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code & 0x1fff, code >> 13, 0);
@@ -377,7 +377,7 @@ READ16_MEMBER(tmnt_state::glfgreat_rom_r)
 		return memregion("zoom")->base()[m_glfgreat_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
 	{
-		UINT8 *usr = memregion("user1")->base();
+		uint8_t *usr = memregion("user1")->base();
 		return usr[offset + 0x80000 + m_glfgreat_roz_rom_bank * 0x40000] + 256 * usr[offset + m_glfgreat_roz_rom_bank * 0x40000];
 	}
 	else
@@ -478,7 +478,7 @@ READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
 		return memregion("zoom")->base()[offset];
 	else
 	{
-		UINT8 *usr = memregion("user1")->base();
+		uint8_t *usr = memregion("user1")->base();
 		return 256 * usr[offset] + usr[offset + 0x020000];
 	}
 }
@@ -517,7 +517,7 @@ WRITE16_MEMBER(tmnt_state::tmnt_priority_w)
 
 ***************************************************************************/
 
-UINT32 tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_update();
 
@@ -530,7 +530,7 @@ UINT32 tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-UINT32 tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_update();
 
@@ -544,7 +544,7 @@ UINT32 tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-UINT32 tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI1);
 	m_layer_colorbase[0] = m_k053251->get_palette_index(K053251_CI2);
@@ -572,7 +572,7 @@ UINT32 tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &b
 }
 
 
-UINT32 tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bg_colorbase;
 
@@ -616,7 +616,7 @@ popmessage("%04x", m_glfgreat_pixel);
 		return m_glfgreat_pixel & 0xff;
 }
 
-UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bg_colorbase;
 
@@ -669,7 +669,7 @@ UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	double brt;
 	int i, newdim, newen, cb, ce;
@@ -721,7 +721,7 @@ UINT32 tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-UINT32 tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bg_colorbase;
 

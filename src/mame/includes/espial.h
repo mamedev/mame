@@ -27,13 +27,13 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_attributeram;
-	required_shared_ptr<UINT8> m_scrollram;
-	required_shared_ptr<UINT8> m_spriteram_1;
-	required_shared_ptr<UINT8> m_spriteram_2;
-	required_shared_ptr<UINT8> m_spriteram_3;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_attributeram;
+	required_shared_ptr<uint8_t> m_scrollram;
+	required_shared_ptr<uint8_t> m_spriteram_1;
+	required_shared_ptr<uint8_t> m_spriteram_2;
+	required_shared_ptr<uint8_t> m_spriteram_3;
+	required_shared_ptr<uint8_t> m_colorram;
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
@@ -41,8 +41,8 @@ public:
 	int       m_flipscreen;
 
 	/* sound-related */
-	UINT8     m_main_nmi_enabled;
-	UINT8     m_sound_nmi_enabled;
+	uint8_t     m_main_nmi_enabled;
+	uint8_t     m_sound_nmi_enabled;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -65,7 +65,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(espial);
 	DECLARE_VIDEO_START(netwars);
-	UINT32 screen_update_espial(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_espial(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(espial_sound_nmi_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(espial_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

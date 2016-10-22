@@ -63,8 +63,8 @@
 	mc6847_base_device::set_black_and_white(*device, _bw);
 
 
-typedef device_delegate<UINT8 (UINT8 ch, int line)> mc6847_get_char_rom_delegate;
-#define MC6847_GET_CHARROM_MEMBER(_name)   UINT8 _name(UINT8 ch, int line)
+typedef device_delegate<uint8_t (uint8_t ch, int line)> mc6847_get_char_rom_delegate;
+#define MC6847_GET_CHARROM_MEMBER(_name)   uint8_t _name(uint8_t ch, int line)
 
 
 #define ARTIFACTING_TAG     "artifacting"
@@ -90,18 +90,18 @@ public:
 	static void set_get_char_rom(device_t &device, mc6847_get_char_rom_delegate callback) { downcast<mc6847_friend_device &>(device).m_charrom_cb = callback; }
 
 protected:
-	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
-		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, const char *shortname, const char *source);
+	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,
+		const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, const char *shortname, const char *source);
 
 	// video mode constants
-	static const UINT8 MODE_AG      = 0x80;
-	static const UINT8 MODE_GM2     = 0x40;
-	static const UINT8 MODE_GM1     = 0x20;
-	static const UINT8 MODE_GM0     = 0x10;
-	static const UINT8 MODE_CSS     = 0x08;
-	static const UINT8 MODE_AS      = 0x04;
-	static const UINT8 MODE_INTEXT  = 0x02;
-	static const UINT8 MODE_INV     = 0x01;
+	static const uint8_t MODE_AG      = 0x80;
+	static const uint8_t MODE_GM2     = 0x40;
+	static const uint8_t MODE_GM1     = 0x20;
+	static const uint8_t MODE_GM0     = 0x10;
+	static const uint8_t MODE_CSS     = 0x08;
+	static const uint8_t MODE_AS      = 0x04;
+	static const uint8_t MODE_INTEXT  = 0x02;
+	static const uint8_t MODE_INV     = 0x01;
 
 	// timer constants
 	static const device_timer_id TIMER_FRAME = 0;
@@ -110,23 +110,23 @@ protected:
 	static const device_timer_id TIMER_FSYNC = 3;
 
 	// fonts
-	static const UINT8 pal_round_fontdata8x12[];
-	static const UINT8 pal_square_fontdata8x12[];
-	static const UINT8 ntsc_round_fontdata8x12[];
-	static const UINT8 ntsc_square_fontdata8x12[];
-	static const UINT8 semigraphics4_fontdata8x12[];
-	static const UINT8 semigraphics6_fontdata8x12[];
-	static const UINT8 s68047_fontdata8x12[];
+	static const uint8_t pal_round_fontdata8x12[];
+	static const uint8_t pal_square_fontdata8x12[];
+	static const uint8_t ntsc_round_fontdata8x12[];
+	static const uint8_t ntsc_square_fontdata8x12[];
+	static const uint8_t semigraphics4_fontdata8x12[];
+	static const uint8_t semigraphics6_fontdata8x12[];
+	static const uint8_t s68047_fontdata8x12[];
 
 	// pixel definitions
-	typedef UINT32 pixel_t;
+	typedef uint32_t pixel_t;
 
 	pixel_t *bitmap_addr(bitmap_rgb32 &bitmap, int y, int x)
 	{
 		return &bitmap.pix32(y, x);
 	}
 
-	static UINT8 simplify_mode(UINT8 data, UINT8 mode)
+	static uint8_t simplify_mode(uint8_t data, uint8_t mode)
 	{
 		// simplifies MC6847 modes to drop mode flags that are not significant
 		return mode & ~((mode & MODE_AG) ? (MODE_AS | MODE_INV) : 0);
@@ -137,29 +137,29 @@ protected:
 	{
 	public:
 		// constructor that sets up the font data
-		character_map(const UINT8 *fontdata, bool is_mc6847t1);
+		character_map(const uint8_t *fontdata, bool is_mc6847t1);
 
 		// optimized template function that emits a single character
 		template<int xscale>
-		ATTR_FORCE_INLINE void emit_character(UINT8 mode, const UINT8 *data, int length, pixel_t *RESTRICT pixels, int y, const pixel_t *palette)
+		ATTR_FORCE_INLINE void emit_character(uint8_t mode, const uint8_t *data, int length, pixel_t *RESTRICT pixels, int y, const pixel_t *palette)
 		{
 			for (int i = 0; i < length; i++)
 			{
 				// get the character
-				UINT8 character = data[i];
+				uint8_t character = data[i];
 
 				// based on the mode, determine which entry to use
 				const entry *e = &m_entries[mode % ARRAY_LENGTH(m_entries)];
 
 				// identify the character in the font data
-				const UINT8 *font_character = e->m_fontdata + (character & e->m_character_mask) * 12;
+				const uint8_t *font_character = e->m_fontdata + (character & e->m_character_mask) * 12;
 
 				// get the particular slice out
-				UINT8 font_character_slice = font_character[y % 12];
+				uint8_t font_character_slice = font_character[y % 12];
 
 				// get the two colors
-				UINT16 color_base_0 = e->m_color_base_0 + ((character >> e->m_color_shift_0) & e->m_color_mask_0);
-				UINT16 color_base_1 = e->m_color_base_1 + ((character >> e->m_color_shift_1) & e->m_color_mask_1);
+				uint16_t color_base_0 = e->m_color_base_0 + ((character >> e->m_color_shift_0) & e->m_color_mask_0);
+				uint16_t color_base_1 = e->m_color_base_1 + ((character >> e->m_color_shift_1) & e->m_color_mask_1);
 				pixel_t color_0 = palette[color_base_0];
 				pixel_t color_1 = palette[color_base_1];
 
@@ -177,26 +177,26 @@ protected:
 	private:
 		struct entry
 		{
-			const UINT8 *m_fontdata;
-			UINT8 m_character_mask;
-			UINT8 m_color_shift_0;
-			UINT8 m_color_shift_1;
-			UINT8 m_color_mask_0;
-			UINT8 m_color_mask_1;
-			UINT16 m_color_base_0;
-			UINT16 m_color_base_1;
+			const uint8_t *m_fontdata;
+			uint8_t m_character_mask;
+			uint8_t m_color_shift_0;
+			uint8_t m_color_shift_1;
+			uint8_t m_color_mask_0;
+			uint8_t m_color_mask_1;
+			uint16_t m_color_base_0;
+			uint16_t m_color_base_1;
 		};
 
 		// lookup table for MC6847 modes to determine font data and color
 		entry m_entries[128];
 
 		// text font data calculated on startup
-		UINT8 m_text_fontdata_inverse[64*12];
-		UINT8 m_text_fontdata_lower_case[64*12];
-		UINT8 m_text_fontdata_lower_case_inverse[64*12];
+		uint8_t m_text_fontdata_inverse[64*12];
+		uint8_t m_text_fontdata_lower_case[64*12];
+		uint8_t m_text_fontdata_lower_case_inverse[64*12];
 
 		// optimized function that tests a single bit
-		ATTR_FORCE_INLINE pixel_t bit_test(UINT8 data, int shift, pixel_t color_0, pixel_t color_1)
+		ATTR_FORCE_INLINE pixel_t bit_test(uint8_t data, int shift, pixel_t color_0, pixel_t color_1)
 		{
 			return data & (0x80 >> shift) ? color_1 : color_0;
 		}
@@ -214,7 +214,7 @@ protected:
 
 		// artifacting application
 		template<int xscale>
-		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, UINT8 mode, const pixel_t *palette)
+		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette)
 		{
 			if (((mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)) == (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0))
 				&& (m_artifacting != 0))
@@ -229,7 +229,7 @@ protected:
 				int x, i;
 				for (x = 0; x < 256; x += 2)
 				{
-					UINT8 val = ((pixels[(x - 2) * xscale] == c1) ? 0x20 : 0x00)
+					uint8_t val = ((pixels[(x - 2) * xscale] == c1) ? 0x20 : 0x00)
 						|   ((pixels[(x - 1) * xscale] == c1) ? 0x10 : 0x00)
 						|   ((pixels[(x + 0) * xscale] == c1) ? 0x08 : 0x00)
 						|   ((pixels[(x + 1) * xscale] == c1) ? 0x04 : 0x00)
@@ -257,7 +257,7 @@ protected:
 		pixel_t m_expanded_colors[128];
 
 		void update_colors(pixel_t c0, pixel_t c1);
-		static pixel_t mix_color(double factor, UINT8 c0, UINT8 c1);
+		static pixel_t mix_color(double factor, uint8_t c0, uint8_t c1);
 	};
 
 	enum border_color_t
@@ -291,9 +291,9 @@ protected:
 	virtual void horizontal_sync_changed(bool line);
 	virtual void field_sync_changed(bool line);
 	virtual void enter_bottom_border(void);
-	virtual void record_border_scanline(UINT16 physical_scanline);
-	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline) = 0;
-	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock) = 0;
+	virtual void record_border_scanline(uint16_t physical_scanline);
+	virtual void record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) = 0;
+	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) = 0;
 
 	// miscellaneous
 	void video_flush(void);
@@ -305,12 +305,12 @@ protected:
 	// converts to B&W
 	static pixel_t black_and_white(rgb_t color)
 	{
-		UINT8 average_color = (color.r() + color.g() + color.b()) / 3;
+		uint8_t average_color = (color.r() + color.g() + color.b()) / 3;
 		return rgb_t(average_color, average_color, average_color);
 	}
 
 	// changes the geometry
-	ATTR_FORCE_INLINE void set_geometry(UINT16 top_border_scanlines, UINT16 body_scanlines, bool wide)
+	ATTR_FORCE_INLINE void set_geometry(uint16_t top_border_scanlines, uint16_t body_scanlines, bool wide)
 	{
 		if (UNEXPECTED((m_top_border_scanlines != top_border_scanlines)
 			|| (m_body_scanlines != body_scanlines)
@@ -324,7 +324,7 @@ protected:
 	}
 
 	// calculates the border color
-	static ATTR_FORCE_INLINE border_color_t border_value(UINT8 mode, bool is_mc6847t1)
+	static ATTR_FORCE_INLINE border_color_t border_value(uint8_t mode, bool is_mc6847t1)
 	{
 		border_color_t result;
 
@@ -374,7 +374,7 @@ protected:
 
 	// template function for emitting graphics bytes
 	template<int bits_per_pixel, int xscale>
-	ATTR_FORCE_INLINE void emit_graphics(const UINT8 *data, int length, pixel_t *RESTRICT pixels, UINT16 color_base, const pixel_t *RESTRICT palette)
+	ATTR_FORCE_INLINE void emit_graphics(const uint8_t *data, int length, pixel_t *RESTRICT pixels, uint16_t color_base, const pixel_t *RESTRICT palette)
 	{
 		for (int i = 0; i < length; i++)
 		{
@@ -382,7 +382,7 @@ protected:
 			{
 				for (int k = 0; k < xscale; k++)
 				{
-					UINT16 color = color_base + ((data[i] >> (8 - (j + 1) * bits_per_pixel)) & ((1 << bits_per_pixel) - 1));
+					uint16_t color = color_base + ((data[i] >> (8 - (j + 1) * bits_per_pixel)) & ((1 << bits_per_pixel) - 1));
 					pixels[(i * (8 / bits_per_pixel) + j) * xscale + k] = palette[color];
 				}
 			}
@@ -391,7 +391,7 @@ protected:
 
 	// template function for external bytes
 	template<int bits_per_pixel, int xscale>
-	ATTR_FORCE_INLINE void emit_extbytes(const UINT8 *data, int length, pixel_t *RESTRICT pixels, UINT16 color_base, const pixel_t *RESTRICT palette)
+	ATTR_FORCE_INLINE void emit_extbytes(const uint8_t *data, int length, pixel_t *RESTRICT pixels, uint16_t color_base, const pixel_t *RESTRICT palette)
 	{
 		for (int i = 0; i < length; i++)
 		{
@@ -399,7 +399,7 @@ protected:
 			{
 				for (int k = 0; k < xscale; k++)
 				{
-					UINT16 color = color_base + BIT(data[i], 7-j);
+					uint16_t color = color_base + BIT(data[i], 7-j);
 					pixels[(i * (8 / bits_per_pixel) + j) * xscale + k] = palette[color];
 				}
 			}
@@ -408,10 +408,10 @@ protected:
 
 	// template function for emitting samples
 	template<int xscale>
-	UINT32 emit_mc6847_samples(UINT8 mode, const UINT8 *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
+	uint32_t emit_mc6847_samples(uint8_t mode, const uint8_t *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
 		mc6847_get_char_rom_delegate get_char_rom, int x, int y)
 	{
-		UINT32 result;
+		uint32_t result;
 		if (mode & MODE_AG)
 		{
 			/* graphics */
@@ -452,7 +452,7 @@ protected:
 			/* external ROM */
 			for (int i = 0; i < length; i++)
 			{
-				UINT8 byte = m_charrom_cb(data[i], y % 12) ^ (mode & MODE_INV ? 0xFF : 0x00);
+				uint8_t byte = m_charrom_cb(data[i], y % 12) ^ (mode & MODE_INV ? 0xFF : 0x00);
 				emit_extbytes<1, xscale>(&byte, 1, &pixels[i * 8], (mode & MODE_CSS) ? 14 : 12, palette);
 			}
 			result = length * 8 * xscale;
@@ -488,25 +488,25 @@ private:
 	int m_field_sync_falling_edge_scanline;
 	bool m_wide;
 	bool m_video_changed;
-	UINT16 m_top_border_scanlines;
-	UINT16 m_body_scanlines;
+	uint16_t m_top_border_scanlines;
+	uint16_t m_body_scanlines;
 	bool m_recording_scanline;
 	bool m_supports_partial_body_scanlines;
 
 	// video state
-	UINT16 m_physical_scanline;
-	UINT16 m_logical_scanline;
-	UINT16 m_logical_scanline_zone;
+	uint16_t m_physical_scanline;
+	uint16_t m_logical_scanline;
+	uint16_t m_logical_scanline_zone;
 	bool m_horizontal_sync;
 	bool m_field_sync;
-	UINT32 m_partial_scanline_clocks;
+	uint32_t m_partial_scanline_clocks;
 
 	// functions
 	void change_horizontal_sync(bool line);
 	void change_field_sync(bool line);
 	void update_field_sync_timer(void);
 	void next_scanline(void);
-	INT32 get_clocks_since_hsync();
+	int32_t get_clocks_since_hsync();
 
 	// debugging
 	const char *scanline_zone_string(scanline_zone zone);
@@ -518,13 +518,13 @@ class mc6847_base_device : public mc6847_friend_device
 public:
 	template<class _Object> static devcb_base &set_input_callback(device_t &device, _Object object) { return downcast<mc6847_base_device &>(device).m_input_cb.set_callback(object); }
 
-	static void set_get_fixed_mode(device_t &device, UINT8 mode) { downcast<mc6847_base_device &>(device).m_fixed_mode = mode; }
+	static void set_get_fixed_mode(device_t &device, uint8_t mode) { downcast<mc6847_base_device &>(device).m_fixed_mode = mode; }
 	static void set_black_and_white(device_t &device, bool bw) { downcast<mc6847_base_device &>(device).m_black_and_white = bw; }
 
 	/* updates the screen -- this will call begin_update(),
 	   followed by update_row() reapeatedly and after all row
 	   updating is complete, end_update() */
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// mode changing operations
 	DECLARE_WRITE_LINE_MEMBER( ag_w )       { change_mode(MODE_AG, state); }
@@ -537,7 +537,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( inv_w )      { change_mode(MODE_INV, state); }
 
 protected:
-	mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, const char *shortname, const char *source);
+	mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -546,8 +546,8 @@ protected:
 
 	// other overrides
 	virtual void field_sync_changed(bool line) override;
-	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 scanline) override;
-	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock) override;
+	virtual void record_body_scanline(uint16_t physical_scanline, uint16_t scanline) override;
+	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) override;
 
 	void set_custom_palette(const pixel_t *custom_palette)
 	{
@@ -560,14 +560,14 @@ protected:
 private:
 	struct video_scanline
 	{
-		UINT8 m_sample_count;
-		UINT8 m_mode[32];
-		UINT8 m_data[32];
+		uint8_t m_sample_count;
+		uint8_t m_mode[32];
+		uint8_t m_data[32];
 	};
 
 	// palette
 	static const int PALETTE_LENGTH = 16;
-	static const UINT32 s_palette[PALETTE_LENGTH];
+	static const uint32_t s_palette[PALETTE_LENGTH];
 
 	// callbacks
 
@@ -578,24 +578,24 @@ private:
 	bool m_black_and_white;
 
 	// incidentals
-	UINT8 m_fixed_mode;
-	UINT8 m_fixed_mode_mask;
+	uint8_t m_fixed_mode;
+	uint8_t m_fixed_mode_mask;
 	const pixel_t *m_palette;
 	pixel_t m_bw_palette[PALETTE_LENGTH];
 
 	// state
-	UINT8 m_mode;
-	UINT16 m_video_address;
+	uint8_t m_mode;
+	uint16_t m_video_address;
 	bool m_dirty;
 	video_scanline m_data[192];
 
-	void change_mode(UINT8 mode, int state)
+	void change_mode(uint8_t mode, int state)
 	{
 		// sanity check, to ensure that we're not changing fixed modes
 		assert((mode & m_fixed_mode_mask) == 0);
 
 		// calculate new mode
-		UINT8 new_mode;
+		uint8_t new_mode;
 		if (state)
 			new_mode = m_mode | mode;
 		else
@@ -620,16 +620,16 @@ private:
 	void setup_fixed_mode();
 
 	// runtime functions
-	void record_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_pos, INT32 end_pos);
-	pixel_t border_value(UINT8 mode, const pixel_t *palette, bool is_mc6847t1);
+	void record_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos);
+	pixel_t border_value(uint8_t mode, const pixel_t *palette, bool is_mc6847t1);
 
 	// template function for doing video update collection
 	template<int sample_count, int yres>
-	void record_scanline_res(int scanline, INT32 start_pos, INT32 end_pos);
+	void record_scanline_res(int scanline, int32_t start_pos, int32_t end_pos);
 
 	// miscellaneous
-	UINT8 input(UINT16 address);
-	INT32 scanline_position_from_clock(INT32 clocks_since_hsync);
+	uint8_t input(uint16_t address);
+	int32_t scanline_position_from_clock(int32_t clocks_since_hsync);
 };
 
 
@@ -640,54 +640,54 @@ private:
 class mc6847_ntsc_device : public mc6847_base_device
 {
 public:
-	mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class mc6847_pal_device : public mc6847_base_device
 {
 public:
-	mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class mc6847y_ntsc_device : public mc6847_base_device
 {
 public:
-	mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class mc6847y_pal_device : public mc6847_base_device
 {
 public:
-	mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class mc6847t1_ntsc_device : public mc6847_base_device
 {
 public:
-	mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class mc6847t1_pal_device : public mc6847_base_device
 {
 public:
-	mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class s68047_device : public mc6847_base_device
 {
 public:
-	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void hack_black_becomes_blue(bool flag);
 
 private:
-	static const UINT32 s_s68047_hack_palette[16];
+	static const uint32_t s_s68047_hack_palette[16];
 };
 
 class m5c6847p1_device : public mc6847_base_device
 {
 public:
-	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

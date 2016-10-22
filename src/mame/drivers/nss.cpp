@@ -321,11 +321,11 @@ public:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
-	UINT8 m_wram_wp_flag;
-	std::unique_ptr<UINT8[]> m_wram;
-	UINT8 m_nmi_enable;
-	UINT8 m_cart_sel;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint8_t m_wram_wp_flag;
+	std::unique_ptr<uint8_t[]> m_wram;
+	uint8_t m_nmi_enable;
+	uint8_t m_cart_sel;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_wp_r);
 	DECLARE_WRITE8_MEMBER(ram_wp_w);
@@ -352,7 +352,7 @@ public:
 
 
 
-UINT32 nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	m_m50458->screen_update(screen,bitmap,cliprect);
 	return 0;
@@ -520,7 +520,7 @@ READ8_MEMBER(nss_state::port_00_r)
     ---- --x-   Button "Joypad Left"        (0=Released, 1=Pressed)
     ---- ---x   Button "Joypad Right"       (0=Released, 1=Pressed)
 */
-	UINT8 res;
+	uint8_t res;
 
 	res = (m_joy_flag) << 7;
 	// TODO: reads from SNES screen output, correct?
@@ -631,7 +631,7 @@ void nss_state::machine_start()
 	snes_state::machine_start();
 
 	m_is_nss = 1;
-	m_wram = make_unique_clear<UINT8[]>(0x1000);
+	m_wram = make_unique_clear<uint8_t[]>(0x1000);
 }
 
 
@@ -1059,7 +1059,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(nss_state,nss)
 {
-	UINT8 *PROM = memregion("rp5h01")->base();
+	uint8_t *PROM = memregion("rp5h01")->base();
 
 	for (int i = 0; i < 0x10; i++)
 		PROM[i] = BITSWAP8(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;

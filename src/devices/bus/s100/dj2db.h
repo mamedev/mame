@@ -29,7 +29,7 @@ class s100_dj2db_device : public device_t,
 {
 public:
 	// construction/destruction
-	s100_dj2db_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s100_dj2db_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -47,10 +47,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_s100_card_interface overrides
-	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset) override;
-	virtual void s100_mwrt_w(address_space &space, offs_t offset, UINT8 data) override;
-	virtual UINT8 s100_sinp_r(address_space &space, offs_t offset) override;
-	virtual void s100_sout_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) override;
+	virtual void s100_mwrt_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) override;
+	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) override;
 	virtual void s100_phantom_w(int state) override;
 
 private:
@@ -63,7 +63,7 @@ private:
 	required_device<floppy_connector> m_floppy3;
 	floppy_image_device *m_floppy;
 	required_memory_region m_rom;
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 	required_ioport m_j1a;
 	required_ioport m_j3a;
 	required_ioport m_j4;

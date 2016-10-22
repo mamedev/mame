@@ -125,9 +125,9 @@ public:
 		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT8> m_stats_ram;
-	required_shared_ptr<UINT16> m_vid1;
-	required_shared_ptr<UINT16> m_vid2;
+	optional_shared_ptr<uint8_t> m_stats_ram;
+	required_shared_ptr<uint16_t> m_vid1;
+	required_shared_ptr<uint16_t> m_vid2;
 	required_device<palette_device> m_palette;
 	int m_bmc_input;
 	DECLARE_READ16_MEMBER(bmc_random_read);
@@ -142,8 +142,8 @@ public:
 	DECLARE_DRIVER_INIT(bmcbowl);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void init_stats(const UINT8 *table, int table_len, int address);
+	uint32_t screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void init_stats(const uint8_t *table, int table_len, int address);
 };
 
 
@@ -153,7 +153,7 @@ void bmcbowl_state::video_start()
 {
 }
 
-UINT32 bmcbowl_state::screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bmcbowl_state::screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
       280x230,4 bitmap layers, 8bpp,
@@ -254,7 +254,7 @@ WRITE_LINE_MEMBER(bmcbowl_state::via_ca2_out)
 // 'working' NVRAM
 
 #ifdef NVRAM_HACK
-static const UINT8 bmc_nv1[]=
+static const uint8_t bmc_nv1[]=
 {
 	0x00,0x00,0x55,0x55,0x00,0x00,0x55,0x55,0x00,0x00,0x55,0x55,0x00,0x00,0x55,0x55,0x13,0x88,0x46,0xDD,0x0F,0xA0,
 	0x5A,0xF5,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00,0x6E,0x55,
@@ -275,20 +275,20 @@ static const UINT8 bmc_nv1[]=
 	0x00,0x00,0xDC,0x00,0xFF,0xFF,0xFF,0xFF
 };
 
-static const UINT8 bmc_nv2[]=
+static const uint8_t bmc_nv2[]=
 {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
 	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x03,0x00,0x09,0x00,0x00,0x2B,0xF1,
 	0xFE,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
 };
 
-static const UINT8 bmc_nv3[]=
+static const uint8_t bmc_nv3[]=
 {
 	0xFA,0xFF,0x01,0x02,0x04,0x0A,0x1E,0xC8,0x02,0x01,0xFF,0xFF,0xFF,0xFF,0xFF
 };
 
 
-void bmcbowl_state::init_stats(const UINT8 *table, int table_len, int address)
+void bmcbowl_state::init_stats(const uint8_t *table, int table_len, int address)
 {
 	for (int i = 0; i < table_len; i++)
 		m_stats_ram[address+2*i]=table[i];

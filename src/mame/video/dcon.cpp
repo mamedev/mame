@@ -117,7 +117,7 @@ void dcon_state::video_start()
 
 void dcon_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *spriteram16 = m_spriteram;
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay,inc,pri_mask = 0;
 
@@ -240,7 +240,7 @@ void dcon_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const
 	}
 }
 
-UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -272,7 +272,7 @@ UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-UINT32 dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 

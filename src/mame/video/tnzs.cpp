@@ -33,7 +33,7 @@
 
 PALETTE_INIT_MEMBER(tnzs_state,arknoid2)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, col;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -44,7 +44,7 @@ PALETTE_INIT_MEMBER(tnzs_state,arknoid2)
 }
 
 
-UINT32 tnzs_state::screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tnzs_state::screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);
 

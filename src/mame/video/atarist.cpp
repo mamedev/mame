@@ -169,7 +169,7 @@ void st_state::shifter_tick()
 inline void st_state::shifter_load()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT16 data = program.read_word(m_shifter_ofs);
+	uint16_t data = program.read_word(m_shifter_ofs);
 
 	m_shifter_ir[m_shifter_bitplane] = data;
 	m_shifter_bitplane++;
@@ -315,7 +315,7 @@ void st_state::set_screen_parameters()
 
 READ8_MEMBER( st_state::shifter_base_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -359,7 +359,7 @@ WRITE8_MEMBER( st_state::shifter_base_w )
 
 READ8_MEMBER( st_state::shifter_counter_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -478,7 +478,7 @@ WRITE8_MEMBER( ste_state::shifter_base_low_w )
 
 READ8_MEMBER( ste_state::shifter_counter_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -596,7 +596,7 @@ WRITE8_MEMBER( ste_state::shifter_pixelofs_w )
 void st_state::blitter_source()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT16 data = program.read_word(m_blitter_src);
+	uint16_t data = program.read_word(m_blitter_src);
 
 	if (m_blitter_src_inc_x < 0)
 	{
@@ -613,10 +613,10 @@ void st_state::blitter_source()
 //  blitter_hop -
 //-------------------------------------------------
 
-UINT16 st_state::blitter_hop()
+uint16_t st_state::blitter_hop()
 {
-	UINT16 source = m_blitter_srcbuf >> (m_blitter_skew & 0x0f);
-	UINT16 halftone = m_blitter_halftone[m_blitter_ctrl & 0x0f];
+	uint16_t source = m_blitter_srcbuf >> (m_blitter_skew & 0x0f);
+	uint16_t halftone = m_blitter_halftone[m_blitter_ctrl & 0x0f];
 
 	if (m_blitter_ctrl & ATARIST_BLITTER_CTRL_SMUDGE)
 	{
@@ -643,12 +643,12 @@ UINT16 st_state::blitter_hop()
 //  blitter_op -
 //-------------------------------------------------
 
-void st_state::blitter_op(UINT16 s, UINT32 dstaddr, UINT16 mask)
+void st_state::blitter_op(uint16_t s, uint32_t dstaddr, uint16_t mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	UINT16 d = program.read_word(dstaddr);
-	UINT16 result = 0;
+	uint16_t d = program.read_word(dstaddr);
+	uint16_t result = 0;
 
 	if (m_blitter_op & 0x08) result = (~s & ~d);
 	if (m_blitter_op & 0x04) result |= (~s & d);
@@ -1124,7 +1124,7 @@ void stbook_state::video_start()
 }
 
 
-UINT32 st_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t st_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

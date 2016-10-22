@@ -24,7 +24,7 @@ extern const device_type TI99_BWG;
 class snug_bwg_device : public ti_expansion_card_device
 {
 public:
-	snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
@@ -50,8 +50,8 @@ private:
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// Debugger accessors
-	void debug_read(offs_t offset, UINT8* value);
-	void debug_write(offs_t offset, UINT8 data);
+	void debug_read(offs_t offset, uint8_t* value);
+	void debug_write(offs_t offset, uint8_t data);
 
 	// Wait state logic
 	void operate_ready_line();
@@ -98,7 +98,7 @@ private:
 	int m_MOTOR_ON;
 
 	// Needed for triggering the motor monoflop
-	UINT8 m_lastval;
+	uint8_t m_lastval;
 
 	// Recent address
 	int m_address;
@@ -117,7 +117,7 @@ private:
 	emu_timer*      m_motor_on_timer;
 
 	// DSR ROM
-	UINT8*          m_dsrrom;
+	uint8_t*          m_dsrrom;
 
 	// Buffer RAM
 	required_device<ram_device> m_buffer_ram;

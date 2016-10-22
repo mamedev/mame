@@ -25,7 +25,7 @@
 class mb87078_device : public device_t
 {
 public:
-	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~mb87078_device() {}
 
 	template<class _Object> static devcb_base &set_gain_changed_callback(device_t &device, _Object object) { return downcast<mb87078_device &>(device).m_gain_changed_cb.set_callback(object); }
@@ -57,8 +57,8 @@ private:
 	// internal state
 	int          m_gain[4];       /* gain index 0-63,64,65 */
 	int          m_channel_latch; /* current channel */
-	UINT8        m_latch[2][4];   /* 6bit+3bit 4 data latches */
-	UINT8        m_reset_comp;
+	uint8_t        m_latch[2][4];   /* 6bit+3bit 4 data latches */
+	uint8_t        m_reset_comp;
 
 	devcb_write8 m_gain_changed_cb;
 };

@@ -16,7 +16,7 @@ class arc_device : public cpu_device
 {
 public:
 	// construction/destruction
-	arc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	arc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -24,9 +24,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 5; }
-	virtual UINT32 execute_max_cycles() const override { return 5; }
-	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 5; }
+	virtual uint32_t execute_max_cycles() const override { return 5; }
+	virtual uint32_t execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -38,9 +38,9 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
@@ -54,18 +54,18 @@ private:
 	//     61 = Short Immediate Data Indicator Settings Flag
 	//     62 = Long Immediate Data Indicator
 	//     63 = Short Immediate Data Indicator NOT Settings Flag
-	UINT32 m_pc;
-	//UINT32 m_r[64];
+	uint32_t m_pc;
+	//uint32_t m_r[64];
 
 
 	address_space *m_program;
 	int m_icount;
 
-	UINT32 m_debugger_temp;
+	uint32_t m_debugger_temp;
 
-	void unimplemented_opcode(UINT16 op);
-	inline UINT32 READ32(UINT32 address);
-	inline void WRITE32(UINT32 address, UINT32 data);
+	void unimplemented_opcode(uint16_t op);
+	inline uint32_t READ32(uint32_t address);
+	inline void WRITE32(uint32_t address, uint32_t data);
 };
 
 

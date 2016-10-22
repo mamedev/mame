@@ -93,19 +93,19 @@ public:
 		, m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	UINT8 m_funkball_config_reg_sel;
-	UINT8 m_funkball_config_regs[256];
-	UINT32 m_cx5510_regs[256/4];
-	std::unique_ptr<UINT8[]> m_bios_ram;
+	uint8_t m_funkball_config_reg_sel;
+	uint8_t m_funkball_config_regs[256];
+	uint32_t m_cx5510_regs[256/4];
+	std::unique_ptr<uint8_t[]> m_bios_ram;
 
-	UINT32 m_biu_ctrl_reg[256/4];
+	uint32_t m_biu_ctrl_reg[256/4];
 
-	UINT32 flashbank_addr;
+	uint32_t flashbank_addr;
 
 	// devices
 	required_device<voodoo_1_device> m_voodoo;
 
-	required_shared_ptr<UINT32> m_unk_ram;
+	required_shared_ptr<uint32_t> m_unk_ram;
 	required_device<address_map_bank_device> m_flashbank;
 	required_device<generic_terminal_device> m_terminal;
 	required_ioport_array<16> m_inputs;
@@ -116,19 +116,19 @@ public:
 	DECLARE_READ8_MEMBER( serial_r );
 	DECLARE_WRITE8_MEMBER( serial_w );
 
-	UINT8 funkball_config_reg_r();
-	void funkball_config_reg_w(UINT8 data);
+	uint8_t funkball_config_reg_r();
+	void funkball_config_reg_w(uint8_t data);
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	struct
 	{
 		/* PCI */
-		UINT32 command;
-		UINT32 base_addr;
+		uint32_t command;
+		uint32_t base_addr;
 
-		UINT32 init_enable;
+		uint32_t init_enable;
 	} m_voodoo_pci_regs;
 	DECLARE_READ32_MEMBER(biu_ctrl_r);
 	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
@@ -143,15 +143,15 @@ void funkball_state::video_start()
 {
 }
 
-UINT32 funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
-static UINT32 voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 	funkball_state* state = device->machine().driver_data<funkball_state>();
-	UINT32 val = 0;
+	uint32_t val = 0;
 
 	printf("Voodoo PCI R: %x\n", reg);
 
@@ -170,7 +170,7 @@ static UINT32 voodoo_0_pci_r(device_t *busdevice, device_t *device, int function
 	return val;
 }
 
-static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	funkball_state* state = device->machine().driver_data<funkball_state>();
 
@@ -194,7 +194,7 @@ static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, 
 	}
 }
 
-static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 	funkball_state *state = busdevice->machine().driver_data<funkball_state>();
 
@@ -207,7 +207,7 @@ static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, 
 	return state->m_cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	funkball_state *state = busdevice->machine().driver_data<funkball_state>();
 
@@ -236,13 +236,13 @@ WRITE8_MEMBER( funkball_state::serial_w )
 	}
 }
 
-UINT8 funkball_state::funkball_config_reg_r()
+uint8_t funkball_state::funkball_config_reg_r()
 {
 	//osd_printf_debug("funkball_config_reg_r %02X\n", funkball_config_reg_sel);
 	return m_funkball_config_regs[m_funkball_config_reg_sel];
 }
 
-void funkball_state::funkball_config_reg_w(UINT8 data)
+void funkball_state::funkball_config_reg_w(uint8_t data)
 {
 	//osd_printf_debug("funkball_config_reg_w %02X, %02X\n", funkball_config_reg_sel, data);
 	m_funkball_config_regs[m_funkball_config_reg_sel] = data;
@@ -250,7 +250,7 @@ void funkball_state::funkball_config_reg_w(UINT8 data)
 
 READ8_MEMBER(funkball_state::io20_r)
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -782,7 +782,7 @@ INPUT_PORTS_END
 
 void funkball_state::machine_start()
 {
-	m_bios_ram = std::make_unique<UINT8[]>(0x20000);
+	m_bios_ram = std::make_unique<uint8_t[]>(0x20000);
 
 	/* defaults, otherwise it won't boot */
 	m_unk_ram[0x010/4] = 0x2f8d85ff;

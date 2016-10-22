@@ -16,14 +16,14 @@
 class segas32_state : public device_t
 {
 public:
-	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	required_shared_ptr<UINT8> m_z80_shared_ram;
-	optional_shared_ptr<UINT8> m_ga2_dpram;
-	optional_shared_ptr<UINT16> m_system32_workram;
-	required_shared_ptr<UINT16> m_system32_videoram;
-	required_shared_ptr<UINT16> m_system32_spriteram;
-	optional_shared_ptr_array<UINT16, 2> m_system32_paletteram;
+	required_shared_ptr<uint8_t> m_z80_shared_ram;
+	optional_shared_ptr<uint8_t> m_ga2_dpram;
+	optional_shared_ptr<uint16_t> m_system32_workram;
+	required_shared_ptr<uint16_t> m_system32_videoram;
+	required_shared_ptr<uint16_t> m_system32_spriteram;
+	optional_shared_ptr_array<uint16_t, 2> m_system32_paletteram;
 
 	optional_ioport_array<8> m_ports_a;
 	optional_ioport_array<8> m_ports_b;
@@ -43,18 +43,18 @@ public:
 	required_device<timer_device> m_irq_timer_1;
 	optional_device<s32comm_device> m_s32comm;
 
-	typedef void (segas32_state::*sys32_output_callback)(int which, UINT16 data);
+	typedef void (segas32_state::*sys32_output_callback)(int which, uint16_t data);
 
 	struct layer_info
 	{
 		bitmap_ind16 *bitmap;
-		UINT8* transparent;
+		uint8_t* transparent;
 	};
 
 	struct extents_list
 	{
-		UINT8                   scan_extent[256];
-		UINT16                  extent[32][16];
+		uint8_t                   scan_extent[256];
+		uint16_t                  extent[32][16];
 	};
 
 
@@ -62,39 +62,39 @@ public:
 	{
 		struct cache_entry *    next;
 		tilemap_t *             tmap;
-		UINT8                   page;
-		UINT8                   bank;
+		uint8_t                   page;
+		uint8_t                   bank;
 	};
 
-	UINT8 m_v60_irq_control[0x10];
+	uint8_t m_v60_irq_control[0x10];
 	timer_device *m_v60_irq_timer[2];
-	UINT8 m_sound_irq_control[4];
-	UINT8 m_sound_irq_input;
-	UINT8 m_sound_dummy_value;
-	UINT16 m_sound_bank;
-	UINT8 m_misc_io_data[2][0x10];
+	uint8_t m_sound_irq_control[4];
+	uint8_t m_sound_irq_input;
+	uint8_t m_sound_dummy_value;
+	uint16_t m_sound_bank;
+	uint8_t m_misc_io_data[2][0x10];
 	read16_delegate m_custom_io_r[2];
 	write16_delegate m_custom_io_w[2];
-	UINT8 m_analog_bank;
-	UINT8 m_analog_value[4];
-	UINT8 m_sonic_last[6];
+	uint8_t m_analog_bank;
+	uint8_t m_analog_value[4];
+	uint8_t m_sonic_last[6];
 	sys32_output_callback m_sw1_output;
 	sys32_output_callback m_sw2_output;
 	sys32_output_callback m_sw3_output;
-	std::unique_ptr<UINT16[]> m_system32_protram;
-	UINT16 m_system32_displayenable[2];
-	UINT16 m_system32_tilebank_external;
-	UINT16 m_arescue_dsp_io[6];
-	UINT8 m_is_multi32;
+	std::unique_ptr<uint16_t[]> m_system32_protram;
+	uint16_t m_system32_displayenable[2];
+	uint16_t m_system32_tilebank_external;
+	uint16_t m_arescue_dsp_io[6];
+	uint8_t m_is_multi32;
 	struct cache_entry *m_cache_head;
 	struct layer_info m_layer_data[11];
-	UINT16 m_mixer_control[2][0x40];
-	std::unique_ptr<UINT16[]> m_solid_0000;
-	std::unique_ptr<UINT16[]> m_solid_ffff;
-	UINT8 m_sprite_render_count;
-	UINT8 m_sprite_control_latched[8];
-	UINT8 m_sprite_control[8];
-	std::unique_ptr<UINT32[]> m_spriteram_32bit;
+	uint16_t m_mixer_control[2][0x40];
+	std::unique_ptr<uint16_t[]> m_solid_0000;
+	std::unique_ptr<uint16_t[]> m_solid_ffff;
+	uint8_t m_sprite_render_count;
+	uint8_t m_sprite_control_latched[8];
+	uint8_t m_sprite_control[8];
+	std::unique_ptr<uint32_t[]> m_spriteram_32bit;
 	typedef void (segas32_state::*prot_vblank_func)();
 	prot_vblank_func m_system32_prot_vblank;
 	int m_print_count;
@@ -176,57 +176,57 @@ public:
 	DECLARE_WRITE8_MEMBER(scross_bank_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	UINT32 screen_update_system32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_multi32_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_system32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_multi32_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(start_of_vblank_int);
 	TIMER_CALLBACK_MEMBER(end_of_vblank_int);
 	TIMER_CALLBACK_MEMBER(update_sprites);
 	TIMER_DEVICE_CALLBACK_MEMBER(signal_v60_irq_callback);
 	void common_start(int multi32);
 	void system32_set_vblank(int state);
-	inline UINT16 xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(UINT16 value);
-	inline UINT16 xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(UINT16 value);
-	inline void update_color(int offset, UINT16 data);
-	inline UINT16 common_paletteram_r(address_space &space, int which, offs_t offset);
-	void common_paletteram_w(address_space &space, int which, offs_t offset, UINT16 data, UINT16 mem_mask);
+	inline uint16_t xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t value);
+	inline uint16_t xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(uint16_t value);
+	inline void update_color(int offset, uint16_t data);
+	inline uint16_t common_paletteram_r(address_space &space, int which, offs_t offset);
+	void common_paletteram_w(address_space &space, int which, offs_t offset, uint16_t data, uint16_t mem_mask);
 	tilemap_t *find_cache_entry(int page, int bank);
 	inline void get_tilemaps(int bgnum, tilemap_t **tilemaps);
-	UINT8 update_tilemaps(screen_device &screen, const rectangle &cliprect);
+	uint8_t update_tilemaps(screen_device &screen, const rectangle &cliprect);
 	void sprite_erase_buffer();
 	void sprite_swap_buffers();
-	int draw_one_sprite(UINT16 *data, int xoffs, int yoffs, const rectangle &clipin, const rectangle &clipout);
+	int draw_one_sprite(uint16_t *data, int xoffs, int yoffs, const rectangle &clipin, const rectangle &clipout);
 	void sprite_render_list();
-	inline UINT8 compute_color_offsets(int which, int layerbit, int layerflag);
-	inline UINT16 compute_sprite_blend(UINT8 encoding);
-	inline UINT16 *get_layer_scanline(int layer, int scanline);
-	void mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 enablemask);
+	inline uint8_t compute_color_offsets(int which, int layerbit, int layerflag);
+	inline uint16_t compute_sprite_blend(uint8_t encoding);
+	inline uint16_t *get_layer_scanline(int layer, int scanline);
+	void mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t enablemask);
 	void print_mixer_data(int which);
-	UINT32 multi32_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
+	uint32_t multi32_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	void decrypt_ga2_protrom();
 	void update_irq_state();
 	void signal_v60_irq(int which);
-	void int_control_w(address_space &space, int offset, UINT8 data);
-	UINT16 common_io_chip_r(address_space &space, int which, offs_t offset, UINT16 mem_mask);
-	void common_io_chip_w(address_space &space, int which, offs_t offset, UINT16 data, UINT16 mem_mask);
+	void int_control_w(address_space &space, int offset, uint8_t data);
+	uint16_t common_io_chip_r(address_space &space, int which, offs_t offset, uint16_t mem_mask);
+	void common_io_chip_w(address_space &space, int which, offs_t offset, uint16_t data, uint16_t mem_mask);
 	void update_sound_irq_state();
 	void segas32_common_init(read16_delegate custom_r, write16_delegate custom_w);
-	void radm_sw1_output( int which, UINT16 data );
-	void radm_sw2_output( int which, UINT16 data );
-	void radr_sw2_output( int which, UINT16 data );
-	void alien3_sw1_output( int which, UINT16 data );
-	void arescue_sw1_output( int which, UINT16 data );
-	void f1lap_sw1_output( int which, UINT16 data );
-	void jpark_sw1_output( int which, UINT16 data );
-	void orunners_sw1_output( int which, UINT16 data );
-	void orunners_sw2_output( int which, UINT16 data );
-	void harddunk_sw1_output( int which, UINT16 data );
-	void harddunk_sw2_output( int which, UINT16 data );
-	void harddunk_sw3_output( int which, UINT16 data );
-	void titlef_sw1_output( int which, UINT16 data );
-	void titlef_sw2_output( int which, UINT16 data );
-	void scross_sw1_output( int which, UINT16 data );
-	void scross_sw2_output( int which, UINT16 data );
+	void radm_sw1_output( int which, uint16_t data );
+	void radm_sw2_output( int which, uint16_t data );
+	void radr_sw2_output( int which, uint16_t data );
+	void alien3_sw1_output( int which, uint16_t data );
+	void arescue_sw1_output( int which, uint16_t data );
+	void f1lap_sw1_output( int which, uint16_t data );
+	void jpark_sw1_output( int which, uint16_t data );
+	void orunners_sw1_output( int which, uint16_t data );
+	void orunners_sw2_output( int which, uint16_t data );
+	void harddunk_sw1_output( int which, uint16_t data );
+	void harddunk_sw2_output( int which, uint16_t data );
+	void harddunk_sw3_output( int which, uint16_t data );
+	void titlef_sw1_output( int which, uint16_t data );
+	void titlef_sw2_output( int which, uint16_t data );
+	void scross_sw1_output( int which, uint16_t data );
+	void scross_sw2_output( int which, uint16_t data );
 	int compute_clipping_extents(screen_device &screen, int enable, int clipout, int clipmask, const rectangle &cliprect, struct extents_list *list);
 	void compute_tilemap_flips(int bgnum, int &flipx, int &flipy);
 	void update_tilemap_zoom(screen_device &screen, struct layer_info *layer, const rectangle &cliprect, int bgnum);
@@ -272,7 +272,7 @@ protected:
 class segas32_regular_state :  public segas32_state
 {
 public:
-	segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -283,7 +283,7 @@ protected:
 class segas32_v25_state :  public segas32_state
 {
 public:
-	segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -294,7 +294,7 @@ protected:
 class sega_multi32_state :  public segas32_state
 {
 public:
-	sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -303,6 +303,6 @@ protected:
 };
 
 /*----------- defined in machine/segas32.c -----------*/
-extern const UINT8 ga2_v25_opcode_table[];
+extern const uint8_t ga2_v25_opcode_table[];
 
 extern const device_type SEGA_S32_PCB;

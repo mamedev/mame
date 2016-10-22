@@ -44,9 +44,9 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
-	required_region_ptr<UINT8> m_char_rom;
-	required_shared_ptr<UINT8> m_page_ram;
-	optional_shared_ptr<UINT8> m_color_ram;
+	required_region_ptr<uint8_t> m_char_rom;
+	required_shared_ptr<uint8_t> m_page_ram;
+	optional_shared_ptr<uint8_t> m_color_ram;
 	required_ioport m_run;
 	required_ioport_array<8> m_key_row;
 
@@ -63,7 +63,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
-	UINT8 get_color(UINT16 pma);
+	uint8_t get_color(uint16_t pma);
 
 	// video state
 	int m_vismac_reg_latch;     // video register latch

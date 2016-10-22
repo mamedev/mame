@@ -24,7 +24,7 @@ extern const device_type TI99_P_CODE;
 class ti_pcode_card_device : public ti_expansion_card_device
 {
 public:
-	ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
@@ -45,9 +45,9 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	void                debugger_read(address_space& space, UINT16 addr, UINT8& value);
+	void                debugger_read(address_space& space, uint16_t addr, uint8_t& value);
 	tmc0430_device*     m_grom[8];
-	UINT8*              m_rom;
+	uint8_t*              m_rom;
 	int                 m_bank_select;
 	bool                m_active;
 	int                 m_clock_count;

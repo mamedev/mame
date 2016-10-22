@@ -30,7 +30,7 @@ extern const device_type DATAMUX;
 class ti99_datamux_device : public device_t
 {
 public:
-	ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_SETOFFSET_MEMBER( setoffset );
@@ -77,23 +77,23 @@ private:
 	address_space* m_spacep;
 
 	// Console ROM
-	UINT16* m_consolerom;
+	uint16_t* m_consolerom;
 
 	// Console GROMs
 	tmc0430_device* m_grom[3];
 
 	// Common read routine
-	void read_all(address_space& space, UINT16 addr, UINT8 *target);
+	void read_all(address_space& space, uint16_t addr, uint8_t *target);
 
 	// Common write routine
-	void write_all(address_space& space, UINT16 addr, UINT8 value);
+	void write_all(address_space& space, uint16_t addr, uint8_t value);
 
 	// Common set address method
-	void setaddress_all(address_space& space, UINT16 addr);
+	void setaddress_all(address_space& space, uint16_t addr);
 
 	// Debugger access
-	UINT16 debugger_read(address_space& space, UINT16 addr);
-	void debugger_write(address_space& space, UINT16 addr, UINT16 data);
+	uint16_t debugger_read(address_space& space, uint16_t addr);
+	void debugger_write(address_space& space, uint16_t addr, uint16_t data);
 
 	// Join own READY and external READY
 	void ready_join();
@@ -102,7 +102,7 @@ private:
 	devcb_write_line m_ready;
 
 	// Address latch (emu). In reality, the address bus remains constant.
-	UINT16 m_addr_buf;
+	uint16_t m_addr_buf;
 
 	// DBIN line
 	int m_dbin;
@@ -114,7 +114,7 @@ private:
 	int  m_sysready;
 
 	// Latch which stores the first (odd) byte
-	UINT8 m_latch;
+	uint8_t m_latch;
 
 	// Counter for the wait states.
 	int   m_waitcount;
@@ -123,7 +123,7 @@ private:
 	bool m_use32k;
 
 	// Memory base for piggy-back 32K expansion. If 0, expansion is not used.
-	UINT16  m_base32k;
+	uint16_t  m_base32k;
 
 	// Console GROMs are available (the HSGPL expects them to be removed)
 	bool m_console_groms_present;

@@ -14,9 +14,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_bgram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_bgram;
 	int m_flipscreen;
 	int m_bg_dispsw;
 	tilemap_t *m_fg_tilemap;
@@ -31,7 +31,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(gomoku);
-	UINT32 screen_update_gomoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gomoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -70,7 +70,7 @@ class gomoku_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~gomoku_sound_device() { }
 
 protected:
@@ -93,19 +93,19 @@ private:
 	gomoku_sound_channel *m_last_channel;
 
 	/* global sound parameters */
-	const UINT8 *m_sound_rom;
+	const uint8_t *m_sound_rom;
 	int m_num_voices;
 	int m_sound_enable;
 	sound_stream *m_stream;
 
 	/* mixer tables and internal buffers */
-	std::unique_ptr<INT16[]> m_mixer_table;
-	INT16 *m_mixer_lookup;
+	std::unique_ptr<int16_t[]> m_mixer_table;
+	int16_t *m_mixer_lookup;
 	std::unique_ptr<short[]> m_mixer_buffer;
 	short *m_mixer_buffer_2;
 
-	UINT8 m_soundregs1[0x20];
-	UINT8 m_soundregs2[0x20];
+	uint8_t m_soundregs1[0x20];
+	uint8_t m_soundregs2[0x20];
 };
 
 extern const device_type GOMOKU;

@@ -291,13 +291,9 @@ void mame_options::parse_standard_inis(emu_options &options, std::string &error_
 		}
 	}
 
-	// next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini
+	// next parse "source/<sourcefile>.ini"
 	std::string sourcename = core_filename_extract_base(cursystem->source_file, true).insert(0, "source" PATH_SEPARATOR);
-	if (!parse_one_ini(options,sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_string))
-	{
-		sourcename = core_filename_extract_base(cursystem->source_file, true);
-		parse_one_ini(options,sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_string);
-	}
+	parse_one_ini(options,sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_string);
 
 	// then parse the grandparent, parent, and system-specific INIs
 	int parent = driver_list::clone(*cursystem);

@@ -21,7 +21,7 @@
 
 TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = (data >> 13) & 0x07;
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = m_playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
 	int color = (data >> 11) & 7;
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -106,8 +106,8 @@ VIDEO_START_MEMBER(atarisy2_state,atarisy2)
 
 WRITE16_MEMBER( atarisy2_state::xscroll_w )
 {
-	UINT16 oldscroll = *m_xscroll;
-	UINT16 newscroll = oldscroll;
+	uint16_t oldscroll = *m_xscroll;
+	uint16_t newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
 	/* if anything has changed, force a partial update */
@@ -137,8 +137,8 @@ TIMER_CALLBACK_MEMBER(atarisy2_state::reset_yscroll_callback)
 
 WRITE16_MEMBER( atarisy2_state::yscroll_w )
 {
-	UINT16 oldscroll = *m_yscroll;
-	UINT16 newscroll = oldscroll;
+	uint16_t oldscroll = *m_yscroll;
+	uint16_t newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
 	/* if anything has changed, force a partial update */
@@ -186,9 +186,9 @@ PALETTE_DECODER_MEMBER( atarisy2_state, RRRRGGGGBBBBIIII )
 	};
 
 	int i = intensity_table[raw & 15];
-	UINT8 r = (color_table[(raw >> 12) & 15] * i) >> 4;
-	UINT8 g = (color_table[(raw >> 8) & 15] * i) >> 4;
-	UINT8 b = (color_table[(raw >> 4) & 15] * i) >> 4;
+	uint8_t r = (color_table[(raw >> 12) & 15] * i) >> 4;
+	uint8_t g = (color_table[(raw >> 8) & 15] * i) >> 4;
+	uint8_t b = (color_table[(raw >> 4) & 15] * i) >> 4;
 
 	return rgb_t(r, g, b);
 }
@@ -271,7 +271,7 @@ WRITE16_MEMBER( atarisy2_state::videoram_w )
  *
  *************************************/
 
-UINT32 atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_mob->draw_async(cliprect);
@@ -291,9 +291,9 @@ UINT32 atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_ind1
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap.pix16(y);
-			UINT16 *pf = &bitmap.pix16(y);
-			UINT8 *pri = &priority_bitmap.pix8(y);
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
+			uint8_t *pri = &priority_bitmap.pix8(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{

@@ -20,7 +20,7 @@ class z88_1024k_flash_device : public device_t,
 {
 public:
 	// construction/destruction
-	z88_1024k_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z88_1024k_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -32,8 +32,8 @@ protected:
 	// z88cart_interface overrides
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
-	virtual UINT8* get_cart_base() override;
-	virtual UINT32 get_cart_size() override { return 0x100000; }
+	virtual uint8_t* get_cart_base() override;
+	virtual uint32_t get_cart_size() override { return 0x100000; }
 
 private:
 	required_device<intelfsh8_device> m_flash;

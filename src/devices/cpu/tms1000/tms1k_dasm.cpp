@@ -39,7 +39,7 @@ static const char *const s_mnemonic[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const UINT32 s_flags[] =
+static const uint32_t s_flags[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _OVER, 0,
@@ -57,7 +57,7 @@ enum e_addressing
 	zB0 = 0, zI2, zI3, zI4, zB7
 };
 
-static const UINT8 s_addressing[] =
+static const uint8_t s_addressing[] =
 {
 	zB0,
 	zB0, zB0, zB0, zI4, zI4, zI4, zI4, zB0, zB0, zB7, zB7, zB0,
@@ -73,7 +73,7 @@ static const UINT8 s_addressing[] =
 
 // opcode luts
 
-static const UINT8 tms1000_mnemonic[256] =
+static const uint8_t tms1000_mnemonic[256] =
 {
 /* 0x00 */
 	zCOMX,   zA8AAC,  zYNEA,   zTAM,    zTAMZA,  zA10AAC, zA6AAC,  zDAN,    zTKA,    zKNEZ,   zTDO,    zCLO,    zRSTR,   zSETR,   zIA,     zRETN,   // 0
@@ -97,7 +97,7 @@ static const UINT8 tms1000_mnemonic[256] =
 };
 
 
-static const UINT8 tms1100_mnemonic[256] =
+static const uint8_t tms1100_mnemonic[256] =
 {
 /* 0x00 */
 	zMNEA,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zAMAAC,  zDMAN,   zTKA,    zCOMX,   zTDO,    zCOMC,   zRSTR,   zSETR,   zKNEZ,   zRETN,   // 0
@@ -121,7 +121,7 @@ static const UINT8 tms1100_mnemonic[256] =
 };
 
 
-static const UINT8 tms0980_mnemonic[512] =
+static const uint8_t tms0980_mnemonic[512] =
 {
 /* 0x000 */
 	zCOMX,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zCLA,    zDMAN,   zTKA,    zMNEA,   zTKM,    0,       0,       zSETR,   zKNEZ,   0,       // 0
@@ -163,7 +163,7 @@ static const UINT8 tms0980_mnemonic[512] =
 };
 
 
-static const UINT8 tp0320_mnemonic[512] =
+static const uint8_t tp0320_mnemonic[512] =
 {
 /* 0x000 */
 	0,       zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zCLA,    zDMAN,   zTKA,    zMNEA,   zTKM,    0,       0,       zSETR,   zKNEZ,   0,       // 0
@@ -208,31 +208,31 @@ static const UINT8 tp0320_mnemonic[512] =
 
 // disasm
 
-static const UINT8 i2_value[4] =
+static const uint8_t i2_value[4] =
 {
 	0, 2, 1, 3
 };
 
-static const UINT8 i3_value[8] =
+static const uint8_t i3_value[8] =
 {
 	0, 4, 2, 6, 1, 5, 3, 7
 };
 
-static const UINT8 i4_value[16] =
+static const uint8_t i4_value[16] =
 {
 	0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf
 };
 
-static offs_t tms1k_dasm(char *dst, const UINT8 *oprom, const UINT8 *lut_mnemonic, UINT16 opcode_mask)
+static offs_t tms1k_dasm(char *dst, const uint8_t *oprom, const uint8_t *lut_mnemonic, uint16_t opcode_mask)
 {
 	// get current opcode
 	int pos = 0;
-	UINT16 op = oprom[pos++];
+	uint16_t op = oprom[pos++];
 	if (opcode_mask & 0x100)
 		op = (op << 8 | oprom[pos++]) & 0x1ff;
 
 	// convert to mnemonic/param
-	UINT16 instr = lut_mnemonic[op];
+	uint16_t instr = lut_mnemonic[op];
 	dst += sprintf(dst, "%-8s ", s_mnemonic[instr]);
 
 	switch( s_addressing[instr] )

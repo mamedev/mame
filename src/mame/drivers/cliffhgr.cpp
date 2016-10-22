@@ -102,7 +102,7 @@ public:
 	required_device<pioneer_pr8210_device> m_laserdisc;
 
 	int m_port_bank;
-	UINT32 m_phillips_code;
+	uint32_t m_phillips_code;
 
 	emu_timer *m_irq_timer;
 	DECLARE_WRITE8_MEMBER(cliff_test_led_w);

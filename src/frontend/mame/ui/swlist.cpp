@@ -36,7 +36,7 @@ namespace ui {
 //  part
 //-------------------------------------------------
 
-static bool is_valid_softlist_part_char(unicode_char ch)
+static bool is_valid_softlist_part_char(char32_t ch)
 {
 	return (ch == (char)ch) && isalnum(ch);
 }
@@ -241,7 +241,7 @@ void menu_software_list::handle()
 
 	if (event && event->itemref)
 	{
-		if ((FPTR)event->itemref == 1 && event->iptkey == IPT_UI_SELECT)
+		if ((uintptr_t)event->itemref == 1 && event->iptkey == IPT_UI_SELECT)
 		{
 			m_ordered_by_shortname = !m_ordered_by_shortname;
 
@@ -267,7 +267,7 @@ void menu_software_list::handle()
 				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 
 				// identify the selected entry
-				entry_info const *const cur_selected = (FPTR(event->itemref) != 1)
+				entry_info const *const cur_selected = (uintptr_t(event->itemref) != 1)
 						? reinterpret_cast<entry_info const *>(get_selection_ref())
 						: nullptr;
 

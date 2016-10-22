@@ -24,12 +24,12 @@
 
 PALETTE_INIT_MEMBER(appoooh_state,appoooh)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
 	{
-		UINT8 pen;
+		uint8_t pen;
 		int bit0, bit1, bit2, r, g, b;
 
 		if (i < 0x100)
@@ -63,14 +63,14 @@ PALETTE_INIT_MEMBER(appoooh_state,appoooh)
 
 PALETTE_INIT_MEMBER(appoooh_state,robowres)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
-		UINT8 pen = color_prom[0x020 + i] & 0x0f;
+		uint8_t pen = color_prom[0x020 + i] & 0x0f;
 
 		/* red component */
 		bit0 = (color_prom[pen] >> 0) & 0x01;
@@ -197,7 +197,7 @@ WRITE8_MEMBER(appoooh_state::out_w)
 	/* bit 7 unknown (used) */
 }
 
-void appoooh_state::appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite )
+void appoooh_state::appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, uint8_t *sprite )
 {
 	int offs;
 	int flipy = flip_screen();
@@ -228,7 +228,7 @@ void appoooh_state::appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangl
 	}
 }
 
-void appoooh_state::robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite )
+void appoooh_state::robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, uint8_t *sprite )
 {
 	int offs;
 	int flipy = flip_screen();
@@ -260,7 +260,7 @@ void appoooh_state::robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectang
 }
 
 
-UINT32 appoooh_state::screen_update_appoooh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t appoooh_state::screen_update_appoooh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -289,7 +289,7 @@ UINT32 appoooh_state::screen_update_appoooh(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 appoooh_state::screen_update_robowres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t appoooh_state::screen_update_robowres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 

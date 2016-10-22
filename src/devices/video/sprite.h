@@ -41,12 +41,12 @@ public:
 
 	// dirtying operations - partially interecting tiles are dirtied
 	void dirty(const rectangle &rect) { dirty(rect.left(), rect.right(), rect.top(), rect.bottom()); }
-	void dirty(INT32 left, INT32 right, INT32 top, INT32 bottom);
+	void dirty(int32_t left, int32_t right, int32_t top, int32_t bottom);
 	void dirty_all() { dirty(0, m_width - 1, 0, m_height - 1); }
 
 	// cleaning operations - partially intersecting tiles are NOT cleaned
 	void clean(const rectangle &rect) { clean(rect.left(), rect.right(), rect.top(), rect.bottom()); }
-	void clean(INT32 left, INT32 right, INT32 top, INT32 bottom);
+	void clean(int32_t left, int32_t right, int32_t top, int32_t bottom);
 	void clean_all() { clean(0, m_width - 1, 0, m_height - 1); }
 
 	// convert to rect list
@@ -94,14 +94,14 @@ protected:
 
 public:
 	// getters
-	INT32 xorigin() const { return m_xorigin; }
-	INT32 yorigin() const { return m_yorigin; }
+	int32_t xorigin() const { return m_xorigin; }
+	int32_t yorigin() const { return m_yorigin; }
 	_BitmapType &bitmap() { return m_bitmap; }
 	sparse_dirty_rect *first_dirty_rect() { return m_dirty.first_dirty_rect(); }
 	sparse_dirty_rect *first_dirty_rect(const rectangle &cliprect) { return m_dirty.first_dirty_rect(cliprect); }
 	_SpriteRAMType *spriteram() const { return m_spriteram; }
-	UINT32 spriteram_bytes() const { return m_spriteram_bytes; }
-	UINT32 spriteram_elements() const { return m_spriteram_bytes / sizeof(_SpriteRAMType); }
+	uint32_t spriteram_bytes() const { return m_spriteram_bytes; }
+	uint32_t spriteram_elements() const { return m_spriteram_bytes / sizeof(_SpriteRAMType); }
 	_SpriteRAMType *buffer() { return &m_buffer[0]; }
 
 	// static configuration
@@ -110,10 +110,10 @@ public:
 	static void static_set_origin(device_t &device, int xorigin, int yorigin) { static_set_xorigin(device, xorigin); static_set_yorigin(device, yorigin); }
 
 	// configuration
-	void set_spriteram(_SpriteRAMType *base, UINT32 bytes) { m_spriteram = base; m_spriteram_bytes = bytes; m_buffer.resize(m_spriteram_bytes / sizeof(_SpriteRAMType)); }
-	void set_origin(INT32 xorigin = 0, INT32 yorigin = 0) { m_xorigin = xorigin; m_yorigin = yorigin; }
-	void set_xorigin(INT32 xorigin) { m_xorigin = xorigin; }
-	void set_yorigin(INT32 yorigin) { m_yorigin = yorigin; }
+	void set_spriteram(_SpriteRAMType *base, uint32_t bytes) { m_spriteram = base; m_spriteram_bytes = bytes; m_buffer.resize(m_spriteram_bytes / sizeof(_SpriteRAMType)); }
+	void set_origin(int32_t xorigin = 0, int32_t yorigin = 0) { m_xorigin = xorigin; m_yorigin = yorigin; }
+	void set_xorigin(int32_t xorigin) { m_xorigin = xorigin; }
+	void set_yorigin(int32_t yorigin) { m_yorigin = yorigin; }
 
 	// buffering
 	void copy_to_buffer() { memcpy(m_buffer, m_spriteram, m_spriteram_bytes); }
@@ -181,16 +181,16 @@ protected:
 
 	// subclass helpers
 	void mark_dirty(const rectangle &rect) { mark_dirty(rect.left(), rect.right(), rect.top(), rect.bottom()); }
-	void mark_dirty(INT32 left, INT32 right, INT32 top, INT32 bottom) { m_dirty.dirty(left - m_xorigin, right - m_xorigin, top - m_yorigin, bottom - m_yorigin); }
+	void mark_dirty(int32_t left, int32_t right, int32_t top, int32_t bottom) { m_dirty.dirty(left - m_xorigin, right - m_xorigin, top - m_yorigin, bottom - m_yorigin); }
 
 private:
 	// configuration
-	INT32                           m_xorigin;              // X origin for drawing
-	INT32                           m_yorigin;              // Y origin for drawing
+	int32_t                           m_xorigin;              // X origin for drawing
+	int32_t                           m_yorigin;              // Y origin for drawing
 
 	// memory pointers and buffers
 	_SpriteRAMType *                m_spriteram;            // pointer to spriteram pointer
-	INT32                           m_spriteram_bytes;      // size of sprite RAM in bytes
+	int32_t                           m_spriteram_bytes;      // size of sprite RAM in bytes
 	std::vector<_SpriteRAMType>          m_buffer;               // buffered spriteram for those that use it
 
 	// bitmaps
@@ -198,13 +198,13 @@ private:
 	sparse_dirty_bitmap             m_dirty;                // dirty bitmap
 };
 
-typedef sprite_device<UINT8, bitmap_ind16> sprite8_device_ind16;
-typedef sprite_device<UINT16, bitmap_ind16> sprite16_device_ind16;
-typedef sprite_device<UINT32, bitmap_ind16> sprite32_device_ind16;
+typedef sprite_device<uint8_t, bitmap_ind16> sprite8_device_ind16;
+typedef sprite_device<uint16_t, bitmap_ind16> sprite16_device_ind16;
+typedef sprite_device<uint32_t, bitmap_ind16> sprite32_device_ind16;
 
-typedef sprite_device<UINT8, bitmap_ind32> sprite8_device_ind32;
-typedef sprite_device<UINT16, bitmap_ind32> sprite16_device_ind32;
-typedef sprite_device<UINT32, bitmap_ind32> sprite32_device_ind32;
+typedef sprite_device<uint8_t, bitmap_ind32> sprite8_device_ind32;
+typedef sprite_device<uint16_t, bitmap_ind32> sprite16_device_ind32;
+typedef sprite_device<uint32_t, bitmap_ind32> sprite32_device_ind32;
 
 
 #endif  // __SPRITE_H__

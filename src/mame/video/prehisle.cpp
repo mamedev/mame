@@ -145,7 +145,7 @@ void prehisle_state::video_start()
 */
 void prehisle_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 const *const spriteram16 = m_spriteram;
+	uint16_t const *const spriteram16 = m_spriteram;
 
 	for (int offs = 1024 - 4; offs >= 0; offs -= 4)
 	{
@@ -180,7 +180,7 @@ void prehisle_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
-UINT32 prehisle_state::screen_update_prehisle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t prehisle_state::screen_update_prehisle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 

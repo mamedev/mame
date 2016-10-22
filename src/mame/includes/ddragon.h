@@ -33,31 +33,31 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	optional_shared_ptr<UINT8> m_rambase;
-	required_shared_ptr<UINT8> m_bgvideoram;
-	required_shared_ptr<UINT8> m_fgvideoram;
-	optional_shared_ptr<UINT8> m_comram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scrollx_lo;
-	required_shared_ptr<UINT8> m_scrolly_lo;
-	optional_shared_ptr<UINT8> m_darktowr_mcu_ports;
+	optional_shared_ptr<uint8_t> m_rambase;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	optional_shared_ptr<uint8_t> m_comram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scrollx_lo;
+	required_shared_ptr<uint8_t> m_scrolly_lo;
+	optional_shared_ptr<uint8_t> m_darktowr_mcu_ports;
 
 	/* video-related */
 	tilemap_t      *m_fg_tilemap;
 	tilemap_t      *m_bg_tilemap;
-	UINT8          m_technos_video_hw;
-	UINT8          m_scrollx_hi;
-	UINT8          m_scrolly_hi;
+	uint8_t          m_technos_video_hw;
+	uint8_t          m_scrollx_hi;
+	uint8_t          m_scrolly_hi;
 
 	/* misc */
-	UINT8          m_ddragon_sub_port;
-	UINT8          m_sprite_irq;
-	UINT8          m_sound_irq;
-	UINT8          m_ym_irq;
-	UINT8          m_adpcm_sound_irq;
-	UINT32         m_adpcm_pos[2];
-	UINT32         m_adpcm_end[2];
-	UINT8          m_adpcm_idle[2];
+	uint8_t          m_ddragon_sub_port;
+	uint8_t          m_sprite_irq;
+	uint8_t          m_sound_irq;
+	uint8_t          m_ym_irq;
+	uint8_t          m_adpcm_sound_irq;
+	uint32_t         m_adpcm_pos[2];
+	uint32_t         m_adpcm_end[2];
+	uint8_t          m_adpcm_idle[2];
 	int            m_adpcm_data[2];
 
 	/* for Sai Yu Gou Ma Roku */
@@ -84,7 +84,7 @@ public:
 
 
 	int scanline_to_vcount(int scanline);
-	void ddragon_interrupt_ack(address_space &space, offs_t offset, UINT8 data);
+	void ddragon_interrupt_ack(address_space &space, offs_t offset, uint8_t data);
 	void dd_adpcm_int(msm5205_device *device, int chip);
 
 	/* video/ddragon.c */
@@ -93,7 +93,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_16color_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	UINT32 screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_MACHINE_START(ddragon);
 	DECLARE_MACHINE_RESET(ddragon);

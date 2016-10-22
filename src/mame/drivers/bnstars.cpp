@@ -120,23 +120,23 @@ public:
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
 	tilemap_t *m_ms32_roz_tilemap[2];
-	required_shared_ptr<UINT32> m_ms32_tx0_ram;
-	required_shared_ptr<UINT32> m_ms32_tx1_ram;
-	required_shared_ptr<UINT32> m_ms32_bg0_ram;
-	required_shared_ptr<UINT32> m_ms32_bg1_ram;
-	required_shared_ptr<UINT32> m_ms32_roz0_ram;
-	required_shared_ptr<UINT32> m_ms32_roz1_ram;
-	required_shared_ptr_array<UINT32, 2> m_ms32_roz_ctrl;
-	required_shared_ptr<UINT32> m_ms32_spram;
-	required_shared_ptr<UINT32> m_ms32_tx0_scroll;
-	required_shared_ptr<UINT32> m_ms32_bg0_scroll;
-	required_shared_ptr<UINT32> m_ms32_tx1_scroll;
-	required_shared_ptr<UINT32> m_ms32_bg1_scroll;
+	required_shared_ptr<uint32_t> m_ms32_tx0_ram;
+	required_shared_ptr<uint32_t> m_ms32_tx1_ram;
+	required_shared_ptr<uint32_t> m_ms32_bg0_ram;
+	required_shared_ptr<uint32_t> m_ms32_bg1_ram;
+	required_shared_ptr<uint32_t> m_ms32_roz0_ram;
+	required_shared_ptr<uint32_t> m_ms32_roz1_ram;
+	required_shared_ptr_array<uint32_t, 2> m_ms32_roz_ctrl;
+	required_shared_ptr<uint32_t> m_ms32_spram;
+	required_shared_ptr<uint32_t> m_ms32_tx0_scroll;
+	required_shared_ptr<uint32_t> m_ms32_bg0_scroll;
+	required_shared_ptr<uint32_t> m_ms32_tx1_scroll;
+	required_shared_ptr<uint32_t> m_ms32_bg1_scroll;
 
 	required_ioport_array<4> m_p1_keys;
 	required_ioport_array<4> m_p2_keys;
 
-	UINT32 m_bnstars1_mahjong_select;
+	uint32_t m_bnstars1_mahjong_select;
 	DECLARE_WRITE32_MEMBER(ms32_tx0_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_tx1_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_bg0_ram_w);
@@ -154,10 +154,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_ms32_roz1_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t *sprram_top, size_t sprram_size);
 };
 
 
@@ -250,7 +250,7 @@ void bnstars_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 		while (y <= maxy)
 		{
-		    UINT32 *lineaddr = ms32_lineram + 8 * (y & 0xff);
+		    uint32_t *lineaddr = ms32_lineram + 8 * (y & 0xff);
 
 		    int start2x = (lineaddr[0x00/4] & 0xffff) | ((lineaddr[0x04/4] & 3) << 16);
 		    int start2y = (lineaddr[0x08/4] & 0xffff) | ((lineaddr[0x0c/4] & 3) << 16);
@@ -349,7 +349,7 @@ WRITE32_MEMBER(bnstars_state::ms32_roz1_ram_w)
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size)
+void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t *sprram_top, size_t sprram_size)
 {
 /***************************************************************************
 
@@ -393,8 +393,8 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	int code, attr, color, size, pri, pri_mask;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
-	UINT32      *source = sprram_top;
-	const UINT32    *finish = sprram_top + (sprram_size - 0x10) / 4;
+	uint32_t      *source = sprram_top;
+	const uint32_t    *finish = sprram_top + (sprram_size - 0x10) / 4;
 
 
 	if (m_reverse_sprite_order == 1)
@@ -499,7 +499,7 @@ void bnstars_state::video_start()
 
 
 
-UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -522,7 +522,7 @@ UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_i
 	return 0;
 }
 
-UINT32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -708,7 +708,7 @@ GFXDECODE_END
 
 CUSTOM_INPUT_MEMBER(bnstars_state::mahjong_ctrl_r)
 {
-	required_ioport_array<4> &keys = (((int)(FPTR)param) == 0) ? m_p1_keys : m_p2_keys;
+	required_ioport_array<4> &keys = (((int)(uintptr_t)param) == 0) ? m_p1_keys : m_p2_keys;
 
 	switch (m_bnstars1_mahjong_select & 0x2080)
 	{

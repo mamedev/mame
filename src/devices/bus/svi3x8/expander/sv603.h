@@ -28,7 +28,7 @@ class sv603_device : public device_t, public device_svi_expander_interface
 {
 public:
 	// construction/destruction
-	sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// from host
 	virtual DECLARE_READ8_MEMBER( mreq_r ) override;

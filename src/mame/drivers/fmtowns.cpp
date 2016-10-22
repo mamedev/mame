@@ -201,19 +201,19 @@ enum
 
 
 
-inline UINT8 towns_state::byte_to_bcd(UINT8 val)
+inline uint8_t towns_state::byte_to_bcd(uint8_t val)
 {
 	return ((val / 10) << 4) | (val % 10);
 }
 
-inline UINT8 towns_state::bcd_to_byte(UINT8 val)
+inline uint8_t towns_state::bcd_to_byte(uint8_t val)
 {
 	return (((val & 0xf0) >> 4) * 10) + (val & 0x0f);
 }
 
-inline UINT32 towns_state::msf_to_lbafm(UINT32 val)  // because the CDROM core doesn't provide this
+inline uint32_t towns_state::msf_to_lbafm(uint32_t val)  // because the CDROM core doesn't provide this
 {
-	UINT8 m,s,f;
+	uint8_t m,s,f;
 	f = bcd_to_byte(val & 0x0000ff);
 	s = (bcd_to_byte((val & 0x00ff00) >> 8));
 	m = (bcd_to_byte((val & 0xff0000) >> 16));
@@ -224,8 +224,8 @@ void towns_state::init_serial_rom()
 {
 	// TODO: init serial ROM contents
 	int x;
-	static const UINT8 code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
-	UINT8* srom = nullptr;
+	static const uint8_t code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
+	uint8_t* srom = nullptr;
 
 	if(m_serial)
 		srom = m_serial->base();
@@ -290,7 +290,7 @@ void towns_state::init_rtc()
 
 READ8_MEMBER(towns_state::towns_system_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch(offset)
 	{
@@ -387,7 +387,7 @@ WRITE8_MEMBER(towns_state::towns_intervaltimer2_w)
 
 READ8_MEMBER(towns_state::towns_intervaltimer2_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch(offset)
 	{
@@ -507,7 +507,7 @@ WRITE_LINE_MEMBER( towns_state::mb8877a_drq_w )
 
 READ8_MEMBER(towns_state::towns_floppy_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	switch(offset)
 	{
@@ -632,7 +632,7 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 }
 
 READ16_MEMBER(towns_state::towns_fdc_dma_r)
-{   UINT16 data = m_fdc->data_r(generic_space(), 0);
+{   uint16_t data = m_fdc->data_r(generic_space(), 0);
 	return data;
 }
 
@@ -657,7 +657,7 @@ WRITE16_MEMBER(towns_state::towns_fdc_dma_w)
  *      bit 7 = always 0
  *      bits 6-0 = key scancode
  */
-void towns_state::kb_sendcode(UINT8 scancode, int release)
+void towns_state::kb_sendcode(uint8_t scancode, int release)
 {
 	switch(release)
 	{
@@ -698,8 +698,8 @@ void towns_state::kb_sendcode(UINT8 scancode, int release)
 void towns_state::poll_keyboard()
 {
 	int port,bit;
-	UINT8 scan;
-	UINT32 portval;
+	uint8_t scan;
+	uint32_t portval;
 
 	scan = 0;
 	for(port=0;port<4;port++)
@@ -722,7 +722,7 @@ void towns_state::poll_keyboard()
 
 READ8_MEMBER(towns_state::towns_keyboard_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	switch(offset)
 	{
@@ -774,13 +774,13 @@ WRITE8_MEMBER(towns_state::towns_keyboard_w)
  *  On write:   bits 2-0: Timer mask set
  *              bit 7: Timer 0 output reset
  */
-UINT8 towns_state::speaker_get_spk()
+uint8_t towns_state::speaker_get_spk()
 {
 	return m_towns_spkrdata & m_pit_out2;
 }
 
 
-void towns_state::speaker_set_spkrdata(UINT8 data)
+void towns_state::speaker_set_spkrdata(uint8_t data)
 {
 	m_towns_spkrdata = data ? 1 : 0;
 	m_speaker->level_w(speaker_get_spk());
@@ -789,7 +789,7 @@ void towns_state::speaker_set_spkrdata(UINT8 data)
 
 READ8_MEMBER(towns_state::towns_port60_r)
 {
-	UINT8 val = 0x00;
+	uint8_t val = 0x00;
 
 	if (m_pit_out0)
 		val |= 0x01;
@@ -854,7 +854,7 @@ WRITE8_MEMBER(towns_state::towns_sys5e8_w)
 // W/O  -- (0x4ec) LED control
 READ8_MEMBER(towns_state::towns_sound_ctrl_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch(offset)
 	{
@@ -901,11 +901,11 @@ void towns_state::mouse_timeout()
 
 READ8_MEMBER(towns_state::towns_padport_r)
 {
-	UINT8 ret = 0x00;
-	UINT32 porttype = m_ctrltype->read();
-	UINT8 extra1;
-	UINT8 extra2;
-	UINT32 state;
+	uint8_t ret = 0x00;
+	uint32_t porttype = m_ctrltype->read();
+	uint8_t extra1;
+	uint8_t extra2;
+	uint32_t state;
 
 	if(offset == 0)
 	{
@@ -1086,8 +1086,8 @@ READ8_MEMBER(towns_state::towns_padport_r)
 
 WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 {
-	UINT8 current_x,current_y;
-	UINT32 type = m_ctrltype->read();
+	uint8_t current_x,current_y;
+	uint32_t type = m_ctrltype->read();
 
 	m_towns_pad_mask = (data & 0xff);
 	if((type & 0x0f) == 0x02)  // mouse
@@ -1204,7 +1204,7 @@ WRITE8_MEMBER( towns_state::towns_cmos_w )
 
 void towns_state::towns_update_video_banks(address_space& space)
 {
-	UINT8* ROM;
+	uint8_t* ROM;
 
 	if(m_towns_mainmem_enable != 0)  // first MB is RAM
 	{
@@ -1378,7 +1378,7 @@ void towns_state::towns_cd_status_ready()
 	towns_cdrom_set_irq(TOWNS_CD_IRQ_MPU,1);
 }
 
-void towns_state::towns_cd_set_status(UINT8 st0, UINT8 st1, UINT8 st2, UINT8 st3)
+void towns_state::towns_cd_set_status(uint8_t st0, uint8_t st1, uint8_t st2, uint8_t st3)
 {
 	m_towns_cd.cmd_status[0] = st0;
 	m_towns_cd.cmd_status[1] = st1;
@@ -1388,11 +1388,11 @@ void towns_state::towns_cd_set_status(UINT8 st0, UINT8 st1, UINT8 st2, UINT8 st3
 	m_towns_status_timer->adjust(attotime::from_msec(1),0,attotime::never);
 }
 
-UINT8 towns_state::towns_cd_get_track()
+uint8_t towns_state::towns_cd_get_track()
 {
 	cdrom_image_device* cdrom = m_cdrom;
-	UINT32 lba = m_cdda->get_audio_lba();
-	UINT8 track;
+	uint32_t lba = m_cdda->get_audio_lba();
+	uint8_t track;
 
 	for(track=1;track<99;track++)
 	{
@@ -1452,9 +1452,9 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
 	}
 }
 
-UINT8 towns_state::towns_cdrom_read_byte_software()
+uint8_t towns_state::towns_cdrom_read_byte_software()
 {
-	UINT8 ret;
+	uint8_t ret;
 	if(m_towns_cd.buffer_ptr < 0) // transfer has ended
 		return 0x00;
 
@@ -1496,7 +1496,7 @@ void towns_state::towns_cdrom_read(cdrom_image_device* device)
 	// parameters:
 	//          3 bytes: MSF of first sector to read
 	//          3 bytes: MSF of last sector to read
-	UINT32 lba1,lba2,track;
+	uint32_t lba1,lba2,track;
 
 	lba1 = m_towns_cd.parameter[7] << 16;
 	lba1 += m_towns_cd.parameter[6] << 8;
@@ -1564,7 +1564,7 @@ void towns_state::towns_cdrom_play_cdda(cdrom_image_device* device)
 	// Parameters:
 	//          3 bytes: starting MSF of audio to play
 	//          3 bytes: ending MSF of audio to play (can span multiple tracks)
-	UINT32 lba1,lba2;
+	uint32_t lba1,lba2;
 
 	lba1 = m_towns_cd.parameter[7] << 16;
 	lba1 += m_towns_cd.parameter[6] << 8;
@@ -1704,8 +1704,8 @@ READ16_MEMBER(towns_state::towns_cdrom_dma_r)
 
 READ8_MEMBER(towns_state::towns_cdrom_r)
 {
-	UINT32 addr = 0;
-	UINT8 ret = 0;
+	uint32_t addr = 0;
+	uint8_t ret = 0;
 
 	ret = m_towns_cd.cmd_status[m_towns_cd.cmd_status_ptr];
 
@@ -2564,12 +2564,12 @@ INPUT_PORTS_END
 
 void towns_state::driver_start()
 {
-	m_towns_vram = std::make_unique<UINT32[]>(0x20000);
-	m_towns_gfxvram = std::make_unique<UINT8[]>(0x80000);
-	m_towns_txtvram = std::make_unique<UINT8[]>(0x20000);
-	memset(m_towns_txtvram.get(), 0, sizeof(UINT8)*0x20000);
-	//towns_sprram = std::make_unique<UINT8[]>(0x20000);
-	m_towns_serial_rom = std::make_unique<UINT8[]>(256/8);
+	m_towns_vram = std::make_unique<uint32_t[]>(0x20000);
+	m_towns_gfxvram = std::make_unique<uint8_t[]>(0x80000);
+	m_towns_txtvram = std::make_unique<uint8_t[]>(0x20000);
+	memset(m_towns_txtvram.get(), 0, sizeof(uint8_t)*0x20000);
+	//towns_sprram = std::make_unique<uint8_t[]>(0x20000);
+	m_towns_serial_rom = std::make_unique<uint8_t[]>(256/8);
 	init_serial_rom();
 	init_rtc();
 	m_towns_rtc_timer = timer_alloc(TIMER_RTC);

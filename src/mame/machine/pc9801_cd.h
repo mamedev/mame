@@ -9,7 +9,7 @@
 class pc9801_cd_device : public atapi_cdrom_device
 {
 public:
-	pc9801_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc9801_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void fill_buffer() override;

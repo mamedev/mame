@@ -78,7 +78,7 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 const device_type PCE_CD = &device_creator<pce_cd_device>;
 
 
-pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, PCE_CD, "PCE CD Add-on", tag, owner, clock, "pcecd", __FILE__),
 						m_maincpu(*this, ":maincpu"),
 						m_msm(*this, "msm5205"),
@@ -91,7 +91,7 @@ pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, dev
 void pce_cd_device::device_start()
 {
 	/* Initialize BRAM */
-	m_bram = std::make_unique<UINT8[]>(PCE_BRAM_SIZE * 2);
+	m_bram = std::make_unique<uint8_t[]>(PCE_BRAM_SIZE * 2);
 	memset(m_bram.get(), 0, PCE_BRAM_SIZE);
 	memset(m_bram.get() + PCE_BRAM_SIZE, 0xff, PCE_BRAM_SIZE);
 	m_bram_locked = 1;
@@ -99,21 +99,21 @@ void pce_cd_device::device_start()
 	m_nvram->set_base(m_bram.get(), PCE_BRAM_SIZE);
 
 	/* set up adpcm related things */
-	m_adpcm_ram = make_unique_clear<UINT8[]>(PCE_ADPCM_RAM_SIZE);
+	m_adpcm_ram = make_unique_clear<uint8_t[]>(PCE_ADPCM_RAM_SIZE);
 	m_adpcm_clock_divider = 1;
 
 	/* Set up cd command buffer */
-	m_command_buffer = make_unique_clear<UINT8[]>(PCE_CD_COMMAND_BUFFER_SIZE);
+	m_command_buffer = make_unique_clear<uint8_t[]>(PCE_CD_COMMAND_BUFFER_SIZE);
 	m_command_buffer_index = 0;
 
 	/* Set up Arcade Card RAM buffer */
-	m_acard_ram = make_unique_clear<UINT8[]>(PCE_ACARD_RAM_SIZE);
+	m_acard_ram = make_unique_clear<uint8_t[]>(PCE_ACARD_RAM_SIZE);
 
-	m_data_buffer = make_unique_clear<UINT8[]>(8192);
+	m_data_buffer = make_unique_clear<uint8_t[]>(8192);
 	m_data_buffer_size = 0;
 	m_data_buffer_index = 0;
 
-	m_subcode_buffer = std::make_unique<UINT8[]>(96);
+	m_subcode_buffer = std::make_unique<uint8_t[]>(96);
 
 	m_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_cd_device::data_timer_callback),this));
 	m_data_timer->adjust(attotime::never);
@@ -234,7 +234,7 @@ void pce_cd_device::late_setup()
 
 void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init[8] = { 0x48, 0x55, 0x42, 0x4d, 0x00, 0xa0, 0x10, 0x80 };
+	static const uint8_t init[8] = { 0x48, 0x55, 0x42, 0x4d, 0x00, 0xa0, 0x10, 0x80 };
 
 	memset(data, 0x00, size);
 	memcpy(data, init, sizeof(init));
@@ -265,7 +265,7 @@ machine_config_constructor pce_cd_device::device_mconfig_additions() const
 }
 
 
-void pce_cd_device::adpcm_stop(UINT8 irq_flag)
+void pce_cd_device::adpcm_stop(uint8_t irq_flag)
 {
 	m_regs[0x0c] |= PCE_CD_ADPCM_STOP_FLAG;
 	m_regs[0x0c] &= ~PCE_CD_ADPCM_PLAY_FLAG;
@@ -293,7 +293,7 @@ void pce_cd_device::adpcm_play()
  */
 WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
 {
-	UINT8 msm_data;
+	uint8_t msm_data;
 
 	//  popmessage("%08x %08x %08x %02x %02x",m_msm_start_addr,m_msm_end_addr,m_msm_half_addr,m_regs[0x0c],m_regs[0x0d]);
 
@@ -329,7 +329,7 @@ WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
 #define SCSI_STATUS_OK          0x00
 #define SCSI_CHECK_CONDITION    0x02
 
-void pce_cd_device::reply_status_byte(UINT8 status)
+void pce_cd_device::reply_status_byte(uint8_t status)
 {
 	logerror("Setting CD in reply_status_byte\n");
 	m_scsi_CD = m_scsi_IO = m_scsi_REQ = 1;
@@ -366,8 +366,8 @@ void pce_cd_device::test_unit_ready()
 /* 0x08 - READ (6) */
 void pce_cd_device::read_6()
 {
-	UINT32 frame = ((m_command_buffer[1] & 0x1f) << 16) | (m_command_buffer[2] << 8) | m_command_buffer[3];
-	UINT32 frame_count = m_command_buffer[4];
+	uint32_t frame = ((m_command_buffer[1] & 0x1f) << 16) | (m_command_buffer[2] << 8) | m_command_buffer[3];
+	uint32_t frame_count = m_command_buffer[4];
 	printf("%08x %08x\n",frame,frame_count);
 
 	/* Check for presence of a CD */
@@ -405,7 +405,7 @@ void pce_cd_device::read_6()
 /* 0xD8 - SET AUDIO PLAYBACK START POSITION (NEC) */
 void pce_cd_device::nec_set_audio_start_position()
 {
-	UINT32  frame = 0;
+	uint32_t  frame = 0;
 
 	if (!m_cd_file)
 	{
@@ -422,7 +422,7 @@ void pce_cd_device::nec_set_audio_start_position()
 			break;
 		case 0x40:
 		{
-			UINT8 m,s,f;
+			uint8_t m,s,f;
 
 			m = bcd_2_dec(m_command_buffer[2]);
 			s = bcd_2_dec(m_command_buffer[3]);
@@ -479,7 +479,7 @@ void pce_cd_device::nec_set_audio_start_position()
 /* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
 void pce_cd_device::nec_set_audio_stop_position()
 {
-	UINT32  frame = 0;
+	uint32_t  frame = 0;
 
 	if (!m_cd_file)
 	{
@@ -496,7 +496,7 @@ void pce_cd_device::nec_set_audio_stop_position()
 			break;
 		case 0x40:
 		{
-			UINT8 m,s,f;
+			uint8_t m,s,f;
 
 			m = bcd_2_dec(m_command_buffer[2]);
 			s = bcd_2_dec(m_command_buffer[3]);
@@ -573,7 +573,7 @@ void pce_cd_device::nec_pause()
 void pce_cd_device::nec_get_subq()
 {
 	/* WP - I do not have access to chds with subchannel information yet, so I'm faking something here */
-	UINT32 msf_abs, msf_rel, track, frame;
+	uint32_t msf_abs, msf_rel, track, frame;
 
 	if (!m_cd_file)
 	{
@@ -623,7 +623,7 @@ void pce_cd_device::nec_get_subq()
 /* 0xDE - GET DIR INFO (NEC) */
 void pce_cd_device::nec_get_dir_info()
 {
-	UINT32 frame, msf, track = 0;
+	uint32_t frame, msf, track = 0;
 	const cdrom_toc *toc;
 	logerror("nec get dir info\n");
 
@@ -697,8 +697,8 @@ typedef void (pce_cd_device::*command_handler_func)();
 void pce_cd_device::handle_data_output()
 {
 	static const struct {
-		UINT8   command_byte;
-		UINT8   command_size;
+		uint8_t   command_byte;
+		uint8_t   command_size;
 		command_handler_func command_handler;
 	} pce_cd_commands[] = {
 		{ 0x00, 6, &pce_cd_device::test_unit_ready },                /* TEST UNIT READY */
@@ -988,7 +988,7 @@ READ8_MEMBER(pce_cd_device::bram_r)
 	return m_bram[(offset & (PCE_BRAM_SIZE - 1)) + m_bram_locked * PCE_BRAM_SIZE];
 }
 
-void pce_cd_device::set_adpcm_ram_byte(UINT8 val)
+void pce_cd_device::set_adpcm_ram_byte(uint8_t val)
 {
 	if (m_adpcm_write_buf > 0)
 	{
@@ -1260,9 +1260,9 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::clear_ack)
 	}
 }
 
-UINT8 pce_cd_device::get_cd_data_byte()
+uint8_t pce_cd_device::get_cd_data_byte()
 {
-	UINT8 data = m_regs[0x01];
+	uint8_t data = m_regs[0x01];
 	if (m_scsi_REQ && !m_scsi_ACK && !m_scsi_CD)
 	{
 		if (m_scsi_IO)
@@ -1286,7 +1286,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_dma_timer_callback)
 	}
 }
 
-UINT8 pce_cd_device::get_adpcm_ram_byte()
+uint8_t pce_cd_device::get_adpcm_ram_byte()
 {
 	if (m_adpcm_read_buf > 0)
 	{
@@ -1295,7 +1295,7 @@ UINT8 pce_cd_device::get_adpcm_ram_byte()
 	}
 	else
 	{
-		UINT8 res;
+		uint8_t res;
 
 		res = m_adpcm_ram[m_adpcm_read_ptr];
 		m_adpcm_read_ptr = ((m_adpcm_read_ptr + 1) & 0xffff);
@@ -1306,7 +1306,7 @@ UINT8 pce_cd_device::get_adpcm_ram_byte()
 
 READ8_MEMBER(pce_cd_device::intf_r)
 {
-	UINT8 data = m_regs[offset & 0x0F];
+	uint8_t data = m_regs[offset & 0x0F];
 
 	logerror("%04X: read from CD interface offset %02X\n", space.device().safe_pc(), offset );
 
@@ -1377,7 +1377,7 @@ PC Engine Arcade Card emulation
 
 READ8_MEMBER(pce_cd_device::acard_r)
 {
-	UINT8 r_num;
+	uint8_t r_num;
 
 	if ((offset & 0x2e0) == 0x2e0)
 	{
@@ -1403,7 +1403,7 @@ READ8_MEMBER(pce_cd_device::acard_r)
 		case 0x00:
 		case 0x01:
 		{
-			UINT8 res;
+			uint8_t res;
 			if (m_acard_ctrl[r_num] & 2)
 				res = m_acard_ram[(m_acard_base_addr[r_num] + m_acard_addr_offset[r_num]) & 0x1fffff];
 			else
@@ -1438,7 +1438,7 @@ READ8_MEMBER(pce_cd_device::acard_r)
 
 WRITE8_MEMBER(pce_cd_device::acard_w)
 {
-	UINT8 w_num;
+	uint8_t w_num;
 
 	if ((offset & 0x2e0) == 0x2e0)
 	{

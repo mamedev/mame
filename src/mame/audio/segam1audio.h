@@ -26,7 +26,7 @@ class segam1audio_device : public device_t
 {
 public:
 		// construction/destruction
-		segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -45,7 +45,7 @@ public:
 		DECLARE_READ16_MEMBER(ready_r);
 
 		void check_fifo_irq();
-		void write_fifo(UINT8 data);
+		void write_fifo(uint8_t data);
 
 protected:
 		// device-level overrides

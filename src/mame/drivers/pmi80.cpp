@@ -50,7 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
 private:
-	UINT8 m_keyrow;
+	uint8_t m_keyrow;
 	bool m_ledready;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

@@ -20,8 +20,8 @@
 #define GTP_BLOCK_TURBO     0x01
 #define GTP_BLOCK_NAME      0x10
 
-static INT16    wave_data;
-static INT16    len;
+static int16_t    wave_data;
+static int16_t    len;
 
 #define PULSE_WIDTH     30
 #define PERIOD_BASE     150
@@ -32,7 +32,7 @@ static INT16    len;
 #define INTERBLOCK_PAUSE    100000
 
 
-static void gtp_output_wave( INT16 **buffer, int length ) {
+static void gtp_output_wave( int16_t **buffer, int length ) {
 	if ( buffer == nullptr ) {
 		return;
 	}
@@ -45,7 +45,7 @@ static void gtp_output_wave( INT16 **buffer, int length ) {
 
 
 
-static int gtp_mod_1( INT16 **buffer )
+static int gtp_mod_1( int16_t **buffer )
 {
 	wave_data = WAVE_LOW;
 	gtp_output_wave(buffer,PULSE_WIDTH);
@@ -63,7 +63,7 @@ static int gtp_mod_1( INT16 **buffer )
 	return PERIOD_1 * 2;
 }
 
-static int gtp_mod_0( INT16 **buffer )
+static int gtp_mod_0( int16_t **buffer )
 {
 	wave_data = WAVE_LOW;
 	gtp_output_wave(buffer,PULSE_WIDTH);
@@ -75,9 +75,9 @@ static int gtp_mod_0( INT16 **buffer )
 	return PERIOD_0;
 }
 
-static int gtp_byte( INT16 **buffer, UINT8 val )
+static int gtp_byte( int16_t **buffer, uint8_t val )
 {
-	UINT8 b;
+	uint8_t b;
 	int j,size = 0;
 	for (j=0;j<8;j++) {
 		b = (val >> j) & 1;
@@ -90,7 +90,7 @@ static int gtp_byte( INT16 **buffer, UINT8 val )
 	return size;
 }
 
-static int gtp_sync( INT16 **buffer )
+static int gtp_sync( int16_t **buffer )
 {
 	int i;
 	int size = 0;
@@ -107,7 +107,7 @@ static int gtp_sync( INT16 **buffer )
 	return size;
 }
 
-static int gtp_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
+static int gtp_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	int size,n;
 	size = 0;
 	n = 0;
@@ -128,7 +128,7 @@ static int gtp_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	return size;
 }
 
-static int gtp_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
+static int gtp_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 	int i,size,n;
 	size = 0;
 	n = 0;

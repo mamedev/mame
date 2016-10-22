@@ -58,7 +58,7 @@ device_saturn_control_port_interface::~device_saturn_control_port_interface()
 //  saturn_control_port_device - constructor
 //-------------------------------------------------
 
-saturn_control_port_device::saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+saturn_control_port_device::saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, SATURN_CONTROL_PORT, "Sega Saturn control port", tag, owner, clock, "saturn_control_port", __FILE__),
 						device_slot_interface(mconfig, *this), m_device(nullptr)
 {
@@ -84,9 +84,9 @@ void saturn_control_port_device::device_start()
 }
 
 
-UINT8 saturn_control_port_device::read_status()
+uint8_t saturn_control_port_device::read_status()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data |= m_device->read_status();
 	return data;
@@ -94,25 +94,25 @@ UINT8 saturn_control_port_device::read_status()
 
 // Notice that the variable idx is only used by the multitap / segatap adapters
 // Otherwise, any value is ignored and the unique controller ID is returned
-UINT8 saturn_control_port_device::read_id(int idx)
+uint8_t saturn_control_port_device::read_id(int idx)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data |= m_device->read_id(idx);
 	return data;
 }
 
-UINT8 saturn_control_port_device::read_ctrl(UINT8 offset)
+uint8_t saturn_control_port_device::read_ctrl(uint8_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data |= m_device->read_ctrl(offset);
 	return data;
 }
 
-UINT16 saturn_control_port_device::read_direct()
+uint16_t saturn_control_port_device::read_direct()
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	if (m_device)
 		data |= m_device->read_direct();
 	return data;

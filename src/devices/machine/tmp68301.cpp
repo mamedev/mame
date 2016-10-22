@@ -92,14 +92,14 @@ READ16_MEMBER(tmp68301_device::pdr_r)
 
 WRITE16_MEMBER(tmp68301_device::pdr_w)
 {
-	UINT16 old = m_pdr;
+	uint16_t old = m_pdr;
 	COMBINE_DATA(&m_pdr);
 	m_pdr = (old & ~m_pdir) | (m_pdr & m_pdir);
 	m_out_parallel_cb(0, m_pdr, mem_mask);
 }
 
 
-tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMP68301, "TMP68301", tag, owner, clock, "tmp68301", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_in_parallel_cb(*this),
@@ -172,7 +172,7 @@ const address_space_config *tmp68301_device::memory_space_config(address_spacenu
 //  read_byte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT16 tmp68301_device::read_word(offs_t address)
+inline uint16_t tmp68301_device::read_word(offs_t address)
 {
 	return space(AS_0).read_word(address << 1);
 }
@@ -181,7 +181,7 @@ inline UINT16 tmp68301_device::read_word(offs_t address)
 //  write_byte - write a byte at the given address
 //-------------------------------------------------
 
-inline void tmp68301_device::write_word(offs_t address, UINT16 data)
+inline void tmp68301_device::write_word(offs_t address, uint16_t data)
 {
 	space(AS_0).write_word(address << 1, data);
 }
@@ -196,9 +196,9 @@ IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)
 TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
 {
 	int i = param;
-	UINT16 TCR  =   m_regs[(0x200 + i * 0x20)/2];
-	UINT16 ICR  =   m_regs[0x8e/2+i];    // Interrupt Controller Register (ICR7..9)
-	UINT16 IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
+	uint16_t TCR  =   m_regs[(0x200 + i * 0x20)/2];
+	uint16_t ICR  =   m_regs[0x8e/2+i];    // Interrupt Controller Register (ICR7..9)
+	uint16_t IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
 
 //  logerror("s: callback timer %04X, j = %d\n",machine.describe_context(),i,tcount);
 
@@ -228,9 +228,9 @@ TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
 
 void tmp68301_device::update_timer( int i )
 {
-	UINT16 TCR  =   m_regs[(0x200 + i * 0x20)/2];
-	UINT16 MAX1 =   m_regs[(0x204 + i * 0x20)/2];
-	UINT16 MAX2 =   m_regs[(0x206 + i * 0x20)/2];
+	uint16_t TCR  =   m_regs[(0x200 + i * 0x20)/2];
+	uint16_t MAX1 =   m_regs[(0x204 + i * 0x20)/2];
+	uint16_t MAX2 =   m_regs[(0x206 + i * 0x20)/2];
 
 	int max = 0;
 	attotime duration = attotime::zero;
@@ -278,7 +278,7 @@ void tmp68301_device::update_irq_state()
 
 	/* Take care of external interrupts */
 
-	UINT16 IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
+	uint16_t IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
 
 	for (i = 0; i < 3; i++)
 	{
@@ -286,7 +286,7 @@ void tmp68301_device::update_irq_state()
 				!(m_imr & (1<<i))
 			)
 		{
-			UINT16 ICR  =   m_regs[0x80/2+i];    // Interrupt Controller Register (ICR0..2)
+			uint16_t ICR  =   m_regs[0x80/2+i];    // Interrupt Controller Register (ICR0..2)
 
 			// Interrupt Controller Register (ICR0..2)
 			int level = ICR & 0x0007;

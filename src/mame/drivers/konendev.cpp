@@ -75,19 +75,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gcu_interrupt);
 	INTERRUPT_GEN_MEMBER(vbl_interrupt);
 
-	UINT8 rtc_dev_r(UINT32 reg);
+	uint8_t rtc_dev_r(uint32_t reg);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-UINT32 konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return m_gcu->draw(screen, bitmap, cliprect);
 }
 
 READ32_MEMBER(konendev_state::mcu2_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -118,7 +118,7 @@ READ32_MEMBER(konendev_state::mcu2_r)
 
 READ32_MEMBER(konendev_state::ifu2_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -129,7 +129,7 @@ READ32_MEMBER(konendev_state::ifu2_r)
 }
 
 // This seems to be Epson RTC-72423
-UINT8 konendev_state::rtc_dev_r(UINT32 reg)
+uint8_t konendev_state::rtc_dev_r(uint32_t reg)
 {
 	switch (reg)
 	{
@@ -153,16 +153,16 @@ UINT8 konendev_state::rtc_dev_r(UINT32 reg)
 
 READ32_MEMBER(konendev_state::rtc_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	if (ACCESSING_BITS_24_31)
-		r |= (UINT32)(rtc_dev_r(offset * 4)) << 24;
+		r |= (uint32_t)(rtc_dev_r(offset * 4)) << 24;
 	if (ACCESSING_BITS_16_23)
-		r |= (UINT32)(rtc_dev_r((offset * 4)+1)) << 16;
+		r |= (uint32_t)(rtc_dev_r((offset * 4)+1)) << 16;
 	if (ACCESSING_BITS_8_15)
-		r |= (UINT32)(rtc_dev_r((offset * 4)+2)) << 8;
+		r |= (uint32_t)(rtc_dev_r((offset * 4)+2)) << 8;
 	if (ACCESSING_BITS_0_7)
-		r |= (UINT32)(rtc_dev_r((offset * 4)+3));
+		r |= (uint32_t)(rtc_dev_r((offset * 4)+3));
 
 	return r;
 }
@@ -173,7 +173,7 @@ WRITE32_MEMBER(konendev_state::rtc_w)
 
 READ32_MEMBER(konendev_state::ctrl0_r)
 {
-	return ((UINT32)(ioport("IN1")->read() & 0xffff) << 16) | 0xffff;
+	return ((uint32_t)(ioport("IN1")->read() & 0xffff) << 16) | 0xffff;
 }
 
 READ32_MEMBER(konendev_state::ctrl1_r)
@@ -186,7 +186,7 @@ READ32_MEMBER(konendev_state::ctrl1_r)
 
 READ32_MEMBER(konendev_state::ctrl2_r)
 {
-	return ((UINT32)(ioport("IN0")->read() & 0xffff) << 16) | 0xffff;
+	return ((uint32_t)(ioport("IN0")->read() & 0xffff) << 16) | 0xffff;
 }
 
 WRITE32_MEMBER(konendev_state::eeprom_w)
@@ -481,7 +481,7 @@ DRIVER_INIT_MEMBER(konendev_state,konendev)
 
 DRIVER_INIT_MEMBER(konendev_state,enchlamp)
 {
-	UINT32 *rom = (UINT32*)memregion("program")->base();
+	uint32_t *rom = (uint32_t*)memregion("program")->base();
 	rom[0x24/4] = 0x00002743;       // patch flash checksum for now
 
 	// patch sound data checksums

@@ -105,7 +105,7 @@ static const char *const ethernet_regname[64] =
     DEVICE INTERFACE
 ***************************************************************************/
 
-smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_irq_handler(*this)
 {
@@ -183,7 +183,7 @@ void smc91c9x_device::device_reset()
 
 const device_type SMC91C94 = &device_creator<smc91c94_device>;
 
-smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: smc91c9x_device(mconfig, SMC91C94, "SMC91C94 Ethernet Controller", tag, owner, clock, "smc91c94", __FILE__)
 {
 }
@@ -191,7 +191,7 @@ smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag,
 
 const device_type SMC91C96 = &device_creator<smc91c96_device>;
 
-smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: smc91c9x_device(mconfig, SMC91C96, "SMC91C96", tag, owner, clock, "smc91c96", __FILE__)
 {
 }
@@ -206,8 +206,8 @@ smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag,
 
 void smc91c9x_device::update_ethernet_irq()
 {
-	UINT8 mask = m_reg[EREG_INTERRUPT] >> 8;
-	UINT8 state = m_reg[EREG_INTERRUPT] & 0xff;
+	uint8_t mask = m_reg[EREG_INTERRUPT] >> 8;
+	uint8_t state = m_reg[EREG_INTERRUPT] & 0xff;
 
 	/* update the IRQ state */
 	m_irq_state = ((mask & state) != 0);
@@ -255,7 +255,7 @@ void smc91c9x_device::finish_enqueue(int param)
 		if (m_fifo_count < ETHER_RX_BUFFERS)
 		{
 			int buffer_len = ((m_tx[3] << 8) | m_tx[2]) & 0x7ff;
-			UINT8 *packet = &m_rx[m_fifo_count++ * ETHER_BUFFER_SIZE];
+			uint8_t *packet = &m_rx[m_fifo_count++ * ETHER_BUFFER_SIZE];
 			int packet_len;
 
 			/* compute the packet length */
@@ -299,7 +299,7 @@ void smc91c9x_device::finish_enqueue(int param)
     process_command - handle MMU commands
 -------------------------------------------------*/
 
-void smc91c9x_device::process_command(UINT16 data)
+void smc91c9x_device::process_command(uint16_t data)
 {
 	switch ((data >> 5) & 7)
 	{
@@ -377,7 +377,7 @@ void smc91c9x_device::process_command(UINT16 data)
 
 READ16_MEMBER( smc91c9x_device::read )
 {
-	UINT32 result;
+	uint32_t result;
 
 	/* determine the effective register */
 	offset %= 8;
@@ -398,7 +398,7 @@ READ16_MEMBER( smc91c9x_device::read )
 		case EREG_DATA_0:   /* data register */
 		case EREG_DATA_1:   /* data register */
 		{
-			UINT8 *buffer = (m_reg[EREG_POINTER] & 0x8000) ? m_rx : m_tx;
+			uint8_t *buffer = (m_reg[EREG_POINTER] & 0x8000) ? m_rx : m_tx;
 			int addr = m_reg[EREG_POINTER] & 0x7ff;
 			result = buffer[addr++];
 			if (ACCESSING_BITS_8_15)
@@ -421,7 +421,7 @@ READ16_MEMBER( smc91c9x_device::read )
 
 WRITE16_MEMBER( smc91c9x_device::write )
 {
-	//  UINT16 olddata;
+	//  uint16_t olddata;
 
 	/* determine the effective register */
 	offset %= 8;
@@ -513,7 +513,7 @@ WRITE16_MEMBER( smc91c9x_device::write )
 		case EREG_DATA_0:   /* data register */
 		case EREG_DATA_1:   /* data register */
 		{
-			UINT8 *buffer = (m_reg[EREG_POINTER] & 0x8000) ? m_rx : m_tx;
+			uint8_t *buffer = (m_reg[EREG_POINTER] & 0x8000) ? m_rx : m_tx;
 			int addr = m_reg[EREG_POINTER] & 0x7ff;
 			buffer[addr++] = data;
 			if (ACCESSING_BITS_8_15)

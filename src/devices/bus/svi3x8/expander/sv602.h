@@ -26,7 +26,7 @@ class sv602_device : public device_t, public device_svi_expander_interface
 {
 public:
 	// construction/destruction
-	sv602_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sv602_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// from slots
 	WRITE_LINE_MEMBER( int_w );

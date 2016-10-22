@@ -8,55 +8,55 @@
 
 #include <stdio.h>
 
-static const UINT8 *sOpROM; // current opROM pointer
-static UINT32 sBasePC;
+static const uint8_t *sOpROM; // current opROM pointer
+static uint32_t sBasePC;
 
-static UINT8 program_read_byte(offs_t pc)
+static uint8_t program_read_byte(offs_t pc)
 {
 	return sOpROM[pc - sBasePC];
 }
 
-static UINT32 r16u(offs_t pc)
+static uint32_t r16u(offs_t pc)
 {
 	return sOpROM[pc - sBasePC] | (sOpROM[pc - sBasePC + 1]<<8);
 }
 
-static INT32 r16s(offs_t pc)
+static int32_t r16s(offs_t pc)
 {
-	return (INT16)(sOpROM[pc - sBasePC] | (sOpROM[pc - sBasePC + 1]<<8));
+	return (int16_t)(sOpROM[pc - sBasePC] | (sOpROM[pc - sBasePC + 1]<<8));
 }
 
-static UINT32 r24u(offs_t pc)
+static uint32_t r24u(offs_t pc)
 {
 	return sOpROM[pc - sBasePC] | (sOpROM[pc - sBasePC + 1]<<8) | (sOpROM[pc - sBasePC + 2]<<16);
 }
 
-static INT32 r24s(offs_t pc)
+static int32_t r24s(offs_t pc)
 {
-	return sOpROM[pc - sBasePC] | (sOpROM[pc - sBasePC + 1]<<8) | ((INT8)sOpROM[pc - sBasePC + 2]<<16);
+	return sOpROM[pc - sBasePC] | (sOpROM[pc - sBasePC + 1]<<8) | ((int8_t)sOpROM[pc - sBasePC + 2]<<16);
 }
 
-static const char *i8str(INT8 v)
-{
-	static char res[0x10];
-	if(v>=0)
-	sprintf(res, "$%x", v);
-	else
-	sprintf(res, "-$%x", (UINT8)(-v));
-	return res;
-}
-
-static const char *i16str(INT16 v)
+static const char *i8str(int8_t v)
 {
 	static char res[0x10];
 	if(v>=0)
 	sprintf(res, "$%x", v);
 	else
-	sprintf(res, "-$%x", (UINT16)(-v));
+	sprintf(res, "-$%x", (uint8_t)(-v));
 	return res;
 }
 
-static const char *i24str(INT32 v)
+static const char *i16str(int16_t v)
+{
+	static char res[0x10];
+	if(v>=0)
+	sprintf(res, "$%x", v);
+	else
+	sprintf(res, "-$%x", (uint16_t)(-v));
+	return res;
+}
+
+static const char *i24str(int32_t v)
 {
 	static char res[0x10];
 	if(v>=0)
@@ -67,9 +67,9 @@ static const char *i24str(INT32 v)
 }
 
 
-static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
+static int mn102_disassemble(char *buffer, uint32_t pc, const uint8_t *oprom)
 {
-	UINT8 opcode;
+	uint8_t opcode;
 
 	sOpROM = oprom;
 	sBasePC = pc;
@@ -185,47 +185,47 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		return 3;
 
 	case 0xe0:
-		sprintf(buffer, "blt $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "blt $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xe1:
-		sprintf(buffer, "bgt $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "bgt $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xe2:
-		sprintf(buffer, "bge $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "bge $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xe3:
-		sprintf(buffer, "ble $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "ble $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xe4:
-		sprintf(buffer, "bcs $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "bcs $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xe5:
-		sprintf(buffer, "bhi $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "bhi $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xe6:
-		sprintf(buffer, "bcc $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "bcc $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xe7:
-		sprintf(buffer, "bls $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "bls $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xe8:
-		sprintf(buffer, "beq $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "beq $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xe9:
-		sprintf(buffer, "bne $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "bne $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xea:
-		sprintf(buffer, "bra $%x", (pc+2+(INT8)program_read_byte(pc+1)) & 0xffffff);
+		sprintf(buffer, "bra $%x", (pc+2+(int8_t)program_read_byte(pc+1)) & 0xffffff);
 		return 2;
 
 	case 0xeb:
@@ -470,12 +470,12 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 			{
 			case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 				sprintf(buffer, "tbz ($%x) %d, $%x", r24u(pc+3), opcode & 7,
-					(pc+7+(INT8)program_read_byte(pc+6)) & 0xffffff);
+					(pc+7+(int8_t)program_read_byte(pc+6)) & 0xffffff);
 				return 7;
 
 			case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
 				sprintf(buffer, "tbnz ($%x) %d, $%x", r24u(pc+3), opcode & 7,
-					(pc+7+(INT8)program_read_byte(pc+6)) & 0xffffff);
+					(pc+7+(int8_t)program_read_byte(pc+6)) & 0xffffff);
 				return 7;
 
 			case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
@@ -497,7 +497,7 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 			case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 			case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 				sprintf(buffer, "tbz (%s, a%d) %d, $%x", i8str(program_read_byte(pc+3)), 2+((opcode>>3)&1), opcode & 7,
-					(pc+5+(INT8)program_read_byte(pc+4)) & 0xffffff);
+					(pc+5+(int8_t)program_read_byte(pc+4)) & 0xffffff);
 				return 5;
 
 			case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
@@ -508,7 +508,7 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 			case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 			case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 				sprintf(buffer, "tbnz (%s, a%d) %d, $%x", i8str(program_read_byte(pc+3)), 2+((opcode>>3)&1), opcode & 7,
-					(pc+5+(INT8)program_read_byte(pc+4)) & 0xffffff);
+					(pc+5+(int8_t)program_read_byte(pc+4)) & 0xffffff);
 				return 5;
 
 			case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
@@ -707,7 +707,7 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
 		case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
 		{
-			UINT8 opcode2 = program_read_byte(pc+2);
+			uint8_t opcode2 = program_read_byte(pc+2);
 			switch(opcode2)
 			{
 			case 0x00:
@@ -731,7 +731,7 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
 		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 		{
-			UINT8 opcode2 = program_read_byte(pc+2);
+			uint8_t opcode2 = program_read_byte(pc+2);
 			switch(opcode2)
 			{
 			case 0x10:
@@ -751,7 +751,7 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 			sprintf(buffer, "tbz (%s, a%d) %d, $%x", i8str(program_read_byte(pc+2)), (opcode>>3)&1, opcode & 7,
-					(pc+4+(INT8)program_read_byte(pc+3)) & 0xffffff);
+					(pc+4+(int8_t)program_read_byte(pc+3)) & 0xffffff);
 			return 4;
 
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
@@ -762,7 +762,7 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 			sprintf(buffer, "tbnz (%s, a%d) %d, $%x", i8str(program_read_byte(pc+2)), (opcode>>3)&1, opcode & 7,
-					(pc+4+(INT8)program_read_byte(pc+3)) & 0xffffff);
+					(pc+4+(int8_t)program_read_byte(pc+3)) & 0xffffff);
 			return 4;
 
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
@@ -772,12 +772,12 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 			sprintf(buffer, "tbz ($%x) %d, $%x", r16u(pc+2), opcode & 7,
-					(pc+5+(INT8)program_read_byte(pc+4)) & 0xffffff);
+					(pc+5+(int8_t)program_read_byte(pc+4)) & 0xffffff);
 			return 5;
 
 		case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
 			sprintf(buffer, "tbnz ($%x) %d, $%x", r16u(pc+2), opcode & 7,
-					(pc+5+(INT8)program_read_byte(pc+4)) & 0xffffff);
+					(pc+5+(int8_t)program_read_byte(pc+4)) & 0xffffff);
 			return 5;
 
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
@@ -789,64 +789,64 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 			return 4;
 
 		case 0xe0:
-			sprintf(buffer, "bltx $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bltx $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xe1:
-			sprintf(buffer, "bgtx $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bgtx $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xe2:
-			sprintf(buffer, "bgex $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bgex $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xe3:
-			sprintf(buffer, "blex $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "blex $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xe4:
-			sprintf(buffer, "bcsx $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bcsx $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xe5:
-			sprintf(buffer, "bhix $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bhix $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xe6:
-			sprintf(buffer, "bccx $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bccx $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xe7:
-			sprintf(buffer, "blsx $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "blsx $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xe8:
-			sprintf(buffer, "beqx $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "beqx $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xe9:
-			sprintf(buffer, "bnex $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bnex $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xec:
-			sprintf(buffer, "bvcx $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bvcx $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xed:
-			sprintf(buffer, "bvsx $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bvsx $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xee:
-			sprintf(buffer, "bncx $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bncx $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xef:
-			sprintf(buffer, "bnsx $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bnsx $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 		{
-			UINT8 opcode2 = program_read_byte(pc+2);
+			uint8_t opcode2 = program_read_byte(pc+2);
 			switch(opcode2)
 			{
 			case 0x04:
@@ -871,19 +871,19 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		}
 
 		case 0xfc:
-			sprintf(buffer, "bvc $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bvc $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xfd:
-			sprintf(buffer, "bvs $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bvs $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xfe:
-			sprintf(buffer, "bnc $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bnc $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		case 0xff:
-			sprintf(buffer, "bns $%x", (pc+3+(INT8)program_read_byte(pc+2)) & 0xffffff);
+			sprintf(buffer, "bns $%x", (pc+3+(int8_t)program_read_byte(pc+2)) & 0xffffff);
 			return 3;
 
 		default:

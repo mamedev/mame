@@ -57,8 +57,9 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #include "wldarrow.lh"
 #include "mdrawpkr.lh"
@@ -76,9 +77,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac") { }
 
-	required_shared_ptr<UINT8> m_videoram_0;
-	required_shared_ptr<UINT8> m_videoram_1;
-	required_shared_ptr<UINT8> m_videoram_2;
+	required_shared_ptr<uint8_t> m_videoram_0;
+	required_shared_ptr<uint8_t> m_videoram_1;
+	required_shared_ptr<uint8_t> m_videoram_2;
 
 	DECLARE_WRITE8_MEMBER(lights_1_w);
 	DECLARE_WRITE8_MEMBER(lights_2_w);
@@ -87,9 +88,9 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_2_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
-	UINT32 screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 };
 
 
@@ -99,7 +100,7 @@ public:
  *
  *************************************/
 
-UINT32 meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -107,18 +108,18 @@ UINT32 meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb3
 	{
 		int i;
 
-		UINT8 y = offs >> 5;
-		UINT8 x = offs << 3;
+		uint8_t y = offs >> 5;
+		uint8_t x = offs << 3;
 
-		UINT8 data0 = m_videoram_0[offs];
-		UINT8 data1 = m_videoram_1[offs];
-		UINT8 data2 = m_videoram_2[offs];
+		uint8_t data0 = m_videoram_0[offs];
+		uint8_t data1 = m_videoram_1[offs];
+		uint8_t data2 = m_videoram_2[offs];
 
 		/* weird equations, but it matches every flyer screenshot -
 		   perhaphs they used a look-up PROM? */
-		UINT8 data_r = data0;
-		UINT8 data_g = (data2 & ~data0) | (data2 & data1) | (~data2 & ~data1 & data0);
-		UINT8 data_b = data0 ^ data1;
+		uint8_t data_r = data0;
+		uint8_t data_g = (data2 & ~data0) | (data2 & data1) | (~data2 & ~data1 & data0);
+		uint8_t data_b = data0 ^ data1;
 
 		for (i = 0; i < 8; i++)
 		{
@@ -276,25 +277,25 @@ WRITE8_MEMBER(meyc8080_state::counters_w)
 
 WRITE8_MEMBER(meyc8080_state::meyc8080_dac_1_w)
 {
-	m_dac->write_unsigned8(0x00);
+	m_dac->write(0);
 }
 
 
 WRITE8_MEMBER(meyc8080_state::meyc8080_dac_2_w)
 {
-	m_dac->write_unsigned8(0x55);
+	m_dac->write(1);
 }
 
 
 WRITE8_MEMBER(meyc8080_state::meyc8080_dac_3_w)
 {
-	m_dac->write_unsigned8(0xaa);
+	m_dac->write(2);
 }
 
 
 WRITE8_MEMBER(meyc8080_state::meyc8080_dac_4_w)
 {
-	m_dac->write_unsigned8(0xff);
+	m_dac->write(3);
 }
 
 
@@ -592,9 +593,10 @@ static MACHINE_CONFIG_START( meyc8080, meyc8080_state )
 	MCFG_SCREEN_UPDATE_DRIVER(meyc8080_state, screen_update_meyc8080)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.66) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 MACHINE_CONFIG_END
 

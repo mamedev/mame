@@ -67,7 +67,7 @@ void menu_tape_control::populate()
 			cassette_state state;
 			double t0 = current_device()->get_position();
 			double t1 = current_device()->get_length();
-			UINT32 tapeflags = 0;
+			uint32_t tapeflags = 0;
 
 			// state
 			if (t1 > 0)

@@ -13,7 +13,7 @@ class msx_cart_halnote : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_halnote(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_halnote(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -27,8 +27,8 @@ public:
 	void restore_banks();
 
 private:
-	UINT8 m_selected_bank[8];
-	UINT8 *m_bank_base[8];
+	uint8_t m_selected_bank[8];
+	uint8_t *m_bank_base[8];
 
 	void map_bank(int bank);
 };

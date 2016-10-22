@@ -79,21 +79,21 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_sc0_vram;
-	required_shared_ptr<UINT16> m_sc1_vram;
-	required_shared_ptr<UINT16> m_sc2_vram;
-	required_shared_ptr<UINT16> m_sc3_vram;
-	required_shared_ptr<UINT16> m_spriteram16;
+	required_shared_ptr<uint16_t> m_sc0_vram;
+	required_shared_ptr<uint16_t> m_sc1_vram;
+	required_shared_ptr<uint16_t> m_sc2_vram;
+	required_shared_ptr<uint16_t> m_sc3_vram;
+	required_shared_ptr<uint16_t> m_spriteram16;
 
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
 	tilemap_t *m_sc3_tilemap;
 
-	UINT16 m_mux_data;
-	UINT8 m_hopper_io;
-	UINT16 m_layer_en;
-	UINT16 m_scrollram[6];
+	uint16_t m_mux_data;
+	uint8_t m_hopper_io;
+	uint16_t m_layer_en;
+	uint16_t m_scrollram[6];
 
 	DECLARE_READ16_MEMBER(mahjong_panel_r);
 	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
@@ -117,7 +117,7 @@ public:
 	virtual void video_start() override;
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -307,7 +307,7 @@ void sengokmj_state::video_start()
 	save_item(NAME(m_scrollram));
 }
 
-UINT32 sengokmj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sengokmj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
@@ -346,7 +346,7 @@ READ16_MEMBER(sengokmj_state::mahjong_panel_r)
 {
 	const char *const mpnames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int i;
-	UINT16 res = 0xffff;
+	uint16_t res = 0xffff;
 
 	for(i=0;i<5;i++)
 	{

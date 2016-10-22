@@ -90,7 +90,7 @@ class ieee488_device : public device_t
 {
 public:
 	// construction/destruction
-	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _write> void set_eoi_callback(_write wr) { m_write_eoi.set_callback(wr); }
 	template<class _write> void set_dav_callback(_write wr) { m_write_dav.set_callback(wr); }
@@ -104,7 +104,7 @@ public:
 	void add_device(ieee488_slot_device *slot, device_t *target);
 
 	// reads for both host and peripherals
-	UINT8 dio_r() { return get_data(); }
+	uint8_t dio_r() { return get_data(); }
 	DECLARE_READ8_MEMBER( dio_r ) { return get_data(); }
 	DECLARE_READ_LINE_MEMBER( eoi_r ) { return get_signal(EOI); }
 	DECLARE_READ_LINE_MEMBER( dav_r ) { return get_signal(DAV); }
@@ -116,7 +116,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( ren_r ) { return get_signal(REN); }
 
 	// writes for host (driver_device)
-	void dio_w(UINT8 data) { return set_data(this, data); }
+	void dio_w(uint8_t data) { return set_data(this, data); }
 	DECLARE_WRITE8_MEMBER( dio_w ) { set_data(this, data); }
 	DECLARE_WRITE_LINE_MEMBER( eoi_w ) { set_signal(this, EOI, state); }
 	DECLARE_WRITE_LINE_MEMBER( dav_w ) { set_signal(this, DAV, state); }
@@ -128,7 +128,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ren_w ) { set_signal(this, REN, state); }
 
 	// writes for peripherals (device_t)
-	void dio_w(device_t *device, UINT8 data) { set_data(device, data); }
+	void dio_w(device_t *device, uint8_t data) { set_data(device, data); }
 	void eoi_w(device_t *device, int state) { set_signal(device, EOI, state); }
 	void dav_w(device_t *device, int state) { set_signal(device, DAV, state); }
 	void nrfd_w(device_t *device, int state) { set_signal(device, NRFD, state); }
@@ -167,7 +167,7 @@ protected:
 		device_ieee488_interface *  m_interface;    // associated device's daisy interface
 
 		int m_line[SIGNAL_COUNT];
-		UINT8 m_dio;
+		uint8_t m_dio;
 	};
 
 	simple_list<daisy_entry> m_device_list;
@@ -184,11 +184,11 @@ private:
 
 	void set_signal(device_t *device, int signal, int state);
 	int get_signal(int signal);
-	void set_data(device_t *device, UINT8 data);
-	UINT8 get_data();
+	void set_data(device_t *device, uint8_t data);
+	uint8_t get_data();
 
 	int m_line[SIGNAL_COUNT];
-	UINT8 m_dio;
+	uint8_t m_dio;
 };
 
 
@@ -199,7 +199,7 @@ class ieee488_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_address(int address) { m_address = address; }
 	int get_address() { return m_address; }

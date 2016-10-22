@@ -18,14 +18,14 @@ class namco_c116_device :
 {
 public:
 	//construction/destruction
-	namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	//read/write handlers
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 	//getters
-	UINT16 get_reg(int reg) { return m_regs[reg]; }
+	uint16_t get_reg(int reg) { return m_regs[reg]; }
 
 protected:
 	// device-level overrides
@@ -33,10 +33,10 @@ protected:
 
 private:
 	// internal state
-	std::vector<UINT8> m_ram_r;
-	std::vector<UINT8> m_ram_g;
-	std::vector<UINT8> m_ram_b;
-	UINT16 m_regs[8];
+	std::vector<uint8_t> m_ram_r;
+	std::vector<uint8_t> m_ram_g;
+	std::vector<uint8_t> m_ram_b;
+	uint16_t m_regs[8];
 };
 
 extern const device_type NAMCO_C116;

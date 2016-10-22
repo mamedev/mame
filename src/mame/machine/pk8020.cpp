@@ -18,8 +18,8 @@
 
 READ8_MEMBER(pk8020_state::keyboard_r)
 {
-	UINT8 retVal=0x00;
-	UINT8 line = 0;
+	uint8_t retVal=0x00;
+	uint8_t line = 0;
 	if (offset & 0x100)  line=8;
 
 	if (offset & 0x0001) retVal|=m_io_port[line]->read();
@@ -55,12 +55,12 @@ WRITE8_MEMBER(pk8020_state::sysreg_w)
 		m_color = data;
 	} else if (BIT(offset,2)==0) {
 		// Palette set
-		UINT8 number = data & 0x0f;
-		UINT8 color = data >> 4;
-		UINT8 i = (color & 0x08) ?  0x3F : 0;
-		UINT8 r = ((color & 0x04) ? 0xC0 : 0) + i;
-		UINT8 g = ((color & 0x02) ? 0xC0 : 0) + i;
-		UINT8 b = ((color & 0x01) ? 0xC0 : 0) + i;
+		uint8_t number = data & 0x0f;
+		uint8_t color = data >> 4;
+		uint8_t i = (color & 0x08) ?  0x3F : 0;
+		uint8_t r = ((color & 0x04) ? 0xC0 : 0) + i;
+		uint8_t g = ((color & 0x02) ? 0xC0 : 0) + i;
+		uint8_t b = ((color & 0x01) ? 0xC0 : 0) + i;
 		m_palette->set_pen_color( number, rgb_t(r,g,b) );
 	}
 }
@@ -73,7 +73,7 @@ READ8_MEMBER(pk8020_state::text_r)
 
 WRITE8_MEMBER(pk8020_state::text_w)
 {
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	ram[0x40000+offset] = data;
 	switch (m_attr) {
 		case 0: break;
@@ -85,11 +85,11 @@ WRITE8_MEMBER(pk8020_state::text_w)
 
 READ8_MEMBER(pk8020_state::gzu_r)
 {
-	UINT8 *addr = m_ram->pointer() + 0x10000 + (m_video_page_access * 0xC000);
-	UINT8 p0 = addr[offset];
-	UINT8 p1 = addr[offset + 0x4000];
-	UINT8 p2 = addr[offset + 0x8000];
-	UINT8 retVal = 0;
+	uint8_t *addr = m_ram->pointer() + 0x10000 + (m_video_page_access * 0xC000);
+	uint8_t p0 = addr[offset];
+	uint8_t p1 = addr[offset + 0x4000];
+	uint8_t p2 = addr[offset + 0x8000];
+	uint8_t retVal = 0;
 	if(m_color & 0x80) {
 		// Color mode
 		if (!(m_color & 0x10)) {
@@ -119,10 +119,10 @@ READ8_MEMBER(pk8020_state::gzu_r)
 
 WRITE8_MEMBER(pk8020_state::gzu_w)
 {
-	UINT8 *addr = m_ram->pointer() + 0x10000 + (m_video_page_access * 0xC000);
-	UINT8 *plane_0 = addr;
-	UINT8 *plane_1 = addr + 0x4000;
-	UINT8 *plane_2 = addr + 0x8000;
+	uint8_t *addr = m_ram->pointer() + 0x10000 + (m_video_page_access * 0xC000);
+	uint8_t *plane_0 = addr;
+	uint8_t *plane_1 = addr + 0x4000;
+	uint8_t *plane_2 = addr + 0x8000;
 
 	if(m_color & 0x80)
 	{
@@ -132,7 +132,7 @@ WRITE8_MEMBER(pk8020_state::gzu_w)
 		plane_2[offset] = (plane_2[offset] & ~data) | ((m_color & 8) ? data : 0);
 	} else {
 		// Plane mode
-		UINT8 mask = (m_color & 1) ? data : 0;
+		uint8_t mask = (m_color & 1) ? data : 0;
 		if (!(m_color & 0x02)) {
 			plane_0[offset] = (plane_0[offset] & ~data) | mask;
 		}
@@ -194,11 +194,11 @@ WRITE8_MEMBER(pk8020_state::devices_w)
 	}
 }
 
-void pk8020_state::pk8020_set_bank(UINT8 data)
+void pk8020_state::pk8020_set_bank(uint8_t data)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *mem = m_region_maincpu->base();
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *mem = m_region_maincpu->base();
+	uint8_t *ram = m_ram->pointer();
 
 	switch(data & 0x1F) {
 		case 0x00 :

@@ -12,7 +12,7 @@
 #include "debugger.h"
 #include "mcs96.h"
 
-mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int data_width, const char *shortname, const char *source) :
+mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int data_width, const char *shortname, const char *source) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	program_config("program", ENDIANNESS_LITTLE, data_width, 16), program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
 	PC(0), PPC(0), PSW(0), OP1(0), OP2(0), OP3(0), OPI(0), TMP(0), irq_requested(false)
@@ -51,22 +51,22 @@ void mcs96_device::device_reset()
 	inst_state = STATE_FETCH;
 }
 
-UINT32 mcs96_device::execute_min_cycles() const
+uint32_t mcs96_device::execute_min_cycles() const
 {
 	return 4;
 }
 
-UINT32 mcs96_device::execute_max_cycles() const
+uint32_t mcs96_device::execute_max_cycles() const
 {
 	return 33;
 }
 
-UINT32 mcs96_device::execute_input_lines() const
+uint32_t mcs96_device::execute_input_lines() const
 {
 	return 1;
 }
 
-void mcs96_device::recompute_bcount(UINT64 event_time)
+void mcs96_device::recompute_bcount(uint64_t event_time)
 {
 	if(!event_time || event_time >= total_cycles() + icount) {
 		bcount = 0;
@@ -153,7 +153,7 @@ void mcs96_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-std::string mcs96_device::regname(UINT8 reg)
+std::string mcs96_device::regname(uint8_t reg)
 {
 	char res[32];
 	switch(reg) {
@@ -172,7 +172,7 @@ std::string mcs96_device::regname(UINT8 reg)
 	return res;
 }
 
-offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options, const disasm_entry *entries)
+offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *entries)
 {
 	bool prefix_fe = false;
 	int off = 0;
@@ -183,7 +183,7 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 		oprom++;
 	}
 	const disasm_entry &e = entries[oprom[0]];
-	UINT32 flags = e.flags | DASMFLAG_SUPPORTED;
+	uint32_t flags = e.flags | DASMFLAG_SUPPORTED;
 	buffer += sprintf(buffer, "%s", prefix_fe ? e.opcode_fe : e.opcode);
 
 	switch(e.mode) {
@@ -413,17 +413,17 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 	return flags+off;
 }
 
-UINT32 mcs96_device::disasm_min_opcode_bytes() const
+uint32_t mcs96_device::disasm_min_opcode_bytes() const
 {
 	return 1;
 }
 
-UINT32 mcs96_device::disasm_max_opcode_bytes() const
+uint32_t mcs96_device::disasm_max_opcode_bytes() const
 {
 	return 7;
 }
 
-void mcs96_device::io_w8(UINT8 adr, UINT8 data)
+void mcs96_device::io_w8(uint8_t adr, uint8_t data)
 {
 	switch(adr) {
 	case 0x02:
@@ -478,7 +478,7 @@ void mcs96_device::io_w8(UINT8 adr, UINT8 data)
 	return;
 }
 
-void mcs96_device::io_w16(UINT8 adr, UINT16 data)
+void mcs96_device::io_w16(uint8_t adr, uint16_t data)
 {
 	switch(adr) {
 	case 0:
@@ -494,7 +494,7 @@ void mcs96_device::io_w16(UINT8 adr, UINT16 data)
 	return;
 }
 
-UINT8 mcs96_device::io_r8(UINT8 adr)
+uint8_t mcs96_device::io_r8(uint8_t adr)
 {
 	switch(adr) {
 	case 0x00:
@@ -504,26 +504,26 @@ UINT8 mcs96_device::io_r8(UINT8 adr)
 	case 0x08:
 		return PSW;
 	}
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 	logerror("%s: io_r8 %02x, %02x (%04x)\n", tag(), adr, data, PPC);
 	return data;
 }
 
-UINT16 mcs96_device::io_r16(UINT8 adr)
+uint16_t mcs96_device::io_r16(uint8_t adr)
 {
 	if(adr < 2)
 		return 0x0000;
-	UINT16 data = 0x0000;
+	uint16_t data = 0x0000;
 	logerror("%s: io_r16 %02x, %04x (%04x)\n", tag(), adr, data, PPC);
 	return data;
 }
 
-void mcs96_device::reg_w8(UINT8 adr, UINT8 data)
+void mcs96_device::reg_w8(uint8_t adr, uint8_t data)
 {
 	if(adr < 0x18)
 		io_w8(adr, data);
 	else {
-		UINT16 &r = R[(adr - 0x18) >> 1];
+		uint16_t &r = R[(adr - 0x18) >> 1];
 		if(adr & 0x01)
 			r = (r & 0x00ff) | (data << 8);
 		else
@@ -531,7 +531,7 @@ void mcs96_device::reg_w8(UINT8 adr, UINT8 data)
 	}
 }
 
-void mcs96_device::reg_w16(UINT8 adr, UINT16 data)
+void mcs96_device::reg_w16(uint8_t adr, uint16_t data)
 {
 	adr &= 0xfe;
 	if(adr < 0x18)
@@ -540,19 +540,19 @@ void mcs96_device::reg_w16(UINT8 adr, UINT16 data)
 		R[(adr-0x18) >> 1] = data;
 }
 
-UINT8 mcs96_device::reg_r8(UINT8 adr)
+uint8_t mcs96_device::reg_r8(uint8_t adr)
 {
 	if(adr < 0x18)
 		return io_r8(adr);
 
-	UINT16 data = R[(adr - 0x18) >> 1];
+	uint16_t data = R[(adr - 0x18) >> 1];
 	if(adr & 0x01)
 		return data >> 8;
 	else
 		return data;
 }
 
-UINT16 mcs96_device::reg_r16(UINT8 adr)
+uint16_t mcs96_device::reg_r16(uint8_t adr)
 {
 	adr &= 0xfe;
 	if(adr < 0x18)
@@ -561,12 +561,12 @@ UINT16 mcs96_device::reg_r16(UINT8 adr)
 	return R[(adr-0x18) >> 1];
 }
 
-void mcs96_device::any_w8(UINT16 adr, UINT8 data)
+void mcs96_device::any_w8(uint16_t adr, uint8_t data)
 {
 	if(adr < 0x18)
 		io_w8(adr, data);
 	else if(adr < 0x100) {
-		UINT16 &r = R[(adr - 0x18) >> 1];
+		uint16_t &r = R[(adr - 0x18) >> 1];
 		if(adr & 0x01)
 			r = (r & 0x00ff) | (data << 8);
 		else
@@ -575,7 +575,7 @@ void mcs96_device::any_w8(UINT16 adr, UINT8 data)
 		program->write_byte(adr, data);
 }
 
-void mcs96_device::any_w16(UINT16 adr, UINT16 data)
+void mcs96_device::any_w16(uint16_t adr, uint16_t data)
 {
 	adr &= 0xfffe;
 	if(adr < 0x18)
@@ -586,12 +586,12 @@ void mcs96_device::any_w16(UINT16 adr, UINT16 data)
 		program->write_word(adr, data);
 }
 
-UINT8 mcs96_device::any_r8(UINT16 adr)
+uint8_t mcs96_device::any_r8(uint16_t adr)
 {
 	if(adr < 0x18)
 		return io_r8(adr);
 	else if(adr < 0x100) {
-		UINT16 data = R[(adr - 0x18) >> 1];
+		uint16_t data = R[(adr - 0x18) >> 1];
 		if(adr & 0x01)
 			return data >> 8;
 		else
@@ -600,7 +600,7 @@ UINT8 mcs96_device::any_r8(UINT16 adr)
 		return program->read_byte(adr);
 }
 
-UINT16 mcs96_device::any_r16(UINT16 adr)
+uint16_t mcs96_device::any_r16(uint16_t adr)
 {
 	adr &= 0xfffe;
 	if(adr < 0x18)
@@ -611,13 +611,13 @@ UINT16 mcs96_device::any_r16(UINT16 adr)
 		return program->read_word(adr);
 }
 
-UINT8 mcs96_device::do_addb(UINT8 v1, UINT8 v2)
+uint8_t mcs96_device::do_addb(uint8_t v1, uint8_t v2)
 {
-	UINT16 sum = v1+v2;
+	uint16_t sum = v1+v2;
 	PSW &= ~(F_Z|F_N|F_C|F_V);
-	if(!UINT8(sum))
+	if(!uint8_t(sum))
 		PSW |= F_Z;
-	else if(INT8(sum) < 0)
+	else if(int8_t(sum) < 0)
 		PSW |= F_N;
 	if(~(v1^v2) & (v1^sum) & 0x80)
 		PSW |= F_V|F_VT;
@@ -626,13 +626,13 @@ UINT8 mcs96_device::do_addb(UINT8 v1, UINT8 v2)
 	return sum;
 }
 
-UINT16 mcs96_device::do_add(UINT16 v1, UINT16 v2)
+uint16_t mcs96_device::do_add(uint16_t v1, uint16_t v2)
 {
-	UINT32 sum = v1+v2;
+	uint32_t sum = v1+v2;
 	PSW &= ~(F_Z|F_N|F_C|F_V);
-	if(!UINT16(sum))
+	if(!uint16_t(sum))
 		PSW |= F_Z;
-	else if(INT16(sum) < 0)
+	else if(int16_t(sum) < 0)
 		PSW |= F_N;
 	if(~(v1^v2) & (v1^sum) & 0x8000)
 		PSW |= F_V|F_VT;
@@ -641,13 +641,13 @@ UINT16 mcs96_device::do_add(UINT16 v1, UINT16 v2)
 	return sum;
 }
 
-UINT8 mcs96_device::do_subb(UINT8 v1, UINT8 v2)
+uint8_t mcs96_device::do_subb(uint8_t v1, uint8_t v2)
 {
-	UINT16 diff = v1 - v2;
+	uint16_t diff = v1 - v2;
 	PSW &= ~(F_N|F_V|F_Z|F_C);
-	if(!UINT8(diff))
+	if(!uint8_t(diff))
 		PSW |= F_Z;
-	else if(INT8(diff) < 0)
+	else if(int8_t(diff) < 0)
 		PSW |= F_N;
 	if((v1^v2) & (v1^diff) & 0x80)
 		PSW |= F_V;
@@ -656,13 +656,13 @@ UINT8 mcs96_device::do_subb(UINT8 v1, UINT8 v2)
 	return diff;
 }
 
-UINT16 mcs96_device::do_sub(UINT16 v1, UINT16 v2)
+uint16_t mcs96_device::do_sub(uint16_t v1, uint16_t v2)
 {
-	UINT32 diff = v1 - v2;
+	uint32_t diff = v1 - v2;
 	PSW &= ~(F_N|F_V|F_Z|F_C);
-	if(!UINT16(diff))
+	if(!uint16_t(diff))
 		PSW |= F_Z;
-	else if(INT16(diff) < 0)
+	else if(int16_t(diff) < 0)
 		PSW |= F_N;
 	if((v1^v2) & (v1^diff) & 0x8000)
 		PSW |= F_V;
@@ -671,13 +671,13 @@ UINT16 mcs96_device::do_sub(UINT16 v1, UINT16 v2)
 	return diff;
 }
 
-UINT8 mcs96_device::do_addcb(UINT8 v1, UINT8 v2)
+uint8_t mcs96_device::do_addcb(uint8_t v1, uint8_t v2)
 {
-	UINT16 sum = v1+v2+(PSW & F_C ? 1 : 0);
+	uint16_t sum = v1+v2+(PSW & F_C ? 1 : 0);
 	PSW &= ~(F_Z|F_N|F_C|F_V);
-	if(!UINT8(sum))
+	if(!uint8_t(sum))
 		PSW |= F_Z;
-	else if(INT8(sum) < 0)
+	else if(int8_t(sum) < 0)
 		PSW |= F_N;
 	if(~(v1^v2) & (v1^sum) & 0x80)
 		PSW |= F_V|F_VT;
@@ -686,13 +686,13 @@ UINT8 mcs96_device::do_addcb(UINT8 v1, UINT8 v2)
 	return sum;
 }
 
-UINT16 mcs96_device::do_addc(UINT16 v1, UINT16 v2)
+uint16_t mcs96_device::do_addc(uint16_t v1, uint16_t v2)
 {
-	UINT32 sum = v1+v2+(PSW & F_C ? 1 : 0);
+	uint32_t sum = v1+v2+(PSW & F_C ? 1 : 0);
 	PSW &= ~(F_Z|F_N|F_C|F_V);
-	if(!UINT16(sum))
+	if(!uint16_t(sum))
 		PSW |= F_Z;
-	else if(INT16(sum) < 0)
+	else if(int16_t(sum) < 0)
 		PSW |= F_N;
 	if(~(v1^v2) & (v1^sum) & 0x8000)
 		PSW |= F_V|F_VT;
@@ -701,13 +701,13 @@ UINT16 mcs96_device::do_addc(UINT16 v1, UINT16 v2)
 	return sum;
 }
 
-UINT8 mcs96_device::do_subcb(UINT8 v1, UINT8 v2)
+uint8_t mcs96_device::do_subcb(uint8_t v1, uint8_t v2)
 {
-	UINT16 diff = v1 - v2 - (PSW & F_C ? 0 : 1);
+	uint16_t diff = v1 - v2 - (PSW & F_C ? 0 : 1);
 	PSW &= ~(F_N|F_V|F_Z|F_C);
-	if(!UINT8(diff))
+	if(!uint8_t(diff))
 		PSW |= F_Z;
-	else if(INT8(diff) < 0)
+	else if(int8_t(diff) < 0)
 		PSW |= F_N;
 	if((v1^v2) & (v1^diff) & 0x80)
 		PSW |= F_V;
@@ -716,13 +716,13 @@ UINT8 mcs96_device::do_subcb(UINT8 v1, UINT8 v2)
 	return diff;
 }
 
-UINT16 mcs96_device::do_subc(UINT16 v1, UINT16 v2)
+uint16_t mcs96_device::do_subc(uint16_t v1, uint16_t v2)
 {
-	UINT32 diff = v1 - v2 - (PSW & F_C ? 0 : 1);
+	uint32_t diff = v1 - v2 - (PSW & F_C ? 0 : 1);
 	PSW &= ~(F_N|F_V|F_Z|F_C);
-	if(!UINT16(diff))
+	if(!uint16_t(diff))
 		PSW |= F_Z;
-	else if(INT16(diff) < 0)
+	else if(int16_t(diff) < 0)
 		PSW |= F_N;
 	if((v1^v2) & (v1^diff) & 0x8000)
 		PSW |= F_V;
@@ -731,21 +731,21 @@ UINT16 mcs96_device::do_subc(UINT16 v1, UINT16 v2)
 	return diff;
 }
 
-void mcs96_device::set_nz8(UINT8 v)
+void mcs96_device::set_nz8(uint8_t v)
 {
 	PSW &= ~(F_N|F_V|F_Z|F_C);
 	if(!v)
 		PSW |= F_Z;
-	else if(INT8(v) < 0)
+	else if(int8_t(v) < 0)
 		PSW |= F_N;
 }
 
-void mcs96_device::set_nz16(UINT16 v)
+void mcs96_device::set_nz16(uint16_t v)
 {
 	PSW &= ~(F_N|F_V|F_Z|F_C);
 	if(!v)
 		PSW |= F_Z;
-	else if(INT16(v) < 0)
+	else if(int16_t(v) < 0)
 		PSW |= F_N;
 }
 

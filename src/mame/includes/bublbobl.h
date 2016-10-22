@@ -26,9 +26,9 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_objectram;
-	optional_shared_ptr<UINT8> m_mcu_sharedram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_objectram;
+	optional_shared_ptr<uint8_t> m_mcu_sharedram;
 
 	/* video-related */
 	int      m_video_enable;
@@ -42,25 +42,25 @@ public:
 	/* Tokio*/
 	int      m_tokio_prot_count;
 	/* Bubble Bobble MCU */
-	UINT8    m_ddr1;
-	UINT8    m_ddr2;
-	UINT8    m_ddr3;
-	UINT8    m_ddr4;
-	UINT8    m_port1_in;
-	UINT8    m_port2_in;
-	UINT8    m_port3_in;
-	UINT8    m_port4_in;
-	UINT8    m_port1_out;
-	UINT8    m_port2_out;
-	UINT8    m_port3_out;
-	UINT8    m_port4_out;
+	uint8_t    m_ddr1;
+	uint8_t    m_ddr2;
+	uint8_t    m_ddr3;
+	uint8_t    m_ddr4;
+	uint8_t    m_port1_in;
+	uint8_t    m_port2_in;
+	uint8_t    m_port3_in;
+	uint8_t    m_port4_in;
+	uint8_t    m_port1_out;
+	uint8_t    m_port2_out;
+	uint8_t    m_port3_out;
+	uint8_t    m_port4_out;
 	/* Bubble Bobble 68705 */
-	UINT8    m_port_a_in;
-	UINT8    m_port_a_out;
-	UINT8    m_ddr_a;
-	UINT8    m_port_b_in;
-	UINT8    m_port_b_out;
-	UINT8    m_ddr_b;
+	uint8_t    m_port_a_in;
+	uint8_t    m_port_a_out;
+	uint8_t    m_ddr_a;
+	uint8_t    m_port_b_in;
+	uint8_t    m_port_b_out;
+	uint8_t    m_ddr_b;
 	int      m_address;
 	int      m_latch;
 	/* Bobble Bobble */
@@ -128,7 +128,7 @@ public:
 	DECLARE_MACHINE_RESET(bub68705);
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_RESET(common);
-	UINT32 screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bublbobl_m68705_interrupt);
 	void configure_banks(  );
 

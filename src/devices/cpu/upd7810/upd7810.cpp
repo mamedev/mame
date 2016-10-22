@@ -381,7 +381,7 @@ const device_type UPD78C05 = &device_creator<upd78c05_device>;
 const device_type UPD78C06 = &device_creator<upd78c06_device>;
 
 
-upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, UPD7810, "uPD7810", tag, owner, clock, "upd7810", __FILE__)
 	, m_to_func(*this)
 	, m_co0_func(*this)
@@ -409,7 +409,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, d
 	m_op74 = s_op74;
 }
 
-upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_to_func(*this)
 	, m_co0_func(*this)
@@ -429,7 +429,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd7810_device(mconfig, UPD7807, "uPD7807", tag, owner, clock, "upd7807", __FILE__)
 {
 	m_opXX = s_opXX_7807;
@@ -442,7 +442,7 @@ upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, d
 	m_op74 = s_op74;
 }
 
-upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd7810_device(mconfig, UPD7801, "uPD7801", tag, owner, clock, "upd7801", __FILE__)
 {
 	m_op48 = s_op48_7801;
@@ -455,7 +455,7 @@ upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, d
 	m_opXX = s_opXX_7801;
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd7810_device(mconfig, UPD78C05, "uPD78C05", tag, owner, clock, "upd78c05", __FILE__)
 {
 	m_op48 = s_op48_78c05;
@@ -468,12 +468,12 @@ upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag,
 	m_opXX = s_opXX_78c05;
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: upd7810_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd78c05_device(mconfig, UPD78C06, "uPD78C06", tag, owner, clock, "upd78c06", __FILE__)
 {
 	m_op48 = s_op48_78c06;
@@ -486,33 +486,33 @@ upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag,
 	m_opXX = s_opXX_78c06;
 }
 
-offs_t upd7810_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t upd7810_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd7810 );
 	return CPU_DISASSEMBLE_NAME(upd7810)(this, buffer, pc, oprom, opram, options);
 }
 
-offs_t upd7807_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t upd7807_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd7807 );
 	return CPU_DISASSEMBLE_NAME(upd7807)(this, buffer, pc, oprom, opram, options);
 }
 
-offs_t upd7801_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t upd7801_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd7801 );
 	return CPU_DISASSEMBLE_NAME(upd7801)(this, buffer, pc, oprom, opram, options);
 }
 
-offs_t upd78c05_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t upd78c05_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd78c05 );
 	return CPU_DISASSEMBLE_NAME(upd78c05)(this, buffer, pc, oprom, opram, options);
 }
 
-UINT8 upd7810_device::RP(offs_t port)
+uint8_t upd7810_device::RP(offs_t port)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	switch (port)
 	{
 	case UPD7810_PORTA:
@@ -590,7 +590,7 @@ UINT8 upd7810_device::RP(offs_t port)
 	return data;
 }
 
-void upd7810_device::WP(offs_t port, UINT8 data)
+void upd7810_device::WP(offs_t port, uint8_t data)
 {
 	switch (port)
 	{
@@ -669,7 +669,7 @@ void upd7810_device::WP(offs_t port, UINT8 data)
 
 void upd7810_device::upd7810_take_irq()
 {
-	UINT16 vector = 0;
+	uint16_t vector = 0;
 	int irqline = 0;
 
 	/* global interrupt disable? */
@@ -767,7 +767,7 @@ void upd7810_device::upd7810_take_irq()
 
 void upd7801_device::upd7810_take_irq()
 {
-	UINT16 vector = 0;
+	uint16_t vector = 0;
 	int irqline = 0;
 
 	/* global interrupt disable? */
@@ -999,7 +999,7 @@ void upd7810_device::upd7810_sio_input()
 	if (m_rxcnt > 0)
 	{
 		RXD = m_rxd_func();
-		m_rxs = (m_rxs >> 1) | ((UINT16)RXD << 15);
+		m_rxs = (m_rxs >> 1) | ((uint16_t)RXD << 15);
 		m_rxcnt--;
 		if (0 == m_rxcnt)
 		{

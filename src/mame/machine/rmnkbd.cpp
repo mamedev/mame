@@ -117,7 +117,7 @@ INPUT_PORTS_END
 } // anonymous namespace
 
 
-rmnimbus_keyboard_device::rmnimbus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
+rmnimbus_keyboard_device::rmnimbus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: buffered_rs232_device(mconfig, RMNIMBUS_KEYBOARD, "RM Nimbus Keyboard", tag, owner, 0, "rmnimbus_keyboard", __FILE__)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA")
 {
@@ -158,19 +158,19 @@ void rmnimbus_keyboard_device::device_timer(emu_timer &timer, device_timer_id id
 }
 
 
-void rmnimbus_keyboard_device::key_make(UINT8 row, UINT8 column)
+void rmnimbus_keyboard_device::key_make(uint8_t row, uint8_t column)
 {
 	transmit_byte((row << 3) | column);
 }
 
 
-void rmnimbus_keyboard_device::key_break(UINT8 row, UINT8 column)
+void rmnimbus_keyboard_device::key_break(uint8_t row, uint8_t column)
 {
 	transmit_byte(0x80U | (row << 3) | column);
 }
 
 
-void rmnimbus_keyboard_device::received_byte(UINT8 byte)
+void rmnimbus_keyboard_device::received_byte(uint8_t byte)
 {
 	logerror("received command %02x", byte);
 }

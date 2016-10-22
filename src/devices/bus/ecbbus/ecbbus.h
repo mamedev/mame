@@ -94,7 +94,7 @@ class ecbbus_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -125,7 +125,7 @@ class ecbbus_device : public device_t
 {
 public:
 	// construction/destruction
-	ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<ecbbus_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<ecbbus_device &>(device).m_write_nmi.set_callback(object); }
@@ -170,10 +170,10 @@ public:
 	virtual ~device_ecbbus_card_interface() { }
 
 	// optional operation overrides
-	virtual UINT8 ecbbus_mem_r(offs_t offset) { return 0; };
-	virtual void ecbbus_mem_w(offs_t offset, UINT8 data) { };
-	virtual UINT8 ecbbus_io_r(offs_t offset) { return 0; };
-	virtual void ecbbus_io_w(offs_t offset, UINT8 data) { };
+	virtual uint8_t ecbbus_mem_r(offs_t offset) { return 0; };
+	virtual void ecbbus_mem_w(offs_t offset, uint8_t data) { };
+	virtual uint8_t ecbbus_io_r(offs_t offset) { return 0; };
+	virtual void ecbbus_io_w(offs_t offset, uint8_t data) { };
 
 public:
 	ecbbus_slot_device  *m_slot;

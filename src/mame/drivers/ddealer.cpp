@@ -135,14 +135,14 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_vregs;
-	required_shared_ptr<UINT16> m_left_fg_vram_top;
-	required_shared_ptr<UINT16> m_right_fg_vram_top;
-	required_shared_ptr<UINT16> m_left_fg_vram_bottom;
-	required_shared_ptr<UINT16> m_right_fg_vram_bottom;
-	required_shared_ptr<UINT16> m_back_vram;
-	required_shared_ptr<UINT16> m_work_ram;
-	required_shared_ptr<UINT16> m_mcu_shared_ram;
+	required_shared_ptr<uint16_t> m_vregs;
+	required_shared_ptr<uint16_t> m_left_fg_vram_top;
+	required_shared_ptr<uint16_t> m_right_fg_vram_top;
+	required_shared_ptr<uint16_t> m_left_fg_vram_bottom;
+	required_shared_ptr<uint16_t> m_right_fg_vram_bottom;
+	required_shared_ptr<uint16_t> m_back_vram;
+	required_shared_ptr<uint16_t> m_work_ram;
+	required_shared_ptr<uint16_t> m_mcu_shared_ram;
 
 	/* video-related */
 	tilemap_t  *m_back_tilemap;
@@ -150,8 +150,8 @@ public:
 	int      m_flipscreen;
 
 	/* misc */
-	UINT8    m_input_pressed;
-	UINT16   m_coin_input;
+	uint8_t    m_input_pressed;
+	uint16_t   m_coin_input;
 	DECLARE_WRITE16_MEMBER(ddealer_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(back_vram_w);
 	DECLARE_WRITE16_MEMBER(ddealer_vregs_w);
@@ -162,13 +162,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_ddealer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ddealer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddealer_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ddealer_mcu_sim);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
+	void ddealer_draw_video_layer( uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
 };
 
 
@@ -193,13 +193,13 @@ void ddealer_state::video_start()
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ddealer_state::get_back_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 }
 
-void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)
+void ddealer_state::ddealer_draw_video_layer( uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
-	INT16 sx, sy;
+	int16_t sx, sy;
 	int x,y, count;
-	UINT16* src;
+	uint16_t* src;
 
 	sx =  ((vreg_base[0x4 / 2] & 0xff));
 	sx |= ((vreg_base[0x2 / 2] & 0xff) << 8);
@@ -221,8 +221,8 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 		{
 			for (y = 0; y < 16; y++)
 			{
-				UINT16 tile = (src[count] & 0x0fff);
-				UINT16 colr = (src[count] & 0xf000) >> 12;
+				uint16_t tile = (src[count] & 0x0fff);
+				uint16_t colr = (src[count] & 0xf000) >> 12;
 				count++;
 					gfx->transpen(bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
 			}
@@ -234,8 +234,8 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 		{
 			for (y = 0; y < 16; y++)
 			{
-				UINT16 tile = (src[count] & 0x0fff);
-				UINT16 colr = (src[count] & 0xf000) >> 12;
+				uint16_t tile = (src[count] & 0x0fff);
+				uint16_t colr = (src[count] & 0xf000) >> 12;
 				count++;
 					gfx->transpen(bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
 			}
@@ -253,8 +253,8 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 		{
 			for (y = 16; y > 0; y--)
 			{
-				UINT16 tile = (src[count] & 0x0fff);
-				UINT16 colr = (src[count] & 0xf000) >> 12;
+				uint16_t tile = (src[count] & 0x0fff);
+				uint16_t colr = (src[count] & 0xf000) >> 12;
 				count++;
 					gfx->transpen(bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
 			}
@@ -266,8 +266,8 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 		{
 			for (y = 16; y > 0; y--)
 			{
-				UINT16 tile = (src[count] & 0x0fff);
-				UINT16 colr = (src[count] & 0xf000) >> 12;
+				uint16_t tile = (src[count] & 0x0fff);
+				uint16_t colr = (src[count] & 0xf000) >> 12;
 				count++;
 					gfx->transpen(bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
 			}
@@ -276,7 +276,7 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 }
 
 
-UINT32 ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_back_tilemap->set_scrollx(0, m_flipscreen ? -192 : -64);
 	m_back_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);

@@ -19,7 +19,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_scanline)
 	}
 	else
 	{
-		UINT8 *line = &m_p_videoram[ m_base_address + 40 * m_scanline ];
+		uint8_t *line = &m_p_videoram[ m_base_address + 40 * m_scanline ];
 		int pal[4];
 		int i;
 
@@ -52,7 +52,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_scanline)
 		}
 		for( i = 0; i < 40; i++ )
 		{
-			UINT8 p = line[i];
+			uint8_t p = line[i];
 			m_bitmap.pix16(i * 4 + 0, m_scanline) = pal[ ( p >> 6 ) & 3 ];
 			m_bitmap.pix16(i * 4 + 1, m_scanline) = pal[ ( p >> 4 ) & 3 ];
 			m_bitmap.pix16(i * 4 + 2, m_scanline) = pal[ ( p >> 2 ) & 3 ];

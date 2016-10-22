@@ -62,7 +62,7 @@ const tiny_rom_entry *cpc_brunword4_device::device_rom_region() const
 	return ROM_NAME( cpc_brunword4 );
 }
 
-cpc_brunword4_device::cpc_brunword4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_brunword4_device::cpc_brunword4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_BRUNWORD_MK4, "Brunword Elite MK4", tag, owner, clock, "cpc_brunword4", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_rombank_active(false), m_bank_sel(0)
 {
@@ -98,14 +98,14 @@ WRITE8_MEMBER(cpc_brunword4_device::rombank_w)
 	m_slot->rom_select(space,0,data & 0x3f);  // repeats every 64 ROMs, this breaks upper cart ROM selection on the Plus
 }
 
-void cpc_brunword4_device::set_mapping(UINT8 type)
+void cpc_brunword4_device::set_mapping(uint8_t type)
 {
 	if(type != MAP_OTHER)
 		return;
 	if(m_rombank_active)
 	{
-		UINT8* ROM = memregion("mk4_roms")->base();
-		UINT8 bank = ((m_bank_sel & 0x38) >> 1) | (m_bank_sel & 0x03);
+		uint8_t* ROM = memregion("mk4_roms")->base();
+		uint8_t bank = ((m_bank_sel & 0x38) >> 1) | (m_bank_sel & 0x03);
 		membank(":bank3")->set_base(ROM+(bank*0x4000));
 		membank(":bank4")->set_base(ROM+((bank*0x4000) + 0x2000));
 	}

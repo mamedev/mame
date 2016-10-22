@@ -71,7 +71,7 @@ const tiny_rom_entry *abc_uni800_device::device_rom_region() const
 //  abc_uni800_device - constructor
 //-------------------------------------------------
 
-abc_uni800_device::abc_uni800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc_uni800_device::abc_uni800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ABC_UNI800, "UNI-800", tag, owner, clock, "uni800", __FILE__),
 		device_abcbus_card_interface(mconfig, *this)
 {
@@ -105,6 +105,6 @@ void abc_uni800_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void abc_uni800_device::abcbus_cs(UINT8 data)
+void abc_uni800_device::abcbus_cs(uint8_t data)
 {
 }

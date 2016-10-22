@@ -41,7 +41,7 @@
 
 using namespace Microsoft::WRL;
 
-static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_internal);
+static int32_t dinput_joystick_pov_get_state(void *device_internal, void *item_internal);
 
 //============================================================
 //  dinput_set_dword_property
@@ -239,7 +239,7 @@ public:
 	{
 		HRESULT result = m_dinput_helper->enum_attached_devices(dinput_devclass(), this, &machine);
 		if (result != DI_OK)
-			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", static_cast<UINT32>(result));
+			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", static_cast<uint32_t>(result));
 	}
 
 	static std::string device_item_name(dinput_device * devinfo, int offset, const char * defstring, const TCHAR * suffix)
@@ -406,7 +406,7 @@ public:
 		// populate the buttons
 		for (butnum = 0; butnum < devinfo->dinput.caps.dwButtons; butnum++)
 		{
-			FPTR offset = reinterpret_cast<FPTR>(&static_cast<DIMOUSESTATE *>(nullptr)->rgbButtons[butnum]);
+			uintptr_t offset = reinterpret_cast<uintptr_t>(&static_cast<DIMOUSESTATE *>(nullptr)->rgbButtons[butnum]);
 
 			// add to the mouse device
 			std::string name = device_item_name(devinfo, offset, default_button_name(butnum), nullptr);
@@ -457,7 +457,7 @@ void dinput_joystick_device::poll()
 int dinput_joystick_device::configure()
 {
 	HRESULT result;
-	UINT32 axisnum, axiscount;
+	uint32_t axisnum, axiscount;
 
 	auto devicelist = static_cast<input_module_base&>(module()).devicelist();
 
@@ -514,31 +514,31 @@ int dinput_joystick_device::configure()
 	}
 
 	// populate the POVs
-	for (UINT32 povnum = 0; povnum < dinput.caps.dwPOVs; povnum++)
+	for (uint32_t povnum = 0; povnum < dinput.caps.dwPOVs; povnum++)
 	{
 		std::string name;
 
 		// left
 		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("L"));
-		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_LEFT)));
+		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_LEFT)));
 
 		// right
 		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("R"));
-		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_RIGHT)));
+		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_RIGHT)));
 
 		// up
 		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("U"));
-		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_UP)));
+		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_UP)));
 
 		// down
 		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("D"));
-		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_DOWN)));
+		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_DOWN)));
 	}
 
 	// populate the buttons
-	for (UINT32 butnum = 0; butnum < dinput.caps.dwButtons; butnum++)
+	for (uint32_t butnum = 0; butnum < dinput.caps.dwButtons; butnum++)
 	{
-		FPTR offset = reinterpret_cast<FPTR>(&static_cast<DIJOYSTATE2 *>(nullptr)->rgbButtons[butnum]);
+		uintptr_t offset = reinterpret_cast<uintptr_t>(&static_cast<DIJOYSTATE2 *>(nullptr)->rgbButtons[butnum]);
 		std::string name = dinput_module::device_item_name(this, offset, default_button_name(butnum), nullptr);
 
 		input_item_id itemid;
@@ -603,12 +603,12 @@ public:
 //  dinput_joystick_pov_get_state
 //============================================================
 
-static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_internal)
+static int32_t dinput_joystick_pov_get_state(void *device_internal, void *item_internal)
 {
 	dinput_joystick_device *devinfo = static_cast<dinput_joystick_device *>(device_internal);
-	int povnum = reinterpret_cast<FPTR>(item_internal) / 4;
-	int povdir = reinterpret_cast<FPTR>(item_internal) % 4;
-	INT32 result = 0;
+	int povnum = reinterpret_cast<uintptr_t>(item_internal) / 4;
+	int povdir = reinterpret_cast<uintptr_t>(item_internal) % 4;
+	int32_t result = 0;
 	DWORD pov;
 
 	// get the current state

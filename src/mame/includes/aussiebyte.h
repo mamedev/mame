@@ -93,22 +93,22 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
-	UINT8 crt8002(UINT8 ac_ra, UINT8 ac_chr, UINT8 ac_attr, UINT16 ac_cnt, bool ac_curs);
+	uint8_t crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs);
 	bool m_port15; // rom switched in (0), out (1)
-	UINT8 m_port17;
-	UINT8 m_port17_rdy;
-	UINT8 m_port19;
-	UINT8 m_port1a; // bank to switch to when write to port 15 happens
-	UINT8 m_port28;
-	UINT8 m_port34;
-	UINT8 m_port35; // byte to be written to vram or aram
-	UINT8 m_video_index;
-	UINT16 m_cnt;
-	UINT8 *m_p_videoram;
-	UINT8 *m_p_attribram;
-	const UINT8 *m_p_chargen;
-	UINT16 m_alpha_address;
-	UINT16 m_graph_address;
+	uint8_t m_port17;
+	uint8_t m_port17_rdy;
+	uint8_t m_port19;
+	uint8_t m_port1a; // bank to switch to when write to port 15 happens
+	uint8_t m_port28;
+	uint8_t m_port34;
+	uint8_t m_port35; // byte to be written to vram or aram
+	uint8_t m_video_index;
+	uint16_t m_cnt;
+	uint8_t *m_p_videoram;
+	uint8_t *m_p_attribram;
+	const uint8_t *m_p_chargen;
+	uint16_t m_alpha_address;
+	uint16_t m_graph_address;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dma_device> m_dma;

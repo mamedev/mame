@@ -54,21 +54,21 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_bg_tile_ram;
+	required_shared_ptr<uint8_t> m_bg_tile_ram;
 	tilemap_t *m_bg_tilemap;
 
-	required_shared_ptr<UINT8> m_fg_tile_ram;
-	required_shared_ptr<UINT8> m_fg_color_ram;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
 
 	// common
 	int m_nmi_ack;
-	UINT8 m_out[3];
+	uint8_t m_out[3];
 
 	// spk116it and spk115it specific
 	int m_video_enable;
 	int m_hopper;
-	UINT8 m_igs_magic[2];
+	uint8_t m_igs_magic[2];
 
 	// common
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
@@ -94,7 +94,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -139,7 +139,7 @@ void spoker_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-UINT32 spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -158,7 +158,7 @@ CUSTOM_INPUT_MEMBER(spoker_state::hopper_r)
 	return machine().input().code_pressed(KEYCODE_H);
 }
 
-static void show_out(running_machine &machine,  UINT8 *out)
+static void show_out(running_machine &machine,  uint8_t *out)
 {
 #ifdef MAME_DEBUG
 	machine.popmessage("%02x %02x %02x", out[0], out[1], out[2]);
@@ -852,7 +852,7 @@ DRIVER_INIT_MEMBER(spoker_state, spkleftover)
     Maybe a leftover...
 */
 	int A, B;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0; A < 0x10000; A++)
 	{
@@ -864,7 +864,7 @@ DRIVER_INIT_MEMBER(spoker_state, spkleftover)
 DRIVER_INIT_MEMBER(spoker_state, spk116it)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0; A < 0x10000; A++)
 	{
@@ -878,7 +878,7 @@ DRIVER_INIT_MEMBER(spoker_state, spk116it)
 
 DRIVER_INIT_MEMBER(spoker_state, 3super8)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 
 	/* Decryption is probably done using one macrocell/output on an address decoding pal which we do not have a dump of */
@@ -888,7 +888,7 @@ DRIVER_INIT_MEMBER(spoker_state, 3super8)
 	/* nor-reduced: !(!(!(!A6|!A8))|!(!(A7|!A11)|!(!A9|A11))); */
 	for(i=0;i<0x20000;i++)
 	{
-		UINT8 a6, a7, a8, a9, a11, d5 = 0;
+		uint8_t a6, a7, a8, a9, a11, d5 = 0;
 		a6 = BIT(i,6); a7 = BIT(i,7); a8 = BIT(i,8); a9 = BIT(i,9); a11 = BIT(i,11);
 		d5 = (a6 & a8) & ((~a7 & a11) | (a9 & ~a11));
 		ROM[i] ^= d5*0x20;
@@ -896,9 +896,9 @@ DRIVER_INIT_MEMBER(spoker_state, 3super8)
 
 	/* cheesy hack: take gfx roms from spk116it and rearrange them for this game needs */
 	{
-		UINT8 *src = memregion("rep_gfx")->base();
-		UINT8 *dst = memregion("gfx1")->base();
-		UINT8 x;
+		uint8_t *src = memregion("rep_gfx")->base();
+		uint8_t *dst = memregion("gfx1")->base();
+		uint8_t x;
 
 		for(x=0;x<3;x++)
 		{

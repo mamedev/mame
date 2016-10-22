@@ -153,13 +153,13 @@ private:
 	void get_title_search(std::string &title, std::string &search);
 
 	// handle keys
-	virtual void handle_keys(UINT32 flags, int &iptkey) override;
+	virtual void handle_keys(uint32_t flags, int &iptkey) override;
 
 	// handle mouse
-	virtual void handle_events(UINT32 flags, event &ev) override;
+	virtual void handle_events(uint32_t flags, event &ev) override;
 
 	// draw game list
-	virtual void draw(UINT32 flags) override;
+	virtual void draw(uint32_t flags) override;
 
 	// draw right panel
 	void draw_right_panel(float origx1, float origy1, float origx2, float origy2);

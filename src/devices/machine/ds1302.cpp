@@ -72,7 +72,7 @@ const device_type DS1302 = &device_creator<ds1302_device>;
 //  ds1302_device - constructor
 //-------------------------------------------------
 
-ds1302_device::ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds1302_device::ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DS1302, "DS1302", tag, owner, clock, "ds1302", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this)

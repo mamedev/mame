@@ -27,30 +27,30 @@ class i82439tx_device :  public northbridge_device,
 {
 public:
 	// construction/destruction
-	i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_cpu(device_t &device, const char *tag) { dynamic_cast<i82439tx_device &>(device).m_cpu_tag = tag; }
 	static void static_set_region(device_t &device, const char *tag) { dynamic_cast<i82439tx_device &>(device).m_region_tag = tag; }
 
-	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask) override;
-	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask) override;
+	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
+	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void i82439tx_configure_memory(UINT8 val, offs_t begin, offs_t end);
+	void i82439tx_configure_memory(uint8_t val, offs_t begin, offs_t end);
 
 private:
 	const char *m_cpu_tag;
 	const char *m_region_tag;
 
 	address_space *m_space;
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 
-	UINT32 m_regs[8];
-	UINT32 m_bios_ram[0x40000 / 4];
+	uint32_t m_regs[8];
+	uint32_t m_bios_ram[0x40000 / 4];
 };
 
 // device type definition

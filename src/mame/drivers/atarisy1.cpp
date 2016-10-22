@@ -310,17 +310,17 @@ READ16_MEMBER(atarisy1_state::trakball_r)
 		/* when reading the even ports, do a real analog port update */
 		if (which == 0)
 		{
-			UINT8 posx,posy;
+			uint8_t posx,posy;
 
 			if (player == 0)
 			{
-				posx = (INT8)ioport("IN0")->read();
-				posy = (INT8)ioport("IN1")->read();
+				posx = (int8_t)ioport("IN0")->read();
+				posy = (int8_t)ioport("IN1")->read();
 			}
 			else
 			{
-				posx = (INT8)ioport("IN2")->read();
-				posy = (INT8)ioport("IN3")->read();
+				posx = (int8_t)ioport("IN2")->read();
+				posy = (int8_t)ioport("IN3")->read();
 			}
 
 			m_cur[player][0] = posx + posy;

@@ -61,7 +61,7 @@ public:
 	void import(float val);
 
 protected:
-	virtual INT32 slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, INT32 newval) override;
+	virtual int32_t slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, int32_t newval) override;
 	slider_state* create_core_slider(running_machine &machine);
 	int32_t as_int() const { return int32_t(floor(m_value / m_step + 0.5f)); }
 

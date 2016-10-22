@@ -15,28 +15,28 @@
 class bfm_bd1_t : public device_t
 {
 public:
-	bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
 	static void static_set_value(device_t &device, int val);
 
 	int write_char(int data);
 	virtual void update_display();
-	UINT8   m_port_val;
+	uint8_t   m_port_val;
 	void blank(int data);
 
 	void shift_clock(int state);
 	void setdata(int segdata, int data);
-	UINT16 set_display(UINT16 segin);
+	uint16_t set_display(uint16_t segin);
 	DECLARE_WRITE_LINE_MEMBER( sclk );
 	DECLARE_WRITE_LINE_MEMBER( data );
 	DECLARE_WRITE_LINE_MEMBER( por );
 
 protected:
-	static const UINT8 AT_NORMAL  = 0x00;
-	static const UINT8 AT_FLASH   = 0x01;
-	static const UINT8 AT_BLANK   = 0x02;
-	static const UINT8 AT_FLASHED = 0x80;   // set when character should be blinked off
+	static const uint8_t AT_NORMAL  = 0x00;
+	static const uint8_t AT_FLASH   = 0x01;
+	static const uint8_t AT_BLANK   = 0x02;
+	static const uint8_t AT_FLASHED = 0x80;   // set when character should be blinked off
 
 	int m_cursor_pos;
 	int m_window_start;     // display window start pos 0-15
@@ -52,12 +52,12 @@ protected:
 	int m_sclk;
 	int m_data;
 
-	UINT8 m_cursor;
-	UINT16 m_chars[16];
-	UINT16 m_outputs[16];
-	UINT8 m_attrs[16];
-	UINT16 m_user_data;             // user defined character data (16 bit)
-	UINT16 m_user_def;          // user defined character state
+	uint8_t m_cursor;
+	uint16_t m_chars[16];
+	uint16_t m_outputs[16];
+	uint8_t m_attrs[16];
+	uint16_t m_user_data;             // user defined character data (16 bit)
+	uint16_t m_user_def;          // user defined character state
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

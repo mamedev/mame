@@ -46,12 +46,12 @@ public:
 	required_ioport m_io_misc;
 	required_ioport m_io_system;
 
-	required_shared_ptr<UINT16> m_fgvideoram;
-	required_shared_ptr<UINT16> m_bg0videoram;
-	required_shared_ptr<UINT16> m_bg1videoram;
-	required_shared_ptr<UINT16> m_spvideoram;
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<uint16_t> m_bg0videoram;
+	required_shared_ptr<uint16_t> m_bg1videoram;
+	required_shared_ptr<uint16_t> m_spvideoram;
 
-	std::unique_ptr<UINT16[]> m_spvideoram_old;
+	std::unique_ptr<uint16_t[]> m_spvideoram_old;
 	tilemap_t *m_fgtilemap;
 	tilemap_t *m_bg0tilemap;
 	tilemap_t *m_bg1tilemap;
@@ -85,7 +85,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

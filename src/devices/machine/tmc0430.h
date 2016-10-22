@@ -16,8 +16,8 @@
 extern const device_type TMC0430;
 
 #ifndef READ8Z_MEMBER
-#define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask = 0xff)
-#define READ8Z_MEMBER(name)             void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask)
+#define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask = 0xff)
+#define READ8Z_MEMBER(name)             void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask)
 #endif
 
 enum
@@ -29,7 +29,7 @@ enum
 class tmc0430_device : public device_t
 {
 public:
-	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<tmc0430_device &>(device).m_gromready.set_callback(object); }
 
@@ -97,13 +97,13 @@ private:
 
 	// The address pointer is always expected to be in the range 0x0000 - 0xffff, even
 	// when this GROM is not addressed.
-	UINT16 m_address;
+	uint16_t m_address;
 
 	/* GROM data buffer. */
-	UINT8 m_buffer;
+	uint8_t m_buffer;
 
 	/* Pointer to the memory region contained in this GROM. */
-	UINT8 *m_memptr;
+	uint8_t *m_memptr;
 };
 
 #define MCFG_GROM_ADD(_tag, _ident, _region, _offset, _ready)    \

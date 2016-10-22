@@ -57,7 +57,7 @@ const device_type MSM5205 = &device_creator<msm5205_device>;
 const device_type MSM6585 = &device_creator<msm6585_device>;
 
 
-msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, MSM5205, "MSM5205", tag, owner, clock, "msm5205", __FILE__),
 						device_sound_interface(mconfig, *this),
 						m_prescaler(0),
@@ -67,7 +67,7 @@ msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sound_interface(mconfig, *this),
 						m_prescaler(0),
@@ -78,7 +78,7 @@ msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, 
 }
 
 
-msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: msm5205_device(mconfig, MSM6585, "MSM6585", tag, owner, clock, "msm6585", __FILE__)
 {
 }
@@ -295,7 +295,7 @@ void msm5205_device::set_volume(int volume)
 	m_stream->set_output_gain(0,volume / 100.0);
 }
 
-void msm5205_device::change_clock_w(INT32 clock)
+void msm5205_device::change_clock_w(int32_t clock)
 {
 	attotime period;
 

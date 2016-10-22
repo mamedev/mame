@@ -165,13 +165,13 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 
-	optional_shared_ptr<UINT16> m_dsw_sel16;
-	optional_shared_ptr<UINT16> m_protection1;
-	optional_shared_ptr<UINT16> m_protection2;
+	optional_shared_ptr<uint16_t> m_dsw_sel16;
+	optional_shared_ptr<uint16_t> m_protection1;
+	optional_shared_ptr<uint16_t> m_protection2;
 
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	std::unique_ptr<UINT8[]>  m_ddenlovr_pixmap[8];
+	std::unique_ptr<uint8_t[]>  m_ddenlovr_pixmap[8];
 
 	/* blitter (TODO: merge with the dynax.h, where possible) */
 	int m_extra_layers;
@@ -210,20 +210,20 @@ public:
 	int m_ddenlovr_blit_regs[2];
 
 	/* ddenlovr misc (TODO: merge with dynax.h, where possible) */
-	UINT8 m_palram[0x200];
+	uint8_t m_palram[0x200];
 	int m_okibank;
-	UINT8 m_rongrong_blitter_busy_select;
-	UINT8 m_prot_val;
-	UINT16 m_prot_16;
-	UINT16 m_quiz365_protection[2];
+	uint8_t m_rongrong_blitter_busy_select;
+	uint8_t m_prot_val;
+	uint16_t m_prot_16;
+	uint16_t m_quiz365_protection[2];
 
-	UINT16 m_mmpanic_leds;  /* A led for each of the 9 buttons */
-	UINT8 m_funkyfig_lockout;
-	UINT8 m_romdata[2];
+	uint16_t m_mmpanic_leds;  /* A led for each of the 9 buttons */
+	uint8_t m_funkyfig_lockout;
+	uint8_t m_romdata[2];
 	int m_palette_index;
-	UINT8 m_hginga_rombank;
-	UINT8 m_mjflove_irq_cause;
-	UINT8 m_daimyojn_palette_sel;
+	uint8_t m_hginga_rombank;
+	uint8_t m_mjflove_irq_cause;
+	uint8_t m_daimyojn_palette_sel;
 
 	DECLARE_MACHINE_START(ddenlovr);
 	DECLARE_MACHINE_RESET(ddenlovr);
@@ -240,8 +240,8 @@ public:
 	DECLARE_MACHINE_START(funkyfig);
 	DECLARE_MACHINE_START(mjmyster);
 	DECLARE_MACHINE_START(hparadis);
-	UINT32 screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(quizchq_irq);
 	INTERRUPT_GEN_MEMBER(mmpanic_irq);
@@ -439,8 +439,8 @@ public:
 	DECLARE_READ8_MEMBER( seljan2_dsw_r );
 	DECLARE_WRITE8_MEMBER( daimyojn_okibank_w );
 
-	void ddenlovr_flipscreen_w( UINT8 data );
-	void ddenlovr_blit_flip_w( UINT8 data );
+	void ddenlovr_flipscreen_w( uint8_t data );
+	void ddenlovr_blit_flip_w( uint8_t data );
 	void do_plot( int x, int y, int pen );
 	inline void log_draw_error( int src, int cmd );
 	int blit_draw( int src, int sx );
@@ -450,12 +450,12 @@ public:
 	void blit_horiz_line();
 	void blit_vert_line();
 	inline void log_blit(int data );
-	void blitter_w( address_space &space, int blitter, offs_t offset, UINT8 data, int irq_vector );
-	void blitter_w_funkyfig(int blitter, offs_t offset, UINT8 data, int irq_vector );
+	void blitter_w( address_space &space, int blitter, offs_t offset, uint8_t data, int irq_vector );
+	void blitter_w_funkyfig(int blitter, offs_t offset, uint8_t data, int irq_vector );
 	void copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer );
 	void mmpanic_update_leds();
 	void mjchuuka_get_romdata();
-	UINT8 hgokou_player_r( int player );
+	uint8_t hgokou_player_r( int player );
 };
 
 VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
@@ -464,7 +464,7 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 
 	for (i = 0; i < 8; i++)
 	{
-		m_ddenlovr_pixmap[i] = std::make_unique<UINT8[]>(512 * 512);
+		m_ddenlovr_pixmap[i] = std::make_unique<uint8_t[]>(512 * 512);
 		m_ddenlovr_scroll[i * 2 + 0] = m_ddenlovr_scroll[i * 2 + 1] = 0;
 	}
 
@@ -577,12 +577,12 @@ VIDEO_START_MEMBER(ddenlovr_state,mjflove)
 	m_ddenlovr_blit_commands = mjflove_commands;
 }
 
-void ddenlovr_state::ddenlovr_flipscreen_w( UINT8 data )
+void ddenlovr_state::ddenlovr_flipscreen_w( uint8_t data )
 {
 	logerror("flipscreen = %02x (%s)\n", data, (data & 1) ? "off" : "on");
 }
 
-void ddenlovr_state::ddenlovr_blit_flip_w( UINT8 data )
+void ddenlovr_state::ddenlovr_blit_flip_w( uint8_t data )
 {
 	if ((data ^ m_ddenlovr_blit_flip) & 0xec)
 	{
@@ -689,7 +689,7 @@ void ddenlovr_state::do_plot( int x, int y, int pen )
 }
 
 
-static inline int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
+static inline int fetch_bit( uint8_t *src_data, int src_len, int *bit_addr )
 {
 	const int baddrmask = 0x7ffffff;
 
@@ -708,7 +708,7 @@ static inline int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 	return (src_data[baddr / 8] >> (7 - (baddr & 7))) & 1;
 }
 
-static inline int fetch_word( UINT8 *src_data, int src_len, int *bit_addr, int word_len )
+static inline int fetch_word( uint8_t *src_data, int src_len, int *bit_addr, int word_len )
 {
 	int res = 0;
 
@@ -742,7 +742,7 @@ inline void ddenlovr_state::log_draw_error( int src, int cmd )
 
 int ddenlovr_state::blit_draw( int src, int sx )
 {
-	UINT8 *src_data = memregion("blitter")->base();
+	uint8_t *src_data = memregion("blitter")->base();
 	int src_len = memregion("blitter")->bytes();
 	int bit_addr = (src & 0xffffff) * m_ddenlovr_blit_rom_bits;  /* convert to bit address */
 	int pen_size, arg_size, cmd;
@@ -993,7 +993,7 @@ inline void ddenlovr_state::log_blit( int data )
 #endif
 }
 
-void ddenlovr_state::blitter_w( address_space &space, int blitter, offs_t offset, UINT8 data, int irq_vector )
+void ddenlovr_state::blitter_w( address_space &space, int blitter, offs_t offset, uint8_t data, int irq_vector )
 {
 	int hi_bits;
 
@@ -1155,7 +1155,7 @@ g_profiler.stop();
 
 
 // differences wrt blitter_data_w: slightly different blitter commands
-void ddenlovr_state::blitter_w_funkyfig( int blitter, offs_t offset, UINT8 data, int irq_vector )
+void ddenlovr_state::blitter_w_funkyfig( int blitter, offs_t offset, uint8_t data, int irq_vector )
 {
 	int hi_bits;
 
@@ -1537,7 +1537,7 @@ WRITE16_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_ack_w)
 
 READ8_MEMBER(ddenlovr_state::rongrong_gfxrom_r)
 {
-	UINT8 *rom  = memregion("blitter")->base();
+	uint8_t *rom  = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
 	int address = m_ddenlovr_blit_address;
 
@@ -1591,7 +1591,7 @@ void ddenlovr_state::copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	}
 }
 
-UINT32 ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int order[24][4] =
 	{
@@ -1608,7 +1608,7 @@ UINT32 ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind1
 
 #if 0
 	static int base = 0x0;
-	const UINT8 *gfx = memregion("blitter")->base();
+	const uint8_t *gfx = memregion("blitter")->base();
 	int next;
 	memset(m_ddenlovr_pixmap[0], 0, 512 * 512);
 	memset(m_ddenlovr_pixmap[1], 0, 512 * 512);
@@ -2004,7 +2004,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ddenlovr_state::ddenlovj_dsw_r)
 {
-	UINT16 dsw = 0;
+	uint16_t dsw = 0;
 	if ((~*m_dsw_sel16) & 0x01) dsw |= ioport("DSW1")->read();
 	if ((~*m_dsw_sel16) & 0x02) dsw |= ioport("DSW2")->read();
 	if ((~*m_dsw_sel16) & 0x04) dsw |= ioport("DSW3")->read();
@@ -2698,7 +2698,7 @@ WRITE8_MEMBER(ddenlovr_state::hanakanz_dsw_w)
 
 READ8_MEMBER(ddenlovr_state::hanakanz_keyb_r)
 {
-	UINT8 val = 0xff;
+	uint8_t val = 0xff;
 
 	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
 	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
@@ -2727,7 +2727,7 @@ READ8_MEMBER(ddenlovr_state::hanakanz_busy_r)
 
 READ8_MEMBER(ddenlovr_state::hanakanz_gfxrom_r)
 {
-	UINT8 *rom  = memregion("blitter")->base();
+	uint8_t *rom  = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
 	int address = (m_ddenlovr_blit_address & 0xffffff) * 2;
 
@@ -2927,7 +2927,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(ddenlovr_state::mjchuuka_keyb_r)
 {
-	UINT8 val = 0xff;
+	uint8_t val = 0xff;
 
 	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
 	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
@@ -2951,7 +2951,7 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_blitter_w)
 
 void ddenlovr_state::mjchuuka_get_romdata()
 {
-	UINT8 *rom = memregion("blitter")->base();
+	uint8_t *rom = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
 	int address = (m_ddenlovr_blit_address & 0xffffff) * 2;
 
@@ -2979,7 +2979,7 @@ READ8_MEMBER(ddenlovr_state::mjchuuka_gfxrom_1_r)
 
 WRITE8_MEMBER(ddenlovr_state::mjchuuka_palette_w)
 {
-	UINT16 rgb = (offset & 0xff00) | data;
+	uint16_t rgb = (offset & 0xff00) | data;
 
 	if (rgb & 0x8000)
 	{
@@ -3153,7 +3153,7 @@ READ8_MEMBER(ddenlovr_state::mjmyster_coins_r)
 
 READ8_MEMBER(ddenlovr_state::mjmyster_keyb_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	if      (BIT(m_keyb, 0))   ret = ioport("KEY0")->read();
 	else if (BIT(m_keyb, 1))   ret = ioport("KEY1")->read();
@@ -3242,7 +3242,7 @@ WRITE8_MEMBER(ddenlovr_state::hginga_rombank_w)
 // similar to rongrong
 READ8_MEMBER(ddenlovr_state::hginga_protection_r)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	if (m_hginga_rombank & 0x10)
 		return hanakanz_rand_r(space, 0);
@@ -3402,9 +3402,9 @@ ADDRESS_MAP_END
                              Hanafuda Hana Gokou
 ***************************************************************************/
 
-UINT8 ddenlovr_state::hgokou_player_r(int player )
+uint8_t ddenlovr_state::hgokou_player_r(int player )
 {
-	UINT8 hopper_bit = ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
+	uint8_t hopper_bit = ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
 
 	if (!BIT(m_input_sel, 0))   return ioport(player ? "KEY5" : "KEY0")->read() | hopper_bit;
 	if (!BIT(m_input_sel, 1))   return ioport(player ? "KEY6" : "KEY1")->read() | hopper_bit;
@@ -3463,7 +3463,7 @@ WRITE8_MEMBER(ddenlovr_state::hgokou_input_w)
 // similar to rongrong
 READ8_MEMBER(ddenlovr_state::hgokou_protection_r)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	if (m_hginga_rombank == 0)
 		return hanakanz_rand_r(space, 0);
@@ -3514,7 +3514,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(ddenlovr_state::hgokbang_input_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 	switch (m_dsw_sel)
 	{
 		case 0x2d:
@@ -3726,7 +3726,7 @@ READ16_MEMBER(ddenlovr_state::akamaru_protection2_r)
 
 READ16_MEMBER(ddenlovr_state::akamaru_dsw_r)
 {
-	UINT16 dsw = 0;
+	uint16_t dsw = 0;
 
 	if (m_dsw_sel16[1] == 0xff) dsw |= ioport("DSW1")->read();
 	if (m_dsw_sel16[0] == 0xff) dsw |= ioport("DSW2")->read();
@@ -3812,7 +3812,7 @@ READ8_MEMBER(ddenlovr_state::mjflove_protection_r)
 
 READ8_MEMBER(ddenlovr_state::mjflove_keyb_r)
 {
-	UINT8 val = 0xff;
+	uint8_t val = 0xff;
 
 	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
 	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
@@ -3989,7 +3989,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(ddenlovr_state::sryudens_keyb_r)
 {
-	UINT8 val = 0x3f;
+	uint8_t val = 0x3f;
 
 	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
 	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
@@ -4216,7 +4216,7 @@ VIDEO_START_MEMBER(ddenlovr_state,htengoku)
 	VIDEO_START_CALL_MEMBER(hnoridur);
 }
 
-UINT32 ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer, x, y;
 
@@ -4229,7 +4229,7 @@ UINT32 ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_ind1
 
 		for (y = 0; y < 256; y++)
 			for (x = 0; x < 512; x++)
-				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (UINT8)(bitmap.pix16(y, x));
+				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (uint8_t)(bitmap.pix16(y, x));
 	}
 
 	return screen_update_ddenlovr(screen, bitmap, cliprect);
@@ -4237,7 +4237,7 @@ UINT32 ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_ind1
 
 MACHINE_START_MEMBER(ddenlovr_state,htengoku)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
@@ -4431,9 +4431,9 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(ddenlovr_state::daimyojn_keyb1_r)
 {
-	UINT8 val = 0x3f;
+	uint8_t val = 0x3f;
 
-	UINT8 hopper_bit = ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
+	uint8_t hopper_bit = ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
 
 	if      (!BIT(m_keyb, 0))  val = ioport("KEY0")->read() | hopper_bit;
 	else if (!BIT(m_keyb, 1))  val = ioport("KEY1")->read() | hopper_bit;
@@ -4447,7 +4447,7 @@ READ8_MEMBER(ddenlovr_state::daimyojn_keyb1_r)
 
 READ8_MEMBER(ddenlovr_state::daimyojn_keyb2_r)
 {
-	UINT8 val = 0x3f;
+	uint8_t val = 0x3f;
 
 	if      (!BIT(m_keyb, 0))  val = ioport("KEY5")->read();
 	else if (!BIT(m_keyb, 1))  val = ioport("KEY6")->read();
@@ -9642,7 +9642,7 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 
 MACHINE_START_MEMBER(ddenlovr_state,rongrong)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
 
@@ -9651,7 +9651,7 @@ MACHINE_START_MEMBER(ddenlovr_state,rongrong)
 
 MACHINE_START_MEMBER(ddenlovr_state,mmpanic)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
@@ -9659,7 +9659,7 @@ MACHINE_START_MEMBER(ddenlovr_state,mmpanic)
 
 MACHINE_START_MEMBER(ddenlovr_state,funkyfig)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
@@ -9668,7 +9668,7 @@ MACHINE_START_MEMBER(ddenlovr_state,funkyfig)
 
 MACHINE_START_MEMBER(ddenlovr_state,hanakanz)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
@@ -9677,7 +9677,7 @@ MACHINE_START_MEMBER(ddenlovr_state,hanakanz)
 
 MACHINE_START_MEMBER(ddenlovr_state,mjmyster)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
@@ -9686,7 +9686,7 @@ MACHINE_START_MEMBER(ddenlovr_state,mjmyster)
 
 MACHINE_START_MEMBER(ddenlovr_state,hparadis)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
 
@@ -9695,7 +9695,7 @@ MACHINE_START_MEMBER(ddenlovr_state,hparadis)
 
 MACHINE_START_MEMBER(ddenlovr_state,mjflove)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
@@ -9704,7 +9704,7 @@ MACHINE_START_MEMBER(ddenlovr_state,mjflove)
 
 MACHINE_START_MEMBER(ddenlovr_state,sryudens)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
@@ -10614,7 +10614,7 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0x00, 0x10, &ROM[0x10000], 0x8000);
 	// banks 10-1f -> palette RAM

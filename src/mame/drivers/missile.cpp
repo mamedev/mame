@@ -377,7 +377,7 @@ public:
 	{ }
 
 	required_device<m6502_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<pokey_device> m_pokey;
 	required_ioport m_in0;
@@ -391,14 +391,14 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	const UINT8 *m_mainrom;
-	const UINT8 *m_writeprom;
+	const uint8_t *m_mainrom;
+	const uint8_t *m_writeprom;
 	emu_timer *m_irq_timer;
 	emu_timer *m_cpu_timer;
-	UINT8 m_irq_state;
-	UINT8 m_ctrld;
-	UINT8 m_flipscreen;
-	UINT64 m_madsel_lastcycles;
+	uint8_t m_irq_state;
+	uint8_t m_ctrld;
+	uint8_t m_flipscreen;
+	uint64_t m_madsel_lastcycles;
 
 	DECLARE_WRITE8_MEMBER(missile_w);
 	DECLARE_READ8_MEMBER(missile_r);
@@ -407,15 +407,15 @@ public:
 	DECLARE_DRIVER_INIT(suprmatk);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	inline int scanline_to_v(int scanline);
 	inline int v_to_scanline(int v);
 	inline void schedule_next_irq(int curv);
 	inline bool get_madsel();
 	inline offs_t get_bit3_addr(offs_t pixaddr);
-	void write_vram(address_space &space, offs_t address, UINT8 data);
-	UINT8 read_vram(address_space &space, offs_t address);
+	void write_vram(address_space &space, offs_t address, uint8_t data);
+	uint8_t read_vram(address_space &space, offs_t address);
 
 	TIMER_CALLBACK_MEMBER(clock_irq);
 	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
@@ -589,12 +589,12 @@ offs_t missile_state::get_bit3_addr(offs_t pixaddr)
 }
 
 
-void missile_state::write_vram(address_space &space, offs_t address, UINT8 data)
+void missile_state::write_vram(address_space &space, offs_t address, uint8_t data)
 {
-	static const UINT8 data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
+	static const uint8_t data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
 	offs_t vramaddr;
-	UINT8 vramdata;
-	UINT8 vrammask;
+	uint8_t vramdata;
+	uint8_t vrammask;
 
 	/* basic 2 bit VRAM writes go to addr >> 2 */
 	/* data comes from bits 6 and 7 */
@@ -619,12 +619,12 @@ void missile_state::write_vram(address_space &space, offs_t address, UINT8 data)
 }
 
 
-UINT8 missile_state::read_vram(address_space &space, offs_t address)
+uint8_t missile_state::read_vram(address_space &space, offs_t address)
 {
 	offs_t vramaddr;
-	UINT8 vramdata;
-	UINT8 vrammask;
-	UINT8 result = 0xff;
+	uint8_t vramdata;
+	uint8_t vrammask;
+	uint8_t result = 0xff;
 
 	/* basic 2 bit VRAM reads go to addr >> 2 */
 	/* data goes to bits 6 and 7 */
@@ -661,19 +661,19 @@ UINT8 missile_state::read_vram(address_space &space, offs_t address)
  *
  *************************************/
 
-UINT32 missile_state::screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t missile_state::screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int x, y;
 
 	/* draw the bitmap to the screen, looping over Y */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dst = &bitmap.pix16(y);
+		uint16_t *dst = &bitmap.pix16(y);
 
 		int effy = m_flipscreen ? ((256+24 - y) & 0xff) : y;
-		UINT8 *src = &videoram[effy * 64];
-		UINT8 *src3 = nullptr;
+		uint8_t *src = &videoram[effy * 64];
+		uint8_t *src3 = nullptr;
 
 		/* compute the base of the 3rd pixel row */
 		if (effy >= 224)
@@ -682,7 +682,7 @@ UINT32 missile_state::screen_update_missile(screen_device &screen, bitmap_ind16 
 		/* loop over X */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT8 pix = src[x / 4] >> (x & 3);
+			uint8_t pix = src[x / 4] >> (x & 3);
 			pix = ((pix >> 2) & 4) | ((pix << 1) & 2);
 
 			/* if we're in the lower region, get the 3rd bit */
@@ -705,7 +705,7 @@ UINT32 missile_state::screen_update_missile(screen_device &screen, bitmap_ind16 
 
 WRITE8_MEMBER(missile_state::missile_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 
 	/* if this is a MADSEL cycle, write to video RAM */
 	if (get_madsel())
@@ -765,8 +765,8 @@ WRITE8_MEMBER(missile_state::missile_w)
 
 READ8_MEMBER(missile_state::missile_r)
 {
-	UINT8 *videoram = m_videoram;
-	UINT8 result = 0xff;
+	uint8_t *videoram = m_videoram;
+	uint8_t result = 0xff;
 
 	/* if this is a MADSEL cycle, read from video RAM */
 	if (get_madsel())
@@ -1212,7 +1212,7 @@ ROM_END
 DRIVER_INIT_MEMBER(missile_state,suprmatk)
 {
 	int i;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x40; i++)
 	{
@@ -1285,8 +1285,8 @@ DRIVER_INIT_MEMBER(missile_state,suprmatk)
 
 DRIVER_INIT_MEMBER(missile_state,missilem)
 {
-	UINT8 *src = memregion("user1")->base();
-	UINT8 *dest = memregion("maincpu")->base();
+	uint8_t *src = memregion("user1")->base();
+	uint8_t *dest = memregion("maincpu")->base();
 
 	// decrypt rom and put in maincpu region (result looks correct, but is untested)
 	for (int i = 0; i < 0x10000; i++)

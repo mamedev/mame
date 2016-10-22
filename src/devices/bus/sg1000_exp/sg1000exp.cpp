@@ -53,7 +53,7 @@ device_sg1000_expansion_slot_interface::~device_sg1000_expansion_slot_interface(
 //  sg1000_expansion_slot_device - constructor
 //-------------------------------------------------
 
-sg1000_expansion_slot_device::sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sg1000_expansion_slot_device::sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, SG1000_EXPANSION_SLOT, "Sega SG-1000 expansion slot", tag, owner, clock, "sg1000_expansion_slot", __FILE__),
 						device_slot_interface(mconfig, *this), m_device(nullptr)
 {
@@ -85,7 +85,7 @@ void sg1000_expansion_slot_device::device_start()
 
 READ8_MEMBER(sg1000_expansion_slot_device::read)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (m_device)
 		data = m_device->peripheral_r(space, offset & 0x07);
 	return data;
@@ -98,7 +98,7 @@ WRITE8_MEMBER(sg1000_expansion_slot_device::write)
 }
 
 
-bool sg1000_expansion_slot_device::is_readable(UINT8 offset)
+bool sg1000_expansion_slot_device::is_readable(uint8_t offset)
 {
 	if (m_device)
 		return m_device->is_readable(offset & 0x07);
@@ -106,7 +106,7 @@ bool sg1000_expansion_slot_device::is_readable(UINT8 offset)
 }
 
 
-bool sg1000_expansion_slot_device::is_writeable(UINT8 offset)
+bool sg1000_expansion_slot_device::is_writeable(uint8_t offset)
 {
 	if (m_device)
 		return m_device->is_writeable(offset & 0x07);

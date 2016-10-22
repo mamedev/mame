@@ -38,12 +38,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
-	required_shared_ptr<UINT8> m_spectrum_video_ram;
+	required_shared_ptr<uint8_t> m_spectrum_video_ram;
 
 	int m_spectrum_frame_number;
 	int m_spectrum_flash_invert;
-	UINT8 m_spectrum_port_fe;
-	UINT8 m_nmi_enable;
+	uint8_t m_spectrum_port_fe;
+	uint8_t m_nmi_enable;
 
 	DECLARE_WRITE8_MEMBER(membank_w);
 	DECLARE_READ8_MEMBER(fe_r);
@@ -54,7 +54,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(photon2);
 
-	UINT32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
@@ -149,12 +149,12 @@ void photon2_state::screen_eof_spectrum(screen_device &screen, bool state)
 	}
 }
 
-static inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+static inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (uint16_t)color;
 }
 
-UINT32 photon2_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t photon2_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for now do a full-refresh */
 	int x, y, b, scrx, scry;

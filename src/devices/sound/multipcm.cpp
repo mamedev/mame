@@ -63,7 +63,7 @@ const double multipcm_device::BASE_TIMES[64] = {
 	0.45,       0.45,       0.45,       0.45
 };
 
-const INT32 multipcm_device::VALUE_TO_CHANNEL[32] =
+const int32_t multipcm_device::VALUE_TO_CHANNEL[32] =
 {
 	0, 1, 2, 3, 4, 5, 6 , -1,
 	7, 8, 9, 10,11,12,13, -1,
@@ -71,12 +71,12 @@ const INT32 multipcm_device::VALUE_TO_CHANNEL[32] =
 	21,22,23,24,25,26,27, -1,
 };
 
-const UINT32 multipcm_device::TL_SHIFT = 12;
-const UINT32 multipcm_device::EG_SHIFT = 16;
+const uint32_t multipcm_device::TL_SHIFT = 12;
+const uint32_t multipcm_device::EG_SHIFT = 16;
 
-void multipcm_device::init_sample(sample_t *sample, UINT32 index)
+void multipcm_device::init_sample(sample_t *sample, uint32_t index)
 {
-	UINT32 address = index * 12;
+	uint32_t address = index * 12;
 
 	sample->m_start = (read_byte(address) << 16) | (read_byte(address + 1) << 8) | read_byte(address + 2);
 	sample->m_loop = (read_byte(address + 3) << 8) | read_byte(address + 4);
@@ -91,7 +91,7 @@ void multipcm_device::init_sample(sample_t *sample, UINT32 index)
 	sample->m_lfo_amplitude_reg = read_byte(address + 11) & 0xf;
 }
 
-INT32 multipcm_device::envelope_generator_update(slot_t *slot)
+int32_t multipcm_device::envelope_generator_update(slot_t *slot)
 {
 	switch(slot->m_envelope_gen.m_state)
 	{
@@ -140,9 +140,9 @@ INT32 multipcm_device::envelope_generator_update(slot_t *slot)
 	return m_linear_to_exp_volume[slot->m_envelope_gen.m_volume >> EG_SHIFT];
 }
 
-UINT32 multipcm_device::get_rate(UINT32 *steps, UINT32 rate, UINT32 val)
+uint32_t multipcm_device::get_rate(uint32_t *steps, uint32_t rate, uint32_t val)
 {
-	INT32 r = 4 * val + rate;
+	int32_t r = 4 * val + rate;
 	if (val == 0)
 	{
 		return steps[0];
@@ -160,12 +160,12 @@ UINT32 multipcm_device::get_rate(UINT32 *steps, UINT32 rate, UINT32 val)
 
 void multipcm_device::envelope_generator_calc(slot_t *slot)
 {
-	INT32 octave = ((slot->m_regs[3] >> 4) - 1) & 0xf;
+	int32_t octave = ((slot->m_regs[3] >> 4) - 1) & 0xf;
 	if (octave & 8) {
 		octave = octave - 16;
 	}
 
-	INT32 rate;
+	int32_t rate;
 	if (slot->m_sample.m_key_rate_scale != 0xf)
 	{
 		rate = (octave + slot->m_sample.m_key_rate_scale) * 2 + ((slot->m_regs[3] >> 3) & 1);
@@ -187,7 +187,7 @@ void multipcm_device::envelope_generator_calc(slot_t *slot)
         LFO  SECTION
 *****************************/
 
-const UINT32 multipcm_device::LFO_SHIFT = 8;
+const uint32_t multipcm_device::LFO_SHIFT = 8;
 
 const float multipcm_device::LFO_FREQ[8] = // In Hertz
 {
@@ -227,9 +227,9 @@ const float multipcm_device::AMPLITUDE_SCALE_LIMIT[8] = // In Decibels
 
 void multipcm_device::lfo_init()
 {
-	m_pitch_table = auto_alloc_array_clear(machine(), INT32, 256);
-	m_amplitude_table = auto_alloc_array_clear(machine(), INT32, 256);
-	for (INT32 i = 0; i < 256; ++i)
+	m_pitch_table = auto_alloc_array_clear(machine(), int32_t, 256);
+	m_amplitude_table = auto_alloc_array_clear(machine(), int32_t, 256);
+	for (int32_t i = 0; i < 256; ++i)
 	{
 		if (i < 64)
 		{
@@ -258,13 +258,13 @@ void multipcm_device::lfo_init()
 		}
 	}
 
-	m_pitch_scale_tables = auto_alloc_array_clear(machine(), INT32*, 8);
-	m_amplitude_scale_tables = auto_alloc_array_clear(machine(), INT32*, 8);
-	for (INT32 table = 0; table < 8; ++table)
+	m_pitch_scale_tables = auto_alloc_array_clear(machine(), int32_t*, 8);
+	m_amplitude_scale_tables = auto_alloc_array_clear(machine(), int32_t*, 8);
+	for (int32_t table = 0; table < 8; ++table)
 	{
 		float limit = PHASE_SCALE_LIMIT[table];
-		m_pitch_scale_tables[table] = auto_alloc_array_clear(machine(), INT32, 256);
-		for(INT32 i = -128; i < 128; ++i)
+		m_pitch_scale_tables[table] = auto_alloc_array_clear(machine(), int32_t, 256);
+		for(int32_t i = -128; i < 128; ++i)
 		{
 			const float value = (limit * (float)i) / 128.0f;
 			const float converted = powf(2.0f, value / 1200.0f);
@@ -272,8 +272,8 @@ void multipcm_device::lfo_init()
 		}
 
 		limit = -AMPLITUDE_SCALE_LIMIT[table];
-		m_amplitude_scale_tables[table] = auto_alloc_array_clear(machine(), INT32, 256);
-		for(INT32 i = 0; i < 256; ++i)
+		m_amplitude_scale_tables[table] = auto_alloc_array_clear(machine(), int32_t, 256);
+		for(int32_t i = 0; i < 256; ++i)
 		{
 			const float value = (limit * (float)i) / 256.0f;
 			const float converted = powf(10.0f, value / 20.0f);
@@ -282,32 +282,32 @@ void multipcm_device::lfo_init()
 	}
 }
 
-UINT32 multipcm_device::value_to_fixed(const UINT32 bits, const float value)
+uint32_t multipcm_device::value_to_fixed(const uint32_t bits, const float value)
 {
 	const float float_shift = (float)(1 << bits);
-	return (UINT32)(float_shift * value);
+	return (uint32_t)(float_shift * value);
 }
 
-INT32 multipcm_device::pitch_lfo_step(lfo_t *lfo)
+int32_t multipcm_device::pitch_lfo_step(lfo_t *lfo)
 {
 	lfo->m_phase += lfo->m_phase_step;
-	INT32 p = lfo->m_table[(lfo->m_phase >> LFO_SHIFT) & 0xff];
+	int32_t p = lfo->m_table[(lfo->m_phase >> LFO_SHIFT) & 0xff];
 	p = lfo->m_scale[p];
 	return p << (TL_SHIFT - LFO_SHIFT);
 }
 
-INT32 multipcm_device::amplitude_lfo_step(lfo_t *lfo)
+int32_t multipcm_device::amplitude_lfo_step(lfo_t *lfo)
 {
 	lfo->m_phase += lfo->m_phase_step;
-	INT32 p = lfo->m_table[(lfo->m_phase >> LFO_SHIFT) & 0xff];
+	int32_t p = lfo->m_table[(lfo->m_phase >> LFO_SHIFT) & 0xff];
 	p = lfo->m_scale[p];
 	return p << (TL_SHIFT - LFO_SHIFT);
 }
 
-void multipcm_device::lfo_compute_step(lfo_t *lfo, UINT32 lfo_frequency, UINT32 lfo_scale, INT32 amplitude_lfo)
+void multipcm_device::lfo_compute_step(lfo_t *lfo, uint32_t lfo_frequency, uint32_t lfo_scale, int32_t amplitude_lfo)
 {
 	float step = (float)LFO_FREQ[lfo_frequency] * 256.0f / (float)m_rate;
-	lfo->m_phase_step = (UINT32)((float)(1 << LFO_SHIFT) * step);
+	lfo->m_phase_step = (uint32_t)((float)(1 << LFO_SHIFT) * step);
 	if (amplitude_lfo)
 	{
 		lfo->m_table = m_amplitude_table;
@@ -320,7 +320,7 @@ void multipcm_device::lfo_compute_step(lfo_t *lfo, UINT32 lfo_frequency, UINT32 
 	}
 }
 
-void multipcm_device::write_slot(slot_t *slot, INT32 reg, UINT8 data)
+void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 {
 	slot->m_regs[reg] = data;
 
@@ -342,8 +342,8 @@ void multipcm_device::write_slot(slot_t *slot, INT32 reg, UINT8 data)
 		case 2: //Pitch
 		case 3:
 			{
-				UINT32 oct = ((slot->m_regs[3] >> 4) - 1) & 0xf;
-				UINT32 pitch = ((slot->m_regs[3] & 0xf) << 6) | (slot->m_regs[2] >> 2);
+				uint32_t oct = ((slot->m_regs[3] >> 4) - 1) & 0xf;
+				uint32_t pitch = ((slot->m_regs[3] & 0xf) << 6) | (slot->m_regs[2] >> 2);
 				pitch = m_freq_step_table[pitch];
 				if (oct & 0x8)
 				{
@@ -457,7 +457,7 @@ WRITE8_MEMBER( multipcm_device::write )
 
 /* MAME/M1 access functions */
 
-void multipcm_device::set_bank(UINT32 leftoffs, UINT32 rightoffs)
+void multipcm_device::set_bank(uint32_t leftoffs, uint32_t rightoffs)
 {
 	m_bank_left = leftoffs;
 	m_bank_right = rightoffs;
@@ -466,7 +466,7 @@ void multipcm_device::set_bank(UINT32 leftoffs, UINT32 rightoffs)
 
 const device_type MULTIPCM = &device_creator<multipcm_device>;
 
-multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 24),
@@ -512,14 +512,14 @@ void multipcm_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
 
 	// Volume + pan table
-	m_left_pan_table = auto_alloc_array_clear(machine(), INT32, 0x800);
-	m_right_pan_table = auto_alloc_array_clear(machine(), INT32, 0x800);
-	for (INT32 level = 0; level < 0x80; ++level)
+	m_left_pan_table = auto_alloc_array_clear(machine(), int32_t, 0x800);
+	m_right_pan_table = auto_alloc_array_clear(machine(), int32_t, 0x800);
+	for (int32_t level = 0; level < 0x80; ++level)
 	{
 		const float vol_db = (float)level * (-24.0f) / 64.0f;
 		const float total_level = powf(10.0f, vol_db / 20.0f) / 4.0f;
 
-		for (INT32 pan = 0; pan < 0x10; ++pan)
+		for (int32_t pan = 0; pan < 0x10; ++pan)
 		{
 			float pan_left, pan_right;
 			if (pan == 0x8)
@@ -536,7 +536,7 @@ void multipcm_device::device_start()
 			{
 				pan_left = 1.0;
 
-				const INT32 inverted_pan = 0x10 - pan;
+				const int32_t inverted_pan = 0x10 - pan;
 				const float pan_vol_db = (float)inverted_pan * (-12.0f) / 4.0f;
 
 				pan_right = pow(10.0f, pan_vol_db / 20.0f);
@@ -566,18 +566,18 @@ void multipcm_device::device_start()
 	}
 
 	//Pitch steps
-	m_freq_step_table = auto_alloc_array_clear(machine(), UINT32, 0x400);
-	for (INT32 i = 0; i < 0x400; ++i)
+	m_freq_step_table = auto_alloc_array_clear(machine(), uint32_t, 0x400);
+	for (int32_t i = 0; i < 0x400; ++i)
 	{
 		const float fcent = m_rate * (1024.0f + (float)i) / 1024.0f;
 		m_freq_step_table[i] = value_to_fixed(TL_SHIFT, fcent);
 	}
 
 	// Envelope steps
-	m_attack_step = auto_alloc_array_clear(machine(), UINT32, 0x40);
-	m_decay_release_step = auto_alloc_array_clear(machine(), UINT32, 0x40);
+	m_attack_step = auto_alloc_array_clear(machine(), uint32_t, 0x40);
+	m_decay_release_step = auto_alloc_array_clear(machine(), uint32_t, 0x40);
 	const double attack_rate_to_decay_rate = 14.32833;
-	for (INT32 i = 0; i < 0x40; ++i)
+	for (int32_t i = 0; i < 0x40; ++i)
 	{
 		// Times are based on 44100Hz clock, adjust to real chip clock
 		m_attack_step[i] = (float)(0x400 << EG_SHIFT) / (float)(BASE_TIMES[i] * 44100.0 / 1000.0);
@@ -588,13 +588,13 @@ void multipcm_device::device_start()
 	m_decay_release_step[0] = m_decay_release_step[1] = m_decay_release_step[2] = m_decay_release_step[3] = 0;
 
 	// Total level interpolation steps
-	m_total_level_steps = auto_alloc_array_clear(machine(), INT32, 2);
+	m_total_level_steps = auto_alloc_array_clear(machine(), int32_t, 2);
 	m_total_level_steps[0] = -(float)(0x80 << TL_SHIFT) / (78.2f * 44100.0f / 1000.0f); // lower
 	m_total_level_steps[1] = (float)(0x80 << TL_SHIFT) / (78.2f * 2 * 44100.0f / 1000.0f); // raise
 
 	// build the linear->exponential ramps
-	m_linear_to_exp_volume = auto_alloc_array_clear(machine(), INT32, 0x400);
-	for(INT32 i = 0; i < 0x400; ++i)
+	m_linear_to_exp_volume = auto_alloc_array_clear(machine(), int32_t, 0x400);
+	for(int32_t i = 0; i < 0x400; ++i)
 	{
 		const float db = -(96.0f - (96.0f * (float)i / (float)0x400));
 		const float exp_volume = powf(10.0f, db / 20.0f);
@@ -608,7 +608,7 @@ void multipcm_device::device_start()
 
 	// Slots
 	m_slots = auto_alloc_array_clear(machine(), slot_t, 28);
-	for (INT32 slot = 0; slot < 28; ++slot)
+	for (int32_t slot = 0; slot < 28; ++slot)
 	{
 		m_slots[slot].m_slot_index = slot;
 		m_slots[slot].m_playing = false;
@@ -645,7 +645,7 @@ void multipcm_device::device_start()
 //  clamp_to_int16 - clamp a 32-bit value to 16 bits
 //-----------------------------------------------------
 
-INT16 multipcm_device::clamp_to_int16(INT32 value)
+int16_t multipcm_device::clamp_to_int16(int32_t value)
 {
 	if (value < -32768)
 	{
@@ -655,14 +655,14 @@ INT16 multipcm_device::clamp_to_int16(INT32 value)
 	{
 		return 32767;
 	}
-	return (INT16)value;
+	return (int16_t)value;
 }
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, INT32 samples)
+void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int32_t samples)
 {
 	stream_sample_t  *datap[2];
 
@@ -672,21 +672,21 @@ void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	memset(datap[0], 0, sizeof(*datap[0]) * samples);
 	memset(datap[1], 0, sizeof(*datap[1]) * samples);
 
-	for (INT32 i = 0; i < samples; ++i)
+	for (int32_t i = 0; i < samples; ++i)
 	{
-		INT32 smpl = 0;
-		INT32 smpr = 0;
-		for (INT32 sl = 0; sl < 28; ++sl)
+		int32_t smpl = 0;
+		int32_t smpr = 0;
+		for (int32_t sl = 0; sl < 28; ++sl)
 		{
 			slot_t *slot = m_slots + sl;
 			if (slot->m_playing)
 			{
-				UINT32 vol = (slot->m_total_level >> TL_SHIFT) | (slot->m_pan << 7);
-				UINT32 adr = slot->m_offset >> TL_SHIFT;
-				UINT32 step = slot->m_step;
-				INT32 csample = (INT16) (read_byte(slot->m_base + adr) << 8);
-				INT32 fpart = slot->m_offset & ((1 << TL_SHIFT) - 1);
-				INT32 sample = (csample * fpart + slot->m_prev_sample * ((1 << TL_SHIFT) - fpart)) >> TL_SHIFT;
+				uint32_t vol = (slot->m_total_level >> TL_SHIFT) | (slot->m_pan << 7);
+				uint32_t adr = slot->m_offset >> TL_SHIFT;
+				uint32_t step = slot->m_step;
+				int32_t csample = (int16_t) (read_byte(slot->m_base + adr) << 8);
+				int32_t fpart = slot->m_offset & ((1 << TL_SHIFT) - 1);
+				int32_t sample = (csample * fpart + slot->m_prev_sample * ((1 << TL_SHIFT) - fpart)) >> TL_SHIFT;
 
 				if (slot->m_regs[6] & 7) // Vibrato enabled
 				{

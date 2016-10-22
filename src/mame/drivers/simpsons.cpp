@@ -282,7 +282,7 @@ INPUT_PORTS_END
 void simpsons_state::simpsons_objdma(  )
 {
 	int counter, num_inactive;
-	UINT16 *src, *dst;
+	uint16_t *src, *dst;
 
 	m_k053246->k053247_get_ram(&dst);
 

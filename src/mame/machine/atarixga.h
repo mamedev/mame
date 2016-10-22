@@ -17,7 +17,7 @@ class atari_xga_device :  public device_t
 {
 public:
 	// construction/destruction
-	atari_xga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_xga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE32_MEMBER(write);
 	DECLARE_READ32_MEMBER(read);
@@ -36,18 +36,18 @@ private:
 		FPGA_DECIPHER
 	};
 
-	UINT16 powers2(UINT8 k, UINT16 x);
-	UINT16 lfsr2(UINT16 x);
-	UINT16 lfsr1(UINT16 x);
-	UINT16 parity(UINT16 x);
-	size_t popcount(UINT16 x);
-	UINT16 ctz(UINT16 x);
-	UINT16 decipher(UINT8 k, UINT16 c);
+	uint16_t powers2(uint8_t k, uint16_t x);
+	uint16_t lfsr2(uint16_t x);
+	uint16_t lfsr1(uint16_t x);
+	uint16_t parity(uint16_t x);
+	size_t popcount(uint16_t x);
+	uint16_t ctz(uint16_t x);
+	uint16_t decipher(uint8_t k, uint16_t c);
 
 	fpga_mode m_mode;
-	UINT16 m_address;    // last written address
-	UINT16 m_ciphertext; // last written ciphertext
-	std::unique_ptr<UINT16[]> m_ram; // CY7C185-45PC, only 16-Kbit used
+	uint16_t m_address;    // last written address
+	uint16_t m_ciphertext; // last written ciphertext
+	std::unique_ptr<uint16_t[]> m_ram; // CY7C185-45PC, only 16-Kbit used
 };
 
 

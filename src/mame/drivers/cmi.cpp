@@ -211,8 +211,8 @@ static const int ch_int_levels[8] =
 
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
-	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	cmi01a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cmi01a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void set_channel_number(device_t &device, int channel) { dynamic_cast<cmi01a_device&>(device).m_channel = channel; }
 
@@ -264,18 +264,18 @@ private:
 	void update_interrupts();
 
 	emu_timer * m_zx_timer;
-	UINT8       m_zx_flag;
-	UINT8       m_zx_ff;
+	uint8_t       m_zx_flag;
+	uint8_t       m_zx_ff;
 
 	int     m_channel;
-	std::unique_ptr<UINT8[]>    m_wave_ram;
-	UINT16  m_segment_cnt;
-	UINT8   m_new_addr;     // Flag
-	UINT8   m_env_dir_ctrl;
-	UINT8   m_vol_latch;
-	UINT8   m_flt_latch;
-	UINT8	m_rp;
-	UINT8	m_ws;
+	std::unique_ptr<uint8_t[]>    m_wave_ram;
+	uint16_t  m_segment_cnt;
+	uint8_t   m_new_addr;     // Flag
+	uint8_t   m_env_dir_ctrl;
+	uint8_t   m_vol_latch;
+	uint8_t   m_flt_latch;
+	uint8_t	m_rp;
+	uint8_t	m_ws;
 	int		m_dir;
 
 	double  m_freq;
@@ -293,7 +293,7 @@ private:
 
 const device_type CMI01A_CHANNEL_CARD = &device_creator<cmi01a_device>;
 
-cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CMI01A_CHANNEL_CARD, "Fairlight CMI-01A Channel Card", tag, owner, clock, "cmi_01a", __FILE__)
 	, device_sound_interface(mconfig, *this)
 	, m_pia_0(*this, "cmi01a_pia_0")
@@ -341,7 +341,7 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	{
 		int length = samples;
 		int seg_addr = m_segment_cnt & 0x7f;
-		UINT8 *wave_ptr = &m_wave_ram[m_segment_cnt & 0x3fff];
+		uint8_t *wave_ptr = &m_wave_ram[m_segment_cnt & 0x3fff];
 		stream_sample_t *buf = outputs[0];
 
 		while (length--)
@@ -360,7 +360,7 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void cmi01a_device::device_start()
 {
-	m_wave_ram = std::make_unique<UINT8[]>(0x4000);
+	m_wave_ram = std::make_unique<uint8_t[]>(0x4000);
 
 	m_zx_timer = timer_alloc(TIMER_ZX);
 	m_zx_timer->adjust(attotime::never);
@@ -498,7 +498,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqa );
 	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqb );
 	DECLARE_WRITE_LINE_MEMBER( ptm_q219_irq );
-	UINT32 screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Memory mapping
 	DECLARE_READ8_MEMBER( rom_r );
@@ -619,7 +619,7 @@ protected:
 
 	required_ioport_array<3> m_key_mux_ports[4];
 
-	required_shared_ptr<UINT8> m_cmi07_ram;
+	required_shared_ptr<uint8_t> m_cmi07_ram;
 
 	address_space *m_cpu1space;
 	address_space *m_cpu2space;
@@ -631,11 +631,11 @@ private:
 	emu_timer *m_cmi10_scnd_timer;
 	emu_timer *m_jam_timeout_timer;
 
-	UINT8 m_video_data;
+	uint8_t m_video_data;
 
 	// Memory
-	bool map_is_active(int cpunum, int map, UINT8 *map_info);
-	void update_address_space(int cpunum, UINT8 mapinfo);
+	bool map_is_active(int cpunum, int map, uint8_t *map_info);
+	void update_address_space(int cpunum, uint8_t mapinfo);
 	void install_video_ram(int cpunum);
 	void install_peripherals(int cpunum);
 
@@ -646,53 +646,53 @@ private:
 
 	// Floppy
 	void dma_fdc_rom();
-	void write_fdc_ctrl(UINT8 data);
+	void write_fdc_ctrl(uint8_t data);
 	void fdc_dma_transfer();
 
 	// Q133 CPU Card
-	UINT8 *m_q133_rom;
-	UINT8 m_q133_acia_irq;
+	uint8_t *m_q133_rom;
+	uint8_t m_q133_acia_irq;
 
-	UINT8   m_hp_int;
-	std::unique_ptr<UINT8[]>    m_shared_ram;
-	std::unique_ptr<UINT8[]>    m_scratch_ram[2];
+	uint8_t   m_hp_int;
+	std::unique_ptr<uint8_t[]>    m_shared_ram;
+	std::unique_ptr<uint8_t[]>    m_scratch_ram[2];
 
 	/* Memory management */
-	UINT8   m_map_sel[16];
-	std::unique_ptr<UINT8[]>    m_map_ram[2];
-	std::unique_ptr<UINT8[]>    m_q256_ram[2];
-	UINT8   m_map_ram_latch;
+	uint8_t   m_map_sel[16];
+	std::unique_ptr<uint8_t[]>    m_map_ram[2];
+	std::unique_ptr<uint8_t[]>    m_q256_ram[2];
+	uint8_t   m_map_ram_latch;
 	int     m_cpu_active_space[2]; // TODO: Make one register
 	int     m_cpu_map_switch[2];
-	UINT8   m_irq_address[2][2];
+	uint8_t   m_irq_address[2][2];
 	int     m_m6809_bs_hack_cnt;
 	int     m_m6809_bs_hack_cpu;
 
 	/* Q219 lightpen/graphics card */
-	std::unique_ptr<UINT8[]>    m_video_ram;
-	UINT16  m_x_pos;
-	UINT8   m_y_pos;
-	UINT16  m_lp_x;
-	UINT8   m_lp_y;
-	UINT8   m_q219_b_touch;
+	std::unique_ptr<uint8_t[]>    m_video_ram;
+	uint16_t  m_x_pos;
+	uint8_t   m_y_pos;
+	uint16_t  m_lp_x;
+	uint8_t   m_lp_y;
+	uint8_t   m_q219_b_touch;
 
 	/* QFC9 floppy disk controller card */
-	UINT8 * m_qfc9_region_ptr;
+	uint8_t * m_qfc9_region_ptr;
 	int     m_fdc_drq;
-	UINT8   m_fdc_addr;
-	UINT8   m_fdc_ctrl;
-	UINT8   m_fdc_status;
+	uint8_t   m_fdc_addr;
+	uint8_t   m_fdc_ctrl;
+	uint8_t   m_fdc_status;
 	PAIR    m_fdc_dma_addr;
 	PAIR    m_fdc_dma_cnt;
 
 	/* CMI-07 */
-	UINT8   m_cmi07_ctrl;
+	uint8_t   m_cmi07_ctrl;
 
 	/* CMI-10 */
-	UINT8   m_scnd;
+	uint8_t   m_scnd;
 
 	/* Musical keyboard */
-	UINT8   m_msm5832_addr;
+	uint8_t   m_msm5832_addr;
 	int     m_mkbd_kbd_acia_irq;
 	int     m_mkbd_cmi_acia_irq;
 
@@ -710,20 +710,20 @@ private:
  *
  *************************************/
 
-UINT32 cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
-	UINT8 y_scroll = m_q219_pia->a_output();
-	UINT8 invert = (!BIT(m_q219_pia->b_output(), 3)) & 1;
+	uint8_t y_scroll = m_q219_pia->a_output();
+	uint8_t invert = (!BIT(m_q219_pia->b_output(), 3)) & 1;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &m_video_ram[(512/8) * ((y + y_scroll) & 0xff)];
-		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint8_t *src = &m_video_ram[(512/8) * ((y + y_scroll) & 0xff)];
+		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
-			UINT8 data = *src++;
+			uint8_t data = *src++;
 
 			/* Store 8 pixels */
 			for (int i = 0; i < 8; ++i)
@@ -783,7 +783,7 @@ void cmi_state::hblank()
 
 void cmi_state::update_video_pos(int y, int x, int byte_size)
 {
-	UINT8 *video_addr = &m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
+	uint8_t *video_addr = &m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
 
 	if (byte_size)
 	{
@@ -892,8 +892,8 @@ READ8_MEMBER( cmi_state::vram_r )
 
 READ8_MEMBER( cmi_state::rom_r )
 {
-	UINT16 base = (&space == m_cpu2space ? 0x1000 : 0x2000);
-	return *(((UINT8 *)m_q133_region->base()) + base + offset);
+	uint16_t base = (&space == m_cpu2space ? 0x1000 : 0x2000);
+	return *(((uint8_t *)m_q133_region->base()) + base + offset);
 }
 
 WRITE8_MEMBER( cmi_state::map_ram_w )
@@ -906,7 +906,7 @@ WRITE8_MEMBER( cmi_state::map_ram_w )
 	{
 		for (int i = 0; i < NUM_Q256_CARDS; ++i)
 		{
-			UINT8 map_info;
+			uint8_t map_info;
 			int map = (offset >> 6);
 			int page_enable = ((m_map_ram_latch & 0x80) && (i == (m_map_ram_latch & 7))) ? 0x80 : 0;
 
@@ -930,7 +930,7 @@ READ8_MEMBER( cmi_state::vector_r )
 READ8_MEMBER( cmi_state::map_r )
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
-	UINT8 data = (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | cpunum;
+	uint8_t data = (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | cpunum;
 	return data;
 }
 
@@ -969,7 +969,7 @@ void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		case TIMER_MAP_SWITCH:
 		{
 			m_cpu_active_space[param] = m_cpu_map_switch[param];
-			UINT8 map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
+			uint8_t map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
 							 m_map_sel[param ? MAPSEL_P2_A : MAPSEL_P1_A] :
 							 m_map_sel[param ? MAPSEL_P2_B : MAPSEL_P1_B];
 			update_address_space(param, map_info);
@@ -1345,7 +1345,7 @@ static INPUT_PORTS_START( cmi2x )
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6")
 INPUT_PORTS_END
 
-bool cmi_state::map_is_active(int cpunum, int map, UINT8 *map_info)
+bool cmi_state::map_is_active(int cpunum, int map, uint8_t *map_info)
 {
 	if (m_cpu_active_space[cpunum] == MAPPING_A)
 	{
@@ -1365,7 +1365,7 @@ bool cmi_state::map_is_active(int cpunum, int map, UINT8 *map_info)
 	return 0;
 }
 
-void cmi_state::update_address_space(int cpunum, UINT8 mapinfo)
+void cmi_state::update_address_space(int cpunum, uint8_t mapinfo)
 {
 	int map = mapinfo & 0x1f;
 	bool vram_en = !BIT(mapinfo, 5);
@@ -1380,7 +1380,7 @@ void cmi_state::update_address_space(int cpunum, UINT8 mapinfo)
 	for (int page = 0; page < PAGE_COUNT; ++page)
 	{
 		int address = page * PAGE_SIZE;
-		UINT8 page_info = 0;
+		uint8_t page_info = 0;
 
 		/* Scan through the cards */
 		for (i = 0; i < NUM_Q256_CARDS; ++i)
@@ -1438,7 +1438,7 @@ WRITE8_MEMBER( cmi_state::cmi07_w )
 	m_cmi07cpu->set_input_line(INPUT_LINE_HALT,  BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* We need to update the address spaces */
-	UINT8 map_info = (m_cpu_active_space[0] == MAPPING_A) ? m_map_sel[MAPSEL_P1_A] : m_map_sel[MAPSEL_P1_B];
+	uint8_t map_info = (m_cpu_active_space[0] == MAPPING_A) ? m_map_sel[MAPSEL_P1_A] : m_map_sel[MAPSEL_P1_B];
 	update_address_space(0, map_info);
 
 	map_info = (m_cpu_active_space[1] == MAPPING_A) ? m_map_sel[MAPSEL_P2_A] : m_map_sel[MAPSEL_P2_B];
@@ -1503,11 +1503,11 @@ READ8_MEMBER( cmi_state::ank_col_r )
 void cmi_state::dma_fdc_rom()
 {
 	/* DMA channel 1 is used*/
-	UINT8 map_info = m_map_sel[MAPSEL_P2_A_DMA1];
+	uint8_t map_info = m_map_sel[MAPSEL_P2_A_DMA1];
 	int map = map_info & 0x1f;
 	int addr = m_fdc_dma_addr.w.l & ~PAGE_MASK;
 	int page = addr / PAGE_SIZE;
-	UINT8 p_info = 0;
+	uint8_t p_info = 0;
 
 	/* Active low */
 	m_fdc_status &= ~FDC_STATUS_DRIVER_LOAD;
@@ -1537,7 +1537,7 @@ void cmi_state::dma_fdc_rom()
 	m_fdc_dma_cnt.w.l = 0;
 }
 
-void cmi_state::write_fdc_ctrl(UINT8 data)
+void cmi_state::write_fdc_ctrl(uint8_t data)
 {
 	int drive = data & 1;
 	int side = BIT(data, 5) ? 1 : 0;
@@ -1602,7 +1602,7 @@ READ8_MEMBER( cmi_state::fdc_r )
 void cmi_state::fdc_dma_transfer()
 {
 	/* DMA channel 1 is used*/
-	UINT8 map_info = m_map_sel[MAPSEL_P2_A_DMA1];
+	uint8_t map_info = m_map_sel[MAPSEL_P2_A_DMA1];
 	int map = map_info & 0x1f;
 
 	int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
@@ -1623,7 +1623,7 @@ void cmi_state::fdc_dma_transfer()
 	if (!BIT(m_fdc_ctrl, 4))
 	{
 		/* Read a byte at a time */
-		UINT8 data = m_wd1791->data_r() ^ 0xff;
+		uint8_t data = m_wd1791->data_r() ^ 0xff;
 
 		if (m_fdc_dma_cnt.w.l == 0xffff)
 			return;
@@ -1649,7 +1649,7 @@ void cmi_state::fdc_dma_transfer()
 			return;
 
 		/* Write a byte at a time */
-		UINT8 data = 0;
+		uint8_t data = 0;
 
 		/* TODO: This should be stuck in a deferred write */
 		if (phys_page & 0x80)
@@ -2006,7 +2006,7 @@ READ8_MEMBER( cmi01a_device::read )
 	if (space.debugger_access())
 		return 0;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -2472,8 +2472,8 @@ READ_LINE_MEMBER( cmi_state::cmi10_u20_cb1_r )
 
 WRITE_LINE_MEMBER( cmi_state::cmi10_u20_cb2_w )
 {
-	UINT8 data = m_cmi10_pia_u20->a_output() & 0x7f;
-	UINT8 b_port = m_cmi10_pia_u20->b_output();
+	uint8_t data = m_cmi10_pia_u20->a_output() & 0x7f;
+	uint8_t b_port = m_cmi10_pia_u20->b_output();
 	int addr = (BIT(b_port, 0) << 1) | BIT(b_port, 1);
 	address_space &space = m_maincpu1->space(AS_PROGRAM); // Just needed to call data_w
 
@@ -2526,13 +2526,13 @@ READ8_MEMBER( cmi_state::cmi10_u21_a_r )
 	int sel = m_cmi10_pia_u20->a_output();
 	int key = sel & 7;
 	int mux = (sel >> 3) & 3;
-	UINT8 data = 0x38; // slave keyboard not used
+	uint8_t data = 0x38; // slave keyboard not used
 
 
 	for (int module = 0; module < 3; ++module)
 	{
 //      char keyname[16];
-		UINT8 keyval;
+		uint8_t keyval;
 		int state = 1;
 
 		if (mux == 0 && key == 3)
@@ -2567,11 +2567,11 @@ READ8_MEMBER( cmi_state::cmi10_u21_a_r )
 	int sel = m_cmi10_pia_u20->a_output();
 	int key = sel & 7;
 	int mux = (sel >> 3) & 3;
-	UINT8 data = 0xf8; // slave keyboard not used
+	uint8_t data = 0xf8; // slave keyboard not used
 
 	for (int module = 0; module < 3; ++module)
 	{
-		UINT8 keyval = m_key_mux_ports[mux][module]->read();
+		uint8_t keyval = m_key_mux_ports[mux][module]->read();
 		data |= BIT(keyval, key) << module;
 	}
 
@@ -2641,7 +2641,7 @@ void cmi_state::machine_reset()
 	m_cpu1space = &m_maincpu1->space(AS_PROGRAM);
 	m_cpu2space = &m_maincpu2->space(AS_PROGRAM);
 
-	m_qfc9_region_ptr = (UINT8 *)m_qfc9_region->base();
+	m_qfc9_region_ptr = (uint8_t *)m_qfc9_region->base();
 
 	/* Set 8214 interrupt lines */
 	m_i8214_0->etlg_w(1);
@@ -2690,7 +2690,7 @@ void cmi_state::machine_reset()
 
 void cmi_state::machine_start()
 {
-	m_q133_rom = (UINT8 *)m_q133_region->base();
+	m_q133_rom = (uint8_t *)m_q133_region->base();
 
 	// allocate timers for the built-in two channel timer
 	m_map_switch_timer = timer_alloc(TIMER_MAP_SWITCH);
@@ -2704,22 +2704,22 @@ void cmi_state::machine_start()
 	m_jam_timeout_timer->adjust(attotime::never);
 
 	/* Allocate 1kB memory mapping RAM */
-	m_map_ram[0] = std::make_unique<UINT8[]>(0x400);
-	m_map_ram[1] = std::make_unique<UINT8[]>(0x400);
+	m_map_ram[0] = std::make_unique<uint8_t[]>(0x400);
+	m_map_ram[1] = std::make_unique<uint8_t[]>(0x400);
 
 	/* Allocate 256kB for each Q256 RAM card */
-	m_q256_ram[0] = std::make_unique<UINT8[]>(0x40000);
-	m_q256_ram[1] = std::make_unique<UINT8[]>(0x40000);
+	m_q256_ram[0] = std::make_unique<uint8_t[]>(0x40000);
+	m_q256_ram[1] = std::make_unique<uint8_t[]>(0x40000);
 
 	/* Allocate 16kB video RAM */
-	m_video_ram = std::make_unique<UINT8[]>(0x4000);
+	m_video_ram = std::make_unique<uint8_t[]>(0x4000);
 
 	/* Allocate 512B shared RAM */
-	m_shared_ram = std::make_unique<UINT8[]>(0x200);
+	m_shared_ram = std::make_unique<uint8_t[]>(0x200);
 
 	/* Allocate 256B scratch RAM per CPU */
-	m_scratch_ram[0] = std::make_unique<UINT8[]>(0x100);
-	m_scratch_ram[1] = std::make_unique<UINT8[]>(0x100);
+	m_scratch_ram[0] = std::make_unique<uint8_t[]>(0x100);
+	m_scratch_ram[1] = std::make_unique<uint8_t[]>(0x100);
 }
 
 INTERRUPT_GEN_MEMBER( cmi_state::cmi_iix_vblank )

@@ -193,7 +193,7 @@ static inline float round_nearest(float f)
 	return floor(f + 0.5f);
 }
 
-static inline HashT texture_compute_hash(const render_texinfo &texture, const UINT32 flags)
+static inline HashT texture_compute_hash(const render_texinfo &texture, const uint32_t flags)
 {
 	return (HashT)texture.base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 }
@@ -218,10 +218,10 @@ static inline SDL_BlendMode map_blendmode(const int blendmode)
 
 void texture_info::set_coloralphamode(SDL_Texture *texture_id, const render_color *color)
 {
-	UINT32 sr = (UINT32)(255.0f * color->r);
-	UINT32 sg = (UINT32)(255.0f * color->g);
-	UINT32 sb = (UINT32)(255.0f * color->b);
-	UINT32 sa = (UINT32)(255.0f * color->a);
+	uint32_t sr = (uint32_t)(255.0f * color->r);
+	uint32_t sg = (uint32_t)(255.0f * color->g);
+	uint32_t sb = (uint32_t)(255.0f * color->b);
+	uint32_t sa = (uint32_t)(255.0f * color->a);
 
 
 	if (color->r >= 1.0f && color->g >= 1.0f && color->b >= 1.0f && is_opaque(color->a))
@@ -285,17 +285,17 @@ void renderer_sdl2::render_quad(texture_info *texture, const render_primitive &p
 		copyinfo->pixel_count += std::max(STAT_PIXEL_THRESHOLD , (texture->raw_width() * texture->raw_height()));
 		if (m_last_blit_pixels)
 		{
-			copyinfo->time += (m_last_blit_time * (INT64) (texture->raw_width() * texture->raw_height())) / (INT64) m_last_blit_pixels;
+			copyinfo->time += (m_last_blit_time * (int64_t) (texture->raw_width() * texture->raw_height())) / (int64_t) m_last_blit_pixels;
 		}
 		copyinfo->samples++;
 		copyinfo->perf = ( texture->m_copyinfo->pixel_count * (osd_ticks_per_second()/1000)) / texture->m_copyinfo->time;
 	}
 	else
 	{
-		UINT32 sr = (UINT32)(255.0f * prim.color.r);
-		UINT32 sg = (UINT32)(255.0f * prim.color.g);
-		UINT32 sb = (UINT32)(255.0f * prim.color.b);
-		UINT32 sa = (UINT32)(255.0f * prim.color.a);
+		uint32_t sr = (uint32_t)(255.0f * prim.color.r);
+		uint32_t sg = (uint32_t)(255.0f * prim.color.g);
+		uint32_t sb = (uint32_t)(255.0f * prim.color.b);
+		uint32_t sa = (uint32_t)(255.0f * prim.color.a);
 
 		SDL_SetRenderDrawBlendMode(m_sdl_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim.flags)));
 		SDL_SetRenderDrawColor(m_sdl_renderer, sr, sg, sb, sa);
@@ -681,7 +681,7 @@ bool texture_info::matches(const render_primitive &prim, const quad_setup_data &
 //  texture_create
 //============================================================
 
-texture_info::texture_info(renderer_sdl2 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, UINT32 flags)
+texture_info::texture_info(renderer_sdl2 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, uint32_t flags)
 {
 	// fill in the core data
 	m_renderer = renderer;
@@ -762,7 +762,7 @@ texture_info::~texture_info()
 //  texture_set_data
 //============================================================
 
-void texture_info::set_data(const render_texinfo &texsource, const UINT32 flags)
+void texture_info::set_data(const render_texinfo &texsource, const uint32_t flags)
 {
 	m_copyinfo->time -= osd_ticks();
 	if (m_sdl_access == SDL_TEXTUREACCESS_STATIC)
@@ -784,8 +784,8 @@ void texture_info::set_data(const render_texinfo &texsource, const UINT32 flags)
 		SDL_LockTexture(m_texture_id, nullptr, (void **) &m_pixels, &m_pitch);
 		if ( m_copyinfo->blitter->m_is_passthrough )
 		{
-			UINT8 *src = (UINT8 *) texsource.base;
-			UINT8 *dst = (UINT8 *) m_pixels;
+			uint8_t *src = (uint8_t *) texsource.base;
+			uint8_t *dst = (uint8_t *) m_pixels;
 			int spitch = texsource.rowpixels * m_copyinfo->blitter->m_dest_bpp;
 			int num = texsource.width * m_copyinfo->blitter->m_dest_bpp;
 			int h = texsource.height;

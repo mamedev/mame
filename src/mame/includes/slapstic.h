@@ -136,7 +136,7 @@ class atari_slapstic_device :  public device_t
 {
 public:
 	// construction/destruction
-	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void slapstic_init();
 	void slapstic_reset();
@@ -160,14 +160,14 @@ public:
 
 	int m_chipnum;
 
-	UINT8 state;
-	UINT8 current_bank;
+	uint8_t state;
+	uint8_t current_bank;
 	int access_68k;
 
-	UINT8 alt_bank;
-	UINT8 bit_bank;
-	UINT8 add_bank;
-	UINT8 bit_xor;
+	uint8_t alt_bank;
+	uint8_t bit_bank;
+	uint8_t add_bank;
+	uint8_t bit_xor;
 
 	struct slapstic_data slapstic;
 

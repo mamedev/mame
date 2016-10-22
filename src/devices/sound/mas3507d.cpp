@@ -10,7 +10,7 @@
 // device type definition
 const device_type MAS3507D = &device_creator<mas3507d_device>;
 
-mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MAS3507D, "MAS3507D", tag, owner, clock, "mas3507d", __FILE__),
 		device_sound_interface(mconfig, *this), i2c_bus_state(), i2c_bus_address(), i2c_scli(false), i2c_sclo(false), i2c_sdai(false), i2c_sdao(false),
 	i2c_bus_curbit(0), i2c_bus_curval(0), i2c_subdest(), i2c_command(), i2c_bytecount(0), i2c_io_bank(0), i2c_io_adr(0), i2c_io_count(0), i2c_io_val(0)
@@ -108,13 +108,13 @@ int mas3507d_device::i2c_sda_r()
 	return i2c_sdai && i2c_sdao;
 }
 
-bool mas3507d_device::i2c_device_got_address(UINT8 address)
+bool mas3507d_device::i2c_device_got_address(uint8_t address)
 {
 	i2c_subdest = UNDEFINED;
 	return (address & 0xfe) == 0x3a;
 }
 
-void mas3507d_device::i2c_device_got_byte(UINT8 byte)
+void mas3507d_device::i2c_device_got_byte(uint8_t byte)
 {
 	switch(i2c_subdest) {
 	case UNDEFINED:
@@ -196,8 +196,8 @@ void mas3507d_device::i2c_device_got_byte(UINT8 byte)
 				case 5: i2c_io_adr |= byte; break;
 				}
 				if(i2c_bytecount >= 6) {
-					UINT32 i2c_wordid = (i2c_bytecount - 6) >> 2;
-					UINT32 i2c_offset = (i2c_bytecount - 6) & 3;
+					uint32_t i2c_wordid = (i2c_bytecount - 6) >> 2;
+					uint32_t i2c_offset = (i2c_bytecount - 6) & 3;
 					if(i2c_wordid >= i2c_io_count) {
 						i2c_nak();
 						return;
@@ -225,7 +225,7 @@ void mas3507d_device::i2c_device_got_stop()
 	logerror("MAS I2C: got stop\n");
 }
 
-void mas3507d_device::mem_write(int bank, UINT32 adr, UINT32 val)
+void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 {
 	switch(adr | (bank ? 0x10000 : 0)) {
 	case 0x0032f: logerror("MAS3507D: OutputConfig = %05x\n", val); break;
@@ -237,7 +237,7 @@ void mas3507d_device::mem_write(int bank, UINT32 adr, UINT32 val)
 	}
 }
 
-void mas3507d_device::reg_write(UINT32 adr, UINT32 val)
+void mas3507d_device::reg_write(uint32_t adr, uint32_t val)
 {
 	switch(adr) {
 	case 0x8e: logerror("MAS3507D: DCCF = %05x\n", val); break;
@@ -250,7 +250,7 @@ void mas3507d_device::reg_write(UINT32 adr, UINT32 val)
 	}
 }
 
-void mas3507d_device::run_program(UINT32 adr)
+void mas3507d_device::run_program(uint32_t adr)
 {
 	switch(adr) {
 	case 0xfcb: logerror("MAS3507D: validate OutputConfig\n"); break;

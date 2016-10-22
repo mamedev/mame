@@ -1122,7 +1122,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wiz_state,stinger)
 {
-	static const UINT8 swap_xor_table[4][4] =
+	static const uint8_t swap_xor_table[4][4] =
 	{
 		{ 7,3,5, 0xa0 },
 		{ 3,7,5, 0x88 },
@@ -1130,13 +1130,13 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 		{ 5,7,3, 0x28 }
 	};
 
-	UINT8 *rom = memregion("maincpu")->base();
-	const UINT8 *tbl;
+	uint8_t *rom = memregion("maincpu")->base();
+	const uint8_t *tbl;
 
 	for (int a = 0x0000; a < 0xc000; a++)
 	{
 		int row;
-		UINT8 src;
+		uint8_t src;
 
 		if (a & 0x2040)
 		{

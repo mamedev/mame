@@ -65,9 +65,9 @@ spriteram is being tested, take no notice of that.]
 
 void othunder_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs )
 {
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
-	UINT16 tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
+	uint16_t tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
+	uint16_t *spriteram16 = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -199,7 +199,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
-UINT32 othunder_state::screen_update_othunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t othunder_state::screen_update_othunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[3];
 

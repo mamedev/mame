@@ -48,7 +48,7 @@
 
 #define TI_FDC_TAG "ti_dssd_controller"
 
-ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock, "ti99_fdc", __FILE__),
 			m_address(0),
 			m_DRQ(0),
@@ -131,7 +131,7 @@ SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
     Access for debugger. This is a stripped-down version of the
     main methods below. We only allow ROM access.
 */
-void ti_fdc_device::debug_read(offs_t offset, UINT8* value)
+void ti_fdc_device::debug_read(offs_t offset, uint8_t* value)
 {
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -152,7 +152,7 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 	{
 		// Read ports of 1771 are mapped to 5FF0,2,4,6: 0101 1111 1111 0xx0
 		// Note that incoming/outgoing data are inverted for FD1771
-		UINT8 reply = 0;
+		uint8_t reply = 0;
 
 		if (m_WDsel && ((m_address & 9)==0))
 		{
@@ -221,7 +221,7 @@ READ8Z_MEMBER(ti_fdc_device::crureadz)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		UINT8 reply = 0;
+		uint8_t reply = 0;
 		if ((offset & 0x07) == 0)
 		{
 			// Selected drive

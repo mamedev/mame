@@ -56,10 +56,10 @@ public:
 	std::vector<menu_item>  item;         // array of items
 
 	// append a new item to the end of the menu
-	void item_append(const std::string &text, const std::string &subtext, UINT32 flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
-	void item_append(std::string &&text, std::string &&subtext, UINT32 flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
+	void item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
+	void item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 	void item_append(menu_item item);
-	void item_append(menu_item_type type, UINT32 flags = 0);
+	void item_append(menu_item_type type, uint32_t flags = 0);
 
 	// Global initialization
 	static void init(running_machine &machine, ui_options &mopt);
@@ -88,7 +88,7 @@ public:
 	static bool stack_has_special_main_menu(running_machine &machine) { return get_global_state(machine)->stack_has_special_main_menu(); }
 
 	// master handler
-	static UINT32 ui_handler(render_container &container, mame_ui_manager &mui);
+	static uint32_t ui_handler(render_container &container, mame_ui_manager &mui);
 
 	// Used by sliders
 	void validate_selection(int scandir);
@@ -96,14 +96,14 @@ public:
 	void do_handle();
 
 private:
-	virtual void draw(UINT32 flags);
+	virtual void draw(uint32_t flags);
 	void draw_text_box();
 
 public:
 	// mouse handling
 	bool mouse_hit, mouse_button;
 	render_target *mouse_target;
-	INT32 mouse_target_x, mouse_target_y;
+	int32_t mouse_target_x, mouse_target_y;
 	float mouse_x, mouse_y;
 
 protected:
@@ -136,7 +136,7 @@ protected:
 		void                *itemref;   // reference for the selected item
 		menu_item_type      type;       // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
 		int                 iptkey;     // one of the IPT_* values from inptport.h
-		unicode_char        unichar;    // unicode character if iptkey == IPT_SPECIAL
+		char32_t        unichar;    // unicode character if iptkey == IPT_SPECIAL
 		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
 	};
 
@@ -171,7 +171,7 @@ protected:
 	void add_cleanup_callback(cleanup_callback &&callback) { m_global_state->add_cleanup_callback(std::move(callback)); }
 
 	// process a menu, drawing it and returning any interesting events
-	const event *process(UINT32 flags, float x0 = 0.0f, float y0 = 0.0f);
+	const event *process(uint32_t flags, float x0 = 0.0f, float y0 = 0.0f);
 	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
 
 	// retrieves the ref of the currently selected menu item or nullptr
@@ -194,7 +194,7 @@ protected:
 	render_texture *hilight_main_texture() { return m_global_state->hilight_main_texture(); }
 
 	// draw arrow
-	void draw_arrow(float x0, float y0, float x1, float y1, rgb_t fgcolor, UINT32 orientation);
+	void draw_arrow(float x0, float y0, float x1, float y1, rgb_t fgcolor, uint32_t orientation);
 
 	// draw header and footer text
 	void extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer);
@@ -207,8 +207,8 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 	// overridable event handling
-	virtual void handle_events(UINT32 flags, event &ev);
-	virtual void handle_keys(UINT32 flags, int &iptkey);
+	virtual void handle_events(uint32_t flags, event &ev);
+	virtual void handle_keys(uint32_t flags, int &iptkey);
 	virtual bool custom_mouse_down() { return false; }
 
 	// test if search is active
@@ -221,7 +221,7 @@ protected:
 
 	// get arrows status
 	template <typename T>
-	UINT32 get_arrow_flags(T min, T max, T actual)
+	uint32_t get_arrow_flags(T min, T max, T actual)
 	{
 		return ((actual > min) ? FLAG_LEFT_ARROW : 0) | ((actual < max) ? FLAG_RIGHT_ARROW : 0);
 	}
@@ -271,8 +271,8 @@ private:
 	struct pool
 	{
 		pool   *next;    // chain to next one
-		UINT8  *top;     // top of the pool
-		UINT8  *end;     // end of the pool
+		uint8_t  *top;     // top of the pool
+		uint8_t  *end;     // end of the pool
 	};
 
 	// request the specific handling of the game selection main menu

@@ -165,12 +165,12 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
 		return CMDERR_NONE;
 
 	/* the first parameter has the command and the real first parameter; separate them */
-	for (p = param[0]; *p && isspace((UINT8)*p); p++) { }
-	for (command = p; *p && !isspace((UINT8)*p); p++) { }
+	for (p = param[0]; *p && isspace((uint8_t)*p); p++) { }
+	for (command = p; *p && !isspace((uint8_t)*p); p++) { }
 	if (*p != 0)
 	{
 		*p++ = 0;
-		for ( ; *p && isspace((UINT8)*p); p++) { }
+		for ( ; *p && isspace((uint8_t)*p); p++) { }
 		if (*p != 0)
 			param[0] = p;
 		else
@@ -270,7 +270,7 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
 					case '+':   if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = TRUE; *p = c; break;
 					case '=':   if (parendex == 0 && paramcount == 1) isexpr = TRUE; *p = c; break;
 					case 0:     foundend = TRUE; break;
-					default:    *p = tolower((UINT8)c); break;
+					default:    *p = tolower((uint8_t)c); break;
 				}
 			}
 		}
@@ -289,7 +289,7 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
 		command_start = params[0];
 
 		/* allow for "do" commands */
-		if (tolower((UINT8)command_start[0] == 'd') && tolower((UINT8)command_start[1] == 'o') && isspace((UINT8)command_start[2]))
+		if (tolower((uint8_t)command_start[0] == 'd') && tolower((uint8_t)command_start[1] == 'o') && isspace((uint8_t)command_start[2]))
 		{
 			isexpr = TRUE;
 			command_start += 3;
@@ -300,7 +300,7 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
 		{
 			try
 			{
-				UINT64 expresult;
+				uint64_t expresult;
 				parsed_expression expression(m_machine.debugger().cpu().get_visible_symtable(), command_start, &expresult);
 			}
 			catch (expression_error &err)
@@ -367,7 +367,7 @@ CMDERR debugger_console::validate_command(const char *command)
     register_command - register a command handler
 -------------------------------------------------*/
 
-void debugger_console::register_command(const char *command, UINT32 flags, int ref, int minparams, int maxparams, std::function<void(int, int, const char **)> handler)
+void debugger_console::register_command(const char *command, uint32_t flags, int ref, int minparams, int maxparams, std::function<void(int, int, const char **)> handler)
 {
 	assert_always(m_machine.phase() == MACHINE_PHASE_INIT, "Can only call register_command() at init time!");
 	assert_always((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0, "Cannot call register_command() when debugger is not running");

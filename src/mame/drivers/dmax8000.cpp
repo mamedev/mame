@@ -140,7 +140,7 @@ MACHINE_RESET_MEMBER( dmax8000_state, dmax8000 )
 
 DRIVER_INIT_MEMBER( dmax8000_state, dmax8000 )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);

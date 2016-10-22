@@ -49,7 +49,7 @@ const tiny_rom_entry *p1_rom_device::device_rom_region() const
 //  p1_rom_device - constructor
 //-------------------------------------------------
 
-p1_rom_device::p1_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+p1_rom_device::p1_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, P1_ROM, "Poisk-1 ROM cart", tag, owner, clock, "p1_rom", __FILE__),
 	device_isa8_card_interface( mconfig, *this )
 {

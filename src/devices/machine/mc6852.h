@@ -66,7 +66,7 @@ class mc6852_device :   public device_t,
 {
 public:
 	// construction/destruction
-	mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_rx_clock(device_t &device, int clock) { downcast<mc6852_device &>(device).m_rx_clock = clock; }
 	static void set_tx_clock(device_t &device, int clock) { downcast<mc6852_device &>(device).m_tx_clock = clock; }
@@ -155,16 +155,16 @@ private:
 	devcb_write_line       m_write_sm_dtr;
 	devcb_write_line       m_write_tuf;
 
-	UINT8 m_status;         // status register
-	UINT8 m_cr[3];          // control registers
-	UINT8 m_scr;            // sync code register
-	UINT8 m_tdr;            // transmit data register
-	UINT8 m_tsr;            // transmit shift register
-	UINT8 m_rdr;            // receive data register
-	UINT8 m_rsr;            // receive shift register
+	uint8_t m_status;         // status register
+	uint8_t m_cr[3];          // control registers
+	uint8_t m_scr;            // sync code register
+	uint8_t m_tdr;            // transmit data register
+	uint8_t m_tsr;            // transmit shift register
+	uint8_t m_rdr;            // receive data register
+	uint8_t m_rsr;            // receive shift register
 
-	std::queue<UINT8> m_rx_fifo;
-	std::queue<UINT8> m_tx_fifo;
+	std::queue<uint8_t> m_rx_fifo;
+	std::queue<uint8_t> m_tx_fifo;
 
 	int m_rx_clock;
 	int m_tx_clock;

@@ -48,7 +48,7 @@ const tiny_rom_entry *pcml_q_disk_interface_t::device_rom_region() const
 //  pcml_q_disk_interface_t - constructor
 //-------------------------------------------------
 
-pcml_q_disk_interface_t::pcml_q_disk_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pcml_q_disk_interface_t::pcml_q_disk_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PCML_Q_DISK_INTERFACE, "PCML Q+ Disk Interface", tag, owner, clock, "ql_pcmlqdi", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this)
 {
@@ -68,7 +68,7 @@ void pcml_q_disk_interface_t::device_start()
 //  read -
 //-------------------------------------------------
 
-UINT8 pcml_q_disk_interface_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t pcml_q_disk_interface_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -78,6 +78,6 @@ UINT8 pcml_q_disk_interface_t::read(address_space &space, offs_t offset, UINT8 d
 //  write -
 //-------------------------------------------------
 
-void pcml_q_disk_interface_t::write(address_space &space, offs_t offset, UINT8 data)
+void pcml_q_disk_interface_t::write(address_space &space, offs_t offset, uint8_t data)
 {
 }

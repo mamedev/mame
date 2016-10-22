@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( pic16c5x_ram_7, AS_DATA, 8, pic16c5x_device )
 ADDRESS_MAP_END
 
 
-pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, int picmodel)
+pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, int picmodel)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
 		, ( ( program_width == 9 ) ? ADDRESS_MAP_NAME(pic16c5x_rom_9) : ( ( program_width == 10 ) ? ADDRESS_MAP_NAME(pic16c5x_rom_10) : ADDRESS_MAP_NAME(pic16c5x_rom_11) )))
@@ -127,33 +127,33 @@ pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type
 }
 
 
-pic16c54_device::pic16c54_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c54_device::pic16c54_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c5x_device(mconfig, PIC16C54, "PIC16C54", tag, owner, clock, "pic16c54", 9, 5, 0x16C54)
 {
 }
 
-pic16c55_device::pic16c55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c55_device::pic16c55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c5x_device(mconfig, PIC16C55, "PIC16C55", tag, owner, clock, "pic16c55", 9, 5, 0x16C55)
 {
 }
 
-pic16c56_device::pic16c56_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c56_device::pic16c56_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c5x_device(mconfig, PIC16C56, "PIC16C56", tag, owner, clock, "pic16c56", 10, 5, 0x16C56)
 {
 }
 
-pic16c57_device::pic16c57_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c57_device::pic16c57_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c5x_device(mconfig, PIC16C57, "PIC16C57", tag, owner, clock, "pic16c57", 11, 7, 0x16C57)
 {
 }
 
-pic16c58_device::pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c58_device::pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c5x_device(mconfig, PIC16C58, "PIC16C58", tag, owner, clock, "pic16c58", 11, 7, 0x16C58)
 {
 }
 
 
-offs_t pic16c5x_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t pic16c5x_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( pic16c5x );
 	return CPU_DISASSEMBLE_NAME(pic16c5x)(this, buffer, pc, oprom, opram, options);
@@ -162,13 +162,13 @@ offs_t pic16c5x_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 
 void pic16c5x_device::update_internalram_ptr()
 {
-	m_internalram = (UINT8 *)m_data->get_write_ptr(0x00);
+	m_internalram = (uint8_t *)m_data->get_write_ptr(0x00);
 }
 
 
 
 #define PIC16C5x_RDOP(A)         (m_direct->read_word((A)<<1))
-#define PIC16C5x_RAM_RDMEM(A)    ((UINT8)m_data->read_byte(A))
+#define PIC16C5x_RAM_RDMEM(A)    ((uint8_t)m_data->read_byte(A))
 #define PIC16C5x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
 
 #define M_RDRAM(A)      (((A) < 8) ? m_internalram[A] : PIC16C5x_RAM_RDMEM(A))
@@ -240,7 +240,7 @@ void pic16c5x_device::update_internalram_ptr()
  *  Shortcuts
  ************************************************************************/
 
-#define CLR(flagreg, flag) ( flagreg &= (UINT8)(~flag) )
+#define CLR(flagreg, flag) ( flagreg &= (uint8_t)(~flag) )
 #define SET(flagreg, flag) ( flagreg |=  flag )
 
 
@@ -259,7 +259,7 @@ void pic16c5x_device::CALCULATE_Z_FLAG()
 
 void pic16c5x_device::CALCULATE_ADD_CARRY()
 {
-	if ((UINT8)(m_old_data) > (UINT8)(m_ALU)) {
+	if ((uint8_t)(m_old_data) > (uint8_t)(m_ALU)) {
 		SET(STATUS, C_FLAG);
 	}
 	else {
@@ -269,7 +269,7 @@ void pic16c5x_device::CALCULATE_ADD_CARRY()
 
 void pic16c5x_device::CALCULATE_ADD_DIGITCARRY()
 {
-	if (((UINT8)(m_old_data) & 0x0f) > ((UINT8)(m_ALU) & 0x0f)) {
+	if (((uint8_t)(m_old_data) & 0x0f) > ((uint8_t)(m_ALU) & 0x0f)) {
 		SET(STATUS, DC_FLAG);
 	}
 	else {
@@ -279,7 +279,7 @@ void pic16c5x_device::CALCULATE_ADD_DIGITCARRY()
 
 void pic16c5x_device::CALCULATE_SUB_CARRY()
 {
-	if ((UINT8)(m_old_data) < (UINT8)(m_ALU)) {
+	if ((uint8_t)(m_old_data) < (uint8_t)(m_ALU)) {
 		CLR(STATUS, C_FLAG);
 	}
 	else {
@@ -289,7 +289,7 @@ void pic16c5x_device::CALCULATE_SUB_CARRY()
 
 void pic16c5x_device::CALCULATE_SUB_DIGITCARRY()
 {
-	if (((UINT8)(m_old_data) & 0x0f) < ((UINT8)(m_ALU) & 0x0f)) {
+	if (((uint8_t)(m_old_data) & 0x0f) < ((uint8_t)(m_ALU) & 0x0f)) {
 		CLR(STATUS, DC_FLAG);
 	}
 	else {
@@ -299,13 +299,13 @@ void pic16c5x_device::CALCULATE_SUB_DIGITCARRY()
 
 
 
-UINT16 pic16c5x_device::POP_STACK()
+uint16_t pic16c5x_device::POP_STACK()
 {
-	UINT16 data = m_STACK[1];
+	uint16_t data = m_STACK[1];
 	m_STACK[1] = m_STACK[0];
 	return (data & ADDR_MASK);
 }
-void pic16c5x_device::PUSH_STACK(UINT16 data)
+void pic16c5x_device::PUSH_STACK(uint16_t data)
 {
 	m_STACK[0] = m_STACK[1];
 	m_STACK[1] = (data & ADDR_MASK);
@@ -313,9 +313,9 @@ void pic16c5x_device::PUSH_STACK(UINT16 data)
 
 
 
-UINT8 pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory */
+uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory */
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (addr == 0) {                        /* Indirect addressing  */
 		addr = (FSR & m_picRAMmask);
@@ -332,21 +332,21 @@ UINT8 pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory */
 		case 00:    /* Not an actual register, so return 0 */
 					data = 0;
 					break;
-		case 04:    data = (FSR | (UINT8)(~m_picRAMmask));
+		case 04:    data = (FSR | (uint8_t)(~m_picRAMmask));
 					break;
 		case 05:    data = m_read_a(PIC16C5x_PORTA, 0xff);
 					data &= m_TRISA;
-					data |= ((UINT8)(~m_TRISA) & PORTA);
+					data |= ((uint8_t)(~m_TRISA) & PORTA);
 					data &= 0x0f;       /* 4-bit port (only lower 4 bits used) */
 					break;
 		case 06:    data = m_read_b(PIC16C5x_PORTB, 0xff);
 					data &= m_TRISB;
-					data |= ((UINT8)(~m_TRISB) & PORTB);
+					data |= ((uint8_t)(~m_TRISB) & PORTB);
 					break;
 		case 07:    if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						data = m_read_c(PIC16C5x_PORTC, 0xff);
 						data &= m_TRISC;
-						data |= ((UINT8)(~m_TRISC) & PORTC);
+						data |= ((uint8_t)(~m_TRISC) & PORTC);
 					}
 					else {              /* PIC16C54, PIC16C56, PIC16C58 */
 						data = M_RDRAM(addr);
@@ -358,7 +358,7 @@ UINT8 pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory */
 	return data;
 }
 
-void pic16c5x_device::STORE_REGFILE(offs_t addr, UINT8 data)    /* Write to internal memory */
+void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to internal memory */
 {
 	if (addr == 0) {                        /* Indirect addressing  */
 		addr = (FSR & m_picRAMmask);
@@ -381,19 +381,19 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, UINT8 data)    /* Write to inte
 		case 02:    PCL = data;
 					m_PC = ((STATUS & PA_REG) << 4) | data;
 					break;
-		case 03:    STATUS &= (UINT8)(~PA_REG); STATUS |= (data & PA_REG);
+		case 03:    STATUS &= (uint8_t)(~PA_REG); STATUS |= (data & PA_REG);
 					break;
-		case 04:    FSR = (data | (UINT8)(~m_picRAMmask));
+		case 04:    FSR = (data | (uint8_t)(~m_picRAMmask));
 					break;
 		case 05:    data &= 0x0f;       /* 4-bit port (only lower 4 bits used) */
-					m_write_a(PIC16C5x_PORTA, data & (UINT8)(~m_TRISA), 0xff);
+					m_write_a(PIC16C5x_PORTA, data & (uint8_t)(~m_TRISA), 0xff);
 					PORTA = data;
 					break;
-		case 06:    m_write_b(PIC16C5x_PORTB, data & (UINT8)(~m_TRISB), 0xff);
+		case 06:    m_write_b(PIC16C5x_PORTB, data & (uint8_t)(~m_TRISB), 0xff);
 					PORTB = data;
 					break;
 		case 07:    if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
-						m_write_c(PIC16C5x_PORTC, data & (UINT8)(~m_TRISC), 0xff);
+						m_write_c(PIC16C5x_PORTC, data & (uint8_t)(~m_TRISC), 0xff);
 						PORTC = data;
 					}
 					else {      /* PIC16C54, PIC16C56, PIC16C58 */
@@ -406,7 +406,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, UINT8 data)    /* Write to inte
 }
 
 
-void pic16c5x_device::STORE_RESULT(offs_t addr, UINT8 data)
+void pic16c5x_device::STORE_RESULT(offs_t addr, uint8_t data)
 {
 	if (m_opcode.b.l & 0x20)
 	{
@@ -521,7 +521,7 @@ void pic16c5x_device::clrwdt()
 
 void pic16c5x_device::comf()
 {
-	m_ALU = (UINT8)(~(GET_REGFILE(ADDR)));
+	m_ALU = (uint8_t)(~(GET_REGFILE(ADDR)));
 	STORE_RESULT(ADDR, m_ALU);
 	CALCULATE_Z_FLAG();
 }
@@ -669,12 +669,12 @@ void pic16c5x_device::tris()
 	switch(m_opcode.b.l & 0x7)
 	{
 		case 05:    if   (m_TRISA == m_W) break;
-					else { m_TRISA = m_W | 0xf0; m_write_a(PIC16C5x_PORTA, PORTA & (UINT8)(~m_TRISA) & 0x0f, 0xff); break; }
+					else { m_TRISA = m_W | 0xf0; m_write_a(PIC16C5x_PORTA, PORTA & (uint8_t)(~m_TRISA) & 0x0f, 0xff); break; }
 		case 06:    if   (m_TRISB == m_W) break;
-					else { m_TRISB = m_W; m_write_b(PIC16C5x_PORTB, PORTB & (UINT8)(~m_TRISB), 0xff); break; }
+					else { m_TRISB = m_W; m_write_b(PIC16C5x_PORTB, PORTB & (uint8_t)(~m_TRISB), 0xff); break; }
 		case 07:    if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						if   (m_TRISC == m_W) break;
-						else { m_TRISC = m_W; m_write_c(PIC16C5x_PORTC, PORTC & (UINT8)(~m_TRISC), 0xff); break; }
+						else { m_TRISC = m_W; m_write_c(PIC16C5x_PORTC, PORTC & (uint8_t)(~m_TRISC), 0xff); break; }
 					}
 					else {
 						illegal(); break;
@@ -890,7 +890,7 @@ void pic16c5x_device::state_import(const device_state_entry &entry)
 			PORTC = m_debugger_temp;
 			break;
 		case PIC16C5x_FSR:
-			FSR = ((m_debugger_temp & m_picRAMmask) | (UINT8)(~m_picRAMmask));
+			FSR = ((m_debugger_temp & m_picRAMmask) | (uint8_t)(~m_picRAMmask));
 			break;
 		case PIC16C5x_PSCL:
 			m_prescaler = m_debugger_temp;
@@ -918,7 +918,7 @@ void pic16c5x_device::state_export(const device_state_entry &entry)
 			m_debugger_temp = PORTC;
 			break;
 		case PIC16C5x_FSR:
-			m_debugger_temp = ((FSR) & m_picRAMmask) | (UINT8)(~m_picRAMmask);
+			m_debugger_temp = ((FSR) & m_picRAMmask) | (uint8_t)(~m_picRAMmask);
 			break;
 	}
 }
@@ -961,7 +961,7 @@ void pic16c5x_device::pic16c5x_reset_regs()
 	m_TRISC  = 0xff;
 	m_OPTION = (T0CS_FLAG | T0SE_FLAG | PSA_FLAG | PS_REG);
 	PCL    = 0xff;
-	FSR   |= (UINT8)(~m_picRAMmask);
+	FSR   |= (uint8_t)(~m_picRAMmask);
 	PORTA &= 0x0f;
 	m_prescaler = 0;
 	m_delay_timer = 0;
@@ -975,7 +975,7 @@ void pic16c5x_device::pic16c5x_soft_reset()
 	pic16c5x_reset_regs();
 }
 
-void pic16c5x_device::pic16c5x_set_config(UINT16 data)
+void pic16c5x_device::pic16c5x_set_config(uint16_t data)
 {
 	logerror("Writing %04x to the PIC16C5x config register\n",data);
 	m_temp_config = data;
@@ -1005,7 +1005,7 @@ void pic16c5x_device::pic16c5x_update_watchdog(int counts)
 
 	if ((m_opcode.w.l != 3) && (m_opcode.w.l != 4))
 	{
-		UINT16 old_WDT = m_WDT;
+		uint16_t old_WDT = m_WDT;
 
 		m_WDT -= counts;
 
@@ -1057,7 +1057,7 @@ void pic16c5x_device::pic16c5x_update_timer(int counts)
 
 void pic16c5x_device::execute_run()
 {
-	UINT8 T0_in;
+	uint8_t T0_in;
 
 	update_internalram_ptr();
 

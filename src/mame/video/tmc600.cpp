@@ -11,7 +11,7 @@ WRITE8_MEMBER( tmc600_state::vismac_register_w )
 
 WRITE8_MEMBER( tmc600_state::vismac_data_w )
 {
-	UINT16 ma = m_maincpu->get_memory_address();
+	uint16_t ma = m_maincpu->get_memory_address();
 
 	switch (m_vismac_reg_latch)
 	{
@@ -50,10 +50,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmc600_state::blink_tick)
 	m_blink = !m_blink;
 }
 
-UINT8 tmc600_state::get_color(UINT16 pma)
+uint8_t tmc600_state::get_color(uint16_t pma)
 {
-	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
-	UINT8 color = m_color_ram[pageaddr];
+	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint8_t color = m_color_ram[pageaddr];
 
 	if (BIT(color, 3) && m_blink)
 	{
@@ -75,10 +75,10 @@ ADDRESS_MAP_END
 
 CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
 {
-	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
-	UINT8 color = get_color(pageaddr);
-	UINT16 charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
-	UINT8 cdb = m_char_rom[charaddr] & 0x3f;
+	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint8_t color = get_color(pageaddr);
+	uint16_t charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
+	uint8_t cdb = m_char_rom[charaddr] & 0x3f;
 
 	int ccb0 = BIT(color, 2);
 	int ccb1 = BIT(color, 1);
@@ -88,8 +88,8 @@ CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
 
 CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 {
-	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
-	UINT8 color = get_color(pageaddr);
+	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint8_t color = get_color(pageaddr);
 
 	return BIT(color, 0);
 }

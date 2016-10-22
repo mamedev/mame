@@ -28,7 +28,7 @@ class vic20_final_expansion_3_t :  public device_t,
 {
 public:
 	// construction/destruction
-	vic20_final_expansion_3_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vic20_final_expansion_3_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -40,8 +40,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_vic20_expansion_card_interface overrides
-	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
-	virtual void vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
+	virtual uint8_t vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
+	virtual void vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
 
 private:
 	enum
@@ -74,14 +74,14 @@ private:
 	};
 
 	offs_t get_address(int bank, int block, offs_t offset);
-	UINT8 read_register(offs_t offset);
-	void write_register(offs_t offset, UINT8 data);
+	uint8_t read_register(offs_t offset);
+	void write_register(offs_t offset, uint8_t data);
 
 	required_device<amd_29f040_device> m_flash_rom;
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 
-	UINT8 m_reg1;
-	UINT8 m_reg2;
+	uint8_t m_reg1;
+	uint8_t m_reg2;
 	int m_lockbit;
 };
 

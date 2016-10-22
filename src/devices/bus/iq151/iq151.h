@@ -61,11 +61,11 @@ public:
 	virtual ~device_iq151cart_interface();
 
 	// reading and writing
-	virtual void read(offs_t offset, UINT8 &data) { }
-	virtual void write(offs_t offset, UINT8 data) { }
-	virtual void io_read(offs_t offset, UINT8 &data) { }
-	virtual void io_write(offs_t offset, UINT8 data) { }
-	virtual UINT8* get_cart_base() { return nullptr; }
+	virtual void read(offs_t offset, uint8_t &data) { }
+	virtual void write(offs_t offset, uint8_t data) { }
+	virtual void io_read(offs_t offset, uint8_t &data) { }
+	virtual void io_write(offs_t offset, uint8_t data) { }
+	virtual uint8_t* get_cart_base() { return nullptr; }
 
 	// video update
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) { }
@@ -79,7 +79,7 @@ class iq151cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~iq151cart_slot_device();
 
 	template<class _Object> static devcb_base &set_out_irq0_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq0_cb.set_callback(object); }
@@ -110,10 +110,10 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual void read(offs_t offset, UINT8 &data);
-	virtual void write(offs_t offset, UINT8 data);
-	virtual void io_read(offs_t offset, UINT8 &data);
-	virtual void io_write(offs_t offset, UINT8 data);
+	virtual void read(offs_t offset, uint8_t &data);
+	virtual void write(offs_t offset, uint8_t data);
+	virtual void io_read(offs_t offset, uint8_t &data);
+	virtual void io_write(offs_t offset, uint8_t data);
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	devcb_write_line                m_out_irq0_cb;

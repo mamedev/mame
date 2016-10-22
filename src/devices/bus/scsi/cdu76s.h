@@ -19,10 +19,10 @@
 class sony_cdu76s_device : public scsicd_device
 {
 public:
-	sony_cdu76s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sony_cdu76s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void ExecCommand() override;
-	virtual void ReadData( UINT8 *data, int dataLength ) override;
+	virtual void ReadData( uint8_t *data, int dataLength ) override;
 };
 
 // device type definition

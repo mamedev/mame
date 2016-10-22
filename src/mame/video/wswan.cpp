@@ -18,7 +18,7 @@
 const device_type WSWAN_VIDEO = &device_creator<wswan_video_device>;
 
 
-wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, WSWAN_VIDEO, "Bandai WonderSwan VDP", tag, owner, clock, "wswan_video", __FILE__),
 					m_vdp_type(VDP_TYPE_WSWAN)
 {
@@ -106,7 +106,7 @@ void wswan_video_device::device_start()
 
 // This is a copy of ws_portram_init
 // TODO: remove unneeded parts!
-static const UINT8 vdp_regs_init[256] =
+static const uint8_t vdp_regs_init[256] =
 {
 	0x00, 0x00, 0x00/*?*/, 0xbb, 0x00, 0x00, 0x00, 0x26, 0xfe, 0xde, 0xf9, 0xfb, 0xdb, 0xd7, 0x7f, 0xf5,
 	0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x9e, 0x9b, 0x00, 0x00, 0x00, 0x00, 0x99, 0xfd, 0xb7, 0xdf,
@@ -213,12 +213,12 @@ void wswan_video_device::setup_palettes()
 
 void wswan_video_device::draw_background()
 {
-	UINT16 map_addr = m_layer_bg_address + (((m_current_line + m_layer_bg_scroll_y) & 0xf8) << 3);
-	UINT8 start_column = (m_layer_bg_scroll_x >> 3);
+	uint16_t map_addr = m_layer_bg_address + (((m_current_line + m_layer_bg_scroll_y) & 0xf8) << 3);
+	uint8_t start_column = (m_layer_bg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
 	{
-		UINT32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		uint32_t plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int x_offset, tile_line, tile_address;
 		int tile_data =  (m_vram[map_addr + (((start_column + column) & 0x1f) << 1) + 1] << 8)
 						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
@@ -322,12 +322,12 @@ void wswan_video_device::draw_background()
 
 void wswan_video_device::draw_foreground_0()
 {
-	UINT16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
-	UINT8 start_column = (m_layer_fg_scroll_x >> 3);
+	uint16_t map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
+	uint8_t start_column = (m_layer_fg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
 	{
-		UINT32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		uint32_t plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int x_offset, tile_line, tile_address;
 		int tile_data =  (m_vram[map_addr + (((start_column + column) & 0x1f) << 1) + 1] << 8)
 						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
@@ -430,12 +430,12 @@ void wswan_video_device::draw_foreground_0()
 
 void wswan_video_device::draw_foreground_2()
 {
-	UINT16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
-	UINT8 start_column = (m_layer_fg_scroll_x >> 3);
+	uint16_t map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
+	uint8_t start_column = (m_layer_fg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
 	{
-		UINT32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		uint32_t plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int x_offset, tile_line, tile_address;
 		int tile_data =  (m_vram[map_addr + (((start_column + column) & 0x1f) << 1) + 1] << 8)
 						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
@@ -538,12 +538,12 @@ void wswan_video_device::draw_foreground_2()
 
 void wswan_video_device::draw_foreground_3()
 {
-	UINT16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
-	UINT8 start_column = (m_layer_fg_scroll_x >> 3);
+	uint16_t map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
+	uint8_t start_column = (m_layer_fg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
 	{
-		UINT32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		uint32_t plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int x_offset, tile_line, tile_address;
 		int tile_data =  (m_vram[map_addr + (((start_column + column) & 0x1f) << 1) + 1] << 8)
 						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
@@ -650,14 +650,14 @@ void wswan_video_device::handle_sprites(int mask)
 
 	for (int i = m_sprite_first + m_sprite_count - 1; i >= m_sprite_first; i--)
 	{
-		UINT16 tile_data = (m_sprite_table_buffer[i * 4 + 1] << 8) | m_sprite_table_buffer[i * 4];
-		UINT8 y = m_sprite_table_buffer[ i * 4 + 2 ];
-		UINT8 x = m_sprite_table_buffer[ i * 4 + 3 ];
+		uint16_t tile_data = (m_sprite_table_buffer[i * 4 + 1] << 8) | m_sprite_table_buffer[i * 4];
+		uint8_t y = m_sprite_table_buffer[ i * 4 + 2 ];
+		uint8_t x = m_sprite_table_buffer[ i * 4 + 3 ];
 		int tile_line = (m_current_line - y) & 0xff;
 
 		if ((tile_line >= 0) && (tile_line < 8) && ((tile_data & 0x2000) == mask))
 		{
-			UINT32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+			uint32_t plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 			int x_offset, tile_address;
 			int tile_number = tile_data & 0x01ff;
 			int tile_palette = 8 + ((tile_data >> 9) & 0x07);
@@ -846,7 +846,7 @@ void wswan_video_device::refresh_scanline()
 
 
 
-UINT32 wswan_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wswan_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -855,7 +855,7 @@ UINT32 wswan_video_device::screen_update(screen_device &screen, bitmap_ind16 &bi
 
 READ8_MEMBER(wswan_video_device::reg_r)
 {
-	UINT8 value = m_regs[offset];
+	uint8_t value = m_regs[offset];
 
 	if (offset >= 0x20 && offset < 0x40)
 		return m_palette_port[offset & 0x1f];

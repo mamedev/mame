@@ -34,22 +34,22 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_main_ram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_main_ram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	UINT8    m_cocktail_flip;
-	UINT8    m_char_palette;
-	UINT8    m_sprite_palette;
-	UINT8    m_char_bank;
-	std::unique_ptr<UINT16[]>  m_background_gfx[4];
-	UINT8    *m_background_mixer;
-	UINT8    m_background_latches[13];
+	uint8_t    m_cocktail_flip;
+	uint8_t    m_char_palette;
+	uint8_t    m_sprite_palette;
+	uint8_t    m_char_bank;
+	std::unique_ptr<uint16_t[]>  m_background_gfx[4];
+	uint8_t    *m_background_mixer;
+	uint8_t    m_background_latches[13];
 
 	/* protection? */
-	UINT8 m_porta;
-	UINT8 m_portb;
+	uint8_t m_porta;
+	uint8_t m_portb;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -71,6 +71,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(exerion);
-	UINT32 screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

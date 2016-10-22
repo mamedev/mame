@@ -102,7 +102,7 @@ class c64_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<c64_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<c64_expansion_slot_device &>(device).m_write_nmi.set_callback(object); }
@@ -112,8 +112,8 @@ public:
 	template<class _Object> static devcb_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<c64_expansion_slot_device &>(device).m_write_dma.set_callback(object); }
 
 	// computer interface
-	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
-	void cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	void cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 	int game_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 
@@ -175,15 +175,15 @@ public:
 	device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_c64_expansion_card_interface();
 
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
+	virtual uint8_t c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
+	virtual void c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) { return m_game; }
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) { return m_exrom; }
 
 protected:
-	optional_shared_ptr<UINT8> m_roml;
-	optional_shared_ptr<UINT8> m_romh;
-	optional_shared_ptr<UINT8> m_nvram;
+	optional_shared_ptr<uint8_t> m_roml;
+	optional_shared_ptr<uint8_t> m_romh;
+	optional_shared_ptr<uint8_t> m_nvram;
 
 	int m_game;
 	int m_exrom;

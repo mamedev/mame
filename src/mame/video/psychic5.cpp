@@ -20,10 +20,10 @@
   Palette color
 ***************************************************************************/
 
-void psychic5_state::change_palette(int offset, UINT8* palram, int palbase)
+void psychic5_state::change_palette(int offset, uint8_t* palram, int palbase)
 {
-	UINT8 lo = palram[(offset) & ~1];
-	UINT8 hi = palram[(offset) | 1];
+	uint8_t lo = palram[(offset) & ~1];
+	uint8_t hi = palram[(offset) | 1];
 
 	int color = offset >> 1;
 
@@ -35,7 +35,7 @@ void psychic5_state::change_palette(int offset, UINT8* palram, int palbase)
 
 void psychic5_state::change_bg_palette(int color, int lo_offs, int hi_offs)
 {
-	UINT8 r,g,b,lo,hi,ir,ig,ib,ix;
+	uint8_t r,g,b,lo,hi,ir,ig,ib,ix;
 	rgb_t irgb;
 
 	/* red,green,blue intensities */
@@ -57,7 +57,7 @@ void psychic5_state::change_bg_palette(int color, int lo_offs, int hi_offs)
 	/* Grey background enable */
 	if (m_bg_control[4] & 2)
 	{
-		UINT8 val = (r + g + b) / 3;        /* Grey */
+		uint8_t val = (r + g + b) / 3;        /* Grey */
 		/* Just leave plain grey */
 		m_palette->set_pen_color(color,m_blend->func(rgb_t(val,val,val),irgb,ix));
 	}
@@ -336,11 +336,11 @@ void psychic5_state::draw_background(screen_device &screen, bitmap_rgb32 &bitmap
 	m_bg_tilemap->draw(screen, bitmap, clip, 0, 0);
 }
 
-UINT32 psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 bg_scrollx = m_bg_control[0] | (m_bg_control[1] << 8);
+	uint16_t bg_scrollx = m_bg_control[0] | (m_bg_control[1] << 8);
 	m_bg_tilemap->set_scrollx(0, bg_scrollx);
-	UINT16 bg_scrolly = m_bg_control[2] | (m_bg_control[3] << 8);
+	uint16_t bg_scrolly = m_bg_control[2] | (m_bg_control[3] << 8);
 	m_bg_tilemap->set_scrolly(0, bg_scrolly);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -352,11 +352,11 @@ UINT32 psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-UINT32 psychic5_state::screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t psychic5_state::screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 bg_scrollx = m_bg_control[0] | (m_bg_control[1] << 8);
+	uint16_t bg_scrollx = m_bg_control[0] | (m_bg_control[1] << 8);
 	m_bg_tilemap->set_scrollx(0, bg_scrollx);
-	UINT16 bg_scrolly = m_bg_control[2] | (m_bg_control[3] << 8);
+	uint16_t bg_scrolly = m_bg_control[2] | (m_bg_control[3] << 8);
 	m_bg_tilemap->set_scrolly(0, bg_scrolly);
 	bitmap.fill(m_palette->black_pen(), cliprect);
 

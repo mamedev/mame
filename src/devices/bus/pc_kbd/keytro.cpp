@@ -377,7 +377,7 @@ ROM_START( keytronic_pc3270 )
 ROM_END
 
 
-pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC_KBD_KEYTRONIC_PC3270, "Keytronic PC3270", tag, owner, clock, "keytronic_pc3270", __FILE__),
 	device_pc_kbd_interface(mconfig, *this),
 	m_cpu(*this, "kb_keytr"), m_p1(0), m_p1_data(0), m_p2(0), m_p3(0), m_last_write_addr(0)
@@ -606,7 +606,7 @@ WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p2_write )
 
 READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_read )
 {
-	UINT8 data = m_p3;
+	uint8_t data = m_p3;
 
 	data &= ~0x14;
 

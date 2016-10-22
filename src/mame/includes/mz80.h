@@ -45,19 +45,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
 	bool m_mz80k_vertical;
 	bool m_mz80k_tempo_strobe;
-	UINT8 m_speaker_level;
+	uint8_t m_speaker_level;
 	bool m_prev_state;
-	UINT8 m_mz80k_cursor_cnt;
-	UINT8 m_mz80k_keyboard_line;
-	required_shared_ptr<UINT8> m_p_ram;
-	const UINT8 *m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
+	uint8_t m_mz80k_cursor_cnt;
+	uint8_t m_mz80k_keyboard_line;
+	required_shared_ptr<uint8_t> m_p_ram;
+	const uint8_t *m_p_chargen;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	DECLARE_DRIVER_INIT(mz80k);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tempo_callback);
 };
 

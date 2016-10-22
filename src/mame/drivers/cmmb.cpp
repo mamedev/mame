@@ -66,11 +66,11 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<at29c020_device> m_flash;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT8 m_irq_mask;
+	uint8_t m_irq_mask;
 
 	DECLARE_READ8_MEMBER(cmmb_charram_r);
 	DECLARE_WRITE8_MEMBER(cmmb_charram_w);
@@ -82,7 +82,7 @@ public:
 	//DECLARE_READ8_MEMBER(kludge_r);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
@@ -91,9 +91,9 @@ void cmmb_state::video_start()
 {
 }
 
-UINT32 cmmb_state::screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cmmb_state::screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x00000;
 
@@ -116,14 +116,14 @@ UINT32 cmmb_state::screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitma
 
 READ8_MEMBER(cmmb_state::cmmb_charram_r)
 {
-	UINT8 *GFX = memregion("gfx")->base();
+	uint8_t *GFX = memregion("gfx")->base();
 
 	return GFX[offset];
 }
 
 WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 {
-	UINT8 *GFX = memregion("gfx")->base();
+	uint8_t *GFX = memregion("gfx")->base();
 
 	GFX[offset] = data;
 
@@ -162,8 +162,8 @@ WRITE8_MEMBER(cmmb_state::cmmb_output_w)
 
 		case 0x03:
 			{
-				UINT8 *ROM = memregion("maincpu")->base();
-				UINT32 bankaddress;
+				uint8_t *ROM = memregion("maincpu")->base();
+				uint32_t bankaddress;
 
 				bankaddress = 0x10000 + (0x4000 * (data & 0x0f));
 				membank("bank1")->set_base(&ROM[bankaddress]);

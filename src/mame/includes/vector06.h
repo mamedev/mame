@@ -77,7 +77,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(vector06);
-	UINT32 screen_update_vector06(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vector06(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vector06_interrupt);
 	TIMER_CALLBACK_MEMBER(reset_check_callback);
 	IRQ_CALLBACK_MEMBER(vector06_irq_callback);
@@ -103,14 +103,14 @@ private:
 	required_ioport_array<9> m_line;
 	required_ioport m_reset;
 
-	UINT8 m_keyboard_mask;
-	UINT8 m_color_index;
-	UINT8 m_video_mode;
-	UINT8 m_romdisk_msb;
-	UINT8 m_romdisk_lsb;
-	UINT8 m_vblank_state;
-	UINT8 m_rambank;
-	UINT8 m_aylatch;
+	uint8_t m_keyboard_mask;
+	uint8_t m_color_index;
+	uint8_t m_video_mode;
+	uint8_t m_romdisk_msb;
+	uint8_t m_romdisk_lsb;
+	uint8_t m_vblank_state;
+	uint8_t m_rambank;
+	uint8_t m_aylatch;
 	bool m_stack_state;
 	bool m_romen;
 

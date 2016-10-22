@@ -141,7 +141,7 @@ imgtool::stream *imgtool::stream::open_zip(const char *zipname, const char *subn
 
 imgtool::stream *imgtool::stream::open(const char *fname, int read_or_write)
 {
-	static const UINT32 write_modes[] =
+	static const uint32_t write_modes[] =
 	{
 		OPEN_FLAG_READ,
 		OPEN_FLAG_WRITE | OPEN_FLAG_CREATE,
@@ -235,22 +235,22 @@ util::core_file *imgtool::stream::core_file()
 //	read
 //-------------------------------------------------
 
-UINT32 imgtool::stream::read(void *buf, UINT32 sz)
+uint32_t imgtool::stream::read(void *buf, uint32_t sz)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 
 	switch(imgtype)
 	{
 		case IMG_FILE:
-			assert(sz == (UINT32) sz);
+			assert(sz == (uint32_t) sz);
 			file->seek(position, SEEK_SET);
-			result = file->read(buf, (UINT32) sz);
+			result = file->read(buf, (uint32_t) sz);
 			break;
 
 		case IMG_MEM:
 			/* do we have to limit sz? */
 			if (sz > (filesize - position))
-				sz = (UINT32) (filesize - position);
+				sz = (uint32_t) (filesize - position);
 
 			memcpy(buf, buffer + position, sz);
 			result = sz;
@@ -269,10 +269,10 @@ UINT32 imgtool::stream::read(void *buf, UINT32 sz)
 //	write
 //-------------------------------------------------
 
-UINT32 imgtool::stream::write(const void *buf, UINT32 sz)
+uint32_t imgtool::stream::write(const void *buf, uint32_t sz)
 {
 	void *new_buffer;
-	UINT32 result = 0;
+	uint32_t result = 0;
 
 	switch(imgtype)
 	{
@@ -286,14 +286,14 @@ UINT32 imgtool::stream::write(const void *buf, UINT32 sz)
 					new_buffer = realloc(buffer , position + sz);
 					if (new_buffer)
 					{
-						buffer = (UINT8*)new_buffer;
+						buffer = (uint8_t*)new_buffer;
 						filesize = position + sz;
 					}
 				}
 
 				/* do we have to limit sz? */
 				if (sz > (filesize - position))
-					sz = (UINT32) (filesize - position);
+					sz = (uint32_t) (filesize - position);
 
 				memcpy(buffer + position, buf, sz);
 				result = sz;
@@ -324,7 +324,7 @@ UINT32 imgtool::stream::write(const void *buf, UINT32 sz)
 //	size
 //-------------------------------------------------
 
-UINT64 imgtool::stream::size() const
+uint64_t imgtool::stream::size() const
 {
 	return filesize;
 }
@@ -356,7 +356,7 @@ void *imgtool::stream::getptr()
 //	seek
 //-------------------------------------------------
 
-int imgtool::stream::seek(INT64 pos, int where)
+int imgtool::stream::seek(int64_t pos, int where)
 {
 	switch(where)
 	{
@@ -371,7 +371,7 @@ int imgtool::stream::seek(INT64 pos, int where)
 	if (pos < 0)
 		position = 0;
 	else
-		position = std::min(size(), UINT64(pos));
+		position = std::min(size(), uint64_t(pos));
 
 	if (position < pos)
 		fill('\0', pos - position);
@@ -384,7 +384,7 @@ int imgtool::stream::seek(INT64 pos, int where)
 //	tell
 //-------------------------------------------------
 
-UINT64 imgtool::stream::tell()
+uint64_t imgtool::stream::tell()
 {
 	return position;
 }
@@ -394,13 +394,13 @@ UINT64 imgtool::stream::tell()
 //	transfer
 //-------------------------------------------------
 
-UINT64 imgtool::stream::transfer(imgtool::stream &dest, imgtool::stream &source, UINT64 sz)
+uint64_t imgtool::stream::transfer(imgtool::stream &dest, imgtool::stream &source, uint64_t sz)
 {
-	UINT64 result = 0;
-	UINT64 readsz;
+	uint64_t result = 0;
+	uint64_t readsz;
 	char buf[1024];
 
-	while(sz && (readsz = source.read(buf, std::min(sz, UINT64(sizeof(buf))))))
+	while(sz && (readsz = source.read(buf, std::min(sz, uint64_t(sizeof(buf))))))
 	{
 		dest.write(buf, readsz);
 		sz -= readsz;
@@ -414,7 +414,7 @@ UINT64 imgtool::stream::transfer(imgtool::stream &dest, imgtool::stream &source,
 //	transfer_all
 //-------------------------------------------------
 
-UINT64 imgtool::stream::transfer_all(imgtool::stream &dest, imgtool::stream &source)
+uint64_t imgtool::stream::transfer_all(imgtool::stream &dest, imgtool::stream &source)
 {
 	return transfer(dest, source, source.size());
 }
@@ -477,18 +477,18 @@ int imgtool::stream::file_crc(const char *fname, unsigned long *result)
 //	fill
 //-------------------------------------------------
 
-UINT64 imgtool::stream::fill(unsigned char b, UINT64 sz)
+uint64_t imgtool::stream::fill(unsigned char b, uint64_t sz)
 {
-	UINT64 outsz;
+	uint64_t outsz;
 	char buf[1024];
 
 	outsz = 0;
-	memset(buf, b, (std::min<UINT64>)(sz, sizeof(buf)));
+	memset(buf, b, (std::min<uint64_t>)(sz, sizeof(buf)));
 
 	while (sz)
 	{
-		outsz += write(buf, (std::min<UINT64>)(sz, sizeof(buf)));
-		sz -= (std::min<UINT64>)(sz, sizeof(buf));
+		outsz += write(buf, (std::min<uint64_t>)(sz, sizeof(buf)));
+		sz -= (std::min<uint64_t>)(sz, sizeof(buf));
 	}
 	return outsz;
 }
@@ -508,7 +508,7 @@ int imgtool::stream::is_read_only()
 //	putc
 //-------------------------------------------------
 
-UINT32 imgtool::stream::putc(char c)
+uint32_t imgtool::stream::putc(char c)
 {
 	return write(&c, 1);
 }
@@ -518,7 +518,7 @@ UINT32 imgtool::stream::putc(char c)
 //	puts
 //-------------------------------------------------
 
-UINT32 imgtool::stream::puts(const char *s)
+uint32_t imgtool::stream::puts(const char *s)
 {
 	return write(s, strlen(s));
 }
@@ -528,7 +528,7 @@ UINT32 imgtool::stream::puts(const char *s)
 //	printf
 //-------------------------------------------------
 
-UINT32 imgtool::stream::printf(const char *fmt, ...)
+uint32_t imgtool::stream::printf(const char *fmt, ...)
 {
 	va_list va;
 	char buf[256];

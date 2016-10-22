@@ -1053,7 +1053,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(m107_state,firebarr)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->set_base(&ROM[0xa0000]);
 
@@ -1062,7 +1062,7 @@ DRIVER_INIT_MEMBER(m107_state,firebarr)
 
 DRIVER_INIT_MEMBER(m107_state,dsoccr94)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::bankswitch_w),this));

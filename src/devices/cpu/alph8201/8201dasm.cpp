@@ -2,10 +2,9 @@
 // copyright-holders:Tatsuyuki Satoh
 /*
 
-Notice: please do not modify this file, except in case of compile- or critical emulation error
-A more accurate implementation is in mame/alpha8201.*
+Notice: The alpha 8201 is now emulated using mame/alpha8201.*
 
-cpu/alph8201/ will be removed soon
+cpu/alph8201/ will be removed when the alpha 8304 has been dumped.
 
 
 
@@ -335,7 +334,7 @@ static void InitDasm8201(void)
 		Op[i].type  = type;
 
 		/* 2 byte code ? */
-		while (isspace((UINT8)*p)) p++;
+		while (isspace((uint8_t)*p)) p++;
 		if( (*p) )
 			Op[i].type |= 0x10;
 		/* number of param */

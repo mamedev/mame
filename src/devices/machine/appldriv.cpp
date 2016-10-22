@@ -124,10 +124,10 @@ static void apple525_seek_disk(apple525_floppy_image_device *img, signed int ste
 		disk->tween_tracks = 0;
 }
 
-static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_state)
+static void apple525_disk_set_lines(device_t *device,device_t *image, uint8_t new_state)
 {
 	apple525_floppy_image_device *cur_disk;
-	UINT8 old_state;
+	uint8_t old_state;
 	unsigned int phase;
 
 	cur_disk = get_device(image);
@@ -174,7 +174,7 @@ int apple525_get_count(device_t *device)
 	return cnt;
 }
 
-void apple525_set_lines(device_t *device, UINT8 lines)
+void apple525_set_lines(device_t *device, uint8_t lines)
 {
 	int i, count;
 	device_t *image;
@@ -192,9 +192,9 @@ void apple525_set_lines(device_t *device, UINT8 lines)
 }
 
 /* reads/writes a byte; write_value is -1 for read only */
-static UINT8 apple525_process_byte(device_t *img, int write_value)
+static uint8_t apple525_process_byte(device_t *img, int write_value)
 {
-	UINT8 read_value;
+	uint8_t read_value;
 	apple525_floppy_image_device *disk;
 	int spinfract_divisor;
 	int spinfract_dividend;
@@ -256,14 +256,14 @@ static device_t *apple525_selected_image(device_t *device)
 	return nullptr;
 }
 
-UINT8 apple525_read_data(device_t *device)
+uint8_t apple525_read_data(device_t *device)
 {
 	device_t *image;
 	image = apple525_selected_image(device);
 	return image ? apple525_process_byte(image, -1) : 0xFF;
 }
 
-void apple525_write_data(device_t *device,UINT8 data)
+void apple525_write_data(device_t *device,uint8_t data)
 {
 	device_t *image;
 	image = apple525_selected_image(device);
@@ -297,7 +297,7 @@ const device_type FLOPPY_APPLE = &device_creator<apple525_floppy_image_device>;
 //  apple525_floppy_image_device - constructor
 //-------------------------------------------------
 
-apple525_floppy_image_device::apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apple525_floppy_image_device::apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: legacy_floppy_image_device(mconfig, FLOPPY_APPLE, "Apple Disk II", tag, owner, clock, "floppy_apple", __FILE__)
 {
 }

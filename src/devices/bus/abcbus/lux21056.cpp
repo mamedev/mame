@@ -337,7 +337,7 @@ ioport_constructor luxor_55_21056_device::device_input_ports() const
 //  luxor_55_21056_device - constructor
 //-------------------------------------------------
 
-luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LUXOR_55_21056, "Luxor 55 21056", tag, owner, clock, "lux21056", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
@@ -405,7 +405,7 @@ void luxor_55_21056_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_cs(UINT8 data)
+void luxor_55_21056_device::abcbus_cs(uint8_t data)
 {
 	m_cs = (data == m_s1->read());
 }
@@ -415,9 +415,9 @@ void luxor_55_21056_device::abcbus_cs(UINT8 data)
 //  abcbus_stat -
 //-------------------------------------------------
 
-UINT8 luxor_55_21056_device::abcbus_stat()
+uint8_t luxor_55_21056_device::abcbus_stat()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs)
 	{
@@ -433,9 +433,9 @@ UINT8 luxor_55_21056_device::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-UINT8 luxor_55_21056_device::abcbus_inp()
+uint8_t luxor_55_21056_device::abcbus_inp()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs && !STAT_DIR)
 	{
@@ -452,7 +452,7 @@ UINT8 luxor_55_21056_device::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_out(UINT8 data)
+void luxor_55_21056_device::abcbus_out(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -467,7 +467,7 @@ void luxor_55_21056_device::abcbus_out(UINT8 data)
 //  abcbus_c1 -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_c1(UINT8 data)
+void luxor_55_21056_device::abcbus_c1(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -481,7 +481,7 @@ void luxor_55_21056_device::abcbus_c1(UINT8 data)
 //  abcbus_c3 -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_c3(UINT8 data)
+void luxor_55_21056_device::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -511,7 +511,7 @@ READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_rdy ^ STAT_DIR;
 
@@ -543,7 +543,7 @@ WRITE8_MEMBER( luxor_55_21056_device::stat_w )
 
 READ8_MEMBER( luxor_55_21056_device::out_r )
 {
-	UINT8 data = m_out;
+	uint8_t data = m_out;
 
 	if (STAT_DIR && m_rdy) set_rdy(!m_rdy);
 
@@ -569,7 +569,7 @@ WRITE8_MEMBER( luxor_55_21056_device::inp_w )
 
 READ8_MEMBER( luxor_55_21056_device::sasi_data_r )
 {
-	UINT8 data = m_sasi_data_in->read();
+	uint8_t data = m_sasi_data_in->read();
 
 	m_sasibus->write_ack(!m_sasi_req);
 

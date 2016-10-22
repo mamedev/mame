@@ -41,23 +41,23 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	optional_shared_ptr<UINT16> m_nvram;
-	optional_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_tileram;
-	optional_shared_ptr<UINT16> m_rgbram;
-	optional_shared_ptr<UINT16> m_vregs;
-	optional_shared_ptr<UINT16> m_funcube_outputs;
-	optional_shared_ptr<UINT16> m_funcube_leds;
+	optional_shared_ptr<uint16_t> m_nvram;
+	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_tileram;
+	optional_shared_ptr<uint16_t> m_rgbram;
+	optional_shared_ptr<uint16_t> m_vregs;
+	optional_shared_ptr<uint16_t> m_funcube_outputs;
+	optional_shared_ptr<uint16_t> m_funcube_leds;
 
 	int m_xoffset;
 	int m_yoffset;
 	int m_keyboard_row;
-	std::unique_ptr<UINT16[]> m_buffered_spriteram;
+	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 
-	UINT64 m_funcube_coin_start_cycles;
-	UINT8 m_funcube_hopper_motor;
+	uint64_t m_funcube_coin_start_cycles;
+	uint8_t m_funcube_hopper_motor;
 
-	UINT16 m_lamps1, m_lamps2, m_cam;
+	uint16_t m_lamps1, m_lamps2, m_cam;
 
 	DECLARE_WRITE16_MEMBER(spriteram16_word_w);
 	DECLARE_READ16_MEMBER(spriteram16_word_r);
@@ -112,8 +112,8 @@ public:
 	DECLARE_VIDEO_START(yoffset);
 	DECLARE_VIDEO_START(xoffset);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_rgbram(bitmap_ind16 &bitmap);

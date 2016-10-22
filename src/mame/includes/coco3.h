@@ -50,17 +50,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gime_firq_w) { recalculate_firq(); }
 	DECLARE_WRITE_LINE_MEMBER(gime_irq_w) { recalculate_irq(); }
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void update_cart_base(UINT8 *cart_base) override;
+	virtual void update_cart_base(uint8_t *cart_base) override;
 
 	/* interrupts */
 	virtual bool firq_get_line(void) override;
 	virtual bool irq_get_line(void) override;
 
 	/* miscellaneous */
-	virtual void update_keyboard_input(UINT8 value, UINT8 z) override;
+	virtual void update_keyboard_input(uint8_t value, uint8_t z) override;
 	virtual void cart_w(bool line) override;
 };
 

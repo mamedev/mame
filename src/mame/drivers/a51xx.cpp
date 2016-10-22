@@ -26,8 +26,8 @@ public:
 	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(a5130);
 	DECLARE_VIDEO_START(a5130);
-	UINT32 screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -68,7 +68,7 @@ void a51xx_state::video_start()
 {
 }
 
-UINT32 a51xx_state::screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t a51xx_state::screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -87,7 +87,7 @@ VIDEO_START_MEMBER(a51xx_state,a5130)
 {
 }
 
-UINT32 a51xx_state::screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t a51xx_state::screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

@@ -69,10 +69,10 @@ private:
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine
 
-	UINT32      m_dispensed_tickets;
-	UINT32      m_coin_count[COIN_COUNTERS];
-	UINT32      m_coinlockedout[COIN_COUNTERS];
-	UINT32      m_lastcoin[COIN_COUNTERS];
+	uint32_t      m_dispensed_tickets;
+	uint32_t      m_coin_count[COIN_COUNTERS];
+	uint32_t      m_coinlockedout[COIN_COUNTERS];
+	uint32_t      m_lastcoin[COIN_COUNTERS];
 };
 
 #endif  /* __BOOKKEEPING_H__ */

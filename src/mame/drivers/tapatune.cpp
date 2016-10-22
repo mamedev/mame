@@ -63,20 +63,20 @@ public:
 	optional_device<cpu_device> m_videocpu;
 	required_device<bsmt2000_device> m_bsmt;
 
-	optional_shared_ptr<UINT16> m_videoram;
+	optional_shared_ptr<uint16_t> m_videoram;
 
-	UINT8   m_paletteram[0x300];
-	UINT16  m_palette_write_addr;
+	uint8_t   m_paletteram[0x300];
+	uint16_t  m_palette_write_addr;
 	rgb_t   m_pens[0x100];
-	UINT8   m_controls_mux;
-	UINT8   m_z80_to_68k_index;
-	UINT8   m_z80_to_68k_data;
-	UINT8   m_68k_to_z80_index;
-	UINT8   m_68k_to_z80_data;
-	UINT8   m_z80_data_available;
-	UINT8   m_68k_data_available;
-	UINT8   m_bsmt_data_l;
-	UINT8   m_bsmt_data_h;
+	uint8_t   m_controls_mux;
+	uint8_t   m_z80_to_68k_index;
+	uint8_t   m_z80_to_68k_data;
+	uint8_t   m_68k_to_z80_index;
+	uint8_t   m_68k_to_z80_data;
+	uint8_t   m_z80_data_available;
+	uint8_t   m_68k_data_available;
+	uint8_t   m_bsmt_data_l;
+	uint8_t   m_bsmt_data_h;
 	bool    m_bsmt_reset;
 
 	virtual void machine_start() override;
@@ -149,7 +149,7 @@ void tapatune_state::machine_reset()
 MC6845_BEGIN_UPDATE( tapatune_state::crtc_begin_update )
 {
 	// Create the pens
-	for (UINT32 i = 0; i < 0x100; i++)
+	for (uint32_t i = 0; i < 0x100; i++)
 	{
 		int r = m_paletteram[3 * i + 0];
 		int g = m_paletteram[3 * i + 1];
@@ -166,14 +166,14 @@ MC6845_BEGIN_UPDATE( tapatune_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( tapatune_state::crtc_update_row )
 {
-	UINT32 *dest = &bitmap.pix32(y);
+	uint32_t *dest = &bitmap.pix32(y);
 	offs_t offs = (ma*2 + ra*0x40)*4;
 
-	UINT8 *videoram = reinterpret_cast<UINT8 *>(m_videoram.target());
+	uint8_t *videoram = reinterpret_cast<uint8_t *>(m_videoram.target());
 
-	for (UINT32 x = 0; x < x_count*4; x++)
+	for (uint32_t x = 0; x < x_count*4; x++)
 	{
-		UINT8 pix = videoram[BYTE_XOR_BE(offs + x)];
+		uint8_t pix = videoram[BYTE_XOR_BE(offs + x)];
 		dest[2*x] = m_pens[((pix >> 4) & 0x0f)];
 		dest[2*x + 1] = m_pens[(pix & 0x0f)];
 	}
@@ -212,7 +212,7 @@ WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
 READ16_MEMBER(tapatune_state::read_from_z80)
 {
 	m_z80_data_available = 0;
-	return ((UINT16)m_z80_to_68k_data << 8) | (m_z80_to_68k_index);
+	return ((uint16_t)m_z80_to_68k_data << 8) | (m_z80_to_68k_index);
 }
 
 

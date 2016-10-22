@@ -97,12 +97,12 @@ public:
 	DECLARE_DRIVER_INIT(sdi);
 
 	// video updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
-	typedef delegate<void (UINT8, UINT8)> lamp_changed_delegate;
+	typedef delegate<void (uint8_t, uint8_t)> lamp_changed_delegate;
 
 	// timer IDs
 	enum
@@ -126,7 +126,7 @@ protected:
 	DECLARE_READ16_MEMBER( passsht16a_custom_io_r );
 	DECLARE_READ16_MEMBER( sdi_custom_io_r );
 	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
-	void sjryuko_lamp_changed_w(UINT8 changed, UINT8 newval);
+	void sjryuko_lamp_changed_w(uint8_t changed, uint8_t newval);
 
 	// devices
 	required_device<m68000_device> m_maincpu;
@@ -143,8 +143,8 @@ protected:
 	required_device<sega_sys16a_sprite_device> m_sprites;
 
 	// memory pointers
-	required_shared_ptr<UINT16> m_workram;
-	optional_shared_ptr<UINT8> m_sound_decrypted_opcodes;
+	required_shared_ptr<uint16_t> m_workram;
+	optional_shared_ptr<uint8_t> m_sound_decrypted_opcodes;
 
 	// configuration
 	read16_delegate         m_custom_io_r;
@@ -153,13 +153,13 @@ protected:
 	lamp_changed_delegate   m_lamp_changed_w;
 
 	// internal state
-	UINT8                   m_video_control;
-	UINT8                   m_mcu_control;
-	UINT8                   m_n7751_command;
-	UINT32                  m_n7751_rom_address;
-	UINT8                   m_last_buttons1;
-	UINT8                   m_last_buttons2;
-	UINT8                   m_read_port;
-	UINT8                   m_mj_input_num;
+	uint8_t                   m_video_control;
+	uint8_t                   m_mcu_control;
+	uint8_t                   m_n7751_command;
+	uint32_t                  m_n7751_rom_address;
+	uint8_t                   m_last_buttons1;
+	uint8_t                   m_last_buttons2;
+	uint8_t                   m_read_port;
+	uint8_t                   m_mj_input_num;
 	optional_ioport_array<6> m_mj_inputs;
 };

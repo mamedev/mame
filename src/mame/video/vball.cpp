@@ -29,8 +29,8 @@ TILEMAP_MAPPER_MEMBER(vball_state::background_scan)
 
 TILE_GET_INFO_MEMBER(vball_state::get_bg_tile_info)
 {
-	UINT8 code = m_videoram[tile_index];
-	UINT8 attr = m_attribram[tile_index];
+	uint8_t code = m_videoram[tile_index];
+	uint8_t attr = m_attribram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			code + ((attr & 0x1f) << 8) + (m_gfxset<<8),
 			(attr >> 5) & 0x7,
@@ -71,7 +71,7 @@ WRITE8_MEMBER(vball_state::attrib_w)
 void vball_state::bgprombank_w( int bank )
 {
 	int i;
-	UINT8* color_prom;
+	uint8_t* color_prom;
 
 	if (bank==m_bgprombank) return;
 
@@ -86,7 +86,7 @@ void vball_state::bgprombank_w( int bank )
 void vball_state::spprombank_w( int bank )
 {
 	int i;
-	UINT8* color_prom;
+	uint8_t* color_prom;
 
 	if (bank==m_spprombank) return;
 
@@ -106,7 +106,7 @@ void vball_state::spprombank_w( int bank )
 void vball_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	UINT8 *src = m_spriteram;
+	uint8_t *src = m_spriteram;
 	int i;
 
 /*  240-Y    S|X|CLR|WCH WHICH    240-X
@@ -149,7 +149,7 @@ void vball_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 #undef DRAW_SPRITE
 
-UINT32 vball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

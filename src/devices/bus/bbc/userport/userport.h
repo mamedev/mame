@@ -47,9 +47,9 @@ public:
 	device_bbc_userport_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bbc_userport_interface();
 
-	virtual UINT8 read_portb() { return 0xff; };
-	virtual UINT8 read_cb1() { return 0xff; };
-	virtual UINT8 read_cb2() { return 0xff; };
+	virtual uint8_t read_portb() { return 0xff; };
+	virtual uint8_t read_cb1() { return 0xff; };
+	virtual uint8_t read_cb2() { return 0xff; };
 
 protected:
 	bbc_userport_device *m_slot;
@@ -62,12 +62,12 @@ class bbc_userport_device : public device_t,
 {
 public:
 	// construction/destruction
-	bbc_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~bbc_userport_device() {}
 
-	UINT8 read_portb();
-	UINT8 read_cb1();
-	UINT8 read_cb2();
+	uint8_t read_portb();
+	uint8_t read_cb1();
+	uint8_t read_cb2();
 
 	// device-level overrides
 	virtual void device_start() override;

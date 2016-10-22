@@ -159,7 +159,7 @@ Fax                  1982  6502   FXL, FLA
 
 CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
 {
-	UINT8 dial = ioport("DIAL")->read();
+	uint8_t dial = ioport("DIAL")->read();
 	int result = 0;
 
 	result = (dial != m_last_dial) << 4;

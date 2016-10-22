@@ -51,24 +51,24 @@ public:
 	virtual DECLARE_WRITE32_MEMBER(write_tilt) {};
 	virtual DECLARE_WRITE32_MEMBER(write_mapper) {};
 
-	void rom_alloc(UINT32 size, const char *tag);
-	void nvram_alloc(UINT32 size);
-	UINT32* get_rom_base() { return m_rom; }
-	UINT32* get_romhlp_base() { return m_romhlp; }
-	UINT32* get_nvram_base() { return &m_nvram[0]; }
-	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_romhlp_size() { return m_romhlp_size; }
-	UINT32 get_nvram_size() { return m_nvram.size()*sizeof(UINT32); }
-	void set_rom_size(UINT32 val) { m_rom_size = val; }
+	void rom_alloc(uint32_t size, const char *tag);
+	void nvram_alloc(uint32_t size);
+	uint32_t* get_rom_base() { return m_rom; }
+	uint32_t* get_romhlp_base() { return m_romhlp; }
+	uint32_t* get_nvram_base() { return &m_nvram[0]; }
+	uint32_t get_rom_size() { return m_rom_size; }
+	uint32_t get_romhlp_size() { return m_romhlp_size; }
+	uint32_t get_nvram_size() { return m_nvram.size()*sizeof(uint32_t); }
+	void set_rom_size(uint32_t val) { m_rom_size = val; }
 
 	void save_nvram()   { device().save_item(NAME(m_nvram)); }
 
 	// internal state
-	UINT32 *m_rom;  // this points to the cart rom region
-	UINT32 m_rom_size;  // this is the actual game size, not the rom region size!
-	UINT32 *m_romhlp;
-	UINT32 m_romhlp_size;
-	std::vector<UINT32> m_nvram;
+	uint32_t *m_rom;  // this points to the cart rom region
+	uint32_t m_rom_size;  // this is the actual game size, not the rom region size!
+	uint32_t *m_romhlp;
+	uint32_t m_romhlp_size;
+	std::vector<uint32_t> m_nvram;
 };
 
 
@@ -80,7 +80,7 @@ class gba_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~gba_cart_slot_device();
 
 	// device-level overrides
@@ -93,12 +93,12 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
-	int get_cart_type(UINT8 *ROM, UINT32 len);
+	int get_cart_type(uint8_t *ROM, uint32_t len);
 
-	void internal_header_logging(UINT8 *ROM, UINT32 len);
+	void internal_header_logging(uint8_t *ROM, uint32_t len);
 
 	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
-	UINT32 get_rom_size()   { if (m_cart) return m_cart->get_rom_size(); return 0; }
+	uint32_t get_rom_size()   { if (m_cart) return m_cart->get_rom_size(); return 0; }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 	virtual bool is_readable()  const override { return 1; }
@@ -168,7 +168,7 @@ extern const device_type GBA_CART_SLOT;
 struct gba_chip_fix_conflict_item
 {
 	char game_code[5];
-	UINT32 chip;
+	uint32_t chip;
 };
 
 static const gba_chip_fix_conflict_item gba_chip_fix_conflict_list[] =

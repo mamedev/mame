@@ -17,7 +17,7 @@ class m68307cpu_device;
 
 struct m68307_single_timer
 {
-	UINT16 regs[0x8];
+	uint16_t regs[0x8];
 	bool enabled;
 	emu_timer *mametimer;
 };
@@ -31,10 +31,10 @@ class m68307_timer
 	emu_timer *wd_mametimer;
 	m68307cpu_device *parent;
 
-	void write_tmr(UINT16 data, UINT16 mem_mask, int which);
-	void write_trr(UINT16 data, UINT16 mem_mask, int which);
-	void write_ter(UINT16 data, UINT16 mem_mask, int which);
-	UINT16 read_tcn(UINT16 mem_mask, int which);
+	void write_tmr(uint16_t data, uint16_t mem_mask, int which);
+	void write_trr(uint16_t data, uint16_t mem_mask, int which);
+	void write_ter(uint16_t data, uint16_t mem_mask, int which);
+	uint16_t read_tcn(uint16_t mem_mask, int which);
 
 	void init(m68307cpu_device *device);
 	void reset(void);

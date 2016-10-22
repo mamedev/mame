@@ -53,15 +53,15 @@
  Tables, this is the form of the data */
 struct LPT_ENTRY
 {
-	UINT8 SC;       /* scanlines in this modeline (two's complement) */
-	UINT8 MB;       /* the MODEBYTE (defines video display mode) */
-	UINT8 LM;       /* left margin etc */
-	UINT8 RM;       /* right margin etc */
-	UINT8 LD1L;     /* (a7..a0) of line data pointer LD1 */
-	UINT8 LD1H;     /* (a8..a15) of line data pointer LD1 */
-	UINT8 LD2L;     /* (a7..a0) of line data pointer LD2 */
-	UINT8 LD2H;     /* (a8..a15) of line data pointer LD2 */
-	UINT8 COL[8];   /* COL0..COL7 */
+	uint8_t SC;       /* scanlines in this modeline (two's complement) */
+	uint8_t MB;       /* the MODEBYTE (defines video display mode) */
+	uint8_t LM;       /* left margin etc */
+	uint8_t RM;       /* right margin etc */
+	uint8_t LD1L;     /* (a7..a0) of line data pointer LD1 */
+	uint8_t LD1H;     /* (a8..a15) of line data pointer LD1 */
+	uint8_t LD2L;     /* (a7..a0) of line data pointer LD2 */
+	uint8_t LD2H;     /* (a8..a15) of line data pointer LD2 */
+	uint8_t COL[8];   /* COL0..COL7 */
 };
 
 
@@ -73,14 +73,14 @@ class nick_device :  public device_t,
 {
 public:
 	// construction/destruction
-	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_virq_wr_callback(device_t &device, _Object object) { return downcast<nick_device &>(device).m_write_virq.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(vio_map, 8);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -113,10 +113,10 @@ private:
 	void do_right_margin();
 
 	int get_color_index(int pen_index);
-	void write_pixels2color(UINT8 pen0, UINT8 pen1, UINT8 data_byte);
-	void write_pixels2color_lpixel(UINT8 pen0, UINT8 pen1, UINT8 data_byte);
-	void write_pixels(UINT8 data_byte, UINT8 char_idx);
-	void write_pixels_lpixel(UINT8 data_byte, UINT8 char_idx);
+	void write_pixels2color(uint8_t pen0, uint8_t pen1, uint8_t data_byte);
+	void write_pixels2color_lpixel(uint8_t pen0, uint8_t pen1, uint8_t data_byte);
+	void write_pixels(uint8_t data_byte, uint8_t char_idx);
+	void write_pixels_lpixel(uint8_t data_byte, uint8_t char_idx);
 
 	void do_pixel(int clocks_visible);
 	void do_lpixel(int clocks_visible);
@@ -130,23 +130,23 @@ private:
 	void do_line();
 
 	/* current scanline within LPT */
-	UINT8 m_scanline_count;
+	uint8_t m_scanline_count;
 
-	UINT8 m_FIXBIAS;
-	UINT8 m_BORDER;
-	UINT8 m_LPL;
-	UINT8 m_LPH;
+	uint8_t m_FIXBIAS;
+	uint8_t m_BORDER;
+	uint8_t m_LPL;
+	uint8_t m_LPH;
 
-	UINT16 m_LD1;
-	UINT16 m_LD2;
+	uint16_t m_LD1;
+	uint16_t m_LD2;
 
 	LPT_ENTRY   m_LPT;
 
-	UINT32 *m_dest;
+	uint32_t *m_dest;
 	int m_dest_pos;
 	int m_dest_max_pos;
 
-	UINT8 m_reg[4];
+	uint8_t m_reg[4];
 
 	/* first clock visible on left hand side */
 	int m_first_visible_clock;
@@ -154,9 +154,9 @@ private:
 	int m_last_visible_clock;
 
 	/* given a bit pattern, this will get the pen index */
-	UINT8 m_pen_idx_4col[256];
+	uint8_t m_pen_idx_4col[256];
 	/* given a bit pattern, this will get the pen index */
-	UINT8 m_pen_idx_16col[256];
+	uint8_t m_pen_idx_16col[256];
 
 	int m_virq;
 

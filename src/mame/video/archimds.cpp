@@ -9,13 +9,13 @@
 #include "emu.h"
 #include "includes/archimds.h"
 
-UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int xstart,ystart,xend,yend;
 	int res_x,res_y;
 	int xsize,ysize;
 	int calc_dxs = 0,calc_dxe = 0;
-	const UINT8 x_step[4] = { 5, 7, 11, 19 };
+	const uint8_t x_step[4] = { 5, 7, 11, 19 };
 
 	/* border color */
 	bitmap.fill(m_palette->pen(0x10), cliprect);
@@ -40,8 +40,8 @@ UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	{
 		int count;
 		int x,y,xi;
-		UINT8 pen;
-		static UINT8 *vram = memregion("vram")->base();
+		uint8_t pen;
+		static uint8_t *vram = memregion("vram")->base();
 
 		count = (0);
 
@@ -187,7 +187,7 @@ UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				{
 					for(xi=0;xi<4;xi++)
 					{
-						UINT8 cursor_dot;
+						uint8_t cursor_dot;
 						pen = m_cursor_vram[count];
 
 						res_x = x+xi+xstart;

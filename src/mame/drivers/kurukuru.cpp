@@ -284,8 +284,8 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_bank1;
 
-	UINT8 m_sound_irq_cause;
-	UINT8 m_adpcm_data;
+	uint8_t m_sound_irq_cause;
+	uint8_t m_adpcm_data;
 
 	DECLARE_WRITE8_MEMBER(kurukuru_out_latch_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
@@ -297,7 +297,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ym2149_aout_w);
 	DECLARE_WRITE8_MEMBER(ym2149_bout_w);
 
-	void update_sound_irq(UINT8 cause);
+	void update_sound_irq(uint8_t cause);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
@@ -317,7 +317,7 @@ public:
 *************************************************/
 
 
-void kurukuru_state::update_sound_irq(UINT8 cause)
+void kurukuru_state::update_sound_irq(uint8_t cause)
 {
 	m_sound_irq_cause = cause & 3;
 	if (m_sound_irq_cause)
@@ -326,7 +326,7 @@ void kurukuru_state::update_sound_irq(UINT8 cause)
 		// latch irq vector is $ef (rst $28)
 		// timer irq vector is $f7 (rst $30)
 		// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
-		const UINT8 irq_vector[4] = { 0x00, 0xef, 0xf7, 0xe7 };
+		const uint8_t irq_vector[4] = { 0x00, 0xef, 0xf7, 0xe7 };
 		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, irq_vector[m_sound_irq_cause]);
 	}
 	else

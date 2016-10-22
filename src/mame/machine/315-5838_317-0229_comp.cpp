@@ -52,7 +52,7 @@ extern const device_type SEGA315_5838_COMP = &device_creator<sega_315_5838_comp_
 
 //#define DEBUG_DATA_DUMP
 
-sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA315_5838_COMP, "Sega 315-5838 / 317-0029 Compression (Encryption?)", tag, owner, clock, "sega315_5838", __FILE__)
 {
 }
@@ -104,10 +104,10 @@ READ32_MEMBER(sega_315_5838_comp_device::decathlt_prot2_r)
 }
 
 
-UINT32 sega_315_5838_comp_device::genericdecathlt_prot_r(UINT32 mem_mask, int channel)
+uint32_t sega_315_5838_comp_device::genericdecathlt_prot_r(uint32_t mem_mask, int channel)
 {
-//  UINT32 *fake0 = (UINT32*)memregion( ":fake0" )->base();
-//  UINT32 retvalue = 0xffff;
+//  uint32_t *fake0 = (uint32_t*)memregion( ":fake0" )->base();
+//  uint32_t retvalue = 0xffff;
 
 	switch (m_srcoffset)
 	{
@@ -115,7 +115,7 @@ UINT32 sega_315_5838_comp_device::genericdecathlt_prot_r(UINT32 mem_mask, int ch
 
 		m_decathlt_lastcount++;
 
-		UINT32 tempdata = 0;
+		uint32_t tempdata = 0;
 		tempdata |= m_channel[channel].m_read_ch(m_srcoffset) << 0;
 		m_srcoffset++;
 		tempdata |= m_channel[channel].m_read_ch(m_srcoffset) << 16;
@@ -186,7 +186,7 @@ UINT32 sega_315_5838_comp_device::genericdecathlt_prot_r(UINT32 mem_mask, int ch
 	return 0xffffffff;
 }
 
-void sega_315_5838_comp_device::set_prot_addr(UINT32 data, UINT32 mem_mask, int channel)
+void sega_315_5838_comp_device::set_prot_addr(uint32_t data, uint32_t mem_mask, int channel)
 {
 //  printf("set_prot_addr\n");
 	COMBINE_DATA(&m_srcoffset);
@@ -232,7 +232,7 @@ void sega_315_5838_comp_device::set_prot_addr(UINT32 data, UINT32 mem_mask, int 
 
 }
 
-void sega_315_5838_comp_device::set_upload_mode(UINT16 data, int channel)
+void sega_315_5838_comp_device::set_upload_mode(uint16_t data, int channel)
 {
 	if ((data == 0x8000) || (data == 0x0000))
 	{
@@ -251,7 +251,7 @@ void sega_315_5838_comp_device::set_upload_mode(UINT16 data, int channel)
 	}
 }
 
-void sega_315_5838_comp_device::upload_table_data(UINT16 data, int channel)
+void sega_315_5838_comp_device::upload_table_data(uint16_t data, int channel)
 {
 	if (m_decathlt_prot_uploadmode == 1)
 	{
@@ -281,7 +281,7 @@ void sega_315_5838_comp_device::upload_table_data(UINT16 data, int channel)
 	}
 }
 
-void sega_315_5838_comp_device::write_prot_data(UINT32 data, UINT32 mem_mask, int channel, int rev_words)
+void sega_315_5838_comp_device::write_prot_data(uint32_t data, uint32_t mem_mask, int channel, int rev_words)
 {
 	if (mem_mask==0xffff0000)
 	{
@@ -327,7 +327,7 @@ void sega_315_5838_comp_device::install_decathlt_protection()
 
 READ32_MEMBER(sega_315_5838_comp_device::doa_prot_r)
 {
-	UINT32 retval = 0;
+	uint32_t retval = 0;
 
 	if (offset == 0x7ff8/4)
 	{

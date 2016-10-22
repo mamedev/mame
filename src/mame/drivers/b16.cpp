@@ -31,9 +31,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	UINT8 *m_char_rom;
-	required_shared_ptr<UINT16> m_vram;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+	uint8_t *m_char_rom;
+	required_shared_ptr<uint16_t> m_vram;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 
 	DECLARE_READ16_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(b16_pcg_w);
@@ -45,7 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	mc6845_device *m_mc6845;
 	required_device<am9517a_device> m_dma8237;
@@ -81,11 +81,11 @@ void b16_state::video_start()
 }
 
 
-UINT32 b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int xi,yi;
-	UINT8 *gfx_rom = memregion("pcg")->base();
+	uint8_t *gfx_rom = memregion("pcg")->base();
 
 	for(y=0;y<mc6845_v_display;y++)
 	{

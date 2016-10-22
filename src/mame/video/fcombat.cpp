@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 PALETTE_INIT_MEMBER(fcombat_state, fcombat)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(fcombat_state, fcombat)
 	/* fg chars/sprites */
 	for (i = 0; i < 0x200; i++)
 	{
-		UINT8 ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
+		uint8_t ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
@@ -85,7 +85,7 @@ PALETTE_INIT_MEMBER(fcombat_state, fcombat)
 	/* using another PROM */
 	for (i = 0x200; i < 0x300; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -131,7 +131,7 @@ WRITE8_MEMBER(fcombat_state::fcombat_videoreg_w)
 
 
 
-UINT32 fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int sx, sy, offs, i;
 

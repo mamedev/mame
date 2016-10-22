@@ -61,24 +61,24 @@ protected:
 	static constexpr unsigned REG_BASE = BASE;
 
 	// 32-bit Register
-	UINT32 &WORD(unsigned x) { return m_regs[(x - REG_BASE) / 4]; }
-	const UINT32 &WORD(unsigned x) const { return m_regs[(x - REG_BASE) / 4]; }
+	uint32_t &WORD(unsigned x) { return m_regs[(x - REG_BASE) / 4]; }
+	const uint32_t &WORD(unsigned x) const { return m_regs[(x - REG_BASE) / 4]; }
 
 	// 16-bit Register, Upper Half-Word
-	UINT16 HWHI(unsigned x) const { return UINT16(WORD(x) >> 16); }
+	uint16_t HWHI(unsigned x) const { return uint16_t(WORD(x) >> 16); }
 
 	// 16-bit Register, Lower Half-Word
-	UINT16 HWLO(unsigned x) const { return UINT16(WORD(x)); }
+	uint16_t HWLO(unsigned x) const { return uint16_t(WORD(x)); }
 
-	UINT32 &WORD_SET(unsigned x, UINT32 y) { return WORD(x) |= y; }
-	UINT32 &HWHI_SET(unsigned x, UINT16 y) { return WORD(x) |= UINT32(y) << 16; }
-	UINT32 &HWLO_SET(unsigned x, UINT16 y) { return WORD(x) |= UINT32(y); }
+	uint32_t &WORD_SET(unsigned x, uint32_t y) { return WORD(x) |= y; }
+	uint32_t &HWHI_SET(unsigned x, uint16_t y) { return WORD(x) |= uint32_t(y) << 16; }
+	uint32_t &HWLO_SET(unsigned x, uint16_t y) { return WORD(x) |= uint32_t(y); }
 
-	UINT32 &WORD_RESET(unsigned x, UINT32 y) { return WORD(x) &= ~y; }
-	UINT32 &HWHI_RESET(unsigned x, UINT16 y) { return WORD(x) &= ~(UINT32(y) << 16); }
-	UINT32 &HWLO_RESET(unsigned x, UINT16 y) { return WORD(x) &= ~UINT32(y); }
+	uint32_t &WORD_RESET(unsigned x, uint32_t y) { return WORD(x) &= ~y; }
+	uint32_t &HWHI_RESET(unsigned x, uint16_t y) { return WORD(x) &= ~(uint32_t(y) << 16); }
+	uint32_t &HWLO_RESET(unsigned x, uint16_t y) { return WORD(x) &= ~uint32_t(y); }
 
-	UINT32 m_regs[COUNT];
+	uint32_t m_regs[COUNT];
 };
 
 
@@ -88,9 +88,9 @@ class gba_lcd_device
 		, protected gba_registers<0x060 / 4, 0x000>
 {
 public:
-	gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ32_MEMBER(video_r);
 	DECLARE_WRITE32_MEMBER(video_w);
@@ -138,14 +138,14 @@ protected:
 private:
 	struct internal_reg
 	{
-		INT32 status;
+		int32_t status;
 		bool  update;
 	};
 	internal_reg m_bg2x, m_bg2y, m_bg3x, m_bg3y;
 
-	UINT8 bg_video_mode();
+	uint8_t bg_video_mode();
 
-	enum class dispcnt : UINT16
+	enum class dispcnt : uint16_t
 	{
 		alt_frame_sel = 0x0010,
 		vram_map_1d   = 0x0040,
@@ -161,7 +161,7 @@ private:
 	};
 	bool is_set(dispcnt flag);
 
-	enum class dispstat : UINT16
+	enum class dispstat : uint16_t
 	{
 		vblank        = 0x0001,
 		hblank        = 0x0002,
@@ -174,18 +174,18 @@ private:
 	void clear(dispstat flag);
 	bool is_set(dispstat flag);
 
-	enum class bgcnt : UINT16
+	enum class bgcnt : uint16_t
 	{
 		mosaic_en     = 0x0040,
 		palette_256   = 0x0080,
 		wraparound_en = 0x2000
 	};
-	bool is_set(UINT16 bgxcnt, bgcnt flag);
+	bool is_set(uint16_t bgxcnt, bgcnt flag);
 
-	UINT8  bg_priority(UINT16 bgxcnt);
-	UINT32 bg_char_base(UINT16 bgxcnt);
-	UINT32 bg_screen_base(UINT16 bgxcnt);
-	void   bg_screen_size(UINT16 bgxcnt, bool text, int &width, int &height);
+	uint8_t  bg_priority(uint16_t bgxcnt);
+	uint32_t bg_char_base(uint16_t bgxcnt);
+	uint32_t bg_screen_base(uint16_t bgxcnt);
+	void   bg_screen_size(uint16_t bgxcnt, bool text, int &width, int &height);
 
 	enum class size_type
 	{
@@ -194,9 +194,9 @@ private:
 		obj_h,
 		obj_v
 	};
-	UINT16 mosaic_size(size_type type);
+	uint16_t mosaic_size(size_type type);
 
-	enum class sfx : UINT16
+	enum class sfx : uint16_t
 	{
 		none    = 0x0000,
 		alpha   = 0x0040,
@@ -210,26 +210,26 @@ private:
 		first = 0,
 		second
 	};
-	UINT8 color_sfx_target(target id);
+	uint8_t color_sfx_target(target id);
 
-	UINT16 tile_number(UINT16 vram_data) { return vram_data & 0x03ff; }
-	bool   tile_hflip(UINT16 vram_data) { return vram_data & 0x0400; }
-	bool   tile_vflip(UINT16 vram_data) { return vram_data & 0x0800; }
+	uint16_t tile_number(uint16_t vram_data) { return vram_data & 0x03ff; }
+	bool   tile_hflip(uint16_t vram_data) { return vram_data & 0x0400; }
+	bool   tile_vflip(uint16_t vram_data) { return vram_data & 0x0800; }
 
-	void update_mask(UINT8 *mask, int y);
-	void draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, dispcnt bg_enable, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, internal_reg &currentx, internal_reg &currenty, int depth);
-	void draw_roz_scanline(UINT32 *scanline, int ypos, dispcnt bg_enable, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, internal_reg &currentx, internal_reg &currenty);
-	void draw_bg_scanline(UINT32 *scanline, int ypos, dispcnt bg_enable, UINT32 ctrl, UINT32 hofs, UINT32 vofs);
-	void draw_oam_window(UINT32 *scanline, int y);
-	void draw_oam(UINT32 *scanline, int y);
+	void update_mask(uint8_t *mask, int y);
+	void draw_roz_bitmap_scanline(uint32_t *scanline, int ypos, dispcnt bg_enable, uint32_t ctrl, int32_t X, int32_t Y, int32_t PA, int32_t PB, int32_t PC, int32_t PD, internal_reg &currentx, internal_reg &currenty, int depth);
+	void draw_roz_scanline(uint32_t *scanline, int ypos, dispcnt bg_enable, uint32_t ctrl, int32_t X, int32_t Y, int32_t PA, int32_t PB, int32_t PC, int32_t PD, internal_reg &currentx, internal_reg &currenty);
+	void draw_bg_scanline(uint32_t *scanline, int ypos, dispcnt bg_enable, uint32_t ctrl, uint32_t hofs, uint32_t vofs);
+	void draw_oam_window(uint32_t *scanline, int y);
+	void draw_oam(uint32_t *scanline, int y);
 	void draw_scanline(int y);
 
 	bool is_in_window_h(int x, int window);
 	bool is_in_window_v(int y, int window);
 
-	UINT32 alpha_blend(UINT32 color0, UINT32 color1);
-	UINT32 increase_brightness(UINT32 color);
-	UINT32 decrease_brightness(UINT32 color);
+	uint32_t alpha_blend(uint32_t color0, uint32_t color1);
+	uint32_t increase_brightness(uint32_t color);
+	uint32_t decrease_brightness(uint32_t color);
 
 	devcb_write_line m_int_hblank_cb;   /* H-Blank interrupt callback function */
 	devcb_write_line m_int_vblank_cb;   /* V-Blank interrupt callback function */
@@ -237,18 +237,18 @@ private:
 	devcb_write_line m_dma_hblank_cb;   /* H-Blank DMA request callback function */
 	devcb_write_line m_dma_vblank_cb;   /* V-Blank DMA request callback function */
 
-	std::unique_ptr<UINT32[]> m_pram;
-	std::unique_ptr<UINT32[]> m_vram;
-	std::unique_ptr<UINT32[]> m_oam;
+	std::unique_ptr<uint32_t[]> m_pram;
+	std::unique_ptr<uint32_t[]> m_vram;
+	std::unique_ptr<uint32_t[]> m_oam;
 
 	emu_timer *m_scan_timer, *m_hbl_timer;
 
 	bitmap_ind16 m_bitmap;
 
-	UINT32 m_scanline[6][240];
+	uint32_t m_scanline[6][240];
 
 	// constants
-	static constexpr UINT32 TRANSPARENT_PIXEL = 0x80000000;
+	static constexpr uint32_t TRANSPARENT_PIXEL = 0x80000000;
 };
 
 #endif /* GBA_LCD_H_ */

@@ -89,7 +89,7 @@ void simpsons_state::simpsons_video_banking( int bank )
 
 ***************************************************************************/
 
-UINT32 simpsons_state::screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t simpsons_state::screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[3], bg_colorbase;
 

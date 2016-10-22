@@ -4,7 +4,7 @@
 
 const device_type MIDI_KBD = &device_creator<midi_keyboard_device>;
 
-midi_keyboard_device::midi_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+midi_keyboard_device::midi_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MIDI_KBD, "Generic MIDI Keyboard", tag, owner, clock, "midi_kbd", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_out_tx_func(*this),
@@ -50,7 +50,7 @@ void midi_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, in
 
 		int i;
 
-		UINT32 kbstate = m_keyboard->read();
+		uint32_t kbstate = m_keyboard->read();
 		if(kbstate != m_keyboard_state)
 		{
 			for (i=0; i < 24; i++)

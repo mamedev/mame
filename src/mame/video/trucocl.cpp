@@ -40,7 +40,7 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 
 PALETTE_INIT_MEMBER(trucocl_state, trucocl)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < 32;i++)
@@ -78,7 +78,7 @@ void trucocl_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(trucocl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32 );
 }
 
-UINT32 trucocl_state::screen_update_trucocl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t trucocl_state::screen_update_trucocl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

@@ -44,7 +44,7 @@ WRITE_LINE_MEMBER(mjkjidai_state::adpcm_int)
 	}
 	else
 	{
-		UINT8 const data = m_adpcmrom[m_adpcm_pos / 2];
+		uint8_t const data = m_adpcmrom[m_adpcm_pos / 2];
 		m_msm->data_w(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
 		m_adpcm_pos++;
 	}

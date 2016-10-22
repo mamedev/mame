@@ -20,96 +20,96 @@
 #define flag(_flag)     ((m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS##_##_flag) ? 1 : 0)
 
 #define mode_r1_r2(_func)   \
-	UINT8 dst_src = fetch();\
-	UINT8 dst = r(dst_src >> 4);\
-	UINT8 src = read(r(dst_src & 0x0f));\
+	uint8_t dst_src = fetch();\
+	uint8_t dst = r(dst_src >> 4);\
+	uint8_t src = read(r(dst_src & 0x0f));\
 	_func(dst, src);
 
 #define mode_r1_Ir2(_func) \
-	UINT8 dst_src = fetch();\
-	UINT8 dst = r(dst_src >> 4);\
-	UINT8 src = read(Ir(dst_src & 0x0f));\
+	uint8_t dst_src = fetch();\
+	uint8_t dst = r(dst_src >> 4);\
+	uint8_t src = read(Ir(dst_src & 0x0f));\
 	_func(dst, src);
 
 #define mode_R2_R1(_func) \
-	UINT8 src = read(R);\
-	UINT8 dst = R;\
+	uint8_t src = read(R);\
+	uint8_t dst = R;\
 	_func(dst, src);
 
 #define mode_IR2_R1(_func) \
-	UINT8 src = read(R);\
-	UINT8 dst = IR;\
+	uint8_t src = read(R);\
+	uint8_t dst = IR;\
 	_func(dst, src);
 
 #define mode_R1_IM(_func) \
-	UINT8 dst = R;\
-	UINT8 src = IM;\
+	uint8_t dst = R;\
+	uint8_t src = IM;\
 	_func(dst, src);
 
 #define mode_IR1_IM(_func) \
-	UINT8 dst = IR;\
-	UINT8 src = IM;\
+	uint8_t dst = IR;\
+	uint8_t src = IM;\
 	_func(dst, src);
 
 #define mode_r1(_func) \
-	UINT8 dst = r(opcode >> 4);\
+	uint8_t dst = r(opcode >> 4);\
 	_func(dst);
 
 #define mode_R1(_func) \
-	UINT8 dst = R;\
+	uint8_t dst = R;\
 	_func(dst);
 
 #define mode_RR1(_func) \
-	UINT8 dst = R;\
+	uint8_t dst = R;\
 	_func(dst);
 
 #define mode_IR1(_func) \
-	UINT8 dst = IR;\
+	uint8_t dst = IR;\
 	_func(dst);
 
 #define mode_r1_IM(_func) \
-	UINT8 dst = r(opcode >> 4);\
-	UINT8 src = IM;\
+	uint8_t dst = r(opcode >> 4);\
+	uint8_t src = IM;\
 	_func(dst, src);
 
 #define mode_r1_R2(_func) \
-	UINT8 dst = r(opcode >> 4);\
-	UINT8 src = read(R);\
+	uint8_t dst = r(opcode >> 4);\
+	uint8_t src = read(R);\
 	_func(dst, src);
 
 #define mode_r2_R1(_func) \
-	UINT8 src = read(r(opcode >> 4));\
-	UINT8 dst = R;\
+	uint8_t src = read(r(opcode >> 4));\
+	uint8_t dst = R;\
 	_func(dst, src);
 
 #define mode_Ir1_r2(_func) \
-	UINT8 dst_src = fetch();\
-	UINT8 dst = Ir(dst_src >> 4);\
-	UINT8 src = read(r(dst_src & 0x0f));\
+	uint8_t dst_src = fetch();\
+	uint8_t dst = Ir(dst_src >> 4);\
+	uint8_t src = read(r(dst_src & 0x0f));\
 	_func(dst, src);
 
 #define mode_R2_IR1(_func) \
-	UINT8 src = read(R);\
-	UINT8 dst = IR;\
+	uint8_t src = read(R);\
+	uint8_t dst = IR;\
 	_func(dst, src);
 
 #define mode_r1_x_R2(_func) \
-	UINT8 dst_src = fetch();\
-	UINT8 dst = r(dst_src >> 4);\
-	UINT8 src = read(read(r(dst_src & 0x0f)) + R);\
+	uint8_t dst_src = fetch();\
+	uint8_t dst = r(dst_src >> 4);\
+	uint8_t src = read(read(r(dst_src & 0x0f)) + R);\
 	_func(dst, src);
 
 #define mode_r2_x_R1(_func) \
-	UINT8 dst_src = fetch();\
-	UINT8 dst = R + read(r(dst_src & 0x0f));\
-	UINT8 src = read(r(dst_src >> 4));\
+	uint8_t dst_src = fetch();\
+	uint8_t dst = R + read(r(dst_src & 0x0f));\
+	uint8_t src = read(r(dst_src >> 4));\
 	_func(dst, src);
 
 /***************************************************************************
     LOAD INSTRUCTIONS
 ***************************************************************************/
 
-void z8_device::clear(UINT8 dst)
+void z8_device::clear(uint8_t dst)
 {
 	/* dst <- 0 */
 	register_write(dst, 0);
@@ -118,7 +118,7 @@ void z8_device::clear(UINT8 dst)
 INSTRUCTION( clr_R1 )           { mode_R1(clear) }
 INSTRUCTION( clr_IR1 )          { mode_IR1(clear) }
 
-void z8_device::load(UINT8 dst, UINT8 src)
+void z8_device::load(uint8_t dst, uint8_t src)
 {
 	/* dst <- src */
 	register_write(dst, src);
@@ -141,37 +141,37 @@ INSTRUCTION( ld_IR1_IM )        { mode_IR1_IM(load) }
 
 void z8_device::load_from_memory(address_space *space)
 {
-	UINT8 operands = fetch();
-	UINT8 dst = get_working_register(operands >> 4);
-	UINT8 src = get_working_register(operands & 0x0f);
+	uint8_t operands = fetch();
+	uint8_t dst = get_working_register(operands >> 4);
+	uint8_t src = get_working_register(operands & 0x0f);
 
-	UINT16 address = register_pair_read(src);
-	UINT8 data = m_direct->read_byte(address);
+	uint16_t address = register_pair_read(src);
+	uint8_t data = m_direct->read_byte(address);
 
 	register_write(dst, data);
 }
 
 void z8_device::load_to_memory(address_space *space)
 {
-	UINT8 operands = fetch();
-	UINT8 src = get_working_register(operands >> 4);
-	UINT8 dst = get_working_register(operands & 0x0f);
+	uint8_t operands = fetch();
+	uint8_t src = get_working_register(operands >> 4);
+	uint8_t dst = get_working_register(operands & 0x0f);
 
-	UINT16 address = register_pair_read(dst);
-	UINT8 data = register_read(src);
+	uint16_t address = register_pair_read(dst);
+	uint8_t data = register_read(src);
 
 	m_program->write_byte(address, data);
 }
 
 void z8_device::load_from_memory_autoinc(address_space *space)
 {
-	UINT8 operands = fetch();
-	UINT8 dst = get_working_register(operands >> 4);
-	UINT8 real_dst = get_intermediate_register(dst);
-	UINT8 src = get_working_register(operands & 0x0f);
+	uint8_t operands = fetch();
+	uint8_t dst = get_working_register(operands >> 4);
+	uint8_t real_dst = get_intermediate_register(dst);
+	uint8_t src = get_working_register(operands & 0x0f);
 
-	UINT16 address = register_pair_read(src);
-	UINT8 data = m_direct->read_byte(address);
+	uint16_t address = register_pair_read(src);
+	uint8_t data = m_direct->read_byte(address);
 
 	register_write(real_dst, data);
 
@@ -181,13 +181,13 @@ void z8_device::load_from_memory_autoinc(address_space *space)
 
 void z8_device::load_to_memory_autoinc(address_space *space)
 {
-	UINT8 operands = fetch();
-	UINT8 src = get_working_register(operands >> 4);
-	UINT8 dst = get_working_register(operands & 0x0f);
-	UINT8 real_src = get_intermediate_register(src);
+	uint8_t operands = fetch();
+	uint8_t src = get_working_register(operands >> 4);
+	uint8_t dst = get_working_register(operands & 0x0f);
+	uint8_t real_src = get_intermediate_register(src);
 
-	UINT16 address = register_pair_read(dst);
-	UINT8 data = register_read(real_src);
+	uint16_t address = register_pair_read(dst);
+	uint8_t data = register_read(real_src);
 
 	m_program->write_byte(address, data);
 
@@ -204,7 +204,7 @@ INSTRUCTION( lde_r2_Irr1 )      { load_to_memory(m_data); }
 INSTRUCTION( ldei_Ir1_Irr2 )    { load_from_memory_autoinc(m_data); }
 INSTRUCTION( ldei_Ir2_Irr1 )    { load_to_memory_autoinc(m_data); }
 
-void z8_device::pop(UINT8 dst)
+void z8_device::pop(uint8_t dst)
 {
 	/* dst <- @SP
 	   SP <- SP + 1 */
@@ -214,7 +214,7 @@ void z8_device::pop(UINT8 dst)
 INSTRUCTION( pop_R1 )           { mode_R1(pop) }
 INSTRUCTION( pop_IR1 )          { mode_IR1(pop) }
 
-void z8_device::push(UINT8 src)
+void z8_device::push(uint8_t src)
 {
 	/* SP <- SP - 1
 	   @SP <- src */
@@ -228,11 +228,11 @@ INSTRUCTION( push_IR2 )         { mode_IR1(push) }
     ARITHMETIC INSTRUCTIONS
 ***************************************************************************/
 
-void z8_device::add_carry(UINT8 dst, INT8 src)
+void z8_device::add_carry(uint8_t dst, int8_t src)
 {
 	/* dst <- dst + src + C */
-	UINT8 data = register_read(dst);
-	UINT16 new_data = data + src + flag(C);
+	uint8_t data = register_read(dst);
+	uint16_t new_data = data + src + flag(C);
 
 	set_flag_c(new_data & 0x100);
 	set_flag_z(new_data == 0);
@@ -251,11 +251,11 @@ INSTRUCTION( adc_IR2_R1 )       { mode_IR2_R1(add_carry) }
 INSTRUCTION( adc_R1_IM )        { mode_R1_IM(add_carry) }
 INSTRUCTION( adc_IR1_IM )       { mode_IR1_IM(add_carry) }
 
-void z8_device::add(UINT8 dst, INT8 src)
+void z8_device::add(uint8_t dst, int8_t src)
 {
 	/* dst <- dst + src */
-	UINT8 data = register_read(dst);
-	UINT16 new_data = data + src;
+	uint8_t data = register_read(dst);
+	uint16_t new_data = data + src;
 
 	set_flag_c(new_data & 0x100);
 	set_flag_z(new_data == 0);
@@ -274,11 +274,11 @@ INSTRUCTION( add_IR2_R1 )       { mode_IR2_R1(add) }
 INSTRUCTION( add_R1_IM )        { mode_R1_IM(add) }
 INSTRUCTION( add_IR1_IM )       { mode_IR1_IM(add) }
 
-void z8_device::compare(UINT8 dst, UINT8 src)
+void z8_device::compare(uint8_t dst, uint8_t src)
 {
 	/* dst - src */
-	UINT8 data = register_read(dst);
-	UINT16 new_data = data - src;
+	uint8_t data = register_read(dst);
+	uint16_t new_data = data - src;
 
 	set_flag_c(!(new_data & 0x100));
 	set_flag_z(new_data == 0);
@@ -293,17 +293,17 @@ INSTRUCTION( cp_IR2_R1 )        { mode_IR2_R1(compare) }
 INSTRUCTION( cp_R1_IM )         { mode_R1_IM(compare) }
 INSTRUCTION( cp_IR1_IM )        { mode_IR1_IM(compare) }
 
-void z8_device::decimal_adjust(UINT8 dst)
+void z8_device::decimal_adjust(uint8_t dst)
 {
 }
 
 INSTRUCTION( da_R1 )            { mode_R1(decimal_adjust) }
 INSTRUCTION( da_IR1 )           { mode_IR1(decimal_adjust) }
 
-void z8_device::decrement(UINT8 dst)
+void z8_device::decrement(uint8_t dst)
 {
 	/* dst <- dst - 1 */
-	UINT8 data = register_read(dst) - 1;
+	uint8_t data = register_read(dst) - 1;
 
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x80);
@@ -315,10 +315,10 @@ void z8_device::decrement(UINT8 dst)
 INSTRUCTION( dec_R1 )           { mode_R1(decrement) }
 INSTRUCTION( dec_IR1 )          { mode_IR1(decrement) }
 
-void z8_device::decrement_word(UINT8 dst)
+void z8_device::decrement_word(uint8_t dst)
 {
 	/* dst <- dst - 1 */
-	UINT16 data = register_pair_read(dst) - 1;
+	uint16_t data = register_pair_read(dst) - 1;
 
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x8000);
@@ -330,10 +330,10 @@ void z8_device::decrement_word(UINT8 dst)
 INSTRUCTION( decw_RR1 )         { mode_RR1(decrement_word) }
 INSTRUCTION( decw_IR1 )         { mode_IR1(decrement_word) }
 
-void z8_device::increment(UINT8 dst)
+void z8_device::increment(uint8_t dst)
 {
 	/* dst <- dst + 1 */
-	UINT8 data = register_read(dst) + 1;
+	uint8_t data = register_read(dst) + 1;
 
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x80);
@@ -346,10 +346,10 @@ INSTRUCTION( inc_r1 )           { mode_r1(increment) }
 INSTRUCTION( inc_R1 )           { mode_R1(increment) }
 INSTRUCTION( inc_IR1 )          { mode_IR1(increment) }
 
-void z8_device::increment_word(UINT8 dst)
+void z8_device::increment_word(uint8_t dst)
 {
 	/* dst <- dst + 1 */
-	UINT16 data = register_pair_read(dst) + 1;
+	uint16_t data = register_pair_read(dst) + 1;
 
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x8000);
@@ -361,11 +361,11 @@ void z8_device::increment_word(UINT8 dst)
 INSTRUCTION( incw_RR1 )         { mode_RR1(increment_word) }
 INSTRUCTION( incw_IR1 )         { mode_IR1(increment_word) }
 
-void z8_device::subtract_carry(UINT8 dst, UINT8 src)
+void z8_device::subtract_carry(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst - src - C */
-	UINT8 data = register_read(dst);
-	UINT16 new_data = data - src;
+	uint8_t data = register_read(dst);
+	uint16_t new_data = data - src;
 
 	set_flag_c(!(new_data & 0x100));
 	set_flag_z(new_data == 0);
@@ -384,11 +384,11 @@ INSTRUCTION( sbc_IR2_R1 )       { mode_IR2_R1(subtract_carry) }
 INSTRUCTION( sbc_R1_IM )        { mode_R1_IM(subtract_carry) }
 INSTRUCTION( sbc_IR1_IM )       { mode_IR1_IM(subtract_carry) }
 
-void z8_device::subtract(UINT8 dst, UINT8 src)
+void z8_device::subtract(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst - src */
-	UINT8 data = register_read(dst);
-	UINT16 new_data = data - src;
+	uint8_t data = register_read(dst);
+	uint16_t new_data = data - src;
 
 	set_flag_c(!(new_data & 0x100));
 	set_flag_z(new_data == 0);
@@ -411,10 +411,10 @@ INSTRUCTION( sub_IR1_IM )       { mode_IR1_IM(subtract) }
     LOGICAL INSTRUCTIONS
 ***************************************************************************/
 
-void z8_device::_and(UINT8 dst, UINT8 src)
+void z8_device::_and(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst AND src */
-	UINT8 data = register_read(dst) & src;
+	uint8_t data = register_read(dst) & src;
 	register_write(dst, data);
 
 	set_flag_z(data == 0);
@@ -429,10 +429,10 @@ INSTRUCTION( and_IR2_R1 )       { mode_IR2_R1(_and) }
 INSTRUCTION( and_R1_IM )        { mode_R1_IM(_and) }
 INSTRUCTION( and_IR1_IM )       { mode_IR1_IM(_and) }
 
-void z8_device::complement(UINT8 dst)
+void z8_device::complement(uint8_t dst)
 {
 	/* dst <- NOT dst */
-	UINT8 data = register_read(dst) ^ 0xff;
+	uint8_t data = register_read(dst) ^ 0xff;
 	register_write(dst, data);
 
 	set_flag_z(data == 0);
@@ -443,10 +443,10 @@ void z8_device::complement(UINT8 dst)
 INSTRUCTION( com_R1 )           { mode_R1(complement) }
 INSTRUCTION( com_IR1 )          { mode_IR1(complement) }
 
-void z8_device::_or(UINT8 dst, UINT8 src)
+void z8_device::_or(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst OR src */
-	UINT8 data = register_read(dst) | src;
+	uint8_t data = register_read(dst) | src;
 	register_write(dst, data);
 
 	set_flag_z(data == 0);
@@ -461,10 +461,10 @@ INSTRUCTION( or_IR2_R1 )        { mode_IR2_R1(_or) }
 INSTRUCTION( or_R1_IM )         { mode_R1_IM(_or) }
 INSTRUCTION( or_IR1_IM )        { mode_IR1_IM(_or) }
 
-void z8_device::_xor(UINT8 dst, UINT8 src)
+void z8_device::_xor(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst XOR src */
-	UINT8 data = register_read(dst) ^ src;
+	uint8_t data = register_read(dst) ^ src;
 	register_write(dst, data);
 
 	set_flag_z(data == 0);
@@ -483,22 +483,22 @@ INSTRUCTION( xor_IR1_IM )       { mode_IR1_IM(_xor) }
     PROGRAM CONTROL INSTRUCTIONS
 ***************************************************************************/
 
-void z8_device::call(UINT16 dst)
+void z8_device::call(uint16_t dst)
 {
 	stack_push_word(m_pc);
 	m_pc = dst;
 }
 
-INSTRUCTION( call_IRR1 )        { UINT16 dst = register_pair_read(get_intermediate_register(get_register(fetch()))); call(dst); }
-INSTRUCTION( call_DA )          { UINT16 dst = (fetch() << 8) | fetch(); call(dst); }
+INSTRUCTION( call_IRR1 )        { uint16_t dst = register_pair_read(get_intermediate_register(get_register(fetch()))); call(dst); }
+INSTRUCTION( call_DA )          { uint16_t dst = (fetch() << 8) | fetch(); call(dst); }
 
 INSTRUCTION( djnz_r1_RA )
 {
-	INT8 ra = (INT8)fetch();
+	int8_t ra = (int8_t)fetch();
 
 	/* r <- r - 1 */
 	int r = get_working_register(opcode >> 4);
-	UINT8 data = register_read(r) - 1;
+	uint8_t data = register_read(r) - 1;
 	register_write(r, data);
 
 	/* if r<>0, PC <- PC + dst */
@@ -530,7 +530,7 @@ INSTRUCTION( ret )
 	m_pc = stack_pop_word();
 }
 
-void z8_device::jump(UINT16 dst)
+void z8_device::jump(uint16_t dst)
 {
 	/* PC <- dst */
 	m_pc = dst;
@@ -567,7 +567,7 @@ int z8_device::check_condition_code(int cc)
 
 INSTRUCTION( jp_cc_DA )
 {
-	UINT16 dst = (fetch() << 8) | fetch();
+	uint16_t dst = (fetch() << 8) | fetch();
 
 	/* if cc is true, then PC <- dst */
 	if (check_condition_code(opcode >> 4))
@@ -579,8 +579,8 @@ INSTRUCTION( jp_cc_DA )
 
 INSTRUCTION( jr_cc_RA )
 {
-	INT8 ra = (INT8)fetch();
-	UINT16 dst = m_pc + ra;
+	int8_t ra = (int8_t)fetch();
+	uint16_t dst = m_pc + ra;
 
 	/* if cc is true, then PC <- dst */
 	if (check_condition_code(opcode >> 4))
@@ -594,10 +594,10 @@ INSTRUCTION( jr_cc_RA )
     BIT MANIPULATION INSTRUCTIONS
 ***************************************************************************/
 
-void z8_device::test_complement_under_mask(UINT8 dst, UINT8 src)
+void z8_device::test_complement_under_mask(uint8_t dst, uint8_t src)
 {
 	/* NOT(dst) AND src */
-	UINT8 data = (register_read(dst) ^ 0xff) & src;
+	uint8_t data = (register_read(dst) ^ 0xff) & src;
 
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x80);
@@ -611,10 +611,10 @@ INSTRUCTION( tcm_IR2_R1 )       { mode_IR2_R1(test_complement_under_mask) }
 INSTRUCTION( tcm_R1_IM )        { mode_R1_IM(test_complement_under_mask) }
 INSTRUCTION( tcm_IR1_IM )       { mode_IR1_IM(test_complement_under_mask) }
 
-void z8_device::test_under_mask(UINT8 dst, UINT8 src)
+void z8_device::test_under_mask(uint8_t dst, uint8_t src)
 {
 	/* dst AND src */
-	UINT8 data = register_read(dst) & src;
+	uint8_t data = register_read(dst) & src;
 
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x80);
@@ -632,11 +632,11 @@ INSTRUCTION( tm_IR1_IM )        { mode_IR1_IM(test_under_mask) }
     ROTATE AND SHIFT INSTRUCTIONS
 ***************************************************************************/
 
-void z8_device::rotate_left(UINT8 dst)
+void z8_device::rotate_left(uint8_t dst)
 {
 	/* << */
-	UINT8 data = register_read(dst);
-	UINT8 new_data = (data << 1) | BIT(data, 7);
+	uint8_t data = register_read(dst);
+	uint8_t new_data = (data << 1) | BIT(data, 7);
 
 	set_flag_c(data & 0x80);
 	set_flag_z(data == 0);
@@ -649,11 +649,11 @@ void z8_device::rotate_left(UINT8 dst)
 INSTRUCTION( rl_R1 )            { mode_R1(rotate_left) }
 INSTRUCTION( rl_IR1 )           { mode_IR1(rotate_left) }
 
-void z8_device::rotate_left_carry(UINT8 dst)
+void z8_device::rotate_left_carry(uint8_t dst)
 {
 	/* << C */
-	UINT8 data = register_read(dst);
-	UINT8 new_data = (data << 1) | flag(C);
+	uint8_t data = register_read(dst);
+	uint8_t new_data = (data << 1) | flag(C);
 
 	set_flag_c(data & 0x80);
 	set_flag_z(data == 0);
@@ -666,11 +666,11 @@ void z8_device::rotate_left_carry(UINT8 dst)
 INSTRUCTION( rlc_R1 )           { mode_R1(rotate_left_carry) }
 INSTRUCTION( rlc_IR1 )          { mode_IR1(rotate_left_carry) }
 
-void z8_device::rotate_right(UINT8 dst)
+void z8_device::rotate_right(uint8_t dst)
 {
 	/* >> */
-	UINT8 data = register_read(dst);
-	UINT8 new_data = ((data & 0x01) << 7) | (data >> 1);
+	uint8_t data = register_read(dst);
+	uint8_t new_data = ((data & 0x01) << 7) | (data >> 1);
 
 	set_flag_c(data & 0x01);
 	set_flag_z(data == 0);
@@ -683,11 +683,11 @@ void z8_device::rotate_right(UINT8 dst)
 INSTRUCTION( rr_R1 )            { mode_R1(rotate_right) }
 INSTRUCTION( rr_IR1 )           { mode_IR1(rotate_right) }
 
-void z8_device::rotate_right_carry(UINT8 dst)
+void z8_device::rotate_right_carry(uint8_t dst)
 {
 	/* >> C */
-	UINT8 data = register_read(dst);
-	UINT8 new_data = (flag(C) << 7) | (data >> 1);
+	uint8_t data = register_read(dst);
+	uint8_t new_data = (flag(C) << 7) | (data >> 1);
 
 	set_flag_c(data & 0x01);
 	set_flag_z(data == 0);
@@ -700,11 +700,11 @@ void z8_device::rotate_right_carry(UINT8 dst)
 INSTRUCTION( rrc_R1 )           { mode_R1(rotate_right_carry) }
 INSTRUCTION( rrc_IR1 )          { mode_IR1(rotate_right_carry) }
 
-void z8_device::shift_right_arithmetic(UINT8 dst)
+void z8_device::shift_right_arithmetic(uint8_t dst)
 {
 	/* */
-	UINT8 data = register_read(dst);
-	UINT8 new_data = (data & 0x80) | ((data >> 1) & 0x7f);
+	uint8_t data = register_read(dst);
+	uint8_t new_data = (data & 0x80) | ((data >> 1) & 0x7f);
 
 	set_flag_c(data & 0x01);
 	set_flag_z(data == 0);
@@ -717,10 +717,10 @@ void z8_device::shift_right_arithmetic(UINT8 dst)
 INSTRUCTION( sra_R1 )           { mode_R1(shift_right_arithmetic) }
 INSTRUCTION( sra_IR1 )          { mode_IR1(shift_right_arithmetic) }
 
-void z8_device::swap(UINT8 dst)
+void z8_device::swap(uint8_t dst)
 {
 	/* dst(7-4) <-> dst(3-0) */
-	UINT8 data = register_read(dst);
+	uint8_t data = register_read(dst);
 	data = (data << 4) | (data >> 4);
 	register_write(dst, data);
 

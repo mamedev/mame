@@ -61,12 +61,12 @@ void concept_state::video_start()
 {
 }
 
-UINT32 concept_state::screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t concept_state::screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* resolution is 720*560 */
-	UINT16 *videoram = m_videoram;
+	uint16_t *videoram = m_videoram;
 	int x, y;
-	UINT16 *line;
+	uint16_t *line;
 
 	for (y = 0; y < 560; y++)
 	{
@@ -138,7 +138,7 @@ WRITE8_MEMBER(concept_state::via_out_a)
 */
 READ8_MEMBER(concept_state::via_in_b)
 {
-	UINT8 status;
+	uint8_t status;
 
 	status = ((ioport("DSW0")->read() & 0x80) >> 1) | ((ioport("DSW0")->read() & 0x40) << 1);
 	LOG(("via_in_b: VIA port B (DIP switches, Video, Comm Rate) - status: 0x%2.2x\n", status));

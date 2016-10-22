@@ -36,7 +36,7 @@ void banctec_state::machine_reset()
 
 TILE_GET_INFO_MEMBER(banctec_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];
 	int color = 1;
 
@@ -48,7 +48,7 @@ void banctec_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(banctec_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 }
 
-UINT32 banctec_state::screen_update_banctec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t banctec_state::screen_update_banctec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 

@@ -241,7 +241,7 @@ protected:
 		// Enumerate all the directinput joysticks and add them if they aren't xinput compatible
 		result = m_dinput_helper->enum_attached_devices(DI8DEVCLASS_GAMECTRL, this, &machine);
 		if (result != DI_OK)
-			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", static_cast<UINT32>(result));
+			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", static_cast<uint32_t>(result));
 
 		xinput_joystick_device *devinfo;
 

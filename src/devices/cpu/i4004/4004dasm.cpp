@@ -15,10 +15,10 @@
 
 CPU_DISASSEMBLE( i4004 )
 {
-	UINT32 flags = 0;
-	UINT8 op;
+	uint32_t flags = 0;
+	uint8_t op;
 	unsigned PC = pc;
-	UINT16 page = PC & 0x0f00;
+	uint16_t page = PC & 0x0f00;
 	switch (op = OP(pc++))
 	{
 		case 0x00:  sprintf (buffer,"nop");                                 break;

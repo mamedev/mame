@@ -63,7 +63,7 @@ struct namco_06xx_config
 class namco_06xx_device : public device_t
 {
 public:
-	namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_maincpu(device_t &device, const char *tag) { downcast<namco_06xx_device &>(device).m_nmicpu.set_tag(tag); }
 
@@ -97,7 +97,7 @@ private:
 	TIMER_CALLBACK_MEMBER( nmi_generate );
 
 	// internal state
-	UINT8 m_control;
+	uint8_t m_control;
 	emu_timer *m_nmi_timer;
 
 	required_device<cpu_device> m_nmicpu;

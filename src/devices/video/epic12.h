@@ -9,14 +9,14 @@
 	epic12_device::set_mainramsize(*device, _rgn);
 
 
-extern UINT8 epic12_device_colrtable[0x20][0x40];
-extern UINT8 epic12_device_colrtable_rev[0x20][0x40];
-extern UINT8 epic12_device_colrtable_add[0x20][0x20];
-extern UINT64 epic12_device_blit_delay;
+extern uint8_t epic12_device_colrtable[0x20][0x40];
+extern uint8_t epic12_device_colrtable_rev[0x20][0x40];
+extern uint8_t epic12_device_colrtable_add[0x20][0x20];
+extern uint64_t epic12_device_blit_delay;
 
 struct _clr_t
 {
-	UINT8 b,g,r,t;
+	uint8_t b,g,r,t;
 };
 
 typedef struct _clr_t clr_t;
@@ -24,12 +24,12 @@ typedef struct _clr_t clr_t;
 union colour_t
 {
 	clr_t trgb;
-	UINT32 u32;
+	uint32_t u32;
 };
 
 typedef void (*epic12_device_blitfunction)(bitmap_rgb32 *,
 						const rectangle *,
-						UINT32 *, /* gfx */
+						uint32_t *, /* gfx */
 						int , /* src_x */
 						int , /* src_y */
 						const int , /* dst_x_start */
@@ -37,8 +37,8 @@ typedef void (*epic12_device_blitfunction)(bitmap_rgb32 *,
 						int , /* dimx */
 						int , /* dimy */
 						const int , /* flipy */
-						const UINT8 , /* s_alpha */
-						const UINT8 , /* d_alpha */
+						const uint8_t , /* s_alpha */
+						const uint8_t , /* d_alpha */
 						//int , /* tint */
 						const clr_t * );
 
@@ -47,14 +47,14 @@ class epic12_device : public device_t,
 	public device_video_interface
 {
 public:
-	epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_rambase(UINT16* rambase) { m_ram16 = rambase; }
+	void set_rambase(uint16_t* rambase) { m_ram16 = rambase; }
 	void set_delay_scale(int delay_scale) { m_delay_scale = delay_scale; }
 	void set_is_unsafe(int is_unsafe) { m_is_unsafe = is_unsafe; }
 	void set_cpu_device(cpu_device* maincpu) { m_maincpu = maincpu; }
 
-	inline UINT16 READ_NEXT_WORD(offs_t *addr);
+	inline uint16_t READ_NEXT_WORD(offs_t *addr);
 
 	static void set_mainramsize(device_t &device, int ramsize)
 	{
@@ -70,16 +70,16 @@ public:
 
 	void draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	UINT16* m_ram16;
-	UINT32 m_gfx_addr;
-	UINT32 m_gfx_scroll_0_x, m_gfx_scroll_0_y;
-	UINT32 m_gfx_scroll_1_x, m_gfx_scroll_1_y;
+	uint16_t* m_ram16;
+	uint32_t m_gfx_addr;
+	uint32_t m_gfx_scroll_0_x, m_gfx_scroll_0_y;
+	uint32_t m_gfx_scroll_1_x, m_gfx_scroll_1_y;
 
 	int m_gfx_size;
 	std::unique_ptr<bitmap_rgb32> m_bitmaps;
 	rectangle m_clip;
 
-	UINT16* m_use_ram;
+	uint16_t* m_use_ram;
 	int m_main_ramsize; // type D has double the main ram
 	int m_main_rammask;
 
@@ -92,13 +92,13 @@ public:
 	// thread safe mode, with no delays & shadow ram copy
 	DECLARE_READ32_MEMBER(blitter_r);
 	DECLARE_WRITE32_MEMBER(blitter_w);
-	UINT32 m_gfx_addr_shadowcopy;
-	UINT32 m_gfx_scroll_0_x_shadowcopy, m_gfx_scroll_0_y_shadowcopy;
-	UINT32 m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_y_shadowcopy;
-	std::unique_ptr<UINT16[]> m_ram16_copy;
+	uint32_t m_gfx_addr_shadowcopy;
+	uint32_t m_gfx_scroll_0_x_shadowcopy, m_gfx_scroll_0_y_shadowcopy;
+	uint32_t m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_y_shadowcopy;
+	std::unique_ptr<uint16_t[]> m_ram16_copy;
 	inline void gfx_upload_shadow_copy(address_space &space, offs_t *addr);
 	inline void gfx_create_shadow_copy(address_space &space);
-	inline UINT16 COPY_NEXT_WORD(address_space &space, offs_t *addr);
+	inline uint16_t COPY_NEXT_WORD(address_space &space, offs_t *addr);
 	inline void gfx_draw_shadow_copy(address_space &space, offs_t *addr);
 	inline void gfx_upload(offs_t *addr);
 	inline void gfx_draw(offs_t *addr);
@@ -115,7 +115,7 @@ public:
 	static void *blit_request_callback_unsafe(void *param, int threadid);
 
 #define BLIT_FUNCTION static void
-#define BLIT_PARAMS bitmap_rgb32 *bitmap, const rectangle *clip, UINT32 *gfx, int src_x, int src_y, const int dst_x_start, const int dst_y_start, int dimx, int dimy, const int flipy, const UINT8 s_alpha, const UINT8 d_alpha, const clr_t *tint_clr
+#define BLIT_PARAMS bitmap_rgb32 *bitmap, const rectangle *clip, uint32_t *gfx, int src_x, int src_y, const int dst_x_start, const int dst_y_start, int dimx, int dimy, const int flipy, const uint8_t s_alpha, const uint8_t d_alpha, const clr_t *tint_clr
 
 	BLIT_FUNCTION draw_sprite_f0_ti0_plain(BLIT_PARAMS);
 	BLIT_FUNCTION draw_sprite_f0_ti0_tr1_s0_d0(BLIT_PARAMS);
@@ -652,7 +652,7 @@ public:
 
 
 
-	static inline void pen_to_clr(UINT32 pen, clr_t *clr)
+	static inline void pen_to_clr(uint32_t pen, clr_t *clr)
 	{
 	// --t- ---- rrrr r--- gggg g--- bbbb b---  format
 		clr->r = (pen >> (16+3));// & 0x1f;
@@ -668,7 +668,7 @@ public:
 
 
 	// convert separate r,g,b biases (0..80..ff) to clr_t (-1f..0..1f)
-	static inline void tint_to_clr(UINT8 r, UINT8 g, UINT8 b, clr_t *clr)
+	static inline void tint_to_clr(uint8_t r, uint8_t g, uint8_t b, clr_t *clr)
 	{
 		clr->r  =   r>>2;
 		clr->g  =   g>>2;
@@ -676,7 +676,7 @@ public:
 	};
 
 	// clr_t to r5g5b5
-	static inline UINT32 clr_to_pen(const clr_t *clr)
+	static inline uint32_t clr_to_pen(const clr_t *clr)
 	{
 	// --t- ---- rrrr r--- gggg g--- bbbb b---  format
 		return (clr->r << (16+3)) | (clr->g << (8+3)) | (clr->b << 3);
@@ -686,7 +686,7 @@ public:
 	};
 
 
-	static inline void clr_add_with_clr_mul_fixed(clr_t *clr, const clr_t *clr0, const UINT8 mulfixed_val, const clr_t *mulfixed_clr0)
+	static inline void clr_add_with_clr_mul_fixed(clr_t *clr, const clr_t *clr0, const uint8_t mulfixed_val, const clr_t *mulfixed_clr0)
 	{
 		clr->r = epic12_device_colrtable_add[clr0->r][epic12_device_colrtable[(mulfixed_clr0->r)][mulfixed_val]];
 		clr->g = epic12_device_colrtable_add[clr0->g][epic12_device_colrtable[(mulfixed_clr0->g)][mulfixed_val]];
@@ -707,7 +707,7 @@ public:
 		clr->b = epic12_device_colrtable_add[clr0->r][epic12_device_colrtable[(clr1->b)][(clr1->b)]];
 	}
 
-	static inline  void clr_add_with_clr_mul_fixed_rev(clr_t *clr, const clr_t *clr0, const UINT8 val, const clr_t *clr1)
+	static inline  void clr_add_with_clr_mul_fixed_rev(clr_t *clr, const clr_t *clr0, const uint8_t val, const clr_t *clr1)
 	{
 		clr->r =  epic12_device_colrtable_add[clr0->r][epic12_device_colrtable_rev[val][(clr1->r)]];
 		clr->g =  epic12_device_colrtable_add[clr0->g][epic12_device_colrtable_rev[val][(clr1->g)]];
@@ -787,14 +787,14 @@ public:
 		clr0->b = epic12_device_colrtable_rev[(clr2->b)][(clr1->b)];
 	}
 
-	static inline void clr_mul_fixed(clr_t *clr, const UINT8 val, const clr_t *clr0)
+	static inline void clr_mul_fixed(clr_t *clr, const uint8_t val, const clr_t *clr0)
 	{
 		clr->r = epic12_device_colrtable[val][(clr0->r)];
 		clr->g = epic12_device_colrtable[val][(clr0->g)];
 		clr->b = epic12_device_colrtable[val][(clr0->b)];
 	}
 
-	static inline void clr_mul_fixed_rev(clr_t *clr, const UINT8 val, const clr_t *clr0)
+	static inline void clr_mul_fixed_rev(clr_t *clr, const uint8_t val, const clr_t *clr0)
 	{
 		clr->r = epic12_device_colrtable_rev[val][(clr0->r)];
 		clr->g = epic12_device_colrtable_rev[val][(clr0->g)];

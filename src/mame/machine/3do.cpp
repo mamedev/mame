@@ -102,7 +102,7 @@ IRQ1
 0x00000001 DMA Player bus
 
 */
-void _3do_state::m_3do_request_fiq(UINT32 irq_req, UINT8 type)
+void _3do_state::m_3do_request_fiq(uint32_t irq_req, uint8_t type)
 {
 	if(type)
 		m_clio.irq1 |= irq_req;
@@ -130,8 +130,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
 	    --x- reload flag
 	    ---x decrement flag (enable)
 	*/
-	UINT8 timer_flag;
-	UINT8 carry_val;
+	uint8_t timer_flag;
+	uint8_t carry_val;
 
 	carry_val = 1;
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER(_3do_state::_3do_nvarea_w) { m_nvmem[offset] = data; }
 */
 
 READ32_MEMBER(_3do_state::_3do_slow2_r){
-	UINT32 data = 0;
+	uint32_t data = 0;
 
 	logerror( "%08X: UNK_318 read offset = %08X\n", m_maincpu->pc(), offset );
 
@@ -235,8 +235,8 @@ WRITE32_MEMBER(_3do_state::_3do_slow2_w)
 
 READ32_MEMBER(_3do_state::_3do_svf_r)
 {
-	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
-	UINT32 *p = m_vram + addr;
+	uint32_t addr = ( offset & ( 0x07fc / 4 ) ) << 9;
+	uint32_t *p = m_vram + addr;
 
 	logerror( "%08X: SVF read offset = %08X\n", m_maincpu->pc(), offset*4 );
 
@@ -260,8 +260,8 @@ READ32_MEMBER(_3do_state::_3do_svf_r)
 
 WRITE32_MEMBER(_3do_state::_3do_svf_w)
 {
-	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
-	UINT32 *p = m_vram + addr;
+	uint32_t addr = ( offset & ( 0x07fc / 4 ) ) << 9;
+	uint32_t *p = m_vram + addr;
 
 	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset*4, data, mem_mask );
 
@@ -269,7 +269,7 @@ WRITE32_MEMBER(_3do_state::_3do_svf_w)
 	{
 	case 0x0000/4:      /* SPORT transfer */
 		{
-			UINT32 keep_bits = data ^ 0xffffffff;
+			uint32_t keep_bits = data ^ 0xffffffff;
 
 			for ( int i = 0; i < 512; i++ )
 			{
@@ -282,8 +282,8 @@ WRITE32_MEMBER(_3do_state::_3do_svf_w)
 		break;
 	case 0x4000/4:      /* Flash write */
 		{
-			UINT32 keep_bits = data ^ 0xffffffff;
-			UINT32 new_bits = m_svf.color & data;
+			uint32_t keep_bits = data ^ 0xffffffff;
+			uint32_t new_bits = m_svf.color & data;
 
 			for ( int i = 0; i < 512; i++ )
 			{
@@ -663,7 +663,7 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 	/* TODO: for debug, to be removed once that we write the CPU core */
 	if(offset >= 0x3800/4 && offset <= 0x39ff/4)
 	{
-		UINT32 res = 0;
+		uint32_t res = 0;
 		offset &= (0x1ff/4);
 		res = (m_dspp.EO[(offset<<1)+0] << 16);
 		res |= (m_dspp.EO[(offset<<1)+1] & 0xffff);
@@ -672,7 +672,7 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 
 	if(offset >= 0x3c00/4 && offset <= 0x3fff/4)
 	{
-		UINT16 res;
+		uint16_t res;
 		offset &= (0x3ff/4);
 		res = m_dspp.EO[offset] & 0xffff;
 		return res;
@@ -926,16 +926,16 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 		break;
 
 	case 0x0200/4:
-		m_clio.timer_ctrl |= (UINT64)data;
+		m_clio.timer_ctrl |= (uint64_t)data;
 		break;
 	case 0x0204/4:
-		m_clio.timer_ctrl &= ~(UINT64)data;
+		m_clio.timer_ctrl &= ~(uint64_t)data;
 		break;
 	case 0x0208/4:
-		m_clio.timer_ctrl |= ((UINT64)data << 32);
+		m_clio.timer_ctrl |= ((uint64_t)data << 32);
 		break;
 	case 0x020c/4:
-		m_clio.timer_ctrl &= ~((UINT64)data << 32);
+		m_clio.timer_ctrl &= ~((uint64_t)data << 32);
 		break;
 
 	case 0x0220/4:
@@ -1036,20 +1036,20 @@ VIDEO_START_MEMBER(_3do_state,_3do)
 }
 
 
-UINT32 _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *source_p = m_vram + 0x1c0000 / 4;
+	uint32_t *source_p = m_vram + 0x1c0000 / 4;
 
 	for ( int y = 0; y < 120; y++ )
 	{
-		UINT32  *dest_p0 = &bitmap.pix32(22 + y * 2, 254 );
-		UINT32  *dest_p1 = &bitmap.pix32(22 + y * 2 + 1, 254 );
+		uint32_t  *dest_p0 = &bitmap.pix32(22 + y * 2, 254 );
+		uint32_t  *dest_p1 = &bitmap.pix32(22 + y * 2 + 1, 254 );
 
 		for ( int x = 0; x < 320; x++ )
 		{
 			/* Every dword contains two pixels, upper word is top pixel, lower is bottom. */
-			UINT32 lower = *source_p & 0xffff;
-			UINT32 upper = ( *source_p >> 16 ) & 0xffff;
+			uint32_t lower = *source_p & 0xffff;
+			uint32_t upper = ( *source_p >> 16 ) & 0xffff;
 			int r, g, b;
 
 			/* Format is RGB555 */
@@ -1112,13 +1112,13 @@ void _3do_state::m_3do_clio_init( screen_device *screen )
 	m_clio.revision = 0x02022000 /* 0x04000000 */;
 	m_clio.unclerev = 0x03800000;
 	m_clio.expctl = 0x80;    /* ARM has the expansion bus */
-	m_dspp.N = std::make_unique<UINT16[]>(0x800 );
-	m_dspp.EI = std::make_unique<UINT16[]>(0x400 );
-	m_dspp.EO = std::make_unique<UINT16[]>(0x400 );
+	m_dspp.N = std::make_unique<uint16_t[]>(0x800 );
+	m_dspp.EI = std::make_unique<uint16_t[]>(0x400 );
+	m_dspp.EO = std::make_unique<uint16_t[]>(0x400 );
 
-	memset(m_dspp.N.get(), 0, sizeof(UINT16) * 0x400);
-	memset(m_dspp.EI.get(), 0, sizeof(UINT16) * 0x400);
-	memset(m_dspp.EO.get(), 0, sizeof(UINT16) * 0x400);
+	memset(m_dspp.N.get(), 0, sizeof(uint16_t) * 0x400);
+	memset(m_dspp.EI.get(), 0, sizeof(uint16_t) * 0x400);
+	memset(m_dspp.EO.get(), 0, sizeof(uint16_t) * 0x400);
 
 	save_pointer(NAME(m_dspp.N.get()), 0x800);
 	save_pointer(NAME(m_dspp.EI.get()), 0x400);

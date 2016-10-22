@@ -43,10 +43,10 @@ public:
 	{
 	}
 
-	std::unique_ptr<UINT32[]> m_bios_ram;
-	std::unique_ptr<UINT32[]> m_bios_ext_ram;
-	UINT8 m_mtxc_config_reg[256];
-	UINT8 m_piix4_config_reg[4][256];
+	std::unique_ptr<uint32_t[]> m_bios_ram;
+	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
+	uint8_t m_mtxc_config_reg[256];
+	uint8_t m_piix4_config_reg[4][256];
 
 	DECLARE_WRITE32_MEMBER( bios_ext_ram_w );
 
@@ -59,7 +59,7 @@ public:
 
 // Intel 82439TX System Controller (MTXC)
 
-static UINT8 mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
+static uint8_t mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	queen_state *state = busdevice->machine().driver_data<queen_state>();
 //  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
@@ -67,7 +67,7 @@ static UINT8 mtxc_config_r(device_t *busdevice, device_t *device, int function, 
 	return state->m_mtxc_config_reg[reg];
 }
 
-static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
+static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
 {
 	queen_state *state = busdevice->machine().driver_data<queen_state>();
 	printf("MTXC: write %d, %02X, %02X\n",  function, reg, data);
@@ -107,9 +107,9 @@ void queen_state::intel82439tx_init()
 	m_mtxc_config_reg[0x65] = 0x02;
 }
 
-static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= mtxc_config_r(busdevice, device, function, reg + 3) << 24;
@@ -129,7 +129,7 @@ static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int func
 	return r;
 }
 
-static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -151,7 +151,7 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
 
-static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
+static uint8_t piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	if ((function >= 4) && (function <= 7))
 	{
@@ -163,16 +163,16 @@ static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function,
 	return state->m_piix4_config_reg[function][reg];
 }
 
-static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
+static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
 {
 	queen_state *state = busdevice->machine().driver_data<queen_state>();
 //  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
 	state->m_piix4_config_reg[function][reg] = data;
 }
 
-static UINT32 intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
@@ -192,7 +192,7 @@ static UINT32 intel82371ab_pci_r(device_t *busdevice, device_t *device, int func
 	return r;
 }
 
-static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -256,8 +256,8 @@ ADDRESS_MAP_END
 
 void queen_state::machine_start()
 {
-	m_bios_ram = std::make_unique<UINT32[]>(0x10000/4);
-	m_bios_ext_ram = std::make_unique<UINT32[]>(0x10000/4);
+	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
+	m_bios_ext_ram = std::make_unique<uint32_t[]>(0x10000/4);
 
 	intel82439tx_init();
 }

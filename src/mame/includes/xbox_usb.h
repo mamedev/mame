@@ -13,12 +13,12 @@ struct OHCIEndpointDescriptor {
 	int d; // Direction
 	int en; // EndpointNumber
 	int fa; // FunctionAddress
-	UINT32 tailp; // TDQueueTailPointer
-	UINT32 headp; // TDQueueHeadPointer
-	UINT32 nexted; // NextED
+	uint32_t tailp; // TDQueueTailPointer
+	uint32_t headp; // TDQueueHeadPointer
+	uint32_t nexted; // NextED
 	int c; // toggleCarry
 	int h; // Halted
-	UINT32 word0;
+	uint32_t word0;
 };
 
 struct OHCITransferDescriptor {
@@ -28,10 +28,10 @@ struct OHCITransferDescriptor {
 	int di; // DelayInterrupt
 	int dp; // Direction/PID
 	int r; // bufferRounding
-	UINT32 cbp; // CurrentBufferPointer
-	UINT32 nexttd; // NextTD
-	UINT32 be; // BufferEnd
-	UINT32 word0;
+	uint32_t cbp; // CurrentBufferPointer
+	uint32_t nexttd; // NextTD
+	uint32_t be; // BufferEnd
+	uint32_t word0;
 };
 
 struct OHCIIsochronousTransferDescriptor {
@@ -39,12 +39,12 @@ struct OHCIIsochronousTransferDescriptor {
 	int fc; // FrameCount
 	int di; // DelayInterrupt
 	int sf; // StartingFrame
-	UINT32 bp0; // BufferPage0
-	UINT32 nexttd; // NextTD
-	UINT32 be; // BufferEnd
-	UINT32 offset[8]; // Offset/PacketStatusWord
-	UINT32 word0;
-	UINT32 word1;
+	uint32_t bp0; // BufferPage0
+	uint32_t nexttd; // NextTD
+	uint32_t be; // BufferEnd
+	uint32_t offset[8]; // Offset/PacketStatusWord
+	uint32_t word0;
+	uint32_t word1;
 };
 
 enum OHCIRegisters {
@@ -187,60 +187,60 @@ enum OHCICompletionCode {
 };
 
 struct USBSetupPacket {
-	UINT8 bmRequestType;
-	UINT8 bRequest;
-	UINT16 wValue;
-	UINT16 wIndex;
-	UINT16 wLength;
+	uint8_t bmRequestType;
+	uint8_t bRequest;
+	uint16_t wValue;
+	uint16_t wIndex;
+	uint16_t wLength;
 };
 
 struct USBStandardDeviceDescriptor {
-	UINT8 bLength;
-	UINT8 bDescriptorType;
-	UINT16 bcdUSB;
-	UINT8 bDeviceClass;
-	UINT8 bDeviceSubClass;
-	UINT8 bDeviceProtocol;
-	UINT8 bMaxPacketSize0;
-	UINT16 idVendor;
-	UINT16 idProduct;
-	UINT16 bcdDevice;
-	UINT8 iManufacturer;
-	UINT8 iProduct;
-	UINT8 iSerialNumber;
-	UINT8 bNumConfigurations;
+	uint8_t bLength;
+	uint8_t bDescriptorType;
+	uint16_t bcdUSB;
+	uint8_t bDeviceClass;
+	uint8_t bDeviceSubClass;
+	uint8_t bDeviceProtocol;
+	uint8_t bMaxPacketSize0;
+	uint16_t idVendor;
+	uint16_t idProduct;
+	uint16_t bcdDevice;
+	uint8_t iManufacturer;
+	uint8_t iProduct;
+	uint8_t iSerialNumber;
+	uint8_t bNumConfigurations;
 };
 
 struct USBStandardConfigurationDescriptor {
-	UINT8 bLength;
-	UINT8 bDescriptorType;
-	UINT16 wTotalLength;
-	UINT8 bNumInterfaces;
-	UINT8 bConfigurationValue;
-	UINT8 iConfiguration;
-	UINT8 bmAttributes;
-	UINT8 MaxPower;
+	uint8_t bLength;
+	uint8_t bDescriptorType;
+	uint16_t wTotalLength;
+	uint8_t bNumInterfaces;
+	uint8_t bConfigurationValue;
+	uint8_t iConfiguration;
+	uint8_t bmAttributes;
+	uint8_t MaxPower;
 };
 
 struct USBStandardInterfaceDescriptor {
-	UINT8 bLength;
-	UINT8 bDescriptorType;
-	UINT8 bInterfaceNumber;
-	UINT8 bAlternateSetting;
-	UINT8 bNumEndpoints;
-	UINT8 bInterfaceClass;
-	UINT8 bInterfaceSubClass;
-	UINT8 bInterfaceProtocol;
-	UINT8 iInterface;
+	uint8_t bLength;
+	uint8_t bDescriptorType;
+	uint8_t bInterfaceNumber;
+	uint8_t bAlternateSetting;
+	uint8_t bNumEndpoints;
+	uint8_t bInterfaceClass;
+	uint8_t bInterfaceSubClass;
+	uint8_t bInterfaceProtocol;
+	uint8_t iInterface;
 };
 
 struct USBStandardEndpointDescriptor {
-	UINT8 bLength;
-	UINT8 bDescriptorType;
-	UINT8 bEndpointAddress;
-	UINT8 bmAttributes;
-	UINT16 wMaxPacketSize;
-	UINT8 bInterval;
+	uint8_t bLength;
+	uint8_t bDescriptorType;
+	uint8_t bEndpointAddress;
+	uint8_t bmAttributes;
+	uint16_t wMaxPacketSize;
+	uint8_t bInterval;
 };
 
 enum USBPid {
@@ -310,13 +310,13 @@ enum USBEndpointType
 
 struct usb_device_string
 {
-	UINT8 *position;
+	uint8_t *position;
 	int size;
 };
 
 struct usb_device_interface_alternate
 {
-	UINT8 *position;
+	uint8_t *position;
 	int size;
 	USBStandardInterfaceDescriptor interface_descriptor;
 	std::forward_list<USBStandardEndpointDescriptor> endpoint_descriptors;
@@ -324,7 +324,7 @@ struct usb_device_interface_alternate
 
 struct usb_device_interface
 {
-	UINT8 *position;
+	uint8_t *position;
 	int size;
 	std::forward_list<usb_device_interface_alternate *> alternate_settings;
 	int selected_alternate;
@@ -333,7 +333,7 @@ struct usb_device_interface
 struct usb_device_configuration
 {
 	USBStandardConfigurationDescriptor configuration_descriptor;
-	UINT8 *position;
+	uint8_t *position;
 	int size;
 	std::forward_list<usb_device_interface *> interfaces;
 };
@@ -343,7 +343,7 @@ class ohci_function_device; // forward declaration
 class ohci_usb_controller : public device_t
 {
 public:
-	ohci_usb_controller(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ohci_usb_controller(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~ohci_usb_controller() {}
 	void usb_ohci_plug(int port, ohci_function_device *function);
 	void usb_ohci_device_address_changed(int old_address, int new_address);
@@ -361,16 +361,16 @@ protected:
 
 private:
 	void usb_ohci_interrupts();
-	void usb_ohci_read_endpoint_descriptor(UINT32 address);
-	void usb_ohci_writeback_endpoint_descriptor(UINT32 address);
-	void usb_ohci_read_transfer_descriptor(UINT32 address);
-	void usb_ohci_writeback_transfer_descriptor(UINT32 address);
-	void usb_ohci_read_isochronous_transfer_descriptor(UINT32 address);
-	void usb_ohci_writeback_isochronous_transfer_descriptor(UINT32 address);
+	void usb_ohci_read_endpoint_descriptor(uint32_t address);
+	void usb_ohci_writeback_endpoint_descriptor(uint32_t address);
+	void usb_ohci_read_transfer_descriptor(uint32_t address);
+	void usb_ohci_writeback_transfer_descriptor(uint32_t address);
+	void usb_ohci_read_isochronous_transfer_descriptor(uint32_t address);
+	void usb_ohci_writeback_isochronous_transfer_descriptor(uint32_t address);
 	cpu_device *m_maincpu;
 	//required_device<pic8259_device> pic8259_1;
 	struct {
-		UINT32 hc_regs[256];
+		uint32_t hc_regs[256];
 		struct {
 			ohci_function_device *function;
 			int address;
@@ -383,13 +383,13 @@ private:
 		} address[256];
 		emu_timer *timer;
 		int state;
-		UINT32 framenumber;
-		UINT32 nextinterupted;
-		UINT32 nextbulked;
+		uint32_t framenumber;
+		uint32_t nextinterupted;
+		uint32_t nextbulked;
 		int interruptbulkratio;
 		int writebackdonehadcounter;
 		address_space *space;
-		UINT8 buffer[1024];
+		uint8_t buffer[1024];
 		OHCIEndpointDescriptor endpoint_descriptor;
 		OHCITransferDescriptor transfer_descriptor;
 		OHCIIsochronousTransferDescriptor isochronous_transfer_descriptor;
@@ -411,7 +411,7 @@ public:
 	virtual void execute_reset();
 	virtual void execute_connect() {};
 	virtual void execute_disconnect() {};
-	int execute_transfer(int endpoint, int pid, UINT8 *buffer, int size);
+	int execute_transfer(int endpoint, int pid, uint8_t *buffer, int size);
 protected:
 	virtual int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) { return -1; };
 	virtual int handle_get_status_request(int endpoint, USBSetupPacket *setup) { return 0; };
@@ -420,21 +420,21 @@ protected:
 	virtual int handle_set_descriptor_request(int endpoint, USBSetupPacket *setup) { return 0; };
 	virtual int handle_synch_frame_request(int endpoint, USBSetupPacket *setup) { return 0; };
 	virtual void handle_status_stage(int endpoint) { return; };
-	virtual int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
-	virtual int handle_interrupt_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
-	virtual int handle_isochronous_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
+	virtual int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) { return 0; };
+	virtual int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) { return 0; };
+	virtual int handle_isochronous_pid(int endpoint, int pid, uint8_t *buffer, int size) { return 0; };
 
 	void add_device_descriptor(const USBStandardDeviceDescriptor &descriptor);
 	void add_configuration_descriptor(const USBStandardConfigurationDescriptor &descriptor);
 	void add_interface_descriptor(const USBStandardInterfaceDescriptor &descriptor);
 	void add_endpoint_descriptor(const USBStandardEndpointDescriptor &descriptor);
-	void add_string_descriptor(const UINT8 *descriptor);
+	void add_string_descriptor(const uint8_t *descriptor);
 	void select_configuration(int index);
 	void select_alternate(int interfacei, int index);
 	int find_alternate(int interfacei);
-	UINT8 *position_device_descriptor(int &size);
-	UINT8 *position_configuration_descriptor(int index, int &size);
-	UINT8 *position_string_descriptor(int index, int &size);
+	uint8_t *position_device_descriptor(int &size);
+	uint8_t *position_configuration_descriptor(int index, int &size);
+	uint8_t *position_string_descriptor(int index, int &size);
 	ohci_usb_controller *busmanager;
 	struct {
 		int type;
@@ -442,15 +442,15 @@ protected:
 		int controltype;
 		int controlrecipient;
 		int remain;
-		UINT8 *position;
-		UINT8 buffer[128];
+		uint8_t *position;
+		uint8_t buffer[128];
 	} endpoints[256];
 	int state;
 	bool settingaddress;
 	int newaddress;
 	int address;
 	int configurationvalue;
-	UINT8 *descriptors;
+	uint8_t *descriptors;
 	int descriptors_pos;
 	bool wantstatuscallback;
 	USBStandardDeviceDescriptor device_descriptor;
@@ -466,10 +466,10 @@ extern const device_type OHCI_GAME_CONTROLLER;
 class ohci_game_controller_device : public device_t, public ohci_function_device
 {
 public:
-	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
-	int handle_interrupt_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
+	int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 
 protected:
 	virtual void device_start() override;

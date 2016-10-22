@@ -27,7 +27,7 @@ public:
 	void reset() { m_total = m_matches = m_nonroms = 0; }
 	void identify(const char *name);
 	void identify_file(const char *name);
-	void identify_data(const char *name, const UINT8 *data, int length);
+	void identify_data(const char *name, const uint8_t *data, int length);
 	int find_by_hash(const util::hash_collection &hashes, int length);
 
 private:

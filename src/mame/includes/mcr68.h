@@ -13,11 +13,11 @@
 
 struct counter_state
 {
-	UINT8           control;
-	UINT16          latch;
-	UINT16          count;
+	uint8_t           control;
+	uint16_t          latch;
+	uint16_t          count;
 	emu_timer *     timer;
-	UINT8           timer_active;
+	uint8_t           timer_active;
 	attotime        period;
 };
 
@@ -44,24 +44,24 @@ public:
 	optional_device<midway_turbo_chip_squeak_device> m_turbo_chip_squeak;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_spriteram;
-	UINT16 m_control_word;
-	UINT8 m_protection_data[5];
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	uint16_t m_control_word;
+	uint8_t m_protection_data[5];
 	attotime m_timing_factor;
-	UINT8 m_sprite_clip;
-	INT8 m_sprite_xoffset;
-	UINT8 m_m6840_status;
-	UINT8 m_m6840_status_read_since_int;
-	UINT8 m_m6840_msb_buffer;
-	UINT8 m_m6840_lsb_buffer;
-	UINT8 m_m6840_irq_state;
-	UINT8 m_m6840_irq_vector;
+	uint8_t m_sprite_clip;
+	int8_t m_sprite_xoffset;
+	uint8_t m_m6840_status;
+	uint8_t m_m6840_status_read_since_int;
+	uint8_t m_m6840_msb_buffer;
+	uint8_t m_m6840_lsb_buffer;
+	uint8_t m_m6840_irq_state;
+	uint8_t m_m6840_irq_vector;
 	struct counter_state m_m6840_state[3];
-	UINT8 m_v493_irq_state;
-	UINT8 m_v493_irq_vector;
+	uint8_t m_v493_irq_state;
+	uint8_t m_v493_irq_vector;
 	timer_expired_delegate m_v493_callback;
-	UINT8 m_zwackery_sound_data;
+	uint8_t m_zwackery_sound_data;
 	attotime m_m6840_counter_periods[3];
 	attotime m_m6840_internal_counter_period;
 	tilemap_t *m_bg_tilemap;
@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcr68_6840_w_common);
 	DECLARE_READ16_MEMBER(mcr68_6840_r_common);
 	void reload_count(int counter);
-	UINT16 compute_counter(int counter);
+	uint16_t compute_counter(int counter);
 	DECLARE_WRITE16_MEMBER(mcr68_videoram_w);
 	DECLARE_WRITE16_MEMBER(zwackery_videoram_w);
 	DECLARE_WRITE16_MEMBER(zwackery_spriteram_w);
@@ -110,8 +110,8 @@ public:
 	DECLARE_MACHINE_START(mcr68);
 	DECLARE_MACHINE_RESET(mcr68);
 	DECLARE_VIDEO_START(mcr68);
-	UINT32 screen_update_zwackery(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_zwackery(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcr68_interrupt);
 	TIMER_CALLBACK_MEMBER(mcr68_493_off_callback);
 	TIMER_CALLBACK_MEMBER(mcr68_493_callback);
@@ -136,6 +136,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	std::unique_ptr<UINT8[]> m_srcdata0;
-	std::unique_ptr<UINT8[]> m_srcdata2;
+	std::unique_ptr<uint8_t[]> m_srcdata0;
+	std::unique_ptr<uint8_t[]> m_srcdata2;
 };

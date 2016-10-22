@@ -227,7 +227,7 @@ const opcode_info instruction::s_opcode_info_table[OP_MAX] =
 //  rol32 - perform a 32-bit left rotate
 //-------------------------------------------------
 
-inline UINT32 rol32(UINT32 source, UINT8 count)
+inline uint32_t rol32(uint32_t source, uint8_t count)
 {
 	count &= 31;
 	return (source << count) | (source >> (32 - count));
@@ -238,7 +238,7 @@ inline UINT32 rol32(UINT32 source, UINT8 count)
 //  rol64 - perform a 64-bit left rotate
 //-------------------------------------------------
 
-inline UINT64 rol64(UINT64 source, UINT8 count)
+inline uint64_t rol64(uint64_t source, uint8_t count)
 {
 	count &= 63;
 	return (source << count) | (source >> (64 - count));
@@ -302,10 +302,10 @@ uml::instruction::instruction()
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, UINT8 size, condition_t condition)
+void uml::instruction::configure(opcode_t op, uint8_t size, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(UINT8)op;
+	m_opcode = (opcode_t)(uint8_t)op;
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -321,10 +321,10 @@ void uml::instruction::configure(opcode_t op, UINT8 size, condition_t condition)
 //  parameter
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, condition_t condition)
+void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(UINT8)op;
+	m_opcode = (opcode_t)(uint8_t)op;
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -341,10 +341,10 @@ void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, conditio
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, parameter p1, condition_t condition)
+void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parameter p1, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(UINT8)op;
+	m_opcode = (opcode_t)(uint8_t)op;
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -362,10 +362,10 @@ void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, paramete
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, parameter p1, parameter p2, condition_t condition)
+void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parameter p1, parameter p2, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(UINT8)op;
+	m_opcode = (opcode_t)(uint8_t)op;
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -384,10 +384,10 @@ void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, paramete
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, parameter p1, parameter p2, parameter p3, condition_t condition)
+void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parameter p1, parameter p2, parameter p3, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(UINT8)op;
+	m_opcode = (opcode_t)(uint8_t)op;
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -414,8 +414,8 @@ void uml::instruction::simplify()
 	if (m_flags != 0)
 		return;
 
-	static const UINT64 instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
-	static const UINT64 paramsizemask[] = { 0xff, 0xffff, 0xffffffff, U64(0xffffffffffffffff) };
+	static const uint64_t instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
+	static const uint64_t paramsizemask[] = { 0xff, 0xffff, 0xffffffff, U64(0xffffffffffffffff) };
 
 	// loop until we've simplified all we can
 	opcode_t origop;
@@ -462,10 +462,10 @@ void uml::instruction::simplify()
 				if (m_param[1].is_immediate())
 					switch (m_param[2].size())
 					{
-						case SIZE_BYTE:     convert_to_mov_immediate((INT8)m_param[1].immediate());     break;
-						case SIZE_WORD:     convert_to_mov_immediate((INT16)m_param[1].immediate());    break;
-						case SIZE_DWORD:    convert_to_mov_immediate((INT32)m_param[1].immediate());    break;
-						case SIZE_QWORD:    convert_to_mov_immediate((INT64)m_param[1].immediate());    break;
+						case SIZE_BYTE:     convert_to_mov_immediate((int8_t)m_param[1].immediate());     break;
+						case SIZE_WORD:     convert_to_mov_immediate((int16_t)m_param[1].immediate());    break;
+						case SIZE_DWORD:    convert_to_mov_immediate((int32_t)m_param[1].immediate());    break;
+						case SIZE_QWORD:    convert_to_mov_immediate((int64_t)m_param[1].immediate());    break;
 						case SIZE_DQWORD:   fatalerror("Invalid SEXT target size\n");
 					}
 				break;
@@ -545,9 +545,9 @@ void uml::instruction::simplify()
 					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 					{
 						if (m_size == 4)
-							convert_to_mov_immediate((UINT32)((UINT32)m_param[1].immediate() * (UINT32)m_param[2].immediate()));
+							convert_to_mov_immediate((uint32_t)((uint32_t)m_param[1].immediate() * (uint32_t)m_param[2].immediate()));
 						else if (m_size == 8)
-							convert_to_mov_immediate((UINT64)((UINT64)m_param[1].immediate() * (UINT64)m_param[2].immediate()));
+							convert_to_mov_immediate((uint64_t)((uint64_t)m_param[1].immediate() * (uint64_t)m_param[2].immediate()));
 					}
 				}
 				break;
@@ -561,9 +561,9 @@ void uml::instruction::simplify()
 					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 					{
 						if (m_size == 4)
-							convert_to_mov_immediate((INT32)((INT32)m_param[1].immediate() * (INT32)m_param[2].immediate()));
+							convert_to_mov_immediate((int32_t)((int32_t)m_param[1].immediate() * (int32_t)m_param[2].immediate()));
 						else if (m_size == 8)
-							convert_to_mov_immediate((INT64)((INT64)m_param[1].immediate() * (INT64)m_param[2].immediate()));
+							convert_to_mov_immediate((int64_t)((int64_t)m_param[1].immediate() * (int64_t)m_param[2].immediate()));
 					}
 				}
 				break;
@@ -577,9 +577,9 @@ void uml::instruction::simplify()
 					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 					{
 						if (m_size == 4)
-							convert_to_mov_immediate((UINT32)((UINT32)m_param[1].immediate() / (UINT32)m_param[2].immediate()));
+							convert_to_mov_immediate((uint32_t)((uint32_t)m_param[1].immediate() / (uint32_t)m_param[2].immediate()));
 						else if (m_size == 8)
-							convert_to_mov_immediate((UINT64)((UINT64)m_param[1].immediate() / (UINT64)m_param[2].immediate()));
+							convert_to_mov_immediate((uint64_t)((uint64_t)m_param[1].immediate() / (uint64_t)m_param[2].immediate()));
 					}
 				}
 				break;
@@ -593,9 +593,9 @@ void uml::instruction::simplify()
 					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 					{
 						if (m_size == 4)
-							convert_to_mov_immediate((INT32)((INT32)m_param[1].immediate() / (INT32)m_param[2].immediate()));
+							convert_to_mov_immediate((int32_t)((int32_t)m_param[1].immediate() / (int32_t)m_param[2].immediate()));
 						else if (m_size == 8)
-							convert_to_mov_immediate((INT64)((INT64)m_param[1].immediate() / (INT64)m_param[2].immediate()));
+							convert_to_mov_immediate((int64_t)((int64_t)m_param[1].immediate() / (int64_t)m_param[2].immediate()));
 					}
 				}
 				break;
@@ -680,9 +680,9 @@ void uml::instruction::simplify()
 				if (m_param[1].is_immediate() && m_param[2].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate((UINT32)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate((uint32_t)m_param[1].immediate() >> m_param[2].immediate());
 					else if (m_size == 8)
-						convert_to_mov_immediate((UINT64)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate((uint64_t)m_param[1].immediate() >> m_param[2].immediate());
 				}
 				else if (m_param[2].is_immediate_value(0))
 					convert_to_mov_param(1);
@@ -693,9 +693,9 @@ void uml::instruction::simplify()
 				if (m_param[1].is_immediate() && m_param[2].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate((INT32)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate((int32_t)m_param[1].immediate() >> m_param[2].immediate());
 					else if (m_size == 8)
-						convert_to_mov_immediate((INT64)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate((int64_t)m_param[1].immediate() >> m_param[2].immediate());
 				}
 				else if (m_param[2].is_immediate_value(0))
 					convert_to_mov_param(1);
@@ -791,9 +791,9 @@ void uml::instruction::validate()
 //  instruction
 //-------------------------------------------------
 
-UINT8 uml::instruction::input_flags() const
+uint8_t uml::instruction::input_flags() const
 {
-	static const UINT8 flags_for_condition[] =
+	static const uint8_t flags_for_condition[] =
 	{
 		FLAG_Z,                     // COND_Z
 		FLAG_Z,                     // COND_NZ
@@ -813,7 +813,7 @@ UINT8 uml::instruction::input_flags() const
 		FLAG_S | FLAG_V             // COND_GE
 	};
 
-	UINT8 flags = s_opcode_info_table[m_opcode].inflags;
+	uint8_t flags = s_opcode_info_table[m_opcode].inflags;
 	if (flags & 0x80)
 		flags = m_param[flags - OPFLAGS_P1].immediate() & OPFLAGS_ALL;
 	if (m_condition != COND_ALWAYS)
@@ -828,9 +828,9 @@ UINT8 uml::instruction::input_flags() const
 //  instruction
 //-------------------------------------------------
 
-UINT8 uml::instruction::output_flags() const
+uint8_t uml::instruction::output_flags() const
 {
-	UINT8 flags = s_opcode_info_table[m_opcode].outflags;
+	uint8_t flags = s_opcode_info_table[m_opcode].outflags;
 	if (flags & 0x80)
 		flags = m_param[flags - OPFLAGS_P1].immediate() & OPFLAGS_ALL;
 	return flags;
@@ -843,7 +843,7 @@ UINT8 uml::instruction::output_flags() const
 //  instruction
 //-------------------------------------------------
 
-UINT8 uml::instruction::modified_flags() const
+uint8_t uml::instruction::modified_flags() const
 {
 	return s_opcode_info_table[m_opcode].modflags;
 }
@@ -915,14 +915,14 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 					}
 
 					// truncate to size
-					UINT64 value = param.immediate();
-					if (size == 1) value = (UINT8)value;
-					if (size == 2) value = (UINT16)value;
-					if (size == 4) value = (UINT32)value;
-					if ((UINT32)value == value)
-						util::stream_format(buffer, "$%X", (UINT32)value);
+					uint64_t value = param.immediate();
+					if (size == 1) value = (uint8_t)value;
+					if (size == 2) value = (uint16_t)value;
+					if (size == 4) value = (uint32_t)value;
+					if ((uint32_t)value == value)
+						util::stream_format(buffer, "$%X", (uint32_t)value);
 					else
-						util::stream_format(buffer, "$%X%08X", (UINT32)(value >> 32), (UINT32)value);
+						util::stream_format(buffer, "$%X%08X", (uint32_t)(value >> 32), (uint32_t)value);
 				}
 				break;
 
@@ -972,7 +972,7 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 			case parameter::PTYPE_MEMORY:
 			{
 				const char *symbol;
-				UINT32 symoffset;
+				uint32_t symoffset;
 
 				// symbol
 				if (drcuml != nullptr && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != nullptr)
@@ -985,7 +985,7 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 
 				// cache memory
 				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
-					util::stream_format(buffer, "[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
+					util::stream_format(buffer, "[+$%X]", (uint32_t)(uintptr_t)((drccodeptr)param.memory() - drcuml->cache().near()));
 
 				// general memory
 				else
@@ -995,7 +995,7 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 
 			// string pointer
 			case parameter::PTYPE_STRING:
-				util::stream_format(buffer, "%s", (const char *)(FPTR)param.string());
+				util::stream_format(buffer, "%s", (const char *)(uintptr_t)param.string());
 				break;
 
 			// handle pointer

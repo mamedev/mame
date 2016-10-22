@@ -671,6 +671,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds1386.h,MACHINES["DS1386"] = true
+---------------------------------------------------
+
+if (MACHINES["DS1386"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds1386.cpp",
+		MAME_DIR .. "src/devices/machine/ds1386.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ds2401.h,MACHINES["DS2401"] = true
 ---------------------------------------------------
 
@@ -1258,18 +1270,6 @@ if (MACHINES["M6M80011AP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/m6m80011ap.cpp",
 		MAME_DIR .. "src/devices/machine/m6m80011ap.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/matsucd.h,MACHINES["MATSUCD"] = true
----------------------------------------------------
-
-if (MACHINES["MATSUCD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/matsucd.cpp",
-		MAME_DIR .. "src/devices/machine/matsucd.h",
 	}
 end
 

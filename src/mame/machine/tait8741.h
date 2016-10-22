@@ -40,24 +40,24 @@ class taito8741_4pack_device : public device_t
 {
 	struct I8741 {
 		int number;
-		UINT8 toData;    /* to host data      */
-		UINT8 fromData;  /* from host data    */
-		UINT8 fromCmd;   /* from host command */
-		UINT8 status;    /* b0 = rd ready,b1 = wd full,b2 = cmd ?? */
-		UINT8 mode;
-		UINT8 phase;
-		UINT8 txd[8];
-		UINT8 rxd[8];
-		UINT8 parallelselect;
-		UINT8 txpoint;
+		uint8_t toData;    /* to host data      */
+		uint8_t fromData;  /* from host data    */
+		uint8_t fromCmd;   /* from host command */
+		uint8_t status;    /* b0 = rd ready,b1 = wd full,b2 = cmd ?? */
+		uint8_t mode;
+		uint8_t phase;
+		uint8_t txd[8];
+		uint8_t rxd[8];
+		uint8_t parallelselect;
+		uint8_t txpoint;
 		int connect;
-		UINT8 pending4a;
+		uint8_t pending4a;
 		int serial_out;
 		int coins;
 	};
 
 public:
-	taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~taito8741_4pack_device() {}
 
 	template<class _Object> static devcb_base &set_port_handler_0_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_0_r.set_callback(object); }
@@ -65,7 +65,7 @@ public:
 	template<class _Object> static devcb_base &set_port_handler_2_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_2_r.set_callback(object); }
 	template<class _Object> static devcb_base &set_port_handler_3_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_3_r.set_callback(object); }
 
-	static void static_set_mode(device_t &device, int num, UINT8 mode) { downcast<taito8741_4pack_device &>(device).m_taito8741[num].mode = mode; }
+	static void static_set_mode(device_t &device, int num, uint8_t mode) { downcast<taito8741_4pack_device &>(device).m_taito8741[num].mode = mode; }
 	static void static_set_connect(device_t &device, int num, int conn) { downcast<taito8741_4pack_device &>(device).m_taito8741[num].connect = conn; }
 
 	DECLARE_READ8_MEMBER( read_0 ) { if(offset&1) return status_r(0); else return data_r(0); }
@@ -84,7 +84,7 @@ public:
 	void data_w(int num, int data);
 	void command_w(int num, int data);
 
-	UINT8 port_read(int num, int offset);
+	uint8_t port_read(int num, int offset);
 
 protected:
 	// device-level overrides
@@ -95,7 +95,7 @@ private:
 	void hostdata_w(I8741 *st,int data);
 	int hostdata_r(I8741 *st);
 	int hostcmd_r(I8741 *st);
-	void serial_rx(I8741 *st,UINT8 *data);
+	void serial_rx(I8741 *st,uint8_t *data);
 
 	// internal state
 	I8741       m_taito8741[4];
@@ -133,17 +133,17 @@ extern const device_type TAITO8741_4PACK;
 class josvolly8741_4pack_device : public device_t
 {
 	struct JV8741  {
-		UINT8 cmd;
-		UINT8 sts;
-		UINT8 txd;
-		UINT8 outport;
-		UINT8 rxd;
-		UINT8 connect;
-		UINT8 rst;
+		uint8_t cmd;
+		uint8_t sts;
+		uint8_t txd;
+		uint8_t outport;
+		uint8_t rxd;
+		uint8_t connect;
+		uint8_t rst;
 	};
 
 public:
-	josvolly8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	josvolly8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~josvolly8741_4pack_device() {}
 
 	template<class _Object> static devcb_base &set_port_handler_0_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_0_r.set_callback(object); }
@@ -169,8 +169,8 @@ protected:
 private:
 	void update(int num);
 	void write(int num, int offset, int data);
-	UINT8 read(int num,int offset);
-	UINT8 port_read(int num);
+	uint8_t read(int num,int offset);
+	uint8_t port_read(int num);
 
 	// internal state
 	JV8741 m_i8741[4];

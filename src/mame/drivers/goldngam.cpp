@@ -247,11 +247,11 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
-	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<uint16_t> m_videoram;
 	DECLARE_READ16_MEMBER(unk_r);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(goldngam);
-	UINT32 screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -264,7 +264,7 @@ void goldngam_state::video_start()
 {
 }
 
-UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int index = 0;
 
@@ -272,7 +272,7 @@ UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind1
 	{
 		for(int x = 0; x < 384; x += 2)
 		{
-			UINT16 word = m_videoram[index];
+			uint16_t word = m_videoram[index];
 			bitmap.pix16(y, x) = word >> 8;
 			bitmap.pix16(y, x+1) = word & 0xff;
 			++index;

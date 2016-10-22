@@ -193,7 +193,7 @@ READ8_MEMBER( c1571_t::via0_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// track 0 sense
 	data |= (m_floppy->trk00_r() ? 0x01 : 0x00);
@@ -232,7 +232,7 @@ WRITE8_MEMBER( c1571_t::via0_pa_w )
 
 	if (m_1_2mhz != clock_1_2)
 	{
-		UINT32 clock = clock_1_2 ? XTAL_16MHz/8 : XTAL_16MHz/16;
+		uint32_t clock = clock_1_2 ? XTAL_16MHz/8 : XTAL_16MHz/16;
 
 		m_maincpu->set_unscaled_clock(clock);
 		m_cia->set_unscaled_clock(clock);
@@ -274,7 +274,7 @@ WRITE8_MEMBER( c1571cr_t::via0_pa_w )
 
 	if (m_1_2mhz != clock_1_2)
 	{
-		UINT32 clock = clock_1_2 ? XTAL_16MHz/8 : XTAL_16MHz/16;
+		uint32_t clock = clock_1_2 ? XTAL_16MHz/8 : XTAL_16MHz/16;
 
 		m_maincpu->set_unscaled_clock(clock);
 		m_cia->set_unscaled_clock(clock);
@@ -303,7 +303,7 @@ READ8_MEMBER( c1571_t::via0_pb_r )
 
 	*/
 
-	UINT8 data;
+	uint8_t data;
 
 	// data in
 	data = !m_bus->data_r();
@@ -381,7 +381,7 @@ WRITE8_MEMBER( c1571cr_t::via0_pb_w )
 
 READ8_MEMBER( c1571_t::via1_r )
 {
-	UINT8 data = m_via1->read(space, offset);
+	uint8_t data = m_via1->read(space, offset);
 
 	m_ga->ted_w(!m_1_2mhz);
 	m_ga->ted_w(1);
@@ -421,7 +421,7 @@ READ8_MEMBER( c1571_t::via1_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// write protect sense
 	data |= !m_floppy->wpt_r() << 4;
@@ -830,7 +830,7 @@ ioport_constructor c1571_t::device_input_ports() const
 //  c1571_t - constructor
 //-------------------------------------------------
 
-c1571_t::c1571_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+c1571_t::c1571_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),
@@ -853,7 +853,7 @@ c1571_t::c1571_t(const machine_config &mconfig, device_type type, const char *na
 {
 }
 
-c1571_t::c1571_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1571_t::c1571_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C1571, "C1571", tag, owner, clock, "c1571", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),
@@ -881,7 +881,7 @@ c1571_t::c1571_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  c1570_t - constructor
 //-------------------------------------------------
 
-c1570_t::c1570_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1570_t::c1570_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: c1571_t(mconfig, C1570, "C1570", tag, owner, clock, "c1570", __FILE__)
 {
 }
@@ -891,7 +891,7 @@ c1570_t::c1570_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  c1571cr_t - constructor
 //-------------------------------------------------
 
-c1571cr_t::c1571cr_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1571cr_t::c1571cr_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: c1571_t(mconfig, C1571CR, "C1571CR", tag, owner, clock, "c1571cr", __FILE__)
 {
 }
@@ -901,7 +901,7 @@ c1571cr_t::c1571cr_t(const machine_config &mconfig, const char *tag, device_t *o
 //  mini_chief_t - constructor
 //-------------------------------------------------
 
-mini_chief_t::mini_chief_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mini_chief_t::mini_chief_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: c1571_t(mconfig, MINI_CHIEF, "ICT Mini Chief", tag, owner, clock, "minichif", __FILE__)
 {
 }
@@ -999,7 +999,7 @@ void c1571_t::cbm_iec_reset(int state)
 //  parallel_data_w -
 //-------------------------------------------------
 
-void c1571_t::parallel_data_w(UINT8 data)
+void c1571_t::parallel_data_w(uint8_t data)
 {
 	m_parallel_data = data;
 }

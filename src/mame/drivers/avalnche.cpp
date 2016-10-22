@@ -47,7 +47,7 @@
  *
  *************************************/
 
-UINT32 avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -55,9 +55,9 @@ UINT32 avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb3
 	{
 		int i;
 
-		UINT8 x = offs << 3;
+		uint8_t x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = m_videoram[offs];
+		uint8_t data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{

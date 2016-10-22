@@ -50,7 +50,7 @@ ntb_cart_interface::~ntb_cart_interface()
 
 const device_type NES_NTB_SLOT = &device_creator<nes_ntb_slot_device>;
 
-nes_ntb_slot_device::nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_ntb_slot_device::nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, NES_NTB_SLOT, "NES NTB Cartridge Slot", tag, owner, clock, "nes_ntb_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr)
@@ -80,7 +80,7 @@ image_init_result nes_ntb_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT8 *ROM = m_cart->get_cart_base();
+		uint8_t *ROM = m_cart->get_cart_base();
 
 		if (!ROM)
 			return image_init_result::FAIL;
@@ -122,7 +122,7 @@ ROM_END
 
 const device_type NES_NTB_ROM = &device_creator<nes_ntb_rom_device>;
 
-nes_ntb_rom_device::nes_ntb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ntb_rom_device::nes_ntb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, NES_NTB_ROM, "NES NTB ROM", tag, owner, clock, "nes_ntbrom", __FILE__),
 						ntb_cart_interface( mconfig, *this )
 {
@@ -130,7 +130,7 @@ nes_ntb_rom_device::nes_ntb_rom_device(const machine_config &mconfig, const char
 
 void nes_ntb_rom_device::device_start()
 {
-	m_rom = (UINT8*)memregion("ntbrom")->base();
+	m_rom = (uint8_t*)memregion("ntbrom")->base();
 }
 
 const tiny_rom_entry *nes_ntb_rom_device::device_rom_region() const
@@ -138,7 +138,7 @@ const tiny_rom_entry *nes_ntb_rom_device::device_rom_region() const
 	return ROM_NAME( ntb_rom );
 }
 
-UINT8 *nes_ntb_rom_device::get_cart_base()
+uint8_t *nes_ntb_rom_device::get_cart_base()
 {
 	return m_rom;
 }
@@ -156,7 +156,7 @@ UINT8 *nes_ntb_rom_device::get_cart_base()
 const device_type NES_SUNSOFT_DCS = &device_creator<nes_sunsoft_dcs_device>;
 
 
-nes_sunsoft_dcs_device::nes_sunsoft_dcs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sunsoft_dcs_device::nes_sunsoft_dcs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_sunsoft_4_device(mconfig, NES_SUNSOFT_DCS, "NES Cart Sunsoft DCS PCB", tag, owner, clock, "nes_dcs", __FILE__), m_timer_on(0), m_exrom_enable(0),
 						m_subslot(*this, "ntb_slot"), ntb_enable_timer(nullptr)
 				{

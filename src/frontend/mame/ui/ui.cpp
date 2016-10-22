@@ -130,7 +130,7 @@ slider_state *mame_ui_manager::slider_current;
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-static const UINT32 mouse_bitmap[32*32] =
+static const uint32_t mouse_bitmap[32*32] =
 {
 	0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,
 	0x09a46f30,0x81ac7c43,0x24af8049,0x00ad7d45,0x00a8753a,0x00a46f30,0x009f6725,0x009b611c,0x00985b14,0x0095560d,0x00935308,0x00915004,0x00904e02,0x008f4e01,0x008f4d00,0x008f4d00,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,
@@ -204,17 +204,16 @@ void mame_ui_manager::init()
 	// more initialization
 	using namespace std::placeholders;
 	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_messagebox, this, _1));
-	m_non_char_keys_down = std::make_unique<UINT8[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
+	m_non_char_keys_down = std::make_unique<uint8_t[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
 	m_mouse_show = machine().system().flags & MACHINE_CLICKABLE_ARTWORK ? true : false;
 
 	// request a callback upon exiting
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(mame_ui_manager::exit), this));
 
-	// retrieve options
-	m_use_natural_keyboard = machine().options().natural_keyboard();
+	// create mouse bitmap
 	bitmap_argb32 *ui_mouse_bitmap = auto_alloc(machine(), bitmap_argb32(32, 32));
-	UINT32 *dst = &ui_mouse_bitmap->pix32(0);
-	memcpy(dst,mouse_bitmap,32*32*sizeof(UINT32));
+	uint32_t *dst = &ui_mouse_bitmap->pix32(0);
+	memcpy(dst,mouse_bitmap,32*32*sizeof(uint32_t));
 	m_mouse_arrow_texture = machine().render().texture_alloc();
 	m_mouse_arrow_texture->set_bitmap(*ui_mouse_bitmap, ui_mouse_bitmap->cliprect(), TEXFORMAT_ARGB32);
 }
@@ -265,7 +264,7 @@ void mame_ui_manager::initialize(running_machine &machine)
 //  pair for the current UI handler
 //-------------------------------------------------
 
-void mame_ui_manager::set_handler(ui_callback_type callback_type, const std::function<UINT32 (render_container &)> &&callback)
+void mame_ui_manager::set_handler(ui_callback_type callback_type, const std::function<uint32_t (render_container &)> &&callback)
 {
 	m_handler_callback = std::move(callback);
 	m_handler_callback_type = callback_type;
@@ -425,7 +424,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	// display the internal mouse cursor
 	if (m_mouse_show || (is_menu_active() && machine().options().ui_mouse()))
 	{
-		INT32 mouse_target_x, mouse_target_y;
+		int32_t mouse_target_x, mouse_target_y;
 		bool mouse_button;
 		render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 
@@ -469,9 +468,9 @@ render_font *mame_ui_manager::get_font()
 
 float mame_ui_manager::get_line_height()
 {
-	INT32 raw_font_pixel_height = get_font()->pixel_height();
+	int32_t raw_font_pixel_height = get_font()->pixel_height();
 	render_target &ui_target = machine().render().ui_target();
-	INT32 target_pixel_height = ui_target.height();
+	int32_t target_pixel_height = ui_target.height();
 	float one_to_one_line_height;
 	float scale_factor;
 
@@ -499,7 +498,7 @@ float mame_ui_manager::get_line_height()
 	// otherwise, just make sure we hit an even number of pixels
 	else
 	{
-		INT32 height = scale_factor * one_to_one_line_height * (float)target_pixel_height;
+		int32_t height = scale_factor * one_to_one_line_height * (float)target_pixel_height;
 		scale_factor = (float)height / (one_to_one_line_height * (float)target_pixel_height);
 	}
 
@@ -512,7 +511,7 @@ float mame_ui_manager::get_line_height()
 //  single character
 //-------------------------------------------------
 
-float mame_ui_manager::get_char_width(unicode_char ch)
+float mame_ui_manager::get_char_width(char32_t ch)
 {
 	return get_font()->char_width(get_line_height(), machine().render().ui_aspect(), ch);
 }
@@ -771,7 +770,7 @@ bool mame_ui_manager::is_menu_active(void)
 //  messagebox_text string but handles no input
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_messagebox(render_container &container)
+uint32_t mame_ui_manager::handler_messagebox(render_container &container)
 {
 	draw_text_box(container, messagebox_text.c_str(), ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
@@ -784,9 +783,9 @@ UINT32 mame_ui_manager::handler_messagebox(render_container &container)
 //  any keypress
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_messagebox_anykey(render_container &container)
+uint32_t mame_ui_manager::handler_messagebox_anykey(render_container &container)
 {
-	UINT32 state = 0;
+	uint32_t state = 0;
 
 	// draw a standard message window
 	draw_text_box(container, messagebox_text.c_str(), ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
@@ -817,8 +816,8 @@ void mame_ui_manager::process_natural_keyboard()
 	int i, pressed;
 	input_item_id itemid;
 	input_code code;
-	UINT8 *key_down_ptr;
-	UINT8 key_down_mask;
+	uint8_t *key_down_ptr;
+	uint8_t key_down_mask;
 
 	// loop while we have interesting events
 	while (machine().ui_input().pop_event(&event))
@@ -987,7 +986,7 @@ void mame_ui_manager::start_save_state()
 	machine().pause();
 	m_load_save_hold = true;
 	using namespace std::placeholders;
-	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_load_save, this, _1, UINT32(LOADSAVE_SAVE)));
+	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_load_save, this, _1, uint32_t(LOADSAVE_SAVE)));
 }
 
 
@@ -1000,7 +999,7 @@ void mame_ui_manager::start_load_state()
 	machine().pause();
 	m_load_save_hold = true;
 	using namespace std::placeholders;
-	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_load_save, this, _1, UINT32(LOADSAVE_LOAD)));
+	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_load_save, this, _1, uint32_t(LOADSAVE_LOAD)));
 }
 
 
@@ -1042,7 +1041,7 @@ void mame_ui_manager::image_handler_ingame()
 //  of the standard keypresses
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_ingame(render_container &container)
+uint32_t mame_ui_manager::handler_ingame(render_container &container)
 {
 	bool is_paused = machine().paused();
 
@@ -1107,7 +1106,7 @@ UINT32 mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// is the natural keyboard enabled?
-	if (use_natural_keyboard() && (machine().phase() == MACHINE_PHASE_RUNNING))
+	if (machine().ioport().natkeyboard().in_use() && (machine().phase() == MACHINE_PHASE_RUNNING))
 		process_natural_keyboard();
 
 	if (!ui_disabled)
@@ -1270,7 +1269,7 @@ UINT32 mame_ui_manager::handler_ingame(render_container &container)
 //  specifying a game to save or load
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_load_save(render_container &container, UINT32 state)
+uint32_t mame_ui_manager::handler_load_save(render_container &container, uint32_t state)
 {
 	char filename[20];
 	char file = 0;
@@ -1389,9 +1388,9 @@ void mame_ui_manager::request_quit()
 //  confirming quit emulation
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_confirm_quit(render_container &container)
+uint32_t mame_ui_manager::handler_confirm_quit(render_container &container)
 {
-	UINT32 state = 0;
+	uint32_t state = 0;
 
 	// get the text for 'UI Select'
 	std::string ui_select_text = machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
@@ -1442,10 +1441,10 @@ std::vector<ui::menu_item>& mame_ui_manager::get_slider_list(void)
 //  slider_alloc - allocate a new slider entry
 //-------------------------------------------------
 
-slider_state* mame_ui_manager::slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, void *arg)
+slider_state* mame_ui_manager::slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
 {
 	int size = sizeof(slider_state) + strlen(title);
-	slider_state *state = (slider_state *)auto_alloc_array_clear(machine, UINT8, size);
+	slider_state *state = (slider_state *)auto_alloc_array_clear(machine, uint8_t, size);
 
 	state->minval = minval;
 	state->defval = defval;
@@ -1479,11 +1478,11 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	mixer_input info;
 	for (int item = 0; machine.sound().indexed_mixer_input(item, info); item++)
 	{
-		INT32 maxval = 2000;
-		INT32 defval = 1000;
+		int32_t maxval = 2000;
+		int32_t defval = 1000;
 
 		std::string str = string_format(_("%1$s Volume"), info.stream->input_name(info.inputnum));
-		sliders.push_back(slider_alloc(machine, SLIDER_ID_MIXERVOL + item, str.c_str(), 0, defval, maxval, 20, (void *)(FPTR)item));
+		sliders.push_back(slider_alloc(machine, SLIDER_ID_MIXERVOL + item, str.c_str(), 0, defval, maxval, 20, (void *)(uintptr_t)item));
 	}
 
 	// add analog adjusters
@@ -1628,7 +1627,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 //  slider_changed - global slider-modified callback
 //----------------------------------------------------
 
-INT32 mame_ui_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	if (id == SLIDER_ID_VOLUME)
 		return slider_volume(machine, arg, id, str, newval);
@@ -1685,7 +1684,7 @@ INT32 mame_ui_manager::slider_changed(running_machine &machine, void *arg, int i
 //  slider_volume - global volume slider callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_volume(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_volume(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		machine.sound().set_attenuation(newval);
@@ -1700,14 +1699,14 @@ INT32 mame_ui_manager::slider_volume(running_machine &machine, void *arg, int id
 //  slider callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_mixervol(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_mixervol(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	mixer_input info;
-	if (!machine.sound().indexed_mixer_input((FPTR)arg, info))
+	if (!machine.sound().indexed_mixer_input((uintptr_t)arg, info))
 		return 0;
 	if (newval != SLIDER_NOCHANGE)
 	{
-		INT32 curval = floor(info.stream->user_gain(info.inputnum) * 1000.0f + 0.5f);
+		int32_t curval = floor(info.stream->user_gain(info.inputnum) * 1000.0f + 0.5f);
 		if (newval > curval && (newval - curval) <= 4) newval += 4; // round up on increment
 		info.stream->set_user_gain(info.inputnum, (float)newval * 0.001f);
 	}
@@ -1722,7 +1721,7 @@ INT32 mame_ui_manager::slider_mixervol(running_machine &machine, void *arg, int 
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_adjuster(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_adjuster(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	ioport_field *field = (ioport_field *)arg;
 	ioport_field::user_settings settings;
@@ -1744,7 +1743,7 @@ INT32 mame_ui_manager::slider_adjuster(running_machine &machine, void *arg, int 
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_overclock(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_overclock(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	device_t *cpu = (device_t *)arg;
 	if (newval != SLIDER_NOCHANGE)
@@ -1759,7 +1758,7 @@ INT32 mame_ui_manager::slider_overclock(running_machine &machine, void *arg, int
 //  slider_refresh - refresh rate slider callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_refresh(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_refresh(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
 	double defrefresh = ATTOSECONDS_TO_HZ(screen->refresh_attoseconds());
@@ -1784,7 +1783,7 @@ INT32 mame_ui_manager::slider_refresh(running_machine &machine, void *arg, int i
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_brightness(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_brightness(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
 	render_container::user_settings settings;
@@ -1806,7 +1805,7 @@ INT32 mame_ui_manager::slider_brightness(running_machine &machine, void *arg, in
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_contrast(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_contrast(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
 	render_container::user_settings settings;
@@ -1827,7 +1826,7 @@ INT32 mame_ui_manager::slider_contrast(running_machine &machine, void *arg, int 
 //  slider_gamma - screen gamma slider callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_gamma(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_gamma(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
 	render_container::user_settings settings;
@@ -1849,7 +1848,7 @@ INT32 mame_ui_manager::slider_gamma(running_machine &machine, void *arg, int id,
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_xscale(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_xscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
 	render_container::user_settings settings;
@@ -1871,7 +1870,7 @@ INT32 mame_ui_manager::slider_xscale(running_machine &machine, void *arg, int id
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_yscale(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_yscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
 	render_container::user_settings settings;
@@ -1893,7 +1892,7 @@ INT32 mame_ui_manager::slider_yscale(running_machine &machine, void *arg, int id
 //  slider callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_xoffset(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_xoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
 	render_container::user_settings settings;
@@ -1915,7 +1914,7 @@ INT32 mame_ui_manager::slider_xoffset(running_machine &machine, void *arg, int i
 //  slider callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_yoffset(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_yoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
 	render_container::user_settings settings;
@@ -1937,7 +1936,7 @@ INT32 mame_ui_manager::slider_yoffset(running_machine &machine, void *arg, int i
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_overxscale(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_overxscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	laserdisc_device *laserdisc = (laserdisc_device *)arg;
 	laserdisc_overlay_config settings;
@@ -1959,7 +1958,7 @@ INT32 mame_ui_manager::slider_overxscale(running_machine &machine, void *arg, in
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_overyscale(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_overyscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	laserdisc_device *laserdisc = (laserdisc_device *)arg;
 	laserdisc_overlay_config settings;
@@ -1981,7 +1980,7 @@ INT32 mame_ui_manager::slider_overyscale(running_machine &machine, void *arg, in
 //  slider callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_overxoffset(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_overxoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	laserdisc_device *laserdisc = (laserdisc_device *)arg;
 	laserdisc_overlay_config settings;
@@ -2003,7 +2002,7 @@ INT32 mame_ui_manager::slider_overxoffset(running_machine &machine, void *arg, i
 //  slider callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_overyoffset(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_overyoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	laserdisc_device *laserdisc = (laserdisc_device *)arg;
 	laserdisc_overlay_config settings;
@@ -2025,7 +2024,7 @@ INT32 mame_ui_manager::slider_overyoffset(running_machine &machine, void *arg, i
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_flicker(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_flicker(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		vector_options::s_flicker = (float)newval * 0.001f;
@@ -2040,7 +2039,7 @@ INT32 mame_ui_manager::slider_flicker(running_machine &machine, void *arg, int i
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_beam_width_min(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_beam_width_min(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		vector_options::s_beam_width_min = std::min((float)newval * 0.01f, vector_options::s_beam_width_max);
@@ -2055,7 +2054,7 @@ INT32 mame_ui_manager::slider_beam_width_min(running_machine &machine, void *arg
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_beam_width_max(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_beam_width_max(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		vector_options::s_beam_width_max = std::max((float)newval * 0.01f, vector_options::s_beam_width_min);
@@ -2070,7 +2069,7 @@ INT32 mame_ui_manager::slider_beam_width_max(running_machine &machine, void *arg
 //  callback
 //-------------------------------------------------
 
-INT32 mame_ui_manager::slider_beam_intensity_weight(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_beam_intensity_weight(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		vector_options::s_beam_intensity_weight = (float)newval * 0.001f;
@@ -2086,7 +2085,7 @@ INT32 mame_ui_manager::slider_beam_intensity_weight(running_machine &machine, vo
 //-------------------------------------------------
 
 #ifdef MAME_DEBUG
-INT32 mame_ui_manager::slider_crossscale(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_crossscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	ioport_field *field = (ioport_field *)arg;
 
@@ -2105,7 +2104,7 @@ INT32 mame_ui_manager::slider_crossscale(running_machine &machine, void *arg, in
 //-------------------------------------------------
 
 #ifdef MAME_DEBUG
-INT32 mame_ui_manager::slider_crossoffset(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t mame_ui_manager::slider_crossoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	ioport_field *field = (ioport_field *)arg;
 
@@ -2116,19 +2115,6 @@ INT32 mame_ui_manager::slider_crossoffset(running_machine &machine, void *arg, i
 	return field->crosshair_offset();
 }
 #endif
-
-//-------------------------------------------------
-//  set_use_natural_keyboard - specifies
-//  whether the natural keyboard is active
-//-------------------------------------------------
-
-void mame_ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
-{
-	m_use_natural_keyboard = use_natural_keyboard;
-	std::string error;
-	machine().options().set_value(OPTION_NATURAL_KEYBOARD, use_natural_keyboard, OPTION_PRIORITY_CMDLINE, error);
-	assert(error.empty());
-}
 
 
 //-------------------------------------------------
@@ -2172,7 +2158,7 @@ int mame_ui_manager::wrap_text(render_container &container, const char *origs, f
 //  textured background and line color
 //-------------------------------------------------
 
-void mame_ui_manager::draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture, UINT32 flags)
+void mame_ui_manager::draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture, uint32_t flags)
 {
 	container.add_quad(x0, y0, x1, y1, backcolor, texture, flags);
 	container.add_line(x0, y0, x1, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -2196,9 +2182,9 @@ rgb_t decode_ui_color(int id, running_machine *machine)
 			const char *s_option = mame_machine_manager::instance()->ui().options().value(s_color_list[x]);
 			int len = strlen(s_option);
 			if (len != 8)
-				color[x] = rgb_t((UINT32)strtoul(o_default, nullptr, 16));
+				color[x] = rgb_t((uint32_t)strtoul(o_default, nullptr, 16));
 			else
-				color[x] = rgb_t((UINT32)strtoul(s_option, nullptr, 16));
+				color[x] = rgb_t((uint32_t)strtoul(s_option, nullptr, 16));
 		}
 	}
 	return color[id];

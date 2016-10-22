@@ -74,7 +74,7 @@ class i8279_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_sl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_sl_cb.set_callback(object); }
@@ -104,8 +104,8 @@ private:
 
 	void timer_adjust();
 	void clear_display();
-	void new_key(UINT8 data, bool skey, bool ckey);
-	void new_fifo(UINT8 data);
+	void new_key(uint8_t data, bool skey, bool ckey);
+	void new_fifo(uint8_t data);
 	void set_irq(bool state);
 
 	devcb_write_line    m_out_irq_cb;       // IRQ
@@ -118,20 +118,20 @@ private:
 
 	emu_timer *m_timer;
 
-	UINT8 m_d_ram[16];      // display ram
-	UINT8 m_d_ram_ptr;
-	UINT8 m_s_ram[8]; // might be same as fifo ram
-	UINT8 m_s_ram_ptr;
-	UINT8 m_fifo[8];    // queued keystrokes
-	UINT8 m_cmd[8];   // Device settings
-	UINT8 m_status;     // Returned via status_r
-	UINT32 m_clock;     // Internal scan clock
-	UINT8 m_scanner;    // next output on SL lines
+	uint8_t m_d_ram[16];      // display ram
+	uint8_t m_d_ram_ptr;
+	uint8_t m_s_ram[8]; // might be same as fifo ram
+	uint8_t m_s_ram_ptr;
+	uint8_t m_fifo[8];    // queued keystrokes
+	uint8_t m_cmd[8];   // Device settings
+	uint8_t m_status;     // Returned via status_r
+	uint32_t m_clock;     // Internal scan clock
+	uint8_t m_scanner;    // next output on SL lines
 
 	bool m_autoinc;     // auto-increment flag
 	bool m_read_flag;   // read from where
 	bool m_ctrl_key;    // previous state of strobe input
-	UINT16 m_key_down;
+	uint16_t m_key_down;
 };
 
 

@@ -58,8 +58,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki") { }
 
-	UINT8 m_mux_data;
-	UINT8 m_oki_bank;
+	uint8_t m_mux_data;
+	uint8_t m_oki_bank;
 	DECLARE_WRITE8_MEMBER(namco_30test_led_w);
 	DECLARE_WRITE8_MEMBER(namco_30test_led_rank_w);
 	DECLARE_WRITE8_MEMBER(namco_30test_lamps_w);
@@ -75,7 +75,7 @@ public:
 };
 
 
-static const UINT8 led_map[16] =
+static const uint8_t led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
 WRITE8_MEMBER(namco_30test_state::namco_30test_led_w)
@@ -99,7 +99,7 @@ WRITE8_MEMBER(namco_30test_state::namco_30test_lamps_w)
 
 READ8_MEMBER(namco_30test_state::namco_30test_mux_r)
 {
-	UINT8 res = 0xff;
+	uint8_t res = 0xff;
 
 	switch(m_mux_data)
 	{

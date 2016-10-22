@@ -25,7 +25,7 @@ WRITE16_MEMBER(vaportra_state::vaportra_priority_w)
 
 void vaportra_state::update_24bitcol( int offset )
 {
-	UINT8 r, g, b;
+	uint8_t r, g, b;
 
 	r = (m_generic_paletteram_16[offset] >> 0) & 0xff;
 	g = (m_generic_paletteram_16[offset] >> 8) & 0xff;
@@ -49,10 +49,10 @@ WRITE16_MEMBER(vaportra_state::vaportra_palette_24bit_b_w)
 /******************************************************************************/
 
 
-UINT32 vaportra_state::screen_update_vaportra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vaportra_state::screen_update_vaportra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	int pri = m_priority[0] & 0x03;
 
 	flip_screen_set(!BIT(flip, 7));

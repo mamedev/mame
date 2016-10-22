@@ -42,22 +42,22 @@ public:
 	required_device<fuukivid_device> m_fuukivid;
 
 	/* memory pointers */
-	required_shared_ptr_array<UINT32,4> m_vram;
-	required_shared_ptr<UINT32> m_vregs;
-	required_shared_ptr<UINT32> m_priority;
-	required_shared_ptr<UINT32> m_tilebank;
-	//UINT32 *    m_buf_spriteram;
-	//UINT32 *    m_buf_spriteram2;
+	required_shared_ptr_array<uint32_t,4> m_vram;
+	required_shared_ptr<uint32_t> m_vregs;
+	required_shared_ptr<uint32_t> m_priority;
+	required_shared_ptr<uint32_t> m_tilebank;
+	//uint32_t *    m_buf_spriteram;
+	//uint32_t *    m_buf_spriteram2;
 
 	/* video-related */
 	tilemap_t     *m_tilemap[4];
-	UINT32      m_spr_buffered_tilebank[2];
+	uint32_t      m_spr_buffered_tilebank[2];
 
 	/* misc */
 	emu_timer   *m_level_1_interrupt_timer;
 	emu_timer   *m_vblank_interrupt_timer;
 	emu_timer   *m_raster_interrupt_timer;
-	UINT8       m_shared_ram[16];
+	uint8_t       m_shared_ram[16];
 
 	DECLARE_READ32_MEMBER(snd_020_r);
 	DECLARE_WRITE32_MEMBER(snd_020_w);
@@ -80,11 +80,11 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	inline void get_tile_info8bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
 	inline void get_tile_info4bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
-	inline void vram_w(offs_t offset, UINT32 data, UINT32 mem_mask, int _N_);
+	inline void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask, int _N_);
 	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 
 protected:

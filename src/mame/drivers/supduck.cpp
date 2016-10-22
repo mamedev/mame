@@ -52,9 +52,9 @@ public:
 
 	// shared pointers
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<UINT16> m_text_videoram;
-	required_shared_ptr<UINT16> m_fore_videoram;
-	required_shared_ptr<UINT16> m_back_videoram;
+	required_shared_ptr<uint16_t> m_text_videoram;
+	required_shared_ptr<uint16_t> m_fore_videoram;
+	required_shared_ptr<uint16_t> m_back_videoram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -65,7 +65,7 @@ public:
 	tilemap_t     *m_fore_tilemap;
 	tilemap_t     *m_back_tilemap;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE16_MEMBER(text_videoram_w);
 	DECLARE_WRITE16_MEMBER(fore_videoram_w);
@@ -124,7 +124,7 @@ void supduck_state::video_start()
 
 }
 
-UINT32 supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -159,7 +159,7 @@ WRITE16_MEMBER(supduck_state::back_videoram_w)
 
 TILE_GET_INFO_MEMBER(supduck_state::get_text_tile_info) // same as tigeroad.c
 {
-	UINT16 *videoram = m_text_videoram;
+	uint16_t *videoram = m_text_videoram;
 	int data = videoram[tile_index];
 	int attr = data >> 8;
 	int code = (data & 0xff) + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5);
@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_text_tile_info) // same as tigeroad.c
 
 TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 {
-	UINT16 *videoram = m_fore_videoram;
+	uint16_t *videoram = m_fore_videoram;
 	int data = videoram[tile_index];
 	int code = data & 0xff;
 	if (data & 0x4000) code |= 0x100;
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 
 TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 {
-	UINT16 *videoram = m_back_videoram;
+	uint16_t *videoram = m_back_videoram;
 	int data = videoram[tile_index];
 
 	int code = data & 0xff;

@@ -31,33 +31,33 @@ public:
 	PAIR m_cp2cr[ 32 ];
 	PAIR m_cp2dr[ 32 ];
 
-	UINT32 getcp2dr( UINT32 pc, int reg );
-	void setcp2dr( UINT32 pc, int reg, UINT32 value );
-	UINT32 getcp2cr( UINT32 pc, int reg );
-	void setcp2cr( UINT32 pc, int reg, UINT32 value );
-	int docop2( UINT32 pc, int gteop );
+	uint32_t getcp2dr( uint32_t pc, int reg );
+	void setcp2dr( uint32_t pc, int reg, uint32_t value );
+	uint32_t getcp2cr( uint32_t pc, int reg );
+	void setcp2cr( uint32_t pc, int reg, uint32_t value );
+	int docop2( uint32_t pc, int gteop );
 
 protected:
 	class int44
 	{
 	public:
-		int44( INT64 value ) :
+		int44( int64_t value ) :
 			m_value( value ),
 			m_positive_overflow( value > S64( 0x7ffffffffff ) ),
 			m_negative_overflow( value < S64( -0x80000000000 ) )
 		{
 		}
 
-		int44( INT64 value, bool positive_overflow, bool negative_overflow ) :
+		int44( int64_t value, bool positive_overflow, bool negative_overflow ) :
 			m_value( value ),
 			m_positive_overflow( positive_overflow ),
 			m_negative_overflow( negative_overflow )
 		{
 		}
 
-		int44 operator+( INT64 add )
+		int44 operator+( int64_t add )
 		{
-			INT64 value = ( ( m_value + add ) << 20 ) >> 20;
+			int64_t value = ( ( m_value + add ) << 20 ) >> 20;
 
 			return int44( value,
 				m_positive_overflow || ( value < 0 && m_value >= 0 && add >= 0 ),
@@ -74,41 +74,41 @@ protected:
 			return m_negative_overflow;
 		}
 
-		INT64 value()
+		int64_t value()
 		{
 			return m_value;
 		}
 
 	private:
-		INT64 m_value;
+		int64_t m_value;
 		bool m_positive_overflow;
 		bool m_negative_overflow;
 	};
 
-	INT32 LIM( INT32 value, INT32 max, INT32 min, UINT32 flag );
-	INT32 BOUNDS( int44 a, int max_flag, int min_flag );
-	INT32 A1( int44 a );
-	INT32 A2( int44 a );
-	INT32 A3( int44 a );
-	INT32 Lm_B1( INT32 a, int lm );
-	INT32 Lm_B2( INT32 a, int lm );
-	INT32 Lm_B3( INT32 a, int lm );
-	INT32 Lm_B3_sf( INT64 value, int sf, int lm );
-	INT32 Lm_C1( INT32 a );
-	INT32 Lm_C2( INT32 a );
-	INT32 Lm_C3( INT32 a );
-	INT32 Lm_D( INT64 a, int sf );
-	UINT32 Lm_E( UINT32 result );
-	INT64 F( INT64 a );
-	INT32 Lm_G1( INT64 a );
-	INT32 Lm_G2( INT64 a );
-	INT32 Lm_H( INT64 value, int sf );
+	int32_t LIM( int32_t value, int32_t max, int32_t min, uint32_t flag );
+	int32_t BOUNDS( int44 a, int max_flag, int min_flag );
+	int32_t A1( int44 a );
+	int32_t A2( int44 a );
+	int32_t A3( int44 a );
+	int32_t Lm_B1( int32_t a, int lm );
+	int32_t Lm_B2( int32_t a, int lm );
+	int32_t Lm_B3( int32_t a, int lm );
+	int32_t Lm_B3_sf( int64_t value, int sf, int lm );
+	int32_t Lm_C1( int32_t a );
+	int32_t Lm_C2( int32_t a );
+	int32_t Lm_C3( int32_t a );
+	int32_t Lm_D( int64_t a, int sf );
+	uint32_t Lm_E( uint32_t result );
+	int64_t F( int64_t a );
+	int32_t Lm_G1( int64_t a );
+	int32_t Lm_G2( int64_t a );
+	int32_t Lm_H( int64_t value, int sf );
 
 	int m_sf;
-	INT64 m_mac0;
-	INT64 m_mac1;
-	INT64 m_mac2;
-	INT64 m_mac3;
+	int64_t m_mac0;
+	int64_t m_mac1;
+	int64_t m_mac2;
+	int64_t m_mac3;
 };
 
 #endif

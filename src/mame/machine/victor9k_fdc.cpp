@@ -221,7 +221,7 @@ machine_config_constructor victor_9000_fdc_t::device_mconfig_additions() const
 //  victor_9000_fdc_t - constructor
 //-------------------------------------------------
 
-victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VICTOR_9000_FDC, "Victor 9000 FDC", tag, owner, clock, "victor9k_fdc", __FILE__),
 	m_irq_cb(*this),
 	m_syn_cb(*this),
@@ -449,7 +449,7 @@ READ8_MEMBER( victor_9000_fdc_t::floppy_p2_r )
 
 	*/
 
-	UINT8 data = m_p2 & 0x3f;
+	uint8_t data = m_p2 & 0x3f;
 
 	data |= m_via_rdy0 << 6;
 	data |= m_via_rdy1 << 7;
@@ -590,7 +590,7 @@ void victor_9000_fdc_t::update_stepper_motor(floppy_image_device *floppy, int st
 	floppy->set_rpm(victor9k_format::get_rpm(m_side, floppy->get_cyl()));
 }
 
-void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da)
+void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, uint8_t &da)
 {
 #ifdef USE_SCP
 	if (start && !stop && floppy->mon_r()) {
@@ -605,7 +605,7 @@ void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_ti
 #endif
 }
 
-void victor_9000_fdc_t::update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, UINT8 &da)
+void victor_9000_fdc_t::update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t &da)
 {
 #ifdef USE_SCP
 	if (sel) {
@@ -698,7 +698,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
 	}
 #endif
 
-	UINT8 st0 = data >> 4;
+	uint8_t st0 = data >> 4;
 
 	if (LOG_VIA) logerror("%s %s L0MS %01x ST0 %01x\n", machine().time().as_string(), machine().describe_context(), m_via_l0ms, st0);
 
@@ -763,7 +763,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pb_w )
 	}
 #endif
 
-	UINT8 st1 = data >> 4;
+	uint8_t st1 = data >> 4;
 
 	if (LOG_VIA) logerror("%s %s L1MS %01x ST1 %01x\n", machine().time().as_string(), machine().describe_context(), m_via_l1ms, st1);
 
@@ -874,7 +874,7 @@ READ8_MEMBER( victor_9000_fdc_t::via6_pa_r )
 
 	if (LOG_VIA) logerror("%s %s TRK0D0 %u TRK0D1 %u SYNC %u\n", machine().time().as_string(), machine().describe_context(), m_floppy0->get_device() ? m_floppy0->get_device()->trk00_r() : 0, m_floppy1->get_device() ? m_floppy1->get_device()->trk00_r() : 0, checkpoint_live.sync);
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// track 0 drive A sense
 	data |= (m_floppy0->get_device() ? m_floppy0->get_device()->trk00_r() : 0) << 1;
@@ -960,7 +960,7 @@ READ8_MEMBER( victor_9000_fdc_t::via6_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// motor speed status, drive A
 	data |= (m_via_rdy0 && m_via_rdy1) ? m_rdy0 : m_scp_rdy0;

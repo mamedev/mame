@@ -35,10 +35,10 @@ Sound:  YM2151
     Or last value when wheel delta = 0
 */
 
-UINT8 amspdwy_state::amspdwy_wheel_r( int index )
+uint8_t amspdwy_state::amspdwy_wheel_r( int index )
 {
 	static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };
-	UINT8 wheel = ioport(portnames[2 + index])->read();
+	uint8_t wheel = ioport(portnames[2 + index])->read();
 	if (wheel != m_wheel_old[index])
 	{
 		wheel = (wheel & 0x7fff) - (wheel & 0x8000);

@@ -651,7 +651,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 {
-	UINT8 *rom = memregion("gfx1")->base();
+	uint8_t *rom = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();
 	int i, j;
 
@@ -662,7 +662,7 @@ DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 	{
 		for (j = 0; j < 0x10; j++)
 		{
-			UINT8 t = rom[i + j + 0x10];
+			uint8_t t = rom[i + j + 0x10];
 			rom[i + j + 0x10] = rom[i + j + 0x20];
 			rom[i + j + 0x20] = t;
 		}

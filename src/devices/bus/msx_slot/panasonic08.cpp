@@ -16,7 +16,7 @@ Todo:
 const device_type MSX_SLOT_PANASONIC08 = &device_creator<msx_slot_panasonic08_device>;
 
 
-msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_PANASONIC08, "MSX Internal Panasonic08", tag, owner, clock, "msx_slot_panasonic08", __FILE__)
 	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
@@ -44,7 +44,7 @@ machine_config_constructor msx_slot_panasonic08_device::device_mconfig_additions
 }
 
 
-void msx_slot_panasonic08_device::set_rom_start(device_t &device, const char *region, UINT32 offset)
+void msx_slot_panasonic08_device::set_rom_start(device_t &device, const char *region, uint32_t offset)
 {
 	msx_slot_panasonic08_device &dev = downcast<msx_slot_panasonic08_device &>(device);
 
@@ -122,7 +122,7 @@ WRITE8_MEMBER(msx_slot_panasonic08_device::write)
 {
 	if ((offset & 0xc000) == 0x8000 || (offset & 0xc000) == 0x0000)
 	{
-		UINT8 bank = m_selected_bank[offset >> 13];
+		uint8_t bank = m_selected_bank[offset >> 13];
 		if (bank >= 0x80 && bank < 0x84)   // Are these banks were sram is present? Mirroring?
 		{
 			logerror("msx_slot_panasonic08: writing %02x to sram %04x, bank = %02x\n", data, offset & 0x1fff, bank);

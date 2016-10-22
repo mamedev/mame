@@ -29,7 +29,7 @@ class ibm_pc_83_keyboard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ibm_pc_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ibm_pc_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -54,7 +54,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<24> m_dr;
 
-	UINT8 m_cnt;
+	uint8_t m_cnt;
 };
 
 

@@ -13,7 +13,7 @@
 
 static int cas_size;
 
-static int pc6001_fill_wave(INT16* buffer, UINT8 data, int sample_pos)
+static int pc6001_fill_wave(int16_t* buffer, uint8_t data, int sample_pos)
 {
 	int x;
 	int sample_count = 0;
@@ -29,7 +29,7 @@ static int pc6001_fill_wave(INT16* buffer, UINT8 data, int sample_pos)
 	return sample_count;
 }
 
-static int pc6001_handle_cas(INT16* buffer, const UINT8* casdata)
+static int pc6001_handle_cas(int16_t* buffer, const uint8_t* casdata)
 {
 	int sample_count = 0;
 	int data_pos = 0;
@@ -46,7 +46,7 @@ static int pc6001_handle_cas(INT16* buffer, const UINT8* casdata)
 /*******************************************************************
    Calculate the number of samples needed for this tape image
 ********************************************************************/
-static int pc6001_cas_to_wav_size (const UINT8 *casdata, int caslen)
+static int pc6001_cas_to_wav_size (const uint8_t *casdata, int caslen)
 {
 	cas_size = caslen*8;
 
@@ -56,7 +56,7 @@ static int pc6001_cas_to_wav_size (const UINT8 *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int pc6001_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int pc6001_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	return pc6001_handle_cas(buffer,bytes);
 }

@@ -20,11 +20,11 @@ public:
 	ParallelMove(const Opcode* oco) : m_valid(false), m_oco(oco) { }
 	virtual ~ParallelMove() {}
 
-	virtual bool decode(const UINT16 word0, const UINT16 word1) = 0;
+	virtual bool decode(const uint16_t word0, const uint16_t word1) = 0;
 	virtual void disassemble(std::string& retString) const = 0;
 	virtual void evaluate() = 0;
 
-	static std::unique_ptr<ParallelMove> decodeParallelMove(const Opcode* opc, const UINT16 word0, const UINT16 word1);
+	static std::unique_ptr<ParallelMove> decodeParallelMove(const Opcode* opc, const uint16_t word0, const uint16_t word1);
 
 	bool valid() const { return m_valid; }
 
@@ -47,11 +47,11 @@ protected:
 class XMemoryDataMove: public ParallelMove
 {
 public:
-	XMemoryDataMove(const Opcode* oco, const UINT16 word0, const UINT16 word1) : ParallelMove(oco)
+	XMemoryDataMove(const Opcode* oco, const uint16_t word0, const uint16_t word1) : ParallelMove(oco)
 	{
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1) override
+	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
 		reg_id r;
 		decode_RR_table(BITSn(word0,0x3000), r);
@@ -87,11 +87,11 @@ private:
 class XMemoryDataMove_2: public ParallelMove
 {
 public:
-	XMemoryDataMove_2(const Opcode* oco, const UINT16 word0, const UINT16 word1) : ParallelMove(oco)
+	XMemoryDataMove_2(const Opcode* oco, const uint16_t word0, const uint16_t word1) : ParallelMove(oco)
 	{
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1) override
+	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
 		std::string ea;
 		if (opDestination() == iB)
@@ -129,11 +129,11 @@ private:
 class DualXMemoryDataRead: public ParallelMove
 {
 public:
-	DualXMemoryDataRead(const Opcode* oco, const UINT16 word0, const UINT16 word1) : ParallelMove(oco)
+	DualXMemoryDataRead(const Opcode* oco, const uint16_t word0, const uint16_t word1) : ParallelMove(oco)
 	{
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1) override
+	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
 		reg_id r;
 		reg_id D1;
@@ -183,11 +183,11 @@ private:
 class RegisterToRegisterDataMove: public ParallelMove
 {
 public:
-	RegisterToRegisterDataMove(const Opcode* oco, const UINT16 word0, const UINT16 word1) : ParallelMove(oco)
+	RegisterToRegisterDataMove(const Opcode* oco, const uint16_t word0, const uint16_t word1) : ParallelMove(oco)
 	{
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1) override
+	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
 		decode_IIIIx_table(BITSn(word0,0x0f00), BITSn(word0,0x0008),
 							m_source, m_destination);
@@ -234,13 +234,13 @@ private:
 class XMemoryDataWriteAndRegisterDataMove: public ParallelMove
 {
 public:
-	XMemoryDataWriteAndRegisterDataMove(const Opcode* oco, const UINT16 word0, const UINT16 word1) : ParallelMove(oco)
+	XMemoryDataWriteAndRegisterDataMove(const Opcode* oco, const uint16_t word0, const uint16_t word1) : ParallelMove(oco)
 	{
 		pms = "";
 		pms2 = "";
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1) override
+	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
 		reg_id r;
 		reg_id S;
@@ -277,12 +277,12 @@ private:
 class AddressRegisterUpdate: public ParallelMove
 {
 public:
-	AddressRegisterUpdate(const Opcode* oco, const UINT16 word0, const UINT16 word1) : ParallelMove(oco)
+	AddressRegisterUpdate(const Opcode* oco, const uint16_t word0, const uint16_t word1) : ParallelMove(oco)
 	{
 		m_ea = "";
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1) override
+	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
 		reg_id r;
 		decode_RR_table(BITSn(word0,0x0300), r);
@@ -305,15 +305,15 @@ private:
 class XMemoryDataMoveWithShortDisplacement: public ParallelMove
 {
 public:
-	XMemoryDataMoveWithShortDisplacement(const Opcode* oco, const UINT16 word0, const UINT16 word1) : ParallelMove(oco)
+	XMemoryDataMoveWithShortDisplacement(const Opcode* oco, const uint16_t word0, const uint16_t word1) : ParallelMove(oco)
 	{
 		m_source = "";
 		m_destination = "";
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1) override
+	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
-		INT8 b;
+		int8_t b;
 		reg_id SD;
 		b = (char)(word0 & 0x00ff);
 		decode_HHH_table(BITSn(word1,0x0e00), SD);

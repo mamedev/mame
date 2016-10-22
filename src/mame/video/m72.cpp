@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-inline void m72_state::m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
+inline void m72_state::m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const uint16_t *vram,int gfxnum)
 {
 	int code,attr,color,pri;
 
@@ -37,7 +37,7 @@ inline void m72_state::m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,
 	tileinfo.group = pri;
 }
 
-inline void m72_state::m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
+inline void m72_state::m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,const uint16_t *vram,int gfxnum)
 {
 	int code,attr,color,pri;
 
@@ -114,7 +114,7 @@ VIDEO_START_MEMBER(m72_state,m72)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
-	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
+	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -209,7 +209,7 @@ VIDEO_START_MEMBER(m72_state,m82)
 	m_bg_tilemap_large->set_scrolldx(4,0);
 	m_bg_tilemap_large->set_scrolldy(-128,-128);
 
-	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
+	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
 	memset(m_buffered_spriteram.get(),0,m_spriteram.bytes());
 
 	register_savestate();
@@ -224,7 +224,7 @@ VIDEO_START_MEMBER(m72_state,rtype2)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
-	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
+	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -454,7 +454,7 @@ WRITE16_MEMBER(m72_state::m82_tm_ctrl_w)
 
 void m72_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram = m_buffered_spriteram.get();
+	uint16_t *spriteram = m_buffered_spriteram.get();
 	int offs;
 
 	offs = 0;
@@ -507,7 +507,7 @@ void m72_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 void m72_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16_2 = m_spriteram2;
+	uint16_t *spriteram16_2 = m_spriteram2;
 	int offs;
 
 	for (offs = 0;offs < m_spriteram.bytes();offs += 4)
@@ -555,7 +555,7 @@ void m72_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip
 	}
 }
 
-UINT32 m72_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m72_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_video_off)
 	{
@@ -577,7 +577,7 @@ UINT32 m72_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
-UINT32 m72_state::screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m72_state::screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// on M81 the FG data always comes from the Ax roms
 	// the source of the BG data however depends on Jumper J3
@@ -589,7 +589,7 @@ UINT32 m72_state::screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-UINT32 m72_state::screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m72_state::screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

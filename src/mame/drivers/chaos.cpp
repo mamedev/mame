@@ -52,10 +52,10 @@ public:
 	DECLARE_READ8_MEMBER(port91_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<generic_terminal_device> m_terminal;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -108,7 +108,7 @@ WRITE8_MEMBER( chaos_state::port1f_w )
 
 READ8_MEMBER( chaos_state::port90_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -120,7 +120,7 @@ READ8_MEMBER( chaos_state::port90_r )
 
 READ8_MEMBER( chaos_state::port91_r )
 {
-	UINT8 ret = 0x80 | ioport("CONFIG")->read();
+	uint8_t ret = 0x80 | ioport("CONFIG")->read();
 	ret |= (m_term_data) ? 8 : 0;
 	return ret;
 }
@@ -133,7 +133,7 @@ WRITE8_MEMBER( chaos_state::kbd_put )
 void chaos_state::machine_reset()
 {
 	// copy the roms into ram
-	UINT8* ROM = memregion("roms")->base();
+	uint8_t* ROM = memregion("roms")->base();
 	memcpy(m_p_ram, ROM, 0x3000);
 	memcpy(m_p_ram+0x7000, ROM+0x3000, 0x1000);
 }

@@ -79,10 +79,10 @@ void xxmissio_state::video_start()
 
 PALETTE_DECODER_MEMBER( xxmissio_state, BBGGRRII )
 {
-	UINT8 i = raw & 3;
-	UINT8 r = (raw >> 0) & 0x0c;
-	UINT8 g = (raw >> 2) & 0x0c;
-	UINT8 b = (raw >> 4) & 0x0c;
+	uint8_t i = raw & 3;
+	uint8_t r = (raw >> 0) & 0x0c;
+	uint8_t g = (raw >> 2) & 0x0c;
+	uint8_t b = (raw >> 4) & 0x0c;
 
 	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
 }
@@ -137,7 +137,7 @@ void xxmissio_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 xxmissio_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t xxmissio_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	machine().tilemap().mark_all_dirty();
 	machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);

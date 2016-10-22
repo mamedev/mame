@@ -5,7 +5,7 @@
 const device_type NSCSI_BUS = &device_creator<nscsi_bus_device>;
 const device_type NSCSI_CONNECTOR = &device_creator<nscsi_connector>;
 
-nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NSCSI_BUS, "NSCSI Bus", tag, owner, clock, "nscsi_bus", __FILE__), data(0), ctrl(0)
 {
 	devcnt = 0;
@@ -42,7 +42,7 @@ void nscsi_bus_device::regen_ctrl(int refid)
 		"dout", "din ", "cmd ", "stat", "4   ", "5   ", "mout", "min "
 	};
 
-	UINT32 octrl = ctrl;
+	uint32_t octrl = ctrl;
 	ctrl = 0;
 	for(int i=0; i<devcnt; i++)
 		ctrl |= dev[i].ctrl;
@@ -85,32 +85,32 @@ void nscsi_bus_device::regen_ctrl(int refid)
 				dev[i].dev->scsi_ctrl_changed();
 }
 
-UINT32 nscsi_bus_device::data_r() const
+uint32_t nscsi_bus_device::data_r() const
 {
 	return data;
 }
 
-UINT32 nscsi_bus_device::ctrl_r() const
+uint32_t nscsi_bus_device::ctrl_r() const
 {
 	return ctrl;
 }
 
-void nscsi_bus_device::ctrl_w(int refid, UINT32 lines, UINT32 mask)
+void nscsi_bus_device::ctrl_w(int refid, uint32_t lines, uint32_t mask)
 {
-	UINT32 c = dev[refid].ctrl;
+	uint32_t c = dev[refid].ctrl;
 	dev[refid].ctrl = (c & ~mask) | (lines & mask);
 	regen_ctrl(refid);
 }
 
-void nscsi_bus_device::data_w(int refid, UINT32 lines)
+void nscsi_bus_device::data_w(int refid, uint32_t lines)
 {
 	dev[refid].data = lines;
 	regen_data();
 }
 
-void nscsi_bus_device::ctrl_wait(int refid, UINT32 lines, UINT32 mask)
+void nscsi_bus_device::ctrl_wait(int refid, uint32_t lines, uint32_t mask)
 {
-	UINT32 w = dev[refid].wait_ctrl;
+	uint32_t w = dev[refid].wait_ctrl;
 	dev[refid].wait_ctrl = (w & ~mask) | (lines & mask);
 }
 
@@ -132,7 +132,7 @@ void nscsi_bus_device::device_config_complete()
 }
 
 
-nscsi_connector::nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nscsi_connector::nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NSCSI_CONNECTOR, "NSCSI Connector Abstraction", tag, owner, clock, "nscsi_connector", __FILE__),
 	device_slot_interface(mconfig, *this)
 {
@@ -151,7 +151,7 @@ nscsi_device *nscsi_connector::get_device()
 	return dynamic_cast<nscsi_device *>(get_card_device());
 }
 
-nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_card_interface(mconfig, *this)
 {
@@ -175,7 +175,7 @@ void nscsi_device::device_start()
 	save_item(NAME(scsi_id));
 }
 
-nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	nscsi_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -262,8 +262,8 @@ void nscsi_full_device::scsi_ctrl_changed()
 
 void nscsi_full_device::step(bool timeout)
 {
-	UINT32 ctrl = scsi_bus->ctrl_r();
-	UINT32 data = scsi_bus->data_r();
+	uint32_t ctrl = scsi_bus->ctrl_r();
+	uint32_t data = scsi_bus->data_r();
 	if(ctrl & S_RST) {
 		scsi_bus->data_w(scsi_refid, 0);
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
@@ -451,7 +451,7 @@ void nscsi_full_device::target_recv_byte()
 	step(false);
 }
 
-void nscsi_full_device::target_send_byte(UINT8 val)
+void nscsi_full_device::target_send_byte(uint8_t val)
 {
 	scsi_bus->ctrl_wait(scsi_refid, S_ACK, S_ACK);
 	scsi_state = (scsi_state & STATE_MASK) | (SEND_BYTE_T_WAIT_ACK_1 << SUB_SHIFT);
@@ -460,7 +460,7 @@ void nscsi_full_device::target_send_byte(UINT8 val)
 	step(false);
 }
 
-UINT8 nscsi_full_device::scsi_get_data(int id, int pos)
+uint8_t nscsi_full_device::scsi_get_data(int id, int pos)
 {
 	switch(id) {
 	case SBUF_MAIN:
@@ -472,7 +472,7 @@ UINT8 nscsi_full_device::scsi_get_data(int id, int pos)
 	}
 }
 
-void nscsi_full_device::scsi_put_data(int id, int pos, UINT8 data)
+void nscsi_full_device::scsi_put_data(int id, int pos, uint8_t data)
 {
 	switch(id) {
 	case SBUF_MAIN:
@@ -495,7 +495,7 @@ bool nscsi_full_device::command_done()
 {
 	if(!data_buffer_pos)
 		return false;
-	UINT8 h = scsi_cmdbuf[0];
+	uint8_t h = scsi_cmdbuf[0];
 	switch(h >> 5) {
 	case 0: return data_buffer_pos == 6;
 	case 1: return data_buffer_pos == 10;
@@ -531,7 +531,7 @@ nscsi_full_device::control *nscsi_full_device::buf_control_pop()
 	return c;
 }
 
-void nscsi_full_device::scsi_status_complete(UINT8 st)
+void nscsi_full_device::scsi_status_complete(uint8_t st)
 {
 	control *c;
 	c = buf_control_push();
@@ -562,7 +562,7 @@ void nscsi_full_device::scsi_data_out(int buf, int size)
 	c->param2 = size;
 }
 
-void nscsi_full_device::sense(bool deferred, UINT8 key)
+void nscsi_full_device::sense(bool deferred, uint8_t key)
 {
 	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
 	scsi_sense_buffer[0] = deferred ? 0x71 : 0x70;

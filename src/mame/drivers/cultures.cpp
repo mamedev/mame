@@ -46,16 +46,16 @@ public:
 	required_memory_bank m_okibank;
 
 	/* memory pointers */
-	required_region_ptr<UINT16> m_bg1_rom;
-	required_region_ptr<UINT16> m_bg2_rom;
+	required_region_ptr<uint16_t> m_bg1_rom;
+	required_region_ptr<uint16_t> m_bg2_rom;
 
-	required_shared_ptr<UINT8> m_bg0_videoram;
-	required_shared_ptr<UINT8> m_bg0_regs_x;
-	required_shared_ptr<UINT8> m_bg0_regs_y;
-	required_shared_ptr<UINT8> m_bg1_regs_x;
-	required_shared_ptr<UINT8> m_bg1_regs_y;
-	required_shared_ptr<UINT8> m_bg2_regs_x;
-	required_shared_ptr<UINT8> m_bg2_regs_y;
+	required_shared_ptr<uint8_t> m_bg0_videoram;
+	required_shared_ptr<uint8_t> m_bg0_regs_x;
+	required_shared_ptr<uint8_t> m_bg0_regs_y;
+	required_shared_ptr<uint8_t> m_bg1_regs_x;
+	required_shared_ptr<uint8_t> m_bg1_regs_y;
+	required_shared_ptr<uint8_t> m_bg2_regs_x;
+	required_shared_ptr<uint8_t> m_bg2_regs_y;
 
 	/* video-related */
 	tilemap_t  *m_bg0_tilemap;
@@ -74,7 +74,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cultures_interrupt);
 };
 
@@ -116,7 +116,7 @@ void cultures_state::video_start()
 	m_bg2_tilemap->set_scrolldy(255, -16);
 }
 
-UINT32 cultures_state::screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cultures_state::screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int attr;
 

@@ -158,7 +158,7 @@ void neogeo_state::video_reset()
  *
  *************************************/
 
-UINT32 neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
 	bitmap.fill(*m_bg_pen, cliprect);
@@ -178,10 +178,10 @@ UINT32 neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &b
  *
  *************************************/
 
-UINT16 neogeo_state::get_video_control()
+uint16_t neogeo_state::get_video_control()
 {
-	UINT16 ret;
-	UINT16 v_counter;
+	uint16_t ret;
+	uint16_t v_counter;
 
 	/*
 	    The format of this very important location is:  AAAA AAAA A??? BCCC
@@ -218,7 +218,7 @@ UINT16 neogeo_state::get_video_control()
 }
 
 
-void neogeo_state::set_video_control(UINT16 data)
+void neogeo_state::set_video_control(uint16_t data)
 {
 	if (VERBOSE) logerror("%s: video control write %04x\n", machine().describe_context(), data);
 
@@ -231,7 +231,7 @@ void neogeo_state::set_video_control(UINT16 data)
 
 READ16_MEMBER(neogeo_state::video_register_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 
 	/* accessing the LSB only is not mapped */
 	if (mem_mask == 0x00ff)

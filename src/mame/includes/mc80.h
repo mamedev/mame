@@ -40,13 +40,13 @@ public:
 	DECLARE_READ8_MEMBER(asp_port_b_r);
 	DECLARE_WRITE8_MEMBER(asp_port_a_w);
 	DECLARE_WRITE8_MEMBER(asp_port_b_w);
-	optional_shared_ptr<UINT8> m_p_videoram;
+	optional_shared_ptr<uint8_t> m_p_videoram;
 	DECLARE_MACHINE_RESET(mc8020);
 	DECLARE_VIDEO_START(mc8020);
 	DECLARE_MACHINE_RESET(mc8030);
 	DECLARE_VIDEO_START(mc8030);
-	UINT32 screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mc8020_kbd);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	IRQ_CALLBACK_MEMBER(mc8020_irq_callback);

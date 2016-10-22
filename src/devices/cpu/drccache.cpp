@@ -18,8 +18,8 @@
 //**************************************************************************
 
 // ensure that all memory allocated is aligned to an 8-byte boundary
-#define ALIGN_PTR_UP(p)         ((void *)(((FPTR)(p) + (CACHE_ALIGNMENT - 1)) & ~(CACHE_ALIGNMENT - 1)))
-#define ALIGN_PTR_DOWN(p)       ((void *)((FPTR)(p) & ~(CACHE_ALIGNMENT - 1)))
+#define ALIGN_PTR_UP(p)         ((void *)(((uintptr_t)(p) + (CACHE_ALIGNMENT - 1)) & ~(CACHE_ALIGNMENT - 1)))
+#define ALIGN_PTR_DOWN(p)       ((void *)((uintptr_t)(p) & ~(CACHE_ALIGNMENT - 1)))
 
 
 
@@ -184,7 +184,7 @@ void drc_cache::dealloc(void *memory, size_t bytes)
 //  begin_codegen - begin code generation
 //-------------------------------------------------
 
-drccodeptr *drc_cache::begin_codegen(UINT32 reserve_bytes)
+drccodeptr *drc_cache::begin_codegen(uint32_t reserve_bytes)
 {
 	// can't restart in the middle of codegen
 	assert(m_codegen == nullptr);

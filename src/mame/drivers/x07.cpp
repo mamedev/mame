@@ -35,7 +35,7 @@
     T6834 IMPLEMENTATION
 ***************************************************************************/
 
-void x07_state::t6834_cmd (UINT8 cmd)
+void x07_state::t6834_cmd (uint8_t cmd)
 {
 	switch (cmd)
 	{
@@ -59,7 +59,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x02:  //STICK
 		{
-			UINT8 data;
+			uint8_t data;
 
 			switch (ioport("S1")->read() & 0x3c)
 			{
@@ -87,8 +87,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x05:  //T6834 RAM read
 		{
-			UINT16 address;
-			UINT8 data;
+			uint16_t address;
+			uint8_t data;
 			address = m_in.data[m_in.read++];
 			address |= (m_in.data[m_in.read++] << 8);
 
@@ -105,8 +105,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x06:  //T6834 RAM write
 		{
-			UINT16 address;
-			UINT8 data;
+			uint16_t address;
+			uint8_t data;
 			data = m_in.data[m_in.read++];
 			address = m_in.data[m_in.read++];
 			address |= (m_in.data[m_in.read++] << 8);
@@ -137,8 +137,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x09:  //line clear
 		{
-			UINT8 line = m_in.data[m_in.read++] & 3;
-			for(UINT8 l = line * 8; l < (line + 1) * 8; l++)
+			uint8_t line = m_in.data[m_in.read++] & 3;
+			for(uint8_t l = line * 8; l < (line + 1) * 8; l++)
 				memset(&m_lcd_map[l][0], 0, 120);
 		}
 		break;
@@ -167,7 +167,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x0f:  //read LCD line
 		{
-			UINT8 line = m_in.data[m_in.read++];
+			uint8_t line = m_in.data[m_in.read++];
 			for(int i = 0; i < 120; i++)
 				m_out.data[m_out.write++] = (line < 32) ? m_lcd_map[line][i] : 0;
 		}
@@ -175,8 +175,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x10:  //read LCD point
 		{
-			UINT8 x = m_in.data[m_in.read++];
-			UINT8 y = m_in.data[m_in.read++];
+			uint8_t x = m_in.data[m_in.read++];
+			uint8_t y = m_in.data[m_in.read++];
 			if(x < 120 && y < 32)
 				m_out.data[m_out.write++] = (m_lcd_map[y][x] ? 0xff : 0);
 			else
@@ -186,24 +186,24 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x11:  //PSET
 		{
-			UINT8 x = m_in.data[m_in.read++];
-			UINT8 y = m_in.data[m_in.read++];
+			uint8_t x = m_in.data[m_in.read++];
+			uint8_t y = m_in.data[m_in.read++];
 			draw_point(x, y, 1);
 		}
 		break;
 
 	case 0x12:  //PRESET
 		{
-			UINT8 x = m_in.data[m_in.read++];
-			UINT8 y = m_in.data[m_in.read++];
+			uint8_t x = m_in.data[m_in.read++];
+			uint8_t y = m_in.data[m_in.read++];
 			draw_point(x, y, 0);
 		}
 		break;
 
 	case 0x13:  //PEOR
 		{
-			UINT8 x = m_in.data[m_in.read++];
-			UINT8 y = m_in.data[m_in.read++];
+			uint8_t x = m_in.data[m_in.read++];
+			uint8_t y = m_in.data[m_in.read++];
 			if(x < 120 && y < 32)
 				m_lcd_map[y][x] = !m_lcd_map[y][x];
 		}
@@ -211,8 +211,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x14:  //Line
 		{
-			UINT8 delta_x, delta_y, step_x, step_y, next_x, next_y, p1, p2, p3, p4;
-			INT16 frac;
+			uint8_t delta_x, delta_y, step_x, step_y, next_x, next_y, p1, p2, p3, p4;
+			int16_t frac;
 			next_x = p1 = m_in.data[m_in.read++];
 			next_y = p2 = m_in.data[m_in.read++];
 			p3 = m_in.data[m_in.read++];
@@ -258,16 +258,16 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x15:  //Circle
 		{
-			UINT8 p1 = m_in.data[m_in.read++];
-			UINT8 p2 = m_in.data[m_in.read++];
-			UINT8 p3 = m_in.data[m_in.read++];
+			uint8_t p1 = m_in.data[m_in.read++];
+			uint8_t p2 = m_in.data[m_in.read++];
+			uint8_t p3 = m_in.data[m_in.read++];
 
 			for(int x = 0, y = p3; x <= sqrt((double)(p3 * p3) / 2) ; x++)
 			{
 				/*
 				 * The old code produced results most likely not intended:
-				 * UINT32 d1 = (x * x + y * y) - p3 * p3;
-				 * UINT32 d2 = (x * x + (y - 1) * (y - 1)) - p3 * p3;
+				 * uint32_t d1 = (x * x + y * y) - p3 * p3;
+				 * uint32_t d2 = (x * x + (y - 1) * (y - 1)) - p3 * p3;
 				 * if(abs((double)d1) > abs((double)d2))
 				 *
 				 * (double)(-1) = 4294967294.000000
@@ -275,8 +275,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 				 *
 				 * Therefore changed.
 				 */
-				INT32 d1 = (x * x + y * y) - p3 * p3;
-				INT32 d2 = (x * x + (y - 1) * (y - 1)) - p3 * p3;
+				int32_t d1 = (x * x + y * y) - p3 * p3;
+				int32_t d2 = (x * x + (y - 1) * (y - 1)) - p3 * p3;
 				if (abs(d1) > abs(d2))
 					y--;
 				draw_point(x + p1, y + p2, 0x01);
@@ -293,12 +293,12 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x16:  //UDK write
 		{
-			UINT8 pos = m_in.data[m_in.read++] - 1;
-			UINT8 udk_size = (pos != 5 && pos != 11) ? 0x2a : 0x2e;
+			uint8_t pos = m_in.data[m_in.read++] - 1;
+			uint8_t udk_size = (pos != 5 && pos != 11) ? 0x2a : 0x2e;
 
 			for(int i = 0; i < udk_size; i++)
 			{
-				UINT8 udk_char = m_in.data[m_in.read++];
+				uint8_t udk_char = m_in.data[m_in.read++];
 				m_t6834_ram[udk_offset[pos] + i] = udk_char;
 				if(!udk_char)   break;
 			}
@@ -307,12 +307,12 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x17:  //UDK read
 		{
-			UINT8 pos = m_in.data[m_in.read++] - 1;
-			UINT8 udk_size = (pos != 5 && pos != 11) ? 0x2a : 0x2e;
+			uint8_t pos = m_in.data[m_in.read++] - 1;
+			uint8_t udk_size = (pos != 5 && pos != 11) ? 0x2a : 0x2e;
 
 			for(int i = 0; i < udk_size; i++)
 			{
-				UINT8 udk_char = m_t6834_ram[udk_offset[pos] + i];
+				uint8_t udk_char = m_t6834_ram[udk_offset[pos] + i];
 				m_out.data[m_out.write++] = udk_char;
 				if(!udk_char)   break;
 			}
@@ -326,7 +326,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x1a:  //UDC write
 		{
-			UINT8 udc_code = m_in.data[m_in.read++];
+			uint8_t udc_code = m_in.data[m_in.read++];
 
 			if(udc_code>=128 && udc_code<=159)
 				for(int i = 0; i < 8; i++)
@@ -339,15 +339,15 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x1b:  //UDC read
 		{
-			UINT16 address = m_in.data[m_in.read++] << 3;
+			uint16_t address = m_in.data[m_in.read++] << 3;
 			for(int i = 0; i < 8; i++)
 				m_out.data[m_out.write++] = get_char(address + i);
 		}
 		break;
 	case 0x1c:  //UDC Init
 		{
-			memcpy(m_t6834_ram + 0x200, (UINT8*)memregion("gfx1")->base() + 0x400, 0x100);
-			memcpy(m_t6834_ram + 0x300, (UINT8*)memregion("gfx1")->base() + 0x700, 0x100);
+			memcpy(m_t6834_ram + 0x200, (uint8_t*)memregion("gfx1")->base() + 0x400, 0x100);
+			memcpy(m_t6834_ram + 0x300, (uint8_t*)memregion("gfx1")->base() + 0x700, 0x100);
 		}
 		break;
 
@@ -355,7 +355,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 		{
 			for(int i = 0; i < 0x80; i++)
 			{
-				UINT8 sp_char = m_in.data[m_in.read++];
+				uint8_t sp_char = m_in.data[m_in.read++];
 				m_t6834_ram[0x500 + i] = sp_char;
 				if (!sp_char) break;
 			}
@@ -366,7 +366,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 		{
 			for(int i = (int)strlen((char*)&m_t6834_ram[0x500]); i < 0x80; i++)
 			{
-				UINT8 sp_char = m_in.data[m_in.read++];
+				uint8_t sp_char = m_in.data[m_in.read++];
 				m_t6834_ram[0x500 + i] = sp_char;
 				if (!sp_char) break;
 			}
@@ -382,7 +382,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 		{
 			for(int i = 0; i < 0x80; i++)
 			{
-				UINT8 sp_data = m_t6834_ram[0x500 + i];
+				uint8_t sp_data = m_t6834_ram[0x500 + i];
 				m_out.data[m_out.write++] = sp_data;
 				if (!sp_data) break;
 			}
@@ -401,9 +401,9 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x24:  //locate
 		{
-			UINT8 x = m_in.data[m_in.read++];
-			UINT8 y = m_in.data[m_in.read++];
-			UINT8 char_code = m_in.data[m_in.read++];
+			uint8_t x = m_in.data[m_in.read++];
+			uint8_t y = m_in.data[m_in.read++];
+			uint8_t char_code = m_in.data[m_in.read++];
 			m_locate.on = (m_locate.x != x || m_locate.y != y);
 			m_locate.x = m_cursor.x = x;
 			m_locate.y = m_cursor.y = y;
@@ -421,8 +421,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 	case 0x27:  //test key
 		{
 			static const char *const lines[] = {"S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "BZ", "A1"};
-			UINT16 matrix;
-			UINT8 data = 0;
+			uint16_t matrix;
+			uint8_t data = 0;
 			matrix = m_in.data[m_in.read++];
 			matrix |= (m_in.data[m_in.read++] << 8);
 
@@ -436,7 +436,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x28:  //test chr
 		{
-			UINT8 idx = kb_get_index(m_in.data[m_in.read++]);
+			uint8_t idx = kb_get_index(m_in.data[m_in.read++]);
 			m_out.data[m_out.write++] = (ioport(x07_keycodes[idx].tag)->read() & x07_keycodes[idx].mask) ? 0x00 : 0xff;
 		}
 		break;
@@ -471,7 +471,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 			if (m_draw_udk)
 				draw_udk();
 			else
-				for(UINT8 l = 3 * 8; l < (3 + 1) * 8; l++)
+				for(uint8_t l = 3 * 8; l < (3 + 1) * 8; l++)
 					memset(&m_lcd_map[l][0], 0, 120);
 		}
 		break;
@@ -486,12 +486,12 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x35:  //UDK cont write
 		{
-			UINT8 pos = m_in.data[m_in.read++] - 1;
-			UINT8 udk_size = (pos != 5 && pos != 11) ? 0x2a : 0x2e;
+			uint8_t pos = m_in.data[m_in.read++] - 1;
+			uint8_t udk_size = (pos != 5 && pos != 11) ? 0x2a : 0x2e;
 
 			for(int i = (int)strlen((char*)&m_t6834_ram[udk_offset[pos]]); i < udk_size; i++)
 			{
-				UINT8 udk_char = m_in.data[m_in.read++];
+				uint8_t udk_char = m_in.data[m_in.read++];
 				m_t6834_ram[udk_offset[pos] + i] = udk_char;
 				if(!udk_char)   break;
 			}
@@ -543,7 +543,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 		{
 			for(int cy = 0; cy < 8; cy++)
 			{
-				UINT8 cl = m_in.data[m_in.read++];
+				uint8_t cl = m_in.data[m_in.read++];
 
 				for(int cx = 0; cx < 6; cx++)
 					m_lcd_map[m_cursor.y * 8 + cy][m_cursor.x * 6 + cx] = (cl & (0x80>>cx)) ? 1 : 0;
@@ -555,7 +555,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 		{
 			for(int cy = 0; cy < 8; cy++)
 			{
-				UINT8 cl = 0x00;
+				uint8_t cl = 0x00;
 
 				for(int cx = 0; cx < 6; cx++)
 					cl |= (m_lcd_map[m_cursor.y * 8 + cy][m_cursor.x * 6 + cx] != 0) ? (1<<(7-cx)) : 0;
@@ -642,7 +642,7 @@ void x07_state::t6834_w ()
 
 	if (m_in.write)
 	{
-		UINT8 cmd_len = t6834_cmd_len[m_in.data[m_in.read]];
+		uint8_t cmd_len = t6834_cmd_len[m_in.data[m_in.read]];
 		if(cmd_len & 0x80)
 		{
 			if((cmd_len & 0x7f) < m_in.write && !m_regs_w[1])
@@ -827,9 +827,9 @@ void x07_state::receive_bit(int bit)
 ****************************************************/
 void x07_state::printer_w()
 {
-	UINT16 char_pos = 0;
-//  UINT16 text_color = 0;
-//  UINT16 text_size = 1;
+	uint16_t char_pos = 0;
+//  uint16_t text_color = 0;
+//  uint16_t text_size = 1;
 
 	if (m_regs_r[4] & 0x20)
 		m_prn_char_code |= 1;
@@ -886,18 +886,18 @@ void x07_state::printer_w()
 		m_prn_char_code <<= 1;
 }
 
-inline UINT8 x07_state::kb_get_index(UINT8 char_code)
+inline uint8_t x07_state::kb_get_index(uint8_t char_code)
 {
-	for(UINT8 i=0 ; i< ARRAY_LENGTH(x07_keycodes); i++)
+	for(uint8_t i=0 ; i< ARRAY_LENGTH(x07_keycodes); i++)
 		if (x07_keycodes[i].codes[0] == char_code)
 			return i;
 
 	return 0;
 }
 
-inline UINT8 x07_state::get_char(UINT16 pos)
+inline uint8_t x07_state::get_char(uint16_t pos)
 {
-	UINT8 code = pos>>3;
+	uint8_t code = pos>>3;
 
 	if(code>=128 && code<=159)      //UDC 0
 	{
@@ -915,13 +915,13 @@ inline UINT8 x07_state::get_char(UINT16 pos)
 
 INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 {
-	UINT8 data = 0;
-	UINT8 idx = (UINT8)(FPTR)param;
+	uint8_t data = 0;
+	uint8_t idx = (uint8_t)(uintptr_t)param;
 
 	if (m_kb_on && newval)
 	{
-		UINT8 shift = (ioport("A1")->read() & 0x01);
-		UINT16 udk_s = udk_offset[(shift*6) +  idx - 1];
+		uint8_t shift = (ioport("A1")->read() & 0x01);
+		uint16_t udk_s = udk_offset[(shift*6) +  idx - 1];
 
 		/* First 3 chars are used for description */
 		udk_s += 3;
@@ -940,10 +940,10 @@ INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 
 INPUT_CHANGED_MEMBER( x07_state::kb_keys )
 {
-	UINT8 modifier;
-	UINT8 a1 = ioport("A1")->read();
-	UINT8 bz = ioport("BZ")->read();
-	UINT8 keycode = (UINT8)(FPTR)param;
+	uint8_t modifier;
+	uint8_t a1 = ioport("A1")->read();
+	uint8_t bz = ioport("BZ")->read();
+	uint8_t keycode = (uint8_t)(uintptr_t)param;
 
 	if (m_kb_on && !newval)
 	{
@@ -964,7 +964,7 @@ INPUT_CHANGED_MEMBER( x07_state::kb_keys )
 
 		if (m_kb_size < 0xff)
 		{
-			UINT8 idx = kb_get_index(keycode);
+			uint8_t idx = kb_get_index(keycode);
 			m_t6834_ram[0x400 + m_kb_size++] = x07_keycodes[idx].codes[modifier];
 		}
 
@@ -1017,7 +1017,7 @@ void x07_state::kb_irq()
     Video
 ***************************************************************************/
 
-inline void x07_state::draw_char(UINT8 x, UINT8 y, UINT8 char_pos)
+inline void x07_state::draw_char(uint8_t x, uint8_t y, uint8_t char_pos)
 {
 	if(x < 20 && y < 4)
 		for(int cy = 0; cy < 8; cy++)
@@ -1026,7 +1026,7 @@ inline void x07_state::draw_char(UINT8 x, UINT8 y, UINT8 char_pos)
 }
 
 
-inline void x07_state::draw_point(UINT8 x, UINT8 y, UINT8 color)
+inline void x07_state::draw_point(uint8_t x, uint8_t y, uint8_t color)
 {
 	if(x < 120 && y < 32)
 		m_lcd_map[y][x] = color;
@@ -1035,12 +1035,12 @@ inline void x07_state::draw_point(UINT8 x, UINT8 y, UINT8 color)
 
 inline void x07_state::draw_udk()
 {
-	UINT8 i, x, j;
+	uint8_t i, x, j;
 
 	if (m_draw_udk)
 		for(i = 0, x = 0; i < 5; i++)
 		{
-			UINT16 ofs = udk_offset[i + ((ioport("A1")->read()&0x01) ? 6 : 0)];
+			uint16_t ofs = udk_offset[i + ((ioport("A1")->read()&0x01) ? 6 : 0)];
 			draw_char(x++, 3, 0x83);
 			for(j = 0; j < 3; j++)
 				draw_char(x++, 3, m_t6834_ram[ofs++]);
@@ -1049,7 +1049,7 @@ inline void x07_state::draw_udk()
 
 DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 {
-	UINT32 size = m_card->common_get_size("rom");
+	uint32_t size = m_card->common_get_size("rom");
 
 	// check card type
 	if (image.software_entry() != nullptr)
@@ -1078,7 +1078,7 @@ PALETTE_INIT_MEMBER(x07_state, x07)
 }
 
 
-UINT32 x07_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t x07_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0);
 
@@ -1105,7 +1105,7 @@ UINT32 x07_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 READ8_MEMBER( x07_state::x07_io_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch(offset)
 	{
@@ -1188,7 +1188,7 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 
 		if((data & 0x0e) == 0x0e)
 		{
-			UINT16 div = (m_regs_w[2] | m_regs_w[3] << 8) & 0x0fff;
+			uint16_t div = (m_regs_w[2] | m_regs_w[3] << 8) & 0x0fff;
 			m_beep->set_clock((div == 0) ? 0 : 192000 / div);
 			m_beep->set_state(1);
 
@@ -1370,7 +1370,7 @@ GFXDECODE_END
 
 void x07_state::machine_start()
 {
-	UINT32 ram_size = m_ram->size();
+	uint32_t ram_size = m_ram->size();
 	m_rsta_clear = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::rsta_clear),this));
 	m_rstb_clear = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::rstb_clear),this));
 	m_beep_stop = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::beep_stop),this));
@@ -1550,8 +1550,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(x07_state, x07)
 {
-	UINT8 *RAM = memregion("default")->base();
-	UINT8 *GFX = memregion("gfx1")->base();
+	uint8_t *RAM = memregion("default")->base();
+	uint8_t *GFX = memregion("gfx1")->base();
 
 	for (int i = 0; i < 12; i++)
 		strcpy((char *)RAM + udk_offset[i], udk_ini[i]);

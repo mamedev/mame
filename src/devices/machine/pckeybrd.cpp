@@ -278,7 +278,7 @@ const at_keyboard_device::extended_keyboard_code at_keyboard_device::m_extended_
 const device_type PC_KEYB = &device_creator<pc_keyboard_device>;
 const device_type AT_KEYB = &device_creator<at_keyboard_device>;
 
-pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC_KEYB, "PC Keyboard", tag, owner, clock, "pc_keyb", __FILE__),
 	m_type(KEYBOARD_TYPE_PC),
 	m_ioport_0(*this, ":pc_keyboard_0"),
@@ -293,7 +293,7 @@ pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, const char
 {
 }
 
-pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_ioport_0(*this, ":pc_keyboard_0"),
 	m_ioport_1(*this, ":pc_keyboard_1"),
@@ -307,7 +307,7 @@ pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_typ
 {
 }
 
-at_keyboard_device::at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+at_keyboard_device::at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pc_keyboard_device(mconfig, AT_KEYB, "AT Keyboard", tag, owner, clock, "at_keyb", __FILE__),
 	m_scan_code_set(1)
 {
@@ -389,7 +389,7 @@ WRITE_LINE_MEMBER(pc_keyboard_device::enable)
 }
 
 /* insert a code into the buffer */
-void pc_keyboard_device::queue_insert(UINT8 data)
+void pc_keyboard_device::queue_insert(uint8_t data)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard queueing %.2x\n",data);
@@ -523,9 +523,9 @@ void at_keyboard_device::helper(const char *codes)
  *  scan keys and stuff make/break codes
  **************************************************************************/
 
-UINT32 pc_keyboard_device::readport(int port)
+uint32_t pc_keyboard_device::readport(int port)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	switch(port)
 	{
 		case 0:
@@ -893,9 +893,9 @@ WRITE8_MEMBER(at_keyboard_device::write)
   unicode_char_to_at_keycode
 ***************************************************************************/
 
-UINT8 pc_keyboard_device::unicode_char_to_at_keycode(unicode_char ch)
+uint8_t pc_keyboard_device::unicode_char_to_at_keycode(char32_t ch)
 {
-	UINT8 b;
+	uint8_t b;
 	switch(ch)
 	{
 		case '\033':                    b = 1;      break;
@@ -1034,10 +1034,10 @@ UINT8 pc_keyboard_device::unicode_char_to_at_keycode(unicode_char ch)
   queue_chars
 ***************************************************************************/
 
-int pc_keyboard_device::queue_chars(const unicode_char *text, size_t text_len)
+int pc_keyboard_device::queue_chars(const char32_t *text, size_t text_len)
 {
 	int i;
-	UINT8 b;
+	uint8_t b;
 
 	for (i = 0; (i < text_len) && ((queue_size()) + 4 < sizeof(m_queue)); i++)
 	{
@@ -1293,7 +1293,7 @@ INPUT_PORTS_END
   Inputx stuff
 ***************************************************************************/
 
-bool pc_keyboard_device::accept_char(unicode_char ch)
+bool pc_keyboard_device::accept_char(char32_t ch)
 {
 	return unicode_char_to_at_keycode(ch) != 0;
 }

@@ -28,7 +28,7 @@ class vp595_device : public device_t,
 {
 public:
 	// construction/destruction
-	vp595_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vp595_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -38,7 +38,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual void vip_io_w(address_space &space, offs_t offset, uint8_t data) override;
 	virtual void vip_q_w(int state) override;
 
 private:

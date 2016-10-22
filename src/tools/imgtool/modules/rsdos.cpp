@@ -44,14 +44,14 @@ struct rsdos_direnum
 *********************************************************************/
 
 #define MAX_DIRENTS     ((18-2)*(256/32))
-static floperr_t get_rsdos_dirent(imgtool::image *f, int index_loc, struct rsdos_dirent *ent)
+static floperr_t get_rsdos_dirent(imgtool::image &f, int index_loc, struct rsdos_dirent *ent)
 {
 	return floppy_read_sector(imgtool_floppy(f), 0, 17, 3, index_loc * 32, (void *) ent, sizeof(*ent));
 }
 
 
 
-static floperr_t put_rsdos_dirent(imgtool::image *f, int index_loc, const struct rsdos_dirent *ent)
+static floperr_t put_rsdos_dirent(imgtool::image &f, int index_loc, const struct rsdos_dirent *ent)
 {
 	if (index_loc >= MAX_DIRENTS)
 		return (floperr_t)IMGTOOLERR_FILENOTFOUND;
@@ -80,7 +80,7 @@ static void get_dirent_fname(char *fnamebuf, const struct rsdos_dirent *ent)
 
 
 
-static imgtoolerr_t lookup_rsdos_file(imgtool::image *f, const char *fname, struct rsdos_dirent *ent, int *position)
+static imgtoolerr_t lookup_rsdos_file(imgtool::image &f, const char *fname, struct rsdos_dirent *ent, int *position)
 {
 	int i;
 	floperr_t ferr;
@@ -115,22 +115,22 @@ static imgtoolerr_t lookup_rsdos_file(imgtool::image *f, const char *fname, stru
 
 
 
-static UINT8 get_granule_count(imgtool::image *img)
+static uint8_t get_granule_count(imgtool::image &img)
 {
-	UINT16 tracks;
-	UINT16 granules;
+	uint16_t tracks;
+	uint16_t granules;
 
 	tracks = floppy_get_tracks_per_disk(imgtool_floppy(img));
 	granules = (tracks - 1) * 2;
-	return (granules > 255) ? 255 : (UINT8) granules;
+	return (granules > 255) ? 255 : (uint8_t) granules;
 }
 
 #define MAX_GRANULEMAP_SIZE 256
 
 /* granule_map must be an array of MAX_GRANULEMAP_SIZE bytes */
-static floperr_t get_granule_map(imgtool::image *img, UINT8 *granule_map, UINT8 *granule_count)
+static floperr_t get_granule_map(imgtool::image &img, uint8_t *granule_map, uint8_t *granule_count)
 {
-	UINT8 count;
+	uint8_t count;
 
 	count = get_granule_count(img);
 	if (granule_count)
@@ -141,7 +141,7 @@ static floperr_t get_granule_map(imgtool::image *img, UINT8 *granule_map, UINT8 
 
 
 
-static floperr_t put_granule_map(imgtool::image *img, const UINT8 *granule_map, UINT8 granule_count)
+static floperr_t put_granule_map(imgtool::image &img, const uint8_t *granule_map, uint8_t granule_count)
 {
 	return floppy_write_sector(imgtool_floppy(img), 0, 17, 2, 0, granule_map, granule_count, 0);    /* TODO: pass ddam argument from imgtool */
 }
@@ -149,10 +149,10 @@ static floperr_t put_granule_map(imgtool::image *img, const UINT8 *granule_map, 
 
 
 
-static imgtoolerr_t transfer_granule(imgtool::image *img, UINT8 granule, int length, imgtool::stream &f, imgtoolerr_t (*proc)(imgtool::image *, int, int, int, int, size_t, imgtool::stream &))
+static imgtoolerr_t transfer_granule(imgtool::image &img, uint8_t granule, int length, imgtool::stream &f, imgtoolerr_t (*proc)(imgtool::image &, int, int, int, int, size_t, imgtool::stream &))
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	UINT8 track, sector;
+	uint8_t track, sector;
 
 	track = granule / 2;
 	if (track >= 17)
@@ -167,28 +167,28 @@ static imgtoolerr_t transfer_granule(imgtool::image *img, UINT8 granule, int len
 
 
 
-static imgtoolerr_t transfer_from_granule(imgtool::image *img, UINT8 granule, int length, imgtool::stream &destf)
+static imgtoolerr_t transfer_from_granule(imgtool::image &img, uint8_t granule, int length, imgtool::stream &destf)
 {
 	return transfer_granule(img, granule, length, destf, imgtool_floppy_read_sector_to_stream);
 }
 
 
 
-static imgtoolerr_t transfer_to_granule(imgtool::image *img, UINT8 granule, int length, imgtool::stream &sourcef)
+static imgtoolerr_t transfer_to_granule(imgtool::image &img, uint8_t granule, int length, imgtool::stream &sourcef)
 {
 	return transfer_granule(img, granule, length, sourcef, imgtool_floppy_write_sector_from_stream);
 }
 
 
 
-static imgtoolerr_t process_rsdos_file(struct rsdos_dirent *ent, imgtool::image *img, imgtool::stream *destf, size_t *size)
+static imgtoolerr_t process_rsdos_file(struct rsdos_dirent *ent, imgtool::image &img, imgtool::stream *destf, size_t *size)
 {
 	floperr_t ferr;
 	size_t s, lastgransize;
-	UINT8 granule_count;
+	uint8_t granule_count;
 	unsigned char i = 0, granule;
-	UINT8 usedmap[MAX_GRANULEMAP_SIZE]; /* Used to detect infinite loops */
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
+	uint8_t usedmap[MAX_GRANULEMAP_SIZE]; /* Used to detect infinite loops */
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
 
 	ferr = get_granule_map(img, granule_map, &granule_count);
 	if (ferr)
@@ -262,7 +262,7 @@ static imgtoolerr_t prepare_dirent(struct rsdos_dirent *ent, const char *fname)
 
 
 
-static imgtoolerr_t rsdos_diskimage_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t rsdos_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
@@ -270,10 +270,9 @@ static imgtoolerr_t rsdos_diskimage_nextenum(imgtool::directory *enumeration, im
 	struct rsdos_direnum *rsenum;
 	struct rsdos_dirent rsent;
 	char fname[13];
-	imgtool::image *image;
 
-	image = &enumeration->image();
-	rsenum = (struct rsdos_direnum *) enumeration->extra_bytes();
+	imgtool::image &image(enumeration.image());
+	rsenum = (struct rsdos_direnum *) enumeration.extra_bytes();
 
 	/* Did we hit the end of file before? */
 	if (rsenum->eof)
@@ -295,7 +294,7 @@ static imgtoolerr_t rsdos_diskimage_nextenum(imgtool::directory *enumeration, im
 	{
 		rsenum->eof = 1;
 eof:
-		ent->eof = 1;
+		ent.eof = 1;
 	}
 	else
 	{
@@ -307,34 +306,34 @@ eof:
 		if (filesize == ((size_t) -1))
 		{
 			/* corrupt! */
-			ent->filesize = 0;
-			ent->corrupt = 1;
+			ent.filesize = 0;
+			ent.corrupt = 1;
 		}
 		else
 		{
-			ent->filesize = filesize;
-			ent->corrupt = 0;
+			ent.filesize = filesize;
+			ent.corrupt = 0;
 		}
-		ent->eof = 0;
+		ent.eof = 0;
 
 		get_dirent_fname(fname, &rsent);
 
-		snprintf(ent->filename, ARRAY_LENGTH(ent->filename), "%s", fname);
-		snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
+		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname);
+		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
 	}
 	return IMGTOOLERR_SUCCESS;
 }
 
 
 
-static imgtoolerr_t rsdos_diskimage_freespace(imgtool::partition *partition, UINT64 *size)
+static imgtoolerr_t rsdos_diskimage_freespace(imgtool::partition &partition, uint64_t *size)
 {
 	floperr_t ferr;
-	UINT8 i;
+	uint8_t i;
 	size_t s = 0;
-	UINT8 granule_count;
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
-	imgtool::image *image = &partition->image();
+	uint8_t granule_count;
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
+	imgtool::image &image(partition.image());
 
 	ferr = get_granule_map(image, granule_map, &granule_count);
 	if (ferr)
@@ -351,12 +350,12 @@ static imgtoolerr_t rsdos_diskimage_freespace(imgtool::partition *partition, UIN
 
 
 
-static imgtoolerr_t delete_entry(imgtool::image *img, struct rsdos_dirent *ent, int pos)
+static imgtoolerr_t delete_entry(imgtool::image &img, struct rsdos_dirent *ent, int pos)
 {
 	floperr_t ferr;
 	unsigned char g, i;
-	UINT8 granule_count;
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
+	uint8_t granule_count;
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
 
 	/* Write a NUL in the filename, marking it deleted */
 	ent->fname[0] = 0;
@@ -386,12 +385,12 @@ static imgtoolerr_t delete_entry(imgtool::image *img, struct rsdos_dirent *ent, 
 
 
 
-static imgtoolerr_t rsdos_diskimage_readfile(imgtool::partition *partition, const char *fname, const char *fork, imgtool::stream &destf)
+static imgtoolerr_t rsdos_diskimage_readfile(imgtool::partition &partition, const char *fname, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
 	struct rsdos_dirent ent;
 	size_t size;
-	imgtool::image *img = &partition->image();
+	imgtool::image &img(partition.image());
 
 	err = lookup_rsdos_file(img, fname, &ent, NULL);
 	if (err)
@@ -409,19 +408,19 @@ static imgtoolerr_t rsdos_diskimage_readfile(imgtool::partition *partition, cons
 
 
 
-static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition *partition, const char *fname, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions)
+static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition &partition, const char *fname, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
-	imgtool::image *img = &partition->image();
+	imgtool::image &img(partition.image());
 	struct rsdos_dirent ent, ent2;
 	size_t i;
-	UINT64 sz;
-	UINT64 freespace = 0;
+	uint64_t sz;
+	uint64_t freespace = 0;
 	unsigned char g;
 	unsigned char *gptr;
-	UINT8 granule_count;
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
+	uint8_t granule_count;
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
 
 	/* can we write to this image? */
 	if (floppy_is_read_only(imgtool_floppy(img)))
@@ -442,7 +441,7 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition *partition, con
 		return err;
 
 	ent.ftype = writeoptions->lookup_int(RSDOS_OPTIONS_FTYPE);
-	ent.asciiflag = UINT8(writeoptions->lookup_int(RSDOS_OPTIONS_ASCII)) - 1;
+	ent.asciiflag = uint8_t(writeoptions->lookup_int(RSDOS_OPTIONS_ASCII)) - 1;
 	ent.lastsectorbytes_lsb = sz % 256;
 	ent.lastsectorbytes_msb = (((sz % 256) == 0) && (sz > 0)) ? 1 : 0;
 	gptr = &ent.first_granule;
@@ -465,7 +464,7 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition *partition, con
 		gptr = &granule_map[g];
 
 
-		i = std::min(sz, UINT64(9*256));
+		i = std::min(sz, uint64_t(9*256));
 		err = transfer_to_granule(img, g, i, sourcef);
 		if (err)
 			return err;
@@ -514,10 +513,10 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition *partition, con
 
 
 
-static imgtoolerr_t rsdos_diskimage_deletefile(imgtool::partition *partition, const char *fname)
+static imgtoolerr_t rsdos_diskimage_deletefile(imgtool::partition &partition, const char *fname)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = &partition->image();
+	imgtool::image &image(partition.image());
 	int pos;
 	struct rsdos_dirent ent;
 
@@ -530,10 +529,10 @@ static imgtoolerr_t rsdos_diskimage_deletefile(imgtool::partition *partition, co
 
 
 
-static imgtoolerr_t rsdos_diskimage_suggesttransfer(imgtool::partition *partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+static imgtoolerr_t rsdos_diskimage_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	imgtoolerr_t err;
-	imgtool::image *image = &partition->image();
+	imgtool::image &image(partition.image());
 	struct rsdos_dirent ent;
 	int pos;
 
@@ -594,7 +593,7 @@ OPTION_GUIDE_END
 
 
 
-void rsdos_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void rsdos_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{

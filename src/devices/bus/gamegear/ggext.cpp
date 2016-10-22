@@ -54,7 +54,7 @@ device_gg_ext_port_interface::~device_gg_ext_port_interface()
 //  gg_ext_port_device - constructor
 //-------------------------------------------------
 
-gg_ext_port_device::gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+gg_ext_port_device::gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, GG_EXT_PORT, "EXT Port", tag, owner, clock, "gg_ext_port", __FILE__),
 						device_slot_interface(mconfig, *this), m_device(nullptr),
 						m_th_pin_handler(*this),
@@ -85,15 +85,15 @@ void gg_ext_port_device::device_start()
 }
 
 
-UINT8 gg_ext_port_device::port_r()
+uint8_t gg_ext_port_device::port_r()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (m_device)
 		data = m_device->peripheral_r();
 	return data;
 }
 
-void gg_ext_port_device::port_w( UINT8 data )
+void gg_ext_port_device::port_w( uint8_t data )
 {
 	if (m_device)
 		m_device->peripheral_w(data);
@@ -105,7 +105,7 @@ void gg_ext_port_device::th_pin_w(int state)
 	m_th_pin_handler(state);
 }
 
-UINT32 gg_ext_port_device::pixel_r()
+uint32_t gg_ext_port_device::pixel_r()
 {
 	return m_pixel_handler();
 }

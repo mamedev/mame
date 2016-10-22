@@ -16,7 +16,7 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 	// search for the title
 	const int strlength = 14;
 	char title_string[] = "PROJECT NUMBER";
-	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
+	uint8_t *src = machine.root_device().memregion( "maincpu" )->base();
 	int size = machine.root_device().memregion( "maincpu" )->bytes();
 
 	int search_start = 0;
@@ -42,8 +42,8 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 		int found = 1;
 		for (j=search_start;j<strlength;j+=search_step)
 		{
-			UINT8 rom = src[(i+j)^addrxor];
-			UINT8 chr = title_string[j];
+			uint8_t rom = src[(i+j)^addrxor];
+			uint8_t chr = title_string[j];
 
 			if (rom != chr)
 			{
@@ -66,7 +66,7 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 
 			while (!end)
 			{
-				UINT8 rom;
+				uint8_t rom;
 				int addr;
 				if (mode==0)
 				{
@@ -136,8 +136,8 @@ sc4inputinfo sc4inputs[32][16];
 
 bool compare_input_code(running_machine &machine, int addr)
 {
-	UINT16 *src = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
-	UINT16* rom = &src[addr];
+	uint16_t *src = (uint16_t*)machine.root_device().memregion( "maincpu" )->base();
+	uint16_t* rom = &src[addr];
 
 
 	if ((rom[0] != 0x48e7) || (rom[1] != 0x3020) || (rom[2] != 0x322f) || (rom[3] != 0x0010) || (rom[4] != 0x227c))
@@ -162,11 +162,11 @@ int find_input_strings(running_machine &machine)
 
 
 	int foundat = -1;
-	UINT32 startblock = 0;
-	UINT32 endblock = 0;
+	uint32_t startblock = 0;
+	uint32_t endblock = 0;
 
-	UINT16 *rom = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
-	UINT8 *rom8 = machine.root_device().memregion( "maincpu" )->base();
+	uint16_t *rom = (uint16_t*)machine.root_device().memregion( "maincpu" )->base();
+	uint8_t *rom8 = machine.root_device().memregion( "maincpu" )->base();
 
 	for (int i=0;i<(0x100000-0x40)/2;i++)
 	{
@@ -184,19 +184,19 @@ int find_input_strings(running_machine &machine)
 			{
 				for (int j = startblock / 2; j < endblock / 2; j+=4)
 				{
-					UINT16 portpos = rom[j + 0];
+					uint16_t portpos = rom[j + 0];
 					int port = (portpos & 0x1f);
 					int pos = (portpos >> 5);
 
-					UINT16 unk2 = rom[j + 1];
-					UINT32 stringaddr = (rom[j + 2] << 16) | rom[j + 3];
+					uint16_t unk2 = rom[j + 1];
+					uint32_t stringaddr = (rom[j + 2] << 16) | rom[j + 3];
 
 					sc45helperlog("(port %02x position %02x) unk %04x addr %08x  ", port,pos, unk2, stringaddr);
 					std::string tempstring;
 
 					for (int k = stringaddr; k < stringaddr + 6; k++)
 					{
-						UINT8 chr = rom8[k^1];
+						uint8_t chr = rom8[k^1];
 
 						if ((chr == 0xff) || (chr == 0x00))
 						{
@@ -458,8 +458,8 @@ int find_lamp_strings(running_machine &machine)
 
 
 
-	UINT16 *rom = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
-	UINT8 *rom8 = machine.root_device().memregion( "maincpu" )->base();
+	uint16_t *rom = (uint16_t*)machine.root_device().memregion( "maincpu" )->base();
+	uint8_t *rom8 = machine.root_device().memregion( "maincpu" )->base();
 
 //  sc45helperlog("------------ LAMPS -----------------\n");
 
@@ -467,11 +467,11 @@ int find_lamp_strings(running_machine &machine)
 	{
 		for (int j = startblock / 2; j < endblock / 2; j+=3)
 		{
-			UINT16 portpos = rom[j + 0];
+			uint16_t portpos = rom[j + 0];
 			int row = portpos & 0xf;
 			int col = (portpos >> 4 ) & 0xf;
 
-			UINT32 stringaddr = (rom[j + 1] << 16) | rom[j + 2];
+			uint32_t stringaddr = (rom[j + 1] << 16) | rom[j + 2];
 
 			//sc45helperlog("(row %02d, col %02d, unused %02x) addr %08x  ", row,col, (portpos&0xff00)>>8, stringaddr);
 
@@ -479,7 +479,7 @@ int find_lamp_strings(running_machine &machine)
 
 			for (int k = stringaddr; k < stringaddr + 10; k++)
 			{
-				UINT8 chr = rom8[k^1];
+				uint8_t chr = rom8[k^1];
 
 				if ((chr == 0xff) || (chr == 0x00))
 				{
@@ -843,8 +843,8 @@ int find_reel_strings(running_machine &machine)
 
 
 
-	UINT16 *rom = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
-	UINT8 *rom8 = machine.root_device().memregion( "maincpu" )->base();
+	uint16_t *rom = (uint16_t*)machine.root_device().memregion( "maincpu" )->base();
+	uint8_t *rom8 = machine.root_device().memregion( "maincpu" )->base();
 
 
 
@@ -870,7 +870,7 @@ int find_reel_strings(running_machine &machine)
 				sc45helperlog("<reel stateoffset=\"%d\" symbollist=\"", shifted);
 			}
 
-			UINT32 stringaddr = (rom[j + 0] << 16) | rom[j + 1];
+			uint32_t stringaddr = (rom[j + 0] << 16) | rom[j + 1];
 			stringaddr &= 0xfffff;
 
 			if (stringaddr >= (0x10000 - 16))
@@ -882,7 +882,7 @@ int find_reel_strings(running_machine &machine)
 
 			for (int k = stringaddr; k < stringaddr + 10; k++)
 			{
-				UINT8 chr = rom8[k^1];
+				uint8_t chr = rom8[k^1];
 
 				if ((chr == 0xff) || (chr == 0x00))
 				{

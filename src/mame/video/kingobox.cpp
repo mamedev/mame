@@ -25,7 +25,7 @@
 
 ***************************************************************************/
 
-void kingofb_state::palette_init_common( palette_device &palette, const UINT8 *color_prom, void (kingofb_state::*get_rgb_data)(const UINT8 *, int, int *, int *, int *) )
+void kingofb_state::palette_init_common( palette_device &palette, const uint8_t *color_prom, void (kingofb_state::*get_rgb_data)(const uint8_t *, int, int *, int *, int *) )
 {
 	static const int resistances[4] = { 1500, 750, 360, 180 };
 	static const int resistances_fg[1] = { 51 };
@@ -98,13 +98,13 @@ void kingofb_state::palette_init_common( palette_device &palette, const UINT8 *c
 
 	for (i = 0x101; i < 0x110; i += 2)
 	{
-		UINT16 ctabentry = ((i - 0x101) >> 1) | 0x100;
+		uint16_t ctabentry = ((i - 0x101) >> 1) | 0x100;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
 
-void kingofb_state::kingofb_get_rgb_data( const UINT8 *color_prom, int i, int *r_data, int *g_data, int *b_data )
+void kingofb_state::kingofb_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data )
 {
 	*r_data = color_prom[i + 0x000] & 0x0f;
 	*g_data = color_prom[i + 0x100] & 0x0f;
@@ -112,7 +112,7 @@ void kingofb_state::kingofb_get_rgb_data( const UINT8 *color_prom, int i, int *r
 }
 
 
-void kingofb_state::ringking_get_rgb_data( const UINT8 *color_prom, int i, int *r_data, int *g_data, int *b_data )
+void kingofb_state::ringking_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data )
 {
 	*r_data = (color_prom[i + 0x000] >> 4) & 0x0f;
 	*g_data = (color_prom[i + 0x000] >> 0) & 0x0f;
@@ -122,13 +122,13 @@ void kingofb_state::ringking_get_rgb_data( const UINT8 *color_prom, int i, int *
 
 PALETTE_INIT_MEMBER(kingofb_state,kingofb)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, &kingofb_state::kingofb_get_rgb_data);
 }
 
 PALETTE_INIT_MEMBER(kingofb_state,ringking)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, &kingofb_state::ringking_get_rgb_data);
 }
 
@@ -203,7 +203,7 @@ VIDEO_START_MEMBER(kingofb_state,kingofb)
 
 void kingofb_state::kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
@@ -238,7 +238,7 @@ void kingofb_state::kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 	}
 }
 
-UINT32 kingofb_state::screen_update_kingofb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kingofb_state::screen_update_kingofb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrolly(0, -(*m_scroll_y));
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -267,7 +267,7 @@ VIDEO_START_MEMBER(kingofb_state,ringking)
 
 void kingofb_state::ringking_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
@@ -295,7 +295,7 @@ void kingofb_state::ringking_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-UINT32 kingofb_state::screen_update_ringking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kingofb_state::screen_update_ringking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrolly(0, -(*m_scroll_y));
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

@@ -67,10 +67,10 @@ public:
 
 	/* video-related */
 	int      m_vrambank;
-	UINT8    m_vram1[0x8000];
-	UINT8    m_vram2[0x8000];
+	uint8_t    m_vram1[0x8000];
+	uint8_t    m_vram2[0x8000];
 	bool     m_flipscreen;
-	required_shared_ptr<UINT8> m_protram;
+	required_shared_ptr<uint8_t> m_protram;
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(vrambank_w);
@@ -82,7 +82,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_laserbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_laserbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -93,7 +93,7 @@ void laserbas_state::video_start()
 	save_item(NAME(m_flipscreen));
 }
 
-UINT32 laserbas_state::screen_update_laserbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t laserbas_state::screen_update_laserbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y, x0,y0, x1,y1, delta;
 
@@ -115,10 +115,10 @@ UINT32 laserbas_state::screen_update_laserbas(screen_device &screen, bitmap_ind1
 	{
 		for (x = x0; x != x1; x += delta)
 		{
-			UINT8 p1    =   m_vram1[pixaddr/2];
-			UINT8 p2    =   m_vram2[pixaddr/2];
-			UINT8 mask  =   (pixaddr & 1) ? 0xf0 : 0x0f;
-			UINT8 shift =   (pixaddr & 1) ?    4 :    0;
+			uint8_t p1    =   m_vram1[pixaddr/2];
+			uint8_t p2    =   m_vram2[pixaddr/2];
+			uint8_t mask  =   (pixaddr & 1) ? 0xf0 : 0x0f;
+			uint8_t shift =   (pixaddr & 1) ?    4 :    0;
 
 			if (p2 & mask)
 				bitmap.pix16(y, x) = (p2 & mask) >> shift;
@@ -164,7 +164,7 @@ WRITE8_MEMBER(laserbas_state::vrambank_w)
 
 READ8_MEMBER(laserbas_state::protram_r)
 {
-	UINT8 prot = m_protram[offset];
+	uint8_t prot = m_protram[offset];
 //  prot = machine().rand();
 //  logerror("%s: Z1 read %03x = %02x\n", machine().describe_context(), offset, prot);
 	return prot;
@@ -178,8 +178,8 @@ WRITE8_MEMBER(laserbas_state::protram_w)
 
 READ8_MEMBER(laserbas_state::track_lo_r)
 {
-	UINT8 dx = ioport("TRACK_X")->read();
-	UINT8 dy = ioport("TRACK_Y")->read();
+	uint8_t dx = ioport("TRACK_X")->read();
+	uint8_t dy = ioport("TRACK_Y")->read();
 	if (dx & 0x10)
 		dx ^= 0x0f;
 	if (dy & 0x10)
@@ -193,7 +193,7 @@ READ8_MEMBER(laserbas_state::track_hi_r)
 
 WRITE8_MEMBER(laserbas_state::out_w)
 {
-	static UINT8 out[4];
+	static uint8_t out[4];
 	out[offset] = data;
 	// port 20: mask 01 = service1, mask 02 = pulsed (no delay) waiting for start1, mask 08 = coin2, mask 40 = coin1
 	popmessage("OUT 20: %02x %02x - %02x %02x", out[0], out[1], out[2], out[3]);

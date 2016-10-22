@@ -257,7 +257,7 @@ ioport_constructor xerox_820_keyboard_t::device_input_ports() const
 //  xerox_820_keyboard_t - constructor
 //-------------------------------------------------
 
-xerox_820_keyboard_t::xerox_820_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+xerox_820_keyboard_t::xerox_820_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, XEROX_820_KEYBOARD, "Xerox 820 Keyboard", tag, owner, clock, "x820kb", __FILE__),
 	m_maincpu(*this, I8748_TAG),
 	m_y(*this, "Y%u", 0),
@@ -348,7 +348,7 @@ READ8_MEMBER( xerox_820_keyboard_t::kb_p2_r )
 
 READ8_MEMBER( xerox_820_keyboard_t::kb_t0_r )
 {
-	UINT8 data = 1;
+	uint8_t data = 1;
 
 	switch (m_p1 & 0x0f)
 	{

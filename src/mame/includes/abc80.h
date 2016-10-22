@@ -105,7 +105,7 @@ public:
 	required_memory_region m_vsync_prom;
 	required_memory_region m_line_prom;
 	required_memory_region m_attr_prom;
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 
 	enum
 	{
@@ -129,7 +129,7 @@ public:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -161,7 +161,7 @@ public:
 	int m_pio_astb;
 
 	// video state
-	UINT8 m_latch;
+	uint8_t m_latch;
 	int m_blink;
 
 	// cassette state

@@ -203,8 +203,8 @@
       after a branch
     - Changed hyperstone_movi to decrement PC by 2 when G0 (PC) is modified so that the
       next opcode isn't skipped after a branch
-    - Changed hyperstone_movi to default to a UINT32 being moved into the register
-      as opposed to a UINT8. This is wrong, the bit width is quite likely to be
+    - Changed hyperstone_movi to default to a uint32_t being moved into the register
+      as opposed to a uint8_t. This is wrong, the bit width is quite likely to be
       dependent on the n field in the Rimm instruction type. However, vamphalf uses
       MOVI G0,[FFFF]FBAC (n=$13) since there's apparently no absolute branch opcode.
       What kind of CPU is this that it doesn't have an absolute jump in its branch
@@ -238,10 +238,10 @@
 #define EXTRA_U (decode)->extra.u
 #define EXTRA_S (decode)->extra.s
 
-#define SET_SREG( _data_ )  ((decode)->src_is_local ? set_local_register((decode)->src, (UINT32)_data_) : set_global_register((decode)->src, (UINT32)_data_))
-#define SET_SREGF( _data_ ) ((decode)->src_is_local ? set_local_register((decode)->src + 1, (UINT32)_data_) : set_global_register((decode)->src + 1, (UINT32)_data_))
-#define SET_DREG( _data_ )  ((decode)->dst_is_local ? set_local_register((decode)->dst, (UINT32)_data_) : set_global_register((decode)->dst, (UINT32)_data_))
-#define SET_DREGF( _data_ ) ((decode)->dst_is_local ? set_local_register((decode)->dst + 1, (UINT32)_data_) : set_global_register((decode)->dst + 1, (UINT32)_data_))
+#define SET_SREG( _data_ )  ((decode)->src_is_local ? set_local_register((decode)->src, (uint32_t)_data_) : set_global_register((decode)->src, (uint32_t)_data_))
+#define SET_SREGF( _data_ ) ((decode)->src_is_local ? set_local_register((decode)->src + 1, (uint32_t)_data_) : set_global_register((decode)->src + 1, (uint32_t)_data_))
+#define SET_DREG( _data_ )  ((decode)->dst_is_local ? set_local_register((decode)->dst, (uint32_t)_data_) : set_global_register((decode)->dst, (uint32_t)_data_))
+#define SET_DREGF( _data_ ) ((decode)->dst_is_local ? set_local_register((decode)->dst + 1, (uint32_t)_data_) : set_global_register((decode)->dst + 1, (uint32_t)_data_))
 
 #define SRC_IS_PC      (!(decode)->src_is_local && (decode)->src == PC_REGISTER)
 #define DST_IS_PC      (!(decode)->dst_is_local && (decode)->dst == PC_REGISTER)
@@ -292,8 +292,8 @@ ADDRESS_MAP_END
 //  hyperstone_device - constructor
 //-------------------------------------------------
 
-hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-										const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map, const char *shortname, const char *source)
+hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, uint32_t clock,
+										const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map),
 		m_io_config("io", ENDIANNESS_BIG, io_data_width, 15),
@@ -309,7 +309,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 //  e116t_device - constructor
 //-------------------------------------------------
 
-e116t_device::e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e116t_device::e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "E1-16T", tag, owner, clock, E116T, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "e116t", __FILE__)
 {
 }
@@ -319,7 +319,7 @@ e116t_device::e116t_device(const machine_config &mconfig, const char *tag, devic
 //  e116xt_device - constructor
 //-------------------------------------------------
 
-e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "E1-16XT", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "e116xt", __FILE__)
 {
 }
@@ -329,7 +329,7 @@ e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, dev
 //  e116xs_device - constructor
 //-------------------------------------------------
 
-e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "E1-16XS", tag, owner, clock, E116XS, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xs", __FILE__)
 {
 }
@@ -339,7 +339,7 @@ e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, dev
 //  e116xsr_device - constructor
 //-------------------------------------------------
 
-e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "E1-16XSR", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xsr", __FILE__)
 {
 }
@@ -349,7 +349,7 @@ e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, d
 //  e132n_device - constructor
 //-------------------------------------------------
 
-e132n_device::e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132n_device::e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "E1-32N", tag, owner, clock, E132N, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132n", __FILE__)
 {
 }
@@ -359,7 +359,7 @@ e132n_device::e132n_device(const machine_config &mconfig, const char *tag, devic
 //  e132t_device - constructor
 //-------------------------------------------------
 
-e132t_device::e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132t_device::e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "E1-32T", tag, owner, clock, E132T, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132t", __FILE__)
 {
 }
@@ -369,7 +369,7 @@ e132t_device::e132t_device(const machine_config &mconfig, const char *tag, devic
 //  e132xn_device - constructor
 //-------------------------------------------------
 
-e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "E1-32XN", tag, owner, clock, E132XN, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xn", __FILE__)
 {
 }
@@ -379,7 +379,7 @@ e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, dev
 //  e132xt_device - constructor
 //-------------------------------------------------
 
-e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "E1-32XT", tag, owner, clock, E132XT, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xt", __FILE__)
 {
 }
@@ -389,7 +389,7 @@ e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, dev
 //  e132xs_device - constructor
 //-------------------------------------------------
 
-e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "E1-32XS", tag, owner, clock, E132XS, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xs", __FILE__)
 {
 }
@@ -399,7 +399,7 @@ e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, dev
 //  e132xsr_device - constructor
 //-------------------------------------------------
 
-e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "E1-32XSR", tag, owner, clock, E132XSR, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xsr", __FILE__)
 {
 }
@@ -409,7 +409,7 @@ e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, d
 //  gms30c2116_device - constructor
 //-------------------------------------------------
 
-gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "GMS30C2116", tag, owner, clock, GMS30C2116, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "gms30c2116", __FILE__)
 {
 }
@@ -419,7 +419,7 @@ gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *
 //  gms30c2132_device - constructor
 //-------------------------------------------------
 
-gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "GMS30C2132", tag, owner, clock, GMS30C2132, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "gms30c2132", __FILE__)
 {
 }
@@ -429,7 +429,7 @@ gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *
 //  gms30c2216_device - constructor
 //-------------------------------------------------
 
-gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "GMS30C2216", tag, owner, clock, GMS30C2216, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "gms30c2216", __FILE__)
 {
 }
@@ -439,15 +439,15 @@ gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *
 //  gms30c2232_device - constructor
 //-------------------------------------------------
 
-gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(mconfig, "GMS30C2232", tag, owner, clock, GMS30C2232, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "gms30c2232", __FILE__)
 {
 }
 
 /* Return the entry point for a determinated trap */
-UINT32 hyperstone_device::get_trap_addr(UINT8 trapno)
+uint32_t hyperstone_device::get_trap_addr(uint8_t trapno)
 {
-	UINT32 addr;
+	uint32_t addr;
 	if( m_trap_entry == 0xffffff00 ) /* @ MEM3 */
 	{
 		addr = trapno * 4;
@@ -462,9 +462,9 @@ UINT32 hyperstone_device::get_trap_addr(UINT8 trapno)
 }
 
 /* Return the entry point for a determinated emulated code (the one for "extend" opcode is reserved) */
-UINT32 hyperstone_device::get_emu_code_addr(UINT8 num) /* num is OP */
+uint32_t hyperstone_device::get_emu_code_addr(uint8_t num) /* num is OP */
 {
-	UINT32 addr;
+	uint32_t addr;
 	if( m_trap_entry == 0xffffff00 ) /* @ MEM3 */
 	{
 		addr = (m_trap_entry - 0x100) | ((num & 0xf) << 4);
@@ -569,7 +569,7 @@ void hyperstone_device::hyperstone_set_trap_entry(int which)
 #define SET_LOW_SR(val)         (SR = (SR & 0xffff0000) | ((val) & 0x0000ffff)) // when SR is addressed, only low 16 bits can be changed
 
 
-#define CHECK_C(x)              (SR = (SR & ~0x00000001) | (((x) & (((UINT64)1) << 32)) ? 1 : 0 ))
+#define CHECK_C(x)              (SR = (SR & ~0x00000001) | (((x) & (((uint64_t)1) << 32)) ? 1 : 0 ))
 #define CHECK_VADD(x,y,z)       (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 8: 0))
 #define CHECK_VADD3(x,y,w,z)    (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & ((w) ^ (z)) & 0x80000000) ? 8: 0))
 #define CHECK_VSUB(x,y,z)       (SR = (SR & ~0x00000008) | ((((z) ^ (y)) & ((y) ^ (x)) & 0x80000000) ? 8: 0))
@@ -582,16 +582,16 @@ void hyperstone_device::hyperstone_set_trap_entry(int which)
 //the user program can only changes the above 2 flags
 
 
-UINT32 hyperstone_device::compute_tr()
+uint32_t hyperstone_device::compute_tr()
 {
-	UINT64 cycles_since_base = total_cycles() - m_tr_base_cycles;
-	UINT64 clocks_since_base = cycles_since_base >> m_clck_scale;
+	uint64_t cycles_since_base = total_cycles() - m_tr_base_cycles;
+	uint64_t clocks_since_base = cycles_since_base >> m_clck_scale;
 	return m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
 }
 
 void hyperstone_device::update_timer_prescale()
 {
-	UINT32 prevtr = compute_tr();
+	uint32_t prevtr = compute_tr();
 	TPR &= ~0x80000000;
 	m_clck_scale = (TPR >> 26) & m_clock_scale_mask;
 	m_clock_cycles_1 = 1 << m_clck_scale;
@@ -605,26 +605,26 @@ void hyperstone_device::update_timer_prescale()
 
 void hyperstone_device::adjust_timer_interrupt()
 {
-	UINT64 cycles_since_base = total_cycles() - m_tr_base_cycles;
-	UINT64 clocks_since_base = cycles_since_base >> m_clck_scale;
-	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << m_clck_scale);
+	uint64_t cycles_since_base = total_cycles() - m_tr_base_cycles;
+	uint64_t clocks_since_base = cycles_since_base >> m_clck_scale;
+	uint64_t cycles_until_next_clock = cycles_since_base - (clocks_since_base << m_clck_scale);
 
 	if (cycles_until_next_clock == 0)
-		cycles_until_next_clock = (UINT64)(1 << m_clck_scale);
+		cycles_until_next_clock = (uint64_t)(1 << m_clck_scale);
 
 	/* special case: if we have a change pending, set a timer to fire then */
 	if (TPR & 0x80000000)
 	{
-		UINT64 clocks_until_int = m_tr_clocks_per_tick - (clocks_since_base % m_tr_clocks_per_tick);
-		UINT64 cycles_until_int = (clocks_until_int << m_clck_scale) + cycles_until_next_clock;
+		uint64_t clocks_until_int = m_tr_clocks_per_tick - (clocks_since_base % m_tr_clocks_per_tick);
+		uint64_t cycles_until_int = (clocks_until_int << m_clck_scale) + cycles_until_next_clock;
 		m_timer->adjust(cycles_to_attotime(cycles_until_int + 1), 1);
 	}
 
 	/* else if the timer interrupt is enabled, configure it to fire at the appropriate time */
 	else if (!(FCR & 0x00800000))
 	{
-		UINT32 curtr = m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
-		UINT32 delta = TCR - curtr;
+		uint32_t curtr = m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
+		uint32_t delta = TCR - curtr;
 		if (delta > 0x80000000)
 		{
 			if (!m_timer_int_pending)
@@ -632,8 +632,8 @@ void hyperstone_device::adjust_timer_interrupt()
 		}
 		else
 		{
-			UINT64 clocks_until_int = mulu_32x32(delta, m_tr_clocks_per_tick);
-			UINT64 cycles_until_int = (clocks_until_int << m_clck_scale) + cycles_until_next_clock;
+			uint64_t clocks_until_int = mulu_32x32(delta, m_tr_clocks_per_tick);
+			uint64_t cycles_until_int = (clocks_until_int << m_clck_scale) + cycles_until_next_clock;
 			m_timer->adjust(cycles_to_attotime(cycles_until_int));
 		}
 	}
@@ -663,7 +663,7 @@ TIMER_CALLBACK_MEMBER( hyperstone_device::timer_callback )
 
 
 
-UINT32 hyperstone_device::get_global_register(UINT8 code)
+uint32_t hyperstone_device::get_global_register(uint8_t code)
 {
 /*
     if( code >= 16 )
@@ -707,14 +707,14 @@ UINT32 hyperstone_device::get_global_register(UINT8 code)
 	return m_global_regs[code];
 }
 
-void hyperstone_device::set_local_register(UINT8 code, UINT32 val)
+void hyperstone_device::set_local_register(uint8_t code, uint32_t val)
 {
-	UINT8 new_code = (code + GET_FP) % 64;
+	uint8_t new_code = (code + GET_FP) % 64;
 
 	m_local_regs[new_code] = val;
 }
 
-void hyperstone_device::set_global_register(UINT8 code, UINT32 val)
+void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 {
 	//TODO: add correct FER set instruction
 
@@ -731,7 +731,7 @@ void hyperstone_device::set_global_register(UINT8 code, UINT32 val)
 	}
 	else
 	{
-		UINT32 oldval = m_global_regs[code];
+		uint32_t oldval = m_global_regs[code];
 		if( code != ISR_REGISTER )
 			m_global_regs[code] = val;
 		else
@@ -831,11 +831,11 @@ void hyperstone_device::set_global_register(UINT8 code, UINT32 val)
 
 #define LOCAL  1
 
-static const INT32 immediate_values[32] =
+static const int32_t immediate_values[32] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
 	8, 9, 10, 11, 12, 13, 14, 15,
-	16, 0, 0, 0, 32, 64, 128, static_cast<INT32>(0x80000000),
+	16, 0, 0, 0, 32, 64, 128, static_cast<int32_t>(0x80000000),
 	-8, -7, -6, -5, -4, -3, -2, -1
 };
 
@@ -846,7 +846,7 @@ do                                                                              
 {                                                                                   \
 	if(local)                                                                       \
 	{                                                                               \
-		UINT8 code = (decode)->src;                                                 \
+		uint8_t code = (decode)->src;                                                 \
 		(decode)->src_is_local = 1;                                                 \
 		code = ((decode)->src + GET_FP) % 64; /* registers offset by frame pointer  */\
 		SREG = m_local_regs[code];                                                  \
@@ -887,7 +887,7 @@ do                                                                              
 {                                                                                   \
 	if(local)                                                                       \
 	{                                                                               \
-		UINT8 code = (decode)->dst;                                                 \
+		uint8_t code = (decode)->dst;                                                 \
 		(decode)->dst_is_local = 1;                                                 \
 		code = ((decode)->dst + GET_FP) % 64; /* registers offset by frame pointer */\
 		DREG = m_local_regs[code];                                                  \
@@ -1023,14 +1023,14 @@ do                                                                              
 #define decode_const(decode)                                                        \
 do                                                                                  \
 {                                                                                   \
-	UINT16 imm_1 = READ_OP(PC);                                                     \
+	uint16_t imm_1 = READ_OP(PC);                                                     \
 																					\
 	PC += 2;                                                                        \
 	m_instruction_length = 2;                                                       \
 																					\
 	if( E_BIT(imm_1) )                                                              \
 	{                                                                               \
-		UINT16 imm_2 = READ_OP(PC);                                                 \
+		uint16_t imm_2 = READ_OP(PC);                                                 \
 																					\
 		PC += 2;                                                                    \
 		m_instruction_length = 3;                                                   \
@@ -1059,7 +1059,7 @@ do                                                                              
 {                                                                                   \
 	if( OP & 0x80 )                                                                 \
 	{                                                                               \
-		UINT16 next = READ_OP(PC);                                                  \
+		uint16_t next = READ_OP(PC);                                                  \
 																					\
 		PC += 2;                                                                    \
 		m_instruction_length = 2;                                                   \
@@ -1082,7 +1082,7 @@ do                                                                              
 #define decode_dis(decode)                                                          \
 do                                                                                  \
 {                                                                                   \
-	UINT16 next_1 = READ_OP(PC);                                                    \
+	uint16_t next_1 = READ_OP(PC);                                                    \
 																					\
 	PC += 2;                                                                        \
 	m_instruction_length = 2;                                                       \
@@ -1091,7 +1091,7 @@ do                                                                              
 																					\
 	if( E_BIT(next_1) )                                                             \
 	{                                                                               \
-		UINT16 next_2 = READ_OP(PC);                                                \
+		uint16_t next_2 = READ_OP(PC);                                                \
 																					\
 		PC += 2;                                                                    \
 		m_instruction_length = 3;                                                   \
@@ -1118,7 +1118,7 @@ do                                                                              
 #define decode_lim(decode)                                                          \
 do                                                                                  \
 {                                                                                   \
-	UINT32 next = READ_OP(PC);                                                      \
+	uint32_t next = READ_OP(PC);                                                      \
 	PC += 2;                                                                        \
 	m_instruction_length = 2;                                                       \
 																					\
@@ -1284,10 +1284,10 @@ void hyperstone_device::execute_dbr(struct hyperstone_device::regs_decode *decod
 }
 
 
-void hyperstone_device::execute_trap(UINT32 addr)
+void hyperstone_device::execute_trap(uint32_t addr)
 {
-	UINT8 reg;
-	UINT32 oldSR;
+	uint8_t reg;
+	uint32_t oldSR;
 	reg = GET_FP + GET_FL;
 
 	SET_ILC(m_instruction_length & 3);
@@ -1312,10 +1312,10 @@ void hyperstone_device::execute_trap(UINT32 addr)
 }
 
 
-void hyperstone_device::execute_int(UINT32 addr)
+void hyperstone_device::execute_int(uint32_t addr)
 {
-	UINT8 reg;
-	UINT32 oldSR;
+	uint8_t reg;
+	uint32_t oldSR;
 	reg = GET_FP + GET_FL;
 
 	SET_ILC(m_instruction_length & 3);
@@ -1341,10 +1341,10 @@ void hyperstone_device::execute_int(UINT32 addr)
 }
 
 /* TODO: mask Parity Error and Extended Overflow exceptions */
-void hyperstone_device::execute_exception(UINT32 addr)
+void hyperstone_device::execute_exception(uint32_t addr)
 {
-	UINT8 reg;
-	UINT32 oldSR;
+	uint8_t reg;
+	uint32_t oldSR;
 	reg = GET_FP + GET_FL;
 
 	SET_ILC(m_instruction_length & 3);
@@ -1371,10 +1371,10 @@ void hyperstone_device::execute_exception(UINT32 addr)
 
 void hyperstone_device::execute_software(struct hyperstone_device::regs_decode *decode)
 {
-	UINT8 reg;
-	UINT32 oldSR;
-	UINT32 addr;
-	UINT32 stack_of_dst;
+	uint8_t reg;
+	uint32_t oldSR;
+	uint32_t addr;
+	uint32_t stack_of_dst;
 
 	SET_ILC(1);
 
@@ -1532,8 +1532,8 @@ void hyperstone_device::device_start()
 
 void hyperstone_device::init(int scale_mask)
 {
-	memset(m_global_regs, 0, sizeof(UINT32) * 32);
-	memset(m_local_regs, 0, sizeof(UINT32) * 64);
+	memset(m_global_regs, 0, sizeof(uint32_t) * 32);
+	memset(m_local_regs, 0, sizeof(uint32_t) * 64);
 	m_ppc = 0;
 	m_op = 0;
 	m_trap_entry = 0;
@@ -1882,7 +1882,7 @@ void hyperstone_device::state_string_export(const device_state_entry &entry, std
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 hyperstone_device::disasm_min_opcode_bytes() const
+uint32_t hyperstone_device::disasm_min_opcode_bytes() const
 {
 	return 2;
 }
@@ -1893,7 +1893,7 @@ UINT32 hyperstone_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 hyperstone_device::disasm_max_opcode_bytes() const
+uint32_t hyperstone_device::disasm_max_opcode_bytes() const
 {
 	return 6;
 }
@@ -1904,7 +1904,7 @@ UINT32 hyperstone_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t hyperstone_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t hyperstone_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hyperstone );
 	return dasm_hyperstone( buffer, pc, oprom, GET_H, GET_FP );
@@ -1914,7 +1914,7 @@ offs_t hyperstone_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 
 void hyperstone_device::hyperstone_chk(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+	uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 
 	if( SRC_IS_SR )
 	{
@@ -1944,8 +1944,8 @@ void hyperstone_device::hyperstone_movd(struct hyperstone_device::regs_decode *d
 	{
 		// RET instruction
 
-		UINT8 old_s, old_l;
-		INT8 difference; // really it's 7 bits
+		uint8_t old_s, old_l;
+		int8_t difference; // really it's 7 bits
 
 		if( SRC_IS_PC || SRC_IS_SR )
 		{
@@ -1966,7 +1966,7 @@ void hyperstone_device::hyperstone_movd(struct hyperstone_device::regs_decode *d
 
 			if( (!old_s && GET_S) || (!GET_S && !old_l && GET_L))
 			{
-				UINT32 addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
+				uint32_t addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
 				execute_exception(addr);
 			}
 
@@ -1974,7 +1974,7 @@ void hyperstone_device::hyperstone_movd(struct hyperstone_device::regs_decode *d
 
 			/* convert to 8 bits */
 			if(difference > 63)
-				difference = (INT8)(difference|0x80);
+				difference = (int8_t)(difference|0x80);
 			else if( difference < -64 )
 				difference = difference & 0x7f;
 
@@ -2004,7 +2004,7 @@ void hyperstone_device::hyperstone_movd(struct hyperstone_device::regs_decode *d
 	}
 	else // Rd doesn't denote PC and Rs doesn't denote SR
 	{
-		UINT64 tmp;
+		uint64_t tmp;
 
 		SET_DREG(SREG);
 		SET_DREGF(SREGF);
@@ -2031,7 +2031,7 @@ void hyperstone_device::hyperstone_divu(struct hyperstone_device::regs_decode *d
 		}
 		else
 		{
-			UINT64 dividend;
+			uint64_t dividend;
 
 			dividend = concat_64(DREG, DREGF);
 
@@ -2040,14 +2040,14 @@ void hyperstone_device::hyperstone_divu(struct hyperstone_device::regs_decode *d
 				//Rd//Rdf -> undefined
 				//Z -> undefined
 				//N -> undefined
-				UINT32 addr;
+				uint32_t addr;
 				SET_V(1);
 				addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 				execute_exception(addr);
 			}
 			else
 			{
-				UINT32 quotient, remainder;
+				uint32_t quotient, remainder;
 
 				/* TODO: add quotient overflow */
 				quotient = dividend / SREG;
@@ -2080,27 +2080,27 @@ void hyperstone_device::hyperstone_divs(struct hyperstone_device::regs_decode *d
 		}
 		else
 		{
-			INT64 dividend;
+			int64_t dividend;
 
-			dividend = (INT64) concat_64(DREG, DREGF);
+			dividend = (int64_t) concat_64(DREG, DREGF);
 
 			if( SREG == 0 || (DREG & 0x80000000) )
 			{
 				//Rd//Rdf -> undefined
 				//Z -> undefined
 				//N -> undefined
-				UINT32 addr;
+				uint32_t addr;
 				SET_V(1);
 				addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 				execute_exception(addr);
 			}
 			else
 			{
-				INT32 quotient, remainder;
+				int32_t quotient, remainder;
 
 				/* TODO: add quotient overflow */
-				quotient = dividend / ((INT32)(SREG));
-				remainder = dividend % ((INT32)(SREG));
+				quotient = dividend / ((int32_t)(SREG));
+				remainder = dividend % ((int32_t)(SREG));
 
 				SET_DREG(remainder);
 				SET_DREGF(quotient);
@@ -2131,12 +2131,12 @@ void hyperstone_device::hyperstone_xm(struct hyperstone_device::regs_decode *dec
 			case 3:
 				if( !SRC_IS_PC && (SREG > EXTRA_U) )
 				{
-					UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+					uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 					execute_exception(addr);
 				}
 				else if( SRC_IS_PC && (SREG >= EXTRA_U) )
 				{
-					UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+					uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 					execute_exception(addr);
 				}
 				else
@@ -2174,12 +2174,12 @@ void hyperstone_device::hyperstone_mask(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_sum(struct hyperstone_device::regs_decode *decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (UINT64)(SREG) + (UINT64)(EXTRA_U);
+	tmp = (uint64_t)(SREG) + (uint64_t)(EXTRA_U);
 	CHECK_C(tmp);
 	CHECK_VADD(SREG,EXTRA_U,tmp);
 
@@ -2198,20 +2198,20 @@ void hyperstone_device::hyperstone_sum(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_sums(struct hyperstone_device::regs_decode *decode)
 {
-	INT32 res;
-	INT64 tmp;
+	int32_t res;
+	int64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (INT64)((INT32)(SREG)) + (INT64)(EXTRA_S);
+	tmp = (int64_t)((int32_t)(SREG)) + (int64_t)(EXTRA_S);
 	CHECK_VADD(SREG,EXTRA_S,tmp);
 
 //#if SETCARRYS
 //  CHECK_C(tmp);
 //#endif
 
-	res = (INT32)(SREG) + EXTRA_S;
+	res = (int32_t)(SREG) + EXTRA_S;
 
 	SET_DREG(res);
 
@@ -2222,14 +2222,14 @@ void hyperstone_device::hyperstone_sums(struct hyperstone_device::regs_decode *d
 
 	if( GET_V && !SRC_IS_SR )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
 
 void hyperstone_device::hyperstone_cmp(struct hyperstone_device::regs_decode *decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
@@ -2239,12 +2239,12 @@ void hyperstone_device::hyperstone_cmp(struct hyperstone_device::regs_decode *de
 	else
 		SET_Z(0);
 
-	if( (INT32) DREG < (INT32) SREG )
+	if( (int32_t) DREG < (int32_t) SREG )
 		SET_N(1);
 	else
 		SET_N(0);
 
-	tmp = (UINT64)(DREG) - (UINT64)(SREG);
+	tmp = (uint64_t)(DREG) - (uint64_t)(SREG);
 	CHECK_VSUB(SREG,DREG,tmp);
 
 	if( DREG < SREG )
@@ -2259,7 +2259,7 @@ void hyperstone_device::hyperstone_mov(struct hyperstone_device::regs_decode *de
 {
 	if( !GET_S && decode->dst >= 16 )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
 		execute_exception(addr);
 	}
 
@@ -2277,12 +2277,12 @@ void hyperstone_device::hyperstone_mov(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_add(struct hyperstone_device::regs_decode *decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (UINT64)(SREG) + (UINT64)(DREG);
+	tmp = (uint64_t)(SREG) + (uint64_t)(DREG);
 	CHECK_C(tmp);
 	CHECK_VADD(SREG,DREG,tmp);
 
@@ -2300,13 +2300,13 @@ void hyperstone_device::hyperstone_add(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_adds(struct hyperstone_device::regs_decode *decode)
 {
-	INT32 res;
-	INT64 tmp;
+	int32_t res;
+	int64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (INT64)((INT32)(SREG)) + (INT64)((INT32)(DREG));
+	tmp = (int64_t)((int32_t)(SREG)) + (int64_t)((int32_t)(DREG));
 
 	CHECK_VADD(SREG,DREG,tmp);
 
@@ -2314,7 +2314,7 @@ void hyperstone_device::hyperstone_adds(struct hyperstone_device::regs_decode *d
 //  CHECK_C(tmp);
 //#endif
 
-	res = (INT32)(SREG) + (INT32)(DREG);
+	res = (int32_t)(SREG) + (int32_t)(DREG);
 
 	SET_DREG(res);
 	SET_Z( res == 0 ? 1 : 0 );
@@ -2324,7 +2324,7 @@ void hyperstone_device::hyperstone_adds(struct hyperstone_device::regs_decode *d
 
 	if( GET_V )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
@@ -2368,16 +2368,16 @@ void hyperstone_device::hyperstone_xor(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_subc(struct hyperstone_device::regs_decode *decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 	{
-		tmp = (UINT64)(DREG) - (UINT64)(GET_C);
+		tmp = (uint64_t)(DREG) - (uint64_t)(GET_C);
 		CHECK_VSUB(GET_C,DREG,tmp);
 	}
 	else
 	{
-		tmp = (UINT64)(DREG) - ((UINT64)(SREG) + (UINT64)(GET_C));
+		tmp = (uint64_t)(DREG) - ((uint64_t)(SREG) + (uint64_t)(GET_C));
 		//CHECK!
 		CHECK_VSUB(SREG + GET_C,DREG,tmp);
 	}
@@ -2412,12 +2412,12 @@ void hyperstone_device::hyperstone_not(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_sub(struct hyperstone_device::regs_decode *decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (UINT64)(DREG) - (UINT64)(SREG);
+	tmp = (uint64_t)(DREG) - (uint64_t)(SREG);
 	CHECK_C(tmp);
 	CHECK_VSUB(SREG,DREG,tmp);
 
@@ -2435,13 +2435,13 @@ void hyperstone_device::hyperstone_sub(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_subs(struct hyperstone_device::regs_decode *decode)
 {
-	INT32 res;
-	INT64 tmp;
+	int32_t res;
+	int64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (INT64)((INT32)(DREG)) - (INT64)((INT32)(SREG));
+	tmp = (int64_t)((int32_t)(DREG)) - (int64_t)((int32_t)(SREG));
 
 //#ifdef SETCARRYS
 //  CHECK_C(tmp);
@@ -2449,7 +2449,7 @@ void hyperstone_device::hyperstone_subs(struct hyperstone_device::regs_decode *d
 
 	CHECK_VSUB(SREG,DREG,tmp);
 
-	res = (INT32)(DREG) - (INT32)(SREG);
+	res = (int32_t)(DREG) - (int32_t)(SREG);
 
 	SET_DREG(res);
 
@@ -2460,23 +2460,23 @@ void hyperstone_device::hyperstone_subs(struct hyperstone_device::regs_decode *d
 
 	if( GET_V )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
 
 void hyperstone_device::hyperstone_addc(struct hyperstone_device::regs_decode *decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 	{
-		tmp = (UINT64)(DREG) + (UINT64)(GET_C);
+		tmp = (uint64_t)(DREG) + (uint64_t)(GET_C);
 		CHECK_VADD(DREG,GET_C,tmp);
 	}
 	else
 	{
-		tmp = (UINT64)(SREG) + (UINT64)(DREG) + (UINT64)(GET_C);
+		tmp = (uint64_t)(SREG) + (uint64_t)(DREG) + (uint64_t)(GET_C);
 
 		//CHECK!
 		//CHECK_VADD1: V = (DREG == 0x7FFF) && (C == 1);
@@ -2518,12 +2518,12 @@ void hyperstone_device::hyperstone_and(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_neg(struct hyperstone_device::regs_decode *decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = -(UINT64)(SREG);
+	tmp = -(uint64_t)(SREG);
 	CHECK_C(tmp);
 	CHECK_VSUB(SREG,0,tmp);
 
@@ -2539,20 +2539,20 @@ void hyperstone_device::hyperstone_neg(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_negs(struct hyperstone_device::regs_decode *decode)
 {
-	INT32 res;
-	INT64 tmp;
+	int32_t res;
+	int64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = -(INT64)((INT32)(SREG));
+	tmp = -(int64_t)((int32_t)(SREG));
 	CHECK_VSUB(SREG,0,tmp);
 
 //#if SETCARRYS
 //  CHECK_C(tmp);
 //#endif
 
-	res = -(INT32)(SREG);
+	res = -(int32_t)(SREG);
 
 	SET_DREG(res);
 
@@ -2564,16 +2564,16 @@ void hyperstone_device::hyperstone_negs(struct hyperstone_device::regs_decode *d
 
 	if( GET_V && !SRC_IS_SR ) //trap doesn't occur when source is SR
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
 
 void hyperstone_device::hyperstone_cmpi(struct hyperstone_device::regs_decode *decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
-	tmp = (UINT64)(DREG) - (UINT64)(EXTRA_U);
+	tmp = (uint64_t)(DREG) - (uint64_t)(EXTRA_U);
 	CHECK_VSUB(EXTRA_U,DREG,tmp);
 
 	if( DREG == EXTRA_U )
@@ -2581,7 +2581,7 @@ void hyperstone_device::hyperstone_cmpi(struct hyperstone_device::regs_decode *d
 	else
 		SET_Z(0);
 
-	if( (INT32) DREG < (INT32) EXTRA_U )
+	if( (int32_t) DREG < (int32_t) EXTRA_U )
 		SET_N(1);
 	else
 		SET_N(0);
@@ -2598,7 +2598,7 @@ void hyperstone_device::hyperstone_movi(struct hyperstone_device::regs_decode *d
 {
 	if( !GET_S && decode->dst >= 16 )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
 		execute_exception(addr);
 	}
 
@@ -2619,8 +2619,8 @@ void hyperstone_device::hyperstone_movi(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_addi(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 imm;
-	UINT64 tmp;
+	uint32_t imm;
+	uint64_t tmp;
 
 	if( N_VALUE )
 		imm = EXTRA_U;
@@ -2628,7 +2628,7 @@ void hyperstone_device::hyperstone_addi(struct hyperstone_device::regs_decode *d
 		imm = GET_C & ((GET_Z == 0 ? 1 : 0) | (DREG & 0x01));
 
 
-	tmp = (UINT64)(imm) + (UINT64)(DREG);
+	tmp = (uint64_t)(imm) + (uint64_t)(DREG);
 	CHECK_C(tmp);
 	CHECK_VADD(imm,DREG,tmp);
 
@@ -2646,22 +2646,22 @@ void hyperstone_device::hyperstone_addi(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_addsi(struct hyperstone_device::regs_decode *decode)
 {
-	INT32 imm, res;
-	INT64 tmp;
+	int32_t imm, res;
+	int64_t tmp;
 
 	if( N_VALUE )
 		imm = EXTRA_S;
 	else
 		imm = GET_C & ((GET_Z == 0 ? 1 : 0) | (DREG & 0x01));
 
-	tmp = (INT64)(imm) + (INT64)((INT32)(DREG));
+	tmp = (int64_t)(imm) + (int64_t)((int32_t)(DREG));
 	CHECK_VADD(imm,DREG,tmp);
 
 //#if SETCARRYS
 //  CHECK_C(tmp);
 //#endif
 
-	res = imm + (INT32)(DREG);
+	res = imm + (int32_t)(DREG);
 
 	SET_DREG(res);
 
@@ -2672,14 +2672,14 @@ void hyperstone_device::hyperstone_addsi(struct hyperstone_device::regs_decode *
 
 	if( GET_V )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
 
 void hyperstone_device::hyperstone_cmpbi(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 imm;
+	uint32_t imm;
 
 	if( N_VALUE )
 	{
@@ -2708,7 +2708,7 @@ void hyperstone_device::hyperstone_cmpbi(struct hyperstone_device::regs_decode *
 
 void hyperstone_device::hyperstone_andni(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 imm;
+	uint32_t imm;
 
 	if( N_VALUE == 31 )
 		imm = 0x7fffffff; // bit 31 = 0, others = 1
@@ -2745,8 +2745,8 @@ void hyperstone_device::hyperstone_xori(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_shrdi(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 low_order, high_order;
-	UINT64 val;
+	uint32_t low_order, high_order;
+	uint64_t val;
 
 	high_order = DREG;
 	low_order  = DREGF;
@@ -2773,9 +2773,9 @@ void hyperstone_device::hyperstone_shrdi(struct hyperstone_device::regs_decode *
 
 void hyperstone_device::hyperstone_shrd(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 low_order, high_order;
-	UINT64 val;
-	UINT8 n = SREG & 0x1f;
+	uint32_t low_order, high_order;
+	uint64_t val;
+	uint8_t n = SREG & 0x1f;
 
 	// result undefined if Ls denotes the same register as Ld or Ldf
 	if( SAME_SRC_DST || SAME_SRC_DSTF )
@@ -2811,8 +2811,8 @@ void hyperstone_device::hyperstone_shrd(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_shr(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 ret;
-	UINT8 n;
+	uint32_t ret;
+	uint8_t n;
 
 	n = SREG & 0x1f;
 	ret = DREG;
@@ -2833,9 +2833,9 @@ void hyperstone_device::hyperstone_shr(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_sardi(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 low_order, high_order;
-	UINT64 val;
-	UINT8 sign_bit;
+	uint32_t low_order, high_order;
+	uint64_t val;
+	uint8_t sign_bit;
 
 	high_order = DREG;
 	low_order  = DREGF;
@@ -2873,9 +2873,9 @@ void hyperstone_device::hyperstone_sardi(struct hyperstone_device::regs_decode *
 
 void hyperstone_device::hyperstone_sard(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 low_order, high_order;
-	UINT64 val;
-	UINT8 n, sign_bit;
+	uint32_t low_order, high_order;
+	uint64_t val;
+	uint8_t n, sign_bit;
 
 	n = SREG & 0x1f;
 
@@ -2923,8 +2923,8 @@ void hyperstone_device::hyperstone_sard(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_sar(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 ret;
-	UINT8 n, sign_bit;
+	uint32_t ret;
+	uint8_t n, sign_bit;
 
 	n = SREG & 0x1f;
 	ret = DREG;
@@ -2955,15 +2955,15 @@ void hyperstone_device::hyperstone_sar(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_shldi(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 low_order, high_order, tmp;
-	UINT64 val, mask;
+	uint32_t low_order, high_order, tmp;
+	uint64_t val, mask;
 
 	high_order = DREG;
 	low_order  = DREGF;
 
 	val  = concat_64(high_order, low_order);
 	SET_C( (N_VALUE)?(((val<<(N_VALUE-1))&U64(0x8000000000000000))?1:0):0);
-	mask = ((((UINT64)1) << (32 - N_VALUE)) - 1) ^ 0xffffffff;
+	mask = ((((uint64_t)1) << (32 - N_VALUE)) - 1) ^ 0xffffffff;
 	tmp  = high_order << N_VALUE;
 
 	if( ((high_order & mask) && (!(tmp & 0x80000000))) ||
@@ -2988,8 +2988,8 @@ void hyperstone_device::hyperstone_shldi(struct hyperstone_device::regs_decode *
 
 void hyperstone_device::hyperstone_shld(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 low_order, high_order, tmp, n;
-	UINT64 val, mask;
+	uint32_t low_order, high_order, tmp, n;
+	uint64_t val, mask;
 
 	n = SREG & 0x1f;
 
@@ -3003,7 +3003,7 @@ void hyperstone_device::hyperstone_shld(struct hyperstone_device::regs_decode *d
 		high_order = DREG;
 		low_order  = DREGF;
 
-		mask = ((((UINT64)1) << (32 - n)) - 1) ^ 0xffffffff;
+		mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
 
 		val = concat_64(high_order, low_order);
 		SET_C( (n)?(((val<<(n-1))&U64(0x8000000000000000))?1:0):0);
@@ -3032,12 +3032,12 @@ void hyperstone_device::hyperstone_shld(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_shl(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 base, ret, n;
-	UINT64 mask;
+	uint32_t base, ret, n;
+	uint64_t mask;
 
 	n    = SREG & 0x1f;
 	base = DREG;
-	mask = ((((UINT64)1) << (32 - n)) - 1) ^ 0xffffffff;
+	mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
 	SET_C( (n)?(((base<<(n-1))&0x80000000)?1:0):0);
 	ret  = base << n;
 
@@ -3061,8 +3061,8 @@ void hyperstone_device::reserved(struct hyperstone_device::regs_decode *decode)
 
 void hyperstone_device::hyperstone_testlz(struct hyperstone_device::regs_decode *decode)
 {
-	UINT8 zeros = 0;
-	UINT32 mask;
+	uint8_t zeros = 0;
+	uint32_t mask;
 
 	for( mask = 0x80000000; ; mask >>= 1 )
 	{
@@ -3082,15 +3082,15 @@ void hyperstone_device::hyperstone_testlz(struct hyperstone_device::regs_decode 
 
 void hyperstone_device::hyperstone_rol(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 val, base;
-	UINT8 n;
-	UINT64 mask;
+	uint32_t val, base;
+	uint8_t n;
+	uint64_t mask;
 
 	n = SREG & 0x1f;
 
 	val = base = DREG;
 
-	mask = ((((UINT64)1) << (32 - n)) - 1) ^ 0xffffffff;
+	mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
 
 	while( n > 0 )
 	{
@@ -3119,7 +3119,7 @@ void hyperstone_device::hyperstone_rol(struct hyperstone_device::regs_decode *de
 //TODO: add trap error
 void hyperstone_device::hyperstone_ldxx1(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 load;
+	uint32_t load;
 
 	if( DST_IS_SR )
 	{
@@ -3275,7 +3275,7 @@ void hyperstone_device::hyperstone_ldxx1(struct hyperstone_device::regs_decode *
 
 void hyperstone_device::hyperstone_ldxx2(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 load;
+	uint32_t load;
 
 	if( DST_IS_PC || DST_IS_SR )
 	{
@@ -3623,7 +3623,7 @@ void hyperstone_device::hyperstone_stxx2(struct hyperstone_device::regs_decode *
 
 void hyperstone_device::hyperstone_shri(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 val;
+	uint32_t val;
 
 	val = DREG;
 
@@ -3643,8 +3643,8 @@ void hyperstone_device::hyperstone_shri(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_sari(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 val;
-	UINT8 sign_bit;
+	uint32_t val;
+	uint8_t sign_bit;
 
 	val = DREG;
 	sign_bit = (val & 0x80000000) >> 31;
@@ -3674,12 +3674,12 @@ void hyperstone_device::hyperstone_sari(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_shli(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 val, val2;
-	UINT64 mask;
+	uint32_t val, val2;
+	uint64_t mask;
 
 	val  = DREG;
 	SET_C( (N_VALUE)?(((val<<(N_VALUE-1))&0x80000000)?1:0):0);
-	mask = ((((UINT64)1) << (32 - N_VALUE)) - 1) ^ 0xffffffff;
+	mask = ((((uint64_t)1) << (32 - N_VALUE)) - 1) ^ 0xffffffff;
 	val2 = val << N_VALUE;
 
 	if( ((val & mask) && (!(val2 & 0x80000000))) ||
@@ -3697,8 +3697,8 @@ void hyperstone_device::hyperstone_shli(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_mulu(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 low_order, high_order;
-	UINT64 double_word;
+	uint32_t low_order, high_order;
+	uint64_t double_word;
 
 	// PC or SR aren't denoted, else result is undefined
 	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
@@ -3707,7 +3707,7 @@ void hyperstone_device::hyperstone_mulu(struct hyperstone_device::regs_decode *d
 	}
 	else
 	{
-		double_word = (UINT64)SREG *(UINT64)DREG;
+		double_word = (uint64_t)SREG *(uint64_t)DREG;
 
 		low_order = double_word & 0xffffffff;
 		high_order = double_word >> 32;
@@ -3727,8 +3727,8 @@ void hyperstone_device::hyperstone_mulu(struct hyperstone_device::regs_decode *d
 
 void hyperstone_device::hyperstone_muls(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 low_order, high_order;
-	INT64 double_word;
+	uint32_t low_order, high_order;
+	int64_t double_word;
 
 	// PC or SR aren't denoted, else result is undefined
 	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
@@ -3737,7 +3737,7 @@ void hyperstone_device::hyperstone_muls(struct hyperstone_device::regs_decode *d
 	}
 	else
 	{
-		double_word = (INT64)(INT32)(SREG) * (INT64)(INT32)(DREG);
+		double_word = (int64_t)(int32_t)(SREG) * (int64_t)(int32_t)(DREG);
 		low_order = double_word & 0xffffffff;
 		high_order = double_word >> 32;
 
@@ -3776,7 +3776,7 @@ void hyperstone_device::hyperstone_set(struct hyperstone_device::regs_decode *de
 			// SETADR
 			case 0:
 			{
-				UINT32 val;
+				uint32_t val;
 				val =  (SP & 0xfffffe00) | (GET_FP << 2);
 
 				//plus carry into bit 9
@@ -4102,7 +4102,7 @@ void hyperstone_device::hyperstone_set(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_mul(struct hyperstone_device::regs_decode *decode)
 {
-	UINT32 single_word;
+	uint32_t single_word;
 
 	// PC or SR aren't denoted, else result is undefined
 	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
@@ -4212,7 +4212,7 @@ void hyperstone_device::hyperstone_fcvtd(struct hyperstone_device::regs_decode *
 void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode *decode)
 {
 	//TODO: add locks, overflow error and other things
-	UINT32 vals, vald;
+	uint32_t vals, vald;
 
 	vals = SREG;
 	vald = DREG;
@@ -4223,7 +4223,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		case EMUL:
 		case 0x100: // used in "N" type cpu
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = vals * vald;
 			SET_G_REG(15, result);
@@ -4233,9 +4233,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// unsigned multiplication, double word product
 		case EMULU:
 		{
-			UINT64 result;
+			uint64_t result;
 
-			result = (UINT64)vals * (UINT64)vald;
+			result = (uint64_t)vals * (uint64_t)vald;
 			vals = result >> 32;
 			vald = result & 0xffffffff;
 			SET_G_REG(14, vals);
@@ -4246,9 +4246,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed multiplication, double word product
 		case EMULS:
 		{
-			INT64 result;
+			int64_t result;
 
-			result = (INT64)(INT32)(vals) * (INT64)(INT32)(vald);
+			result = (int64_t)(int32_t)(vals) * (int64_t)(int32_t)(vald);
 			vals = result >> 32;
 			vald = result & 0xffffffff;
 			SET_G_REG(14, vals);
@@ -4259,9 +4259,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed multiply/add, single word product sum
 		case EMAC:
 		{
-			INT32 result;
+			int32_t result;
 
-			result = (INT32)GET_G_REG(15) + ((INT32)(vals) * (INT32)(vald));
+			result = (int32_t)GET_G_REG(15) + ((int32_t)(vals) * (int32_t)(vald));
 			SET_G_REG(15, result);
 
 			break;
@@ -4269,9 +4269,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed multiply/add, double word product sum
 		case EMACD:
 		{
-			INT64 result;
+			int64_t result;
 
-			result = (INT64)concat_64(GET_G_REG(14), GET_G_REG(15)) + (INT64)((INT64)(INT32)(vals) * (INT64)(INT32)(vald));
+			result = (int64_t)concat_64(GET_G_REG(14), GET_G_REG(15)) + (int64_t)((int64_t)(int32_t)(vals) * (int64_t)(int32_t)(vald));
 
 			vals = result >> 32;
 			vald = result & 0xffffffff;
@@ -4283,9 +4283,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed multiply/substract, single word product difference
 		case EMSUB:
 		{
-			INT32 result;
+			int32_t result;
 
-			result = (INT32)GET_G_REG(15) - ((INT32)(vals) * (INT32)(vald));
+			result = (int32_t)GET_G_REG(15) - ((int32_t)(vals) * (int32_t)(vald));
 			SET_G_REG(15, result);
 
 			break;
@@ -4293,9 +4293,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed multiply/substract, double word product difference
 		case EMSUBD:
 		{
-			INT64 result;
+			int64_t result;
 
-			result = (INT64)concat_64(GET_G_REG(14), GET_G_REG(15)) - (INT64)((INT64)(INT32)(vals) * (INT64)(INT32)(vald));
+			result = (int64_t)concat_64(GET_G_REG(14), GET_G_REG(15)) - (int64_t)((int64_t)(int32_t)(vals) * (int64_t)(int32_t)(vald));
 
 			vals = result >> 32;
 			vald = result & 0xffffffff;
@@ -4307,9 +4307,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed half-word multiply/add, single word product sum
 		case EHMAC:
 		{
-			INT32 result;
+			int32_t result;
 
-			result = (INT32)GET_G_REG(15) + ((INT32)((vald & 0xffff0000) >> 16) * (INT32)((vals & 0xffff0000) >> 16)) + ((INT32)(vald & 0xffff) * (INT32)(vals & 0xffff));
+			result = (int32_t)GET_G_REG(15) + ((int32_t)((vald & 0xffff0000) >> 16) * (int32_t)((vals & 0xffff0000) >> 16)) + ((int32_t)(vald & 0xffff) * (int32_t)(vals & 0xffff));
 			SET_G_REG(15, result);
 
 			break;
@@ -4317,9 +4317,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed half-word multiply/add, double word product sum
 		case EHMACD:
 		{
-			INT64 result;
+			int64_t result;
 
-			result = (INT64)concat_64(GET_G_REG(14), GET_G_REG(15)) + (INT64)((INT64)(INT32)((vald & 0xffff0000) >> 16) * (INT64)(INT32)((vals & 0xffff0000) >> 16)) + ((INT64)(INT32)(vald & 0xffff) * (INT64)(INT32)(vals & 0xffff));
+			result = (int64_t)concat_64(GET_G_REG(14), GET_G_REG(15)) + (int64_t)((int64_t)(int32_t)((vald & 0xffff0000) >> 16) * (int64_t)(int32_t)((vals & 0xffff0000) >> 16)) + ((int64_t)(int32_t)(vald & 0xffff) * (int64_t)(int32_t)(vals & 0xffff));
 
 			vals = result >> 32;
 			vald = result & 0xffffffff;
@@ -4331,7 +4331,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// half-word complex multiply
 		case EHCMULD:
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = (((vald & 0xffff0000) >> 16) * ((vals & 0xffff0000) >> 16)) - ((vald & 0xffff) * (vals & 0xffff));
 			SET_G_REG(14, result);
@@ -4344,7 +4344,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// half-word complex multiply/add
 		case EHCMACD:
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = GET_G_REG(14) + (((vald & 0xffff0000) >> 16) * ((vals & 0xffff0000) >> 16)) - ((vald & 0xffff) * (vals & 0xffff));
 			SET_G_REG(14, result);
@@ -4358,7 +4358,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// Ls is not used and should denote the same register as Ld
 		case EHCSUMD:
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = ((((vals & 0xffff0000) >> 16) + GET_G_REG(14)) << 16) & 0xffff0000;
 			result |= ((vals & 0xffff) + GET_G_REG(15)) & 0xffff;
@@ -4374,7 +4374,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// Ls is not used and should denote the same register as Ld
 		case EHCFFTD:
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = ((((vals & 0xffff0000) >> 16) + (GET_G_REG(14) >> 15)) << 16) & 0xffff0000;
 			result |= ((vals & 0xffff) + (GET_G_REG(15) >> 15)) & 0xffff;
@@ -4390,7 +4390,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// Ls is not used and should denote the same register as Ld
 		case EHCFFTSD:
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = (((((vals & 0xffff0000) >> 16) + (GET_G_REG(14) >> 15)) >> 1) << 16) & 0xffff0000;
 			result |= ((((vals & 0xffff) + (GET_G_REG(15) >> 15)) >> 1) & 0xffff);
@@ -4612,8 +4612,8 @@ void hyperstone_device::hyperstone_dbr(struct hyperstone_device::regs_decode *de
 
 void hyperstone_device::hyperstone_frame(struct hyperstone_device::regs_decode *decode)
 {
-	INT8 difference; // really it's 7 bits
-	UINT8 realfp = GET_FP - SRC_CODE;
+	int8_t difference; // really it's 7 bits
+	uint8_t realfp = GET_FP - SRC_CODE;
 
 	SET_FP(realfp);
 	SET_FL(DST_CODE);
@@ -4623,13 +4623,13 @@ void hyperstone_device::hyperstone_frame(struct hyperstone_device::regs_decode *
 
 	/* convert to 8 bits */
 	if(difference > 63)
-		difference = (INT8)(difference|0x80);
+		difference = (int8_t)(difference|0x80);
 	else if( difference < -64 )
 		difference = difference & 0x7f;
 
 	if( difference < 0 ) // else it's finished
 	{
-		UINT8 tmp_flag;
+		uint8_t tmp_flag;
 
 		tmp_flag = ( SP >= UB ? 1 : 0 );
 
@@ -4643,7 +4643,7 @@ void hyperstone_device::hyperstone_frame(struct hyperstone_device::regs_decode *
 
 		if( tmp_flag )
 		{
-			UINT32 addr = get_trap_addr(TRAPNO_FRAME_ERROR);
+			uint32_t addr = get_trap_addr(TRAPNO_FRAME_ERROR);
 			execute_exception(addr);
 		}
 	}
@@ -4786,8 +4786,8 @@ void hyperstone_device::hyperstone_br(struct hyperstone_device::regs_decode *dec
 
 void hyperstone_device::hyperstone_trap(struct hyperstone_device::regs_decode *decode)
 {
-	UINT8 code, trapno;
-	UINT32 addr;
+	uint8_t code, trapno;
+	uint32_t addr;
 
 	trapno = (OP & 0xfc) >> 2;
 
@@ -4883,7 +4883,7 @@ void hyperstone_device::hyperstone_trap(struct hyperstone_device::regs_decode *d
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 hyperstone_device::execute_min_cycles() const
+uint32_t hyperstone_device::execute_min_cycles() const
 {
 	return 1;
 }
@@ -4894,7 +4894,7 @@ UINT32 hyperstone_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 hyperstone_device::execute_max_cycles() const
+uint32_t hyperstone_device::execute_max_cycles() const
 {
 	return 36;
 }
@@ -4905,7 +4905,7 @@ UINT32 hyperstone_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 hyperstone_device::execute_input_lines() const
+uint32_t hyperstone_device::execute_input_lines() const
 {
 	return 8;
 }
@@ -4934,7 +4934,7 @@ void hyperstone_device::execute_run()
 
 	do
 	{
-		UINT32 oldh = SR & 0x00000020;
+		uint32_t oldh = SR & 0x00000020;
 
 		PPC = PC;   /* copy PC to previous PC */
 		debugger_instruction_hook(this, PC);
@@ -4954,7 +4954,7 @@ void hyperstone_device::execute_run()
 
 		if( GET_T && GET_P && m_delay.delay_cmd == NO_DELAY ) /* Not in a Delayed Branch instructions */
 		{
-			UINT32 addr = get_trap_addr(TRAPNO_TRACE_EXCEPTION);
+			uint32_t addr = get_trap_addr(TRAPNO_TRACE_EXCEPTION);
 			execute_exception(addr);
 		}
 

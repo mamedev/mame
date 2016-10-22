@@ -22,7 +22,7 @@ class dmv_k220_device :
 {
 public:
 	// construction/destruction
-	dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -41,8 +41,8 @@ protected:
 	virtual void device_reset() override;
 
 	// dmvcart_interface overrides
-	virtual bool read(offs_t offset, UINT8 &data) override;
-	virtual bool write(offs_t offset, UINT8 data) override;
+	virtual bool read(offs_t offset, uint8_t &data) override;
+	virtual bool write(offs_t offset, uint8_t data) override;
 
 private:
 	required_device<pit8253_device> m_pit;
@@ -50,7 +50,7 @@ private:
 	required_memory_region m_ram;
 	required_memory_region m_rom;
 
-	UINT8   m_portc;
+	uint8_t   m_portc;
 };
 
 

@@ -10,8 +10,8 @@
 #include "includes/mcr.h"
 
 
-INT8 mcr12_sprite_xoffs;
-INT8 mcr12_sprite_xoffs_flip;
+int8_t mcr12_sprite_xoffs;
+int8_t mcr12_sprite_xoffs_flip;
 
 static tilemap_t *bg_tilemap;
 
@@ -30,7 +30,7 @@ static tilemap_t *bg_tilemap;
  */
 TILE_GET_INFO_MEMBER(mcr_state::mcr_90009_get_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	SET_TILE_INFO_MEMBER(0, videoram[tile_index], 0, 0);
 
 	/* sprite color base is constant 0x10 */
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_90009_get_tile_info)
  */
 TILE_GET_INFO_MEMBER(mcr_state::mcr_90010_get_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x1ff;
 	int color = (data >> 11) & 3;
@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_90010_get_tile_info)
  */
 TILE_GET_INFO_MEMBER(mcr_state::mcr_91490_get_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 3;
@@ -187,7 +187,7 @@ WRITE8_MEMBER(mcr_state::mcr_paletteram9_w)
 
 WRITE8_MEMBER(mcr_state::mcr_90009_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	bg_tilemap->mark_tile_dirty(offset);
 }
@@ -195,7 +195,7 @@ WRITE8_MEMBER(mcr_state::mcr_90009_videoram_w)
 
 WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	bg_tilemap->mark_tile_dirty(offset / 2);
 
@@ -212,7 +212,7 @@ WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
 
 READ8_MEMBER(mcr_state::twotiger_videoram_r)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	/* Two Tigers swizzles the address bits on videoram */
 	int effoffs = ((offset << 1) & 0x7fe) | ((offset >> 10) & 1);
 	return videoram[effoffs];
@@ -220,7 +220,7 @@ READ8_MEMBER(mcr_state::twotiger_videoram_r)
 
 WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	/* Two Tigers swizzles the address bits on videoram */
 	int effoffs = ((offset << 1) & 0x7fe) | ((offset >> 10) & 1);
 
@@ -235,7 +235,7 @@ WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
 
 WRITE8_MEMBER(mcr_state::mcr_91490_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	bg_tilemap->mark_tile_dirty(offset / 2);
 }
@@ -254,7 +254,7 @@ WRITE8_MEMBER(mcr_state::mcr_91490_videoram_w)
 
 void mcr_state::render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int offs;
 
@@ -289,9 +289,9 @@ void mcr_state::render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap
 		for (y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
 			if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 			{
-				const UINT8 *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
-				UINT16 *dst = &bitmap.pix16(sy);
-				UINT8 *pri = &screen.priority().pix8(sy);
+				const uint8_t *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
+				uint16_t *dst = &bitmap.pix16(sy);
+				uint8_t *pri = &screen.priority().pix8(sy);
 
 				/* loop over columns */
 				for (x = 0; x < 32; x++)
@@ -326,7 +326,7 @@ void mcr_state::render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap
 
 void mcr_state::render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int offs;
 
@@ -360,9 +360,9 @@ void mcr_state::render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap
 		for (y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
 			if (sy >= 2 && sy >= cliprect.min_y && sy <= cliprect.max_y)
 			{
-				const UINT8 *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
-				UINT16 *dst = &bitmap.pix16(sy);
-				UINT8 *pri = &screen.priority().pix8(sy);
+				const uint8_t *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
+				uint16_t *dst = &bitmap.pix16(sy);
+				uint8_t *pri = &screen.priority().pix8(sy);
 
 				/* loop over columns */
 				for (x = 0; x < 32; x++)
@@ -398,7 +398,7 @@ void mcr_state::render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap
  *
  *************************************/
 
-UINT32 mcr_state::screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mcr_state::screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* update the flip state */
 	bg_tilemap->set_flip(mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);

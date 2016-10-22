@@ -42,7 +42,7 @@ enum
 
 const device_type FD800 = &device_creator<fd800_legacy_device>;
 
-fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FD800, "TI FD800 Diablo floppy disk controller", tag, owner, clock, "fd800", __FILE__),
 	m_recv_buf(0), m_stat_reg(0), m_xmit_buf(0), m_cmd_reg(0), m_interrupt_f_f(0),
 	m_int_line(*this), m_buf_pos(0), m_buf_mode(), m_unit(0), m_sector(0)
@@ -104,7 +104,7 @@ void fd800_machine_init(void (*interrupt_callback)(running_machine &machine, int
 */
 int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sector_id)
 {
-	//UINT8 revolution_count;*/
+	//uint8_t revolution_count;*/
 	// chrn_id id;
 
 	//revolution_count = 0;*/
@@ -136,7 +136,7 @@ int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sect
 */
 int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_id)
 {
-/*  UINT8 revolution_count;
+/*  uint8_t revolution_count;
     chrn_id id;
 
     revolution_count = 0;

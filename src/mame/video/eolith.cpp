@@ -6,7 +6,7 @@
 
 WRITE32_MEMBER(eolith_state::eolith_vram_w)
 {
-	UINT32 *dest = &m_vram[offset+(0x40000/4)*m_buffer];
+	uint32_t *dest = &m_vram[offset+(0x40000/4)*m_buffer];
 
 	if (mem_mask == 0xffffffff)
 	{
@@ -34,17 +34,17 @@ READ32_MEMBER(eolith_state::eolith_vram_r)
 
 VIDEO_START_MEMBER(eolith_state,eolith)
 {
-	m_vram = std::make_unique<UINT32[]>(0x40000*2/4);
+	m_vram = std::make_unique<uint32_t[]>(0x40000*2/4);
 	save_pointer(NAME(m_vram.get()), 0x40000*2/4);
 	save_item(NAME(m_buffer));
 }
 
-UINT32 eolith_state::screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t eolith_state::screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 240; y++)
 	{
-		UINT32 *src = &m_vram[(m_buffer ? 0 : 0x10000) | (y * (336 / 2))];
-		UINT16 *dest = &bitmap.pix16(y);
+		uint32_t *src = &m_vram[(m_buffer ? 0 : 0x10000) | (y * (336 / 2))];
+		uint16_t *dest = &bitmap.pix16(y);
 
 		for (int x = 0; x < 320; x += 2)
 		{

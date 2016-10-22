@@ -49,7 +49,7 @@ std::string zippath_combine(const std::string &path1, const std::string &path2);
 // ----- file operations -----
 
 // opens a zip path file
-osd_file::error zippath_fopen(const std::string &filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path);
+osd_file::error zippath_fopen(const std::string &filename, uint32_t openflags, util::core_file::ptr &file, std::string &revised_path);
 
 
 // ----- directory operations ----- */

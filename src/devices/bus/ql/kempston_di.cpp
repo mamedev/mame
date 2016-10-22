@@ -48,7 +48,7 @@ const tiny_rom_entry *kempston_disk_interface_t::device_rom_region() const
 //  kempston_disk_interface_t - constructor
 //-------------------------------------------------
 
-kempston_disk_interface_t::kempston_disk_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+kempston_disk_interface_t::kempston_disk_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KEMPSTON_DISK_INTERFACE, "Kempston Disk Interface", tag, owner, clock, "ql_kdi", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this)
 {
@@ -68,7 +68,7 @@ void kempston_disk_interface_t::device_start()
 //  read -
 //-------------------------------------------------
 
-UINT8 kempston_disk_interface_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t kempston_disk_interface_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -78,6 +78,6 @@ UINT8 kempston_disk_interface_t::read(address_space &space, offs_t offset, UINT8
 //  write -
 //-------------------------------------------------
 
-void kempston_disk_interface_t::write(address_space &space, offs_t offset, UINT8 data)
+void kempston_disk_interface_t::write(address_space &space, offs_t offset, uint8_t data)
 {
 }

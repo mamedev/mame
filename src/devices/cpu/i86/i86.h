@@ -31,7 +31,7 @@ class i8086_common_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_lock_handler(device_t &device, _Object object)
 		{ return downcast<i8086_common_cpu_device &>(device).m_lock_handler.set_callback(object); }
@@ -117,60 +117,60 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 50; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 50; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual void interrupt(int int_num, int trap = 1);
-	virtual bool common_op(UINT8 op);
+	virtual bool common_op(uint8_t op);
 
 	// Accessing memory and io
-	inline UINT8 read_byte(UINT32 addr);
-	inline UINT16 read_word(UINT32 addr);
-	inline void write_byte(UINT32 addr, UINT8 data);
-	inline void write_word(UINT32 addr, UINT16 data);
-	virtual UINT8 read_port_byte(UINT16 port);
-	virtual UINT16 read_port_word(UINT16 port);
-	virtual void write_port_byte(UINT16 port, UINT8 data);
-	virtual void write_port_word(UINT16 port, UINT16 data);
+	inline uint8_t read_byte(uint32_t addr);
+	inline uint16_t read_word(uint32_t addr);
+	inline void write_byte(uint32_t addr, uint8_t data);
+	inline void write_word(uint32_t addr, uint16_t data);
+	virtual uint8_t read_port_byte(uint16_t port);
+	virtual uint16_t read_port_word(uint16_t port);
+	virtual void write_port_byte(uint16_t port, uint8_t data);
+	virtual void write_port_word(uint16_t port, uint16_t data);
 
 	// Executing instructions
-	virtual UINT8 fetch_op() = 0;
-	virtual UINT8 fetch() = 0;
-	inline UINT16 fetch_word();
-	inline UINT8 repx_op();
+	virtual uint8_t fetch_op() = 0;
+	virtual uint8_t fetch() = 0;
+	inline uint16_t fetch_word();
+	inline uint8_t repx_op();
 
 	// Cycles passed while executing instructions
-	inline void CLK(UINT8 op);
-	inline void CLKM(UINT8 op_reg, UINT8 op_mem);
+	inline void CLK(uint8_t op);
+	inline void CLKM(uint8_t op_reg, uint8_t op_mem);
 
 	// Memory handling while executing instructions
-	virtual UINT32 calc_addr(int seg, UINT16 offset, int size, int op, bool override = true);
-	inline UINT32 get_ea(int size, int op);
-	inline void PutbackRMByte(UINT8 data);
-	inline void PutbackRMWord(UINT16 data);
-	inline void RegByte(UINT8 data);
-	inline void RegWord(UINT16 data);
-	inline UINT8 RegByte();
-	inline UINT16 RegWord();
-	inline UINT16 GetRMWord();
-	inline UINT16 GetnextRMWord();
-	inline UINT8 GetRMByte();
-	inline void PutMemB(int seg, UINT16 offset, UINT8 data);
-	inline void PutMemW(int seg, UINT16 offset, UINT16 data);
-	inline UINT8 GetMemB(int seg, UINT16 offset);
-	inline UINT16 GetMemW(int seg, UINT16 offset);
+	virtual uint32_t calc_addr(int seg, uint16_t offset, int size, int op, bool override = true);
+	inline uint32_t get_ea(int size, int op);
+	inline void PutbackRMByte(uint8_t data);
+	inline void PutbackRMWord(uint16_t data);
+	inline void RegByte(uint8_t data);
+	inline void RegWord(uint16_t data);
+	inline uint8_t RegByte();
+	inline uint16_t RegWord();
+	inline uint16_t GetRMWord();
+	inline uint16_t GetnextRMWord();
+	inline uint8_t GetRMByte();
+	inline void PutMemB(int seg, uint16_t offset, uint8_t data);
+	inline void PutMemW(int seg, uint16_t offset, uint16_t data);
+	inline uint8_t GetMemB(int seg, uint16_t offset);
+	inline uint16_t GetMemW(int seg, uint16_t offset);
 	inline void PutImmRMWord();
-	inline void PutRMWord(UINT16 val);
-	inline void PutRMByte(UINT8 val);
+	inline void PutRMWord(uint16_t val);
+	inline void PutRMByte(uint8_t val);
 	inline void PutImmRMByte();
 	inline void DEF_br8();
 	inline void DEF_wr16();
@@ -180,20 +180,20 @@ protected:
 	inline void DEF_axd16();
 
 	// Flags
-	inline void set_CFB(UINT32 x);
-	inline void set_CFW(UINT32 x);
-	inline void set_AF(UINT32 x,UINT32 y,UINT32 z);
-	inline void set_SF(UINT32 x);
-	inline void set_ZF(UINT32 x);
-	inline void set_PF(UINT32 x);
-	inline void set_SZPF_Byte(UINT32 x);
-	inline void set_SZPF_Word(UINT32 x);
-	inline void set_OFW_Add(UINT32 x,UINT32 y,UINT32 z);
-	inline void set_OFB_Add(UINT32 x,UINT32 y,UINT32 z);
-	inline void set_OFW_Sub(UINT32 x,UINT32 y,UINT32 z);
-	inline void set_OFB_Sub(UINT32 x,UINT32 y,UINT32 z);
-	inline UINT16 CompressFlags() const;
-	inline void ExpandFlags(UINT16 f);
+	inline void set_CFB(uint32_t x);
+	inline void set_CFW(uint32_t x);
+	inline void set_AF(uint32_t x,uint32_t y,uint32_t z);
+	inline void set_SF(uint32_t x);
+	inline void set_ZF(uint32_t x);
+	inline void set_PF(uint32_t x);
+	inline void set_SZPF_Byte(uint32_t x);
+	inline void set_SZPF_Word(uint32_t x);
+	inline void set_OFW_Add(uint32_t x,uint32_t y,uint32_t z);
+	inline void set_OFB_Add(uint32_t x,uint32_t y,uint32_t z);
+	inline void set_OFW_Sub(uint32_t x,uint32_t y,uint32_t z);
+	inline void set_OFB_Sub(uint32_t x,uint32_t y,uint32_t z);
+	inline uint16_t CompressFlags() const;
+	inline void ExpandFlags(uint16_t f);
 
 	// rep instructions
 	inline void i_insb();
@@ -213,10 +213,10 @@ protected:
 	inline void i_popf();
 
 	// sub implementations
-	inline UINT32 ADDB();
-	inline UINT32 ADDX();
-	inline UINT32 SUBB();
-	inline UINT32 SUBX();
+	inline uint32_t ADDB();
+	inline uint32_t ADDX();
+	inline uint32_t SUBB();
+	inline uint32_t SUBX();
 	inline void ORB();
 	inline void ORW();
 	inline void ANDB();
@@ -231,27 +231,27 @@ protected:
 	inline void ROLC_WORD();
 	inline void RORC_BYTE();
 	inline void RORC_WORD();
-	inline void SHL_BYTE(UINT8 c);
-	inline void SHL_WORD(UINT8 c);
-	inline void SHR_BYTE(UINT8 c);
-	inline void SHR_WORD(UINT8 c);
-	inline void SHRA_BYTE(UINT8 c);
-	inline void SHRA_WORD(UINT8 c);
-	inline void XchgAXReg(UINT8 reg);
-	inline void IncWordReg(UINT8 reg);
-	inline void DecWordReg(UINT8 reg);
-	inline void PUSH(UINT16 data);
-	inline UINT16 POP();
+	inline void SHL_BYTE(uint8_t c);
+	inline void SHL_WORD(uint8_t c);
+	inline void SHR_BYTE(uint8_t c);
+	inline void SHR_WORD(uint8_t c);
+	inline void SHRA_BYTE(uint8_t c);
+	inline void SHRA_WORD(uint8_t c);
+	inline void XchgAXReg(uint8_t reg);
+	inline void IncWordReg(uint8_t reg);
+	inline void DecWordReg(uint8_t reg);
+	inline void PUSH(uint16_t data);
+	inline uint16_t POP();
 	inline void JMP(bool cond);
-	inline void ADJ4(INT8 param1, INT8 param2);
-	inline void ADJB(INT8 param1, INT8 param2);
+	inline void ADJ4(int8_t param1, int8_t param2);
+	inline void ADJB(int8_t param1, int8_t param2);
 
 protected:
 
 	union
 	{                   /* eight general registers */
-		UINT16 w[8];    /* viewed as 16 bits registers */
-		UINT8  b[16];   /* or as 8 bit registers */
+		uint16_t w[8];    /* viewed as 16 bits registers */
+		uint8_t  b[16];   /* or as 8 bit registers */
 	} m_regs;
 
 	enum BREGS {
@@ -280,22 +280,22 @@ protected:
 		I8086_NONE
 	};
 
-	UINT16  m_sregs[4];
+	uint16_t  m_sregs[4];
 
-	UINT16  m_ip;
-	UINT16  m_prev_ip;
+	uint16_t  m_ip;
+	uint16_t  m_prev_ip;
 
-	INT32   m_SignVal;
-	UINT32  m_AuxVal, m_OverVal, m_ZeroVal, m_CarryVal, m_ParityVal; /* 0 or non-0 valued flags */
-	UINT8   m_TF, m_IF, m_DF;     /* 0 or 1 valued flags */
-	UINT8   m_IOPL, m_NT, m_MF;
-	UINT32  m_int_vector;
-	UINT32  m_pending_irq;
-	UINT32  m_nmi_state;
-	UINT32  m_irq_state;
-	UINT8   m_no_interrupt;
-	UINT8   m_fire_trap;
-	UINT8   m_test_state;
+	int32_t   m_SignVal;
+	uint32_t  m_AuxVal, m_OverVal, m_ZeroVal, m_CarryVal, m_ParityVal; /* 0 or non-0 valued flags */
+	uint8_t   m_TF, m_IF, m_DF;     /* 0 or 1 valued flags */
+	uint8_t   m_IOPL, m_NT, m_MF;
+	uint32_t  m_int_vector;
+	uint32_t  m_pending_irq;
+	uint32_t  m_nmi_state;
+	uint32_t  m_irq_state;
+	uint8_t   m_no_interrupt;
+	uint8_t   m_fire_trap;
+	uint8_t   m_test_state;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
@@ -303,22 +303,22 @@ protected:
 	offs_t m_fetch_xor;
 	int m_icount;
 
-	UINT32 m_prefix_seg;   /* the latest prefix segment */
+	uint32_t m_prefix_seg;   /* the latest prefix segment */
 	bool m_seg_prefix;      /* prefix segment indicator */
 	bool m_seg_prefix_next; /* prefix segment for next instruction */
 
-	UINT32 m_ea;
-	UINT16 m_eo;
-	UINT16 m_e16;
+	uint32_t m_ea;
+	uint16_t m_eo;
+	uint16_t m_e16;
 
 	// Used during execution of instructions
-	UINT8   m_modrm;
-	UINT32  m_dst;
-	UINT32  m_src;
-	UINT32  m_pc;
+	uint8_t   m_modrm;
+	uint32_t  m_dst;
+	uint32_t  m_src;
+	uint32_t  m_pc;
 
 	// Lookup tables
-	UINT8 m_parity_table[256];
+	uint8_t m_parity_table[256];
 	struct {
 		struct {
 			int w[256];
@@ -330,7 +330,7 @@ protected:
 		} RM;
 	} m_Mod_RM;
 
-	UINT8 m_timing[200];
+	uint8_t m_timing[200];
 	bool m_halt;
 
 	bool m_lock;
@@ -341,8 +341,8 @@ class i8086_cpu_device : public i8086_common_cpu_device
 {
 public:
 	// construction/destruction
-	i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size);
+	i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int data_bus_size);
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
@@ -350,21 +350,21 @@ public:
 protected:
 	virtual void execute_run() override;
 	virtual void device_start() override;
-	virtual UINT32 execute_input_lines() const override { return 1; }
-	virtual UINT8 fetch_op() override;
-	virtual UINT8 fetch() override;
-	UINT32 pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint8_t fetch_op() override;
+	virtual uint8_t fetch() override;
+	uint32_t pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
-	static const UINT8 m_i8086_timing[200];
+	static const uint8_t m_i8086_timing[200];
 };
 
 class i8088_cpu_device : public i8086_cpu_device
 {
 public:
 	// construction/destruction
-	i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

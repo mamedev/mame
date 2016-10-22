@@ -94,7 +94,7 @@
 #define TRACE_CRU 0
 #define TRACE_SWITCH 0
 
-ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : ti_expansion_card_device(mconfig, TI99_P_CODE, "TI-99 P-Code Card", tag, owner, clock, "ti99_pcode", __FILE__),
 	m_rom(nullptr),
 	m_bank_select(0),
@@ -137,7 +137,7 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 	}
 }
 
-void ti_pcode_card_device::debugger_read(address_space& space, UINT16 offset, UINT8& value)
+void ti_pcode_card_device::debugger_read(address_space& space, uint16_t offset, uint8_t& value)
 {
 	// The debuger does not call setaddress
 	if (m_active && ((offset & m_select_mask)==m_select_value))

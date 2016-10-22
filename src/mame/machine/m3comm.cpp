@@ -136,7 +136,7 @@ machine_config_constructor m3comm_device::device_mconfig_additions() const
 //  m3comm_device - constructor
 //-------------------------------------------------
 
-m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M3COMM, "MODEL-3 COMMUNICATION BD", tag, owner, clock, "m3comm", __FILE__),
 	m68k_ram(*this, "m68k_ram"),
 	m_commcpu(*this, M68K_TAG),
@@ -190,7 +190,7 @@ void m3comm_device::device_reset_after_children()
 
 /////////////
 
-UINT16 swapb16(UINT16 data)
+uint16_t swapb16(uint16_t data)
 {
 	return (data << 8) | (data >> 8);
 }
@@ -278,7 +278,7 @@ WRITE16_MEMBER(m3comm_device::ioregs_w)
             }
             if (m_line_rx.is_open())
             {
-                UINT8 *commram = (UINT8*)membank("comm_ram")->base();
+                uint8_t *commram = (uint8_t*)membank("comm_ram")->base();
                 m_line_rx.read(&commram[recv_offset], recv_size);
             }
 */
@@ -298,7 +298,7 @@ WRITE16_MEMBER(m3comm_device::ioregs_w)
             }
             if (m_line_tx.is_open())
             {
-                UINT8 *commram = (UINT8*)membank("comm_ram")->base();
+                uint8_t *commram = (uint8_t*)membank("comm_ram")->base();
                 m_line_tx.write(&commram[send_offset], send_size);
             }
 */
@@ -336,7 +336,7 @@ WRITE16_MEMBER(m3comm_device::ioregs_w)
 
 READ16_MEMBER(m3comm_device::m3_m68k_ram_r)
 {
-	UINT16 value = m68k_ram[offset];        // FIXME endian
+	uint16_t value = m68k_ram[offset];        // FIXME endian
 	return swapb16(value);
 }
 WRITE16_MEMBER(m3comm_device::m3_m68k_ram_w)
@@ -345,22 +345,22 @@ WRITE16_MEMBER(m3comm_device::m3_m68k_ram_w)
 }
 READ8_MEMBER(m3comm_device::m3_comm_ram_r)
 {
-	UINT8 *commram = (UINT8*)membank("comm_ram")->base();
+	uint8_t *commram = (uint8_t*)membank("comm_ram")->base();
 	return commram[offset ^ 3];
 }
 WRITE8_MEMBER(m3comm_device::m3_comm_ram_w)
 {
-	UINT8 *commram = (UINT8*)membank("comm_ram")->base();
+	uint8_t *commram = (uint8_t*)membank("comm_ram")->base();
 	commram[offset ^ 3] = data;
 }
 READ16_MEMBER(m3comm_device::m3_ioregs_r)
 {
-	UINT16 value = ioregs_r(space, offset, swapb16(mem_mask));
+	uint16_t value = ioregs_r(space, offset, swapb16(mem_mask));
 	return swapb16(value);
 }
 WRITE16_MEMBER(m3comm_device::m3_ioregs_w)
 {
-	UINT16 value = swapb16(data);
+	uint16_t value = swapb16(data);
 	ioregs_w(space, offset, value, swapb16(mem_mask));
 
 	// guess, can be asserted at any reg write
@@ -381,11 +381,11 @@ READ16_MEMBER(m3comm_device::naomi_r)
 	case 2:         // 5F7020
 	{
 //      logerror("M3COMM read @ %08x\n", (naomi_control << 16) | naomi_offset);
-		UINT16 value;
+		uint16_t value;
 		if (naomi_control & 1)
 			value = m68k_ram[naomi_offset / 2];     // FIXME endian
 		else {
-			UINT16 *commram = (UINT16*)membank("comm_ram")->base();
+			uint16_t *commram = (uint16_t*)membank("comm_ram")->base();
 
 			value = commram[naomi_offset / 2];      // FIXME endian
 		}
@@ -424,7 +424,7 @@ WRITE16_MEMBER(m3comm_device::naomi_w)
 		if (naomi_control & 1)
 			m68k_ram[naomi_offset / 2] = data;      // FIXME endian
 		else {
-			UINT16 *commram = (UINT16*)membank("comm_ram")->base();
+			uint16_t *commram = (uint16_t*)membank("comm_ram")->base();
 			commram[naomi_offset / 2] = data;       // FIXME endian
 		}
 		naomi_offset += 2;

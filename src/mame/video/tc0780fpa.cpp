@@ -10,7 +10,7 @@
 #define POLY_FIFO_SIZE  32
 
 
-tc0780fpa_renderer::tc0780fpa_renderer(device_t &parent, screen_device &screen, const UINT8 *texture_ram)
+tc0780fpa_renderer::tc0780fpa_renderer(device_t &parent, screen_device &screen, const uint8_t *texture_ram)
 	: poly_manager<float, tc0780fpa_polydata, 6, 10000>(screen)
 {
 	int width = screen.width();
@@ -47,13 +47,13 @@ void tc0780fpa_renderer::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	copybitmap_trans(bitmap, *m_fb[m_current_fb^1], 0, 0, 0, 0, cliprect, 0);
 }
 
-void tc0780fpa_renderer::render_solid_scan(INT32 scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid)
+void tc0780fpa_renderer::render_solid_scan(int32_t scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid)
 {
 	float z = extent.param[0].start;
 	int color = extent.param[1].start;
 	float dz = extent.param[0].dpdx;
-	UINT16 *fb = &m_fb[m_current_fb]->pix16(scanline);
-	UINT16 *zb = &m_zb->pix16(scanline);
+	uint16_t *fb = &m_fb[m_current_fb]->pix16(scanline);
+	uint16_t *zb = &m_zb->pix16(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -69,14 +69,14 @@ void tc0780fpa_renderer::render_solid_scan(INT32 scanline, const extent_t &exten
 	}
 }
 
-void tc0780fpa_renderer::render_shade_scan(INT32 scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid)
+void tc0780fpa_renderer::render_shade_scan(int32_t scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid)
 {
 	float z = extent.param[0].start;
 	float color = extent.param[1].start;
 	float dz = extent.param[0].dpdx;
 	float dcolor = extent.param[1].dpdx;
-	UINT16 *fb = &m_fb[m_current_fb]->pix16(scanline);
-	UINT16 *zb = &m_zb->pix16(scanline);
+	uint16_t *fb = &m_fb[m_current_fb]->pix16(scanline);
+	uint16_t *zb = &m_zb->pix16(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -94,7 +94,7 @@ void tc0780fpa_renderer::render_shade_scan(INT32 scanline, const extent_t &exten
 	}
 }
 
-void tc0780fpa_renderer::render_texture_scan(INT32 scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid)
+void tc0780fpa_renderer::render_texture_scan(int32_t scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid)
 {
 	float z = extent.param[0].start;
 	float u = extent.param[1].start;
@@ -104,8 +104,8 @@ void tc0780fpa_renderer::render_texture_scan(INT32 scanline, const extent_t &ext
 	float du = extent.param[1].dpdx;
 	float dv = extent.param[2].dpdx;
 	float dcolor = extent.param[3].dpdx;
-	UINT16 *fb = &m_fb[m_current_fb]->pix16(scanline);
-	UINT16 *zb = &m_zb->pix16(scanline);
+	uint16_t *fb = &m_fb[m_current_fb]->pix16(scanline);
+	uint16_t *zb = &m_zb->pix16(scanline);
 	int tex_wrap_x = extradata.tex_wrap_x;
 	int tex_wrap_y = extradata.tex_wrap_y;
 	int tex_base_x = extradata.tex_base_x;
@@ -114,7 +114,7 @@ void tc0780fpa_renderer::render_texture_scan(INT32 scanline, const extent_t &ext
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		int iu, iv;
-		UINT8 texel;
+		uint8_t texel;
 		int palette = ((int)color & 0x7f) << 8;
 		int iz = (int)z & 0xffff;
 
@@ -152,12 +152,12 @@ void tc0780fpa_renderer::render_texture_scan(INT32 scanline, const extent_t &ext
 }
 
 
-void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
+void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 {
 	vertex_t vert[4];
 	int i;
 
-	UINT16 cmd = polygon_fifo[0];
+	uint16_t cmd = polygon_fifo[0];
 
 	int ptr = 1;
 	switch (cmd & 0x7)
@@ -165,7 +165,7 @@ void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
 		// screen global clipping for 3d(?)
 		case 0x00:
 		{
-			UINT16 min_x,min_y,min_z,max_x,max_y,max_z;
+			uint16_t min_x,min_y,min_z,max_x,max_y,max_z;
 
 			min_x = polygon_fifo[ptr+1];
 			min_y = polygon_fifo[ptr+0];
@@ -209,9 +209,9 @@ void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
 			for (i=0; i < 3; i++)
 			{
 				vert[i].p[1] = polygon_fifo[ptr++];
-				vert[i].y =  (INT16)(polygon_fifo[ptr++]);
-				vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-				vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
+				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
+				vert[i].x =  (int16_t)(polygon_fifo[ptr++]);
+				vert[i].p[0] = (uint16_t)(polygon_fifo[ptr++]);
 			}
 
 			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
@@ -255,7 +255,7 @@ void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
 			// 0x13: Vertex 3 Z
 
 			tc0780fpa_polydata &extra = object_data_alloc();
-			UINT16 texbase = polygon_fifo[ptr++];
+			uint16_t texbase = polygon_fifo[ptr++];
 
 			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
 			extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
@@ -266,11 +266,11 @@ void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
 			for (i=0; i < 3; i++)
 			{
 				vert[i].p[3] = polygon_fifo[ptr++] + 0.5;   // palette
-				vert[i].p[2] = (UINT16)(polygon_fifo[ptr++]);
-				vert[i].p[1] = (UINT16)(polygon_fifo[ptr++]);
-				vert[i].y =  (INT16)(polygon_fifo[ptr++]);
-				vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-				vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
+				vert[i].p[2] = (uint16_t)(polygon_fifo[ptr++]);
+				vert[i].p[1] = (uint16_t)(polygon_fifo[ptr++]);
+				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
+				vert[i].x =  (int16_t)(polygon_fifo[ptr++]);
+				vert[i].p[0] = (uint16_t)(polygon_fifo[ptr++]);
 			}
 
 			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
@@ -304,9 +304,9 @@ void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
 			for (i=0; i < 4; i++)
 			{
 				vert[i].p[1] = polygon_fifo[ptr++];
-				vert[i].y =  (INT16)(polygon_fifo[ptr++]);
-				vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-				vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
+				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
+				vert[i].x =  (int16_t)(polygon_fifo[ptr++]);
+				vert[i].p[0] = (uint16_t)(polygon_fifo[ptr++]);
 			}
 
 			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
@@ -357,7 +357,7 @@ void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
 			// 0x19: Vertex 4 Z
 
 			tc0780fpa_polydata &extra = object_data_alloc();
-			UINT16 texbase = polygon_fifo[ptr++];
+			uint16_t texbase = polygon_fifo[ptr++];
 
 			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
 			extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
@@ -368,11 +368,11 @@ void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
 			for (i=0; i < 4; i++)
 			{
 				vert[i].p[3] = polygon_fifo[ptr++] + 0.5;   // palette
-				vert[i].p[2] = (UINT16)(polygon_fifo[ptr++]);
-				vert[i].p[1] = (UINT16)(polygon_fifo[ptr++]);
-				vert[i].y =  (INT16)(polygon_fifo[ptr++]);
-				vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-				vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
+				vert[i].p[2] = (uint16_t)(polygon_fifo[ptr++]);
+				vert[i].p[1] = (uint16_t)(polygon_fifo[ptr++]);
+				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
+				vert[i].x =  (int16_t)(polygon_fifo[ptr++]);
+				vert[i].p[0] = (uint16_t)(polygon_fifo[ptr++]);
 			}
 
 			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
@@ -392,7 +392,7 @@ void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
 
 const device_type TC0780FPA = &device_creator<tc0780fpa_device>;
 
-tc0780fpa_device::tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0780fpa_device::tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0780FPA, "TC0780FPA Polygon Renderer", tag, owner, clock, "tc0780fpa", __FILE__),
 	device_video_interface(mconfig, *this)
 {
@@ -414,8 +414,8 @@ void tc0780fpa_device::device_config_complete()
 
 void tc0780fpa_device::device_start()
 {
-	m_texture = std::make_unique<UINT8[]>(0x400000);
-	m_poly_fifo = std::make_unique<UINT16[]>(POLY_FIFO_SIZE);
+	m_texture = std::make_unique<uint8_t[]>(0x400000);
+	m_poly_fifo = std::make_unique<uint16_t[]>(POLY_FIFO_SIZE);
 
 	m_renderer = std::make_unique<tc0780fpa_renderer>(*this, *m_screen, m_texture.get());
 
@@ -482,7 +482,7 @@ WRITE16_MEMBER(tc0780fpa_device::poly_fifo_w)
 	m_poly_fifo[m_poly_fifo_ptr++] = data;
 
 	static const int cmd_length[8] = { 7, 13, -1, 20, 17, -1, 26, -1 };
-	UINT16 cmd = m_poly_fifo[0] & 0x7;
+	uint16_t cmd = m_poly_fifo[0] & 0x7;
 
 	if (m_poly_fifo_ptr >= cmd_length[cmd])
 	{

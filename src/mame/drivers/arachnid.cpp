@@ -107,7 +107,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
 
-	UINT8 read_keyboard(int pa);
+	uint8_t read_keyboard(int pa);
 };
 
 /***************************************************************************
@@ -253,10 +253,10 @@ WRITE_LINE_MEMBER(arachnid_state::ptm_o1_callback)
 	m_speaker->level_w(state);
 }
 
-UINT8 arachnid_state::read_keyboard(int pa)
+uint8_t arachnid_state::read_keyboard(int pa)
 {
 	int i;
-	UINT8 value;
+	uint8_t value;
 	static const char *const keynames[3][8] =
 			{
 				{ "PA0-0", "PA0-1", "PA0-2", "PA0-3", "PA0-4", "PA0-5", "PA0-6", "PA0-7" },
@@ -292,7 +292,7 @@ READ8_MEMBER( arachnid_state::pia_u4_pa_r )
 	// PA6 - A
 	// PA7 - B
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	data &= read_keyboard(1);
 
 	return data;
@@ -310,7 +310,7 @@ READ8_MEMBER( arachnid_state::pia_u4_pb_r )
 	// PB6 - P
 	// PB7 - O
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	data &= read_keyboard(2);
 
 	return data;
@@ -320,7 +320,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u4_pca_r )
 {
 	// CA1 - SW1 Coin In (Coin Door)
 
-	UINT8 data = 1;
+	uint8_t data = 1;
 	data &= ioport("SW1")->read();
 
 	return data;
@@ -330,7 +330,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u4_pcb_r )
 {
 	// CB1 - SW2 Test Mode (Coin Door)
 
-	UINT8 data = 1;
+	uint8_t data = 1;
 	data &= ioport("SW2")->read();
 
 	return data;
@@ -344,7 +344,7 @@ READ8_MEMBER( arachnid_state::pia_u17_pa_r )
 	// PA3 - Test
 	// PA4 thru PA7 - DIP SW1
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	data &= read_keyboard(0);
 
 	return data;
@@ -354,7 +354,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u17_pca_r )
 {
 	// CA1 - 1000 HZ Input
 
-	UINT8 data = 1;
+	uint8_t data = 1;
 
 	return data;
 }

@@ -14,7 +14,7 @@
 
 PALETTE_INIT_MEMBER(kchamp_state, kchamp)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, red, green, blue;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -69,7 +69,7 @@ void kchamp_state::video_start()
 
 void kchamp_state::kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < 0x100; offs += 4)
@@ -97,7 +97,7 @@ void kchamp_state::kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 
 void kchamp_state::kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < 0x100; offs += 4)
@@ -124,14 +124,14 @@ void kchamp_state::kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 }
 
 
-UINT32 kchamp_state::screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kchamp_state::screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	kchamp_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
-UINT32 kchamp_state::screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kchamp_state::screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	kchampvs_draw_sprites(bitmap, cliprect);

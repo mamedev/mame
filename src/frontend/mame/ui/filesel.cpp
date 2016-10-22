@@ -540,7 +540,7 @@ void menu_select_rw::handle()
 
 void *menu_select_rw::itemref_from_result(menu_select_rw::result result)
 {
-	return (void *)(FPTR)(unsigned int)result;
+	return (void *)(uintptr_t)(unsigned int)result;
 }
 
 
@@ -550,7 +550,7 @@ void *menu_select_rw::itemref_from_result(menu_select_rw::result result)
 
 menu_select_rw::result menu_select_rw::result_from_itemref(void *itemref)
 {
-	return (menu_select_rw::result) (unsigned int) (FPTR)itemref;
+	return (menu_select_rw::result) (unsigned int) (uintptr_t)itemref;
 }
 
 

@@ -39,8 +39,8 @@ class a2_16sect_format : public floppy_image_format_t
 public:
 		a2_16sect_format();
 
-		virtual int identify(io_generic *io, UINT32 form_factor) override;
-		virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+		virtual int identify(io_generic *io, uint32_t form_factor) override;
+		virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) override;
 		virtual bool save(io_generic *io, floppy_image *image) override;
 
 		virtual const char *name() const override;
@@ -51,8 +51,8 @@ public:
 private:
 		static const desc_e mac_gcr[];
 
-		UINT8 gb(const UINT8 *buf, int ts, int &pos, int &wrap);
-		void update_chk(const UINT8 *data, int size, UINT32 &chk);
+		uint8_t gb(const uint8_t *buf, int ts, int &pos, int &wrap);
+		void update_chk(const uint8_t *data, int size, uint32_t &chk);
 
 		bool m_prodos_order;
 };
@@ -64,8 +64,8 @@ class a2_rwts18_format : public floppy_image_format_t
 public:
 		a2_rwts18_format();
 
-		virtual int identify(io_generic *io, UINT32 form_factor) override;
-		virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+		virtual int identify(io_generic *io, uint32_t form_factor) override;
+		virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) override;
 		virtual bool save(io_generic *io, floppy_image *image) override;
 
 		virtual const char *name() const override;
@@ -76,8 +76,8 @@ public:
 private:
 		static const desc_e mac_gcr[];
 
-		UINT8 gb(const UINT8 *buf, int ts, int &pos, int &wrap);
-		void update_chk(const UINT8 *data, int size, UINT32 &chk);
+		uint8_t gb(const uint8_t *buf, int ts, int &pos, int &wrap);
+		void update_chk(const uint8_t *data, int size, uint32_t &chk);
 };
 
 extern const floppy_format_type FLOPPY_RWTS18_FORMAT;
@@ -88,8 +88,8 @@ class a2_edd_format : public floppy_image_format_t
 public:
 		a2_edd_format();
 
-		virtual int identify(io_generic *io, UINT32 form_factor) override;
-		virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+		virtual int identify(io_generic *io, uint32_t form_factor) override;
+		virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) override;
 		virtual bool supports_save() const override;
 
 		virtual const char *name() const override;
@@ -97,7 +97,7 @@ public:
 		virtual const char *extensions() const override;
 
 private:
-		static UINT8 pick(const UINT8 *data, int pos);
+		static uint8_t pick(const uint8_t *data, int pos);
 };
 
 extern const floppy_format_type FLOPPY_EDD_FORMAT;

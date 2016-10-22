@@ -119,12 +119,12 @@ public:
 	tilemap_t *m_layer0_tilemap;
 	tilemap_t *m_layer1_tilemap;
 	tilemap_t *m_layer2_tilemap;
-	required_shared_ptr<UINT16> m_layer0_videoram;
-	required_shared_ptr<UINT16> m_layer1_videoram;
-	required_shared_ptr<UINT16> m_layer2_videoram;
+	required_shared_ptr<uint16_t> m_layer0_videoram;
+	required_shared_ptr<uint16_t> m_layer1_videoram;
+	required_shared_ptr<uint16_t> m_layer2_videoram;
 	int m_layer2_offset[2];
-	required_shared_ptr<UINT16> m_vregs;
-	UINT16 m_magic102_ret;
+	required_shared_ptr<uint16_t> m_vregs;
+	uint16_t m_magic102_ret;
 	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer1_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer2_videoram_w);
@@ -142,7 +142,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -205,7 +205,7 @@ void magic10_state::video_start()
 	m_layer2_tilemap->set_transparent_pen(0);
 }
 
-UINT32 magic10_state::screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t magic10_state::screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/*TODO: understand where this comes from. */
 	m_layer2_tilemap->set_scrollx(0, m_layer2_offset[0]);
@@ -1477,7 +1477,7 @@ DRIVER_INIT_MEMBER(magic10_state, altaten)
 	m_layer2_offset[1] = 16;
 
 	// patching the boot protection...
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 		rom[0x7668] = 0x71;
 		rom[0x7669] = 0x4e;

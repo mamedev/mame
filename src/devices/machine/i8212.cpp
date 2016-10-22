@@ -30,7 +30,7 @@ const device_type I8212 = &device_creator<i8212_device>;
 //  i8212_device - constructor
 //-------------------------------------------------
 
-i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, I8212, "I8212", tag, owner, clock, "i8212", __FILE__),
 	m_write_irq(*this),
 	m_read_di(*this),

@@ -210,13 +210,13 @@ public:
 		{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT32> m_sysregs;
-	required_shared_ptr<UINT32> m_workram;
-	required_shared_ptr<UINT32> m_vidregs;
-	required_shared_ptr<UINT32> m_textureram;
-	required_shared_ptr<UINT32> m_frameram;
-	optional_shared_ptr<UINT32> m_reset_patch; // not needed for trivrus
-//  UINT32 *  m_nvram;    // currently this uses generic nvram handling
+	required_shared_ptr<uint32_t> m_sysregs;
+	required_shared_ptr<uint32_t> m_workram;
+	required_shared_ptr<uint32_t> m_vidregs;
+	required_shared_ptr<uint32_t> m_textureram;
+	required_shared_ptr<uint32_t> m_frameram;
+	optional_shared_ptr<uint32_t> m_reset_patch; // not needed for trivrus
+//  uint32_t *  m_nvram;    // currently this uses generic nvram handling
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -225,18 +225,18 @@ public:
 	required_device<screen_device> m_screen;
 
 #ifdef IDLE_LOOP_SPEEDUP
-	UINT8     m_FlipCntRead;
+	uint8_t     m_FlipCntRead;
 #endif
 
-	UINT32    m_Bank;
-	UINT8     m_FlipCount;
-	UINT8     m_IntHigh;
-	UINT32    m_Timerctrl[4];
+	uint32_t    m_Bank;
+	uint8_t     m_FlipCount;
+	uint8_t     m_IntHigh;
+	uint32_t    m_Timerctrl[4];
 	emu_timer *m_Timer[4];
-	UINT32    m_FlashCmd;
-	UINT32    m_PIO;
-	UINT32    m_DMActrl[2];
-	UINT8     m_OldPort4;
+	uint32_t    m_FlashCmd;
+	uint32_t    m_PIO;
+	uint32_t    m_DMActrl[2];
+	uint8_t     m_OldPort4;
 
 	DECLARE_READ32_MEMBER(FlipCount_r);
 	DECLARE_WRITE32_MEMBER(FlipCount_w);
@@ -268,31 +268,31 @@ public:
 
 	DECLARE_READ32_MEMBER(trivrus_input_r);
 	DECLARE_WRITE32_MEMBER(trivrus_input_w);
-	UINT8 m_trivrus_input;
+	uint8_t m_trivrus_input;
 
 	DECLARE_READ32_MEMBER(crzyddz2_4_r);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_crystal(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(crystal_interrupt);
 	TIMER_CALLBACK_MEMBER(Timercb);
 	IRQ_CALLBACK_MEMBER(icallback);
 	void crystal_banksw_postload();
 	void IntReq( int num );
-	inline void Timer_w( address_space &space, int which, UINT32 data, UINT32 mem_mask );
-	inline void DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask );
+	inline void Timer_w( address_space &space, int which, uint32_t data, uint32_t mem_mask );
+	inline void DMA_w( address_space &space, int which, uint32_t data, uint32_t mem_mask );
 	void PatchReset(  );
-	UINT16 GetVidReg( address_space &space, UINT16 reg );
-	void SetVidReg( address_space &space, UINT16 reg, UINT16 val );
+	uint16_t GetVidReg( address_space &space, uint16_t reg );
+	void SetVidReg( address_space &space, uint16_t reg, uint16_t val );
 };
 
 void crystal_state::IntReq( int num )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT32 IntEn = space.read_dword(0x01800c08);
-	UINT32 IntPend = space.read_dword(0x01800c0c);
+	uint32_t IntEn = space.read_dword(0x01800c08);
+	uint32_t IntPend = space.read_dword(0x01800c0c);
 	if (IntEn & (1 << num))
 	{
 		IntPend |= (1 << num);
@@ -308,12 +308,12 @@ void crystal_state::IntReq( int num )
 READ32_MEMBER(crystal_state::FlipCount_r)
 {
 #ifdef IDLE_LOOP_SPEEDUP
-	UINT32 IntPend = space.read_dword(0x01800c0c);
+	uint32_t IntPend = space.read_dword(0x01800c0c);
 	m_FlipCntRead++;
 	if (m_FlipCntRead >= 16 && !IntPend && m_FlipCount != 0)
 		m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
 #endif
-	return ((UINT32) m_FlipCount) << 16;
+	return ((uint32_t) m_FlipCount) << 16;
 }
 
 WRITE32_MEMBER(crystal_state::FlipCount_w)
@@ -336,7 +336,7 @@ READ32_MEMBER(crystal_state::Input_r)
 		return ioport("P3_P4")->read();
 	else if( offset == 2)
 	{
-		UINT8 Port4 = ioport("SYSTEM")->read();
+		uint8_t Port4 = ioport("SYSTEM")->read();
 		if (!(Port4 & 0x10) && ((m_OldPort4 ^ Port4) & 0x10))   //coin buttons trigger IRQs
 			IntReq(12);
 		if (!(Port4 & 0x20) && ((m_OldPort4 ^ Port4) & 0x20))
@@ -349,7 +349,7 @@ READ32_MEMBER(crystal_state::Input_r)
 
 WRITE32_MEMBER(crystal_state::IntAck_w)
 {
-	UINT32 IntPend = space.read_dword(0x01800c0c);
+	uint32_t IntPend = space.read_dword(0x01800c0c);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -365,7 +365,7 @@ WRITE32_MEMBER(crystal_state::IntAck_w)
 IRQ_CALLBACK_MEMBER(crystal_state::icallback)
 {
 	address_space &space = device.memory().space(AS_PROGRAM);
-	UINT32 IntPend = space.read_dword(0x01800c0c);
+	uint32_t IntPend = space.read_dword(0x01800c0c);
 	int i;
 
 	for (i = 0; i < 32; ++i)
@@ -389,7 +389,7 @@ WRITE32_MEMBER(crystal_state::Banksw_w)
 
 TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
 {
-	int which = (int)(FPTR)ptr;
+	int which = (int)(uintptr_t)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
 
 	if (!(m_Timerctrl[which] & 2))
@@ -398,7 +398,7 @@ TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
 	IntReq(num[which]);
 }
 
-void crystal_state::Timer_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
+void crystal_state::Timer_w( address_space &space, int which, uint32_t data, uint32_t mem_mask )
 {
 	if (((data ^ m_Timerctrl[which]) & 1) && (data & 1)) //Timer activate
 	{
@@ -460,7 +460,7 @@ READ32_MEMBER(crystal_state::FlashCmd_r)
 	{
 		if (m_Bank <= 2)
 		{
-			UINT32 *ptr = (UINT32*)(memregion("user1")->base() + m_Bank * 0x1000000);
+			uint32_t *ptr = (uint32_t*)(memregion("user1")->base() + m_Bank * 0x1000000);
 			return ptr[0];
 		}
 		else
@@ -488,9 +488,9 @@ READ32_MEMBER(crystal_state::PIO_r)
 
 WRITE32_MEMBER(crystal_state::PIO_w)
 {
-	UINT32 RST = data & 0x01000000;
-	UINT32 CLK = data & 0x02000000;
-	UINT32 DAT = data & 0x10000000;
+	uint32_t RST = data & 0x01000000;
+	uint32_t CLK = data & 0x02000000;
+	uint32_t DAT = data & 0x10000000;
 
 	m_ds1302->ce_w(RST ? 1 : 0);
 	m_ds1302->io_w(DAT ? 1 : 0);
@@ -504,21 +504,21 @@ WRITE32_MEMBER(crystal_state::PIO_w)
 	COMBINE_DATA(&m_PIO);
 }
 
-void crystal_state::DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
+void crystal_state::DMA_w( address_space &space, int which, uint32_t data, uint32_t mem_mask )
 {
 	if (((data ^ m_DMActrl[which]) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
 	{
-		UINT32 CTR = data;
-		UINT32 SRC = space.read_dword(0x01800804 + which * 0x10);
-		UINT32 DST = space.read_dword(0x01800808 + which * 0x10);
-		UINT32 CNT = space.read_dword(0x0180080C + which * 0x10);
+		uint32_t CTR = data;
+		uint32_t SRC = space.read_dword(0x01800804 + which * 0x10);
+		uint32_t DST = space.read_dword(0x01800808 + which * 0x10);
+		uint32_t CNT = space.read_dword(0x0180080C + which * 0x10);
 		int i;
 
 		if (CTR & 0x2)  //32 bits
 		{
 			for (i = 0; i < CNT; ++i)
 			{
-				UINT32 v = space.read_dword(SRC + i * 4);
+				uint32_t v = space.read_dword(SRC + i * 4);
 				space.write_dword(DST + i * 4, v);
 			}
 		}
@@ -526,7 +526,7 @@ void crystal_state::DMA_w( address_space &space, int which, UINT32 data, UINT32 
 		{
 			for (i = 0; i < CNT; ++i)
 			{
-				UINT16 v = space.read_word(SRC + i * 2);
+				uint16_t v = space.read_word(SRC + i * 2);
 				space.write_word(DST + i * 2, v);
 			}
 		}
@@ -534,7 +534,7 @@ void crystal_state::DMA_w( address_space &space, int which, UINT32 data, UINT32 
 		{
 			for (i = 0; i < CNT; ++i)
 			{
-				UINT8 v = space.read_byte(SRC + i);
+				uint8_t v = space.read_byte(SRC + i);
 				space.write_byte(DST + i, v);
 			}
 		}
@@ -736,7 +736,7 @@ loop:
 
 
 #if 1
-	static const UINT32 Patch[] =
+	static const uint32_t Patch[] =
 	{
 		0x40c0ea01,
 		0xe906400a,
@@ -748,7 +748,7 @@ loop:
 
 	memcpy(m_reset_patch, Patch, sizeof(Patch));
 #else
-	static const UINT8 Patch[] =
+	static const uint8_t Patch[] =
 	{
 		0x01,0xEA,0xC0,0x40,0x0A,0x40,0x06,0xE9,
 		0x20,0x2A,0xC0,0x40,0x0A,0x40,0x06,0xE9,
@@ -772,7 +772,7 @@ void crystal_state::machine_start()
 	int i;
 
 	for (i = 0; i < 4; i++)
-		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(FPTR)i);
+		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(uintptr_t)i);
 
 	PatchReset();
 
@@ -822,18 +822,18 @@ void crystal_state::machine_reset()
 	PatchReset();
 }
 
-UINT16 crystal_state::GetVidReg( address_space &space, UINT16 reg )
+uint16_t crystal_state::GetVidReg( address_space &space, uint16_t reg )
 {
 	return space.read_word(0x03000000 + reg);
 }
 
-void crystal_state::SetVidReg( address_space &space, UINT16 reg, UINT16 val )
+void crystal_state::SetVidReg( address_space &space, uint16_t reg, uint16_t val )
 {
 	space.write_word(0x03000000 + reg, val);
 }
 
 
-UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int xres = 320;
 	int yres = 240;
@@ -856,29 +856,29 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int DoFlip;
 
-	UINT32 B0 = 0x0;
-	UINT32 B1 = (GetVidReg(space, 0x90) & 0x8000) ? 0x400000 : 0x100000;
-	UINT16 *Front, *Back;
-	UINT16 *Visible, *DrawDest;
-	UINT16 *srcline;
+	uint32_t B0 = 0x0;
+	uint32_t B1 = (GetVidReg(space, 0x90) & 0x8000) ? 0x400000 : 0x100000;
+	uint16_t *Front, *Back;
+	uint16_t *Visible, *DrawDest;
+	uint16_t *srcline;
 	int y;
-	UINT16 head, tail;
-	UINT32 width = screen.width();
+	uint16_t head, tail;
+	uint32_t width = screen.width();
 
 	if (GetVidReg(space, 0x8e) & 1)
 	{
-		Front = (UINT16*) (m_frameram + B1 / 4);
-		Back  = (UINT16*) (m_frameram + B0 / 4);
+		Front = (uint16_t*) (m_frameram + B1 / 4);
+		Back  = (uint16_t*) (m_frameram + B0 / 4);
 	}
 	else
 	{
-		Front = (UINT16*) (m_frameram + B0 / 4);
-		Back  = (UINT16*) (m_frameram + B1 / 4);
+		Front = (uint16_t*) (m_frameram + B0 / 4);
+		Back  = (uint16_t*) (m_frameram + B1 / 4);
 	}
 
-	Visible  = (UINT16*) Front;
+	Visible  = (uint16_t*) Front;
 	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-	DrawDest = reinterpret_cast<UINT16 *>(m_frameram.target());
+	DrawDest = reinterpret_cast<uint16_t *>(m_frameram.target());
 
 
 	if (GetVidReg(space, 0x8c) & 0x80)
@@ -888,7 +888,7 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 
 //  DrawDest = Visible;
 
-	srcline = (UINT16 *) DrawDest;
+	srcline = (uint16_t *) DrawDest;
 
 	DoFlip = 0;
 	head = GetVidReg(space, 0x82);
@@ -896,7 +896,7 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 	while ((head & 0x7ff) != (tail & 0x7ff))
 	{
 		// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-		DoFlip = m_vr0->vrender0_ProcessPacket(0x03800000 + head * 64, DrawDest, reinterpret_cast<UINT8*>(m_textureram.target()));
+		DoFlip = m_vr0->vrender0_ProcessPacket(0x03800000 + head * 64, DrawDest, reinterpret_cast<uint8_t*>(m_textureram.target()));
 		head++;
 		head &= 0x7ff;
 		if (DoFlip)
@@ -906,7 +906,7 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 	if (DoFlip)
 		SetVidReg(space, 0x8e, GetVidReg(space, 0x8e) ^ 1);
 
-	srcline = (UINT16 *) Visible;
+	srcline = (uint16_t *) Visible;
 	for (y = 0; y < screen.height(); y++)
 		memcpy(&bitmap.pix16(y), &srcline[y * 1024], width * 2);
 
@@ -919,14 +919,14 @@ void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
 	if (state)
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
-		UINT16 head, tail;
+		uint16_t head, tail;
 		int DoFlip = 0;
 
 		head = GetVidReg(space, 0x82);
 		tail = GetVidReg(space, 0x80);
 		while ((head & 0x7ff) != (tail & 0x7ff))
 		{
-			UINT16 Packet0 = space.read_word(0x03800000 + head * 64);
+			uint16_t Packet0 = space.read_word(0x03800000 + head * 64);
 			if (Packet0 & 0x81)
 				DoFlip = 1;
 			head++;
@@ -1402,7 +1402,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(crystal_state,crysking)
 {
-	UINT16 *Rom = (UINT16*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 
 	//patch the data feed by the protection
 
@@ -1421,7 +1421,7 @@ DRIVER_INIT_MEMBER(crystal_state,crysking)
 
 DRIVER_INIT_MEMBER(crystal_state,evosocc)
 {
-	UINT16 *Rom = (UINT16*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 	Rom += 0x1000000 * 2 / 2;
 
 	Rom[WORD_XOR_LE(0x97388E/2)] = 0x90FC;  //PUSH R2..R7
@@ -1449,7 +1449,7 @@ also it seems that bit 0x40000000 is the PIC reset.
 DRIVER_INIT_MEMBER(crystal_state,topbladv)
 {
 	// patches based on analysis of PIC dump
-	UINT16 *Rom = (UINT16*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 	/*
 	    PIC Protection data:
 	    - RAM ADDR - --PATCH--
@@ -1476,7 +1476,7 @@ DRIVER_INIT_MEMBER(crystal_state,topbladv)
 DRIVER_INIT_MEMBER(crystal_state,officeye)
 {
 	// patches based on analysis of PIC dump
-	UINT16 *Rom = (UINT16*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 
 	/*
 	    PIC Protection data:
@@ -1502,7 +1502,7 @@ DRIVER_INIT_MEMBER(crystal_state,officeye)
 
 DRIVER_INIT_MEMBER(crystal_state, donghaer)
 {
-	UINT16 *Rom = (UINT16*)memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*)memregion("user1")->base();
 
 	Rom[WORD_XOR_LE(0x037A2 / 2)] = 0x9004; // PUSH %R2
 	Rom[WORD_XOR_LE(0x037A4 / 2)] = 0x8202; // LD   (%SP,0x8),%R2

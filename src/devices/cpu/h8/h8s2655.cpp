@@ -6,7 +6,7 @@
 const device_type H8S2655 = &device_creator<h8s2655_device>;
 const device_type H8S2653 = &device_creator<h8s2653_device>;
 
-h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	h8s2600_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2655_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -41,7 +41,7 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, 
 	syscr = 0;
 }
 
-h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2600_device(mconfig, H8S2655, "H8S/2655", tag, owner, clock, "h8s2655", __FILE__, address_map_delegate(FUNC(h8s2655_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -77,7 +77,7 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, d
 	syscr = 0;
 }
 
-h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2655_device(mconfig, H8S2653, "H8S/2653", tag, owner, clock, "h8s2653", __FILE__)
 {
 }
@@ -397,9 +397,9 @@ void h8s2655_device::interrupt_taken()
 	standard_irq_callback(intc->interrupt_taken(taken_irq_vector));
 }
 
-void h8s2655_device::internal_update(UINT64 current_time)
+void h8s2655_device::internal_update(uint64_t current_time)
 {
-	UINT64 event_time = 0;
+	uint64_t event_time = 0;
 
 	add_event(event_time, adc->internal_update(current_time));
 	add_event(event_time, sci0->internal_update(current_time));

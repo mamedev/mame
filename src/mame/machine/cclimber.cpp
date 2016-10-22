@@ -6,14 +6,14 @@
 /* set to 1 to fix protection check after bonus round (see notes in pacman.c driver) */
 #define CANNONB_HACK    0
 
-void cclimber_state::cclimber_decode(const UINT8 convtable[8][16])
+void cclimber_state::cclimber_decode(const uint8_t convtable[8][16])
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int A = 0x0000;A < 0x6000;A++)
 	{
 		int i,j;
-		UINT8 src = rom[A];
+		uint8_t src = rom[A];
 
 		/* pick the translation table from bit 0 of the address */
 		/* and from bits 1 7 of the source data */
@@ -29,7 +29,7 @@ void cclimber_state::cclimber_decode(const UINT8 convtable[8][16])
 
 DRIVER_INIT_MEMBER(cclimber_state,cclimber)
 {
-	static const UINT8 convtable[8][16] =
+	static const uint8_t convtable[8][16] =
 	{
 		/* 0xff marks spots which are unused and therefore unknown */
 		{ 0x44,0x14,0x54,0x10,0x11,0x41,0x05,0x50,0x51,0x00,0x40,0x55,0x45,0x04,0x01,0x15 },
@@ -47,7 +47,7 @@ DRIVER_INIT_MEMBER(cclimber_state,cclimber)
 
 DRIVER_INIT_MEMBER(cclimber_state,cclimberj)
 {
-	static const UINT8 convtable[8][16] =
+	static const uint8_t convtable[8][16] =
 	{
 		{ 0x41,0x54,0x51,0x14,0x05,0x10,0x01,0x55,0x44,0x11,0x00,0x50,0x15,0x40,0x04,0x45 },
 		{ 0x50,0x11,0x40,0x55,0x51,0x14,0x45,0x04,0x54,0x15,0x10,0x05,0x44,0x01,0x00,0x41 },
@@ -65,7 +65,7 @@ DRIVER_INIT_MEMBER(cclimber_state,cclimberj)
 DRIVER_INIT_MEMBER(cclimber_state,ckongb)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0x0000;A < 0x6000;A++) /* all the program ROMs are encrypted */
 	{
@@ -76,7 +76,7 @@ DRIVER_INIT_MEMBER(cclimber_state,ckongb)
 #if CANNONB_HACK
 void ::cannonb_patch()
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x2ba0] = 0x21;
 	rom[0x2ba1] = 0xfb;
@@ -88,13 +88,13 @@ void ::cannonb_patch()
 DRIVER_INIT_MEMBER(cclimber_state,cannonb)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0x0000;A < 0x1000;A++) /* only first ROM is encrypted */
 	{
-		UINT8 src;
+		uint8_t src;
 		int i;
-		static const UINT8 xor_tab[4] ={0x92, 0x82, 0x12, 0x10};
+		static const uint8_t xor_tab[4] ={0x92, 0x82, 0x12, 0x10};
 
 		src = rom[A+0x10000];
 

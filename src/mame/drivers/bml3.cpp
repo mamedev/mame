@@ -114,10 +114,10 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	UINT8 *m_p_videoram;
-	UINT8 *m_p_chargen;
-	UINT8 m_hres_reg;
-	UINT8 m_crtc_vreg[0x100];
+	uint8_t *m_p_videoram;
+	uint8_t *m_p_chargen;
+	uint8_t m_hres_reg;
+	uint8_t m_crtc_vreg[0x100];
 	// INTERRUPT_GEN_MEMBER(bml3_irq);
 	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
 	TIMER_DEVICE_CALLBACK_MEMBER(bml3_c);
@@ -127,27 +127,27 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
 
 private:
-	UINT8 m_psg_latch;
-	UINT8 m_attr_latch;
-	UINT8 m_vres_reg;
+	uint8_t m_psg_latch;
+	uint8_t m_attr_latch;
+	uint8_t m_vres_reg;
 	bool m_keyb_interrupt_disabled;
 	bool m_keyb_nmi_disabled; // not used yet
 	bool m_keyb_counter_operation_disabled;
-	UINT8 m_keyb_empty_scan;
-	UINT8 m_keyb_scancode;
+	uint8_t m_keyb_empty_scan;
+	uint8_t m_keyb_scancode;
 	bool m_keyb_capslock_led_on;
 	bool m_keyb_hiragana_led_on;
 	bool m_keyb_katakana_led_on;
 	bool m_cassbit;
 	bool m_cassold;
-	UINT8 m_cass_data[4];
+	uint8_t m_cass_data[4];
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	void m6845_change_clock(UINT8 setting);
-	UINT8 m_crtc_index;
-	std::unique_ptr<UINT8[]> m_extram;
-	UINT8 m_firq_mask;
-	UINT8 m_firq_status;
+	void m6845_change_clock(uint8_t setting);
+	uint8_t m_crtc_index;
+	std::unique_ptr<uint8_t[]> m_extram;
+	uint8_t m_firq_mask;
+	uint8_t m_firq_status;
 	required_device<cpu_device> m_maincpu;
 	required_device<bml3bus_device> m_bml3bus;
 	required_device<mc6845_device> m_crtc;
@@ -202,7 +202,7 @@ WRITE8_MEMBER( bml3_state::bml3_6845_w )
 
 READ8_MEMBER( bml3_state::bml3_keyboard_r )
 {
-	UINT8 ret = m_keyb_scancode;
+	uint8_t ret = m_keyb_scancode;
 	m_keyb_scancode &= 0x7f;
 	return ret;
 }
@@ -217,7 +217,7 @@ WRITE8_MEMBER( bml3_state::bml3_keyboard_w )
 	m_keyb_nmi_disabled = !BIT(data, 7);
 }
 
-void bml3_state::m6845_change_clock(UINT8 setting)
+void bml3_state::m6845_change_clock(uint8_t setting)
 {
 	int m6845_clock = CPU_CLOCK;    // CRTC and MPU are synchronous by default
 
@@ -289,14 +289,14 @@ WRITE8_MEMBER( bml3_state::bml3_psg_latch_w)
 
 READ8_MEMBER(bml3_state::bml3_ym2203_r)
 {
-	UINT8 dev_offs = ((m_psg_latch & 3) != 3);
+	uint8_t dev_offs = ((m_psg_latch & 3) != 3);
 
 	return m_ym2203->read(space, dev_offs);
 }
 
 WRITE8_MEMBER(bml3_state::bml3_ym2203_w)
 {
-	UINT8 dev_offs = ((m_psg_latch & 3) != 3);
+	uint8_t dev_offs = ((m_psg_latch & 3) != 3);
 
 	m_ym2203->write(space, dev_offs, data);
 }
@@ -366,7 +366,7 @@ WRITE8_MEMBER( bml3_state::bml3_firq_mask_w)
 
 READ8_MEMBER( bml3_state::bml3_firq_status_r )
 {
-	UINT8 res = m_firq_status << 7;
+	uint8_t res = m_firq_status << 7;
 	m_firq_status = 0;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return res;
@@ -601,9 +601,9 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 	// 3: reverse/inverse video
 	// 4: graphic (not character)
 
-	UINT8 x=0,hf=0,xi=0,interlace=0,bgcolor=0,rawbits=0,dots[2],color=0,pen=0;
+	uint8_t x=0,hf=0,xi=0,interlace=0,bgcolor=0,rawbits=0,dots[2],color=0,pen=0;
 	bool reverse=0,graphic=0,lowres=0;
-	UINT16 mem=0;
+	uint16_t mem=0;
 
 	interlace = (m_crtc_vreg[8] & 3) ? 1 : 0;
 	lowres = BIT(m_hres_reg, 6);
@@ -733,7 +733,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_p )
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -762,7 +762,7 @@ INTERRUPT_GEN_MEMBER(bml3_state::bml3_timer_firq)
 
 void bml3_state::machine_start()
 {
-	m_extram = std::make_unique<UINT8[]>(0x10000);
+	m_extram = std::make_unique<uint8_t[]>(0x10000);
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("vram")->base();
 	m_psg_latch = 0;

@@ -266,7 +266,7 @@ READ8_MEMBER( vip_state::read )
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
 	int minh = 0;
 
-	UINT8 data = m_exp->program_r(space, offset, cs, cdef, &minh);
+	uint8_t data = m_exp->program_r(space, offset, cs, cdef, &minh);
 
 	if (cs)
 	{
@@ -306,7 +306,7 @@ WRITE8_MEMBER( vip_state::write )
 
 READ8_MEMBER( vip_state::io_r )
 {
-	UINT8 data = m_exp->io_r(space, offset);
+	uint8_t data = m_exp->io_r(space, offset);
 
 	switch (offset)
 	{
@@ -530,7 +530,7 @@ WRITE_LINE_MEMBER( vip_state::vdc_ef1_w )
 	m_vdc_ef1 = state;
 }
 
-UINT32 vip_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vip_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vdc->screen_update(screen, bitmap, cliprect);
 
@@ -608,10 +608,10 @@ WRITE_LINE_MEMBER( vip_state::exp_dma_in_w )
 
 void vip_state::machine_start()
 {
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	// randomize RAM contents
-	for (UINT16 addr = 0; addr < m_ram->size(); addr++)
+	for (uint16_t addr = 0; addr < m_ram->size(); addr++)
 	{
 		ram[addr] = machine().rand() & 0xff;
 	}
@@ -662,8 +662,8 @@ void vip_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 {
-	UINT8 *ram = m_ram->pointer();
-	UINT8 *chip8_ptr = nullptr;
+	uint8_t *ram = m_ram->pointer();
+	uint8_t *chip8_ptr = nullptr;
 	int chip8_size = 0;
 	int size = image.length();
 

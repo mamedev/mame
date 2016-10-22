@@ -366,9 +366,9 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_PALETTE_INIT_OWNER(zaccaria_state, zaccaria)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_ZACCARIA_1B11142("audiopcb")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("audiopcb", ZACCARIA_1B11142, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

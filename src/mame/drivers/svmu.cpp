@@ -37,7 +37,7 @@ public:
 	required_device<lc8670_cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
 	required_device<speaker_sound_device> m_speaker;
-	required_region_ptr<UINT8> m_bios;
+	required_region_ptr<uint8_t> m_bios;
 
 	DECLARE_PALETTE_INIT(svmu);
 	virtual void machine_reset() override;
@@ -51,7 +51,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
 private:
-	UINT8       m_page;
+	uint8_t       m_page;
 };
 
 
@@ -183,12 +183,12 @@ static LC8670_LCD_UPDATE( svmu_lcd_update )
 }
 
 
-inline void vmufat_write_byte(UINT8* flash, UINT8 block, offs_t offset, UINT8 data)
+inline void vmufat_write_byte(uint8_t* flash, uint8_t block, offs_t offset, uint8_t data)
 {
 	flash[(block * 512) + offset] = data;
 }
 
-inline void vmufat_write_word(UINT8* flash, UINT8 block, offs_t offset, UINT16 data)
+inline void vmufat_write_word(uint8_t* flash, uint8_t block, offs_t offset, uint16_t data)
 {
 	// 16-bit data are stored in little endian
 	flash[(block * 512) + offset + 0] = data & 0xff;
@@ -197,8 +197,8 @@ inline void vmufat_write_word(UINT8* flash, UINT8 block, offs_t offset, UINT16 d
 
 QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 {
-	UINT32 size = image.length();
-	UINT8 *flash = m_flash->base();
+	uint32_t size = image.length();
+	uint8_t *flash = m_flash->base();
 
 	image.fread(flash, size);
 

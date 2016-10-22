@@ -24,8 +24,8 @@ public:
 	virtual void SetDevice( void *device ) override;
 	virtual void GetDevice( void **device ) override;
 	virtual void ExecCommand() override;
-	virtual void WriteData( UINT8 *data, int dataLength ) override;
-	virtual void ReadData( UINT8 *data, int dataLength ) override;
+	virtual void WriteData( uint8_t *data, int dataLength ) override;
+	virtual void ReadData( uint8_t *data, int dataLength ) override;
 
 protected:
 	virtual void t10_start(device_t &device) override;
@@ -57,11 +57,11 @@ protected:
 	cdda_device *m_cdda;
 	cdrom_file *m_cdrom;
 
-	UINT32 m_lba;
-	UINT32 m_blocks;
-	UINT32 m_last_lba;
-	UINT32 m_num_subblocks;
-	UINT32 m_cur_subblock;
+	uint32_t m_lba;
+	uint32_t m_blocks;
+	uint32_t m_last_lba;
+	uint32_t m_num_subblocks;
+	uint32_t m_cur_subblock;
 	int m_audio_sense;
 
 	device_t *m_device;

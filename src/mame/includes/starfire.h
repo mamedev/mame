@@ -33,18 +33,18 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen") { }
 
-	required_shared_ptr<UINT8> m_starfire_colorram;
-	required_shared_ptr<UINT8> m_starfire_videoram;
+	required_shared_ptr<uint8_t> m_starfire_colorram;
+	required_shared_ptr<uint8_t> m_starfire_videoram;
 	optional_device<samples_device> m_samples;
 	optional_ioport m_nmi;
 
-	UINT8 m_prev_sound;
-	UINT8 m_fireone_select;
+	uint8_t m_prev_sound;
+	uint8_t m_fireone_select;
 
-	UINT8 m_starfire_vidctrl;
-	UINT8 m_starfire_vidctrl1;
-	UINT8 m_starfire_color;
-	UINT16 m_starfire_colors[STARFIRE_NUM_PENS];
+	uint8_t m_starfire_vidctrl;
+	uint8_t m_starfire_vidctrl1;
+	uint8_t m_starfire_color;
+	uint16_t m_starfire_colors[STARFIRE_NUM_PENS];
 
 	read8_delegate m_input_read;
 	write8_delegate m_io2_write;
@@ -64,7 +64,7 @@ public:
 	DECLARE_DRIVER_INIT(starfire);
 	DECLARE_DRIVER_INIT(fireone);
 	virtual void video_start() override;
-	UINT32 screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(starfire_scanline_callback);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	void get_pens(pen_t *pens);

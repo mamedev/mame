@@ -16,7 +16,7 @@
 
 const device_type KONPPC = &device_creator<konppc_device>;
 
-konppc_device::konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+konppc_device::konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KONPPC, "Konami PowerPC Common Functions", tag, owner, clock, "konppc", __FILE__),
 	cgboard_type(0),
 	num_cgboards(0)/*,
@@ -33,7 +33,7 @@ void konppc_device::device_start()
 	for (i=0; i < num_cgboards; i++)
 	{
 		dsp_comm_ppc[i][0] = 0x00;
-		dsp_shared_ram[i] = std::make_unique<UINT32[]>(DSP_BANK_SIZE * 2/4);
+		dsp_shared_ram[i] = std::make_unique<uint32_t[]>(DSP_BANK_SIZE * 2/4);
 		dsp_shared_ram_bank[i] = 0;
 
 		dsp_state[i] = 0x80;
@@ -43,8 +43,8 @@ void konppc_device::device_start()
 		nwk_fifo_read_ptr[i] = 0;
 		nwk_fifo_write_ptr[i] = 0;
 
-		nwk_fifo[i] = std::make_unique<UINT32[]>(0x800);
-		nwk_ram[i] = std::make_unique<UINT32[]>(0x2000);
+		nwk_fifo[i] = std::make_unique<uint32_t[]>(0x800);
+		nwk_ram[i] = std::make_unique<uint32_t[]>(0x2000);
 
 		save_item(NAME(dsp_comm_ppc[i]), i);
 		save_item(NAME(dsp_comm_sharc[i]), i);
@@ -99,7 +99,7 @@ int konppc_device::get_cgboard_id(void)
 	}
 }
 
-void konppc_device::set_cgboard_texture_bank(int board, const char *bank, UINT8 *rom)
+void konppc_device::set_cgboard_texture_bank(int board, const char *bank, uint8_t *rom)
 {
 	texture_bank[board] = bank;
 
@@ -193,12 +193,12 @@ WRITE32_MEMBER( konppc_device::cgboard_dsp_shared_w_ppc )
 
 /* CG Board DSP interface for SHARC */
 
-UINT32 konppc_device::dsp_comm_sharc_r(int board, int offset)
+uint32_t konppc_device::dsp_comm_sharc_r(int board, int offset)
 {
 	return dsp_comm_ppc[board][offset];
 }
 
-void konppc_device::dsp_comm_sharc_w(address_space &space, int board, int offset, UINT32 data)
+void konppc_device::dsp_comm_sharc_w(address_space &space, int board, int offset, uint32_t data)
 {
 	if (offset >= 2)
 	{
@@ -266,9 +266,9 @@ void konppc_device::dsp_comm_sharc_w(address_space &space, int board, int offset
 	dsp_comm_sharc[board][offset] = data;
 }
 
-UINT32 konppc_device::dsp_shared_ram_r_sharc(int board, int offset)
+uint32_t konppc_device::dsp_shared_ram_r_sharc(int board, int offset)
 {
-//  printf("dsp_shared_r: (board %d) %08X, (%08X, %08X)\n", cgboard_id, offset, (UINT32)dsp_shared_ram[(offset >> 1)], (UINT32)dsp_shared_ram[offset]);
+//  printf("dsp_shared_r: (board %d) %08X, (%08X, %08X)\n", cgboard_id, offset, (uint32_t)dsp_shared_ram[(offset >> 1)], (uint32_t)dsp_shared_ram[offset]);
 
 	if (offset & 0x1)
 	{
@@ -280,7 +280,7 @@ UINT32 konppc_device::dsp_shared_ram_r_sharc(int board, int offset)
 	}
 }
 
-void konppc_device::dsp_shared_ram_w_sharc(int board, int offset, UINT32 data)
+void konppc_device::dsp_shared_ram_w_sharc(int board, int offset, uint32_t data)
 {
 //  printf("dsp_shared_w: (board %d) %08X, %08X\n", cgboard_id, offset, data);
 	if (offset & 0x1)
@@ -337,11 +337,11 @@ WRITE32_MEMBER( konppc_device::cgboard_1_shared_sharc_w )
 
 /*****************************************************************************/
 
-UINT32 konppc_device::nwk_fifo_r(address_space &space, int board)
+uint32_t konppc_device::nwk_fifo_r(address_space &space, int board)
 {
 	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
 	adsp21062_device *device = space.machine().device<adsp21062_device>(dsptag);
-	UINT32 data;
+	uint32_t data;
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
 	{
@@ -368,7 +368,7 @@ UINT32 konppc_device::nwk_fifo_r(address_space &space, int board)
 	return data;
 }
 
-void konppc_device::nwk_fifo_w(int board, UINT32 data)
+void konppc_device::nwk_fifo_w(int board, uint32_t data)
 {
 	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
 	adsp21062_device *device = machine().device<adsp21062_device>(dsptag);
@@ -527,7 +527,7 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_1_w)
 
 #define LED_ON      0xff00ff00
 
-void draw_7segment_led(bitmap_rgb32 &bitmap, int x, int y, UINT8 value)
+void draw_7segment_led(bitmap_rgb32 &bitmap, int x, int y, uint8_t value)
 {
 	if ((value & 0x7f) == 0x7f)
 	{

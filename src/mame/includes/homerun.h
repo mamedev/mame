@@ -26,17 +26,17 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
 	optional_device<upd7756_device> m_d7756;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	UINT8 m_control;
-	UINT8 m_sample;
+	uint8_t m_control;
+	uint8_t m_sample;
 
 	tilemap_t *m_tilemap;
 	int m_gfx_ctrl;
@@ -60,7 +60,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_homerun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_homerun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(homerun_banking_w);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

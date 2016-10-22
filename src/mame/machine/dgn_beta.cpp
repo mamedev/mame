@@ -142,7 +142,7 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 	address_space &space_0 = m_maincpu->space(AS_PROGRAM);
 	address_space &space_1 = machine().device(DMACPU_TAG)->memory().space(AS_PROGRAM);
 	int                 Page;
-	UINT8               *readbank;
+	uint8_t               *readbank;
 	int                 bank_start;
 	int                 bank_end;
 	int                 MapPage;
@@ -202,7 +202,7 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 		m_PageRegs[m_TaskReg][Page].memory=readbank;
 		membank(page_num)->set_base(readbank);
 
-		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)(FPTR)readbank));
+		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)(uintptr_t)readbank));
 		LOG_BANK_UPDATE(("PageRegsSet Task=%X Page=%x\n",m_TaskReg,Page));
 		//LOG_BANK_UPDATE(("%X)\n",membank(Page+1)));
 		LOG_BANK_UPDATE(("memory_install_write8_handler CPU=0\n"));
@@ -213,7 +213,7 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 //
 void dgn_beta_state::SetDefaultTask()
 {
-//  UINT8 *videoram = m_videoram;
+//  uint8_t *videoram = m_videoram;
 	int     Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
@@ -747,12 +747,12 @@ void dgn_beta_state::cpu0_recalc_irq(int state)
 	pia6821_device *pia_0 = machine().device<pia6821_device>( PIA_0_TAG );
 	pia6821_device *pia_1 = machine().device<pia6821_device>( PIA_1_TAG );
 	pia6821_device *pia_2 = machine().device<pia6821_device>( PIA_2_TAG );
-	UINT8 pia0_irq_a = pia_0->irq_a_state();
-	UINT8 pia1_irq_a = pia_1->irq_a_state();
-	UINT8 pia1_irq_b = pia_1->irq_b_state();
-	UINT8 pia2_irq_a = pia_2->irq_a_state();
-	UINT8 pia2_irq_b = pia_2->irq_b_state();
-	UINT8 IRQ;
+	uint8_t pia0_irq_a = pia_0->irq_a_state();
+	uint8_t pia1_irq_a = pia_1->irq_a_state();
+	uint8_t pia1_irq_b = pia_1->irq_b_state();
+	uint8_t pia2_irq_a = pia_2->irq_a_state();
+	uint8_t pia2_irq_b = pia_2->irq_b_state();
+	uint8_t IRQ;
 
 	if (pia0_irq_a || pia1_irq_a || pia1_irq_b || pia2_irq_a || pia2_irq_b)
 		IRQ = ASSERT_LINE;
@@ -766,8 +766,8 @@ void dgn_beta_state::cpu0_recalc_irq(int state)
 void dgn_beta_state::cpu0_recalc_firq(int state)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>( PIA_0_TAG );
-	UINT8 pia0_irq_b = pia_0->irq_b_state();
-	UINT8 FIRQ;
+	uint8_t pia0_irq_b = pia_0->irq_b_state();
+	uint8_t FIRQ;
 
 	if (pia0_irq_b)
 		FIRQ = ASSERT_LINE;
@@ -1101,7 +1101,7 @@ static const char *const os9syscalls[] =
 };
 
 
-offs_t dgn_beta_state::dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+offs_t dgn_beta_state::dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	unsigned call;
 	unsigned result = 0;

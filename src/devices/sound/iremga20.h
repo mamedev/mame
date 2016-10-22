@@ -27,16 +27,16 @@
 
 struct IremGA20_channel_def
 {
-	UINT32 rate;
-	UINT32 size;
-	UINT32 start;
-	UINT32 pos;
-	UINT32 frac;
-	UINT32 end;
-	UINT32 volume;
-	UINT32 pan;
-	UINT32 effect;
-	UINT32 play;
+	uint32_t rate;
+	uint32_t size;
+	uint32_t start;
+	uint32_t pos;
+	uint32_t frac;
+	uint32_t end;
+	uint32_t volume;
+	uint32_t pan;
+	uint32_t effect;
+	uint32_t play;
 };
 
 
@@ -46,7 +46,7 @@ class iremga20_device : public device_t,
 						public device_sound_interface
 {
 public:
-	iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~iremga20_device() { }
 
 protected:
@@ -65,9 +65,9 @@ private:
 	void iremga20_reset();
 
 private:
-	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<uint8_t> m_rom;
 	sound_stream *m_stream;
-	UINT16 m_regs[0x40];
+	uint16_t m_regs[0x40];
 	IremGA20_channel_def m_channel[4];
 };
 

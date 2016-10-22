@@ -230,8 +230,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	UINT8 m_output[8];
-	required_shared_ptr<UINT8> m_video;
+	uint8_t m_output[8];
+	required_shared_ptr<uint8_t> m_video;
 	int m_mixdata;
 	DECLARE_READ8_MEMBER(mixport_r);
 	DECLARE_WRITE8_MEMBER(outport0_w);
@@ -244,7 +244,7 @@ public:
 	DECLARE_WRITE8_MEMBER(outport7_w);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mgames);
-	UINT32 screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -255,7 +255,7 @@ void mgames_state::video_start()
 {
 }
 
-UINT32 mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x;
 	int count;
@@ -266,8 +266,8 @@ UINT32 mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &b
 	{
 		for (x = 0; x < 32; x++)
 		{
-			UINT16 dat = m_video[count];
-			UINT16 col = m_video[count + 0x400] & 0x7f;
+			uint16_t dat = m_video[count];
+			uint16_t col = m_video[count + 0x400] & 0x7f;
 			gfx->opaque(bitmap, cliprect, dat, col, 0, 0, x * 16, y * 16);
 			count++;
 		}

@@ -13,7 +13,7 @@
 class i8089_instruction
 {
 public:
-	i8089_instruction(offs_t pc, const UINT8 *oprom) :
+	i8089_instruction(offs_t pc, const uint8_t *oprom) :
 		m_oprom(oprom), m_ppc(pc), m_pc(0), m_flags(DASMFLAG_SUPPORTED)
 	{
 		// instruction
@@ -37,7 +37,7 @@ public:
 	int flags() const { return m_flags; }
 
 private:
-	const UINT8 *m_oprom;
+	const uint8_t *m_oprom;
 
 	char m_buffer[256];
 	char m_offset[100];
@@ -72,23 +72,23 @@ private:
 	};
 
 	// fetch 1-byte value
-	UINT8 fetch_value8()
+	uint8_t fetch_value8()
 	{
-		UINT8 i = m_oprom[m_pc];
+		uint8_t i = m_oprom[m_pc];
 		m_pc += 1;
 		return i;
 	}
 
 	// fetch 2-byte value
-	UINT16 fetch_value16()
+	uint16_t fetch_value16()
 	{
-		UINT16 i = m_oprom[m_pc] | m_oprom[m_pc + 1] << 8;
+		uint16_t i = m_oprom[m_pc] | m_oprom[m_pc + 1] << 8;
 		m_pc += 2;
 		return i;
 	}
 
 	// fetch a 1 or 2 byte immediate value
-	UINT16 fetch_immediate()
+	uint16_t fetch_immediate()
 	{
 		return (m_wb & 1) ? fetch_value8() : fetch_value16();
 	}
@@ -139,11 +139,11 @@ private:
 	// jump register
 	void inst_jr(const char *instr8, const char *instr16)
 	{
-		UINT16 i = fetch_immediate();
+		uint16_t i = fetch_immediate();
 		if (m_mm == 0 && m_w == 0 && m_wb == 1)
-			sprintf(m_buffer, "%s %s, %05x", instr8, m_reg[m_brp], m_ppc + m_pc + (INT8) i);
+			sprintf(m_buffer, "%s %s, %05x", instr8, m_reg[m_brp], m_ppc + m_pc + (int8_t) i);
 		else if (m_mm == 0 && m_w == 0 && m_wb == 2)
-			sprintf(m_buffer, "%s %s, %05x", instr16, m_reg[m_brp], m_ppc + m_pc + (INT16) i);
+			sprintf(m_buffer, "%s %s, %05x", instr16, m_reg[m_brp], m_ppc + m_pc + (int16_t) i);
 		else
 			invalid();
 	}
@@ -171,11 +171,11 @@ private:
 	void inst_jm(const char *jump8short, const char *jump8long)
 	{
 		offset();
-		UINT16 i = fetch_immediate();
+		uint16_t i = fetch_immediate();
 		if (m_w == 0 && m_wb == 1 && m_brp == 0)
-			sprintf(m_buffer, "%s %s, %05x", jump8short, m_offset, m_ppc + m_pc + (INT8) i);
+			sprintf(m_buffer, "%s %s, %05x", jump8short, m_offset, m_ppc + m_pc + (int8_t) i);
 		else if (m_w == 0 && m_wb == 2 && m_brp == 0)
-			sprintf(m_buffer, "%s %s, %05x", jump8long, m_offset, m_ppc + m_pc + (INT16) i);
+			sprintf(m_buffer, "%s %s, %05x", jump8long, m_offset, m_ppc + m_pc + (int16_t) i);
 		else
 			invalid();
 	}
@@ -184,11 +184,11 @@ private:
 	void inst_jmb(const char *jump8short, const char *jump8long)
 	{
 		offset();
-		UINT16 i = fetch_immediate();
+		uint16_t i = fetch_immediate();
 		if (m_w == 0 && m_wb == 1)
-			sprintf(m_buffer, "%s %s, %d, %05x", jump8short, m_offset, m_brp, m_ppc + m_pc + (INT8) i);
+			sprintf(m_buffer, "%s %s, %d, %05x", jump8short, m_offset, m_brp, m_ppc + m_pc + (int8_t) i);
 		else if (m_w == 0 && m_wb == 2)
-			sprintf(m_buffer, "%s %s, %d, %05x", jump8long, m_offset, m_brp, m_ppc + m_pc + (INT16) i);
+			sprintf(m_buffer, "%s %s, %d, %05x", jump8long, m_offset, m_brp, m_ppc + m_pc + (int16_t) i);
 		else
 			invalid();
 	}
@@ -229,15 +229,15 @@ private:
 	void inst_j16(const char *jump8short, const char *jump16short, const char *jump8long, const char *jump16long)
 	{
 		offset();
-		UINT16 i = fetch_immediate();
+		uint16_t i = fetch_immediate();
 		if (m_w == 0 && m_wb == 1)
-			sprintf(m_buffer, "%s %s, %05x", jump8short, m_offset, m_ppc + m_pc + (INT8) i);
+			sprintf(m_buffer, "%s %s, %05x", jump8short, m_offset, m_ppc + m_pc + (int8_t) i);
 		else if (m_w == 1 && m_wb == 1)
-			sprintf(m_buffer, "%s %s, %05x", jump16short, m_offset, m_ppc + m_pc + (INT8) i);
+			sprintf(m_buffer, "%s %s, %05x", jump16short, m_offset, m_ppc + m_pc + (int8_t) i);
 		else if (m_w == 0 && m_wb == 2)
-			sprintf(m_buffer, "%s %s, %05x", jump8long, m_offset, m_ppc + m_pc + (INT16) i);
+			sprintf(m_buffer, "%s %s, %05x", jump8long, m_offset, m_ppc + m_pc + (int16_t) i);
 		else if (m_w == 1 && m_wb == 2)
-			sprintf(m_buffer, "%s %s, %05x", jump16long, m_offset, m_ppc + m_pc + (INT16) i);
+			sprintf(m_buffer, "%s %s, %05x", jump16long, m_offset, m_ppc + m_pc + (int16_t) i);
 		else
 			invalid();
 	}
@@ -298,8 +298,8 @@ private:
 		case 0x02:
 			if (m_w == 1 && m_aa == 0 && m_wb == 2)
 			{
-				UINT16 offs = fetch_immediate();
-				UINT16 segm = fetch_immediate();
+				uint16_t offs = fetch_immediate();
+				uint16_t segm = fetch_immediate();
 				sprintf(m_buffer, "lpdi %s, %05x", m_reg[m_brp], ((segm << 4) + offs) & 0xfffff);
 			}
 			else
@@ -309,12 +309,12 @@ private:
 		case 0x08:
 			if (m_mm == 0)
 			{
-				UINT16 i = fetch_immediate();
+				uint16_t i = fetch_immediate();
 
 				if (m_w == 0 && m_aa == 0 && m_wb == 1 && m_brp == TP)
-					sprintf(m_buffer, "jmp %05x", m_ppc + m_pc + (INT8) i);
+					sprintf(m_buffer, "jmp %05x", m_ppc + m_pc + (int8_t) i);
 				else if (m_w == 1 && m_aa == 0 && m_wb == 2 && m_brp == TP)
-					sprintf(m_buffer, "ljmp %05x", m_ppc + m_pc + (INT16) i);
+					sprintf(m_buffer, "ljmp %05x", m_ppc + m_pc + (int16_t) i);
 				else if (m_w == 0 && m_wb == 1)
 					sprintf(m_buffer, "addbi %s, %02x", m_reg[m_brp], i);
 				else if (m_w == 1 && m_wb == 2)
@@ -371,8 +371,8 @@ private:
 			if (m_w == 0 && m_wb == 3 && m_brp == 0)
 			{
 				offset();
-				UINT16 i = fetch_immediate();
-				int displacement = (INT8) fetch_immediate();
+				uint16_t i = fetch_immediate();
+				int displacement = (int8_t) fetch_immediate();
 				sprintf(m_buffer, "tsl %s, %02x, %05x", m_offset, i, m_ppc + m_pc + displacement);
 			}
 			else
@@ -385,12 +385,12 @@ private:
 			if (m_w == 1 && m_brp == TP && (m_wb == 1 || m_wb == 2))
 			{
 				offset();
-				UINT16 i = fetch_immediate();
+				uint16_t i = fetch_immediate();
 
 				if (m_wb == 1)
-					sprintf(m_buffer, "call %s, %05x", m_offset, m_ppc + m_pc + (INT8) i);
+					sprintf(m_buffer, "call %s, %05x", m_offset, m_ppc + m_pc + (int8_t) i);
 				else if (m_wb == 2)
-					sprintf(m_buffer, "lcall %s, %05x", m_offset, m_ppc + m_pc + (INT16) i);
+					sprintf(m_buffer, "lcall %s, %05x", m_offset, m_ppc + m_pc + (int16_t) i);
 
 				m_flags |= DASMFLAG_STEP_OVER;
 			}

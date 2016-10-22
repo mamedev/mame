@@ -39,7 +39,6 @@ backup of playfield rom and picture/description of its board
 
 #include "includes/ssystem3.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/dac.h"
 
 
 // in my opinion own cpu to display lcd field and to handle own buttons
@@ -122,7 +121,7 @@ WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_a)
 
 READ8_MEMBER(ssystem3_state::ssystem3_via_read_a)
 {
-	UINT8 data=0xff;
+	uint8_t data=0xff;
 #if 1 // time switch
 	if (!(m_porta&0x10)) data&=m_matrix[0]->read()|0xf1;
 	if (!(m_porta&0x20)) data&=m_matrix[1]->read()|0xf1;
@@ -186,7 +185,7 @@ READ8_MEMBER(ssystem3_state::ssystem3_via_read_a)
  */
 READ8_MEMBER(ssystem3_state::ssystem3_via_read_b)
 {
-	UINT8 data=0xff;
+	uint8_t data=0xff;
 	int on, ready;
 	ssystem3_playfield_read(&on, &ready);
 	if (!on) data&=~0x20;
@@ -200,7 +199,7 @@ WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_b)
 	ssystem3_lcd_write(data & 4, data & 2);
 
 	// TODO: figure out what this is trying to achieve
-	UINT8 d = ssystem3_via_read_b(space, 0, mem_mask) & ~0x40;
+	uint8_t d = ssystem3_via_read_b(space, 0, mem_mask) & ~0x40;
 	if (data & 0x80) d |= 0x40;
 	//  d&=~0x8f;
 	m_via6522_0->write_pb0((d >> 0) & 1);
@@ -303,11 +302,6 @@ static MACHINE_CONFIG_START( ssystem3, ssystem3_state )
 
 	MCFG_PALETTE_ADD("palette", 242 + 32768)
 	MCFG_PALETTE_INIT_OWNER(ssystem3_state, ssystem3)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)

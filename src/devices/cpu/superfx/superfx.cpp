@@ -7,7 +7,7 @@
 
 const device_type SUPERFX = &device_creator<superfx_device>;
 
-superfx_device::superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+superfx_device::superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SUPERFX, "SuperFX", tag, owner, clock, "superfx", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 32, 0)
 	, m_out_irq_func(*this), m_pipeline(0), m_ramaddr(0), m_sfr(0), m_pbr(0), m_rombr(0), m_rambr(0), m_cbr(0), m_scbr(0), m_scmr(0), m_colr(0), m_por(0),
@@ -49,20 +49,20 @@ void superfx_device::superfx_update_speed()
 
 void superfx_device::superfx_cache_flush()
 {
-	UINT32 n = 0;
+	uint32_t n = 0;
 	for(n = 0; n < 32; n++)
 	{
 		m_cache.valid[n] = 0;
 	}
 }
 
-UINT8 superfx_device::superfx_cache_mmio_read(UINT32 addr)
+uint8_t superfx_device::superfx_cache_mmio_read(uint32_t addr)
 {
 	addr = (addr + m_cbr) & 0x1ff;
 	return m_cache.buffer[addr];
 }
 
-void superfx_device::superfx_cache_mmio_write(UINT32 addr, UINT8 data)
+void superfx_device::superfx_cache_mmio_write(uint32_t addr, uint8_t data)
 {
 	addr = (addr + m_cbr) & 0x1ff;
 	m_cache.buffer[addr] = data;
@@ -74,7 +74,7 @@ void superfx_device::superfx_cache_mmio_write(UINT32 addr, UINT8 data)
 
 void superfx_device::superfx_memory_reset()
 {
-	UINT32 n = 0;
+	uint32_t n = 0;
 	for(n = 0; n < 0x200; n++)
 	{
 		m_cache.buffer[n] = 0x00;
@@ -90,24 +90,24 @@ void superfx_device::superfx_memory_reset()
 	}
 }
 
-UINT8 superfx_device::superfx_bus_read(UINT32 addr)
+uint8_t superfx_device::superfx_bus_read(uint32_t addr)
 {
 	return m_program->read_byte(addr);
 }
 
-void superfx_device::superfx_bus_write(UINT32 addr, UINT8 data)
+void superfx_device::superfx_bus_write(uint32_t addr, uint8_t data)
 {
 	m_program->write_byte(addr, data);
 }
 
-void superfx_device::superfx_pixelcache_flush(INT32 line)
+void superfx_device::superfx_pixelcache_flush(int32_t line)
 {
-	UINT8 x = m_pixelcache[line].offset << 3;
-	UINT8 y = m_pixelcache[line].offset >> 5;
-	UINT32 cn = 0;
-	UINT32 bpp = 2 << ((m_scmr & SUPERFX_SCMR_MD) - ((m_scmr & SUPERFX_SCMR_MD) >> 1)); // = [regs.scmr.md]{ 2, 4, 4, 8 };
-	UINT32 addr;
-	UINT32 n = 0;
+	uint8_t x = m_pixelcache[line].offset << 3;
+	uint8_t y = m_pixelcache[line].offset >> 5;
+	uint32_t cn = 0;
+	uint32_t bpp = 2 << ((m_scmr & SUPERFX_SCMR_MD) - ((m_scmr & SUPERFX_SCMR_MD) >> 1)); // = [regs.scmr.md]{ 2, 4, 4, 8 };
+	uint32_t addr;
+	uint32_t n = 0;
 
 	if(m_pixelcache[line].bitpend == 0x00)
 	{
@@ -134,9 +134,9 @@ void superfx_device::superfx_pixelcache_flush(INT32 line)
 
 	for(n = 0; n < bpp; n++)
 	{
-		UINT32 byte = ((n >> 1) << 4) + (n & 1);  // = [n]{ 0, 1, 16, 17, 32, 33, 48, 49 };
-		UINT8 data = 0x00;
-		UINT32 x32 = 0;
+		uint32_t byte = ((n >> 1) << 4) + (n & 1);  // = [n]{ 0, 1, 16, 17, 32, 33, 48, 49 };
+		uint8_t data = 0x00;
+		uint32_t x32 = 0;
 		for(x32 = 0; x32 < 8; x32++)
 		{
 			data |= ((m_pixelcache[line].data[x32] >> n) & 1) << x32;
@@ -154,10 +154,10 @@ void superfx_device::superfx_pixelcache_flush(INT32 line)
 	m_pixelcache[line].bitpend = 0x00;
 }
 
-void superfx_device::superfx_plot(UINT8 x, UINT8 y)
+void superfx_device::superfx_plot(uint8_t x, uint8_t y)
 {
-	UINT8 color = m_colr;
-	UINT16 offset = (y << 5) + (x >> 3);
+	uint8_t color = m_colr;
+	uint16_t offset = (y << 5) + (x >> 3);
 
 	if((m_por & SUPERFX_POR_DITHER) != 0 && (m_scmr & SUPERFX_SCMR_MD) != 3)
 	{
@@ -215,13 +215,13 @@ void superfx_device::superfx_plot(UINT8 x, UINT8 y)
 	}
 }
 
-UINT8 superfx_device::superfx_rpix(UINT8 x, UINT8 y)
+uint8_t superfx_device::superfx_rpix(uint8_t x, uint8_t y)
 {
-	UINT32 cn = 0;
-	UINT32 bpp;
-	UINT32 addr;
-	UINT8 data = 0x00;
-	UINT32 n = 0;
+	uint32_t cn = 0;
+	uint32_t bpp;
+	uint32_t addr;
+	uint8_t data = 0x00;
+	uint32_t n = 0;
 
 	superfx_pixelcache_flush(1);
 	superfx_pixelcache_flush(0);
@@ -249,7 +249,7 @@ UINT8 superfx_device::superfx_rpix(UINT8 x, UINT8 y)
 
 	for(n = 0; n < bpp; n++)
 	{
-		UINT32 byte = ((n >> 1) << 4) + (n & 1);  // = [n]{ 0, 1, 16, 17, 32, 33, 48, 49 };
+		uint32_t byte = ((n >> 1) << 4) + (n & 1);  // = [n]{ 0, 1, 16, 17, 32, 33, 48, 49 };
 		superfx_add_clocks_internal(m_memory_access_speed);
 		data |= ((superfx_bus_read(addr + byte) >> x) & 1) << n;
 	}
@@ -257,7 +257,7 @@ UINT8 superfx_device::superfx_rpix(UINT8 x, UINT8 y)
 	return data;
 }
 
-UINT8 superfx_device::superfx_color(UINT8 source)
+uint8_t superfx_device::superfx_color(uint8_t source)
 {
 	if(m_por & SUPERFX_POR_HIGHNIBBLE)
 	{
@@ -278,13 +278,13 @@ void superfx_device::superfx_rambuffer_sync()
 	}
 }
 
-UINT8 superfx_device::superfx_rambuffer_read(UINT16 addr)
+uint8_t superfx_device::superfx_rambuffer_read(uint16_t addr)
 {
 	superfx_rambuffer_sync();
 	return superfx_bus_read(0x700000 + (m_rambr << 16) + addr);
 }
 
-void superfx_device::superfx_rambuffer_write(UINT16 addr, UINT8 data)
+void superfx_device::superfx_rambuffer_write(uint16_t addr, uint8_t data)
 {
 	superfx_rambuffer_sync();
 	m_ramcl = m_memory_access_speed;
@@ -306,13 +306,13 @@ void superfx_device::superfx_rombuffer_update()
 	m_romcl = m_memory_access_speed;
 }
 
-UINT8 superfx_device::superfx_rombuffer_read()
+uint8_t superfx_device::superfx_rombuffer_read()
 {
 	superfx_rombuffer_sync();
 	return m_romdr;
 }
 
-void superfx_device::superfx_gpr_write(UINT8 r, UINT16 data)
+void superfx_device::superfx_gpr_write(uint8_t r, uint16_t data)
 {
 	m_r[r] = data;
 	if(r == 14)
@@ -325,16 +325,16 @@ void superfx_device::superfx_gpr_write(UINT8 r, UINT16 data)
 	}
 }
 
-UINT8 superfx_device::superfx_op_read(UINT16 addr)
+uint8_t superfx_device::superfx_op_read(uint16_t addr)
 {
-	UINT16 offset = addr - m_cbr;
+	uint16_t offset = addr - m_cbr;
 	if(offset < 512)
 	{
 		if(!m_cache.valid[offset >> 4])
 		{
-			UINT32 dp = offset & 0xfff0;
-			UINT32 sp = (m_pbr << 16) + ((m_cbr + dp) & 0xfff0);
-			UINT32 n = 0;
+			uint32_t dp = offset & 0xfff0;
+			uint32_t sp = (m_pbr << 16) + ((m_cbr + dp) & 0xfff0);
+			uint32_t n = 0;
 			for(n = 0; n < 16; n++)
 			{
 				superfx_add_clocks_internal(m_memory_access_speed);
@@ -365,17 +365,17 @@ UINT8 superfx_device::superfx_op_read(UINT16 addr)
 	}
 }
 
-UINT8 superfx_device::superfx_peekpipe()
+uint8_t superfx_device::superfx_peekpipe()
 {
-	UINT8 result = m_pipeline;
+	uint8_t result = m_pipeline;
 	m_pipeline = superfx_op_read(m_r[15]);
 	m_r15_modified = 0;
 	return result;
 }
 
-UINT8 superfx_device::superfx_pipe()
+uint8_t superfx_device::superfx_pipe()
 {
-	UINT8 result = m_pipeline;
+	uint8_t result = m_pipeline;
 	m_pipeline = superfx_op_read(++m_r[15]);
 	m_r15_modified = 0;
 	return result;
@@ -401,7 +401,7 @@ int superfx_device::access_rom()
 	return 1;
 }
 
-UINT8 superfx_device::mmio_read(UINT32 addr)
+uint8_t superfx_device::mmio_read(uint32_t addr)
 {
 	addr &= 0xffff;
 
@@ -422,7 +422,7 @@ UINT8 superfx_device::mmio_read(UINT32 addr)
 
 		case 0x3031:
 		{
-			UINT8 r = m_sfr >> 8;
+			uint8_t r = m_sfr >> 8;
 			m_sfr &= ~SUPERFX_SFR_IRQ;
 			m_irq = 0;
 			m_out_irq_func(m_irq);
@@ -451,7 +451,7 @@ UINT8 superfx_device::mmio_read(UINT32 addr)
 	return 0;
 }
 
-void superfx_device::mmio_write(UINT32 addr, UINT8 data)
+void superfx_device::mmio_write(uint32_t addr, uint8_t data)
 {
 	addr &= 0xffff;
 
@@ -465,7 +465,7 @@ void superfx_device::mmio_write(UINT32 addr, UINT8 data)
 
 	if(addr >= 0x3000 && addr <= 0x301f)
 	{
-		UINT32 n = (addr >> 1) & 0xf;
+		uint32_t n = (addr >> 1) & 0xf;
 		if((addr & 1) == 0)
 		{
 			m_r[n] = (m_r[n] & 0xff00) | data;
@@ -486,7 +486,7 @@ void superfx_device::mmio_write(UINT32 addr, UINT8 data)
 	{
 		case 0x3030:
 		{
-			UINT8 g = (m_sfr & SUPERFX_SFR_G) ? 1 : 0;
+			uint8_t g = (m_sfr & SUPERFX_SFR_G) ? 1 : 0;
 			m_sfr = (m_sfr & 0xff00) | (data << 0);
 			if(g == 1 && !(m_sfr & SUPERFX_SFR_G))
 			{
@@ -529,7 +529,7 @@ void superfx_device::mmio_write(UINT32 addr, UINT8 data)
 	}
 }
 
-void superfx_device::superfx_add_clocks_internal(UINT32 clocks)
+void superfx_device::superfx_add_clocks_internal(uint32_t clocks)
 {
 	if(m_romcl)
 	{
@@ -564,7 +564,7 @@ void superfx_device::superfx_timing_reset()
 	m_ramdr = 0;
 }
 
-void superfx_device::add_clocks(INT32 clocks)
+void superfx_device::add_clocks(int32_t clocks)
 {
 	superfx_add_clocks_internal(clocks);
 }
@@ -763,7 +763,7 @@ void superfx_device::superfx_dreg_sfr_sz_update()
 
 void superfx_device::execute_run()
 {
-	UINT8 op;
+	uint8_t op;
 
 	if(!(m_sfr & SUPERFX_SFR_G))
 	{
@@ -817,7 +817,7 @@ void superfx_device::execute_run()
 				break;
 			case 0x04: // ROL
 			{
-				UINT16 carry = *(m_sreg) & 0x8000;
+				uint16_t carry = *(m_sreg) & 0x8000;
 				superfx_gpr_write(m_dreg_idx, (*(m_sreg) << 1) | SUPERFX_SFR_CY_SET);
 				m_sfr &= ~SUPERFX_SFR_CY;
 				m_sfr |= carry ? SUPERFX_SFR_CY : 0;
@@ -827,13 +827,13 @@ void superfx_device::execute_run()
 			}
 			case 0x05: // BRA
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				superfx_gpr_write(15, m_r[15] + e);
 				break;
 			}
 			case 0x06: // BLT
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				if((SUPERFX_SFR_S_SET ^ SUPERFX_SFR_OV_SET) == 0)
 				{
 					superfx_gpr_write(15, m_r[15] + e);
@@ -842,7 +842,7 @@ void superfx_device::execute_run()
 			}
 			case 0x07: // BGE
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				if((SUPERFX_SFR_S_SET ^ SUPERFX_SFR_OV_SET) == 1)
 				{
 					superfx_gpr_write(15, m_r[15] + e);
@@ -851,7 +851,7 @@ void superfx_device::execute_run()
 			}
 			case 0x08: // BNE
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				if(SUPERFX_SFR_Z_SET == 0)
 				{
 					superfx_gpr_write(15, m_r[15] + e);
@@ -860,7 +860,7 @@ void superfx_device::execute_run()
 			}
 			case 0x09: // BEQ
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				if(SUPERFX_SFR_Z_SET == 1)
 				{
 					superfx_gpr_write(15, m_r[15] + e);
@@ -869,7 +869,7 @@ void superfx_device::execute_run()
 			}
 			case 0x0a: // BPL
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				if(SUPERFX_SFR_S_SET == 0)
 				{
 					superfx_gpr_write(15, m_r[15] + e);
@@ -878,7 +878,7 @@ void superfx_device::execute_run()
 			}
 			case 0x0b: // BMI
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				if(SUPERFX_SFR_S_SET == 1)
 				{
 					superfx_gpr_write(15, m_r[15] + e);
@@ -887,7 +887,7 @@ void superfx_device::execute_run()
 			}
 			case 0x0c: // BCC
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				if(SUPERFX_SFR_CY_SET == 0)
 				{
 					superfx_gpr_write(15, m_r[15] + e);
@@ -896,7 +896,7 @@ void superfx_device::execute_run()
 			}
 			case 0x0d: // BCS
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				if(SUPERFX_SFR_CY_SET == 1)
 				{
 					superfx_gpr_write(15, m_r[15] + e);
@@ -905,7 +905,7 @@ void superfx_device::execute_run()
 			}
 			case 0x0e: // BVC
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				if(SUPERFX_SFR_OV_SET == 0)
 				{
 					superfx_gpr_write(15, m_r[15] + e);
@@ -914,7 +914,7 @@ void superfx_device::execute_run()
 			}
 			case 0x0f: // BVS
 			{
-				INT32 e = (INT8)superfx_pipe();
+				int32_t e = (int8_t)superfx_pipe();
 				if(SUPERFX_SFR_OV_SET == 1)
 				{
 					superfx_gpr_write(15, m_r[15] + e);
@@ -991,7 +991,7 @@ void superfx_device::execute_run()
 			case 0x46: case 0x47: case 0x48: case 0x49: case 0x4a: case 0x4b:   // LDW_IR / LDB_IR
 				if((m_sfr & SUPERFX_SFR_ALT1) == 0)
 				{ // LDW_IR
-					UINT16 data;
+					uint16_t data;
 					m_ramaddr = m_r[op & 0xf];
 					data  = superfx_rambuffer_read(m_ramaddr ^ 0) << 0;
 					data |= superfx_rambuffer_read(m_ramaddr ^ 1) << 8;
@@ -1049,7 +1049,7 @@ void superfx_device::execute_run()
 			case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
 			case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f: // ADD / ADC / ADDI / ADCI
 			{
-				INT32 r = *(m_sreg);
+				int32_t r = *(m_sreg);
 				m_sfr &= ~(SUPERFX_SFR_OV | SUPERFX_SFR_S | SUPERFX_SFR_Z);
 				switch(m_sfr & SUPERFX_SFR_ALT)
 				{
@@ -1073,7 +1073,7 @@ void superfx_device::execute_run()
 				m_sfr &= ~SUPERFX_SFR_CY;
 				m_sfr |= (r & 0x8000) ? SUPERFX_SFR_S : 0;
 				m_sfr |= (r >= 0x10000) ? SUPERFX_SFR_CY : 0;
-				m_sfr |= ((UINT16)r == 0) ? SUPERFX_SFR_Z : 0;
+				m_sfr |= ((uint16_t)r == 0) ? SUPERFX_SFR_Z : 0;
 				superfx_gpr_write(m_dreg_idx, r);
 				superfx_regs_reset();
 				break;
@@ -1082,7 +1082,7 @@ void superfx_device::execute_run()
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f: // SUB / SBC / SUBI / CMP
 			{
-				INT32 r = 0;
+				int32_t r = 0;
 				m_sfr &= ~(SUPERFX_SFR_OV | SUPERFX_SFR_S | SUPERFX_SFR_Z);
 				switch(m_sfr & SUPERFX_SFR_ALT)
 				{
@@ -1109,7 +1109,7 @@ void superfx_device::execute_run()
 				m_sfr &= ~SUPERFX_SFR_CY;
 				m_sfr |= (r & 0x8000) ? SUPERFX_SFR_S : 0;
 				m_sfr |= (r >= 0x0) ? SUPERFX_SFR_CY : 0;
-				m_sfr |= ((UINT16)r == 0) ? SUPERFX_SFR_Z : 0;
+				m_sfr |= ((uint16_t)r == 0) ? SUPERFX_SFR_Z : 0;
 				superfx_regs_reset();
 				break;
 			}
@@ -1150,16 +1150,16 @@ void superfx_device::execute_run()
 				switch(m_sfr & SUPERFX_SFR_ALT)
 				{
 					case SUPERFX_SFR_ALT0: // MULT
-						superfx_gpr_write(m_dreg_idx, (INT8)(*(m_sreg)) * (INT8)(m_r[op & 0xf]));
+						superfx_gpr_write(m_dreg_idx, (int8_t)(*(m_sreg)) * (int8_t)(m_r[op & 0xf]));
 						break;
 					case SUPERFX_SFR_ALT1: // UMULT
-						superfx_gpr_write(m_dreg_idx, (UINT8)(*(m_sreg)) * (UINT8)(m_r[op & 0xf]));
+						superfx_gpr_write(m_dreg_idx, (uint8_t)(*(m_sreg)) * (uint8_t)(m_r[op & 0xf]));
 						break;
 					case SUPERFX_SFR_ALT2: // MULTI
-						superfx_gpr_write(m_dreg_idx, (INT8)(*(m_sreg)) * (INT8)(op & 0xf));
+						superfx_gpr_write(m_dreg_idx, (int8_t)(*(m_sreg)) * (int8_t)(op & 0xf));
 						break;
 					case SUPERFX_SFR_ALT3: // UMULTI
-						superfx_gpr_write(m_dreg_idx, (UINT8)(*(m_sreg)) * (UINT8)(op & 0xf));
+						superfx_gpr_write(m_dreg_idx, (uint8_t)(*(m_sreg)) * (uint8_t)(op & 0xf));
 						break;
 				}
 				superfx_dreg_sfr_sz_update();
@@ -1182,7 +1182,7 @@ void superfx_device::execute_run()
 				break;
 
 			case 0x95: // SEX
-				superfx_gpr_write(m_dreg_idx, (INT8)(*(m_sreg)));
+				superfx_gpr_write(m_dreg_idx, (int8_t)(*(m_sreg)));
 				superfx_dreg_sfr_sz_update();
 				superfx_regs_reset();
 				break;
@@ -1192,7 +1192,7 @@ void superfx_device::execute_run()
 				{ // ASR
 					m_sfr &= ~SUPERFX_SFR_CY;
 					m_sfr |= (*(m_sreg) & 1) ? SUPERFX_SFR_CY : 0;
-					superfx_gpr_write(m_dreg_idx, (INT16)(*(m_sreg)) >> 1);
+					superfx_gpr_write(m_dreg_idx, (int16_t)(*(m_sreg)) >> 1);
 					superfx_dreg_sfr_sz_update();
 					superfx_regs_reset();
 				}
@@ -1200,7 +1200,7 @@ void superfx_device::execute_run()
 				{ // DIV2
 					m_sfr &= ~SUPERFX_SFR_CY;
 					m_sfr |= (*(m_sreg) & 1) ? SUPERFX_SFR_CY : 0;
-					superfx_gpr_write(m_dreg_idx, ((INT16)(*(m_sreg)) >> 1) + ((UINT32)(*(m_sreg) + 1) >> 16));
+					superfx_gpr_write(m_dreg_idx, ((int16_t)(*(m_sreg)) >> 1) + ((uint32_t)(*(m_sreg) + 1) >> 16));
 					superfx_dreg_sfr_sz_update();
 					superfx_regs_reset();
 				}
@@ -1208,8 +1208,8 @@ void superfx_device::execute_run()
 
 			case 0x97: // ROR
 			{
-				UINT16 carry = *(m_sreg) & 1;
-				superfx_gpr_write(m_dreg_idx, (SUPERFX_SFR_CY_SET << 15) | ((UINT16)(*(m_sreg)) >> 1));
+				uint16_t carry = *(m_sreg) & 1;
+				superfx_gpr_write(m_dreg_idx, (SUPERFX_SFR_CY_SET << 15) | ((uint16_t)(*(m_sreg)) >> 1));
 				m_sfr &= ~SUPERFX_SFR_CY;
 				m_sfr |= carry ? SUPERFX_SFR_CY : 0;
 				superfx_dreg_sfr_sz_update();
@@ -1234,7 +1234,7 @@ void superfx_device::execute_run()
 				break;
 
 			case 0x9e: // LOB
-				superfx_gpr_write(m_dreg_idx, (UINT16)(*(m_sreg)) & 0x00ff);
+				superfx_gpr_write(m_dreg_idx, (uint16_t)(*(m_sreg)) & 0x00ff);
 				m_sfr &= ~(SUPERFX_SFR_S | SUPERFX_SFR_Z);
 				m_sfr |= (*(m_dreg) & 0x80) ? SUPERFX_SFR_S : 0;
 				m_sfr |= (*(m_dreg) == 0) ? SUPERFX_SFR_Z : 0;
@@ -1243,7 +1243,7 @@ void superfx_device::execute_run()
 
 			case 0x9f: // FMULT / LMULT
 			{
-				UINT32 result = (INT16)(*(m_sreg)) * (INT16)(m_r[6]);
+				uint32_t result = (int16_t)(*(m_sreg)) * (int16_t)(m_r[6]);
 				if(m_sfr & SUPERFX_SFR_ALT1)
 				{ // LMULT
 					superfx_gpr_write(4, result);
@@ -1262,7 +1262,7 @@ void superfx_device::execute_run()
 				switch(m_sfr & SUPERFX_SFR_ALT)
 				{
 					case SUPERFX_SFR_ALT0: // IBT
-						superfx_gpr_write(op & 0xf, (INT8)superfx_pipe());
+						superfx_gpr_write(op & 0xf, (int8_t)superfx_pipe());
 						superfx_regs_reset();
 						break;
 					case SUPERFX_SFR_ALT2: // SMS
@@ -1274,7 +1274,7 @@ void superfx_device::execute_run()
 					case SUPERFX_SFR_ALT1: // LMS
 					case SUPERFX_SFR_ALT3: // LMS
 					{
-						UINT16 data;
+						uint16_t data;
 						m_ramaddr = superfx_pipe() << 1;
 						data  = superfx_rambuffer_read(m_ramaddr ^ 0) << 0;
 						data |= superfx_rambuffer_read(m_ramaddr ^ 1) << 8;
@@ -1372,7 +1372,7 @@ void superfx_device::execute_run()
 
 			case 0xef: // GETB / GETBH / GETBL / GETBS
 			{
-				UINT8 byte = superfx_rombuffer_read();
+				uint8_t byte = superfx_rombuffer_read();
 				switch(m_sfr & SUPERFX_SFR_ALT)
 				{
 					case SUPERFX_SFR_ALT0: // GETB
@@ -1385,7 +1385,7 @@ void superfx_device::execute_run()
 						superfx_gpr_write(m_dreg_idx, (*(m_sreg) & 0xff00) | (byte << 0));
 						break;
 					case SUPERFX_SFR_ALT3: // GETBS
-						superfx_gpr_write(m_dreg_idx, (INT8)byte);
+						superfx_gpr_write(m_dreg_idx, (int8_t)byte);
 						break;
 				}
 				superfx_regs_reset();
@@ -1395,7 +1395,7 @@ void superfx_device::execute_run()
 			case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 			case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff: // IWT / LM / SM / LM
 			{
-				UINT16 data;
+				uint16_t data;
 				switch(m_sfr & SUPERFX_SFR_ALT)
 				{
 					case SUPERFX_SFR_ALT0: // IWT
@@ -1439,14 +1439,14 @@ void superfx_device::execute_run()
 }
 
 
-offs_t superfx_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t superfx_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-extern offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 param1, UINT16 alt);
+extern offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uint8_t param1, uint16_t alt);
 
-	UINT8  op = *(UINT8 *)(opram + 0);
-	UINT8  param0 = *(UINT8 *)(opram + 1);
-	UINT8  param1 = *(UINT8 *)(opram + 2);
-	UINT16 alt = m_sfr & SUPERFX_SFR_ALT;
+	uint8_t  op = *(uint8_t *)(opram + 0);
+	uint8_t  param0 = *(uint8_t *)(opram + 1);
+	uint8_t  param1 = *(uint8_t *)(opram + 2);
+	uint16_t alt = m_sfr & SUPERFX_SFR_ALT;
 
 	return superfx_dasm_one(buffer, pc, op, param0, param1, alt);
 }

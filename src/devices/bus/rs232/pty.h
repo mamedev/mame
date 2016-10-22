@@ -12,7 +12,7 @@ class pseudo_terminal_device : public device_t,
 								public device_pty_interface
 {
 public:
-		pseudo_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		pseudo_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 		virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override {
 				device_serial_interface::rx_w(state);
@@ -39,9 +39,9 @@ private:
 		required_ioport m_rs232_parity;
 		required_ioport m_rs232_stopbits;
 
-		UINT8 m_input_buffer[ 1024 ];
-		UINT32 m_input_count;
-		UINT32 m_input_index;
+		uint8_t m_input_buffer[ 1024 ];
+		uint32_t m_input_count;
+		uint32_t m_input_index;
 		emu_timer *m_timer_poll;
 
 		void queue(void);

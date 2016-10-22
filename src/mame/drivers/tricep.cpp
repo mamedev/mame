@@ -29,7 +29,7 @@ public:
 	DECLARE_READ16_MEMBER(tricep_terminal_r);
 	DECLARE_WRITE16_MEMBER(tricep_terminal_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	required_shared_ptr<UINT16> m_p_ram;
+	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
 };
 
@@ -59,9 +59,9 @@ INPUT_PORTS_END
 
 void tricep_state::machine_reset()
 {
-	UINT8* user1 = memregion("user1")->base();
+	uint8_t* user1 = memregion("user1")->base();
 
-	memcpy((UINT8*)m_p_ram.target(),user1,0x2000);
+	memcpy((uint8_t*)m_p_ram.target(),user1,0x2000);
 
 	m_maincpu->reset();
 }

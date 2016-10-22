@@ -39,14 +39,14 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	UINT16 m_r;                         // MCU R-pins data
-	UINT16 m_o;                         // MCU O-pins data
-	UINT32 m_inp_mux;                   // multiplexed inputs mask
+	uint16_t m_r;                         // MCU R-pins data
+	uint16_t m_o;                         // MCU O-pins data
+	uint32_t m_inp_mux;                   // multiplexed inputs mask
 	bool m_power_on;
 	bool m_power_led;
 
-	UINT8 read_inputs(int columns);
-	UINT8 read_rotated_inputs(int columns, UINT8 rowmask = 0xf);
+	uint8_t read_inputs(int columns);
+	uint8_t read_rotated_inputs(int columns, uint8_t rowmask = 0xf);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 
@@ -55,19 +55,19 @@ public:
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
 
-	UINT32 m_grid;                      // VFD/LED current row data
-	UINT32 m_plate;                     // VFD/LED current column data
+	uint32_t m_grid;                      // VFD/LED current row data
+	uint32_t m_plate;                     // VFD/LED current column data
 
-	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	UINT32 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x20];  // (internal use)
+	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
+	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	uint32_t m_display_cache[0x20];       // (internal use)
+	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(UINT32 digits, UINT32 mask);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update = true);
+	void set_display_segmask(uint32_t digits, uint32_t mask);
+	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;

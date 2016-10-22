@@ -31,7 +31,7 @@ class generic_latch_8_device : public device_t
 {
 public:
 	// construction/destruction
-	generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -41,15 +41,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( preset_w );
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
 
-	void preset_w(UINT16 value) { m_latched_value = value; }
+	void preset_w(uint16_t value) { m_latched_value = value; }
 
 protected:
 	virtual void device_start() override;
 
-	void sync_callback(void *ptr, INT32 param);
+	void sync_callback(void *ptr, int32_t param);
 private:
-	UINT16                  m_latched_value;
-	UINT8                   m_latch_read;
+	uint16_t                  m_latched_value;
+	uint8_t                   m_latch_read;
 };
 
 // device type definition
@@ -62,7 +62,7 @@ class generic_latch_16_device : public device_t
 {
 public:
 	// construction/destruction
-	generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
@@ -75,10 +75,10 @@ public:
 protected:
 	virtual void device_start() override;
 
-	void sync_callback(void *ptr, INT32 param);
+	void sync_callback(void *ptr, int32_t param);
 private:
-	UINT16                  m_latched_value;
-	UINT8                   m_latch_read;
+	uint16_t                  m_latched_value;
+	uint8_t                   m_latch_read;
 };
 
 // device type definition

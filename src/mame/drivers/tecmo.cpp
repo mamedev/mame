@@ -105,7 +105,7 @@ WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base();
+		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ROM[m_adpcm_pos++];
 		m_msm->data_w(m_adpcm_data >> 4);
@@ -115,28 +115,28 @@ WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
 /* the 8-bit dipswitches are split across addresses */
 READ8_MEMBER(tecmo_state::dswa_l_r)
 {
-	UINT8 port = ioport("DSWA")->read();
+	uint8_t port = ioport("DSWA")->read();
 	port &= 0x0f;
 	return port;
 }
 
 READ8_MEMBER(tecmo_state::dswa_h_r)
 {
-	UINT8 port = ioport("DSWA")->read();
+	uint8_t port = ioport("DSWA")->read();
 	port &= 0xf0;
 	return port>>4;
 }
 
 READ8_MEMBER(tecmo_state::dswb_l_r)
 {
-	UINT8 port = ioport("DSWB")->read();
+	uint8_t port = ioport("DSWB")->read();
 	port &= 0x0f;
 	return port;
 }
 
 READ8_MEMBER(tecmo_state::dswb_h_r)
 {
-	UINT8 port = ioport("DSWB")->read();
+	uint8_t port = ioport("DSWB")->read();
 	port &= 0xf0;
 	return port>>4;
 }

@@ -80,11 +80,11 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(maygayep_state,maygayep)
 {
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 
 	for (int i=0x100;i<0x210;i++)
 	{
-		UINT8 val = src[i^1];
+		uint8_t val = src[i^1];
 
 		if (i%0x40 == 0) printf("\n");
 

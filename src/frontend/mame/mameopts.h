@@ -50,7 +50,7 @@ class software_part;
 
 class mame_options
 {
-	static const UINT32 OPTION_FLAG_DEVICE = 0x80000000;
+	static const uint32_t OPTION_FLAG_DEVICE = 0x80000000;
 
 public:
 	// parsing wrappers

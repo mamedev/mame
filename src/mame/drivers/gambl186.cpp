@@ -67,7 +67,7 @@ public:
 	optional_device<upd7759_device> m_upd7759;
 	int m_comms_state;
 	int m_comms_ind;
-	UINT8 m_comms_data[1002];
+	uint8_t m_comms_data[1002];
 	int m_comms_cmd;
 	int m_comms_expect;
 	int m_comms_blocks;
@@ -85,11 +85,11 @@ void gambl186_state::machine_start()
 	membank("data_bank")->configure_entries(0, 4, memregion("data")->base(), 0x40000);
 }
 
-static const UINT8 password[] = {5, 2, 0, 3, 0, 0, 2, 4, 5, 6, 0x16};
+static const uint8_t password[] = {5, 2, 0, 3, 0, 0, 2, 4, 5, 6, 0x16};
 
 READ16_MEMBER(gambl186_state::comms_r)
 {
-	UINT16 retval = 0;
+	uint16_t retval = 0;
 
 	if ((offset == 0) && ACCESSING_BITS_0_7) //port 680 == data
 	{
@@ -292,7 +292,7 @@ WRITE16_MEMBER(gambl186_state::comms_w)
 					data = 5;
 				}
 
-				m_comms_data[++m_comms_ind] = (UINT8) data;
+				m_comms_data[++m_comms_ind] = (uint8_t) data;
 			}
 
 			m_comms_ack = false;

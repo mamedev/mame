@@ -53,14 +53,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 private:
-	UINT8 m_port08;
-	UINT8 m_port09;
-	UINT8 *m_p_prom;
+	uint8_t m_port08;
+	uint8_t m_port09;
+	uint8_t *m_p_prom;
 	bool m_ipl;
 	offs_t m_curr_bank;
 	floppy_image_device *m_floppy;
-	UINT8 convert(offs_t offset, bool state);
-	void setup_banks(UINT8 source);
+	uint8_t convert(offs_t offset, bool state);
+	void setup_banks(uint8_t source);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio0;
@@ -111,9 +111,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( altos5 )
 INPUT_PORTS_END
 
-UINT8 altos5_state::convert(offs_t offset, bool state)
+uint8_t altos5_state::convert(offs_t offset, bool state)
 {
-	UINT8 data = m_p_prom[offset];
+	uint8_t data = m_p_prom[offset];
 
 	// if IPL and /A12, point at rom
 	if (!state && m_ipl && !BIT(offset, 0))
@@ -128,7 +128,7 @@ UINT8 altos5_state::convert(offs_t offset, bool state)
 	return data & 0x3f;
 }
 
-void altos5_state::setup_banks(UINT8 source)
+void altos5_state::setup_banks(uint8_t source)
 {
 	offs_t offs,temp;
 	// WPRT | template | dma bank / cpu bank
@@ -267,9 +267,9 @@ d7: IRQ from FDC
 */
 READ8_MEMBER( altos5_state::port08_r )
 {
-	UINT8 data = m_port08 | 0x87;
+	uint8_t data = m_port08 | 0x87;
 	if (m_floppy)
-		data |= ((UINT8)m_floppy->twosid_r() << 3); // get number of sides
+		data |= ((uint8_t)m_floppy->twosid_r() << 3); // get number of sides
 	return data;
 }
 
@@ -324,7 +324,7 @@ SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( altos5_state::fdc_intrq_w )
 {
-	UINT8 data = m_port08 | ((UINT8)(state) << 7);
+	uint8_t data = m_port08 | ((uint8_t)(state) << 7);
 	m_pio0->port_a_write(data);
 }
 
@@ -332,7 +332,7 @@ DRIVER_INIT_MEMBER( altos5_state, altos5 )
 {
 	m_p_prom =  memregion("proms")->base();
 
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entries(0, 50, &RAM[0], 0x1000);
 	membank("bankr1")->configure_entries(0, 50, &RAM[0], 0x1000);

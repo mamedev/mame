@@ -25,8 +25,8 @@ class atari_cage_device : public device_t
 {
 public:
 	// construction/destruction
-	atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void static_set_speedup(device_t &device, offs_t speedup) { downcast<atari_cage_device &>(device).m_speedup = speedup; }
 	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<atari_cage_device &>(device).m_irqhandler.set_callback(object); }
@@ -36,11 +36,11 @@ public:
 
 	void reset_w(int state);
 
-	UINT16 main_r();
-	void main_w(UINT16 data);
+	uint16_t main_r();
+	void main_w(uint16_t data);
 
-	UINT16 control_r();
-	void control_w(UINT16 data);
+	uint16_t control_r();
+	void control_w(uint16_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 	void update_dma_state(address_space &space);
@@ -62,31 +62,31 @@ protected:
 	virtual void device_start() override;
 
 private:
-	required_shared_ptr<UINT32> m_cageram;
+	required_shared_ptr<uint32_t> m_cageram;
 	cpu_device *m_cpu;
 	required_device<generic_latch_16_device> m_soundlatch;
 	attotime m_cpu_h1_clock_period;
 
-	UINT8 m_cpu_to_cage_ready;
-	UINT8 m_cage_to_cpu_ready;
+	uint8_t m_cpu_to_cage_ready;
+	uint8_t m_cage_to_cpu_ready;
 
 	devcb_write8 m_irqhandler;
 
 
 	attotime m_serial_period_per_word;
 
-	UINT8 m_dma_enabled;
-	UINT8 m_dma_timer_enabled;
+	uint8_t m_dma_enabled;
+	uint8_t m_dma_timer_enabled;
 	timer_device *m_dma_timer;
 
-	UINT8 m_timer_enabled[2];
+	uint8_t m_timer_enabled[2];
 	timer_device *m_timer[2];
 
-	UINT32 m_tms32031_io_regs[0x100];
-	UINT16 m_from_main;
-	UINT16 m_control;
+	uint32_t m_tms32031_io_regs[0x100];
+	uint16_t m_from_main;
+	uint16_t m_control;
 
-	UINT32 *m_speedup_ram;
+	uint32_t *m_speedup_ram;
 	dmadac_sound_device *m_dmadac[4];
 
 	offs_t m_speedup;
@@ -100,7 +100,7 @@ class atari_cage_seattle_device : public atari_cage_device
 {
 public:
 	// construction/destruction
-	atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

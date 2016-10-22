@@ -46,15 +46,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	TIMER_CALLBACK_MEMBER(irisha_key);
-	UINT32 screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<UINT8> m_p_videoram;
+	uint32_t screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<uint8_t> m_p_videoram;
 
 private:
 	bool m_sg1_line;
 	bool m_keypressed;
-	UINT8 m_keyboard_cnt;
-	UINT8 m_ppi_porta;
-	UINT8 m_ppi_portc;
+	uint8_t m_keyboard_cnt;
+	uint8_t m_ppi_porta;
+	uint8_t m_ppi_portc;
 	void update_speaker();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -191,11 +191,11 @@ INPUT_PORTS_END
 
 *************************************************/
 
-UINT32 irisha_state::screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t irisha_state::screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 gfx;
-	UINT16 y,ma=0,x;
-	UINT16 *p;
+	uint8_t gfx;
+	uint16_t y,ma=0,x;
+	uint16_t *p;
 
 	for (y = 0; y < 200; y++)
 	{
@@ -324,7 +324,7 @@ TIMER_CALLBACK_MEMBER(irisha_state::irisha_key)
 
 READ8_MEMBER(irisha_state::irisha_keyboard_r)
 {
-	UINT8 keycode;
+	uint8_t keycode;
 
 	if (m_keyboard_cnt!=0 && m_keyboard_cnt<11)
 		keycode = m_io_ports[m_keyboard_cnt-1]->read() ^ 0xff;
@@ -356,7 +356,7 @@ void irisha_state::machine_start()
 		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
 	};
 
-	for ( UINT8 i = 0; i < 10; i++ )
+	for ( uint8_t i = 0; i < 10; i++ )
 		m_io_ports[i] = ioport( keynames[i] );
 
 	machine().scheduler().timer_pulse(attotime::from_msec(30), timer_expired_delegate(FUNC(irisha_state::irisha_key),this));

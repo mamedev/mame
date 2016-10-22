@@ -197,7 +197,7 @@ WRITE8_MEMBER(thedeep_state::p1_w)
 
 READ8_MEMBER(thedeep_state::from_main_r)
 {
-	static UINT8 res;
+	static uint8_t res;
 
 	res = 0x11;
 
@@ -230,7 +230,7 @@ WRITE8_MEMBER(thedeep_state::p3_w)
 
 READ8_MEMBER(thedeep_state::p0_r)
 {
-	UINT8 coin_mux;
+	uint8_t coin_mux;
 
 	coin_mux = ((ioport("COINS")->read() & 0x0e) == 0x0e); // bit 0 is hard-wired to ALL three coin latches
 

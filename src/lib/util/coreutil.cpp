@@ -27,9 +27,9 @@ int bcd_adjust(int value)
 }
 
 
-UINT32 dec_2_bcd(UINT32 a)
+uint32_t dec_2_bcd(uint32_t a)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	int shift = 0;
 
 	while (a != 0)
@@ -42,10 +42,10 @@ UINT32 dec_2_bcd(UINT32 a)
 }
 
 
-UINT32 bcd_2_dec(UINT32 a)
+uint32_t bcd_2_dec(uint32_t a)
 {
-	UINT32 result = 0;
-	UINT32 scale = 1;
+	uint32_t result = 0;
+	uint32_t scale = 1;
 
 	while (a != 0)
 	{
@@ -106,19 +106,19 @@ int gregorian_days_in_month(int month, int year)
 
 void rand_memory(void *memory, size_t length)
 {
-	static UINT32 seed = 0;
-	UINT8 *bytes = (UINT8 *) memory;
+	static uint32_t seed = 0;
+	uint8_t *bytes = (uint8_t *) memory;
 	size_t i;
 
 	for (i = 0; i < length; i++)
 	{
 		seed = seed * 214013 + 2531011;
-		bytes[i] = (UINT8) (seed >> 16);
+		bytes[i] = (uint8_t) (seed >> 16);
 	}
 }
 
 
-UINT32 core_crc32(UINT32 crc, const UINT8 *buf, UINT32 len)
+uint32_t core_crc32(uint32_t crc, const uint8_t *buf, uint32_t len)
 {
 	return crc32(crc, buf, len);
 }

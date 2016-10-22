@@ -3,9 +3,9 @@
 #include "emu.h"
 #include "scspdsp.h"
 
-static UINT16 PACK(INT32 val)
+static uint16_t PACK(int32_t val)
 {
-	UINT32 temp;
+	uint32_t temp;
 	int sign,exponent,k;
 
 	sign = (val >> 23) & 0x1;
@@ -27,13 +27,13 @@ static UINT16 PACK(INT32 val)
 	val |= sign << 15;
 	val |= exponent << 11;
 
-	return (UINT16)val;
+	return (uint16_t)val;
 }
 
-static INT32 UNPACK(UINT16 val)
+static int32_t UNPACK(uint16_t val)
 {
 	int sign,exponent,mantissa;
-	INT32 uval;
+	int32_t uval;
 
 	sign = (val >> 15) & 0x1;
 	exponent = (val >> 11) & 0xF;
@@ -63,17 +63,17 @@ void SCSPDSP_Init(SCSPDSP *DSP)
 
 void SCSPDSP_Step(SCSPDSP *DSP)
 {
-	INT32 ACC=0;    //26 bit
-	INT32 SHIFTED=0;    //24 bit
-	INT32 X;  //24 bit
-	INT32 Y=0;  //13 bit
-	INT32 B;  //26 bit
-	INT32 INPUTS; //24 bit
-	INT32 MEMVAL=0;
-	INT32 FRC_REG=0;    //13 bit
-	INT32 Y_REG=0;      //24 bit
-	UINT32 ADDR;
-	UINT32 ADRS_REG=0;  //13 bit
+	int32_t ACC=0;    //26 bit
+	int32_t SHIFTED=0;    //24 bit
+	int32_t X;  //24 bit
+	int32_t Y=0;  //13 bit
+	int32_t B;  //26 bit
+	int32_t INPUTS; //24 bit
+	int32_t MEMVAL=0;
+	int32_t FRC_REG=0;    //13 bit
+	int32_t Y_REG=0;      //24 bit
+	uint32_t ADDR;
+	uint32_t ADRS_REG=0;  //13 bit
 	int step;
 
 	if(DSP->Stopped)
@@ -88,42 +88,42 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 #endif
 	for(step=0;step</*128*/DSP->LastStep;++step)
 	{
-		UINT16 *IPtr=DSP->MPRO+step*4;
+		uint16_t *IPtr=DSP->MPRO+step*4;
 
 //      if(IPtr[0]==0 && IPtr[1]==0 && IPtr[2]==0 && IPtr[3]==0)
 //          break;
 
-		UINT32 TRA=(IPtr[0]>>8)&0x7F;
-		UINT32 TWT=(IPtr[0]>>7)&0x01;
-		UINT32 TWA=(IPtr[0]>>0)&0x7F;
+		uint32_t TRA=(IPtr[0]>>8)&0x7F;
+		uint32_t TWT=(IPtr[0]>>7)&0x01;
+		uint32_t TWA=(IPtr[0]>>0)&0x7F;
 
-		UINT32 XSEL=(IPtr[1]>>15)&0x01;
-		UINT32 YSEL=(IPtr[1]>>13)&0x03;
-		UINT32 IRA=(IPtr[1]>>6)&0x3F;
-		UINT32 IWT=(IPtr[1]>>5)&0x01;
-		UINT32 IWA=(IPtr[1]>>0)&0x1F;
+		uint32_t XSEL=(IPtr[1]>>15)&0x01;
+		uint32_t YSEL=(IPtr[1]>>13)&0x03;
+		uint32_t IRA=(IPtr[1]>>6)&0x3F;
+		uint32_t IWT=(IPtr[1]>>5)&0x01;
+		uint32_t IWA=(IPtr[1]>>0)&0x1F;
 
-		UINT32 TABLE=(IPtr[2]>>15)&0x01;
-		UINT32 MWT=(IPtr[2]>>14)&0x01;
-		UINT32 MRD=(IPtr[2]>>13)&0x01;
-		UINT32 EWT=(IPtr[2]>>12)&0x01;
-		UINT32 EWA=(IPtr[2]>>8)&0x0F;
-		UINT32 ADRL=(IPtr[2]>>7)&0x01;
-		UINT32 FRCL=(IPtr[2]>>6)&0x01;
-		UINT32 SHIFT=(IPtr[2]>>4)&0x03;
-		UINT32 YRL=(IPtr[2]>>3)&0x01;
-		UINT32 NEGB=(IPtr[2]>>2)&0x01;
-		UINT32 ZERO=(IPtr[2]>>1)&0x01;
-		UINT32 BSEL=(IPtr[2]>>0)&0x01;
+		uint32_t TABLE=(IPtr[2]>>15)&0x01;
+		uint32_t MWT=(IPtr[2]>>14)&0x01;
+		uint32_t MRD=(IPtr[2]>>13)&0x01;
+		uint32_t EWT=(IPtr[2]>>12)&0x01;
+		uint32_t EWA=(IPtr[2]>>8)&0x0F;
+		uint32_t ADRL=(IPtr[2]>>7)&0x01;
+		uint32_t FRCL=(IPtr[2]>>6)&0x01;
+		uint32_t SHIFT=(IPtr[2]>>4)&0x03;
+		uint32_t YRL=(IPtr[2]>>3)&0x01;
+		uint32_t NEGB=(IPtr[2]>>2)&0x01;
+		uint32_t ZERO=(IPtr[2]>>1)&0x01;
+		uint32_t BSEL=(IPtr[2]>>0)&0x01;
 
-		UINT32 NOFL=(IPtr[3]>>15)&1;        //????
-		UINT32 COEF=(IPtr[3]>>9)&0x3f;
+		uint32_t NOFL=(IPtr[3]>>15)&1;        //????
+		uint32_t COEF=(IPtr[3]>>9)&0x3f;
 
-		UINT32 MASA=(IPtr[3]>>2)&0x1f;  //???
-		UINT32 ADREB=(IPtr[3]>>1)&0x1;
-		UINT32 NXADR=(IPtr[3]>>0)&0x1;
+		uint32_t MASA=(IPtr[3]>>2)&0x1f;  //???
+		uint32_t ADREB=(IPtr[3]>>1)&0x1;
+		uint32_t NXADR=(IPtr[3]>>0)&0x1;
 
-		INT64 v;
+		int64_t v;
 
 		//operations are done at 24 bit precision
 #if 0
@@ -264,7 +264,7 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 		//if(Y&0x1000)
 		//  Y|=0xFFFFF000;
 
-		v=(((INT64) X*(INT64) Y)>>12);
+		v=(((int64_t) X*(int64_t) Y)>>12);
 		ACC=(int) v+B;
 
 		if(TWT)
@@ -331,7 +331,7 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 //      fclose(f);
 }
 
-void SCSPDSP_SetSample(SCSPDSP *DSP,INT32 sample,int SEL,int MXL)
+void SCSPDSP_SetSample(SCSPDSP *DSP,int32_t sample,int SEL,int MXL)
 {
 	//DSP->MIXS[SEL]+=sample<<(MXL+1)/*7*/;
 	DSP->MIXS[SEL]+=sample;
@@ -345,7 +345,7 @@ void SCSPDSP_Start(SCSPDSP *DSP)
 	DSP->Stopped=0;
 	for(i=127;i>=0;--i)
 	{
-		UINT16 *IPtr=DSP->MPRO+i*4;
+		uint16_t *IPtr=DSP->MPRO+i*4;
 
 		if(IPtr[0]!=0 || IPtr[1]!=0 || IPtr[2]!=0 || IPtr[3]!=0)
 			break;

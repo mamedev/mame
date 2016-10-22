@@ -38,16 +38,16 @@ for TI990. */
 /* machine-independent big-endian 32-bit integer */
 struct UINT32BE
 {
-	UINT8 bytes[4];
+	uint8_t bytes[4];
 };
 
-static inline UINT32 get_UINT32BE(UINT32BE word)
+static inline uint32_t get_UINT32BE(UINT32BE word)
 {
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
 #ifdef UNUSED_FUNCTION
-static inline void set_UINT32BE(UINT32BE *word, UINT32 data)
+static inline void set_UINT32BE(UINT32BE *word, uint32_t data)
 {
 	word->bytes[0] = (data >> 24) & 0xff;
 	word->bytes[1] = (data >> 16) & 0xff;
@@ -119,7 +119,7 @@ enum
 };
 
 /* masks for computer-controlled bit in each controller register  */
-static const UINT16 w_mask[8] =
+static const uint16_t w_mask[8] =
 {
 	0x000f,     /* Controllers should prevent overwriting of w0 status bits, and I know
 	            that some controllers do so. */
@@ -422,7 +422,7 @@ void ti990_hdc_device::store_registers()
 	int dma_address;
 	int byte_count;
 
-	UINT16 buffer[3];
+	uint16_t buffer[3];
 	int i, real_word_count;
 
 	int dsk_sel = cur_disk_unit();
@@ -481,7 +481,7 @@ void ti990_hdc_device::write_format()
 	unsigned int cylinder, head, sector;
 	unsigned int lba;
 
-	UINT8 buffer[MAX_SECTOR_SIZE];
+	uint8_t buffer[MAX_SECTOR_SIZE];
 	int bytes_written;
 
 	int dsk_sel = cur_disk_unit();
@@ -554,7 +554,7 @@ void ti990_hdc_device::read_data()
 	unsigned int cylinder, head, sector;
 	unsigned int lba;
 
-	UINT8 buffer[MAX_SECTOR_SIZE];
+	uint8_t buffer[MAX_SECTOR_SIZE];
 	int bytes_to_read;
 	int bytes_read;
 	int i;
@@ -654,8 +654,8 @@ void ti990_hdc_device::write_data()
 	unsigned int cylinder, head, sector;
 	unsigned int lba;
 
-	UINT8 buffer[MAX_SECTOR_SIZE];
-	UINT16 word;
+	uint8_t buffer[MAX_SECTOR_SIZE];
+	uint16_t word;
 	int bytes_written;
 	int i;
 
@@ -765,7 +765,7 @@ void ti990_hdc_device::unformatted_read()
 
 	unsigned int cylinder, head, sector;
 
-	UINT16 buffer[3];
+	uint16_t buffer[3];
 	int i, real_word_count;
 
 	int dsk_sel = cur_disk_unit();
@@ -942,7 +942,7 @@ WRITE16_MEMBER(ti990_hdc_device::write)
 		/* write protect if a command is in progress */
 		if (m_w[7] & w7_idle)
 		{
-			UINT16 old_data = m_w[offset];
+			uint16_t old_data = m_w[offset];
 
 			/* Only write writable bits AND honor byte accesses (ha!) */
 			m_w[offset] = (m_w[offset] & ((~w_mask[offset]) | mem_mask)) | (data & w_mask[offset] & ~mem_mask);
@@ -976,7 +976,7 @@ MACHINE_CONFIG_END
 
 const device_type TI990_HDC = &device_creator<ti990_hdc_device>;
 
-ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI990_HDC, "Generic TI-990 Hard Disk Controller", tag, owner, clock, "hdc_990", __FILE__),
 	m_interrupt_callback(*this)
 {

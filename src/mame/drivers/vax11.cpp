@@ -89,8 +89,8 @@ public:
 	DECLARE_READ16_MEMBER( term_rx_status_r );
 	DECLARE_WRITE16_MEMBER( term_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 m_term_data;
-	UINT16 m_term_status;
+	uint8_t m_term_data;
+	uint16_t m_term_status;
 };
 
 WRITE16_MEMBER(vax11_state::term_w)

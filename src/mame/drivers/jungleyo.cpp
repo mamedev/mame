@@ -54,7 +54,7 @@ public:
 
 	/* video-related */
 	virtual void video_start() override;
-	UINT32 screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -63,7 +63,7 @@ void jungleyo_state::video_start()
 {
 }
 
-UINT32 jungleyo_state::screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jungleyo_state::screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

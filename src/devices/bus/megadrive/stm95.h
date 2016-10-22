@@ -28,10 +28,10 @@ enum STMSTATE
 class stm95_eeprom_device
 {
 public:
-	stm95_eeprom_device(running_machine &machine, UINT8 *eeprom);
+	stm95_eeprom_device(running_machine &machine, uint8_t *eeprom);
 	running_machine &machine() const { return m_machine; }
 
-	UINT8   *eeprom_data;
+	uint8_t   *eeprom_data;
 	void    set_cs_line(int);
 	void    set_halt_line(int state) {}; // not implemented
 	void    set_si_line(int);
@@ -60,8 +60,8 @@ class md_eeprom_stm95_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	md_eeprom_stm95_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	md_eeprom_stm95_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -73,7 +73,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
 
 private:
-	UINT8 m_bank[3];
+	uint8_t m_bank[3];
 	int m_rdcnt;
 
 	std::unique_ptr<stm95_eeprom_device> m_stm95;

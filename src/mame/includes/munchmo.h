@@ -26,12 +26,12 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_sprite_xpos;
-	required_shared_ptr<UINT8> m_sprite_tile;
-	required_shared_ptr<UINT8> m_sprite_attr;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_status_vram;
-	required_shared_ptr<UINT8> m_vreg;
+	required_shared_ptr<uint8_t> m_sprite_xpos;
+	required_shared_ptr<uint8_t> m_sprite_tile;
+	required_shared_ptr<uint8_t> m_sprite_attr;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_status_vram;
+	required_shared_ptr<uint8_t> m_vreg;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
@@ -59,7 +59,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(munchmo);
-	UINT32 screen_update_mnchmobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mnchmobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mnchmobl_vblank_irq);
 	INTERRUPT_GEN_MEMBER(mnchmobl_sound_irq);
 	void draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect );

@@ -113,14 +113,14 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	UINT32* m_cpuregion;
-	std::unique_ptr<UINT32[]> m_mainram;
+	uint32_t* m_cpuregion;
+	std::unique_ptr<uint32_t[]> m_mainram;
 
 	DECLARE_READ32_MEMBER(bfm_swp_mem_r);
 	DECLARE_WRITE32_MEMBER(bfm_swp_mem_w);
 
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
@@ -190,8 +190,8 @@ INPUT_PORTS_END
 
 void bfm_swp_state::machine_start()
 {
-	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
-	m_mainram = make_unique_clear<UINT32[]>(0x10000);
+	m_cpuregion = (uint32_t*)memregion( "maincpu" )->base();
+	m_mainram = make_unique_clear<uint32_t[]>(0x10000);
 
 }
 

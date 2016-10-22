@@ -23,22 +23,22 @@ enum
 #define CDP1802_OPCODE(...) \
 	if (variant < TYPE_1802) sprintf(buffer, "illegal"); else sprintf(buffer, __VA_ARGS__)
 
-static offs_t implied(const UINT8 opcode)
+static offs_t implied(const uint8_t opcode)
 {
 	return opcode & 0x0f;
 }
 
-static offs_t immediate(const UINT8 **opram)
+static offs_t immediate(const uint8_t **opram)
 {
 	return *(*opram)++;
 }
 
-static offs_t short_branch(offs_t pc, const UINT8 **opram)
+static offs_t short_branch(offs_t pc, const uint8_t **opram)
 {
 	return (pc & 0xff00) | immediate(opram);
 }
 
-static offs_t long_branch(const UINT8 **opram)
+static offs_t long_branch(const uint8_t **opram)
 {
 	return (immediate(opram) << 8) | immediate(opram);
 }
@@ -53,13 +53,13 @@ static offs_t long_skip(offs_t pc)
 	return pc + 3;
 }
 
-static UINT32 disassemble(device_t *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 variant)
+static uint32_t disassemble(device_t *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t variant)
 {
-	const UINT8 *startram = opram;
-	UINT32 flags = 0;
+	const uint8_t *startram = opram;
+	uint32_t flags = 0;
 
 	opram++;
-	UINT8 opcode = *oprom++;
+	uint8_t opcode = *oprom++;
 
 	switch (opcode)
 	{

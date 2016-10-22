@@ -79,8 +79,8 @@ enum
 void px8_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
-	UINT8 *ipl_rom = memregion(UPD70008_TAG)->base();
+	uint8_t *ram = m_ram->pointer();
+	uint8_t *ipl_rom = memregion(UPD70008_TAG)->base();
 
 	if (!m_bank0)
 	{
@@ -373,7 +373,7 @@ WRITE8_MEMBER( px8_state::gah40m_w )
 
 READ8_MEMBER( px8_state::gah40s_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (offset)
 	{
@@ -449,9 +449,9 @@ WRITE8_MEMBER( px8_state::gah40s_ier_w )
    krtn_read - read keyboard return
 -------------------------------------------------*/
 
-UINT8 px8_state::krtn_read()
+uint8_t px8_state::krtn_read()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_ksc)
 	{
@@ -691,7 +691,7 @@ PALETTE_INIT_MEMBER(px8_state, px8)
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);
 }
 
-UINT32 px8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t px8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

@@ -16,7 +16,7 @@ WRITE8_MEMBER( super80_state::pio_port_a_w )
 
 READ8_MEMBER( super80_state::pio_port_b_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -74,7 +74,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
     bit 2 = CA3140 */
 TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_p )
 {
-	UINT8 cass_ws=0;
+	uint8_t cass_ws=0;
 
 	m_cass_data[1]++;
 	cass_ws = ((m_cassette)->input() > +0.03) ? 4 : 0;
@@ -96,7 +96,7 @@ TIMER_CALLBACK_MEMBER(super80_state::super80_reset)
 
 TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
 {
-	UINT8 go_fast = 0;
+	uint8_t go_fast = 0;
 	if ( (!BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 1)) )    /* bit 2 of port F0 is low, OR user turned on config switch */
 		go_fast++; // must be 1 at boot so banking works correctly
 
@@ -166,7 +166,7 @@ WRITE8_MEMBER( super80_state::port3f_w )
 
 READ8_MEMBER( super80_state::super80_f2_r )
 {
-	UINT8 data = m_io_dsw->read() & 0xf0;  // dip switches on pcb
+	uint8_t data = m_io_dsw->read() & 0xf0;  // dip switches on pcb
 	data |= m_cass_data[2];         // bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
 	data |= 0x08;               // bit 3 - not used
 	return data;
@@ -183,7 +183,7 @@ WRITE8_MEMBER( super80_state::super80_dc_w )
 
 WRITE8_MEMBER( super80_state::super80_f0_w )
 {
-	UINT8 bits = data ^ m_last_data;
+	uint8_t bits = data ^ m_last_data;
 	m_portf0 = data;
 	m_speaker->level_w(BIT(data, 3));               /* bit 3 - speaker */
 	if (BIT(bits, 1)) super80_cassette_motor(BIT(data, 1));  /* bit 1 - cassette motor */
@@ -194,7 +194,7 @@ WRITE8_MEMBER( super80_state::super80_f0_w )
 
 WRITE8_MEMBER( super80_state::super80r_f0_w )
 {
-	UINT8 bits = data ^ m_last_data;
+	uint8_t bits = data ^ m_last_data;
 	m_portf0 = data | 0x14;
 	m_speaker->level_w(BIT(data, 3));               /* bit 3 - speaker */
 	if (BIT(bits, 1)) super80_cassette_motor(BIT(data, 1));  /* bit 1 - cassette motor */
@@ -227,7 +227,7 @@ MACHINE_RESET_MEMBER( super80_state, super80r )
 
 DRIVER_INIT_MEMBER( super80_state,super80 )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
 }
 
@@ -238,7 +238,7 @@ DRIVER_INIT_MEMBER( super80_state,super80 )
 
 QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
 {
-	UINT16 exec_addr, start_addr, end_addr;
+	uint16_t exec_addr, start_addr, end_addr;
 
 	/* load the binary into memory */
 	if (z80bin_load_file(&image, m_maincpu->space(AS_PROGRAM), file_type, &exec_addr, &start_addr, &end_addr) != image_init_result::PASS)

@@ -78,8 +78,8 @@ WRITE_LINE_MEMBER(sms_state::gg_ext_th_input)
 
 void sms_state::sms_get_inputs()
 {
-	UINT8 data1 = 0xff;
-	UINT8 data2 = 0xff;
+	uint8_t data1 = 0xff;
+	uint8_t data2 = 0xff;
 
 	m_port_dc_reg = 0xff;
 	m_port_dd_reg = 0xff;
@@ -125,8 +125,8 @@ void sms_state::sms_get_inputs()
 WRITE8_MEMBER(sms_state::sms_io_control_w)
 {
 	bool latch_hcount = false;
-	UINT8 ctrl1_port_data = 0xff;
-	UINT8 ctrl2_port_data = 0xff;
+	uint8_t ctrl1_port_data = 0xff;
+	uint8_t ctrl2_port_data = 0xff;
 
 	if (m_is_gamegear && !(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
 	{
@@ -254,7 +254,7 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 {
 	if (m_port_rapid.found())
 	{
-		UINT8 rapid_previous_mode = m_rapid_mode;
+		uint8_t rapid_previous_mode = m_rapid_mode;
 
 		m_csync_counter++;
 		// counter is 12 bits wide (for 4096 pulses)
@@ -479,7 +479,7 @@ WRITE8_MEMBER(sms_state::smsj_audio_control_w)
 
 READ8_MEMBER(sms_state::smsj_audio_control_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	/* Charles MacDonald discovered an internal 12-bit counter that is
 	   incremented on each pulse of the C-Sync line that connects the VDP
@@ -547,7 +547,7 @@ READ8_MEMBER(sms_state::gg_input_port_00_r)
 	else
 	{
 		// bit 6 is NJAP (0=domestic/1=overseas); bit 7 is STT (START button)
-		UINT8 data = (m_ioctrl_region_is_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
+		uint8_t data = (m_ioctrl_region_is_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
 
 		// According to GG official docs, bits 0-4 are meaningless and bit 5
 		// is NNTS (0=NTSC, 1=PAL). All games run in NTSC and no original GG
@@ -606,7 +606,7 @@ READ8_MEMBER(sms_state::read_ram)
 {
 	if (m_mem_device_enabled & ENABLE_EXT_RAM)
 	{
-		UINT8 data = 0xff;
+		uint8_t data = 0xff;
 
 		if (m_mem_device_enabled & ENABLE_CART)
 			data &= m_cartslot->read_ram(space, offset);
@@ -704,7 +704,7 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 }
 
 
-UINT8 sms_state::read_bus(address_space &space, unsigned int page, UINT16 base_addr, UINT16 offset)
+uint8_t sms_state::read_bus(address_space &space, unsigned int page, uint16_t base_addr, uint16_t offset)
 {
 	if (m_is_gamegear)
 	{
@@ -722,7 +722,7 @@ UINT8 sms_state::read_bus(address_space &space, unsigned int page, UINT16 base_a
 	}
 	else if (m_mem_device_enabled != ENABLE_NONE)
 	{
-		UINT8 data = 0xff;
+		uint8_t data = 0xff;
 
 		// SMS2 behavior described by Charles MacDonald's SMS notes:
 		// "If the BIOS is enabled at the same time the cartridge slot is,
@@ -780,7 +780,7 @@ READ8_MEMBER(smssdisp_state::store_cart_peek)
 {
 	if (m_mem_device_enabled != ENABLE_NONE)
 	{
-		UINT8 data = 0xff;
+		uint8_t data = 0xff;
 
 		if (m_mem_device_enabled & ENABLE_CART)
 			data &= m_cartslot->read_cart(space, 0x6000 + (offset & 0x1fff));
@@ -1028,7 +1028,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 
 	if (m_mainram == nullptr)
 	{
-		m_mainram = make_unique_clear<UINT8[]>(0x2000);
+		m_mainram = make_unique_clear<uint8_t[]>(0x2000);
 		save_pointer(NAME(m_mainram.get()), 0x2000);
 
 		// alibaba and blockhol are ports of games for the MSX system. The
@@ -1190,10 +1190,10 @@ void sms_state::store_post_load()
 // that seems to change the active cart/card slot pair or, for the 4th
 // game switch onward of the 16-3 model, the active cart slot only.
 
-void sms_state::store_select_cart(UINT8 data)
+void sms_state::store_select_cart(uint8_t data)
 {
-	UINT8 slot = data >> 4;
-	UINT8 slottype = data & 0x08;
+	uint8_t slot = data >> 4;
+	uint8_t slottype = data & 0x08;
 
 	// The SMS Store Display Unit only uses the logical cartridge slot to
 	// map the active cartridge or card slot, of its multiple ones.
@@ -1338,7 +1338,7 @@ VIDEO_RESET_MEMBER(sms_state,sms1)
 {
 	if (m_port_scope->read())
 	{
-		UINT8 sscope_binocular_hack = m_port_scope_binocular->read();
+		uint8_t sscope_binocular_hack = m_port_scope_binocular->read();
 
 		if (sscope_binocular_hack & 0x01)
 			m_prevleft_bitmap.fill(rgb_t::black);
@@ -1377,11 +1377,11 @@ void sms_state::screen_vblank_sms1(screen_device &screen, bool state)
 }
 
 
-UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 sscope = 0;
-	UINT8 sscope_binocular_hack;
-	UINT8 occluded_view = 0;
+	uint8_t sscope = 0;
+	uint8_t sscope_binocular_hack;
+	uint8_t occluded_view = 0;
 
 	if (&screen != m_main_scr)
 	{
@@ -1458,7 +1458,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-UINT32 sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vdp->screen_update(screen, bitmap, cliprect);
 	return 0;
@@ -1542,7 +1542,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 
 				if (sms_y2 >= vdp_bitmap.cliprect().min_y && sms_y2 <= vdp_bitmap.cliprect().max_y)
 				{
-					UINT32 *vdp_buffer =  &vdp_bitmap.pix32(sms_y2);
+					uint32_t *vdp_buffer =  &vdp_bitmap.pix32(sms_y2);
 
 					int sms_x = sms_min_x;
 					int x_min_i = plot_min_x - plot_x_first_group;
@@ -1605,7 +1605,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 				line3 = m_line_buffer.get() + ((sms_y + y_i + 1) & 0x03) * 160;
 				line4 = m_line_buffer.get() + ((sms_y + y_i + 2) & 0x03) * 160;
 
-				UINT32 *p_bitmap = &bitmap.pix32(visarea.min_y + plot_y_group + y_i, visarea.min_x);
+				uint32_t *p_bitmap = &bitmap.pix32(visarea.min_y + plot_y_group + y_i, visarea.min_x);
 
 				for (int plot_x = plot_min_x; plot_x <= plot_max_x; plot_x++)
 				{
@@ -1629,7 +1629,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 }
 
 
-UINT32 sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 *source_bitmap;
 
@@ -1664,22 +1664,22 @@ UINT32 sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bi
 		// (it would be better to generalize this in the core, to be used for all LCD systems)
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *linedst = &bitmap.pix32(y);
-			UINT32 *line0 = &source_bitmap->pix32(y);
-			UINT32 *line1 = &m_prev_bitmap.pix32(y);
+			uint32_t *linedst = &bitmap.pix32(y);
+			uint32_t *line0 = &source_bitmap->pix32(y);
+			uint32_t *line1 = &m_prev_bitmap.pix32(y);
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				UINT32 color0 = line0[x];
-				UINT32 color1 = line1[x];
-				UINT16 r0 = (color0 >> 16) & 0x000000ff;
-				UINT16 g0 = (color0 >>  8) & 0x000000ff;
-				UINT16 b0 = (color0 >>  0) & 0x000000ff;
-				UINT16 r1 = (color1 >> 16) & 0x000000ff;
-				UINT16 g1 = (color1 >>  8) & 0x000000ff;
-				UINT16 b1 = (color1 >>  0) & 0x000000ff;
-				UINT8 r = (UINT8)((r0 + r1) >> 1);
-				UINT8 g = (UINT8)((g0 + g1) >> 1);
-				UINT8 b = (UINT8)((b0 + b1) >> 1);
+				uint32_t color0 = line0[x];
+				uint32_t color1 = line1[x];
+				uint16_t r0 = (color0 >> 16) & 0x000000ff;
+				uint16_t g0 = (color0 >>  8) & 0x000000ff;
+				uint16_t b0 = (color0 >>  0) & 0x000000ff;
+				uint16_t r1 = (color1 >> 16) & 0x000000ff;
+				uint16_t g1 = (color1 >>  8) & 0x000000ff;
+				uint16_t b1 = (color1 >>  0) & 0x000000ff;
+				uint8_t r = (uint8_t)((r0 + r1) >> 1);
+				uint8_t g = (uint8_t)((g0 + g1) >> 1);
+				uint8_t b = (uint8_t)((b0 + b1) >> 1);
 				linedst[x] = (r << 16) | (g << 8) | b;
 			}
 		}

@@ -59,8 +59,8 @@ class g65816_device : public cpu_device
 {
 public:
 	// construction/destruction
-	g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal = nullptr);
+	g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal = nullptr);
 
 	void set_read_vector_callback(read8_delegate read_vector);
 
@@ -70,9 +70,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 20; }
-	virtual UINT32 execute_input_lines() const override { return 5; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 20; }
+	virtual uint32_t execute_input_lines() const override { return 5; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -85,9 +85,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	address_space_config m_program_config;
 
@@ -233,15 +233,15 @@ protected:
 	uint m_destination;
 	int m_ICount;
 	int m_cpu_type;
-	UINT8 m_rw8_cycles, m_rw16_cycles, m_rw24_cycles;
-	UINT32 m_debugger_temp;
+	uint8_t m_rw8_cycles, m_rw16_cycles, m_rw24_cycles;
+	uint32_t m_debugger_temp;
 
 	/* 5A22 specific registers */
-	UINT8 m_wrmpya, m_wrmpyb;
-	UINT16 m_rdmpy;
-	UINT16 m_wrdiv;
-	UINT8 m_dvdd;
-	UINT16 m_rddiv;
+	uint8_t m_wrmpya, m_wrmpyb;
+	uint16_t m_rdmpy;
+	uint16_t m_wrdiv;
+	uint8_t m_dvdd;
+	uint16_t m_rddiv;
 
 	void g65816i_00_M0X0();
 	void g65816i_01_M0X0();
@@ -1529,7 +1529,7 @@ protected:
 class _5a22_device : public g65816_device
 {
 public:
-	_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( wrmpya_w );
 	DECLARE_WRITE8_MEMBER( wrmpyb_w );

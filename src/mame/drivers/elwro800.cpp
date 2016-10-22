@@ -48,11 +48,11 @@ public:
 
 	/* for elwro800 */
 	/* RAM mapped at 0 */
-	UINT8 m_ram_at_0000;
+	uint8_t m_ram_at_0000;
 
 	/* NR signal */
-	UINT8 m_NR;
-	UINT8 m_df_on_databus;
+	uint8_t m_NR;
+	uint8_t m_df_on_databus;
 
 	DECLARE_DIRECT_UPDATE_MEMBER(elwro800_direct_handler);
 	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
@@ -72,7 +72,7 @@ protected:
 	required_ioport m_io_line9;
 	required_ioport m_io_network_id;
 
-	void elwro800jr_mmu_w(UINT8 data);
+	void elwro800jr_mmu_w(uint8_t data);
 
 	int m_centronics_ack;
 };
@@ -118,12 +118,12 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
  *
  *************************************/
 
-void elwro800_state::elwro800jr_mmu_w(UINT8 data)
+void elwro800_state::elwro800jr_mmu_w(uint8_t data)
 {
-	UINT8 *prom = memregion("proms")->base() + 0x200;
-	UINT8 *messram = m_ram->pointer();
-	UINT8 cs;
-	UINT8 ls175;
+	uint8_t *prom = memregion("proms")->base() + 0x200;
+	uint8_t *messram = m_ram->pointer();
+	uint8_t cs;
+	uint8_t ls175;
 
 	ls175 = BITSWAP8(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
 
@@ -225,8 +225,8 @@ WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
 
 READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 {
-	UINT8 *prom = memregion("proms")->base();
-	UINT8 cs = prom[offset & 0x1ff];
+	uint8_t *prom = memregion("proms")->base();
+	uint8_t cs = prom[offset & 0x1ff];
 
 	if (!BIT(cs,0))
 	{
@@ -309,8 +309,8 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 
 WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 {
-	UINT8 *prom = memregion("proms")->base();
-	UINT8 cs = prom[offset & 0x1ff];
+	uint8_t *prom = memregion("proms")->base();
+	uint8_t cs = prom[offset & 0x1ff];
 
 	if (!BIT(cs,0))
 	{
@@ -494,7 +494,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(elwro800_state,elwro800)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	m_df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);

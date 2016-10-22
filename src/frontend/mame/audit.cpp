@@ -380,7 +380,7 @@ media_auditor::audit_record &media_auditor::audit_one_rom(const rom_entry *rom)
 	audit_record &record = *m_record_list.emplace(m_record_list.end(), *rom, media_type::ROM);
 
 	// see if we have a CRC and extract it if so
-	UINT32 crc = 0;
+	uint32_t crc = 0;
 	bool const has_crc = record.expected_hashes().crc(crc);
 
 	// find the file and checksum it, getting the file length along the way
@@ -481,7 +481,7 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 //  shares a media entry with the same hashes
 //-------------------------------------------------
 
-device_t *media_auditor::find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, UINT64 romlength)
+device_t *media_auditor::find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, uint64_t romlength)
 {
 	bool const dumped = !romhashes.flag(util::hash_collection::FLAG_NO_DUMP);
 

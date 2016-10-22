@@ -14,7 +14,7 @@ class o2_voice_device : public o2_rom_device
 {
 public:
 	// construction/destruction
-	o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;

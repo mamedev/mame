@@ -120,8 +120,8 @@ class netlist_mame_device_t : public device_t
 public:
 
 	// construction/destruction
-	netlist_mame_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *file);
+	netlist_mame_device_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *file);
 	virtual ~netlist_mame_device_t() { pstring::resetmem(); }
 
 	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &));
@@ -184,7 +184,7 @@ class netlist_mame_cpu_device_t : public netlist_mame_device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_cpu_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	netlist_mame_cpu_device_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_cpu_device_t() {}
 protected:
 	// netlist_mame_device_t
@@ -202,15 +202,15 @@ protected:
 
 	// device_execute_interface overrides
 
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override;
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
 
 	ATTR_HOT virtual void execute_run() override;
 
 	// device_disasm_interface overrides
-	ATTR_COLD virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	ATTR_COLD virtual UINT32 disasm_max_opcode_bytes() const override { return 1; }
-	ATTR_COLD virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	ATTR_COLD virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	ATTR_COLD virtual uint32_t disasm_max_opcode_bytes() const override { return 1; }
+	ATTR_COLD virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_memory_interface overrides
 
@@ -258,7 +258,7 @@ class netlist_mame_sound_device_t : public netlist_mame_device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_sound_device_t() {}
 
 	inline sound_stream *get_stream() { return m_stream; }
@@ -341,7 +341,7 @@ class netlist_mame_analog_input_t : public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_analog_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	netlist_mame_analog_input_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_analog_input_t() { }
 
 	static void static_set_name(device_t &device, const char *param_name);
@@ -395,7 +395,7 @@ class netlist_mame_analog_output_t : public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_analog_output_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	netlist_mame_analog_output_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_analog_output_t() { }
 
 	static void static_set_params(device_t &device, const char *in_name, netlist_analog_output_delegate adelegate);
@@ -421,14 +421,14 @@ class netlist_mame_int_input_t :  public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_int_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	netlist_mame_int_input_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_int_input_t() { }
 
-	static void static_set_params(device_t &device, const char *param_name, const UINT32 mask, const UINT32 shift);
+	static void static_set_params(device_t &device, const char *param_name, const uint32_t mask, const uint32_t shift);
 
-	inline void write(const UINT32 val)
+	inline void write(const uint32_t val)
 	{
-		const UINT32 v = (val >> m_shift) & m_mask;
+		const uint32_t v = (val >> m_shift) & m_mask;
 		if (v != (*m_param)())
 			synchronize(0, v);
 	}
@@ -452,8 +452,8 @@ protected:
 
 private:
 	netlist::param_int_t *m_param;
-	UINT32 m_mask;
-	UINT32 m_shift;
+	uint32_t m_mask;
+	uint32_t m_shift;
 	pstring m_param_name;
 };
 
@@ -467,14 +467,14 @@ class netlist_mame_logic_input_t :  public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_logic_input_t() { }
 
-	static void static_set_params(device_t &device, const char *param_name, const UINT32 shift);
+	static void static_set_params(device_t &device, const char *param_name, const uint32_t shift);
 
-	inline void write(const UINT32 val)
+	inline void write(const uint32_t val)
 	{
-		const UINT32 v = (val >> m_shift) & 1;
+		const uint32_t v = (val >> m_shift) & 1;
 		if (v != (*m_param)())
 			synchronize(0, v);
 	}
@@ -498,7 +498,7 @@ protected:
 
 private:
 	netlist::param_logic_t *m_param;
-	UINT32 m_shift;
+	uint32_t m_shift;
 	pstring m_param_name;
 };
 
@@ -512,7 +512,7 @@ class netlist_mame_stream_input_t :  public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_stream_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	netlist_mame_stream_input_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_stream_input_t() { }
 
 	static void static_set_params(device_t &device, int channel, const char *param_name);
@@ -522,7 +522,7 @@ protected:
 	virtual void device_start() override;
 	virtual void custom_netlist_additions(netlist::setup_t &setup) override;
 private:
-	UINT32 m_channel;
+	uint32_t m_channel;
 	pstring m_param_name;
 };
 
@@ -536,7 +536,7 @@ class netlist_mame_stream_output_t :  public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_stream_output_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	netlist_mame_stream_output_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_stream_output_t() { }
 
 	static void static_set_params(device_t &device, int channel, const char *out_name);
@@ -546,7 +546,7 @@ protected:
 	virtual void device_start() override;
 	virtual void custom_netlist_additions(netlist::setup_t &setup) override;
 private:
-	UINT32 m_channel;
+	uint32_t m_channel;
 	pstring m_out_name;
 };
 // ----------------------------------------------------------------------------------------

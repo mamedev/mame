@@ -27,7 +27,7 @@ void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	/* check the various IRQs */
 	for (int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)
 	{
-		UINT8 mask = 1 << irq;
+		uint8_t mask = 1 << irq;
 
 		/* is this IRQ in service and not cascading and sfnm? */
 		if ((m_isr & mask) && !(m_master && m_cascade && m_nested && (m_slave & mask)))
@@ -59,7 +59,7 @@ void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void pic8259_device::set_irq_line(int irq, int state)
 {
-	UINT8 mask = (1 << irq);
+	uint8_t mask = (1 << irq);
 
 	if (state)
 	{
@@ -88,11 +88,11 @@ void pic8259_device::set_irq_line(int irq, int state)
 }
 
 
-UINT32 pic8259_device::acknowledge()
+uint32_t pic8259_device::acknowledge()
 {
 	for (int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)
 	{
-		UINT8 mask = 1 << irq;
+		uint8_t mask = 1 << irq;
 
 		/* is this IRQ pending and enabled? */
 		if ((m_irr & mask) && !(m_imr & mask))
@@ -149,7 +149,7 @@ IRQ_CALLBACK_MEMBER(pic8259_device::inta_cb)
 READ8_MEMBER( pic8259_device::read )
 {
 	/* NPW 18-May-2003 - Changing 0xFF to 0x00 as per Ruslan */
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	switch(offset)
 	{
@@ -235,7 +235,7 @@ WRITE8_MEMBER( pic8259_device::write )
 				else if ((data & 0x18) == 0x00)
 				{
 					int n = data & 7;
-					UINT8 mask = 1 << n;
+					uint8_t mask = 1 << n;
 
 					/* write OCW2 */
 					if (LOG_OCW)
@@ -430,7 +430,7 @@ void pic8259_device::device_reset()
 
 const device_type PIC8259 = &device_creator<pic8259_device>;
 
-pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PIC8259, "8259 PIC", tag, owner, clock, "pit8259", __FILE__)
 	, m_out_int_func(*this)
 	, m_sp_en_func(*this)

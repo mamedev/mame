@@ -82,7 +82,7 @@ machine_config_constructor segam1audio_device::device_mconfig_additions() const
 //  segam1audio_device - constructor
 //-------------------------------------------------
 
-segam1audio_device::segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+segam1audio_device::segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGAM1AUDIO, "Sega Model 1 Sound Board", tag, owner, clock, "segam1audio", __FILE__),
 	m_audiocpu(*this, M68000_TAG),
 	m_multipcm_1(*this, MULTIPCM_1_TAG),
@@ -114,7 +114,7 @@ void segam1audio_device::device_reset()
 
 READ16_MEMBER(segam1audio_device::m1_snd_68k_latch_r)
 {
-	UINT16 retval;
+	uint16_t retval;
 
 	retval = m_to_68k[m_fifo_rptr];
 
@@ -168,7 +168,7 @@ void segam1audio_device::check_fifo_irq()
 	}
 }
 
-void segam1audio_device::write_fifo(UINT8 data)
+void segam1audio_device::write_fifo(uint8_t data)
 {
 	m_to_68k[m_fifo_wptr] = data;
 	m_fifo_wptr++;

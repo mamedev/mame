@@ -20,9 +20,9 @@
 
 class h8_port_device : public device_t {
 public:
-	h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_info(int address, UINT8 default_ddr, UINT8 mask);
+	void set_info(int address, uint8_t default_ddr, uint8_t mask);
 
 	DECLARE_WRITE8_MEMBER(ddr_w);
 	DECLARE_WRITE8_MEMBER(dr_w);
@@ -38,10 +38,10 @@ protected:
 	address_space *io;
 
 	int address;
-	UINT8 default_ddr, ddr, pcr, odr;
-	UINT8 mask;
-	UINT8 dr;
-	UINT8 last_output;
+	uint8_t default_ddr, ddr, pcr, odr;
+	uint8_t mask;
+	uint8_t dr;
+	uint8_t last_output;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

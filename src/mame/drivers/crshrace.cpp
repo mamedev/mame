@@ -541,10 +541,10 @@ ROM_END
 
 
 #ifdef UNUSED_FUNCTION
-void crshrace_state::crshrace_patch_code( UINT16 offset )
+void crshrace_state::crshrace_patch_code( uint16_t offset )
 {
 	/* A hack which shows 3 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x4e71;
 	RAM[(offset + 2)/2] = 0x4e71;
 	RAM[(offset + 4)/2] = 0x4e71;

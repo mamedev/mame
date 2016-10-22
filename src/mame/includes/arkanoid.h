@@ -31,42 +31,42 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_protram;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_protram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
-	UINT8    m_gfxbank;
-	UINT8    m_palettebank;
+	uint8_t    m_gfxbank;
+	uint8_t    m_palettebank;
 
 	/* input-related */
-	UINT8    m_paddle_select;   // selected by d008 bit 2
+	uint8_t    m_paddle_select;   // selected by d008 bit 2
 
 	/* bootleg related */
 	int      m_bootleg_id;
-	UINT8    m_bootleg_cmd;
+	uint8_t    m_bootleg_cmd;
 
 	/* mcu interface related */
 	bool     m_Z80HasWritten;   // z80 has written to latch flag
-	UINT8    m_fromZ80;         // byte latch for z80->68705 comms
+	uint8_t    m_fromZ80;         // byte latch for z80->68705 comms
 	bool     m_MCUHasWritten;   // 68705 has written to latch flag
-	UINT8    m_fromMCU;         // byte latch for 68705->z80 comms
+	uint8_t    m_fromMCU;         // byte latch for 68705->z80 comms
 
 	/* mcu internal related */
-	UINT8    m_portA_in;
-	UINT8    m_portA_out;
-	UINT8    m_ddrA;
-	UINT8    m_portC_internal;
-	UINT8    m_portC_out;
-	UINT8    m_ddrC;
-	UINT8    m_tdr;
-	UINT8    m_tcr;
+	uint8_t    m_portA_in;
+	uint8_t    m_portA_out;
+	uint8_t    m_ddrA;
+	uint8_t    m_portC_internal;
+	uint8_t    m_portC_out;
+	uint8_t    m_ddrC;
+	uint8_t    m_tdr;
+	uint8_t    m_tcr;
 	emu_timer *m_68705_timer;
 
 	/* hexaa */
-	UINT8 m_hexaa_from_main;
-	UINT8 m_hexaa_from_sub;
+	uint8_t m_hexaa_from_main;
+	uint8_t m_hexaa_from_sub;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -116,8 +116,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_68705_increment);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void arkanoid_bootleg_init(  );

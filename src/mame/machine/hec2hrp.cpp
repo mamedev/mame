@@ -172,7 +172,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_keyboard_w)
 
 READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (offset ==7) /* Only when joy reading*/
 	{
@@ -251,7 +251,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_sn_2800_w)
 READ8_MEMBER(hec2hrp_state::hector_cassette_r)
 {
 	double level;
-	UINT8 value=0;
+	uint8_t value=0;
 
 	if ((m_state3000 & 0x38) != 0x38 )   /* Selon Sb choix cassette ou timer (74153)*/
 	{
@@ -374,9 +374,9 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_b_w)
 READ8_MEMBER(hec2hrp_state::hector_io_8255_r)
 {
 	/* 8255 in mode 0 */
-	UINT8 data =0;
-	UINT8 data_l=0;
-	UINT8 data_h=0;
+	uint8_t data =0;
+	uint8_t data_l=0;
+	uint8_t data_h=0;
 
 
 	if ((offset & 0x3) == 0x0) /* Port A */
@@ -710,7 +710,7 @@ void hec2hrp_state::Init_Value_SN76477_Hector()
 	m_ValMixer = 0;
 }
 
-void hec2hrp_state::Update_Sound(address_space &space, UINT8 data)
+void hec2hrp_state::Update_Sound(address_space &space, uint8_t data)
 {
 	/* keep device*/
 	/* MIXER*/

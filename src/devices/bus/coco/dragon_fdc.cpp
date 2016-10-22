@@ -94,7 +94,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	protected:
 		// device-level overrides
@@ -109,7 +109,7 @@ namespace
 		required_device_array<floppy_connector, 4>  m_floppies;
 
 		// methods
-		void dskreg_w(UINT8 data);
+		void dskreg_w(uint8_t data);
 	};
 };
 
@@ -141,7 +141,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 //  dragon_fdc_device_base - constructor
 //-------------------------------------------------
-dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: coco_family_fdc_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_wd2797(*this, WD2797_TAG)
 	, m_floppies(*this, WD2797_TAG ":%u", 0)
@@ -180,7 +180,7 @@ void dragon_fdc_device_base::update_lines()
 //  Dragon dskreg
 //-------------------------------------------------
 
-void dragon_fdc_device_base::dskreg_w(UINT8 data)
+void dragon_fdc_device_base::dskreg_w(uint8_t data)
 {
 	if (LOG_FDC)
 	{
@@ -218,7 +218,7 @@ void dragon_fdc_device_base::dskreg_w(UINT8 data)
 
 READ8_MEMBER(dragon_fdc_device_base::read)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 	switch (offset & 0xEF)
 	{
 	case 0:
@@ -284,7 +284,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: dragon_fdc_device_base(mconfig, DRAGON_FDC, "Dragon FDC", tag, owner, clock, "dragon_fdc", __FILE__)
 		{
 		}
@@ -316,7 +316,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: dragon_fdc_device_base(mconfig, SDTANDY_FDC, "SDTANDY FDC", tag, owner, clock, "sdtandy_fdc", __FILE__)
 		{
 		}

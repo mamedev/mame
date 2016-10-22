@@ -79,17 +79,17 @@ public:
 		m_palette(*this, "palette")  { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_bgram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_bgram;
 
 	/* input-related */
-	//UINT8 m_paddle_select;
-	//UINT8 m_paddle_value;
+	//uint8_t m_paddle_select;
+	//uint8_t m_paddle_value;
 	DECLARE_WRITE8_MEMBER(dominob_d008_w);
 	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
 	virtual void video_start() override;
-	UINT32 screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -130,7 +130,7 @@ void dominob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int index = 0;

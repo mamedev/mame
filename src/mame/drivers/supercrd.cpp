@@ -181,15 +181,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(supercrd_videoram_w);
 	DECLARE_WRITE8_MEMBER(supercrd_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_PALETTE_INIT(supercrd);
 	DECLARE_VIDEO_START(supercrd);
-	UINT32 screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -201,7 +201,7 @@ public:
 
 PALETTE_INIT_MEMBER(supercrd_state, supercrd)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	static const int resistances_rb[3] = { 1000, 470, 220 };
 	static const int resistances_g [2] = { 470, 220 };
@@ -272,7 +272,7 @@ VIDEO_START_MEMBER(supercrd_state, supercrd)
 }
 
 
-UINT32 supercrd_state::screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t supercrd_state::screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

@@ -6,7 +6,7 @@
 
 const device_type PSX_MULTITAP = &device_creator<psx_multitap_device>;
 
-psx_multitap_device::psx_multitap_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+psx_multitap_device::psx_multitap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	device_t(mconfig, PSX_MULTITAP, "Playstation Multitap", tag, owner, clock, "psx_multitap", __FILE__),
 	device_psx_controller_interface(mconfig, *this),
 	m_activeport(0),
@@ -235,7 +235,7 @@ void psx_multitap_device::do_pad()
 		m_count++;
 }
 
-bool psx_multitap_device::get_pad(int count, UINT8 *odata, UINT8 idata)
+bool psx_multitap_device::get_pad(int count, uint8_t *odata, uint8_t idata)
 {
 	if(!count)
 		*odata = 0x80;

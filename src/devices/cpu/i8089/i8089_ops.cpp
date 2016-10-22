@@ -13,8 +13,8 @@
 
 #define UNIMPLEMENTED logerror("%s('%s'): unimplemented opcode: %s\n", shortname(), tag(), __FUNCTION__);
 
-#define LWR(m, o) ((INT16)m_iop->read_word(m_r[m].t, o))
-#define LBR(m, o) ((INT8)m_iop->read_byte(m_r[m].t, o))
+#define LWR(m, o) ((int16_t)m_iop->read_word(m_r[m].t, o))
+#define LBR(m, o) ((int8_t)m_iop->read_byte(m_r[m].t, o))
 #define SWR(m, o, d) (m_iop->write_word(m_r[m].t, o, d))
 #define SBR(m, o, d) (m_iop->write_byte(m_r[m].t, o, d))
 
@@ -38,22 +38,22 @@ void i8089_channel::addb_mr(int m, int r, int o)
 	SBR(m, o, LBR(m, o) + m_r[r].w);
 }
 
-void i8089_channel::addbi_ri(int r, INT8 i)
+void i8089_channel::addbi_ri(int r, int8_t i)
 {
 	set_reg(r, m_r[r].w + i);
 }
 
-void i8089_channel::addbi_mi(int m, INT8 i, int o)
+void i8089_channel::addbi_mi(int m, int8_t i, int o)
 {
 	SBR(m, o, LBR(m, o) + i);
 }
 
-void i8089_channel::addi_ri(int r, INT16 i)
+void i8089_channel::addi_ri(int r, int16_t i)
 {
 	set_reg(r, m_r[r].w + i);
 }
 
-void i8089_channel::addi_mi(int m, INT16 i, int o)
+void i8089_channel::addi_mi(int m, int16_t i, int o)
 {
 	SWR(m, o, LWR(m, o) + i);
 }
@@ -70,7 +70,7 @@ void i8089_channel::and_mr(int m, int r, int o)
 
 void i8089_channel::andb_rm(int r, int m, int o)
 {
-	set_reg(r, m_r[r].w & (INT16)LBR(m, o));
+	set_reg(r, m_r[r].w & (int16_t)LBR(m, o));
 }
 
 void i8089_channel::andb_mr(int m, int r, int o)
@@ -78,27 +78,27 @@ void i8089_channel::andb_mr(int m, int r, int o)
 	SBR(m, o, LBR(m, o) & m_r[r].w);
 }
 
-void i8089_channel::andbi_ri(int r, INT8 i)
+void i8089_channel::andbi_ri(int r, int8_t i)
 {
-	set_reg(r, m_r[r].w & (INT16)i);
+	set_reg(r, m_r[r].w & (int16_t)i);
 }
 
-void i8089_channel::andbi_mi(int m, INT8 i, int o)
+void i8089_channel::andbi_mi(int m, int8_t i, int o)
 {
 	SBR(m, o, LBR(m, o) & i);
 }
 
-void i8089_channel::andi_ri(int r, INT16 i)
+void i8089_channel::andi_ri(int r, int16_t i)
 {
 	set_reg(r, m_r[r].w & i);
 }
 
-void i8089_channel::andi_mi(int m, INT16 i, int o)
+void i8089_channel::andi_mi(int m, int16_t i, int o)
 {
 	SWR(m, o, LWR(m, o) & i);
 }
 
-void i8089_channel::call(int m, INT16 d, int o)
+void i8089_channel::call(int m, int16_t d, int o)
 {
 	movp_mp(m, TP, o);
 	set_reg(TP, m_r[TP].w + d);
@@ -148,62 +148,62 @@ void i8089_channel::incb(int m, int o)
 	SBR(m, o, LBR(m, o) + 1);
 }
 
-void i8089_channel::jbt(int m, int b, INT16 d, int o)
+void i8089_channel::jbt(int m, int b, int16_t d, int o)
 {
 	if(LBR(m, o) & (1<<b))
 		set_reg(TP, m_r[TP].w + d);
 }
 
-void i8089_channel::jmce(int m, INT16 d, int o)
+void i8089_channel::jmce(int m, int16_t d, int o)
 {
 	if(!((LBR(m, o) ^ (m_r[MC].w & 0xff)) & (m_r[MC].w >> 8)))
 		set_reg(TP, m_r[TP].w + d);
 }
 
-void i8089_channel::jmcne(int m, INT16 d, int o)
+void i8089_channel::jmcne(int m, int16_t d, int o)
 {
 	if((LBR(m, o) ^ (m_r[MC].w & 0xff)) & (m_r[MC].w >> 8))
 		set_reg(TP, m_r[TP].w + d);
 }
 
-void i8089_channel::jnbt(int m, int b, INT16 d, int o)
+void i8089_channel::jnbt(int m, int b, int16_t d, int o)
 {
 	if(!(LBR(m, o) & (1<<b)))
 		set_reg(TP, m_r[TP].w + d);
 }
 
-void i8089_channel::jnz_r(int r, INT16 d)
+void i8089_channel::jnz_r(int r, int16_t d)
 {
 	m_icount += 5;
 	if(m_r[r].w & 0xffff)
 		set_reg(TP, m_r[TP].w + d);
 }
 
-void i8089_channel::jnz_m(int m, INT16 d, int o)
+void i8089_channel::jnz_m(int m, int16_t d, int o)
 {
 	if(LWR(m, o))
 		set_reg(TP, m_r[TP].w + d);
 }
 
-void i8089_channel::jnzb(int m, INT16 d, int o)
+void i8089_channel::jnzb(int m, int16_t d, int o)
 {
 	if(LBR(m, o))
 		set_reg(TP, m_r[TP].w + d);
 }
 
-void i8089_channel::jz_r(int r, INT16 d)
+void i8089_channel::jz_r(int r, int16_t d)
 {
 	if(!(m_r[r].w & 0xffff))
 		set_reg(TP, m_r[TP].w + d);
 }
 
-void i8089_channel::jz_m(int m, INT16 d, int o)
+void i8089_channel::jz_m(int m, int16_t d, int o)
 {
 	if(!LWR(m, o))
 		set_reg(TP, m_r[TP].w + d);
 }
 
-void i8089_channel::jzb(int m, INT16 d, int o)
+void i8089_channel::jzb(int m, int16_t d, int o)
 {
 	if(!LBR(m, o))
 		set_reg(TP, m_r[TP].w + d);
@@ -213,8 +213,8 @@ void i8089_channel::jzb(int m, INT16 d, int o)
 // load pointer from memory
 void i8089_channel::lpd(int p, int m, int o)
 {
-	UINT16 offset = m_iop->read_word(m_r[m].t, o);
-	UINT16 segment = m_iop->read_word(m_r[m].t, o + 2);
+	uint16_t offset = m_iop->read_word(m_r[m].t, o);
+	uint16_t segment = m_iop->read_word(m_r[m].t, o + 2);
 
 	set_reg(p, ((segment << 4) + offset) & 0xfffff, 0);
 }
@@ -232,7 +232,7 @@ void i8089_channel::mov_mr(int m, int r, int o)
 
 void i8089_channel::mov_rm(int r, int m, int o)
 {
-	set_reg(r, (INT32)LWR(m, o), 1);
+	set_reg(r, (int32_t)LWR(m, o), 1);
 }
 
 void i8089_channel::mov_mm(int m1, int m2, int o1, int o2)
@@ -249,37 +249,37 @@ void i8089_channel::movb_mr(int m, int r, int o)
 // move memory byte to register
 void i8089_channel::movb_rm(int r, int m, int o)
 {
-	UINT8 byte = m_iop->read_byte(m_r[m].t, o);
+	uint8_t byte = m_iop->read_byte(m_r[m].t, o);
 	set_reg(r, (BIT(byte, 7) ? 0xfff00 : 0x00000) | byte, 1);
 }
 
 // move memory byte to memory byte
 void i8089_channel::movb_mm(int m1, int m2, int o1, int o2)
 {
-	UINT8 byte = m_iop->read_byte(m_r[m1].t, o1);
+	uint8_t byte = m_iop->read_byte(m_r[m1].t, o1);
 	m_iop->write_byte(m_r[m2].t, o2, byte);
 }
 
 // move immediate byte to register
-void i8089_channel::movbi_ri(int r, INT8 i)
+void i8089_channel::movbi_ri(int r, int8_t i)
 {
 	set_reg(r, (BIT(i, 7) ? 0xfff00 : 0x00000) | (i & 0xff), 1);
 }
 
 // move immediate byte to memory byte
-void i8089_channel::movbi_mi(int m, INT8 i, int o)
+void i8089_channel::movbi_mi(int m, int8_t i, int o)
 {
 	m_iop->write_byte(m_r[m].t, o, i & 0xff);
 }
 
 // move immediate word to register
-void i8089_channel::movi_ri(int r, INT16 i)
+void i8089_channel::movi_ri(int r, int16_t i)
 {
 	set_reg(r, (BIT(i, 15) ? 0xf0000 : 0x00000) | (i & 0xffff), 1);
 }
 
 // move immediate word to memory word
-void i8089_channel::movi_mi(int m, INT16 i, int o)
+void i8089_channel::movi_mi(int m, int16_t i, int o)
 {
 	m_iop->write_word(m_r[m].t, o, (BIT(i, 15) ? 0xf0000 : 0x00000) | (i & 0xffff));
 }
@@ -294,8 +294,8 @@ void i8089_channel::movp_mp(int m, int p, int o)
 // move memory to pointer (restore)
 void i8089_channel::movp_pm(int p, int m, int o)
 {
-	UINT16 offset = m_iop->read_word(m_r[m].t, o);
-	UINT16 segment = m_iop->read_byte(m_r[m].t, o + 2);
+	uint16_t offset = m_iop->read_word(m_r[m].t, o);
+	uint16_t segment = m_iop->read_byte(m_r[m].t, o + 2);
 
 	set_reg(p, (((segment & 0xf0) << 12) + offset) & 0xfffff, segment >> 3 & 0x01);
 }
@@ -317,7 +317,7 @@ void i8089_channel::not_m(int m, int o)
 
 void i8089_channel::not_rm(int r, int m, int o)
 {
-	set_reg(r, ~(INT32)LWR(m, o));
+	set_reg(r, ~(int32_t)LWR(m, o));
 }
 
 void i8089_channel::notb_m(int m, int o)
@@ -327,7 +327,7 @@ void i8089_channel::notb_m(int m, int o)
 
 void i8089_channel::notb_rm(int r, int m, int o)
 {
-	set_reg(r, ~(INT32)LBR(m, o));
+	set_reg(r, ~(int32_t)LBR(m, o));
 }
 
 void i8089_channel::or_rm(int r, int m, int o)
@@ -342,7 +342,7 @@ void i8089_channel::or_mr(int m, int r, int o)
 
 void i8089_channel::orb_rm(int r, int m, int o)
 {
-	set_reg(r, m_r[r].w | (INT16)LBR(m, o));
+	set_reg(r, m_r[r].w | (int16_t)LBR(m, o));
 }
 
 void i8089_channel::orb_mr(int m, int r, int o)
@@ -350,22 +350,22 @@ void i8089_channel::orb_mr(int m, int r, int o)
 	SBR(m, o, LBR(m, o) | m_r[r].w);
 }
 
-void i8089_channel::orbi_ri(int r, INT8 i)
+void i8089_channel::orbi_ri(int r, int8_t i)
 {
-	set_reg(r, m_r[r].w | (INT16)i);
+	set_reg(r, m_r[r].w | (int16_t)i);
 }
 
-void i8089_channel::orbi_mi(int m, INT8 i, int o)
+void i8089_channel::orbi_mi(int m, int8_t i, int o)
 {
 	SBR(m, o, LBR(m, o) | i);
 }
 
-void i8089_channel::ori_ri(int r, INT16 i)
+void i8089_channel::ori_ri(int r, int16_t i)
 {
 	set_reg(r, m_r[r].w | i);
 }
 
-void i8089_channel::ori_mi(int m, INT16 i, int o)
+void i8089_channel::ori_mi(int m, int16_t i, int o)
 {
 	SWR(m, o, LWR(m, o) | i);
 }
@@ -386,7 +386,7 @@ void i8089_channel::sintr()
 	}
 }
 
-void i8089_channel::tsl(int m, INT8 i, INT8 d, int o)
+void i8089_channel::tsl(int m, int8_t i, int8_t d, int o)
 {
 	if(LBR(m, o))
 		set_reg(TP, m_r[TP].w + d);

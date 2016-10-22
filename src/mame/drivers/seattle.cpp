@@ -197,6 +197,7 @@
 #include "calspeed.lh"
 #include "vaportrx.lh"
 #include "hyprdriv.lh"
+#include "sfrush.lh"
 
 
 
@@ -389,38 +390,38 @@
 struct galileo_timer
 {
 	emu_timer *     timer;
-	UINT32          count;
-	UINT8           active;
+	uint32_t          count;
+	uint8_t           active;
 };
 
 
 struct galileo_data
 {
 	/* raw register data */
-	UINT32          reg[0x1000/4];
+	uint32_t          reg[0x1000/4];
 
 	/* timer info */
 	galileo_timer   timer[4];
 
 	/* DMA info */
-	INT8            dma_active;
-	UINT8           dma_stalled_on_voodoo[4];
+	int8_t            dma_active;
+	uint8_t           dma_stalled_on_voodoo[4];
 
 	/* PCI info */
-	UINT32          pci_bridge_regs[0x40];
-	UINT32          pci_3dfx_regs[0x40];
-	UINT32          pci_ide_regs[0x40];
+	uint32_t          pci_bridge_regs[0x40];
+	uint32_t          pci_3dfx_regs[0x40];
+	uint32_t          pci_ide_regs[0x40];
 };
 
 
 struct widget_data
 {
 	/* ethernet register address */
-	UINT8           ethernet_addr;
+	uint8_t           ethernet_addr;
 
 	/* IRQ information */
-	UINT8           irq_num;
-	UINT8           irq_mask;
+	uint8_t           irq_num;
+	uint8_t           irq_mask;
 };
 
 
@@ -444,12 +445,12 @@ public:
 	{
 	}
 
-	required_shared_ptr<UINT32> m_nvram;
-	required_shared_ptr<UINT32> m_rambase;
-	required_shared_ptr<UINT32> m_interrupt_enable;
-	required_shared_ptr<UINT32> m_interrupt_config;
-	required_shared_ptr<UINT32> m_asic_reset;
-	required_shared_ptr<UINT32> m_rombase;
+	required_shared_ptr<uint32_t> m_nvram;
+	required_shared_ptr<uint32_t> m_rambase;
+	required_shared_ptr<uint32_t> m_interrupt_enable;
+	required_shared_ptr<uint32_t> m_interrupt_config;
+	required_shared_ptr<uint32_t> m_asic_reset;
+	required_shared_ptr<uint32_t> m_rombase;
 	required_device<mips3_device> m_maincpu;
 	required_device<bus_master_ide_controller_device> m_ide;
 	optional_device<smc91c94_device> m_ethernet;
@@ -459,22 +460,22 @@ public:
 	galileo_data m_galileo;
 	widget_data m_widget;
 	voodoo_device *m_voodoo;
-	UINT8 m_voodoo_stalled;
-	UINT8 m_cpu_stalled_on_voodoo;
-	UINT32 m_cpu_stalled_offset;
-	UINT32 m_cpu_stalled_data;
-	UINT32 m_cpu_stalled_mem_mask;
-	UINT8 m_board_config;
-	UINT8 m_ethernet_irq_num;
-	UINT8 m_ethernet_irq_state;
-	UINT8 m_vblank_irq_num;
-	UINT8 m_vblank_latch;
-	UINT8 m_vblank_state;
-	UINT8 m_pending_analog_read;
-	UINT8 m_status_leds;
-	UINT32 m_cmos_write_enabled;
-	UINT32 m_output;
-	UINT8 m_output_mode;
+	uint8_t m_voodoo_stalled;
+	uint8_t m_cpu_stalled_on_voodoo;
+	uint32_t m_cpu_stalled_offset;
+	uint32_t m_cpu_stalled_data;
+	uint32_t m_cpu_stalled_mem_mask;
+	uint8_t m_board_config;
+	uint8_t m_ethernet_irq_num;
+	uint8_t m_ethernet_irq_state;
+	uint8_t m_vblank_irq_num;
+	uint8_t m_vblank_latch;
+	uint8_t m_vblank_state;
+	uint8_t m_pending_analog_read;
+	uint8_t m_status_leds;
+	uint32_t m_cmos_write_enabled;
+	uint32_t m_output;
+	uint8_t m_output_mode;
 	DECLARE_READ32_MEMBER(interrupt_state_r);
 	DECLARE_READ32_MEMBER(interrupt_state2_r);
 	DECLARE_WRITE32_MEMBER(interrupt_config_w);
@@ -520,17 +521,17 @@ public:
 	DECLARE_DRIVER_INIT(blitz99);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(galileo_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
 	void update_vblank_irq();
-	UINT32 pci_bridge_r(address_space &space, UINT8 reg, UINT8 type);
-	void pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data);
-	UINT32 pci_3dfx_r(address_space &space, UINT8 reg, UINT8 type);
-	void pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data);
-	UINT32 pci_ide_r(address_space &space, UINT8 reg, UINT8 type);
-	void pci_ide_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data);
+	uint32_t pci_bridge_r(address_space &space, uint8_t reg, uint8_t type);
+	void pci_bridge_w(address_space &space, uint8_t reg, uint8_t type, uint32_t data);
+	uint32_t pci_3dfx_r(address_space &space, uint8_t reg, uint8_t type);
+	void pci_3dfx_w(address_space &space, uint8_t reg, uint8_t type, uint32_t data);
+	uint32_t pci_ide_r(address_space &space, uint8_t reg, uint8_t type);
+	void pci_ide_w(address_space &space, uint8_t reg, uint8_t type, uint32_t data);
 	void update_galileo_irqs();
 	int galileo_dma_fetch_next(address_space &space, int which);
 	void galileo_perform_dma(address_space &space, int which);
@@ -546,7 +547,7 @@ public:
  *
  *************************************/
 
-UINT32 seattle_state::screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t seattle_state::screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
@@ -664,7 +665,7 @@ WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
 	m_ethernet_irq_state = state;
 	if (m_board_config == FLAGSTAFF_CONFIG)
 	{
-		UINT8 assert = m_ethernet_irq_state && (*m_interrupt_enable & (1 << ETHERNET_IRQ_SHIFT));
+		uint8_t assert = m_ethernet_irq_state && (*m_interrupt_enable & (1 << ETHERNET_IRQ_SHIFT));
 		if (m_ethernet_irq_num != 0)
 			m_maincpu->set_input_line(m_ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 	}
@@ -693,7 +694,7 @@ WRITE_LINE_MEMBER(seattle_state::ioasic_irq)
 
 READ32_MEMBER(seattle_state::interrupt_state_r)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	result |= m_ethernet_irq_state << ETHERNET_IRQ_SHIFT;
 	result |= m_vblank_latch << VBLANK_IRQ_SHIFT;
 	return result;
@@ -702,7 +703,7 @@ READ32_MEMBER(seattle_state::interrupt_state_r)
 
 READ32_MEMBER(seattle_state::interrupt_state2_r)
 {
-	UINT32 result = interrupt_state_r(space, offset, mem_mask);
+	uint32_t result = interrupt_state_r(space, offset, mem_mask);
 	result |= m_vblank_state << 8;
 	return result;
 }
@@ -753,7 +754,7 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 
 WRITE32_MEMBER(seattle_state::seattle_interrupt_enable_w)
 {
-	UINT32 old = *m_interrupt_enable;
+	uint32_t old = *m_interrupt_enable;
 	COMBINE_DATA(m_interrupt_enable);
 	if (old != *m_interrupt_enable)
 	{
@@ -816,9 +817,9 @@ WRITE_LINE_MEMBER(seattle_state::vblank_assert)
  *
  *************************************/
 
-UINT32 seattle_state::pci_bridge_r(address_space &space, UINT8 reg, UINT8 type)
+uint32_t seattle_state::pci_bridge_r(address_space &space, uint8_t reg, uint8_t type)
 {
-	UINT32 result = m_galileo.pci_bridge_regs[reg];
+	uint32_t result = m_galileo.pci_bridge_regs[reg];
 
 	switch (reg)
 	{
@@ -837,7 +838,7 @@ UINT32 seattle_state::pci_bridge_r(address_space &space, UINT8 reg, UINT8 type)
 }
 
 
-void seattle_state::pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
+void seattle_state::pci_bridge_w(address_space &space, uint8_t reg, uint8_t type, uint32_t data)
 {
 	m_galileo.pci_bridge_regs[reg] = data;
 	if (LOG_PCI)
@@ -852,9 +853,9 @@ void seattle_state::pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UI
  *
  *************************************/
 
-UINT32 seattle_state::pci_3dfx_r(address_space &space, UINT8 reg, UINT8 type)
+uint32_t seattle_state::pci_3dfx_r(address_space &space, uint8_t reg, uint8_t type)
 {
-	UINT32 result = m_galileo.pci_3dfx_regs[reg];
+	uint32_t result = m_galileo.pci_3dfx_regs[reg];
 
 	switch (reg)
 	{
@@ -873,7 +874,7 @@ UINT32 seattle_state::pci_3dfx_r(address_space &space, UINT8 reg, UINT8 type)
 }
 
 
-void seattle_state::pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
+void seattle_state::pci_3dfx_w(address_space &space, uint8_t reg, uint8_t type, uint32_t data)
 {
 	m_galileo.pci_3dfx_regs[reg] = data;
 
@@ -901,9 +902,9 @@ void seattle_state::pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT
  *
  *************************************/
 
-UINT32 seattle_state::pci_ide_r(address_space &space, UINT8 reg, UINT8 type)
+uint32_t seattle_state::pci_ide_r(address_space &space, uint8_t reg, uint8_t type)
 {
-	UINT32 result = m_galileo.pci_ide_regs[reg];
+	uint32_t result = m_galileo.pci_ide_regs[reg];
 
 	switch (reg)
 	{
@@ -922,7 +923,7 @@ UINT32 seattle_state::pci_ide_r(address_space &space, UINT8 reg, UINT8 type)
 }
 
 
-void seattle_state::pci_ide_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
+void seattle_state::pci_ide_w(address_space &space, uint8_t reg, uint8_t type, uint32_t data)
 {
 	m_galileo.pci_ide_regs[reg] = data;
 	if (LOG_PCI)
@@ -987,7 +988,7 @@ int seattle_state::galileo_dma_fetch_next(address_space &space, int which)
 {
 	galileo_data &galileo = m_galileo;
 	offs_t address = 0;
-	UINT32 data;
+	uint32_t data;
 
 	/* no-op for unchained mode */
 	if (!(galileo.reg[GREG_DMA0_CONTROL + which] & 0x200))
@@ -1031,7 +1032,7 @@ void seattle_state::galileo_perform_dma(address_space &space, int which)
 	{
 		offs_t srcaddr = galileo.reg[GREG_DMA0_SOURCE + which];
 		offs_t dstaddr = galileo.reg[GREG_DMA0_DEST + which];
-		UINT32 bytesleft = galileo.reg[GREG_DMA0_COUNT + which] & 0xffff;
+		uint32_t bytesleft = galileo.reg[GREG_DMA0_COUNT + which] & 0xffff;
 		int srcinc, dstinc;
 
 		galileo.dma_active = which;
@@ -1133,7 +1134,7 @@ void seattle_state::galileo_reset()
 READ32_MEMBER(seattle_state::galileo_r)
 {
 	galileo_data &galileo = m_galileo;
-	UINT32 result = galileo.reg[offset];
+	uint32_t result = galileo.reg[offset];
 
 	/* switch off the offset for special cases */
 	switch (offset)
@@ -1149,7 +1150,7 @@ READ32_MEMBER(seattle_state::galileo_r)
 			result = timer->count;
 			if (timer->active)
 			{
-				UINT32 elapsed = (timer->timer->elapsed() * SYSTEM_CLOCK).as_double();
+				uint32_t elapsed = (timer->timer->elapsed() * SYSTEM_CLOCK).as_double();
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
@@ -1215,7 +1216,7 @@ READ32_MEMBER(seattle_state::galileo_r)
 WRITE32_MEMBER(seattle_state::galileo_w)
 {
 	galileo_data &galileo = m_galileo;
-	UINT32 oldata = galileo.reg[offset];
+	uint32_t oldata = galileo.reg[offset];
 	COMBINE_DATA(&galileo.reg[offset]);
 
 	/* switch off the offset for special cases */
@@ -1287,7 +1288,7 @@ WRITE32_MEMBER(seattle_state::galileo_w)
 				}
 				else if (timer->active && !(data & mask))
 				{
-					UINT32 elapsed = (timer->timer->elapsed() * SYSTEM_CLOCK).as_double();
+					uint32_t elapsed = (timer->timer->elapsed() * SYSTEM_CLOCK).as_double();
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
 					timer->timer->adjust(attotime::never, which);
@@ -1471,7 +1472,7 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 
 READ32_MEMBER(seattle_state::carnevil_gun_r)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 
 	switch (offset)
 	{
@@ -1555,7 +1556,7 @@ WRITE32_MEMBER(seattle_state::ethernet_w)
 
 void seattle_state::widget_reset()
 {
-	UINT8 saved_irq = m_widget.irq_num;
+	uint8_t saved_irq = m_widget.irq_num;
 	memset(&m_widget, 0, sizeof(m_widget));
 	m_widget.irq_num = saved_irq;
 }
@@ -1563,9 +1564,9 @@ void seattle_state::widget_reset()
 
 void seattle_state::update_widget_irq()
 {
-	UINT8 state = m_ethernet_irq_state << WINT_ETHERNET_SHIFT;
-	UINT8 mask = m_widget.irq_mask;
-	UINT8 assert = ((mask & state) != 0) && (*m_interrupt_enable & (1 << WIDGET_IRQ_SHIFT));
+	uint8_t state = m_ethernet_irq_state << WINT_ETHERNET_SHIFT;
+	uint8_t mask = m_widget.irq_mask;
+	uint8_t assert = ((mask & state) != 0) && (*m_interrupt_enable & (1 << WIDGET_IRQ_SHIFT));
 
 	/* update the IRQ state */
 	if (m_widget.irq_num != 0)
@@ -1581,8 +1582,8 @@ READ32_MEMBER(seattle_state::output_r)
 
 WRITE32_MEMBER(seattle_state::output_w)
 {
-	UINT8 op = (data >> 8) & 0xF;
-	UINT8 arg = data & 0xFF;
+	uint8_t op = (data >> 8) & 0xF;
+	uint8_t arg = data & 0xFF;
 
 	switch (op)
 	{
@@ -1608,22 +1609,22 @@ WRITE32_MEMBER(seattle_state::output_w)
 					break;
 
 				case 0x05:
-					for (UINT8 bit = 0; bit < 8; bit++)
+					for (uint8_t bit = 0; bit < 8; bit++)
 						output().set_lamp_value(bit, (arg >> bit) & 0x1);
 					break;
 
 				case 0x06: // Hyperdrive LEDs 0-7
-					for (UINT8 bit = 0; bit < 8; bit++)
+					for (uint8_t bit = 0; bit < 8; bit++)
 						output().set_led_value(bit, (arg >> bit) & 0x1);
 					break;
 
 				case 0x07: // Hyperdrive LEDs 8-15
-					for (UINT8 bit = 0; bit < 8; bit++)
+					for (uint8_t bit = 0; bit < 8; bit++)
 						output().set_led_value(8 + bit, (arg >> bit) & 0x1);
 					break;
 
 				case 0x08: // Hyperdrive LEDs 16-23 (Only uses up to 19)
-					for (UINT8 bit = 0; bit < 8; bit++)
+					for (uint8_t bit = 0; bit < 8; bit++)
 						output().set_led_value(16 + bit, (arg >> bit) & 0x1);
 					break;
 			}
@@ -1634,7 +1635,7 @@ WRITE32_MEMBER(seattle_state::output_w)
 
 READ32_MEMBER(seattle_state::widget_r)
 {
-	UINT32 result = ~0;
+	uint32_t result = ~0;
 
 	switch (offset)
 	{
@@ -3306,8 +3307,8 @@ DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
 GAME( 1996, wg3dh,    0,        wg3dh,             wg3dh, seattle_state,    wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, mace,     0,        mace,              mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, macea,    mace,     mace,              mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sfrush,   0,        sfrush,            sfrush, seattle_state,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sfrushrk, 0,        sfrushrk,          sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, sfrush,   0,        sfrush,            sfrush, seattle_state,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1996, sfrushrk, 0,        sfrushrk,          sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
 GAMEL( 1998, calspeed, 0,        calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 GAMEL( 1998, calspeeda,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 GAMEL( 1998, calspeedb,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )

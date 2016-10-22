@@ -14,7 +14,7 @@
 
 PALETTE_INIT_MEMBER(retofinv_state, retofinv)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -34,7 +34,7 @@ PALETTE_INIT_MEMBER(retofinv_state, retofinv)
 	/* fg chars (1bpp) */
 	for (i = 0; i < 0x200; i++)
 	{
-		UINT8 ctabentry;
+		uint8_t ctabentry;
 
 		if (i & 0x01)
 			ctabentry = i >> 1;
@@ -47,7 +47,7 @@ PALETTE_INIT_MEMBER(retofinv_state, retofinv)
 	/* sprites and bg tiles */
 	for (i = 0; i < 0x800; i++)
 	{
-		UINT8 ctabentry = BITSWAP8(color_prom[i],4,5,6,7,3,2,1,0);
+		uint8_t ctabentry = BITSWAP8(color_prom[i],4,5,6,7,3,2,1,0);
 		palette.set_pen_indirect(i + 0x200, ctabentry);
 	}
 }
@@ -166,9 +166,9 @@ WRITE8_MEMBER(retofinv_state::gfx_ctrl_w)
 
 void retofinv_state::draw_sprites(bitmap_ind16 &bitmap)
 {
-	UINT8 *spriteram = m_sharedram + 0x0780;
-	UINT8 *spriteram_2 = m_sharedram + 0x0f80;
-	UINT8 *spriteram_3 = m_sharedram + 0x1780;
+	uint8_t *spriteram = m_sharedram + 0x0780;
+	uint8_t *spriteram_2 = m_sharedram + 0x0f80;
+	uint8_t *spriteram_3 = m_sharedram + 0x1780;
 	int offs;
 	const rectangle spritevisiblearea(2*8, 34*8-1, 0*8, 28*8-1);
 
@@ -219,7 +219,7 @@ void retofinv_state::draw_sprites(bitmap_ind16 &bitmap)
 
 
 
-UINT32 retofinv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t retofinv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap);

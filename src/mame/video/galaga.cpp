@@ -327,7 +327,7 @@ struct galaga_state::star galaga_state::m_star_seed_tab[252]=
 
 PALETTE_INIT_MEMBER(galaga_state,galaga)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* core palette */
@@ -471,9 +471,9 @@ WRITE8_MEMBER(galaga_state::gatsbee_bank_w)
 
 void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_galaga_ram1 + 0x380;
-	UINT8 *spriteram_2 = m_galaga_ram2 + 0x380;
-	UINT8 *spriteram_3 = m_galaga_ram3 + 0x380;
+	uint8_t *spriteram = m_galaga_ram1 + 0x380;
+	uint8_t *spriteram_2 = m_galaga_ram2 + 0x380;
+	uint8_t *spriteram_3 = m_galaga_ram3 + 0x380;
 	int offs;
 
 
@@ -551,7 +551,7 @@ void galaga_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect )
 	}
 }
 
-UINT32 galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	draw_stars(bitmap,cliprect);

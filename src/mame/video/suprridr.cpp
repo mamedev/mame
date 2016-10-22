@@ -18,14 +18,14 @@
 
 TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info)
 {
-	UINT8 code = m_bgram[tile_index];
+	uint8_t code = m_bgram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 
 TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info2)
 {
-	UINT8 code = m_fgram[tile_index];
+	uint8_t code = m_fgram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
@@ -59,7 +59,7 @@ void suprridr_state::video_start()
 
 PALETTE_INIT_MEMBER(suprridr_state, suprridr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 96; i++)
@@ -161,7 +161,7 @@ WRITE8_MEMBER(suprridr_state::fgram_w)
  *
  *************************************/
 
-UINT32 suprridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t suprridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle subclip;
 	const rectangle &visarea = screen.visible_area();

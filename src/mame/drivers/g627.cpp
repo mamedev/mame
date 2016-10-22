@@ -64,9 +64,9 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
 private:
-	UINT8 m_seg[6];
-	UINT8 m_portc;
-	UINT8 m_motor;
+	uint8_t m_seg[6];
+	uint8_t m_portc;
+	uint8_t m_motor;
 	bool m_type;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<7> m_switch;
@@ -227,7 +227,7 @@ WRITE8_MEMBER( g627_state::portc_w )
 // save segments until we can write the digits
 WRITE8_MEMBER( g627_state::disp_w )
 {
-	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 	offset <<= 1;
 	m_seg[offset] = patterns[data>>4];
 	m_seg[++offset] = patterns[data&15];
@@ -254,7 +254,7 @@ WRITE8_MEMBER( g627_state::lamp_w )
 
  */
 
-	UINT16 solenoid = (offset << 8) | data;
+	uint16_t solenoid = (offset << 8) | data;
 	switch (solenoid)
 	{
 		case 0x0101:

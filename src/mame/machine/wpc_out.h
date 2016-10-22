@@ -15,7 +15,7 @@ class wpc_out_device : public device_t
 public:
 	typedef delegate<bool (int, bool)> handler_t;
 
-	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_out_device();
 
 	DECLARE_WRITE8_MEMBER(out_w);
@@ -28,11 +28,11 @@ public:
 	void set_gi_count(int _count);
 
 protected:
-	UINT8 state[6], gi;
+	uint8_t state[6], gi;
 	bool first_after_led;
 	attotime previous_gi_update;
 	int gi_count;
-	UINT32 gi_time[5];
+	uint32_t gi_time[5];
 	emu_timer *timer;
 	const char *const *names;
 	handler_t handler_cb;

@@ -53,14 +53,14 @@ class adam_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~adam_expansion_slot_device() { }
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<adam_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 
 	// computer interface
-	UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
-	void bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
+	uint8_t bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
+	void bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
@@ -107,12 +107,12 @@ public:
 
 protected:
 	// runtime
-	virtual UINT8 adam_bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { return data; }
-	virtual void adam_bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { }
+	virtual uint8_t adam_bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { return data; }
+	virtual void adam_bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { }
 
 	adam_expansion_slot_device *m_slot;
 
-	optional_shared_ptr<UINT8> m_rom;
+	optional_shared_ptr<uint8_t> m_rom;
 };
 
 

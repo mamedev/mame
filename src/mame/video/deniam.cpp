@@ -62,7 +62,7 @@ TILEMAP_MAPPER_MEMBER(deniam_state::scan_pages)
 TILE_GET_INFO_MEMBER(deniam_state::get_bg_tile_info)
 {
 	int page = tile_index >> 11;
-	UINT16 attr = m_videoram[m_bg_page[page] * 0x0800 + (tile_index & 0x7ff)];
+	uint16_t attr = m_videoram[m_bg_page[page] * 0x0800 + (tile_index & 0x7ff)];
 	SET_TILE_INFO_MEMBER(0,
 			attr,
 			(attr & 0x1fc0) >> 6,
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
 {
 	int page = tile_index >> 11;
-	UINT16 attr = m_videoram[m_fg_page[page] * 0x0800 + (tile_index & 0x7ff)];
+	uint16_t attr = m_videoram[m_fg_page[page] * 0x0800 + (tile_index & 0x7ff)];
 	SET_TILE_INFO_MEMBER(0,
 			attr,
 			(attr & 0x1fc0) >> 6,
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(deniam_state::get_tx_tile_info)
 {
-	UINT16 attr = m_textram[tile_index];
+	uint16_t attr = m_textram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			attr & 0xf1ff,
 			(attr & 0x0e00) >> 9,
@@ -202,12 +202,12 @@ WRITE16_MEMBER(deniam_state::deniam_coinctrl_w)
 void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
-	UINT8 *gfx = memregion("gfx2")->base();
+	uint8_t *gfx = memregion("gfx2")->base();
 
 	for (offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int sx, starty, endy, x, y, start, color, width, flipx, primask;
-		UINT8 *rom = gfx;
+		uint8_t *rom = gfx;
 
 		sx = (m_spriteram[offs + 1] & 0x01ff) + 16 * 8 - 1;
 		if (sx >= 512) sx -= 512;
@@ -355,7 +355,7 @@ void deniam_state::set_fg_page( int page, int value )
 	}
 }
 
-UINT32 deniam_state::screen_update_deniam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t deniam_state::screen_update_deniam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bg_scrollx, bg_scrolly, fg_scrollx, fg_scrolly;
 	int page;

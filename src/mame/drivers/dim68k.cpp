@@ -67,16 +67,16 @@ public:
 	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	const UINT8 *m_p_chargen;
+	const uint8_t *m_p_chargen;
 	bool m_speaker_bit;
-	UINT8 m_video_control;
-	UINT8 m_term_data;
+	uint8_t m_video_control;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<uint16_t> m_ram;
 	required_device<palette_device> m_palette;
 };
 
@@ -212,9 +212,9 @@ INPUT_PORTS_END
 
 void dim68k_state::machine_reset()
 {
-	UINT8* ROM = memregion("bootrom")->base();
+	uint8_t* ROM = memregion("bootrom")->base();
 
-	memcpy((UINT8*)m_ram.target(), ROM, 0x2000);
+	memcpy((uint8_t*)m_ram.target(), ROM, 0x2000);
 
 	m_maincpu->reset();
 }
@@ -228,11 +228,11 @@ void dim68k_state::video_start()
 MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx,x,xx,inv;
-	UINT16 chr16=0x2020; // set to spaces if screen is off
-	UINT32 *p = &bitmap.pix32(y);
-	UINT8 screen_on = ~m_video_control & 4;
-	UINT8 dot8 = ~m_video_control & 40;
+	uint8_t chr,gfx,x,xx,inv;
+	uint16_t chr16=0x2020; // set to spaces if screen is off
+	uint32_t *p = &bitmap.pix32(y);
+	uint8_t screen_on = ~m_video_control & 4;
+	uint8_t dot8 = ~m_video_control & 40;
 
 	// need to divide everything in half to cater for 16-bit reads
 	x_count /= 2;

@@ -45,7 +45,7 @@ public:
 
 	void machine_reset() override;
 
-	UINT8 m_sysctl, m_pa, m_kbcin, m_kbcout;
+	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 };
 

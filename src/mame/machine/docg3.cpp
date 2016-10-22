@@ -38,33 +38,33 @@ const device_type DISKONCHIP_G3 = &device_creator<diskonchip_g3_device>;
 //  diskonchip_g3_device - constructor
 //-------------------------------------------------
 
-diskonchip_g3_device::diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+diskonchip_g3_device::diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DISKONCHIP_G3, "DiskOnChip G3", tag, owner, clock, "diskonchip_g3", __FILE__),
 		device_nvram_interface(mconfig, *this)
 {
 }
 
 
-UINT32 diskonchip_g3_device::g3_offset_data_1()
+uint32_t diskonchip_g3_device::g3_offset_data_1()
 {
 //  printf( "block %d pages %d page %d planes %d plane %d user_data_size %d extra_area_size %d\n", doc->block, doc->pages, doc->page, doc->planes, doc->plane, doc->user_data_size, doc->extra_area_size);
 	return ((((m_block * m_pages) + m_page) * m_planes) + m_plane) * (m_user_data_size + m_extra_area_size);
 }
 
-UINT32 diskonchip_g3_device::g3_offset_data_2()
+uint32_t diskonchip_g3_device::g3_offset_data_2()
 {
 	return ((((m_block * m_pages) + m_page) * m_planes) + m_plane) * 16;
 }
 
-UINT32 diskonchip_g3_device::g3_offset_data_3()
+uint32_t diskonchip_g3_device::g3_offset_data_3()
 {
 	return m_block * 8;
 }
 
-UINT8 diskonchip_g3_device::g3_read_data()
+uint8_t diskonchip_g3_device::g3_read_data()
 {
-	UINT8 data = 0;
-	UINT32 offset;
+	uint8_t data = 0;
+	uint32_t offset;
 	if (m_test == 0)
 	{
 		// read page data (512 + 16)
@@ -105,7 +105,7 @@ UINT8 diskonchip_g3_device::g3_read_data()
 
 READ16_MEMBER( diskonchip_g3_device::sec_1_r )
 {
-	UINT16 data;
+	uint16_t data;
 	if (m_sec_2[0x1B] & 0x40)
 	{
 		data = g3_read_data();
@@ -119,9 +119,9 @@ READ16_MEMBER( diskonchip_g3_device::sec_1_r )
 	return data;
 }
 
-void diskonchip_g3_device::g3_write_data(UINT8 data)
+void diskonchip_g3_device::g3_write_data(uint8_t data)
 {
-	UINT32 offset;
+	uint32_t offset;
 	if (m_test == 3)
 	{
 		// read page data (512 + 16)
@@ -132,7 +132,7 @@ void diskonchip_g3_device::g3_write_data(UINT8 data)
 		}
 		if (m_transfer_offset == 0)
 		{
-			const UINT8 xxx[] = { 0x00, 0x00, 0x27, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+			const uint8_t xxx[] = { 0x00, 0x00, 0x27, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 			offset = g3_offset_data_2();
 			memcpy( m_data[1].get() + offset, xxx, 16);
 		}
@@ -169,7 +169,7 @@ WRITE16_MEMBER( diskonchip_g3_device::sec_1_w )
 // #define DoC_G3_FlashCtrl 0x1038
 // #define DoC_G3_Nop 0x103e
 
-UINT16 diskonchip_g3_device::sec_2_read_1000()
+uint16_t diskonchip_g3_device::sec_2_read_1000()
 {
 	if (m_device == 0)
 	{
@@ -181,7 +181,7 @@ UINT16 diskonchip_g3_device::sec_2_read_1000()
 	}
 }
 
-UINT16 diskonchip_g3_device::sec_2_read_1074()
+uint16_t diskonchip_g3_device::sec_2_read_1074()
 {
 	if (m_device == 0)
 	{
@@ -193,16 +193,16 @@ UINT16 diskonchip_g3_device::sec_2_read_1074()
 	}
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_1042()
+uint8_t diskonchip_g3_device::sec_2_read_1042()
 {
-	UINT8 data;
+	uint8_t data;
 	if ((m_block == 0) && (m_page == 0) && (m_transfersize == 0x27))
 	{
 		data = 0x07;
 	}
 	else
 	{
-		UINT32 offset = g3_offset_data_2() + 0x02;
+		uint32_t offset = g3_offset_data_2() + 0x02;
 		data = m_data[1][offset]; //0x07; //data & ~(1 << 7);
 		if ((m_sec_2[0x41] & 0x10) == 0)
 		{
@@ -220,11 +220,11 @@ UINT8 diskonchip_g3_device::sec_2_read_1042()
 	return data;
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_1046()
+uint8_t diskonchip_g3_device::sec_2_read_1046()
 {
 	if (m_test == 0)
 	{
-		UINT32 offset = g3_offset_data_2() + 0x06;
+		uint32_t offset = g3_offset_data_2() + 0x06;
 		return m_data[1][offset];
 	}
 	else
@@ -233,11 +233,11 @@ UINT8 diskonchip_g3_device::sec_2_read_1046()
 	}
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_1048()
+uint8_t diskonchip_g3_device::sec_2_read_1048()
 {
 	if (m_test == 0)
 	{
-		UINT32 offset = g3_offset_data_2() + 0x08;
+		uint32_t offset = g3_offset_data_2() + 0x08;
 		return m_data[1][offset];
 	}
 	else
@@ -246,11 +246,11 @@ UINT8 diskonchip_g3_device::sec_2_read_1048()
 	}
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_1049()
+uint8_t diskonchip_g3_device::sec_2_read_1049()
 {
 	if (m_test == 0)
 	{
-		UINT32 offset = g3_offset_data_2() + 0x09;
+		uint32_t offset = g3_offset_data_2() + 0x09;
 		return m_data[1][offset];
 	}
 	else
@@ -259,11 +259,11 @@ UINT8 diskonchip_g3_device::sec_2_read_1049()
 	}
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_104A()
+uint8_t diskonchip_g3_device::sec_2_read_104A()
 {
 	if (m_test == 0)
 	{
-		UINT32 offset = g3_offset_data_2() + 0x0A;
+		uint32_t offset = g3_offset_data_2() + 0x0A;
 		return m_data[1][offset];
 	}
 	else
@@ -272,11 +272,11 @@ UINT8 diskonchip_g3_device::sec_2_read_104A()
 	}
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_104B()
+uint8_t diskonchip_g3_device::sec_2_read_104B()
 {
 	if (m_test == 0)
 	{
-		UINT32 offset = g3_offset_data_2() + 0x0B;
+		uint32_t offset = g3_offset_data_2() + 0x0B;
 		return m_data[1][offset];
 	}
 	else
@@ -285,11 +285,11 @@ UINT8 diskonchip_g3_device::sec_2_read_104B()
 	}
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_104C()
+uint8_t diskonchip_g3_device::sec_2_read_104C()
 {
 	if (m_test == 0)
 	{
-		UINT32 offset = g3_offset_data_2() + 0x0C;
+		uint32_t offset = g3_offset_data_2() + 0x0C;
 		return m_data[1][offset];
 	}
 	else
@@ -298,11 +298,11 @@ UINT8 diskonchip_g3_device::sec_2_read_104C()
 	}
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_104D()
+uint8_t diskonchip_g3_device::sec_2_read_104D()
 {
 	if (m_test == 0)
 	{
-		UINT32 offset = g3_offset_data_2() + 0x0D;
+		uint32_t offset = g3_offset_data_2() + 0x0D;
 		return m_data[1][offset];
 	}
 	else
@@ -311,11 +311,11 @@ UINT8 diskonchip_g3_device::sec_2_read_104D()
 	}
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_104E()
+uint8_t diskonchip_g3_device::sec_2_read_104E()
 {
 	if (m_test == 0)
 	{
-		UINT32 offset = g3_offset_data_2() + 0x0E;
+		uint32_t offset = g3_offset_data_2() + 0x0E;
 		return m_data[1][offset];
 	}
 	else
@@ -324,11 +324,11 @@ UINT8 diskonchip_g3_device::sec_2_read_104E()
 	}
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_104F()
+uint8_t diskonchip_g3_device::sec_2_read_104F()
 {
 	if (m_test == 0)
 	{
-		UINT32 offset = g3_offset_data_2() + 0x0F;
+		uint32_t offset = g3_offset_data_2() + 0x0F;
 		return m_data[1][offset];
 	}
 	else
@@ -337,22 +337,22 @@ UINT8 diskonchip_g3_device::sec_2_read_104F()
 	}
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_100E()
+uint8_t diskonchip_g3_device::sec_2_read_100E()
 {
 	return 0x81;
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_1014()
+uint8_t diskonchip_g3_device::sec_2_read_1014()
 {
 	return 0x01;
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_1022()
+uint8_t diskonchip_g3_device::sec_2_read_1022()
 {
 	return 0x85;
 }
 
-UINT8 diskonchip_g3_device::sec_2_read_1038()
+uint8_t diskonchip_g3_device::sec_2_read_1038()
 {
 	// bit 0 = ?
 	// bit 1 = ? error 0x7C
@@ -372,9 +372,9 @@ UINT8 diskonchip_g3_device::sec_2_read_1038()
 	}
 }
 
-UINT16 diskonchip_g3_device::sec_2_read16(UINT32 offset)
+uint16_t diskonchip_g3_device::sec_2_read16(uint32_t offset)
 {
-	UINT16 data = (m_sec_2[offset+0] << 0) + (m_sec_2[offset+1] << 8);
+	uint16_t data = (m_sec_2[offset+0] << 0) + (m_sec_2[offset+1] << 8);
 	switch (0x1000 + offset)
 	{
 		// ?
@@ -403,9 +403,9 @@ UINT16 diskonchip_g3_device::sec_2_read16(UINT32 offset)
 	return data;
 }
 
-UINT8 diskonchip_g3_device::sec_2_read8(UINT32 offset)
+uint8_t diskonchip_g3_device::sec_2_read8(uint32_t offset)
 {
-	UINT8 data = m_sec_2[offset];
+	uint8_t data = m_sec_2[offset];
 	switch (0x1000 + offset)
 	{
 		// ?
@@ -434,10 +434,10 @@ UINT8 diskonchip_g3_device::sec_2_read8(UINT32 offset)
 	return data;
 }
 
-void diskonchip_g3_device::sec_2_write_100C(UINT8 data)
+void diskonchip_g3_device::sec_2_write_100C(uint8_t data)
 {
 	const char *mode_name[] = { "reset", "normal", "deep power down" };
-	UINT32 mode = data & 3;
+	uint32_t mode = data & 3;
 	verboselog(*this, 5, "mode %d (%s)\n", mode, mode_name[mode]);
 	if (mode == 0)
 	{
@@ -445,7 +445,7 @@ void diskonchip_g3_device::sec_2_write_100C(UINT8 data)
 	}
 }
 
-void diskonchip_g3_device::sec_2_write_1032(UINT8 data)
+void diskonchip_g3_device::sec_2_write_1032(uint8_t data)
 {
 	verboselog(*this, 5, "flash select %02X\n", data);
 	if ((data == 0x12) || (data == 0x27))
@@ -459,9 +459,9 @@ void diskonchip_g3_device::sec_2_write_1032(UINT8 data)
 
 void diskonchip_g3_device::g3_erase_block()
 {
-	UINT32 offset;
+	uint32_t offset;
 	int i, j;
-	const UINT8 xxx[] = { 0x00, 0x00, 0x87, 0x00, 0x00, 0x00, 0xCE, 0x00, 0xCF, 0x72, 0xFC, 0x1B, 0xA9, 0xC7, 0xB9, 0x00 };
+	const uint8_t xxx[] = { 0x00, 0x00, 0x87, 0x00, 0x00, 0x00, 0xCE, 0x00, 0xCF, 0x72, 0xFC, 0x1B, 0xA9, 0xC7, 0xB9, 0x00 };
 	verboselog(*this, 5, "erase block %04X\n", m_block);
 	for (i=0;i<m_pages;i++)
 	{
@@ -484,7 +484,7 @@ void diskonchip_g3_device::g3_erase_block()
 // 'maincpu' (028848E4): diskonchip_sec_2_write_1034: unknown value 11/1D
 // 'maincpu' (028848E4): diskonchip_sec_2_write_1034: unknown value 10/1D
 
-void diskonchip_g3_device::sec_2_write_1034(UINT8 data)
+void diskonchip_g3_device::sec_2_write_1034(uint8_t data)
 {
 	verboselog(*this, 5, "flash command %02X\n", data);
 	if ((m_sec_2[0x32] == 0x0E) && (data == 0x00))
@@ -590,14 +590,14 @@ void diskonchip_g3_device::sec_2_write_1034(UINT8 data)
 	}
 }
 
-void diskonchip_g3_device::sec_2_write_1036(UINT8 data)
+void diskonchip_g3_device::sec_2_write_1036(uint8_t data)
 {
 	if (m_sec_2[0x34] == 0x60)
 	{
 		m_data_1036 |= data << (8 * m_data_1036_count++);
 		if (m_data_1036_count == 3)
 		{
-			UINT32 block, page, plane;
+			uint32_t block, page, plane;
 			block = (m_data_1036 >> 7);
 			if (block >= m_blocks) fatalerror( "DOCG3: invalid block (%d)\n", block);
 			plane = (m_data_1036 >> 6) & 1;
@@ -616,7 +616,7 @@ void diskonchip_g3_device::sec_2_write_1036(UINT8 data)
 		m_data_1036 |= data << (8 * m_data_1036_count++);
 		if (m_data_1036_count == 4)
 		{
-			UINT32 block, page, plane, unk;
+			uint32_t block, page, plane, unk;
 			block = (m_data_1036 >> 15);
 			plane = (m_data_1036 >> 14) & 1;
 			page = (m_data_1036 >> 8) & 0x3F;
@@ -638,19 +638,19 @@ void diskonchip_g3_device::sec_2_write_1036(UINT8 data)
 	}
 }
 
-void diskonchip_g3_device::sec_2_write_1040(UINT16 data)
+void diskonchip_g3_device::sec_2_write_1040(uint16_t data)
 {
 	m_transfersize = (data & 0x3FF);
 	verboselog(*this, 5, "flash transfer size %04X\n", m_transfersize);
 }
 
-void diskonchip_g3_device::sec_2_write_100A(UINT8 data)
+void diskonchip_g3_device::sec_2_write_100A(uint8_t data)
 {
 	m_device = data & 3;
 	verboselog(*this, 5, "select device %d\n", m_device);
 }
 
-void diskonchip_g3_device::sec_2_write16(UINT32 offset, UINT16 data)
+void diskonchip_g3_device::sec_2_write16(uint32_t offset, uint16_t data)
 {
 	m_sec_2[offset+0] = (data >> 0) & 0xFF;
 	m_sec_2[offset+1] = (data >> 8) & 0xFF;
@@ -672,7 +672,7 @@ void diskonchip_g3_device::sec_2_write16(UINT32 offset, UINT16 data)
 	}
 }
 
-void diskonchip_g3_device::sec_2_write8(UINT32 offset, UINT8 data)
+void diskonchip_g3_device::sec_2_write8(uint32_t offset, uint8_t data)
 {
 	m_sec_2[offset] = data;
 	verboselog(*this, 9, "(DOC) %08X <- %02X\n", 0x1000 + offset, data);
@@ -734,7 +734,7 @@ WRITE16_MEMBER( diskonchip_g3_device::sec_2_w )
 
 READ16_MEMBER( diskonchip_g3_device::sec_3_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	verboselog(*this, 9, "(DOC) %08X -> %04X\n", 0x1800 + (offset << 1), data);
 	return data;
 }
@@ -777,12 +777,12 @@ void diskonchip_g3_device::device_start()
 
 	memset(m_sec_2, 0, sizeof(m_sec_2));
 
-	m_data[0] = std::make_unique<UINT8[]>(m_data_size[0]);
-	memset(m_data[0].get(), 0, sizeof(UINT8) * m_data_size[0]);
-	m_data[1] = std::make_unique<UINT8[]>(m_data_size[1]);
-	memset(m_data[1].get(), 0, sizeof(UINT8) * m_data_size[1]);
-	m_data[2] = std::make_unique<UINT8[]>(m_data_size[2]);
-	memset(m_data[2].get(), 0, sizeof(UINT8) * m_data_size[2]);
+	m_data[0] = std::make_unique<uint8_t[]>(m_data_size[0]);
+	memset(m_data[0].get(), 0, sizeof(uint8_t) * m_data_size[0]);
+	m_data[1] = std::make_unique<uint8_t[]>(m_data_size[1]);
+	memset(m_data[1].get(), 0, sizeof(uint8_t) * m_data_size[1]);
+	m_data[2] = std::make_unique<uint8_t[]>(m_data_size[2]);
+	memset(m_data[2].get(), 0, sizeof(uint8_t) * m_data_size[2]);
 
 //  diskonchip_load( device, "diskonchip");
 

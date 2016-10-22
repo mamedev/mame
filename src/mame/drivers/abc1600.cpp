@@ -102,10 +102,10 @@ enum
 
 READ8_MEMBER( abc1600_state::bus_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// card select pulse
-	UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
+	uint8_t cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
 
 	m_bus0i->cs_w(cs);
 	m_bus0x->cs_w(cs);
@@ -244,7 +244,7 @@ READ8_MEMBER( abc1600_state::bus_r )
 
 WRITE8_MEMBER( abc1600_state::bus_w )
 {
-	UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
+	uint8_t cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
 
 	m_bus0i->cs_w(cs);
 	m_bus0x->cs_w(cs);
@@ -632,7 +632,7 @@ READ8_MEMBER( abc1600_state::cio_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_bus2->irq_r();
 	data |= m_bus1->irq_r() << 1;
@@ -663,7 +663,7 @@ READ8_MEMBER( abc1600_state::cio_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= !m_sysscc << 5;
 	data |= !m_sysfs << 6;
@@ -711,7 +711,7 @@ READ8_MEMBER( abc1600_state::cio_pc_r )
 
 	*/
 
-	UINT8 data = 0x0d;
+	uint8_t data = 0x0d;
 
 	// data in
 	data |= (m_rtc->dio_r() || m_nvram->do_r()) << 1;

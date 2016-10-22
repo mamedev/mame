@@ -74,7 +74,7 @@
 /*
     Constructor
 */
-ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__),
 	m_video(*owner, VDP_TAG),
 	m_sound(*owner, TISOUNDCHIP_TAG),
@@ -106,7 +106,7 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
     DEVICE ACCESSOR FUNCTIONS
 ***************************************************************************/
 
-void ti99_datamux_device::read_all(address_space& space, UINT16 addr, UINT8 *value)
+void ti99_datamux_device::read_all(address_space& space, uint16_t addr, uint8_t *value)
 {
 	// Valid access
 	bool validaccess = ((addr & 0x0400)==0);
@@ -144,7 +144,7 @@ void ti99_datamux_device::read_all(address_space& space, UINT16 addr, UINT8 *val
 	m_peb->memen_in(CLEAR_LINE);
 }
 
-void ti99_datamux_device::write_all(address_space& space, UINT16 addr, UINT8 value)
+void ti99_datamux_device::write_all(address_space& space, uint16_t addr, uint8_t value)
 {
 	// GROM access
 	if ((addr & 0xf801)==0x9800)
@@ -180,7 +180,7 @@ void ti99_datamux_device::write_all(address_space& space, UINT16 addr, UINT8 val
 	m_peb->memen_in(CLEAR_LINE);
 }
 
-void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
+void ti99_datamux_device::setaddress_all(address_space& space, uint16_t addr)
 {
 	line_state a14 = ((addr & 2)!=0)? ASSERT_LINE : CLEAR_LINE;
 
@@ -223,10 +223,10 @@ void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
     mapped devices are excluded because their state would be changed
     unpredictably by the debugger access.
 */
-UINT16 ti99_datamux_device::debugger_read(address_space& space, UINT16 addr)
+uint16_t ti99_datamux_device::debugger_read(address_space& space, uint16_t addr)
 {
-	UINT16 addrb = addr << 1;
-	UINT16 value = 0;
+	uint16_t addrb = addr << 1;
+	uint16_t value = 0;
 
 	if ((addrb & 0xe000)==0x0000) value = m_consolerom[(addrb & 0x1fff)>>1];
 	else
@@ -248,8 +248,8 @@ UINT16 ti99_datamux_device::debugger_read(address_space& space, UINT16 addr)
 			}
 			else
 			{
-				UINT8 lval = 0;
-				UINT8 hval = 0;
+				uint8_t lval = 0;
+				uint8_t hval = 0;
 
 				if ((addrb & 0xe000)==0x6000)
 				{
@@ -268,9 +268,9 @@ UINT16 ti99_datamux_device::debugger_read(address_space& space, UINT16 addr)
 	return value;
 }
 
-void ti99_datamux_device::debugger_write(address_space& space, UINT16 addr, UINT16 data)
+void ti99_datamux_device::debugger_write(address_space& space, uint16_t addr, uint16_t data)
 {
-	UINT16 addrb = addr << 1;
+	uint16_t addrb = addr << 1;
 
 	if ((addrb & 0xe000)==0x0000) return;
 
@@ -319,7 +319,7 @@ void ti99_datamux_device::debugger_write(address_space& space, UINT16 addr, UINT
 */
 READ16_MEMBER( ti99_datamux_device::read )
 {
-	UINT16 value = 0;
+	uint16_t value = 0;
 
 	// Care for debugger
 	if (space.debugger_access())
@@ -355,7 +355,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 			{
 				// The byte from the odd address has already been read into the latch
 				// Reading the even address now (addr)
-				UINT8 hbyte = 0;
+				uint8_t hbyte = 0;
 				read_all(space, m_addr_buf, &hbyte);
 				if (TRACE_ACCESS) logerror("Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
 
@@ -589,7 +589,7 @@ void ti99_datamux_device::device_stop(void)
 
 void ti99_datamux_device::device_reset(void)
 {
-	m_consolerom = (UINT16*)owner()->memregion(CONSOLEROM)->base();
+	m_consolerom = (uint16_t*)owner()->memregion(CONSOLEROM)->base();
 	m_use32k = (ioport("RAM")->read()==1);
 	m_console_groms_present = (ioport("GROMENA")->read()==1);
 

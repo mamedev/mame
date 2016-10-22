@@ -63,7 +63,7 @@ class wd7600_device : public device_t
 {
 public:
 	// construction/destruction
-	wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -110,9 +110,9 @@ public:
 	DECLARE_READ8_MEMBER( dma1_ior1_r ) { return m_read_ior(1); }
 	DECLARE_READ8_MEMBER( dma1_ior2_r ) { return m_read_ior(2); }
 	DECLARE_READ8_MEMBER( dma1_ior3_r ) { return m_read_ior(3); }
-	DECLARE_READ8_MEMBER( dma2_ior1_r ) { UINT16 result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior2_r ) { UINT16 result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior3_r ) { UINT16 result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior1_r ) { uint16_t result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior2_r ) { uint16_t result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior3_r ) { uint16_t result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
 	DECLARE_WRITE8_MEMBER( dma1_iow0_w ) { m_write_iow(0, data, 0xffff); }
 	DECLARE_WRITE8_MEMBER( dma1_iow1_w ) { m_write_iow(1, data, 0xffff); }
 	DECLARE_WRITE8_MEMBER( dma1_iow2_w ) { m_write_iow(2, data, 0xffff); }
@@ -207,30 +207,30 @@ private:
 	const char *m_isatag;
 	const char *m_biostag;
 	const char *m_keybctag;
-	UINT8 m_portb;
+	uint8_t m_portb;
 	int m_iochck;
 	int m_nmi_mask;
 	int m_alt_a20;
 	int m_ext_gatea20;
 	int m_kbrst;
 	int m_refresh_toggle;
-	UINT16 m_refresh_ctrl;
-	UINT16 m_memory_ctrl;
-	UINT16 m_chip_sel;
-	UINT16 m_split_start;
-	UINT8 m_bank_start[4];
-	UINT16 m_diagnostic;
+	uint16_t m_refresh_ctrl;
+	uint16_t m_memory_ctrl;
+	uint16_t m_chip_sel;
+	uint16_t m_split_start;
+	uint8_t m_bank_start[4];
+	uint16_t m_diagnostic;
 
 	int m_dma_eop;
-	UINT8 m_dma_page[0x10];
-	UINT8 m_dma_high_byte;
+	uint8_t m_dma_page[0x10];
+	uint8_t m_dma_high_byte;
 	int m_dma_channel;
 
 	address_space *m_space;
 	address_space *m_space_io;
-	UINT8 *m_isa;
-	UINT8 *m_bios;
-	UINT8 *m_ram;
+	uint8_t *m_isa;
+	uint8_t *m_bios;
+	uint8_t *m_ram;
 	at_keyboard_controller_device *m_keybc;
 };
 

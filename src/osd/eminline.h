@@ -57,9 +57,9 @@
 -------------------------------------------------*/
 
 #ifndef mul_32x32
-static inline INT64 mul_32x32(INT32 a, INT32 b)
+static inline int64_t mul_32x32(int32_t a, int32_t b)
 {
-	return (INT64)a * (INT64)b;
+	return (int64_t)a * (int64_t)b;
 }
 #endif
 
@@ -71,9 +71,9 @@ static inline INT64 mul_32x32(INT32 a, INT32 b)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32
-static inline UINT64 mulu_32x32(UINT32 a, UINT32 b)
+static inline uint64_t mulu_32x32(uint32_t a, uint32_t b)
 {
-	return (UINT64)a * (UINT64)b;
+	return (uint64_t)a * (uint64_t)b;
 }
 #endif
 
@@ -85,9 +85,9 @@ static inline UINT64 mulu_32x32(UINT32 a, UINT32 b)
 -------------------------------------------------*/
 
 #ifndef mul_32x32_hi
-static inline INT32 mul_32x32_hi(INT32 a, INT32 b)
+static inline int32_t mul_32x32_hi(int32_t a, int32_t b)
 {
-	return (UINT32)(((INT64)a * (INT64)b) >> 32);
+	return (uint32_t)(((int64_t)a * (int64_t)b) >> 32);
 }
 #endif
 
@@ -99,9 +99,9 @@ static inline INT32 mul_32x32_hi(INT32 a, INT32 b)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32_hi
-static inline UINT32 mulu_32x32_hi(UINT32 a, UINT32 b)
+static inline uint32_t mulu_32x32_hi(uint32_t a, uint32_t b)
 {
-	return (UINT32)(((UINT64)a * (UINT64)b) >> 32);
+	return (uint32_t)(((uint64_t)a * (uint64_t)b) >> 32);
 }
 #endif
 
@@ -114,9 +114,9 @@ static inline UINT32 mulu_32x32_hi(UINT32 a, UINT32 b)
 -------------------------------------------------*/
 
 #ifndef mul_32x32_shift
-static inline INT32 mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+static inline int32_t mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 {
-	return (INT32)(((INT64)a * (INT64)b) >> shift);
+	return (int32_t)(((int64_t)a * (int64_t)b) >> shift);
 }
 #endif
 
@@ -129,9 +129,9 @@ static inline INT32 mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32_shift
-static inline UINT32 mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+static inline uint32_t mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 {
-	return (UINT32)(((UINT64)a * (UINT64)b) >> shift);
+	return (uint32_t)(((uint64_t)a * (uint64_t)b) >> shift);
 }
 #endif
 
@@ -142,9 +142,9 @@ static inline UINT32 mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 -------------------------------------------------*/
 
 #ifndef div_64x32
-static inline INT32 div_64x32(INT64 a, INT32 b)
+static inline int32_t div_64x32(int64_t a, int32_t b)
 {
-	return a / (INT64)b;
+	return a / (int64_t)b;
 }
 #endif
 
@@ -155,9 +155,9 @@ static inline INT32 div_64x32(INT64 a, INT32 b)
 -------------------------------------------------*/
 
 #ifndef divu_64x32
-static inline UINT32 divu_64x32(UINT64 a, UINT32 b)
+static inline uint32_t divu_64x32(uint64_t a, uint32_t b)
 {
-	return a / (UINT64)b;
+	return a / (uint64_t)b;
 }
 #endif
 
@@ -169,10 +169,10 @@ static inline UINT32 divu_64x32(UINT64 a, UINT32 b)
 -------------------------------------------------*/
 
 #ifndef div_64x32_rem
-static inline INT32 div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
+static inline int32_t div_64x32_rem(int64_t a, int32_t b, int32_t *remainder)
 {
-	INT32 res = div_64x32(a, b);
-	*remainder = a - ((INT64)b * res);
+	int32_t res = div_64x32(a, b);
+	*remainder = a - ((int64_t)b * res);
 	return res;
 }
 #endif
@@ -185,10 +185,10 @@ static inline INT32 div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
 -------------------------------------------------*/
 
 #ifndef divu_64x32_rem
-static inline UINT32 divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
+static inline uint32_t divu_64x32_rem(uint64_t a, uint32_t b, uint32_t *remainder)
 {
-	UINT32 res = divu_64x32(a, b);
-	*remainder = a - ((UINT64)b * res);
+	uint32_t res = divu_64x32(a, b);
+	*remainder = a - ((uint64_t)b * res);
 	return res;
 }
 #endif
@@ -201,9 +201,9 @@ static inline UINT32 divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
 -------------------------------------------------*/
 
 #ifndef div_32x32_shift
-static inline INT32 div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+static inline int32_t div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 {
-	return ((INT64)a << shift) / (INT64)b;
+	return ((int64_t)a << shift) / (int64_t)b;
 }
 #endif
 
@@ -215,9 +215,9 @@ static inline INT32 div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 -------------------------------------------------*/
 
 #ifndef divu_32x32_shift
-static inline UINT32 divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+static inline uint32_t divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 {
-	return ((UINT64)a << shift) / (UINT64)b;
+	return ((uint64_t)a << shift) / (uint64_t)b;
 }
 #endif
 
@@ -228,7 +228,7 @@ static inline UINT32 divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 -------------------------------------------------*/
 
 #ifndef mod_64x32
-static inline INT32 mod_64x32(INT64 a, INT32 b)
+static inline int32_t mod_64x32(int64_t a, int32_t b)
 {
 	return a - (b * div_64x32(a, b));
 }
@@ -241,7 +241,7 @@ static inline INT32 mod_64x32(INT64 a, INT32 b)
 -------------------------------------------------*/
 
 #ifndef modu_64x32
-static inline UINT32 modu_64x32(UINT64 a, UINT32 b)
+static inline uint32_t modu_64x32(uint64_t a, uint32_t b)
 {
 	return a - (b * divu_64x32(a, b));
 }
@@ -272,10 +272,10 @@ static inline float recip_approx(float value)
 -------------------------------------------------*/
 
 #ifndef count_leading_zeros
-static inline UINT8 count_leading_zeros(UINT32 val)
+static inline uint8_t count_leading_zeros(uint32_t val)
 {
-	UINT8 count;
-	for (count = 0; (INT32)val >= 0; count++) val <<= 1;
+	uint8_t count;
+	for (count = 0; (int32_t)val >= 0; count++) val <<= 1;
 	return count;
 }
 #endif
@@ -287,10 +287,10 @@ static inline UINT8 count_leading_zeros(UINT32 val)
 -------------------------------------------------*/
 
 #ifndef count_leading_ones
-static inline UINT8 count_leading_ones(UINT32 val)
+static inline uint8_t count_leading_ones(uint32_t val)
 {
-	UINT8 count;
-	for (count = 0; (INT32)val < 0; count++) val <<= 1;
+	uint8_t count;
+	for (count = 0; (int32_t)val < 0; count++) val <<= 1;
 	return count;
 }
 #endif
@@ -308,7 +308,7 @@ static inline UINT8 count_leading_ones(UINT32 val)
 -------------------------------------------------*/
 
 #ifndef get_profile_ticks
-static inline INT64 get_profile_ticks(void)
+static inline int64_t get_profile_ticks(void)
 {
 	return osd_ticks();
 }

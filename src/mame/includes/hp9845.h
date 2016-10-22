@@ -17,7 +17,7 @@ class hp9845b_state : public driver_device
 public:
 	hp9845b_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -37,11 +37,11 @@ public:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_irq(void);
-	void irq_w(UINT8 sc , int state);
+	void irq_w(uint8_t sc , int state);
 	void update_flg_sts(void);
-	void sts_w(UINT8 sc , int state);
-	void flg_w(UINT8 sc , int state);
-	void install_readwrite_handler(UINT8 sc , read16_delegate rhandler, write16_delegate whandler);
+	void sts_w(uint8_t sc , int state);
+	void flg_w(uint8_t sc , int state);
+	void install_readwrite_handler(uint8_t sc , read16_delegate rhandler, write16_delegate whandler);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	DECLARE_READ16_MEMBER(kb_scancode_r);
@@ -70,31 +70,31 @@ private:
 	required_device<timer_device> m_beep_timer;
 	required_device<hp9845_io_slot_device> m_io_slot0;
 
-	void set_video_mar(UINT16 mar);
+	void set_video_mar(uint16_t mar);
 	void video_fill_buff(bool buff_idx);
 	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
 	void graphic_video_render(unsigned video_scanline);
 
 	// Character generator
-	const UINT8 *m_chargen;
+	const uint8_t *m_chargen;
 
 	// Optional character generator
-	const UINT8 *m_optional_chargen;
+	const uint8_t *m_optional_chargen;
 
 	// Text mode video I/F
 	typedef struct {
-		UINT8 chars[ 80 ];
-		UINT8 attrs[ 80 ];
+		uint8_t chars[ 80 ];
+		uint8_t attrs[ 80 ];
 		bool full;
 	} video_buffer_t;
 
 	bitmap_rgb32 m_bitmap;
 	offs_t m_video_mar;
-	UINT16 m_video_word;
+	uint16_t m_video_word;
 	bool m_video_load_mar;
 	bool m_video_first_mar;
 	bool m_video_byte_idx;
-	UINT8 m_video_attr;
+	uint8_t m_video_attr;
 	bool m_video_buff_idx;
 	bool m_video_blanked;
 	video_buffer_t m_video_buff[ 2 ];
@@ -116,30 +116,30 @@ private:
 	gv_fsm_state_t m_gv_fsm_state;
 	bool m_gv_int_en;
 	bool m_gv_dma_en;
-	UINT8 m_gv_cmd; // U65 (GC)
-	UINT16 m_gv_data_w;     // U29, U45, U28 & U44 (GC)
-	UINT16 m_gv_data_r;     // U59 & U60 (GC)
-	UINT16 m_gv_io_counter; // U1, U2, U14 & U15 (GC)
-	UINT16 m_gv_cursor_w;   // U38 & U39 (GS)
-	UINT16 m_gv_cursor_x;   // U31 & U23 (GS)
-	UINT16 m_gv_cursor_y;   // U15 & U8 (GS)
+	uint8_t m_gv_cmd; // U65 (GC)
+	uint16_t m_gv_data_w;     // U29, U45, U28 & U44 (GC)
+	uint16_t m_gv_data_r;     // U59 & U60 (GC)
+	uint16_t m_gv_io_counter; // U1, U2, U14 & U15 (GC)
+	uint16_t m_gv_cursor_w;   // U38 & U39 (GS)
+	uint16_t m_gv_cursor_x;   // U31 & U23 (GS)
+	uint16_t m_gv_cursor_y;   // U15 & U8 (GS)
 	bool m_gv_cursor_gc;    // U8 (GS)
 	bool m_gv_cursor_fs;    // U8 (GS)
-	std::vector<UINT16> m_graphic_mem;
+	std::vector<uint16_t> m_graphic_mem;
 
 	// Interrupt handling
-	UINT8 m_irl_pending;
-	UINT8 m_irh_pending;
+	uint8_t m_irl_pending;
+	uint8_t m_irh_pending;
 
 	// FLG/STS handling
-	UINT8 m_pa;
-	UINT16 m_flg_status;
-	UINT16 m_sts_status;
+	uint8_t m_pa;
+	uint16_t m_flg_status;
+	uint16_t m_sts_status;
 
 	// State of keyboard
 	ioport_value m_kb_state[ 4 ];
-	UINT8 m_kb_scancode;
-	UINT16 m_kb_status;
+	uint8_t m_kb_scancode;
+	uint16_t m_kb_status;
 };
 
 #endif /* _HP9845_H_ */

@@ -48,12 +48,12 @@ protected:
 public:
 	DECLARE_DRIVER_INIT(de_3b);
 
-	UINT8 m_strobe;
-	UINT8 m_kbdrow;
-	UINT8 m_diag;
+	uint8_t m_strobe;
+	uint8_t m_kbdrow;
+	uint8_t m_diag;
 	bool m_ca1;
 	bool m_irq_active;
-	UINT8 m_sound_data;
+	uint8_t m_sound_data;
 
 };
 
@@ -181,7 +181,7 @@ WRITE8_MEMBER( de_3b_state::pia2c_pb_w )
 }
 READ8_MEMBER(de_3b_state::display_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	switch(offset)
 	{

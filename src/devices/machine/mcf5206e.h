@@ -51,9 +51,9 @@ class mcf5206e_peripheral_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void ICR_info(UINT8 ICR);
+	void ICR_info(uint8_t ICR);
 
 	DECLARE_READ32_MEMBER( dev_r );
 	DECLARE_WRITE32_MEMBER( dev_w );
@@ -68,12 +68,12 @@ public:
 	DECLARE_READ8_MEMBER( ICR13_r );
 	DECLARE_WRITE8_MEMBER( ICR13_w );
 
-	UINT16 CSAR_r(int which, int offset, UINT16 mem_mask);
-	void CSAR_w(int which, int offset, UINT16 data, UINT16 mem_mask);
-	UINT32 CSMR_r(int which, UINT32 mem_mask);
-	void CSMR_w(int which, UINT32 data, UINT32 mem_mask);
-	UINT16 CSCR_r(int which, int offset, UINT16 mem_mask);
-	void CSCR_w(int which, int offset, UINT16 data, UINT16 mem_mask);
+	uint16_t CSAR_r(int which, int offset, uint16_t mem_mask);
+	void CSAR_w(int which, int offset, uint16_t data, uint16_t mem_mask);
+	uint32_t CSMR_r(int which, uint32_t mem_mask);
+	void CSMR_w(int which, uint32_t data, uint32_t mem_mask);
+	uint16_t CSCR_r(int which, int offset, uint16_t mem_mask);
+	void CSCR_w(int which, int offset, uint16_t data, uint16_t mem_mask);
 
 	DECLARE_READ16_MEMBER(  CSAR0_r );
 	DECLARE_WRITE16_MEMBER( CSAR0_w );
@@ -176,34 +176,34 @@ private:
 
 	void init_regs(bool first_init);
 
-	UINT8 m_ICR[MAX_ICR];
+	uint8_t m_ICR[MAX_ICR];
 
-	UINT16 m_CSAR[8];
-	UINT32 m_CSMR[8];
-	UINT16 m_CSCR[8];
+	uint16_t m_CSAR[8];
+	uint32_t m_CSMR[8];
+	uint16_t m_CSCR[8];
 
-	UINT16 m_DMCR;
-	UINT16 m_PAR;
+	uint16_t m_DMCR;
+	uint16_t m_PAR;
 
 	emu_timer *m_timer1;
-	UINT16 m_TMR1;
-	UINT16 m_TRR1;
-	UINT8 m_TER1;
-	UINT16 m_TCN1;
+	uint16_t m_TMR1;
+	uint16_t m_TRR1;
+	uint8_t m_TER1;
+	uint16_t m_TCN1;
 	TIMER_CALLBACK_MEMBER(timer1_callback);
 
 
-	UINT8 m_PPDDR;
-	UINT8 m_PPDAT;
+	uint8_t m_PPDDR;
+	uint8_t m_PPDAT;
 
-	UINT16 m_IMR;
+	uint16_t m_IMR;
 
-	UINT8 m_MBCR;
-	UINT8 m_MBSR;
-	UINT8 m_MFDR;
-	UINT8 m_MBDR;
+	uint8_t m_MBCR;
+	uint8_t m_MBSR;
+	uint8_t m_MFDR;
+	uint8_t m_MBDR;
 
-	UINT32 m_coldfire_regs[0x400/4];
+	uint32_t m_coldfire_regs[0x400/4];
 
 private:
 };

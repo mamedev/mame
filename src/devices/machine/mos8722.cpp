@@ -68,7 +68,7 @@ static const offs_t RCR_TOP_ADDRESS[4] =    { 0xf000, 0xf000, 0xe000, 0xc000 };
 //  mos8722_device - constructor
 //-------------------------------------------------
 
-mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MOS8722, "MOS8722", tag, owner, clock, "mos8722", __FILE__),
 	m_write_z80en(*this),
 	m_write_fsdir(*this),
@@ -119,7 +119,7 @@ void mos8722_device::device_reset()
 //  read - register read
 //-------------------------------------------------
 
-UINT8 mos8722_device::read(offs_t offset, UINT8 data)
+uint8_t mos8722_device::read(offs_t offset, uint8_t data)
 {
 	if (MCR_C64) return data;
 

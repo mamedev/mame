@@ -25,7 +25,7 @@ public:
 
 	required_device<upd7220_device> m_hgdc;
 
-	required_shared_ptr<UINT16> m_video_ram;
+	required_shared_ptr<uint16_t> m_video_ram;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -38,7 +38,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( if800_state::hgdc_display_pixels )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	int xi,gfx;
-	UINT8 pen;
+	uint8_t pen;
 
 	gfx = m_video_ram[address >> 1];
 

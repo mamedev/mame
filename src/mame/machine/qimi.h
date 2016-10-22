@@ -34,14 +34,14 @@ class qimi_t :  public device_t
 {
 public:
 	// construction/destruction
-	qimi_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	qimi_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_exting_wr_callback(device_t &device, _Object object) { return downcast<qimi_t &>(device).m_write_extint.set_callback(object); }
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	UINT8 read(address_space &space, offs_t offset, UINT8 data);
+	uint8_t read(address_space &space, offs_t offset, uint8_t data);
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
@@ -65,7 +65,7 @@ private:
 
 	required_ioport m_buttons;
 
-	UINT8 m_status;
+	uint8_t m_status;
 	bool m_extint_en;
 };
 

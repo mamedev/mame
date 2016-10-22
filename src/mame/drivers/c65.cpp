@@ -50,17 +50,17 @@ public:
 	required_device<mos6526_device> m_cia1;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_workram;
-	required_shared_ptr<UINT8> m_palred;
-	required_shared_ptr<UINT8> m_palgreen;
-	required_shared_ptr<UINT8> m_palblue;
-	required_shared_ptr<UINT8> m_dmalist;
-	required_shared_ptr<UINT8> m_cram;
+	required_shared_ptr<uint8_t> m_workram;
+	required_shared_ptr<uint8_t> m_palred;
+	required_shared_ptr<uint8_t> m_palgreen;
+	required_shared_ptr<uint8_t> m_palblue;
+	required_shared_ptr<uint8_t> m_dmalist;
+	required_shared_ptr<uint8_t> m_cram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	UINT8 *m_iplrom;
-	UINT8 m_keyb_input[10];
-	UINT8 m_keyb_mux;
+	uint8_t *m_iplrom;
+	uint8_t m_keyb_input[10];
+	uint8_t m_keyb_mux;
 
 	DECLARE_READ8_MEMBER(vic4567_dummy_r);
 	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
@@ -79,7 +79,7 @@ public:
 	DECLARE_READ8_MEMBER(dummy_r);
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(c65);
 	DECLARE_DRIVER_INIT(c65);
 	DECLARE_DRIVER_INIT(c65pal);
@@ -92,16 +92,16 @@ protected:
 
 	virtual void video_start() override;
 private:
-	UINT8 m_VIC2_IRQPend, m_VIC2_IRQMask;
+	uint8_t m_VIC2_IRQPend, m_VIC2_IRQMask;
 	/* 0x20: border color (TODO: different thread?) */
-	UINT8 m_VIC2_EXTColor;
+	uint8_t m_VIC2_EXTColor;
 	/* 0x30: banking + PAL + EXT SYNC */
-	UINT8 m_VIC3_ControlA;
+	uint8_t m_VIC3_ControlA;
 	/* 0x31: video modes */
-	UINT8 m_VIC3_ControlB;
-	void PalEntryFlush(UINT8 offset);
-	void DMAgicExecute(address_space &space,UINT32 address);
-	void IRQCheck(UINT8 irq_cause);
+	uint8_t m_VIC3_ControlB;
+	void PalEntryFlush(uint8_t offset);
+	void DMAgicExecute(address_space &space,uint32_t address);
+	void IRQCheck(uint8_t irq_cause);
 	int inner_x_char(int xoffs);
 	int inner_y_char(int yoffs);
 };
@@ -121,7 +121,7 @@ int c65_state::inner_y_char(int yoffs)
 	return yoffs>>3;
 }
 
-UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int y,x;
 	int border_color = m_VIC2_EXTColor & 0xf;
@@ -136,8 +136,8 @@ UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, co
 			int yi = inner_y_char(y);
 			int xm = 7 - (x & 7);
 			int ym = (y & 7);
-			UINT8 tile = m_workram[xi+yi*80+0x800];
-			UINT8 attr = m_cram[xi+yi*80];
+			uint8_t tile = m_workram[xi+yi*80+0x800];
+			uint8_t attr = m_cram[xi+yi*80];
 			if(attr & 0xf0)
 				attr = machine().rand() & 0xf;
 
@@ -156,7 +156,7 @@ UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, co
 
 READ8_MEMBER(c65_state::vic4567_dummy_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res=0xff;
 	switch(offset)
@@ -226,7 +226,7 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 
 }
 
-void c65_state::PalEntryFlush(UINT8 offset)
+void c65_state::PalEntryFlush(uint8_t offset)
 {
 	m_palette->set_pen_color(offset, pal4bit(m_palred[offset]), pal4bit(m_palgreen[offset]), pal4bit(m_palblue[offset]));
 }
@@ -249,11 +249,11 @@ WRITE8_MEMBER(c65_state::PalBlue_w)
 	PalEntryFlush(offset);
 }
 
-void c65_state::DMAgicExecute(address_space &space,UINT32 address)
+void c65_state::DMAgicExecute(address_space &space,uint32_t address)
 {
-	UINT8 cmd;// = space.read_byte(address++);
-	UINT16 length; //= space.read_byte(address++);
-	UINT32 src, dst;
+	uint8_t cmd;// = space.read_byte(address++);
+	uint16_t length; //= space.read_byte(address++);
+	uint32_t src, dst;
 	static const char *const dma_cmd_string[] =
 	{
 		"COPY",                 // 0
@@ -279,9 +279,9 @@ void c65_state::DMAgicExecute(address_space &space,UINT32 address)
 		{
 				if(length != 1)
 					printf("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
-				UINT32 SourceIndex;
-				UINT32 DestIndex;
-				UINT16 SizeIndex;
+				uint32_t SourceIndex;
+				uint32_t DestIndex;
+				uint16_t SizeIndex;
 				SourceIndex = src & 0xfffff;
 				DestIndex = dst & 0xfffff;
 				SizeIndex = length;
@@ -297,9 +297,9 @@ void c65_state::DMAgicExecute(address_space &space,UINT32 address)
 			{
 				/* TODO: upper bits of source */
 				printf("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src & 0xff,dst,length,cmd & 4 ? "yes" : "no");
-				UINT8 FillValue;
-				UINT32 DestIndex;
-				UINT16 SizeIndex;
+				uint8_t FillValue;
+				uint32_t DestIndex;
+				uint16_t SizeIndex;
 				FillValue = src & 0xff;
 				DestIndex = dst & 0xfffff;
 				SizeIndex = length;
@@ -377,7 +377,7 @@ READ8_MEMBER(c65_state::cia0_porta_r)
 READ8_MEMBER(c65_state::cia0_portb_r)
 {
 	static const char *const c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
-	UINT8 res;
+	uint8_t res;
 
 	res = 0xff;
 	for(int i=0;i<8;i++)
@@ -550,7 +550,7 @@ static GFXDECODE_START( c65 )
 	GFXDECODE_ENTRY( "maincpu", 0xd000, charlayout,     0, 16 ) // another identical copy is at 0x9000
 GFXDECODE_END
 
-void c65_state::IRQCheck(UINT8 irq_cause)
+void c65_state::IRQCheck(uint8_t irq_cause)
 {
 	m_VIC2_IRQPend |= (irq_cause != 0) ? 0x80 : 0x00;
 	m_VIC2_IRQPend |= irq_cause;

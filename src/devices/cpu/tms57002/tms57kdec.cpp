@@ -12,7 +12,7 @@
 #include "debugger.h"
 #include "tms57002.h"
 
-inline int tms57002_device::xmode(UINT32 opcode, char type, cstate *cs)
+inline int tms57002_device::xmode(uint32_t opcode, char type, cstate *cs)
 {
 	if(((opcode & 0x400) && (type == 'c')) || (!(opcode & 0x400) && (type == 'd'))) {
 		if(opcode & 0x100)
@@ -28,52 +28,52 @@ inline int tms57002_device::xmode(UINT32 opcode, char type, cstate *cs)
 	return 1;
 }
 
-inline int tms57002_device::sfao(UINT32 st1)
+inline int tms57002_device::sfao(uint32_t st1)
 {
 	return st1 & ST1_SFAO ? 1 : 0;
 }
 
-inline int tms57002_device::dbp(UINT32 st1)
+inline int tms57002_device::dbp(uint32_t st1)
 {
 	return st1 & ST1_DBP ? 1 : 0;
 }
 
-inline int tms57002_device::crm(UINT32 st1)
+inline int tms57002_device::crm(uint32_t st1)
 {
 	int crm = (st1 & ST1_CRM) >> ST1_CRM_SHIFT;
 	return crm <= 2 ? crm : 0;
 }
 
-inline int tms57002_device::sfai(UINT32 st1)
+inline int tms57002_device::sfai(uint32_t st1)
 {
 	return st1 & ST1_SFAI ? 1 : 0;
 }
 
-inline int tms57002_device::sfmo(UINT32 st1)
+inline int tms57002_device::sfmo(uint32_t st1)
 {
 	return (st1 & ST1_SFMO) >> ST1_SFMO_SHIFT;
 }
 
-inline int tms57002_device::rnd(UINT32 st1)
+inline int tms57002_device::rnd(uint32_t st1)
 {
 	int rnd = (st1 & ST1_RND) >> ST1_RND_SHIFT;
 	return rnd <= 4 ? rnd : 0;
 }
 
-inline int tms57002_device::movm(UINT32 st1)
+inline int tms57002_device::movm(uint32_t st1)
 {
 	return st1 & ST1_MOVM ? 1 : 0;
 }
 
-inline int tms57002_device::sfma(UINT32 st1)
+inline int tms57002_device::sfma(uint32_t st1)
 {
 	return (st1 & ST1_SFMA) >> ST1_SFMA_SHIFT;
 }
 
-void tms57002_device::decode_error(UINT32 opcode)
+void tms57002_device::decode_error(uint32_t opcode)
 {
 	char buf[256];
-	UINT8 opr[3];
+	uint8_t opr[3];
 	if(unsupported_inst_warning)
 		return;
 
@@ -86,7 +86,7 @@ void tms57002_device::decode_error(UINT32 opcode)
 	popmessage("tms57002: %s - Contact Mamedev", buf);
 }
 
-void tms57002_device::decode_cat1(UINT32 opcode, unsigned short *op, cstate *cs)
+void tms57002_device::decode_cat1(uint32_t opcode, unsigned short *op, cstate *cs)
 {
 	switch(opcode >> 18) {
 	case 0x00: // nop
@@ -102,7 +102,7 @@ void tms57002_device::decode_cat1(UINT32 opcode, unsigned short *op, cstate *cs)
 	}
 }
 
-void tms57002_device::decode_cat2_pre(UINT32 opcode, unsigned short *op, cstate *cs)
+void tms57002_device::decode_cat2_pre(uint32_t opcode, unsigned short *op, cstate *cs)
 {
 	switch((opcode >> 11) & 0x7f) {
 	case 0x00: // nop
@@ -118,7 +118,7 @@ void tms57002_device::decode_cat2_pre(UINT32 opcode, unsigned short *op, cstate 
 	}
 }
 
-void tms57002_device::decode_cat2_post(UINT32 opcode, unsigned short *op, cstate *cs)
+void tms57002_device::decode_cat2_post(uint32_t opcode, unsigned short *op, cstate *cs)
 {
 	switch((opcode >> 11) & 0x7f) {
 	case 0x00: // nop
@@ -134,7 +134,7 @@ void tms57002_device::decode_cat2_post(UINT32 opcode, unsigned short *op, cstate
 	}
 }
 
-void tms57002_device::decode_cat3(UINT32 opcode, unsigned short *op, cstate *cs)
+void tms57002_device::decode_cat3(uint32_t opcode, unsigned short *op, cstate *cs)
 {
 	switch((opcode >> 11) & 0x7f) {
 	case 0x00: // nop

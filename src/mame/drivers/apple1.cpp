@@ -106,14 +106,14 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device<ram_device> m_ram;
-	required_shared_ptr<UINT8> m_basicram;
+	required_shared_ptr<uint8_t> m_basicram;
 	required_ioport m_kb0, m_kb1, m_kb2, m_kb3, m_kbspecial;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(apple2);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -126,25 +126,25 @@ public:
 	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
 
 private:
-	UINT8 *m_ram_ptr, *m_char_ptr;
+	uint8_t *m_ram_ptr, *m_char_ptr;
 	int m_ram_size, m_char_size;
 
-	UINT8 m_vram[40*24];
+	uint8_t m_vram[40*24];
 	int m_cursx, m_cursy;
 
 	bool m_reset_down;
 	bool m_clear_down;
 
-	UINT8 m_transchar;
-	UINT16 m_lastports[4];
+	uint8_t m_transchar;
+	uint16_t m_lastports[4];
 
-	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code, const UINT8 *textgfx_data, UINT32 textgfx_datalen);
+	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen);
 	void poll_keyboard();
 
 	emu_timer *m_ready_start_timer, *m_ready_end_timer, *m_kbd_strobe_timer;
 };
 
-static const UINT8 apple1_keymap[] =
+static const uint8_t apple1_keymap[] =
 {
 	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '=', '[', ']', ';', '\'',    // KEY0
 	',', '.', '/', '\\', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',    // KEY1
@@ -166,9 +166,9 @@ static const UINT8 apple1_keymap[] =
 // header is "LOAD:abcdDATA:" where abcd is the starting address
 SNAPSHOT_LOAD_MEMBER( apple1_state, apple1 )
 {
-	UINT64 snapsize;
-	UINT8 *data;
-	UINT16 start, end;
+	uint64_t snapsize;
+	uint8_t *data;
+	uint16_t start, end;
 	static const char hd1[6] = "LOAD:";
 	static const char hd2[6] = "DATA:";
 
@@ -187,7 +187,7 @@ SNAPSHOT_LOAD_MEMBER( apple1_state, apple1 )
 		return image_init_result::FAIL;
 	}
 
-	data = (UINT8 *)image.ptr();
+	data = (uint8_t *)image.ptr();
 	if (!data)
 	{
 		logerror("Internal error loading snapshot\n");
@@ -230,8 +230,8 @@ SNAPSHOT_LOAD_MEMBER( apple1_state, apple1 )
 
 void apple1_state::poll_keyboard()
 {
-	UINT8 special = m_kbspecial->read();
-	UINT16 ports[4];
+	uint8_t special = m_kbspecial->read();
+	uint16_t ports[4];
 	int rawkey = 0;
 	bool bKeypress = false;
 
@@ -270,7 +270,7 @@ void apple1_state::poll_keyboard()
 
 	for (int port = 0; port < 4; port++)
 	{
-		UINT16 ptread = ports[port] ^ m_lastports[port];
+		uint16_t ptread = ports[port] ^ m_lastports[port];
 
 		for (int bit = 0; bit < 16; bit++)
 		{
@@ -313,12 +313,12 @@ void apple1_state::poll_keyboard()
 	}
 }
 
-void apple1_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
-	const UINT8 *textgfx_data, UINT32 textgfx_datalen)
+void apple1_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
+	const uint8_t *textgfx_data, uint32_t textgfx_datalen)
 {
 	int x, y, i;
-	const UINT8 *chardata;
-	UINT16 color;
+	const uint8_t *chardata;
+	uint16_t color;
 	int fg = 1, bg = 0;
 	int charcode = (code & 0x1f) | (((code ^ 0x40) & 0x40) >> 1);
 
@@ -339,11 +339,11 @@ void apple1_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos,
 	}
 }
 
-UINT32 apple1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t apple1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int vramad;
 	int cursor_blink = 0;
-	UINT8 curs_save = 0;
+	uint8_t curs_save = 0;
 
 	poll_keyboard();
 

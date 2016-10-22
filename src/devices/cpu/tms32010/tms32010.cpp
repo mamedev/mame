@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( tms32015_ram, AS_DATA, 16, tms32010_device )
 ADDRESS_MAP_END
 
 
-tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS32010, "TMS32010", tag, owner, clock, "tms32010", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32010_ram))
@@ -108,7 +108,7 @@ tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag,
 }
 
 
-tms32010_device::tms32010_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int addr_mask)
+tms32010_device::tms32010_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int addr_mask)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32015_ram))
@@ -119,19 +119,19 @@ tms32010_device::tms32010_device(const machine_config &mconfig, device_type type
 }
 
 
-tms32015_device::tms32015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32015_device::tms32015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms32010_device(mconfig, TMS32015, "TMS32015", tag, owner, clock, "tms32015", __FILE__, 0x0fff)
 {
 }
 
 
-tms32016_device::tms32016_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32016_device::tms32016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms32010_device(mconfig, TMS32016, "TMS32016", tag, owner, clock, "tms32016", __FILE__, 0xffff)
 {
 }
 
 
-offs_t tms32010_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tms32010_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms32010 );
 	return CPU_DISASSEMBLE_NAME(tms32010)(this, buffer, pc, oprom, opram, options);
@@ -225,36 +225,36 @@ offs_t tms32010_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
  *  Shortcuts
  ************************************************************************/
 
-void tms32010_device::CLR(UINT16 flag) { m_STR &= ~flag; m_STR |= 0x1efe; }
-void tms32010_device::SET_FLAG(UINT16 flag) { m_STR |=  flag; m_STR |= 0x1efe; }
+void tms32010_device::CLR(uint16_t flag) { m_STR &= ~flag; m_STR |= 0x1efe; }
+void tms32010_device::SET_FLAG(uint16_t flag) { m_STR |=  flag; m_STR |= 0x1efe; }
 
 
-void tms32010_device::CALCULATE_ADD_OVERFLOW(INT32 addval)
+void tms32010_device::CALCULATE_ADD_OVERFLOW(int32_t addval)
 {
-	if ((INT32)(~(m_oldacc.d ^ addval) & (m_oldacc.d ^ m_ACC.d)) < 0) {
+	if ((int32_t)(~(m_oldacc.d ^ addval) & (m_oldacc.d ^ m_ACC.d)) < 0) {
 		SET_FLAG(OV_FLAG);
 		if (OVM)
-			m_ACC.d = ((INT32)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+			m_ACC.d = ((int32_t)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 	}
 }
-void tms32010_device::CALCULATE_SUB_OVERFLOW(INT32 subval)
+void tms32010_device::CALCULATE_SUB_OVERFLOW(int32_t subval)
 {
-	if ((INT32)((m_oldacc.d ^ subval) & (m_oldacc.d ^ m_ACC.d)) < 0) {
+	if ((int32_t)((m_oldacc.d ^ subval) & (m_oldacc.d ^ m_ACC.d)) < 0) {
 		SET_FLAG(OV_FLAG);
 		if (OVM)
-			m_ACC.d = ((INT32)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+			m_ACC.d = ((int32_t)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 	}
 }
 
-UINT16 tms32010_device::POP_STACK()
+uint16_t tms32010_device::POP_STACK()
 {
-	UINT16 data = m_STACK[3];
+	uint16_t data = m_STACK[3];
 	m_STACK[3] = m_STACK[2];
 	m_STACK[2] = m_STACK[1];
 	m_STACK[1] = m_STACK[0];
 	return (data & m_addr_mask);
 }
-void tms32010_device::PUSH_STACK(UINT16 data)
+void tms32010_device::PUSH_STACK(uint16_t data)
 {
 	m_STACK[0] = m_STACK[1];
 	m_STACK[1] = m_STACK[2];
@@ -265,7 +265,7 @@ void tms32010_device::PUSH_STACK(UINT16 data)
 void tms32010_device::UPDATE_AR()
 {
 	if (m_opcode.b.l & 0x30) {
-		UINT16 tmpAR = m_AR[ARP];
+		uint16_t tmpAR = m_AR[ARP];
 		if (m_opcode.b.l & 0x20) tmpAR++ ;
 		if (m_opcode.b.l & 0x10) tmpAR-- ;
 		m_AR[ARP] = (m_AR[ARP] & 0xfe00) | (tmpAR & 0x01ff);
@@ -280,15 +280,15 @@ void tms32010_device::UPDATE_ARP()
 }
 
 
-void tms32010_device::getdata(UINT8 shift,UINT8 signext)
+void tms32010_device::getdata(uint8_t shift,uint8_t signext)
 {
 	if (m_opcode.b.l & 0x80)
 		m_memaccess = IND;
 	else
 		m_memaccess = DMA_DP;
 
-	m_ALU.d = (UINT16)M_RDRAM(m_memaccess);
-	if (signext) m_ALU.d = (INT16)m_ALU.d;
+	m_ALU.d = (uint16_t)M_RDRAM(m_memaccess);
+	if (signext) m_ALU.d = (int16_t)m_ALU.d;
 	m_ALU.d <<= shift;
 	if (m_opcode.b.l & 0x80) {
 		UPDATE_AR();
@@ -296,7 +296,7 @@ void tms32010_device::getdata(UINT8 shift,UINT8 signext)
 	}
 }
 
-void tms32010_device::putdata(UINT16 data)
+void tms32010_device::putdata(uint16_t data)
 {
 	if (m_opcode.b.l & 0x80)
 		m_memaccess = IND;
@@ -309,7 +309,7 @@ void tms32010_device::putdata(UINT16 data)
 	}
 	M_WRTRAM(m_memaccess,data);
 }
-void tms32010_device::putdata_sar(UINT8 data)
+void tms32010_device::putdata_sar(uint8_t data)
 {
 	if (m_opcode.b.l & 0x80)
 		m_memaccess = IND;
@@ -322,7 +322,7 @@ void tms32010_device::putdata_sar(UINT8 data)
 	}
 	M_WRTRAM(m_memaccess,m_AR[data]);
 }
-void tms32010_device::putdata_sst(UINT16 data)
+void tms32010_device::putdata_sst(uint16_t data)
 {
 	if (m_opcode.b.l & 0x80)
 		m_memaccess = IND;
@@ -354,7 +354,7 @@ void tms32010_device::illegal()
 
 void tms32010_device::abst()
 {
-	if ( (INT32)(m_ACC.d) < 0 ) {
+	if ( (int32_t)(m_ACC.d) < 0 ) {
 		m_ACC.d = -m_ACC.d;
 		if (OVM && (m_ACC.d == 0x80000000)) m_ACC.d-- ;
 	}
@@ -381,10 +381,10 @@ void tms32010_device::addh()
 	m_oldacc.d = m_ACC.d;
 	getdata(0,0);
 	m_ACC.w.h += m_ALU.w.l;
-	if ((INT16)(~(m_oldacc.w.h ^ m_ALU.w.h) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
+	if ((int16_t)(~(m_oldacc.w.h ^ m_ALU.w.h) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
 		SET_FLAG(OV_FLAG);
 		if (OVM)
-			m_ACC.w.h = ((INT16)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+			m_ACC.w.h = ((int16_t)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
 	}
 }
 void tms32010_device::adds()
@@ -423,7 +423,7 @@ void tms32010_device::banz()
 }
 void tms32010_device::bgez()
 {
-	if ( (INT32)(m_ACC.d) >= 0 ) {
+	if ( (int32_t)(m_ACC.d) >= 0 ) {
 		m_PC = M_RDOP_ARG(m_PC);
 		m_icount -= add_branch_cycle();
 	}
@@ -432,7 +432,7 @@ void tms32010_device::bgez()
 }
 void tms32010_device::bgz()
 {
-	if ( (INT32)(m_ACC.d) > 0 ) {
+	if ( (int32_t)(m_ACC.d) > 0 ) {
 		m_PC = M_RDOP_ARG(m_PC);
 		m_icount -= add_branch_cycle();
 	}
@@ -450,7 +450,7 @@ void tms32010_device::bioz()
 }
 void tms32010_device::blez()
 {
-	if ( (INT32)(m_ACC.d) <= 0 ) {
+	if ( (int32_t)(m_ACC.d) <= 0 ) {
 		m_PC = M_RDOP_ARG(m_PC);
 		m_icount -= add_branch_cycle();
 	}
@@ -459,7 +459,7 @@ void tms32010_device::blez()
 }
 void tms32010_device::blz()
 {
-	if ( (INT32)(m_ACC.d) <  0 ) {
+	if ( (int32_t)(m_ACC.d) <  0 ) {
 		m_PC = M_RDOP_ARG(m_PC);
 		m_icount -= add_branch_cycle();
 	}
@@ -608,12 +608,12 @@ void tms32010_device::ltd()
 void tms32010_device::mpy()
 {
 	getdata(0,0);
-	m_Preg.d = (INT16)m_ALU.w.l * (INT16)m_Treg;
+	m_Preg.d = (int16_t)m_ALU.w.l * (int16_t)m_Treg;
 	if (m_Preg.d == 0x40000000) m_Preg.d = 0xc0000000;
 }
 void tms32010_device::mpyk()
 {
-	m_Preg.d = (INT16)m_Treg * ((INT16)(m_opcode.w.l << 3) >> 3);
+	m_Preg.d = (int16_t)m_Treg * ((int16_t)(m_opcode.w.l << 3) >> 3);
 }
 void tms32010_device::nop()
 {
@@ -692,10 +692,10 @@ void tms32010_device::subc()
 {
 	m_oldacc.d = m_ACC.d;
 	getdata(15,0);
-	m_ALU.d = (INT32) m_ACC.d - m_ALU.d;
-	if ((INT32)((m_oldacc.d ^ m_ALU.d) & (m_oldacc.d ^ m_ACC.d)) < 0)
+	m_ALU.d = (int32_t) m_ACC.d - m_ALU.d;
+	if ((int32_t)((m_oldacc.d ^ m_ALU.d) & (m_oldacc.d ^ m_ACC.d)) < 0)
 		SET_FLAG(OV_FLAG);
-	if ( (INT32)(m_ALU.d) >= 0 )
+	if ( (int32_t)(m_ALU.d) >= 0 )
 		m_ACC.d = ((m_ALU.d << 1) + 1);
 	else
 		m_ACC.d = (m_ACC.d << 1);

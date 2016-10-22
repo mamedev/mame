@@ -39,7 +39,7 @@ enum
 	SIZE_512
 };
 
-myarc_memory_expansion_device::myarc_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+myarc_memory_expansion_device::myarc_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : ti_expansion_card_device(mconfig, TI99_MYARCMEM, "Myarc Memory expansion card MEXP-1", tag, owner, clock, "ti99_myarcmem", __FILE__),
 	m_ram(*this, RAM_TAG),
 	m_dsrrom(nullptr), m_bank(0), m_size(0)

@@ -42,11 +42,11 @@ public:
 	optional_device<address_map_bank_device> m_pfprotect;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT16> m_ram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_paletteram;
-	optional_shared_ptr<UINT8> m_robocop_shared_ram;
-	optional_shared_ptr<UINT8> m_hippodrm_shared_ram;
+	required_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_paletteram;
+	optional_shared_ptr<uint8_t> m_robocop_shared_ram;
+	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
 
 	int m_game;
 	int m_i8751_return;
@@ -54,9 +54,9 @@ public:
 	int m_slyspy_state;
 	int m_hippodrm_msb;
 	int m_hippodrm_lsb;
-	UINT8 m_i8751_ports[4];
-	UINT16 *m_buffered_spriteram;
-	UINT16 m_pri;
+	uint8_t m_i8751_ports[4];
+	uint16_t *m_buffered_spriteram;
+	uint16_t m_pri;
 
 	DECLARE_WRITE16_MEMBER(dec0_control_w);
 	DECLARE_WRITE16_MEMBER(slyspy_control_w);
@@ -95,13 +95,13 @@ public:
 	DECLARE_VIDEO_START(dec0);
 	DECLARE_VIDEO_START(dec0_nodma);
 
-	UINT32 screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_robocop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_hippodrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_robocop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hippodrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void baddudes_i8751_write(int data);
 	void birdtry_i8751_write(int data);
@@ -118,9 +118,9 @@ public:
 		: dec0_state(mconfig, type, tag) {
 	}
 
-	UINT8 m_automat_adpcm_byte;
+	uint8_t m_automat_adpcm_byte;
 	int m_automat_msm5205_vclk_toggle;
-	UINT16 m_automat_scroll_regs[4];
+	uint16_t m_automat_scroll_regs[4];
 
 	DECLARE_WRITE16_MEMBER(automat_control_w);
 	DECLARE_WRITE8_MEMBER(automat_adpcm_w);
@@ -134,6 +134,6 @@ public:
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

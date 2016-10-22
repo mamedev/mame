@@ -44,7 +44,7 @@ machine_config_constructor a8sio_cassette_device::device_mconfig_additions() con
 //  LIVE DEVICE
 //**************************************************************************
 
-a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, A8SIO_CASSETTE, "Atari 8 bit cassette", tag, owner, clock, "a8sio_cass", __FILE__)
 	, device_a8sio_card_interface(mconfig, *this)
 	, m_cassette(*this, "cassette"), m_read_timer(nullptr)
@@ -53,7 +53,7 @@ a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, cons
 {
 }
 
-a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_a8sio_card_interface(mconfig, *this)
 	, m_cassette(*this, "cassette"), m_read_timer(nullptr)
@@ -96,7 +96,7 @@ void a8sio_cassette_device::device_timer(emu_timer &timer, device_timer_id id, i
 	switch (id)
 	{
 		case TIMER_CASSETTE_READ:
-			UINT8 cass_signal = m_cassette->input() < 0 ? 0 : 1;
+			uint8_t cass_signal = m_cassette->input() < 0 ? 0 : 1;
 
 			if (m_signal_count < 20)
 			{

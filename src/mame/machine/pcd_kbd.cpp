@@ -221,7 +221,7 @@ ioport_constructor pcd_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pcd_keyboard );
 }
 
-pcd_keyboard_device::pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pcd_keyboard_device::pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PCD_KEYBOARD, "PC-D Keyboard", tag, owner, clock, "pcd_kbd", __FILE__)
 	, m_rows(*this, "ROW.%u", 0)
 	, m_p1(0)

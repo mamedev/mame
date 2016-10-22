@@ -29,7 +29,7 @@ class sandy_super_disk_t : public device_t,
 {
 public:
 	// construction/destruction
-	sandy_super_disk_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sandy_super_disk_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -45,8 +45,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_ql_expansion_card_interface overrides
-	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) override;
-	virtual void write(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
 	void check_interrupt();

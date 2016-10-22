@@ -29,23 +29,23 @@ public:
 	DECLARE_READ8_MEMBER(gmaster_port_r);
 	DECLARE_WRITE8_MEMBER(gmaster_port_w);
 	DECLARE_DRIVER_INIT(gmaster) { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
-	UINT32 screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	virtual void machine_start() override;
 
 	struct
 	{
-		UINT8 data[8];
+		uint8_t data[8];
 		int index;
 		int x, y;
 		bool mode; // true read does not increase address
 		bool delayed;
-		UINT8 pixels[8][64];
+		uint8_t pixels[8][64];
 	} m_video;
 
-	UINT8 m_ports[5];
-	UINT8 m_ram[0x4000];
+	uint8_t m_ports[5];
+	uint8_t m_ram[0x4000];
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;
@@ -55,7 +55,7 @@ private:
 
 READ8_MEMBER(gmaster_state::gmaster_io_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_ports[2] & 1)
 	{
@@ -151,8 +151,8 @@ WRITE8_MEMBER(gmaster_state::gmaster_io_w)
 
 READ8_MEMBER(gmaster_state::gmaster_port_r)
 {
-//  UINT8 data = m_ports[offset];
-	UINT8 data = 0xff;
+//  uint8_t data = m_ports[offset];
+	uint8_t data = 0xff;
 	switch (offset)
 	{
 	case UPD7810_PORTA:
@@ -230,15 +230,15 @@ PALETTE_INIT_MEMBER(gmaster_state, gmaster)
 }
 
 
-UINT32 gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	for (y = 0; y < ARRAY_LENGTH(m_video.pixels); y++)
 	{
 		for (x = 0; x < ARRAY_LENGTH(m_video.pixels[0]); x++)
 		{
-			UINT8 d = m_video.pixels[y][x];
-			UINT16 *line;
+			uint8_t d = m_video.pixels[y][x];
+			uint16_t *line;
 
 			line = &bitmap.pix16((y * 8), x);
 			line[0] = BIT(d, 0);

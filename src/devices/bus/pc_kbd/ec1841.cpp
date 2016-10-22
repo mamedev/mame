@@ -280,7 +280,7 @@ ioport_constructor ec_1841_keyboard_device::device_input_ports() const
 //  ec_1841_keyboard_device - constructor
 //-------------------------------------------------
 
-ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC_KBD_EC_1841, "EC-1841 Keyboard", tag, owner, clock, "kb_ec1841", __FILE__),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
@@ -371,7 +371,7 @@ READ8_MEMBER( ec_1841_keyboard_device::p1_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= clock_signal();
 	data |= data_signal() << 1;
@@ -442,7 +442,7 @@ READ8_MEMBER( ec_1841_keyboard_device::t1_r )
 	if (BIT(m_p2,0)) {
 		m_q = 1;
 	} else {
-		UINT8 sense = 0xff;
+		uint8_t sense = 0xff;
 		sense &= m_kbd[m_bus & 15]->read();
 		m_q = BIT(sense, (m_bus >> 4) & 7);
 	}

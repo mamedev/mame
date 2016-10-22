@@ -14,7 +14,7 @@ m_vector->add_point (m_xcenter + ((x) << 16), m_ycenter - ((y) << 16), color, in
 
 
 
-inline void aztarac_state::read_vectorram(UINT16 *vectorram, int addr, int *x, int *y, int *c)
+inline void aztarac_state::read_vectorram(uint16_t *vectorram, int addr, int *x, int *y, int *c)
 {
 	*c = vectorram[addr] & 0xffff;
 	*x = vectorram[addr + 0x800] & 0x03ff;

@@ -46,7 +46,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
 	DECLARE_PALETTE_INIT(dlair2);
@@ -63,7 +63,7 @@ void dlair2_state::video_start()
 {
 }
 
-UINT32 dlair2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t dlair2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }

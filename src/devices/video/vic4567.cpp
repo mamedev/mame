@@ -144,7 +144,7 @@
 
 const device_type VIC3 = &device_creator<vic3_device>;
 
-vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: device_t(mconfig, VIC3, "4567 VIC III", tag, owner, clock, "vic3", __FILE__),
 				device_video_interface(mconfig, *this),
 				m_type(VIC4567_NTSC),
@@ -186,7 +186,7 @@ void vic3_device::device_start()
 	m_lightpen_x_cb.resolve_safe(0);
 	m_lightpen_y_cb.resolve_safe(0);
 
-	m_screenptr[0] = auto_alloc_array(machine(), UINT8, 216 * 656 / 8);
+	m_screenptr[0] = auto_alloc_array(machine(), uint8_t, 216 * 656 / 8);
 
 	for (int i = 1; i < 216; i++)
 		m_screenptr[i] = m_screenptr[i - 1] + 656 / 8;
@@ -416,7 +416,7 @@ TIMER_CALLBACK_MEMBER( vic3_device::timer_timeout )
 	}
 }
 
-void vic3_device::draw_character( int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color, int start_x, int end_x )
+void vic3_device::draw_character( int ybegin, int yend, int ch, int yoff, int xoff, uint16_t *color, int start_x, int end_x )
 {
 	int code;
 
@@ -560,7 +560,7 @@ void vic3_device::sprite_collision( int nr, int y, int x, int mask )
 		else if (xdiff < 0)
 			value = m_sprites[i].bitmap[y][0] >> (-xdiff);
 		else {
-			UINT8 *vp = m_sprites[i].bitmap[y]+(xdiff >> 3);
+			uint8_t *vp = m_sprites[i].bitmap[y]+(xdiff >> 3);
 			value = ((vp[1] | (*vp << 8)) >> (8 - (xdiff & 7) )) & 0xff;
 		}
 
@@ -2033,7 +2033,7 @@ void vic3_device::raster_interrupt_gen()
 		}
 }
 
-UINT32 vic3_device::video_update( bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t vic3_device::video_update( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

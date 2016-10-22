@@ -10,7 +10,7 @@ class asst128_mb_device : public ibm5150_mb_device
 {
 public:
 	// construction/destruction
-	asst128_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	asst128_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: ibm5150_mb_device(mconfig, tag, owner, clock) { }
 
 	DECLARE_ADDRESS_MAP(map, 8);

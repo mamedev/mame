@@ -28,13 +28,13 @@ static ADDRESS_MAP_START(data_5x13x4, AS_DATA, 8, sm510_base_device)
 ADDRESS_MAP_END
 
 // device definitions
-kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sm500_device(mconfig, KB1013VK12, "KB1013VK1-2", tag, owner, clock, 1 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_8k), 7 /* data width */, ADDRESS_MAP_NAME(data_5x13x4), "kb1013vk1-2", __FILE__)
 { }
 
 
 // disasm
-offs_t kb1013vk12_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t kb1013vk12_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(kb1013vk12);
 	return CPU_DISASSEMBLE_NAME(kb1013vk12)(this, buffer, pc, oprom, opram, options);

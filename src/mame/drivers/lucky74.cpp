@@ -1398,7 +1398,7 @@ void lucky74_state::sound_start()
 {
 	/* cleaning all 09R81P registers */
 
-	UINT8 i;
+	uint8_t i;
 
 	for (i = 0; i < 6; i++)
 	{

@@ -257,9 +257,9 @@
 
 
 
-UINT8 sc4_state::read_input_matrix(int row)
+uint8_t sc4_state::read_input_matrix(int row)
 {
-	UINT8 value;
+	uint8_t value;
 
 	if (row<4)
 		value = (m_io_ports[row].read_safe(0x00) & 0x1f) + ((m_io_ports[row+8].read_safe(0x00) & 0x07) << 5);
@@ -278,16 +278,16 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 		// allow some sets to boot, should probably return this data on Mbus once we figure out what it is
 		if ((pc == m_chk41addr) && (offset == m_chk41addr>>1))
 		{
-			UINT32 r_A0 = space.device().state().state_int(M68K_A0);
-			UINT32 r_A1 = space.device().state().state_int(M68K_A1);
-			UINT32 r_D1 = space.device().state().state_int(M68K_D1);
+			uint32_t r_A0 = space.device().state().state_int(M68K_A0);
+			uint32_t r_A1 = space.device().state().state_int(M68K_A1);
+			uint32_t r_D1 = space.device().state().state_int(M68K_D1);
 
 			if (r_D1 == 0x7)
 			{
 				bool valid = true;
 				for (int i=0;i<8;i++)
 				{
-					UINT8 code = space.read_byte(r_A0+i);
+					uint8_t code = space.read_byte(r_A0+i);
 					if (code != 0xff) // assume our mbus code just returns 0xff for now..
 						valid = false;
 				}
@@ -300,7 +300,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 					printf("Ident code? ");
 					for (int i=0;i<8;i++)
 					{
-						UINT8 code = space.read_byte(r_A1+i);
+						uint8_t code = space.read_byte(r_A1+i);
 						printf("%02x",code);
 						space.write_byte(r_A0+i, code);
 					}
@@ -324,7 +324,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 	int cs = m_maincpu->get_cs(offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
 //  if (!(debugger_access())) printf("cs is %d\n", cs);
-	UINT16 retvalue;
+	uint16_t retvalue;
 
 
 	switch ( cs )
@@ -353,7 +353,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 
 				if (addr < 0x0080)
 				{
-					UINT16 retvalue = 0x0000;
+					uint16_t retvalue = 0x0000;
 					if (ACCESSING_BITS_8_15)
 					{
 						logerror("mem_mask&0xff00 unhandled\n");
@@ -471,9 +471,9 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 	{
 		m_segment_34_cache[offset] = data;
 
-		UINT16 short_data;
-		UINT8 byte_data_first_segment;
-		UINT8 byte_data_second_segment;
+		uint16_t short_data;
+		uint8_t byte_data_first_segment;
+		uint8_t byte_data_second_segment;
 		for (int digit = 0; digit < 32; digit += 2)
 		{
 			short_data = (m_segment_34_cache[digit + 1] << 8) | m_segment_34_cache[digit];
@@ -491,7 +491,7 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 	}
 	else
 	{
-		UINT8 bf7segdata = BITSWAP8(data,0,7,6,5,4,3,2,1);
+		uint8_t bf7segdata = BITSWAP8(data,0,7,6,5,4,3,2,1);
 		output().set_digit_value(offset, bf7segdata);
 	}
 }
@@ -728,7 +728,7 @@ void bfm_sc45_state::bfm_sc45_write_serial_vfd(bool cs, bool clock, bool data)
 }
 
 
-void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask)
+void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint8_t data, uint8_t line_mask)
 {
 	m_reel12_latch = data;
 
@@ -767,7 +767,7 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel4_w )
 	}
 }
 
-void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask)
+void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint16_t data, uint16_t line_mask)
 {
 //  if (dedicated == false)
 	{
@@ -782,14 +782,14 @@ void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT
 	}
 
 }
-UINT8 sc4_state::bfm_sc4_68307_porta_r(address_space &space, bool dedicated, UINT8 line_mask)
+uint8_t sc4_state::bfm_sc4_68307_porta_r(address_space &space, bool dedicated, uint8_t line_mask)
 {
 	int pc = space.device().safe_pc();
 	logerror("%08x bfm_sc4_68307_porta_r\n", pc);
 	return 0xbb;// machine().rand();
 }
 
-UINT16 sc4_state::bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_mask)
+uint16_t sc4_state::bfm_sc4_68307_portb_r(address_space &space, bool dedicated, uint16_t line_mask)
 {
 	if (dedicated==false)
 	{
@@ -1247,8 +1247,8 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(sc4_adder4_state,adder4)
 {
-	m_adder4cpuregion = (UINT32*)memregion( "adder4" )->base();
-	m_adder4ram = make_unique_clear<UINT32[]>(0x10000);
+	m_adder4cpuregion = (uint32_t*)memregion( "adder4" )->base();
+	m_adder4ram = make_unique_clear<uint32_t[]>(0x10000);
 	MACHINE_START_CALL_MEMBER(sc4);
 }
 
@@ -1713,7 +1713,7 @@ INPUT_PORTS_END
 #define MACHINE_FLAGS MACHINE_NOT_WORKING|MACHINE_CLICKABLE_ARTWORK
 #define MACHINE_FLAGS_NOSOUND MACHINE_FLAGS|MACHINE_NO_SOUND
 
-bool compare_mbus(UINT16* rom)
+bool compare_mbus(uint16_t* rom)
 {
 	for (int i=0;i<11;i++)
 	{
@@ -1733,7 +1733,7 @@ bool compare_mbus(UINT16* rom)
 	return true;
 }
 
-void sc4_state::find_mbus(UINT16* rom)
+void sc4_state::find_mbus(uint16_t* rom)
 {
 	for (int i=0;i<(0x100000-0x40)/2;i++)
 	{
@@ -1760,7 +1760,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(sc4_state,sc4)
 {
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 	// SC4 identification sequence 0x80 0x00 0xf0 0x7d
 	if (((src[0] == 0x80) && (src[2] == 0xf0)) || ((src[1] == 0x00) && (src[3] == 0x7d)))
 	{
@@ -1797,7 +1797,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4)
 DRIVER_INIT_MEMBER(sc4_state,sc4mbus)
 {
 	DRIVER_INIT_CALL(sc4);
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	find_mbus(rom);
 }
 

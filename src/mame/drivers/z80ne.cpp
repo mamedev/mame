@@ -378,7 +378,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 #if 0
-static const UINT32 lx388palette[] =
+static const uint32_t lx388palette[] =
 {
 	rgb_t(0x00, 0xff, 0x00), /* GREEN */
 	rgb_t(0x00, 0xff, 0x00), /* YELLOW in original, here GREEN */

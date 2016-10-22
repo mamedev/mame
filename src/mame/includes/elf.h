@@ -64,7 +64,7 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( elf );
 	// display state
-	UINT8 m_data;
+	uint8_t m_data;
 };
 
 #endif

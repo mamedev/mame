@@ -32,7 +32,7 @@
 class r10696_device : public device_t
 {
 public:
-	r10696_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r10696_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~r10696_device() {}
 
 	DECLARE_READ8_MEMBER ( io_r );
@@ -46,9 +46,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8         m_io_a;   //!< input/output flip-flops group A
-	UINT8         m_io_b;   //!< input/output flip-flops group B
-	UINT8         m_io_c;   //!< input/output flip-flops group C
+	uint8_t         m_io_a;   //!< input/output flip-flops group A
+	uint8_t         m_io_b;   //!< input/output flip-flops group B
+	uint8_t         m_io_c;   //!< input/output flip-flops group C
 	devcb_read8   m_iord;   //!< input line (read, offset = group, data = 4 bits)
 	devcb_write8  m_iowr;   //!< output line (write, offset = group, data = 4 bits)
 };

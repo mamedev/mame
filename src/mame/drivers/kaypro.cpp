@@ -329,8 +329,8 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER( kaypro_state, kaypro )
 {
-	UINT8 *main = memregion("roms")->base();
-	UINT8 *ram = memregion("rambank")->base();
+	uint8_t *main = memregion("roms")->base();
+	uint8_t *ram = memregion("rambank")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &ram[0x0000]);

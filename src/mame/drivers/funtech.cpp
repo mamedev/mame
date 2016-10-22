@@ -46,14 +46,14 @@ public:
 		m_hopper(*this, "hopper"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_fgram;
-	required_shared_ptr<UINT8> m_reel1_ram;
-	required_shared_ptr<UINT8> m_reel2_ram;
-	required_shared_ptr<UINT8> m_reel3_ram;
-	required_shared_ptr<UINT8> m_reel1_scroll;
-	required_shared_ptr<UINT8> m_reel2_scroll;
-	required_shared_ptr<UINT8> m_reel3_scroll;
-	required_shared_ptr<UINT8> m_reel1_alt_scroll;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_reel1_ram;
+	required_shared_ptr<uint8_t> m_reel2_ram;
+	required_shared_ptr<uint8_t> m_reel3_ram;
+	required_shared_ptr<uint8_t> m_reel1_scroll;
+	required_shared_ptr<uint8_t> m_reel2_scroll;
+	required_shared_ptr<uint8_t> m_reel3_scroll;
+	required_shared_ptr<uint8_t> m_reel1_alt_scroll;
 
 
 	INTERRUPT_GEN_MEMBER(funtech_vblank_interrupt);
@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(funtech_vreg_w);
 
 
-	UINT8 m_vreg;
+	uint8_t m_vreg;
 
 	tilemap_t *m_fg_tilemap;
 	
@@ -86,7 +86,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_funtech(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_funtech(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -188,7 +188,7 @@ WRITE8_MEMBER(fun_tech_corp_state::fgram_w)
 }
 
 
-UINT32 fun_tech_corp_state::screen_update_funtech(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fun_tech_corp_state::screen_update_funtech(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 

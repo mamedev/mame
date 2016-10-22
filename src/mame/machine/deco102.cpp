@@ -13,13 +13,13 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/deco102.h"
 
-static UINT16 decrypt(UINT16 data, int address, int select_xor)
+static uint16_t decrypt(uint16_t data, int address, int select_xor)
 {
-	static const UINT16 xors[16] =
+	static const uint16_t xors[16] =
 	{
 		0xb52c,0x2458,0x139a,0xc998,0xce8e,0x5144,0x0429,0xaad4,0xa331,0x3645,0x69a3,0xac64,0x1a53,0x5083,0x4dea,0xd237
 	};
-	static const UINT8 bitswaps[16][16] =
+	static const uint8_t bitswaps[16][16] =
 	{
 		{ 12,8,13,11,14,10,15,9, 3,2,1,0,4,5,6,7 }, { 10,11,14,12,15,13,8,9, 6,7,5,3,0,4,2,1 },
 		{ 14,13,15,9,8,12,11,10, 7,4,1,5,6,0,3,2 }, { 15,14,8,9,10,11,13,12, 1,2,7,3,4,6,0,5 },
@@ -31,7 +31,7 @@ static UINT16 decrypt(UINT16 data, int address, int select_xor)
 		{ 13,8,12,14,11,15,10,9, 7,6,5,4,3,2,1,0 }, { 15,14,13,12,11,10,9,8, 0,6,7,4,3,2,1,5 }
 	};
 	int j, xorval;
-	const UINT8 *bs;
+	const uint8_t *bs;
 
 	// calculate bitswap to use
 	j = ((address ^ select_xor) & 0xf0) >> 4;
@@ -49,9 +49,9 @@ static UINT16 decrypt(UINT16 data, int address, int select_xor)
 				bs[8],bs[9],bs[10],bs[11],bs[12],bs[13],bs[14],bs[15]);
 }
 
-void deco102_decrypt_cpu(UINT16 *rom, UINT16 *opcodes, int size, int address_xor, int data_select_xor, int opcode_select_xor)
+void deco102_decrypt_cpu(uint16_t *rom, uint16_t *opcodes, int size, int address_xor, int data_select_xor, int opcode_select_xor)
 {
-	std::vector<UINT16> buf(size / 2);
+	std::vector<uint16_t> buf(size / 2);
 
 	memcpy(&buf[0], rom, size);
 

@@ -32,15 +32,15 @@ class aicartc_device : public device_t,
 {
 public:
 	// construction/destruction
-	aicartc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	aicartc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_READ16_MEMBER( read );
 
-	UINT16 m_rtc_reg_lo,m_rtc_reg_hi;
-	UINT16 m_rtc_tick;
-	UINT8 m_we;
+	uint16_t m_rtc_reg_lo,m_rtc_reg_hi;
+	uint16_t m_rtc_tick;
+	uint8_t m_we;
 
 protected:
 	// device-level overrides

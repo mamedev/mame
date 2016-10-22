@@ -54,7 +54,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_portselect_w)
 
 READ16_MEMBER(fromanc2_state::fromanc2_keymatrix_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 
 	switch (m_portselect)
 	{
@@ -477,7 +477,7 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc4)
 
 MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 {
-	m_bankedram = std::make_unique<UINT8[]>(0x4000 * 3);
+	m_bankedram = std::make_unique<uint8_t[]>(0x4000 * 3);
 
 	membank("bank1")->configure_entries(0, 4, memregion("sub")->base(), 0x4000);
 	membank("bank2")->configure_entry(0, memregion("sub")->base() + 0x08000);

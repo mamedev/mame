@@ -25,7 +25,7 @@ const device_type MC2661 = &device_creator<mc2661_device>;
 #define LOG 0
 
 
-UINT32 baud_rates[16] =
+uint32_t baud_rates[16] =
 {
 	50, 75, 110, 135 /*134.5*/, 150, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 7200, 9600, 19200
 };
@@ -94,7 +94,7 @@ enum
 //  mc2661_device - constructor
 //-------------------------------------------------
 
-mc2661_device::mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mc2661_device::mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MC2661, "MC2661", tag, owner, clock, "mc2661", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_write_txd(*this),
@@ -221,7 +221,7 @@ void mc2661_device::rcv_complete()
 
 READ8_MEMBER( mc2661_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x03)
 	{
@@ -331,8 +331,8 @@ WRITE8_MEMBER( mc2661_device::write )
 		}
 		if(m_mode_index == 1)
 		{
-			UINT32 rx_baud = baud_rates[data & 0x0f];
-			UINT32 tx_baud = baud_rates[data & 0x0f];
+			uint32_t rx_baud = baud_rates[data & 0x0f];
+			uint32_t tx_baud = baud_rates[data & 0x0f];
 			if(data & 0x10)  // internal receiver clock
 			{
 //              if((m_mr[0] & 0x03) != 0)

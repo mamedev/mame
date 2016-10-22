@@ -38,7 +38,7 @@ class tx0_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tx0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int addr_bits, int address_mask, int ir_mask);
+	tx0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int addr_bits, int address_mask, int ir_mask);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_cpy_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_cpy_handler.set_callback(object); }
@@ -61,15 +61,15 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 3; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 3; }
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
 
 protected:
 	address_space_config m_program_config;
@@ -88,8 +88,8 @@ protected:
 	int m_tbr;        /* toggle switch buffer register (18 bits) */
 	int m_tac;        /* toggle switch accumulator (18 bits) */
 	int m_tss[16];    /* toggle switch storage (18 bits * 16) */
-	UINT16 m_cm_sel;   /* individual cm select (1 bit * 16) */
-	UINT16 m_lr_sel;   /* individual lr select (1 bit * 16) */
+	uint16_t m_cm_sel;   /* individual cm select (1 bit * 16) */
+	uint16_t m_lr_sel;   /* individual lr select (1 bit * 16) */
 	unsigned int m_gbl_cm_sel;/* global cm select (1 bit) */
 	unsigned int m_stop_cyc0; /* stop on cycle 0 */
 	unsigned int m_stop_cyc1; /* stop on cycle 1 */
@@ -147,11 +147,11 @@ class tx0_8kw_device : public tx0_device
 {
 public:
 	// construction/destruction
-	tx0_8kw_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	tx0_8kw_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 protected:
 	virtual void execute_run() override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	void execute_instruction_8kw();
@@ -162,11 +162,11 @@ class tx0_64kw_device : public tx0_device
 {
 public:
 	// construction/destruction
-	tx0_64kw_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	tx0_64kw_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 protected:
 	virtual void execute_run() override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	void execute_instruction_64kw();

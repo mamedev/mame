@@ -28,13 +28,13 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2") { }
 
-	UINT8 m_ay8910_latch_1;
-	UINT8 m_ay8910_latch_2;
+	uint8_t m_ay8910_latch_1;
+	uint8_t m_ay8910_latch_2;
 
-	required_shared_ptr<UINT8> m_bitmap_videoram;
-	required_shared_ptr<UINT8> m_charmap_videoram;
-	required_shared_ptr<UINT8> m_video_control;
-	required_shared_ptr<UINT8> m_bitmap_color;
+	required_shared_ptr<uint8_t> m_bitmap_videoram;
+	required_shared_ptr<uint8_t> m_charmap_videoram;
+	required_shared_ptr<uint8_t> m_video_control;
+	required_shared_ptr<uint8_t> m_bitmap_color;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -43,8 +43,8 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
 
-	std::unique_ptr<UINT8[]> m_bitmap_colorram;
-	UINT8 m_control_xor;
+	std::unique_ptr<uint8_t[]> m_bitmap_colorram;
+	uint8_t m_control_xor;
 	DECLARE_READ8_MEMBER(redalert_interrupt_clear_r);
 	DECLARE_WRITE8_MEMBER(redalert_interrupt_clear_w);
 	DECLARE_READ8_MEMBER(panther_interrupt_clear_r);
@@ -59,9 +59,9 @@ public:
 	DECLARE_VIDEO_START(ww3);
 	DECLARE_SOUND_START(redalert);
 	DECLARE_SOUND_START(demoneye);
-	UINT32 screen_update_redalert(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_panther(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_redalert(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_panther(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(redalert_vblank_interrupt);
 	DECLARE_WRITE8_MEMBER(redalert_analog_w);
 	DECLARE_WRITE8_MEMBER(redalert_AY8910_w);

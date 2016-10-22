@@ -661,7 +661,7 @@
 
 WRITE_LINE_MEMBER(calomega_state::update_aciabaud_scale)
 {
-	UINT8 dsw2 = m_sw2->read();
+	uint8_t dsw2 = m_sw2->read();
 
 	m_aciabaud->set_clock_scale((double)dsw2 / 128);
 }
@@ -3665,7 +3665,7 @@ DRIVER_INIT_MEMBER(calomega_state,comg080)
 	   Start = $2042;  NMI = $26f8;
 	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
 	*/
-	UINT8 *PRGROM = memregion( "maincpu" )->base();
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
 	PRGROM[0x3ff8] = 0x8e; /* checked by code */
 	PRGROM[0x3ff9] = 0x97; /* checked by code */

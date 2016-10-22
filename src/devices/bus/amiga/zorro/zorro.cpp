@@ -21,7 +21,7 @@ const device_type ZORRO_SLOT = &device_creator<zorro_slot_device>;
 //  zorro_slot_device - constructor
 //-------------------------------------------------
 
-zorro_slot_device::zorro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+zorro_slot_device::zorro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ZORRO_SLOT, "Zorro slot", tag, owner, clock, "zorro_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_zorro_tag(nullptr)
@@ -29,7 +29,7 @@ zorro_slot_device::zorro_slot_device(const machine_config &mconfig, const char *
 }
 
 zorro_slot_device::zorro_slot_device(const machine_config &mconfig, device_type type, const char *name,
-	const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_interface(mconfig, *this),
 	m_zorro_tag(nullptr)
@@ -68,7 +68,7 @@ void zorro_slot_device::device_start()
 //-------------------------------------------------
 
 zorro_device::zorro_device(const machine_config &mconfig, device_type type, const char *name,
-	const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_space(nullptr),
 	m_cputag(nullptr),
@@ -120,7 +120,7 @@ const device_type EXP_SLOT = &device_creator<exp_slot_device>;
 //  exp_slot_device - constructor
 //-------------------------------------------------
 
-exp_slot_device::exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+exp_slot_device::exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	zorro_device(mconfig, EXP_SLOT, "86-pin expansion slot", tag, owner, clock, "exp_slot", __FILE__),
 	m_ipl_handler(*this),
 	m_dev(nullptr)
@@ -128,7 +128,7 @@ exp_slot_device::exp_slot_device(const machine_config &mconfig, const char *tag,
 }
 
 exp_slot_device::exp_slot_device(const machine_config &mconfig, device_type type, const char *name,
-	const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	zorro_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_ipl_handler(*this),
 	m_dev(nullptr)
@@ -186,7 +186,7 @@ const device_type ZORRO2 = &device_creator<zorro2_device>;
 //  zorro2_device - constructor
 //-------------------------------------------------
 
-zorro2_device::zorro2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+zorro2_device::zorro2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	zorro_device(mconfig, ZORRO2, "Zorro-II bus", tag, owner, clock, "zorro2", __FILE__),
 	m_eint1_handler(*this),
 	m_eint4_handler(*this),
@@ -197,7 +197,7 @@ zorro2_device::zorro2_device(const machine_config &mconfig, const char *tag, dev
 }
 
 zorro2_device::zorro2_device(const machine_config &mconfig, device_type type, const char *name,
-	const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	zorro_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_eint1_handler(*this),
 	m_eint4_handler(*this),

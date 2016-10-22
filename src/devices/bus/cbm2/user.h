@@ -78,11 +78,11 @@ public:
 	device_cbm2_user_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_cbm2_user_port_interface() { }
 
-	virtual UINT8 cbm2_d1_r(address_space &space, offs_t offset) { return 0xff; };
-	virtual void cbm2_d1_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual uint8_t cbm2_d1_r(address_space &space, offs_t offset) { return 0xff; };
+	virtual void cbm2_d1_w(address_space &space, offs_t offset, uint8_t data) { };
 
-	virtual UINT8 cbm2_d2_r(address_space &space, offs_t offset) { return 0xff; };
-	virtual void cbm2_d2_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual uint8_t cbm2_d2_r(address_space &space, offs_t offset) { return 0xff; };
+	virtual void cbm2_d2_w(address_space &space, offs_t offset, uint8_t data) { };
 
 	virtual int cbm2_pb2_r() { return 1; }
 	virtual void cbm2_pb2_w(int state) { };
@@ -105,7 +105,7 @@ class cbm2_user_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cbm2_user_port_device() { }
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_irq.set_callback(object); }
@@ -114,9 +114,9 @@ public:
 	template<class _Object> static devcb_base &set_flag_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_flag.set_callback(object); }
 
 	// computer interface
-	DECLARE_READ8_MEMBER( d1_r ) { UINT8 data = 0xff; if (m_card != nullptr) data = m_card->cbm2_d1_r(space, offset); return data; }
+	DECLARE_READ8_MEMBER( d1_r ) { uint8_t data = 0xff; if (m_card != nullptr) data = m_card->cbm2_d1_r(space, offset); return data; }
 	DECLARE_WRITE8_MEMBER( d1_w ) { if (m_card != nullptr) m_card->cbm2_d1_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( d2_r ) { UINT8 data = 0xff; if (m_card != nullptr) data = m_card->cbm2_d2_r(space, offset); return data; }
+	DECLARE_READ8_MEMBER( d2_r ) { uint8_t data = 0xff; if (m_card != nullptr) data = m_card->cbm2_d2_r(space, offset); return data; }
 	DECLARE_WRITE8_MEMBER( d2_w ) { if (m_card != nullptr) m_card->cbm2_d2_w(space, offset, data); }
 	DECLARE_READ_LINE_MEMBER( pb2_r ) { return m_card ? m_card->cbm2_pb2_r() : 1; }
 	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { if (m_card != nullptr) m_card->cbm2_pb2_w(state); }

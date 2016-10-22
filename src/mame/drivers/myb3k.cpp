@@ -39,14 +39,14 @@ public:
 	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
 	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
-	required_shared_ptr<UINT8> m_p_vram;
+	required_shared_ptr<uint8_t> m_p_vram;
 	required_device<palette_device> m_palette;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-	UINT8 m_vmode;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	uint8_t m_vmode;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void myb3k_state::video_start()
@@ -71,7 +71,7 @@ void myb3k_state::video_start()
 #define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
-UINT32 myb3k_state::screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t myb3k_state::screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int xi,yi;

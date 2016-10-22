@@ -162,7 +162,7 @@ READ8_MEMBER( abc_fd2_t::pio_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_fdc->drq_r() << 5;
 	data |= m_fdc->hld_r() << 6;
@@ -276,7 +276,7 @@ machine_config_constructor abc_fd2_t::device_mconfig_additions() const
 //  abc_fd2_t - constructor
 //-------------------------------------------------
 
-abc_fd2_t::abc_fd2_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc_fd2_t::abc_fd2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC_FD2, "ABC FD2", tag, owner, clock, "abc_fd2", __FILE__),
 	device_abcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
@@ -324,7 +324,7 @@ void abc_fd2_t::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void abc_fd2_t::abcbus_cs(UINT8 data)
+void abc_fd2_t::abcbus_cs(uint8_t data)
 {
 	m_cs = (data == 0x2d);
 }
@@ -334,9 +334,9 @@ void abc_fd2_t::abcbus_cs(UINT8 data)
 //  abcbus_stat -
 //-------------------------------------------------
 
-UINT8 abc_fd2_t::abcbus_stat()
+uint8_t abc_fd2_t::abcbus_stat()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs)
 	{
@@ -351,9 +351,9 @@ UINT8 abc_fd2_t::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-UINT8 abc_fd2_t::abcbus_inp()
+uint8_t abc_fd2_t::abcbus_inp()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs)
 	{
@@ -374,7 +374,7 @@ UINT8 abc_fd2_t::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void abc_fd2_t::abcbus_out(UINT8 data)
+void abc_fd2_t::abcbus_out(uint8_t data)
 {
 	if (!m_cs) return;
 
@@ -392,7 +392,7 @@ void abc_fd2_t::abcbus_out(UINT8 data)
 //  abcbus_c1 -
 //-------------------------------------------------
 
-void abc_fd2_t::abcbus_c1(UINT8 data)
+void abc_fd2_t::abcbus_c1(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -406,7 +406,7 @@ void abc_fd2_t::abcbus_c1(UINT8 data)
 //  abcbus_c3 -
 //-------------------------------------------------
 
-void abc_fd2_t::abcbus_c3(UINT8 data)
+void abc_fd2_t::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -419,9 +419,9 @@ void abc_fd2_t::abcbus_c3(UINT8 data)
 //  abcbus_xmemfl -
 //-------------------------------------------------
 
-UINT8 abc_fd2_t::abcbus_xmemfl(offs_t offset)
+uint8_t abc_fd2_t::abcbus_xmemfl(offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if ((offset & 0xf000) == 0x6000)
 	{

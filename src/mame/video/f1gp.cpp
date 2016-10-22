@@ -52,8 +52,8 @@ VIDEO_START_MEMBER(f1gp_state,f1gp)
 
 	m_fg_tilemap->set_transparent_pen(0xff);
 
-	m_zoomdata = (UINT16 *)memregion("gfx4")->base();
-	m_gfxdecode->gfx(3)->set_source((UINT8 *)m_zoomdata);
+	m_zoomdata = (uint16_t *)memregion("gfx4")->base();
+	m_gfxdecode->gfx(3)->set_source((uint8_t *)m_zoomdata);
 
 	save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes()/2);
 }
@@ -66,25 +66,25 @@ VIDEO_START_MEMBER(f1gp_state,f1gpb)
 
 	m_fg_tilemap->set_transparent_pen(0xff);
 
-	m_zoomdata = (UINT16 *)memregion("gfx4")->base();
-	m_gfxdecode->gfx(3)->set_source((UINT8 *)m_zoomdata);
+	m_zoomdata = (uint16_t *)memregion("gfx4")->base();
+	m_gfxdecode->gfx(3)->set_source((uint8_t *)m_zoomdata);
 
 	save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes()/2);
 }
 
 /* new hw type */
-UINT32 f1gp_state::f1gp2_tile_callback( UINT32 code )
+uint32_t f1gp_state::f1gp2_tile_callback( uint32_t code )
 {
 	return m_sprcgram[code&0x3fff];
 }
 
 /* old hw type */
-UINT32 f1gp_state::f1gp_old_tile_callback( UINT32 code )
+uint32_t f1gp_state::f1gp_old_tile_callback( uint32_t code )
 {
 	return m_spr1cgram[code % (m_spr1cgram.bytes()/2)];
 }
 
-UINT32 f1gp_state::f1gp_ol2_tile_callback( UINT32 code )
+uint32_t f1gp_state::f1gp_ol2_tile_callback( uint32_t code )
 {
 	return m_spr2cgram[code % (m_spr2cgram.bytes()/2)];
 }
@@ -186,7 +186,7 @@ WRITE16_MEMBER(f1gp_state::f1gp2_gfxctrl_w)
 ***************************************************************************/
 
 
-UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -209,7 +209,7 @@ UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-UINT32 f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_gfxctrl & 4)  /* blank screen */
 		bitmap.fill(m_palette->black_pen(), cliprect);
@@ -250,7 +250,7 @@ UINT32 f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitm
 // BOOTLEG
 void f1gp_state::f1gpb_draw_sprites( screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int attr_start, start_offset = m_spriteram.bytes() / 2 - 4;
 
 	// find the "end of list" to draw the sprites in reverse order
@@ -316,14 +316,14 @@ void f1gp_state::f1gpb_draw_sprites( screen_device &screen,bitmap_ind16 &bitmap,
 }
 
 // BOOTLEG
-UINT32 f1gp_state::screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t f1gp_state::screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT32 startx, starty;
+	uint32_t startx, starty;
 	int incxx, incxy, incyx, incyy;
 
-	incxy = (INT16)m_rozregs[1];
+	incxy = (int16_t)m_rozregs[1];
 	incyx = -incxy;
-	incxx = incyy = (INT16)m_rozregs[3];
+	incxx = incyy = (int16_t)m_rozregs[3];
 	startx = m_rozregs[0] + 328;
 	starty = m_rozregs[2];
 

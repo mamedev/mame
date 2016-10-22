@@ -37,14 +37,14 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_rom40) { return 0xff; }
 	virtual DECLARE_READ8_MEMBER(read_rom80) { return 0xff; }
 
-	void rom_alloc(UINT32 size, const char *tag);
-	UINT8* get_rom_base() { return m_rom; }
-	UINT32 get_rom_size() { return m_rom_size; }
+	void rom_alloc(uint32_t size, const char *tag);
+	uint8_t* get_rom_base() { return m_rom; }
+	uint32_t get_rom_size() { return m_rom_size; }
 
 protected:
 	// internal state
-	UINT8 *m_rom;
-	UINT32 m_rom_size;
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
 };
 
 
@@ -56,7 +56,7 @@ class crvision_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	crvision_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	crvision_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~crvision_cart_slot_device();
 
 	// device-level overrides

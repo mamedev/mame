@@ -5,7 +5,7 @@
 #include "emu.h"
 
 
-#define SIMM15(v) (INT32)((v & 0x4000) ? (v | 0xffffe000) : (v))
+#define SIMM15(v) (int32_t)((v & 0x4000) ? (v | 0xffffe000) : (v))
 #define UIMM15(v) (v)
 
 static const char *BCND_CONDITION[32] =
@@ -50,7 +50,7 @@ static const char *FLOATOP_ROUND[4] =
 };
 
 static char *output;
-static const UINT8 *opdata;
+static const uint8_t *opdata;
 static int opbytes;
 
 static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
@@ -62,15 +62,15 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 	va_end(vl);
 }
 
-static UINT32 fetch(void)
+static uint32_t fetch(void)
 {
-	UINT32 d = ((UINT32)(opdata[0]) << 24) | ((UINT32)(opdata[1]) << 16) | ((UINT32)(opdata[2]) << 8) | opdata[3];
+	uint32_t d = ((uint32_t)(opdata[0]) << 24) | ((uint32_t)(opdata[1]) << 16) | ((uint32_t)(opdata[2]) << 8) | opdata[3];
 	opdata += 4;
 	opbytes += 4;
 	return d;
 }
 
-static char* get_creg_name(UINT32 reg)
+static char* get_creg_name(uint32_t reg)
 {
 	static char buffer[64];
 
@@ -108,7 +108,7 @@ static char* get_creg_name(UINT32 reg)
 	return buffer;
 }
 
-static char* format_vector_op(UINT32 op, UINT32 imm32)
+static char* format_vector_op(uint32_t op, uint32_t imm32)
 {
 	static char buffer[256];
 	static char dest[64];
@@ -201,14 +201,14 @@ static char* format_vector_op(UINT32 op, UINT32 imm32)
 	return buffer;
 }
 
-static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
+static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const uint8_t *oprom)
 {
 	output = buffer;
 	opdata = oprom;
 	opbytes = 0;
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 
-	UINT32 op = fetch();
+	uint32_t op = fetch();
 
 	int rd = (op >> 27) & 0x1f;
 	int link = rd;
@@ -217,7 +217,7 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 	int endmask = (op >> 5) & 0x1f;
 	int rotate = (op & 0x1f);
 	int src1 = rotate;
-	UINT32 uimm15 = op & 0x7fff;
+	uint32_t uimm15 = op & 0x7fff;
 
 	switch ((op >> 20) & 3)
 	{
@@ -317,7 +317,7 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 		{
 			int subop = (op >> 12) & 0xff;
 
-			UINT32 imm32 = 0;
+			uint32_t imm32 = 0;
 			if (op & (1 << 12))     // fetch 32-bit immediate if needed
 				imm32 = fetch();
 

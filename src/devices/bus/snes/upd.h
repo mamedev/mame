@@ -14,8 +14,8 @@ class sns_rom20_necdsp_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	sns_rom20_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	sns_rom20_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -31,8 +31,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
 
-	std::vector<UINT32> m_dsp_prg;
-	std::vector<UINT16> m_dsp_data;
+	std::vector<uint32_t> m_dsp_prg;
+	std::vector<uint16_t> m_dsp_data;
 };
 
 // ======================> sns_rom21_necdsp_device
@@ -41,8 +41,8 @@ class sns_rom21_necdsp_device : public sns_rom21_device
 {
 public:
 	// construction/destruction
-	sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	sns_rom21_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	sns_rom21_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -58,8 +58,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
 
-	std::vector<UINT32> m_dsp_prg;
-	std::vector<UINT16> m_dsp_data;
+	std::vector<uint32_t> m_dsp_prg;
+	std::vector<uint16_t> m_dsp_data;
 };
 
 // ======================> sns_rom_setadsp_device
@@ -68,7 +68,7 @@ class sns_rom_setadsp_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_setadsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	sns_rom_setadsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -83,8 +83,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(setadsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(setadsp_data_r);
 
-	std::vector<UINT32> m_dsp_prg;
-	std::vector<UINT16> m_dsp_data;
+	std::vector<uint32_t> m_dsp_prg;
+	std::vector<uint16_t> m_dsp_data;
 };
 
 // ======================> sns_rom_seta10dsp_device
@@ -93,7 +93,7 @@ class sns_rom_seta10dsp_device : public sns_rom_setadsp_device
 {
 public:
 	// construction/destruction
-	sns_rom_seta10dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom_seta10dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -105,7 +105,7 @@ class sns_rom_seta11dsp_device : public sns_rom_setadsp_device
 {
 public:
 	// construction/destruction
-	sns_rom_seta11dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom_seta11dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -127,7 +127,7 @@ class sns_rom20_necdsp1_legacy_device : public sns_rom20_necdsp_device
 {
 public:
 	// construction/destruction
-	sns_rom20_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom20_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -138,7 +138,7 @@ class sns_rom20_necdsp1b_legacy_device : public sns_rom20_necdsp_device
 {
 public:
 	// construction/destruction
-	sns_rom20_necdsp1b_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom20_necdsp1b_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -149,7 +149,7 @@ class sns_rom20_necdsp2_legacy_device : public sns_rom20_necdsp_device
 {
 public:
 	// construction/destruction
-	sns_rom20_necdsp2_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom20_necdsp2_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -160,7 +160,7 @@ class sns_rom20_necdsp3_legacy_device : public sns_rom20_necdsp_device
 {
 public:
 	// construction/destruction
-	sns_rom20_necdsp3_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom20_necdsp3_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -171,7 +171,7 @@ class sns_rom20_necdsp4_legacy_device : public sns_rom20_necdsp_device
 {
 public:
 	// construction/destruction
-	sns_rom20_necdsp4_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom20_necdsp4_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -182,7 +182,7 @@ class sns_rom21_necdsp1_legacy_device : public sns_rom21_necdsp_device
 {
 public:
 	// construction/destruction
-	sns_rom21_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom21_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -193,7 +193,7 @@ class sns_rom_seta10dsp_legacy_device : public sns_rom_setadsp_device
 {
 public:
 	// construction/destruction
-	sns_rom_seta10dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom_seta10dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -204,7 +204,7 @@ class sns_rom_seta11dsp_legacy_device : public sns_rom_setadsp_device
 {
 public:
 	// construction/destruction
-	sns_rom_seta11dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom_seta11dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

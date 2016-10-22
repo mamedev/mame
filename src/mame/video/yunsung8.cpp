@@ -69,7 +69,7 @@ WRITE8_MEMBER(yunsung8_state::videoram_w)
 	if (offset < 0x0800)        // c000-c7ff    Banked Palette RAM
 	{
 		int bank = m_videobank & 2;
-		UINT8 *RAM;
+		uint8_t *RAM;
 		int color;
 
 		if (bank)
@@ -186,7 +186,7 @@ void yunsung8_state::video_start()
 
 ***************************************************************************/
 
-UINT32 yunsung8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t yunsung8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = (~m_layers_ctrl) >> 4;
 

@@ -25,7 +25,7 @@
 const device_type HUC6261 = &device_creator<huc6261_device>;
 
 
-huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, HUC6261, "HuC6261", tag, owner, clock, "huc6261", __FILE__),
 		device_video_interface(mconfig, *this), m_huc6270_a_tag(nullptr), m_huc6270_b_tag(nullptr), m_huc6270_a(nullptr), m_huc6270_b(nullptr), m_last_h(0), m_last_v(0), m_height(0), m_address(0), m_palette_latch(0), m_register(0), m_control(0), m_pixels_per_clock(0), m_pixel_data(0), m_pixel_clock(0), m_timer(nullptr), m_bmp(nullptr)
 {
@@ -34,9 +34,9 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 	{
 		for ( int vr = 0; vr < 256; vr++ )
 		{
-			INT32 r,g,b;
-			INT32 u = ur - 128;
-			INT32 v = vr - 128;
+			int32_t r,g,b;
+			int32_t u = ur - 128;
+			int32_t v = vr - 128;
 
 			r =              - 1.13983 * v;
 			g = -0.35465 * u - 0.58060 * v;
@@ -50,11 +50,11 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-inline UINT32 huc6261_device::yuv2rgb(UINT32 yuv)
+inline uint32_t huc6261_device::yuv2rgb(uint32_t yuv)
 {
-	INT32 r, g, b;
-	UINT8 y = yuv >> 16;
-	UINT16 uv = yuv & 0xffff;
+	int32_t r, g, b;
+	uint8_t y = yuv >> 16;
+	uint16_t uv = yuv & 0xffff;
 
 	r = y + m_uv_lookup[uv][0];
 	g = y + m_uv_lookup[uv][1];
@@ -76,7 +76,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	int hpos = m_screen->hpos();
 	int h = m_last_h;
 	int v = m_last_v;
-	UINT32 *bitmap_line = &m_bmp->pix32(v);
+	uint32_t *bitmap_line = &m_bmp->pix32(v);
 
 	while ( h != hpos || v != vpos )
 	{
@@ -161,7 +161,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 	/* Ask our slave device for time until next possible event */
 	{
-		UINT16 next_event_clocks = HUC6261_WPF; //m_get_time_til_next_event( 0, 0xffff );
+		uint16_t next_event_clocks = HUC6261_WPF; //m_get_time_til_next_event( 0, 0xffff );
 		int event_hpos, event_vpos;
 
 		/* Adjust for pixel clocks per pixel */
@@ -200,15 +200,15 @@ void huc6261_device::video_update( bitmap_rgb32 &bitmap, const rectangle &clipre
 
 READ16_MEMBER( huc6261_device::read )
 {
-	UINT16 data = 0xFFFF;
+	uint16_t data = 0xFFFF;
 
 	switch ( offset & 1 )
 	{
 		/* Status info */
 		case 0x00:
 			{
-				UINT16 vpos = m_screen->vpos();
-				UINT16 hpos = m_screen->hpos();
+				uint16_t vpos = m_screen->vpos();
+				uint16_t hpos = m_screen->hpos();
 
 				data = ( vpos << 5 ) | ( m_register & 0x1F);
 

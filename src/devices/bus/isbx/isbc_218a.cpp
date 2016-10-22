@@ -79,7 +79,7 @@ machine_config_constructor isbc_218a_device::device_mconfig_additions() const
 //  isbc_218a_device - constructor
 //-------------------------------------------------
 
-isbc_218a_device::isbc_218a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isbc_218a_device::isbc_218a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISBC_218A, "ISBX 218a for ISBC", tag, owner, clock, "isbc_218a", __FILE__),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),
@@ -112,9 +112,9 @@ void isbc_218a_device::device_reset()
 //  mcs0_r - chip select 0 read
 //-------------------------------------------------
 
-UINT8 isbc_218a_device::mcs0_r(address_space &space, offs_t offset)
+uint8_t isbc_218a_device::mcs0_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (BIT(offset, 0))
 	{
@@ -130,7 +130,7 @@ UINT8 isbc_218a_device::mcs0_r(address_space &space, offs_t offset)
 //  mcs0_w - chip select 0 write
 //-------------------------------------------------
 
-void isbc_218a_device::mcs0_w(address_space &space, offs_t offset, UINT8 data)
+void isbc_218a_device::mcs0_w(address_space &space, offs_t offset, uint8_t data)
 {
 	switch (BIT(offset, 0))
 	{
@@ -143,9 +143,9 @@ void isbc_218a_device::mcs0_w(address_space &space, offs_t offset, UINT8 data)
 //  mcs1_r - chip select 1 read
 //-------------------------------------------------
 
-UINT8 isbc_218a_device::mcs1_r(address_space &space, offs_t offset)
+uint8_t isbc_218a_device::mcs1_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (offset)
 	{
@@ -160,7 +160,7 @@ UINT8 isbc_218a_device::mcs1_r(address_space &space, offs_t offset)
 //  mcs1_w - chip select 1 write
 //-------------------------------------------------
 
-void isbc_218a_device::mcs1_w(address_space &space, offs_t offset, UINT8 data)
+void isbc_218a_device::mcs1_w(address_space &space, offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -182,7 +182,7 @@ void isbc_218a_device::mcs1_w(address_space &space, offs_t offset, UINT8 data)
 //  mdack_r - DMA acknowledge read
 //-------------------------------------------------
 
-UINT8 isbc_218a_device::mdack_r(address_space &space, offs_t offset)
+uint8_t isbc_218a_device::mdack_r(address_space &space, offs_t offset)
 {
 	return m_fdc->dma_r();
 }
@@ -192,7 +192,7 @@ UINT8 isbc_218a_device::mdack_r(address_space &space, offs_t offset)
 //  mdack_w - DMA acknowledge write
 //-------------------------------------------------
 
-void isbc_218a_device::mdack_w(address_space &space, offs_t offset, UINT8 data)
+void isbc_218a_device::mdack_w(address_space &space, offs_t offset, uint8_t data)
 {
 	m_fdc->dma_w(data);
 }

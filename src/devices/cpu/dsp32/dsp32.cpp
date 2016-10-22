@@ -142,7 +142,7 @@ const device_type DSP32C = &device_creator<dsp32c_device>;
 //  dsp32c_device - constructor
 //-------------------------------------------------
 
-dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, DSP32C, "DSP32C", tag, owner, clock, "dsp32c", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24),
 		m_pin(0),
@@ -399,7 +399,7 @@ void dsp32c_device::state_string_export(const device_state_entry &entry, std::st
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 dsp32c_device::disasm_min_opcode_bytes() const
+uint32_t dsp32c_device::disasm_min_opcode_bytes() const
 {
 	return 4;
 }
@@ -410,7 +410,7 @@ UINT32 dsp32c_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 dsp32c_device::disasm_max_opcode_bytes() const
+uint32_t dsp32c_device::disasm_max_opcode_bytes() const
 {
 	return 4;
 }
@@ -421,7 +421,7 @@ UINT32 dsp32c_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t dsp32c_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t dsp32c_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( dsp32c );
 	return CPU_DISASSEMBLE_NAME(dsp32c)(this, buffer, pc, oprom, opram, options);
@@ -434,22 +434,22 @@ offs_t dsp32c_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 //  MEMORY ACCESSORS
 //**************************************************************************
 
-inline UINT32 dsp32c_device::ROPCODE(offs_t pc)
+inline uint32_t dsp32c_device::ROPCODE(offs_t pc)
 {
 	return m_direct->read_dword(pc);
 }
 
-inline UINT8 dsp32c_device::RBYTE(offs_t addr)
+inline uint8_t dsp32c_device::RBYTE(offs_t addr)
 {
 	return m_program->read_byte(addr);
 }
 
-inline void dsp32c_device::WBYTE(offs_t addr, UINT8 data)
+inline void dsp32c_device::WBYTE(offs_t addr, uint8_t data)
 {
 	m_program->write_byte(addr, data);
 }
 
-inline UINT16 dsp32c_device::RWORD(offs_t addr)
+inline uint16_t dsp32c_device::RWORD(offs_t addr)
 {
 #if DETECT_MISALIGNED_MEMORY
 	if (!WORD_ALIGNED(addr))
@@ -458,7 +458,7 @@ inline UINT16 dsp32c_device::RWORD(offs_t addr)
 	return m_program->read_word(addr);
 }
 
-inline UINT32 dsp32c_device::RLONG(offs_t addr)
+inline uint32_t dsp32c_device::RLONG(offs_t addr)
 {
 #if DETECT_MISALIGNED_MEMORY
 	if (!DWORD_ALIGNED(addr))
@@ -467,7 +467,7 @@ inline UINT32 dsp32c_device::RLONG(offs_t addr)
 	return m_program->read_dword(addr);
 }
 
-inline void dsp32c_device::WWORD(offs_t addr, UINT16 data)
+inline void dsp32c_device::WWORD(offs_t addr, uint16_t data)
 {
 #if DETECT_MISALIGNED_MEMORY
 	if (!WORD_ALIGNED(addr))
@@ -476,7 +476,7 @@ inline void dsp32c_device::WWORD(offs_t addr, UINT16 data)
 	m_program->write_word(addr, data);
 }
 
-inline void dsp32c_device::WLONG(offs_t addr, UINT32 data)
+inline void dsp32c_device::WLONG(offs_t addr, uint32_t data)
 {
 #if DETECT_MISALIGNED_MEMORY
 	if (!DWORD_ALIGNED(addr))
@@ -508,9 +508,9 @@ void dsp32c_device::set_irq_line(int irqline, int state)
 //  REGISTER HANDLING
 //**************************************************************************
 
-void dsp32c_device::update_pcr(UINT16 newval)
+void dsp32c_device::update_pcr(uint16_t newval)
 {
-	UINT16 oldval = m_pcr;
+	uint16_t oldval = m_pcr;
 	m_pcr = newval;
 
 	// reset the chip if we get a reset
@@ -528,7 +528,7 @@ void dsp32c_device::update_pins(void)
 {
 	if (m_pcr & PCR_ENI)
 	{
-		UINT16 newoutput = 0;
+		uint16_t newoutput = 0;
 
 		if (m_pcr & PCR_PIFs)
 			newoutput |= DSP32_OUTPUT_PIF;
@@ -563,7 +563,7 @@ void dsp32c_device::update_pins(void)
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 dsp32c_device::execute_min_cycles() const
+uint32_t dsp32c_device::execute_min_cycles() const
 {
 	return 4;
 }
@@ -574,7 +574,7 @@ UINT32 dsp32c_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 dsp32c_device::execute_max_cycles() const
+uint32_t dsp32c_device::execute_max_cycles() const
 {
 	return 4;
 }
@@ -585,7 +585,7 @@ UINT32 dsp32c_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 dsp32c_device::execute_input_lines() const
+uint32_t dsp32c_device::execute_input_lines() const
 {
 	return 2;
 }
@@ -630,7 +630,7 @@ void dsp32c_device::execute_run()
 //  PARALLEL INTERFACE WRITES
 //**************************************************************************
 
-const UINT32 dsp32c_device::s_regmap[4][16] =
+const uint32_t dsp32c_device::s_regmap[4][16] =
 {
 	{   // DSP32 compatible mode
 		PIO_PAR|LOWER, PIO_PAR|UPPER, PIO_PDR|LOWER, PIO_PDR|UPPER,
@@ -681,7 +681,7 @@ void dsp32c_device::dma_load()
 	// only process if DMA is enabled
 	if (m_pcr & PCR_DMA)
 	{
-		UINT32 addr = m_par | (m_pare << 16);
+		uint32_t addr = m_par | (m_pare << 16);
 
 		// 16-bit case
 		if (!(m_pcr & PCR_DMA32))
@@ -690,7 +690,7 @@ void dsp32c_device::dma_load()
 		// 32-bit case
 		else
 		{
-			UINT32 temp = RLONG(addr & 0xfffffc);
+			uint32_t temp = RLONG(addr & 0xfffffc);
 			m_pdr = temp >> 16;
 			m_pdr2 = temp & 0xffff;
 		}
@@ -706,7 +706,7 @@ void dsp32c_device::dma_store()
 	// only process if DMA is enabled
 	if (m_pcr & PCR_DMA)
 	{
-		UINT32 addr = m_par | (m_pare << 16);
+		uint32_t addr = m_par | (m_pare << 16);
 
 		// 16-bit case
 		if (!(m_pcr & PCR_DMA32))
@@ -724,8 +724,8 @@ void dsp32c_device::dma_store()
 
 void dsp32c_device::pio_w(int reg, int data)
 {
-	UINT16 mask;
-	UINT8 mode;
+	uint16_t mask;
+	uint8_t mode;
 
 	// look up register and mask
 	mode = ((m_pcr >> 8) & 2) | ((m_pcr >> 1) & 1);
@@ -806,8 +806,8 @@ void dsp32c_device::pio_w(int reg, int data)
 
 int dsp32c_device::pio_r(int reg)
 {
-	UINT16 mask, result = 0xffff;
-	UINT8 mode, shift = 0;
+	uint16_t mask, result = 0xffff;
+	uint8_t mode, shift = 0;
 
 	// look up register and mask
 	mode = ((m_pcr >> 8) & 2) | ((m_pcr >> 1) & 1);

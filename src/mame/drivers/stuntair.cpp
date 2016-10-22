@@ -102,10 +102,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<UINT8> m_fgram;
-	required_shared_ptr<UINT8> m_bgram;
-	required_shared_ptr<UINT8> m_bgattrram;
-	required_shared_ptr<UINT8> m_sprram;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_bgram;
+	required_shared_ptr<uint8_t> m_bgattrram;
+	required_shared_ptr<uint8_t> m_sprram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -113,10 +113,10 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 
-	UINT8 m_bg_xscroll;
-	UINT8 m_nmi_enable;
-	UINT8 m_spritebank0;
-	UINT8 m_spritebank1;
+	uint8_t m_bg_xscroll;
+	uint8_t m_nmi_enable;
+	uint8_t m_spritebank0;
+	uint8_t m_spritebank1;
 
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
@@ -135,7 +135,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
 };
 
@@ -150,11 +150,11 @@ public:
 PALETTE_INIT_MEMBER(stuntair_state, stuntair)
 {
 	/* need resistor weights etc. */
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const uint8_t *color_prom = machine().root_device().memregion("proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
 	{
-		UINT8 data = color_prom[i];
+		uint8_t data = color_prom[i];
 
 		int b = (data&0xc0)>>6;
 		int g = (data&0x38)>>3;
@@ -224,7 +224,7 @@ void stuntair_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_bg_xscroll);
 

@@ -25,7 +25,7 @@
 class mb86901_device : public cpu_device, protected sparc_debug_state
 {
 public:
-	mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -33,9 +33,9 @@ public:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -43,15 +43,15 @@ public:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	UINT8 get_asi() { return m_asi; }
-	UINT32 pc() { return m_pc; }
+	uint8_t get_asi() { return m_asi; }
+	uint32_t pc() { return m_pc; }
 
 	template<typename T> static void add_asi_desc(device_t &device, const T &desc) { return downcast<mb86901_device &>(device).add_asi_desc(desc); }
 
@@ -66,41 +66,41 @@ protected:
 
 	void update_gpr_pointers();
 
-	void execute_add(UINT32 op);
-	void execute_taddcc(UINT32 op);
-	void execute_sub(UINT32 op);
-	void execute_tsubcc(UINT32 op);
-	void execute_logical(UINT32 op);
-	void execute_shift(UINT32 op);
-	void execute_mulscc(UINT32 op);
-	void execute_rdsr(UINT32 op);
-	void execute_wrsr(UINT32 op);
-	void execute_rett(UINT32 op);
-	void execute_saverestore(UINT32 op);
-	void execute_jmpl(UINT32 op);
+	void execute_add(uint32_t op);
+	void execute_taddcc(uint32_t op);
+	void execute_sub(uint32_t op);
+	void execute_tsubcc(uint32_t op);
+	void execute_logical(uint32_t op);
+	void execute_shift(uint32_t op);
+	void execute_mulscc(uint32_t op);
+	void execute_rdsr(uint32_t op);
+	void execute_wrsr(uint32_t op);
+	void execute_rett(uint32_t op);
+	void execute_saverestore(uint32_t op);
+	void execute_jmpl(uint32_t op);
 #if SPARCV8
-	void execute_mul(UINT32 op);
-	void execute_div(UINT32 op);
+	void execute_mul(uint32_t op);
+	void execute_div(uint32_t op);
 #endif
-	void execute_group2(UINT32 op);
+	void execute_group2(uint32_t op);
 
-	void execute_load(UINT32 op);
-	void execute_store(UINT32 op);
-	void execute_ldstub(UINT32 op);
+	void execute_load(uint32_t op);
+	void execute_store(uint32_t op);
+	void execute_ldstub(uint32_t op);
 #if SPARCV8
-	void execute_swap(UINT32 op);
+	void execute_swap(uint32_t op);
 #endif
-	void execute_group3(UINT32 op);
+	void execute_group3(uint32_t op);
 
-	bool evaluate_condition(UINT32 op);
-	void execute_bicc(UINT32 op);
-	void execute_ticc(UINT32 op);
+	bool evaluate_condition(uint32_t op);
+	void execute_bicc(uint32_t op);
+	void execute_ticc(uint32_t op);
 	void select_trap();
 	void execute_trap();
 
-	void complete_instruction_execution(UINT32 op);
-	void dispatch_instruction(UINT32 op);
-	void complete_fp_execution(UINT32 /*op*/);
+	void complete_instruction_execution(uint32_t op);
+	void dispatch_instruction(uint32_t op);
+	void complete_fp_execution(uint32_t /*op*/);
 	void execute_step();
 
 	void reset_step();
@@ -108,7 +108,7 @@ protected:
 
 #if LOG_FCODES
 	void indent();
-	void disassemble_ss1_fcode(UINT32 r5, UINT32 opcode, UINT32 handler_base, UINT32 entry_point, UINT32 stack);
+	void disassemble_ss1_fcode(uint32_t r5, uint32_t opcode, uint32_t handler_base, uint32_t entry_point, uint32_t stack);
 	void log_fcodes();
 #endif
 
@@ -116,46 +116,46 @@ protected:
 	const address_space_config m_program_config;
 
 	// memory access
-	UINT32 read_sized_word(UINT8 asi, UINT32 address, int size);
-	void write_sized_word(UINT8 asi, UINT32 address, UINT32 data, int size);
+	uint32_t read_sized_word(uint8_t asi, uint32_t address, int size);
+	void write_sized_word(uint8_t asi, uint32_t address, uint32_t data, int size);
 
 	// helpers for the disassembler
-	virtual UINT64 get_reg_r(unsigned index) const override;
-	virtual UINT64 get_translated_pc() const override;
-	virtual UINT8 get_icc() const override;
-	virtual UINT8 get_xcc() const override;
-	virtual UINT8 get_fcc(unsigned index) const override;
+	virtual uint64_t get_reg_r(unsigned index) const override;
+	virtual uint64_t get_translated_pc() const override;
+	virtual uint8_t get_icc() const override;
+	virtual uint8_t get_xcc() const override;
+	virtual uint8_t get_fcc(unsigned index) const override;
 
 	// general-purpose registers
-	UINT32 m_r[120];
+	uint32_t m_r[120];
 
 	// FPU registers
-	UINT32 m_fpr[32];
-	UINT32 m_fsr;
-	UINT8 m_ftt;
+	uint32_t m_fpr[32];
+	uint32_t m_fsr;
+	uint8_t m_ftt;
 
 	// control/status registers
-	UINT32 m_pc;
-	UINT32 m_npc;
-	UINT32 m_psr;
-	UINT32 m_wim;
-	UINT32 m_tbr;
-	UINT32 m_y;
+	uint32_t m_pc;
+	uint32_t m_npc;
+	uint32_t m_psr;
+	uint32_t m_wim;
+	uint32_t m_tbr;
+	uint32_t m_y;
 
 	bool m_bp_reset_in;
-	UINT8 m_bp_irl;
+	uint8_t m_bp_irl;
 	bool m_bp_fpu_present;
 	bool m_bp_cp_present;
 	bool m_pb_error;
 	bool m_pb_block_ldst_byte;
 	bool m_pb_block_ldst_word;
-	UINT16 m_irq_state;
+	uint16_t m_irq_state;
 
 	// trap and error registers
 	bool m_trap;
-	UINT8 m_tt;
-	UINT8 m_ticc_trap_type;
-	UINT8 m_interrupt_level;
+	uint8_t m_tt;
+	uint8_t m_ticc_trap_type;
+	uint8_t m_interrupt_level;
 	bool m_privileged_instruction;
 	bool m_illegal_instruction;
 	bool m_mem_address_not_aligned;
@@ -179,29 +179,29 @@ protected:
 	bool m_reset_trap;
 	bool m_execute_mode;
 	bool m_error_mode;
-	UINT8 m_fpu_sequence_err;
-	UINT8 m_cp_sequence_err;
+	uint8_t m_fpu_sequence_err;
+	uint8_t m_cp_sequence_err;
 
 	// fields separated out from PSR (Processor State Register)
-	UINT8 m_impl;   // implementation (always 0 in MB86901)
-	UINT8 m_ver;    // version (always 0 in MB86901)
-	UINT8 m_icc;    // integer condition codes
+	uint8_t m_impl;   // implementation (always 0 in MB86901)
+	uint8_t m_ver;    // version (always 0 in MB86901)
+	uint8_t m_icc;    // integer condition codes
 	bool m_ec;      // enable coprocessor
 	bool m_ef;      // enable FPU
-	UINT8 m_pil;    // processor interrupt level
+	uint8_t m_pil;    // processor interrupt level
 	bool m_s;       // supervisor mode
 	bool m_ps;      // prior S state
 	bool m_et;      // enable traps
-	UINT8 m_cwp;    // current window pointer
+	uint8_t m_cwp;    // current window pointer
 
 	bool m_alu_op3_assigned[64];
 	bool m_ldst_op3_assigned[64];
 
 	// register windowing helpers
-	UINT32* m_regs[32];
+	uint32_t* m_regs[32];
 
 	// addressing helpers
-	UINT8 m_asi;
+	uint8_t m_asi;
 
 	// other internal states
 	bool m_privileged_asr[32];
@@ -212,19 +212,19 @@ protected:
 	int m_icount;
 
 	// debugger helpers
-	UINT32 m_dbgregs[24];
+	uint32_t m_dbgregs[24];
 	sparc_disassembler m_dasm;
 
 	// address spaces
 	address_space *m_program;
 
 #if LOG_FCODES
-	UINT32 m_ss1_next_pc;
-	UINT32 m_ss1_next_opcode;
-	UINT32 m_ss1_next_handler_base;
-	UINT32 m_ss1_next_entry_point;
-	UINT32 m_ss1_next_stack;
-	std::map<UINT16, std::string> m_ss1_fcode_table;
+	uint32_t m_ss1_next_pc;
+	uint32_t m_ss1_next_opcode;
+	uint32_t m_ss1_next_handler_base;
+	uint32_t m_ss1_next_entry_point;
+	uint32_t m_ss1_next_stack;
+	std::map<uint16_t, std::string> m_ss1_fcode_table;
 	bool m_log_fcodes;
 #endif
 

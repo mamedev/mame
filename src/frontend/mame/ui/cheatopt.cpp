@@ -142,7 +142,7 @@ void menu_cheat::populate()
 	if (!mame_machine_manager::instance()->cheat().entries().empty()) {
 		for (auto &curcheat : mame_machine_manager::instance()->cheat().entries())
 		{
-			UINT32 flags;
+			uint32_t flags;
 			curcheat->menu_text(text, subtext, flags);
 			if (text == MENU_SEPARATOR_ITEM)
 				item_append(menu_item_type::SEPARATOR, flags);

@@ -67,7 +67,7 @@ public:
 	{}
 
 public:
-	const UINT8 *m_p_chargen;
+	const uint8_t *m_p_chargen;
 	DECLARE_DRIVER_INIT(zorba);
 	DECLARE_MACHINE_RESET(zorba);
 	DECLARE_READ8_MEMBER(ram_r);
@@ -90,8 +90,8 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
-	UINT8 m_term_data;
-	UINT8 m_fdc_rq;
+	uint8_t m_term_data;
+	uint8_t m_fdc_rq;
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
 	required_device<z80dma_device> m_dma;
@@ -205,7 +205,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER( zorba_state, zorba )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(0, &main[0x0000]);
 	membank("bankr0")->configure_entry(1, &main[0x10000]);
@@ -283,7 +283,7 @@ I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-	UINT8 gfx = m_p_chargen[(linecount & 15) + (charcode << 4) + ((gpa & 1) << 11)];
+	uint8_t gfx = m_p_chargen[(linecount & 15) + (charcode << 4) + ((gpa & 1) << 11)];
 
 	if (vsp)
 		gfx = 0;
@@ -331,7 +331,7 @@ READ8_MEMBER( zorba_state::keyboard_r )
 	if (offset)
 		return (m_term_data) ? 0x87 : 0x85;
 
-	UINT8 data = m_term_data;
+	uint8_t data = m_term_data;
 	m_term_data = 0;
 	return data;
 }

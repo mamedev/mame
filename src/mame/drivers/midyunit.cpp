@@ -1096,7 +1096,7 @@ static MACHINE_CONFIG_START( zunit, midyunit_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_WILLIAMS_NARC_SOUND_ADD("narcsnd")
+	MCFG_SOUND_ADD("narcsnd", WILLIAMS_NARC_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1136,15 +1136,15 @@ static MACHINE_CONFIG_START( yunit_core, midyunit_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_slow, yunit_core )
 
 	/* basic machine hardware */
-	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1159,8 +1159,8 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_fast, yunit_core )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
 
-	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1172,8 +1172,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( yunit_cvsd_6bit_slow, yunit_core )
 
 	/* basic machine hardware */
-	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1188,8 +1188,8 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_fast, yunit_core )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
 
-	MCFG_WILLIAMS_ADPCM_SOUND_ADD("adpcm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("adpcm", WILLIAMS_ADPCM_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1204,8 +1204,8 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_faster, yunit_core )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(FASTER_MASTER_CLOCK)
 
-	MCFG_WILLIAMS_ADPCM_SOUND_ADD("adpcm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("adpcm", WILLIAMS_ADPCM_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1231,7 +1231,7 @@ static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

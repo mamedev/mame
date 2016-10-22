@@ -322,7 +322,7 @@ GFXDECODE_END
 
 void homerun_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entry(0, &ROM[0x00000]);
 	membank("bank1")->configure_entries(1, 7, &ROM[0x10000], 0x4000);

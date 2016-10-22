@@ -239,7 +239,7 @@ WRITE32_MEMBER(atarigt_state::led_w)
 
 READ32_MEMBER(atarigt_state::sound_data_r)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 
 	if (ACCESSING_BITS_0_15)
 		result |= m_cage->control_r();
@@ -276,7 +276,7 @@ void atarigt_state::tmek_update_mode(offs_t offset)
 }
 
 
-void atarigt_state::tmek_protection_w(address_space &space, offs_t offset, UINT16 data)
+void atarigt_state::tmek_protection_w(address_space &space, offs_t offset, uint16_t data)
 {
 /*
     T-Mek init:
@@ -299,7 +299,7 @@ void atarigt_state::tmek_protection_w(address_space &space, offs_t offset, UINT1
 	}
 }
 
-void atarigt_state::tmek_protection_r(address_space &space, offs_t offset, UINT16 *data)
+void atarigt_state::tmek_protection_r(address_space &space, offs_t offset, uint16_t *data)
 {
 	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", space.device().safe_pcbase(), offset);
 
@@ -363,11 +363,11 @@ void atarigt_state::primrage_update_mode(offs_t offset)
 
 
 
-void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, UINT16 data)
+void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, uint16_t data)
 {
 	if (LOG_PROTECTION)
 	{
-	UINT32 pc = space.device().safe_pcbase();
+	uint32_t pc = space.device().safe_pcbase();
 	switch (pc)
 	{
 		/* protection code from 20f90 - 21000 */
@@ -433,15 +433,15 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, U
 
 
 
-void atarigt_state::primrage_protection_r(address_space &space, offs_t offset, UINT16 *data)
+void atarigt_state::primrage_protection_r(address_space &space, offs_t offset, uint16_t *data)
 {
 	/* track accesses */
 	primrage_update_mode(offset);
 
 if (LOG_PROTECTION)
 {
-	UINT32 pc = space.device().safe_pcbase();
-	UINT32 p1, p2, a6;
+	uint32_t pc = space.device().safe_pcbase();
+	uint32_t p1, p2, a6;
 	switch (pc)
 	{
 		/* protection code from 20f90 - 21000 */
@@ -550,8 +550,8 @@ if (LOG_PROTECTION)
 READ32_MEMBER(atarigt_state::colorram_protection_r)
 {
 	offs_t address = 0xd80000 + offset * 4;
-	UINT32 result32 = 0;
-	UINT16 result;
+	uint32_t result32 = 0;
+	uint16_t result;
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -1291,14 +1291,14 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	/* protected version */
 	if (pc == 0x2EB3C || pc == 0x2EB48)
 	{
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)space.device().state().state_int(M68K_A4) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)space.device().state().state_int(M68K_A4) - 2);
 		/* skip these writes to make more stuff visible */
 		return;
 	}
 
 	/* unprotected version */
 	if (pc == 0x25834 || pc == 0x25860)
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)space.device().state().state_int(M68K_A3) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)space.device().state().state_int(M68K_A3) - 2);
 
 	m_playfield_tilemap->write(space, offset, data, mem_mask);
 }

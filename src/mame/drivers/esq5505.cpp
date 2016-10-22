@@ -100,7 +100,7 @@
     62 = DATA INCREMENT
     63 = DATA DECREMENT
 
-    VFX / VFX-SD / SD-1 analog values:
+    VFX / VFX-SD / SD-1 analog values: all values are 10 bits, left-justified within 16 bits.
     0 = Pitch Bend
     1 = Patch Select
     2 = Mod Wheel
@@ -202,11 +202,11 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output);
 
 	int m_system_type;
-	UINT8 m_duart_io;
-	UINT8 otis_irq_state;
-	UINT8 dmac_irq_state;
+	uint8_t m_duart_io;
+	uint8_t otis_irq_state;
+	uint8_t dmac_irq_state;
 	int dmac_irq_vector;
-	UINT8 duart_irq_state;
+	uint8_t duart_irq_state;
 	int duart_irq_vector;
 
 	void update_irq_to_maincpu();
@@ -214,8 +214,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 private:
-	UINT16  *m_rom, *m_ram;
-	UINT16 m_analog_values[8];
+	uint16_t  *m_rom, *m_ram;
+	uint16_t m_analog_values[8];
 
 public:
 	DECLARE_DRIVER_INIT(eps);
@@ -243,28 +243,17 @@ SLOT_INTERFACE_END
 
 IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 {
-	// We immediately update the interrupt presented to the CPU, so that it doesn't
-	// end up retrying the same interrupt over and over. We then return the appropriate vector.
-	int vector = 0;
 	switch(irqline) {
 	case 1:
-		otis_irq_state = 0;
-		vector = M68K_INT_ACK_AUTOVECTOR;
-		break;
+		return M68K_INT_ACK_AUTOVECTOR;
 	case 2:
-		dmac_irq_state = 0;
-		vector = dmac_irq_vector;
-		break;
+		return dmac_irq_vector;
 	case 3:
-		duart_irq_state = 0;
-		vector = duart_irq_vector;
-		break;
+		return duart_irq_vector;
 	default:
 		logerror("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqline);
 		return 0;
 	}
-	update_irq_to_maincpu();
-	return vector;
 }
 
 void esq5505_state::machine_start()
@@ -274,8 +263,8 @@ void esq5505_state::machine_start()
 	m_pump->set_otis(m_otis);
 	m_pump->set_esp(m_esp);
 
-	m_rom = (UINT16 *)(void *)memregion("osrom")->base();
-	m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
+	m_rom = (uint16_t *)(void *)memregion("osrom")->base();
+	m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
 }
 
 void esq5505_state::machine_reset()
@@ -283,13 +272,13 @@ void esq5505_state::machine_reset()
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : nullptr;
 
-	// Default analog values:
-	m_analog_values[0] = 0x7fff; // pitch mod: start in the center
+	// Default analog values: all values are 10 bits, left-justified within 16 bits.
+	m_analog_values[0] = 0x7fc0; // pitch mod: start in the center
 	m_analog_values[1] = 0x0000; // patch select: nothing pressed.
-	m_analog_values[2] = 0x0000; // mod wheel: at the bottom, no modulation
-	m_analog_values[3] = 0xcccc; // data entry: somewhere in the middle
-	m_analog_values[4] = 0xffff; // control voltage / pedal: full on.
-	m_analog_values[5] = 0xffff; // Volume control: full on.
+	m_analog_values[2] = 0xffc0; // mod wheel: at the bottom, no modulation
+	m_analog_values[3] = 0xccc0; // data entry: somewhere in the middle
+	m_analog_values[4] = 0xffc0; // control voltage / pedal: full on.
+	m_analog_values[5] = 0xffc0; // Volume control: full on.
 	m_analog_values[6] = 0x7fc0; // Battery voltage: something reasonable.
 	m_analog_values[7] = 0x5540; // vRef to check battery.
 
@@ -316,7 +305,7 @@ void esq5505_state::machine_reset()
 }
 
 void esq5505_state::update_irq_to_maincpu() {
-	//printf("\nupdating IRQ state: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
+	// printf("updating IRQ state: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
 	if (duart_irq_state) {
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
@@ -343,8 +332,8 @@ READ16_MEMBER(esq5505_state::lower_r)
 	// get pointers when 68k resets
 	if (!m_rom)
 	{
-		m_rom = (UINT16 *)(void *)memregion("osrom")->base();
-		m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
+		m_rom = (uint16_t *)(void *)memregion("osrom")->base();
+		m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
 	}
 
 	if (!space.debugger_access() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
@@ -526,6 +515,7 @@ WRITE8_MEMBER(esq5505_state::dma_end)
 		dmac_irq_state = 0;
 	}
 
+	// printf("IRQ update from DMAC: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
 	update_irq_to_maincpu();
 }
 
@@ -558,7 +548,7 @@ WRITE8_MEMBER(esq5505_state::fdc_write_byte)
 #if KEYBOARD_HACK
 INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 {
-	int val = (UINT8)(FPTR)param;
+	int val = (uint8_t)(uintptr_t)param;
 	int cmp = 0x60;
 
 	if (m_system_type == SQ1)
@@ -601,7 +591,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 		}
 		else if (oldval == 1 && newval == 0)
 		{
-	//        printf("key off %x\n", (UINT8)(FPTR)param);
+	//        printf("key off %x\n", (uint8_t)(uintptr_t)param);
 			m_panel->xmit_char(val&0x7f);
 			m_panel->xmit_char(0x00);
 		}
@@ -977,14 +967,16 @@ DRIVER_INIT_MEMBER(esq5505_state,sq1)
 {
 	DRIVER_INIT_CALL(common);
 	m_system_type = SQ1;
+#if KEYBOARD_HACK
 	shift = 60;
+#endif
 }
 
 DRIVER_INIT_MEMBER(esq5505_state,denib)
 {
-	UINT8 *pNibbles = (UINT8 *)memregion("nibbles")->base();
-	UINT8 *pBS0L = (UINT8 *)memregion("waverom")->base();
-	UINT8 *pBS0H = pBS0L + 0x100000;
+	uint8_t *pNibbles = (uint8_t *)memregion("nibbles")->base();
+	uint8_t *pBS0L = (uint8_t *)memregion("waverom")->base();
+	uint8_t *pBS0H = pBS0L + 0x100000;
 
 	DRIVER_INIT_CALL(common);
 

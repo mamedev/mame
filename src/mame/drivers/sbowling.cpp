@@ -57,16 +57,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	int m_bgmap;
 	int m_system;
 	tilemap_t *m_tilemap;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
-	UINT32 m_color_prom_address;
-	UINT8 m_pix_sh;
-	UINT8 m_pix[2];
+	uint32_t m_color_prom_address;
+	uint8_t m_pix_sh;
+	uint8_t m_pix[2];
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(pix_shift_w);
@@ -82,13 +82,13 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sbowling);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
 };
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
 {
-	UINT8 *rom = memregion("user1")->base();
+	uint8_t *rom = memregion("user1")->base();
 	int tileno = rom[tile_index + m_bgmap * 1024];
 
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
@@ -128,7 +128,7 @@ WRITE8_MEMBER(sbowling_state::videoram_w)
 	}
 }
 
-UINT32 sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x18, cliprect);
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -167,7 +167,7 @@ WRITE8_MEMBER(sbowling_state::pix_data_w)
 }
 READ8_MEMBER(sbowling_state::pix_data_r)
 {
-	UINT32 p1, p0;
+	uint32_t p1, p0;
 	int res;
 	int sh = m_pix_sh & 7;
 
@@ -362,7 +362,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	static const int resistances_rg[3] = { 470, 270, 100 };
 	static const int resistances_b[2]  = { 270, 100 };

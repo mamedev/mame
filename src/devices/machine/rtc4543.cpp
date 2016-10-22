@@ -46,14 +46,14 @@ const device_type RTC4543 = &device_creator<rtc4543_device>;
 //  rtc4543_device - constructor
 //-------------------------------------------------
 
-rtc4543_device::rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rtc4543_device::rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RTC4543, "R4543 RTC", tag, owner, clock, "rtc4543", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		data_cb(*this), m_ce(0), m_clk(0), m_wr(0), m_data(0), m_curbit(0), m_clock_timer(nullptr)
 {
 }
 
-rtc4543_device::rtc4543_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *filename)
+rtc4543_device::rtc4543_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *filename)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, filename),
 		device_rtc_interface(mconfig, *this),
 		data_cb(*this), m_ce(0), m_clk(0), m_wr(0), m_data(0), m_curbit(0), m_clock_timer(nullptr)
@@ -353,7 +353,7 @@ const device_type JRC6355E = &device_creator<jrc6355e_device>;
 //  jrc6355e_device - constructor
 //-------------------------------------------------
 
-jrc6355e_device::jrc6355e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+jrc6355e_device::jrc6355e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rtc4543_device(mconfig, JRC6355E, "JRC 6355E RTC", tag, owner, clock, "jrc6355e", __FILE__)
 {
 }

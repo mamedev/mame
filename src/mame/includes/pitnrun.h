@@ -18,17 +18,17 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	int m_nmi;
-	UINT8 m_fromz80;
-	UINT8 m_toz80;
+	uint8_t m_fromz80;
+	uint8_t m_toz80;
 	int m_zaccept;
 	int m_zready;
-	UINT8 m_portA_in;
-	UINT8 m_portA_out;
+	uint8_t m_portA_in;
+	uint8_t m_portA_out;
 	int m_address;
 	int m_h_heed;
 	int m_v_heed;
@@ -74,7 +74,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pitnrun);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void spotlights();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

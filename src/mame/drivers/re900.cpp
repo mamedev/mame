@@ -94,15 +94,15 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	required_shared_ptr<UINT8> m_rom;
+	required_shared_ptr<uint8_t> m_rom;
 
 	// re900 specific
-	UINT8 m_psg_pa;
-	UINT8 m_psg_pb;
-	UINT8 m_mux_data;
-	UINT8 m_ledant;
-	UINT8 m_player;
-	UINT8 m_stat_a;
+	uint8_t m_psg_pa;
+	uint8_t m_psg_pb;
+	uint8_t m_mux_data;
+	uint8_t m_ledant;
+	uint8_t m_player;
+	uint8_t m_stat_a;
 
 	// common
 	DECLARE_READ8_MEMBER(rom_r);
@@ -140,7 +140,7 @@ READ8_MEMBER(re900_state::re_psg_portA_r)
 
 READ8_MEMBER(re900_state::re_psg_portB_r)
 {
-	UINT8 retval = 0xff;
+	uint8_t retval = 0xff;
 	logerror("llamada a re_psg_portB_r\n");
 	/* This is a hack to select the active player due to Keyboard size restrictions  */
 
@@ -206,7 +206,7 @@ WRITE8_MEMBER(re900_state::re_mux_port_A_w)
 
 WRITE8_MEMBER(re900_state::re_mux_port_B_w)
 {
-	UINT8 led;
+	uint8_t led;
 	m_psg_pb = data;
 	led = (m_psg_pa >> 2) & 0x3f;
 

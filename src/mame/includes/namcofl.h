@@ -46,10 +46,10 @@ public:
 	optional_ioport m_brake;
 	optional_ioport m_wheel;
 	emu_timer *m_raster_interrupt_timer;
-	std::unique_ptr<UINT32[]> m_workram;
-	required_shared_ptr<UINT16> m_shareram;
-	UINT8 m_mcu_port6;
-	UINT32 m_sprbank;
+	std::unique_ptr<uint32_t[]> m_workram;
+	required_shared_ptr<uint16_t> m_shareram;
+	uint8_t m_mcu_port6;
+	uint32_t m_sprbank;
 
 	DECLARE_READ32_MEMBER(fl_unk1_r);
 	DECLARE_READ32_MEMBER(fl_network_r);
@@ -76,7 +76,7 @@ public:
 	DECLARE_MACHINE_START(namcofl);
 	DECLARE_MACHINE_RESET(namcofl);
 	DECLARE_VIDEO_START(namcofl);
-	UINT32 screen_update_namcofl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_namcofl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(network_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(raster_interrupt_callback);

@@ -103,7 +103,7 @@ const char *const wow_sample_names[] =
 
 READ8_MEMBER( astrocde_state::wow_speech_r )
 {
-	UINT8 data = offset >> 8;
+	uint8_t data = offset >> 8;
 #if USE_FAKE_VOTRAX
 	int Phoneme/*, Intonation*/;
 	int i = 0;

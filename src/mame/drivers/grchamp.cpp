@@ -128,7 +128,7 @@ INTERRUPT_GEN_MEMBER(grchamp_state::cpu1_interrupt)
 
 WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 {
-	UINT8 diff = data ^ m_cpu0_out[offset];
+	uint8_t diff = data ^ m_cpu0_out[offset];
 	m_cpu0_out[offset] = data;
 
 	switch (offset)
@@ -209,7 +209,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 
 WRITE8_MEMBER(grchamp_state::led_board_w)
 {
-	static const UINT8 ls247_map[16] =
+	static const uint8_t ls247_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	switch (offset)
@@ -253,7 +253,7 @@ WRITE8_MEMBER(grchamp_state::led_board_w)
 
 WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
 {
-	UINT8 diff = data ^ m_cpu1_out[offset];
+	uint8_t diff = data ^ m_cpu1_out[offset];
 	m_cpu1_out[offset] = data;
 
 	switch (offset)
@@ -344,7 +344,7 @@ WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
  *
  *************************************/
 
-UINT8 grchamp_state::get_pc3259_bits(int offs)
+uint8_t grchamp_state::get_pc3259_bits(int offs)
 {
 	int bits;
 

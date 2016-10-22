@@ -14,7 +14,7 @@
 
 READ8_MEMBER( vector06_state::vector06_8255_portb_r )
 {
-	UINT8 key = 0xff;
+	uint8_t key = 0xff;
 	if (BIT(m_keyboard_mask, 0)) key &= m_line[0]->read();
 	if (BIT(m_keyboard_mask, 1)) key &= m_line[1]->read();
 	if (BIT(m_keyboard_mask, 2)) key &= m_line[2]->read();
@@ -28,7 +28,7 @@ READ8_MEMBER( vector06_state::vector06_8255_portb_r )
 
 READ8_MEMBER( vector06_state::vector06_8255_portc_r )
 {
-	UINT8 ret = m_line[8]->read();
+	uint8_t ret = m_line[8]->read();
 
 	if (m_cassette->input() > 0)
 		ret |= 0x10;
@@ -59,16 +59,16 @@ WRITE8_MEMBER( vector06_state::vector06_8255_portb_w )
 
 WRITE8_MEMBER( vector06_state::vector06_color_set )
 {
-	UINT8 r = (data & 7) << 5;
-	UINT8 g = ((data >> 3) & 7) << 5;
-	UINT8 b = ((data >>6) & 3) << 6;
+	uint8_t r = (data & 7) << 5;
+	uint8_t g = ((data >> 3) & 7) << 5;
+	uint8_t b = ((data >>6) & 3) << 6;
 	m_palette->set_pen_color( m_color_index, rgb_t(r,g,b) );
 }
 
 
 READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 {
-	UINT16 addr = ((m_romdisk_msb & 0x7f) << 8) | m_romdisk_lsb;
+	uint16_t addr = ((m_romdisk_msb & 0x7f) << 8) | m_romdisk_lsb;
 	if ((m_romdisk_msb & 0x80) && m_cart->exists() && addr < m_cart->get_rom_size())
 		return m_cart->read_rom(space, addr);
 	else
@@ -125,7 +125,7 @@ IRQ_CALLBACK_MEMBER(vector06_state::vector06_irq_callback)
 
 TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 {
-	UINT8 val = m_reset->read();
+	uint8_t val = m_reset->read();
 
 	if (BIT(val, 0))
 	{
@@ -185,7 +185,7 @@ void vector06_state::update_mem()
 
 WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
 {
-	UINT8 oldbank = m_rambank;
+	uint8_t oldbank = m_rambank;
 	m_rambank = data;
 	if (oldbank != m_rambank)
 		update_mem();

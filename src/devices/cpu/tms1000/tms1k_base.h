@@ -84,7 +84,7 @@ class tms1k_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms1k_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	tms1k_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint8_t o_pins, uint8_t r_pins, uint8_t pc_bits, uint8_t byte_bits, uint8_t x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
@@ -109,9 +109,9 @@ public:
 	template<class _Object> static devcb_base &set_write_o_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_write_o.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_write_r.set_callback(object); }
 	template<class _Object> static devcb_base &set_power_off_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_power_off.set_callback(object); }
-	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1k_base_device &>(device).m_output_pla_table = output_pla; }
+	static void set_output_pla(device_t &device, const uint16_t *output_pla) { downcast<tms1k_base_device &>(device).m_output_pla_table = output_pla; }
 
-	UINT8 debug_peek_o_index() { return m_o_index; } // get output PLA index, for debugging (don't use in emulation)
+	uint8_t debug_peek_o_index() { return m_o_index; } // get output PLA index, for debugging (don't use in emulation)
 
 	// microinstructions
 	enum
@@ -177,25 +177,25 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 6; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 6; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 1; }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	void next_pc();
 
-	virtual void write_o_output(UINT8 index);
-	virtual UINT8 read_k_input();
+	virtual void write_o_output(uint8_t index);
+	virtual uint8_t read_k_input();
 	virtual void set_cki_bus();
 	virtual void dynamic_output() { ; } // not used by default
 	virtual void read_opcode();
@@ -232,70 +232,70 @@ protected:
 	optional_device<pla_device> m_opla;
 	optional_device<pla_device> m_spla;
 
-	UINT8   m_pc;        // 6 or 7-bit program counter
-	UINT32  m_sr;        // 6 or 7-bit subroutine return register(s)
-	UINT8   m_pa;        // 4-bit page address register
-	UINT8   m_pb;        // 4-bit page buffer register
-	UINT16  m_ps;        // 4-bit page subroutine register(s)
-	UINT8   m_a;         // 4-bit accumulator
-	UINT8   m_x;         // 2,3,or 4-bit RAM X register
-	UINT8   m_y;         // 4-bit RAM Y register
-	UINT8   m_ca;        // chapter address register
-	UINT8   m_cb;        // chapter buffer register
-	UINT16  m_cs;        // chapter subroutine register(s)
-	UINT16  m_r;
-	UINT16  m_o;
-	UINT8   m_cki_bus;
-	UINT8   m_c4;
-	UINT8   m_p;         // 4-bit adder p(lus)-input
-	UINT8   m_n;         // 4-bit adder n(egative)-input
-	UINT8   m_adder_out; // adder result
-	UINT8   m_carry_in;  // adder carry-in bit
-	UINT8   m_carry_out; // adder carry-out bit
-	UINT8   m_status;
-	UINT8   m_status_latch;
-	UINT8   m_eac;       // end around carry bit
-	UINT8   m_clatch;    // call latch bit(s)
-	UINT8   m_add;       // add latch bit
-	UINT8   m_bl;        // branch latch bit
+	uint8_t   m_pc;        // 6 or 7-bit program counter
+	uint32_t  m_sr;        // 6 or 7-bit subroutine return register(s)
+	uint8_t   m_pa;        // 4-bit page address register
+	uint8_t   m_pb;        // 4-bit page buffer register
+	uint16_t  m_ps;        // 4-bit page subroutine register(s)
+	uint8_t   m_a;         // 4-bit accumulator
+	uint8_t   m_x;         // 2,3,or 4-bit RAM X register
+	uint8_t   m_y;         // 4-bit RAM Y register
+	uint8_t   m_ca;        // chapter address register
+	uint8_t   m_cb;        // chapter buffer register
+	uint16_t  m_cs;        // chapter subroutine register(s)
+	uint16_t  m_r;
+	uint16_t  m_o;
+	uint8_t   m_cki_bus;
+	uint8_t   m_c4;
+	uint8_t   m_p;         // 4-bit adder p(lus)-input
+	uint8_t   m_n;         // 4-bit adder n(egative)-input
+	uint8_t   m_adder_out; // adder result
+	uint8_t   m_carry_in;  // adder carry-in bit
+	uint8_t   m_carry_out; // adder carry-out bit
+	uint8_t   m_status;
+	uint8_t   m_status_latch;
+	uint8_t   m_eac;       // end around carry bit
+	uint8_t   m_clatch;    // call latch bit(s)
+	uint8_t   m_add;       // add latch bit
+	uint8_t   m_bl;        // branch latch bit
 
-	UINT8   m_ram_in;
-	UINT8   m_dam_in;
+	uint8_t   m_ram_in;
+	uint8_t   m_dam_in;
 	int     m_ram_out; // signed!
-	UINT8   m_ram_address;
-	UINT16  m_rom_address;
-	UINT16  m_opcode;
-	UINT32  m_fixed;
-	UINT32  m_micro;
+	uint8_t   m_ram_address;
+	uint16_t  m_rom_address;
+	uint16_t  m_opcode;
+	uint32_t  m_fixed;
+	uint32_t  m_micro;
 	int     m_subcycle;
 	int     m_icount;
-	UINT8   m_o_index;
+	uint8_t   m_o_index;
 
-	UINT8   m_o_pins;    // how many O pins
-	UINT8   m_r_pins;    // how many R pins
-	UINT8   m_pc_bits;   // how many program counter bits
-	UINT8   m_byte_bits; // how many bits per 'byte'
-	UINT8   m_x_bits;    // how many X register bits
+	uint8_t   m_o_pins;    // how many O pins
+	uint8_t   m_r_pins;    // how many R pins
+	uint8_t   m_pc_bits;   // how many program counter bits
+	uint8_t   m_byte_bits; // how many bits per 'byte'
+	uint8_t   m_x_bits;    // how many X register bits
 
 	address_space *m_program;
 	address_space *m_data;
 
-	const UINT16 *m_output_pla_table;
+	const uint16_t *m_output_pla_table;
 	devcb_read8 m_read_k;
 	devcb_write16 m_write_o;
 	devcb_write16 m_write_r;
 	devcb_write_line m_power_off;
 
-	UINT32 m_o_mask;
-	UINT32 m_r_mask;
-	UINT32 m_k_mask;
-	UINT32 m_pc_mask;
-	UINT32 m_x_mask;
+	uint32_t m_o_mask;
+	uint32_t m_r_mask;
+	uint32_t m_k_mask;
+	uint32_t m_pc_mask;
+	uint32_t m_x_mask;
 
 	// lookup tables
-	std::vector<UINT32> m_fixed_decode;
-	std::vector<UINT32> m_micro_decode;
-	std::vector<UINT32> m_micro_direct;
+	std::vector<uint32_t> m_fixed_decode;
+	std::vector<uint32_t> m_micro_decode;
+	std::vector<uint32_t> m_micro_direct;
 };
 
 

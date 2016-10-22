@@ -45,7 +45,7 @@ K05324X_CB_MEMBER(surpratk_state::sprite_callback)
 
 ***************************************************************************/
 
-UINT32 surpratk_state::screen_update_surpratk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t surpratk_state::screen_update_surpratk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[3], bg_colorbase;
 

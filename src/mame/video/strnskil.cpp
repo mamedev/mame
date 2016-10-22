@@ -16,7 +16,7 @@ Video hardware driver by Uki
 
 PALETTE_INIT_MEMBER(strnskil_state, strnskil)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -35,7 +35,7 @@ PALETTE_INIT_MEMBER(strnskil_state, strnskil)
 	/* sprites lookup table */
 	for (i = 0; i < 0x400; i++)
 	{
-		UINT8 ctabentry = color_prom[i];
+		uint8_t ctabentry = color_prom[i];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -115,9 +115,9 @@ void strnskil_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 strnskil_state::screen_update_strnskil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t strnskil_state::screen_update_strnskil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *usr1 = memregion("user1")->base();
+	const uint8_t *usr1 = memregion("user1")->base();
 
 	for (int row = 0; row < 32; row++)
 	{

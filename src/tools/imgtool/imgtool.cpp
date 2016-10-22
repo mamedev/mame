@@ -363,9 +363,9 @@ imgtoolerr_t imgtool::image::identify_file(const char *fname, imgtool_module **m
 //  protection scheme
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::get_geometry(UINT32 *tracks, UINT32 *heads, UINT32 *sectors)
+imgtoolerr_t imgtool::image::get_geometry(uint32_t *tracks, uint32_t *heads, uint32_t *sectors)
 {
-	UINT32 dummy;
+	uint32_t dummy;
 
 	/* some sanitization, to make the callbacks easier to implement */
 	if (!tracks)
@@ -382,7 +382,7 @@ imgtoolerr_t imgtool::image::get_geometry(UINT32 *tracks, UINT32 *heads, UINT32 
 	if (!module().get_geometry)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return module().get_geometry(this, tracks, heads, sectors);
+	return module().get_geometry(*this, tracks, heads, sectors);
 }
 
 
@@ -391,14 +391,14 @@ imgtoolerr_t imgtool::image::get_geometry(UINT32 *tracks, UINT32 *heads, UINT32 
 //	read_sector - reads a sector on an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::read_sector(UINT32 track, UINT32 head,
-	UINT32 sector, std::vector<UINT8> &buffer)
+imgtoolerr_t imgtool::image::read_sector(uint32_t track, uint32_t head,
+	uint32_t sector, std::vector<uint8_t> &buffer)
 {
 	// implemented?
 	if (!module().read_sector)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return module().read_sector(this, track, head, sector, buffer);
+	return module().read_sector(*this, track, head, sector, buffer);
 }
 
 
@@ -407,14 +407,14 @@ imgtoolerr_t imgtool::image::read_sector(UINT32 track, UINT32 head,
 //	write_sector - writes a sector on an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::write_sector(UINT32 track, UINT32 head,
-	UINT32 sector, const void *buffer, size_t len)
+imgtoolerr_t imgtool::image::write_sector(uint32_t track, uint32_t head,
+	uint32_t sector, const void *buffer, size_t len)
 {
 	// implemented?
 	if (!module().write_sector)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return module().write_sector(this, track, head, sector, buffer, len);
+	return module().write_sector(*this, track, head, sector, buffer, len);
 }
 
 
@@ -424,7 +424,7 @@ imgtoolerr_t imgtool::image::write_sector(UINT32 track, UINT32 head,
 //	block on an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::get_block_size(UINT32 &length)
+imgtoolerr_t imgtool::image::get_block_size(uint32_t &length)
 {
 	// implemented?
 	if (module().block_size == 0)
@@ -439,13 +439,13 @@ imgtoolerr_t imgtool::image::get_block_size(UINT32 &length)
 //	read_block - reads a standard block on an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::read_block(UINT64 block, void *buffer)
+imgtoolerr_t imgtool::image::read_block(uint64_t block, void *buffer)
 {
 	// implemented?
 	if (!module().read_block)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return module().read_block(this, buffer, block);
+	return module().read_block(*this, buffer, block);
 }
 
 
@@ -453,13 +453,13 @@ imgtoolerr_t imgtool::image::read_block(UINT64 block, void *buffer)
 //	write_block - writes a standard block on an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::write_block(UINT64 block, const void *buffer)
+imgtoolerr_t imgtool::image::write_block(uint64_t block, const void *buffer)
 {
 	// implemented?
 	if (!module().write_block)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	return module().write_block(this, buffer, block);
+	return module().write_block(*this, buffer, block);
 }
 
 
@@ -467,17 +467,17 @@ imgtoolerr_t imgtool::image::write_block(UINT64 block, const void *buffer)
 //	clear_block - clears a standard block on an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::clear_block(UINT64 block, UINT8 data)
+imgtoolerr_t imgtool::image::clear_block(uint64_t block, uint8_t data)
 {
 	imgtoolerr_t err;
-	UINT8 *block_data = nullptr;
-	UINT32 length;
+	uint8_t *block_data = nullptr;
+	uint32_t length;
 
 	err = get_block_size(length);
 	if (err)
 		goto done;
 
-	block_data = (UINT8*)malloc(length);
+	block_data = (uint8_t*)malloc(length);
 	if (!block_data)
 	{
 		err = (imgtoolerr_t)IMGTOOLERR_OUTOFMEMORY;
@@ -500,14 +500,14 @@ done:
 //	list_partitions - lists the partitions on an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::list_partitions(imgtool_partition_info *partitions, size_t len)
+imgtoolerr_t imgtool::image::list_partitions(std::vector<imgtool::partition_info> &partitions)
 {
 	/* implemented? */
 	if (!module().list_partitions)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	memset(partitions, '\0', sizeof(*partitions) * len);
-	return module().list_partitions(this, partitions, len);
+	partitions.clear();
+	return module().list_partitions(*this, partitions);
 }
 
 
@@ -525,14 +525,14 @@ void *imgtool::image::malloc(size_t size)
 //	imgtool::image::rand - returns a random number
 //-------------------------------------------------
 
-UINT64 imgtool::image::rand()
+uint64_t imgtool::image::rand()
 {
 	// we can't use mame_rand() here
 #ifdef rand
 #undef rand
 #endif
-	return ((UINT64) std::rand()) << 32
-		| ((UINT64)std::rand()) << 0;
+	return ((uint64_t) std::rand()) << 32
+		| ((uint64_t)std::rand()) << 0;
 }
 
 
@@ -547,7 +547,7 @@ UINT64 imgtool::image::rand()
 //	imgtool::partition ctor
 //-------------------------------------------------
 
-imgtool::partition::partition(imgtool::image &image, imgtool_class &imgclass, int partition_index, UINT64 base_block, UINT64 block_count)
+imgtool::partition::partition(imgtool::image &image, imgtool_class &imgclass, int partition_index, uint64_t base_block, uint64_t block_count)
 	: m_image(image)
 	//, m_partition_index(partition_index)
 	, m_base_block(base_block)
@@ -558,7 +558,7 @@ imgtool::partition::partition(imgtool::image &image, imgtool_class &imgclass, in
 	size_t extra_bytes_size = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_PARTITION_EXTRA_BYTES);
 	if (extra_bytes_size > 0)
 	{
-		m_extra_bytes = std::make_unique<UINT8[]>(extra_bytes_size);
+		m_extra_bytes = std::make_unique<uint8_t[]>(extra_bytes_size);
 		memset(m_extra_bytes.get(), 0, sizeof(m_extra_bytes.get()[0]) * extra_bytes_size);
 	}
 
@@ -569,23 +569,23 @@ imgtool::partition::partition(imgtool::image &image, imgtool_class &imgclass, in
 	m_supports_creation_time = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_SUPPORTS_CREATION_TIME) ? 1 : 0;
 	m_supports_lastmodified_time = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_SUPPORTS_LASTMODIFIED_TIME) ? 1 : 0;
 	m_supports_bootblock = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_SUPPORTS_BOOTBLOCK) ? 1 : 0;
-	m_begin_enum = (imgtoolerr_t(*)(imgtool::directory *, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_BEGIN_ENUM);
-	m_next_enum = (imgtoolerr_t(*)(imgtool::directory *, imgtool_dirent *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_NEXT_ENUM);
-	m_close_enum = (void(*)(imgtool::directory *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CLOSE_ENUM);
-	m_free_space = (imgtoolerr_t(*)(imgtool::partition *, UINT64 *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_FREE_SPACE);
-	m_read_file = (imgtoolerr_t(*)(imgtool::partition *, const char *, const char *, imgtool::stream &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_READ_FILE);
-	m_write_file = (imgtoolerr_t(*)(imgtool::partition *, const char *, const char *, imgtool::stream &, util::option_resolution *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_WRITE_FILE);
-	m_delete_file = (imgtoolerr_t(*)(imgtool::partition *, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_DELETE_FILE);
-	m_list_forks = (imgtoolerr_t(*)(imgtool::partition *, const char *, imgtool_forkent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_LIST_FORKS);
-	m_create_dir = (imgtoolerr_t(*)(imgtool::partition *, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CREATE_DIR);
-	m_delete_dir = (imgtoolerr_t(*)(imgtool::partition *, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_DELETE_DIR);
-	m_list_attrs = (imgtoolerr_t(*)(imgtool::partition *, const char *, UINT32 *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_LIST_ATTRS);
-	m_get_attrs = (imgtoolerr_t(*)(imgtool::partition *, const char *, const UINT32 *, imgtool_attribute *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_ATTRS);
-	m_set_attrs = (imgtoolerr_t(*)(imgtool::partition *, const char *, const UINT32 *, const imgtool_attribute *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SET_ATTRS);
-	m_attr_name = (imgtoolerr_t(*)(UINT32, const imgtool_attribute *, char *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_ATTR_NAME);
-	m_get_iconinfo = (imgtoolerr_t(*)(imgtool::partition *, const char *, imgtool_iconinfo *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_ICON_INFO);
-	m_suggest_transfer = (imgtoolerr_t(*)(imgtool::partition *, const char *, imgtool_transfer_suggestion *, size_t))  imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SUGGEST_TRANSFER);
-	m_get_chain = (imgtoolerr_t(*)(imgtool::partition *, const char *, imgtool_chainent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_CHAIN);
+	m_begin_enum = (imgtoolerr_t(*)(imgtool::directory &, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_BEGIN_ENUM);
+	m_next_enum = (imgtoolerr_t(*)(imgtool::directory &, imgtool_dirent &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_NEXT_ENUM);
+	m_close_enum = (void(*)(imgtool::directory &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CLOSE_ENUM);
+	m_free_space = (imgtoolerr_t(*)(imgtool::partition &, uint64_t *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_FREE_SPACE);
+	m_read_file = (imgtoolerr_t(*)(imgtool::partition &, const char *, const char *, imgtool::stream &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_READ_FILE);
+	m_write_file = (imgtoolerr_t(*)(imgtool::partition &, const char *, const char *, imgtool::stream &, util::option_resolution *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_WRITE_FILE);
+	m_delete_file = (imgtoolerr_t(*)(imgtool::partition &, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_DELETE_FILE);
+	m_list_forks = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool_forkent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_LIST_FORKS);
+	m_create_dir = (imgtoolerr_t(*)(imgtool::partition &, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CREATE_DIR);
+	m_delete_dir = (imgtoolerr_t(*)(imgtool::partition &, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_DELETE_DIR);
+	m_list_attrs = (imgtoolerr_t(*)(imgtool::partition &, const char *, uint32_t *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_LIST_ATTRS);
+	m_get_attrs = (imgtoolerr_t(*)(imgtool::partition &, const char *, const uint32_t *, imgtool_attribute *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_ATTRS);
+	m_set_attrs = (imgtoolerr_t(*)(imgtool::partition &, const char *, const uint32_t *, const imgtool_attribute *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SET_ATTRS);
+	m_attr_name = (imgtoolerr_t(*)(uint32_t, const imgtool_attribute *, char *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_ATTR_NAME);
+	m_get_iconinfo = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool_iconinfo *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_ICON_INFO);
+	m_suggest_transfer = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool_transfer_suggestion *, size_t))  imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SUGGEST_TRANSFER);
+	m_get_chain = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool_chainent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_CHAIN);
 	m_writefile_optguide = (const util::option_guide *) imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 	
 	const char *writefile_optspec = (const char *)imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
@@ -623,31 +623,26 @@ imgtoolerr_t imgtool::partition::open(imgtool::image &image, int partition_index
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
 	imgtool::partition::ptr p;
 	imgtool_class imgclass;
-	imgtool_partition_info partition_info[32];
-	UINT64 base_block, block_count;
-	imgtoolerr_t (*open_partition)(imgtool::partition *partition, UINT64 first_block, UINT64 block_count);
+	std::vector<imgtool::partition_info> partitions;
+	uint64_t base_block, block_count;
+	imgtoolerr_t (*open_partition)(imgtool::partition &partition, uint64_t first_block, uint64_t block_count);
 
 	if (image.module().list_partitions)
 	{
-		// this image supports partitions 
-		if ((partition_index < 0) || (partition_index >= ARRAY_LENGTH(partition_info)))
-			return IMGTOOLERR_INVALIDPARTITION;
-
-		// retrieve the info on the partitions
-		memset(partition_info, '\0', sizeof(partition_info));
-		err = image.module().list_partitions(&image, partition_info, ARRAY_LENGTH(partition_info));
+		// this image supports partitions  - retrieve the info on the partitions
+		err = image.module().list_partitions(image, partitions);
 		if (err)
 			return err;
 
-		// is this a valid partition 
-		if (!partition_info[partition_index].get_info)
+		// is this an invalid index?
+		if ((partition_index < 0) || (partition_index >= partitions.size()) || !partitions[partition_index].get_info())
 			return IMGTOOLERR_INVALIDPARTITION;
 
 		// use this partition 
 		memset(&imgclass, 0, sizeof(imgclass));
-		imgclass.get_info = partition_info[partition_index].get_info;
-		base_block = partition_info[partition_index].base_block;
-		block_count = partition_info[partition_index].block_count;
+		imgclass.get_info = partitions[partition_index].get_info();
+		base_block = partitions[partition_index].base_block();
+		block_count = partitions[partition_index].block_count();
 	}
 	else
 	{
@@ -671,11 +666,11 @@ imgtoolerr_t imgtool::partition::open(imgtool::image &image, int partition_index
 
 
 	// call the partition open function, if present
-	open_partition = (imgtoolerr_t (*)(imgtool::partition *, UINT64, UINT64)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_OPEN_PARTITION);
+	open_partition = (imgtoolerr_t (*)(imgtool::partition &, uint64_t, uint64_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_OPEN_PARTITION);
 	if (open_partition)
 	{
 		/* we have an open partition function */
-		err = (*open_partition)(p.get(), base_block, block_count);
+		err = (*open_partition)(*p, base_block, block_count);
 		if (err)
 			goto done;
 	}
@@ -701,7 +696,7 @@ done:
 //	name for an attribute
 //-------------------------------------------------
 
-void imgtool::partition::get_attribute_name(UINT32 attribute, const imgtool_attribute *attr_value,
+void imgtool::partition::get_attribute_name(uint32_t attribute, const imgtool_attribute *attr_value,
 	char *buffer, size_t buffer_len)
 {
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_UNIMPLEMENTED;
@@ -896,7 +891,7 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 	int read_or_write, util::option_resolution *createopts, imgtool::image::ptr &outimg)
 {
 	imgtoolerr_t err;
-	imgtool::stream *f = nullptr;
+	imgtool::stream::ptr stream;
 	imgtool::image::ptr image;
 	object_pool *pool = nullptr;
 	void *extra_bytes = nullptr;
@@ -919,8 +914,8 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 	}
 
 	// open the stream
-	f = imgtool::stream::open(fname, read_or_write);
-	if (!f)
+	stream = imgtool::stream::ptr(imgtool::stream::open(fname, read_or_write));
+	if (!stream)
 	{
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_IMAGEFILE);
 		goto done;
@@ -951,8 +946,8 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 
 	// actually call create or open
 	err = (read_or_write == OSD_FOPEN_RW_CREATE)
-		? module->create(image.get(), f, createopts)
-		: module->open(image.get(), f);
+		? module->create(*image, std::move(stream), createopts)
+		: module->open(*image, std::move(stream));
 	if (err)
 	{
 		err = markerrorsource(err);
@@ -965,9 +960,6 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 	outimg = std::move(image);
 
 done:
-	if (err && f)
-		delete f;
-
 	if (pool)
 		pool_free_lib(pool);
 	return err;
@@ -1021,7 +1013,7 @@ imgtool::image::image(const imgtool_module &module, object_pool *pool, void *ext
 imgtool::image::~image()
 {
 	if (m_okay_to_close && module().close)
-		module().close(this);
+		module().close(*this);
 	pool_free_lib(m_pool);
 }
 
@@ -1094,15 +1086,16 @@ imgtoolerr_t imgtool::image::create(const std::string &modulename, const char *f
 //	info - returns format specific information about an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::info(char *string, size_t len)
+std::string imgtool::image::info()
 {
-	if (len > 0)
+	std::string string;
+	if (module().info)
 	{
-		string[0] = '\0';
-		if (module().info)
-			module().info(this, string, len);
+		std::stringstream stream;
+		module().info(*this, stream);
+		string = stream.str();
 	}
-	return IMGTOOLERR_SUCCESS;
+	return string;
 }
 
 
@@ -1116,7 +1109,7 @@ imgtoolerr_t imgtool::image::info(char *string, size_t len)
 //  into a NUL delimited list
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::cannonicalize_path(UINT32 flags, const char **path, char **alloc_path)
+imgtoolerr_t imgtool::partition::cannonicalize_path(uint32_t flags, const char **path, char **alloc_path)
 {
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
 	char *new_path = nullptr;
@@ -1263,7 +1256,7 @@ done:
 //  space on a partition, in bytes
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::get_file_size(const char *fname, UINT64 &filesize)
+imgtoolerr_t imgtool::partition::get_file_size(const char *fname, uint64_t &filesize)
 {
 	imgtoolerr_t err;
 	imgtool::directory::ptr imgenum;
@@ -1272,7 +1265,7 @@ imgtoolerr_t imgtool::partition::get_file_size(const char *fname, UINT64 &filesi
 
 	path = nullptr;    /* TODO: Need to parse off the path */
 
-	filesize = ~((UINT64) 0);
+	filesize = ~((uint64_t) 0);
 	memset(&ent, 0, sizeof(ent));
 
 	err = imgtool::directory::open(*this, path, imgenum);
@@ -1305,7 +1298,7 @@ done:
 //  all attributes on a file
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::list_file_attributes(const char *path, UINT32 *attrs, size_t len)
+imgtoolerr_t imgtool::partition::list_file_attributes(const char *path, uint32_t *attrs, size_t len)
 {
 	imgtoolerr_t err;
 	char *alloc_path = nullptr;
@@ -1333,7 +1326,7 @@ imgtoolerr_t imgtool::partition::list_file_attributes(const char *path, UINT32 *
 	if (err)
 		goto done;
 
-	err = m_list_attrs(this, path, attrs, len);
+	err = m_list_attrs(*this, path, attrs, len);
 	if (err)
 		goto done;
 
@@ -1351,7 +1344,7 @@ done:
 //  attributes on a file
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::get_file_attributes(const char *path, const UINT32 *attrs, imgtool_attribute *values)
+imgtoolerr_t imgtool::partition::get_file_attributes(const char *path, const uint32_t *attrs, imgtool_attribute *values)
 {
 	imgtoolerr_t err;
 	char *alloc_path = nullptr;
@@ -1377,7 +1370,7 @@ imgtoolerr_t imgtool::partition::get_file_attributes(const char *path, const UIN
 	if (err)
 		goto done;
 
-	err = m_get_attrs(this, path, attrs, values);
+	err = m_get_attrs(*this, path, attrs, values);
 	if (err)
 		goto done;
 
@@ -1395,7 +1388,7 @@ done:
 //  attributes on a file
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::put_file_attributes(const char *path, const UINT32 *attrs, const imgtool_attribute *values)
+imgtoolerr_t imgtool::partition::put_file_attributes(const char *path, const uint32_t *attrs, const imgtool_attribute *values)
 {
 	imgtoolerr_t err;
 	char *alloc_path = nullptr;
@@ -1411,7 +1404,7 @@ imgtoolerr_t imgtool::partition::put_file_attributes(const char *path, const UIN
 	if (err)
 		goto done;
 
-	err = m_set_attrs(this, path, attrs, values);
+	err = m_set_attrs(*this, path, attrs, values);
 	if (err)
 		goto done;
 
@@ -1427,9 +1420,9 @@ done:
 //  an attribute on a single file
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::get_file_attribute(const char *path, UINT32 attr, imgtool_attribute &value)
+imgtoolerr_t imgtool::partition::get_file_attribute(const char *path, uint32_t attr, imgtool_attribute &value)
 {
-	UINT32 attrs[2];
+	uint32_t attrs[2];
 	attrs[0] = attr;
 	attrs[1] = 0;
 	return get_file_attributes(path, attrs, &value);
@@ -1441,9 +1434,9 @@ imgtoolerr_t imgtool::partition::get_file_attribute(const char *path, UINT32 att
 //	attributes on a single file
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::put_file_attribute(const char *path, UINT32 attr, const imgtool_attribute &value)
+imgtoolerr_t imgtool::partition::put_file_attribute(const char *path, uint32_t attr, const imgtool_attribute &value)
 {
-	UINT32 attrs[2];
+	uint32_t attrs[2];
 	attrs[0] = attr;
 	attrs[1] = 0;
 	return put_file_attributes(path, attrs, &value);
@@ -1482,7 +1475,7 @@ imgtoolerr_t imgtool::partition::get_icon_info(const char *path, imgtool_iconinf
 		goto done;
 
 	memset(iconinfo, 0, sizeof(*iconinfo));
-	err = m_get_iconinfo(this, path, iconinfo);
+	err = m_get_iconinfo(*this, path, iconinfo);
 	if (err)
 		goto done;
 
@@ -1525,7 +1518,7 @@ imgtoolerr_t imgtool::partition::suggest_file_filters(const char *path,
 		goto done;
 
 	// invoke the module's suggest call
-	err = m_suggest_transfer(this, path, suggestions, suggestions_length);
+	err = m_suggest_transfer(*this, path, suggestions, suggestions_length);
 	if (err)
 		goto done;
 
@@ -1598,7 +1591,7 @@ imgtoolerr_t imgtool::partition::get_chain(const char *path, imgtool_chainent *c
 		chain[i].block = ~0;
 	}
 
-	return m_get_chain(this, path, chain, chain_size - 1);
+	return m_get_chain(*this, path, chain, chain_size - 1);
 }
 
 
@@ -1612,8 +1605,8 @@ imgtoolerr_t imgtool::partition::get_chain_string(const char *path, char *buffer
 {
 	imgtoolerr_t err;
 	imgtool_chainent chain[512];
-	UINT64 last_block;
-	UINT8 cur_level = 0;
+	uint64_t last_block;
+	uint8_t cur_level = 0;
 	int len, i;
 	int comma_needed = FALSE;
 
@@ -1677,14 +1670,14 @@ imgtoolerr_t imgtool::partition::get_chain_string(const char *path, char *buffer
 //  amount of free space on a partition
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::get_free_space(UINT64 &sz)
+imgtoolerr_t imgtool::partition::get_free_space(uint64_t &sz)
 {
 	imgtoolerr_t err;
 
 	if (!m_free_space)
 		return (imgtoolerr_t)(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
-	err = m_free_space(this, &sz);
+	err = m_free_space(*this, &sz);
 	if (err)
 		return (imgtoolerr_t)(err | IMGTOOLERR_SRC_IMAGEFILE);
 
@@ -1719,7 +1712,7 @@ imgtoolerr_t imgtool::partition::read_file(const char *filename, const char *for
 			goto done;
 		}
 
-		err = u.read_file(this, filename, fork, destf);
+		err = u.read_file(*this, filename, fork, destf);
 		if (err)
 		{
 			err = markerrorsource(err);
@@ -1738,7 +1731,7 @@ imgtoolerr_t imgtool::partition::read_file(const char *filename, const char *for
 			goto done;
 
 		// invoke the actual module
-		err = m_read_file(this, filename, fork, destf);
+		err = m_read_file(*this, filename, fork, destf);
 		if (err)
 		{
 			err = markerrorsource(err);
@@ -1765,8 +1758,8 @@ imgtoolerr_t imgtool::partition::write_file(const char *filename, const char *fo
 	char *s;
 	std::unique_ptr<util::option_resolution> alloc_resolution;
 	char *alloc_path = nullptr;
-	UINT64 free_space;
-	UINT64 file_size;
+	uint64_t free_space;
+	uint64_t file_size;
 	union filterinfo u;
 
 	if (!m_write_file)
@@ -1785,7 +1778,7 @@ imgtoolerr_t imgtool::partition::write_file(const char *filename, const char *fo
 			goto done;
 		}
 
-		err = u.write_file(this, filename, fork, sourcef, opts);
+		err = u.write_file(*this, filename, fork, sourcef, opts);
 		if (err)
 		{
 			err = markerrorsource(err);
@@ -1835,7 +1828,7 @@ imgtoolerr_t imgtool::partition::write_file(const char *filename, const char *fo
 		// if free_space is implemented; do a quick check to see if space is available
 		if (m_free_space)
 		{
-			err = m_free_space(this, &free_space);
+			err = m_free_space(*this, &free_space);
 			if (err)
 			{
 				err = markerrorsource(err);
@@ -1852,7 +1845,7 @@ imgtoolerr_t imgtool::partition::write_file(const char *filename, const char *fo
 		}
 
 		// actually invoke the write file handler
-		err = m_write_file(this, filename, fork, sourcef, opts);
+		err = m_write_file(*this, filename, fork, sourcef, opts);
 		if (err)
 		{
 			err = markerrorsource(err);
@@ -2018,7 +2011,7 @@ imgtoolerr_t imgtool::partition::delete_file(const char *fname)
 	if (err)
 		goto done;
 
-	err = m_delete_file(this, fname);
+	err = m_delete_file(*this, fname);
 	if (err)
 	{
 		err = markerrorsource(err);
@@ -2065,7 +2058,7 @@ imgtoolerr_t imgtool::partition::list_file_forks(const char *path, imgtool_forke
 	if (err)
 		goto done;
 
-	err = m_list_forks(this, path, ents, len);
+	err = m_list_forks(*this, path, ents, len);
 	if (err)
 		goto done;
 
@@ -2110,7 +2103,7 @@ imgtoolerr_t imgtool::partition::create_directory(const char *path)
 	if (err)
 		goto done;
 
-	err = m_create_dir(this, path);
+	err = m_create_dir(*this, path);
 	if (err)
 		goto done;
 
@@ -2155,7 +2148,7 @@ imgtoolerr_t imgtool::partition::delete_directory(const char *path)
 	if (err)
 		goto done;
 
-	err = m_delete_dir(this, path);
+	err = m_delete_dir(*this, path);
 	if (err)
 		goto done;
 
@@ -2173,7 +2166,7 @@ done:
 //  size of a standard block on a partition
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::get_block_size(UINT32 &length)
+imgtoolerr_t imgtool::partition::get_block_size(uint32_t &length)
 {
 	return m_image.get_block_size(length);
 }
@@ -2183,7 +2176,7 @@ imgtoolerr_t imgtool::partition::get_block_size(UINT32 &length)
 //	partition::is_block_in_range
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::map_block_to_image_block(UINT64 partition_block, UINT64 &image_block) const
+imgtoolerr_t imgtool::partition::map_block_to_image_block(uint64_t partition_block, uint64_t &image_block) const
 {
 	if (partition_block >= m_block_count)
 		return IMGTOOLERR_SEEKERROR;
@@ -2198,9 +2191,9 @@ imgtoolerr_t imgtool::partition::map_block_to_image_block(UINT64 partition_block
 //  block on a partition
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::read_block(UINT64 block, void *buffer)
+imgtoolerr_t imgtool::partition::read_block(uint64_t block, void *buffer)
 {
-	UINT64 image_block;
+	uint64_t image_block;
 	imgtoolerr_t err = map_block_to_image_block(block, image_block);
 	if (err)
 		return err;
@@ -2214,9 +2207,9 @@ imgtoolerr_t imgtool::partition::read_block(UINT64 block, void *buffer)
 //  standard block on a partition
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::write_block(UINT64 block, const void *buffer)
+imgtoolerr_t imgtool::partition::write_block(uint64_t block, const void *buffer)
 {
-	UINT64 image_block;
+	uint64_t image_block;
 	imgtoolerr_t err = map_block_to_image_block(block, image_block);
 	if (err)
 		return err;
@@ -2265,7 +2258,7 @@ imgtool_partition_features imgtool::partition::get_features() const
 //  pointer associated with a partition's format
 //-------------------------------------------------
 
-void *imgtool::partition::get_info_ptr(UINT32 state)
+void *imgtool::partition::get_info_ptr(uint32_t state)
 {
 	return imgtool_get_info_ptr(&m_imgclass, state);
 }
@@ -2276,7 +2269,7 @@ void *imgtool::partition::get_info_ptr(UINT32 state)
 //	string associated with a partition's format
 //-------------------------------------------------
 
-const char *imgtool::partition::get_info_string(UINT32 state)
+const char *imgtool::partition::get_info_string(uint32_t state)
 {
 	return imgtool_get_info_string(&m_imgclass, state);
 }
@@ -2287,7 +2280,7 @@ const char *imgtool::partition::get_info_string(UINT32 state)
 //  pointer associated with a partition's format
 //-------------------------------------------------
 
-UINT64 imgtool::partition::get_info_int(UINT32 state)
+uint64_t imgtool::partition::get_info_int(uint32_t state)
 {
 	return imgtool_get_info_int(&m_imgclass, state);
 }
@@ -2422,7 +2415,7 @@ imgtool::directory::directory(imgtool::partition &partition)
 {
 	if (partition.m_directory_extra_bytes > 0)
 	{
-		m_extra_bytes = std::make_unique<UINT8[]>(partition.m_directory_extra_bytes);
+		m_extra_bytes = std::make_unique<uint8_t[]>(partition.m_directory_extra_bytes);
 		memset(m_extra_bytes.get(), 0, sizeof(m_extra_bytes.get()[0] * partition.m_directory_extra_bytes));
 	}
 }
@@ -2464,7 +2457,7 @@ imgtoolerr_t imgtool::directory::open(imgtool::partition &partition, const char 
 
 	if (partition.m_begin_enum)
 	{
-		err = partition.m_begin_enum(enumeration.get(), path);
+		err = partition.m_begin_enum(*enumeration, path);
 		if (err)
 		{
 			err = markerrorsource(err);
@@ -2491,7 +2484,7 @@ done:
 imgtool::directory::~directory()
 {
 	if (m_okay_to_close && m_partition.m_close_enum)
-		m_partition.m_close_enum(this);
+		m_partition.m_close_enum(*this);
 }
 
 
@@ -2508,7 +2501,7 @@ imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
 	// the attributes if they don't apply
 	memset(&ent, 0, sizeof(ent));
 
-	err = m_partition.m_next_enum(this, &ent);
+	err = m_partition.m_next_enum(*this, ent);
 	if (err)
 		return markerrorsource(err);
 
@@ -2550,7 +2543,7 @@ imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
 //  unknown partition
 //-------------------------------------------------
 
-void unknown_partition_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void unknown_partition_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{

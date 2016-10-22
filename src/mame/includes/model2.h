@@ -49,16 +49,16 @@ public:
 		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
 		{ }
 
-	required_shared_ptr<UINT32> m_workram;
-	required_shared_ptr<UINT32> m_bufferram;
-	std::unique_ptr<UINT16[]> m_palram;
-	required_shared_ptr<UINT32> m_colorxlat;
-	required_shared_ptr<UINT32> m_textureram0;
-	required_shared_ptr<UINT32> m_textureram1;
-	required_shared_ptr<UINT32> m_lumaram;
-	optional_shared_ptr<UINT16> m_soundram;
-	optional_shared_ptr<UINT32> m_tgp_program;
-	optional_shared_ptr<UINT64> m_tgpx4_program;
+	required_shared_ptr<uint32_t> m_workram;
+	required_shared_ptr<uint32_t> m_bufferram;
+	std::unique_ptr<uint16_t[]> m_palram;
+	required_shared_ptr<uint32_t> m_colorxlat;
+	required_shared_ptr<uint32_t> m_textureram0;
+	required_shared_ptr<uint32_t> m_textureram1;
+	required_shared_ptr<uint32_t> m_lumaram;
+	optional_shared_ptr<uint16_t> m_soundram;
+	optional_shared_ptr<uint32_t> m_tgp_program;
+	optional_shared_ptr<uint64_t> m_tgpx4_program;
 
 	required_device<i960_cpu_device> m_maincpu;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
@@ -81,14 +81,14 @@ public:
 	optional_ioport_array<4> m_analog_ports;
 	optional_ioport_array<4> m_lightgun_ports;
 
-	UINT32 m_intreq;
-	UINT32 m_intena;
-	UINT32 m_coproctl;
-	UINT32 m_coprocnt;
-	UINT32 m_geoctl;
-	UINT32 m_geocnt;
-	UINT32 m_timervals[4];
-	UINT32 m_timerorig[4];
+	uint32_t m_intreq;
+	uint32_t m_intena;
+	uint32_t m_coproctl;
+	uint32_t m_coprocnt;
+	uint32_t m_geoctl;
+	uint32_t m_geocnt;
+	uint32_t m_timervals[4];
+	uint32_t m_timerorig[4];
 	int m_timerrun[4];
 	timer_device *m_timers[4];
 	int m_ctrlmode;
@@ -96,33 +96,33 @@ public:
 	int m_dsp_type;
 	int m_copro_fifoin_rpos;
 	int m_copro_fifoin_wpos;
-	std::unique_ptr<UINT32[]> m_copro_fifoin_data;
+	std::unique_ptr<uint32_t[]> m_copro_fifoin_data;
 	int m_copro_fifoin_num;
 	int m_copro_fifoout_rpos;
 	int m_copro_fifoout_wpos;
-	std::unique_ptr<UINT32[]> m_copro_fifoout_data;
+	std::unique_ptr<uint32_t[]> m_copro_fifoout_data;
 	int m_copro_fifoout_num;
-	UINT16 m_cmd_data;
-	UINT8 m_driveio_comm_data;
+	uint16_t m_cmd_data;
+	uint8_t m_driveio_comm_data;
 	int m_iop_write_num;
-	UINT32 m_iop_data;
+	uint32_t m_iop_data;
 	int m_geo_iop_write_num;
-	UINT32 m_geo_iop_data;
+	uint32_t m_geo_iop_data;
 	int m_to_68k;
 
 	int m_maxxstate;
-	UINT32 m_geo_read_start_address;
-	UINT32 m_geo_write_start_address;
+	uint32_t m_geo_read_start_address;
+	uint32_t m_geo_write_start_address;
 	model2_renderer *m_poly;
 	raster_state *m_raster;
 	geo_state *m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
-	UINT32 m_videocontrol;
-	UINT32 m_soundack;
+	uint32_t m_videocontrol;
+	uint32_t m_soundack;
 	void model2_check_irq_state();
-	void model2_check_irqack_state(UINT32 data);
-	UINT8 m_gearsel;
-	UINT8 m_lightgun_mux;
+	void model2_check_irqack_state(uint32_t data);
+	uint8_t m_gearsel;
+	uint8_t m_lightgun_mux;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
@@ -185,7 +185,7 @@ public:
 	DECLARE_READ8_MEMBER(driveio_port_r);
 	DECLARE_WRITE8_MEMBER(driveio_port_w);
 	DECLARE_READ8_MEMBER(driveio_port_str_r);
-	void push_geo_data(UINT32 data);
+	void push_geo_data(uint32_t data);
 	DECLARE_DRIVER_INIT(overrev);
 	DECLARE_DRIVER_INIT(pltkids);
 	DECLARE_DRIVER_INIT(rchase2);
@@ -204,7 +204,7 @@ public:
 	DECLARE_MACHINE_RESET(model2c);
 	DECLARE_MACHINE_RESET(model2_common);
 	DECLARE_MACHINE_RESET(model2_scsp);
-	UINT32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
@@ -215,12 +215,12 @@ public:
 	DECLARE_READ8_MEMBER(virtuacop_lightgun_r);
 	DECLARE_READ8_MEMBER(virtuacop_lightgun_offscreen_r);
 
-	UINT16 crypt_read_callback(UINT32 addr);
+	uint16_t crypt_read_callback(uint32_t addr);
 
-	bool copro_fifoin_pop(device_t *device, UINT32 *result,UINT32 offset, UINT32 mem_mask);
-	void copro_fifoin_push(device_t *device, UINT32 data, UINT32 offset, UINT32 mem_mask);
-	UINT32 copro_fifoout_pop(address_space &space, UINT32 offset, UINT32 mem_mask);
-	void copro_fifoout_push(device_t *device, UINT32 data,UINT32 offset,UINT32 mem_mask);
+	bool copro_fifoin_pop(device_t *device, uint32_t *result,uint32_t offset, uint32_t mem_mask);
+	void copro_fifoin_push(device_t *device, uint32_t data, uint32_t offset, uint32_t mem_mask);
+	uint32_t copro_fifoout_pop(address_space &space, uint32_t offset, uint32_t mem_mask);
+	void copro_fifoout_push(device_t *device, uint32_t data,uint32_t offset,uint32_t mem_mask);
 
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 };
@@ -235,23 +235,23 @@ public:
 struct m2_poly_extra_data
 {
 	model2_state *  state;
-	UINT32      lumabase;
-	UINT32      colorbase;
-	UINT32 *    texsheet;
-	UINT32      texwidth;
-	UINT32      texheight;
-	UINT32      texx, texy;
-	UINT8       texmirrorx;
-	UINT8       texmirrory;
+	uint32_t      lumabase;
+	uint32_t      colorbase;
+	uint32_t *    texsheet;
+	uint32_t      texwidth;
+	uint32_t      texheight;
+	uint32_t      texx, texy;
+	uint8_t       texmirrorx;
+	uint8_t       texmirrory;
 };
 
 
-static inline UINT16 get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *sheet )
+static inline uint16_t get_texel( uint32_t base_x, uint32_t base_y, int x, int y, uint32_t *sheet )
 {
-	UINT32  baseoffs = ((base_y/2)*512)+(base_x/2);
-	UINT32  texeloffs = ((y/2)*512)+(x/2);
-	UINT32  offset = baseoffs + texeloffs;
-	UINT32  texel = sheet[offset>>1];
+	uint32_t  baseoffs = ((base_y/2)*512)+(base_x/2);
+	uint32_t  texeloffs = ((y/2)*512)+(x/2);
+	uint32_t  offset = baseoffs + texeloffs;
+	uint32_t  texel = sheet[offset>>1];
 
 	if ( offset & 1 )
 		texel >>= 16;
@@ -270,7 +270,7 @@ struct triangle;
 class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 4000>
 {
 public:
-	typedef void (model2_renderer::*scanline_render_func)(INT32 scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
+	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 public:
 	model2_renderer(model2_state& state)
@@ -374,7 +374,7 @@ struct texture_parameter
 {
 	float   diffuse;
 	float   ambient;
-	UINT32  specular_control;
+	uint32_t  specular_control;
 	float   specular_scale;
 };
 
@@ -382,22 +382,22 @@ struct triangle
 {
 	void *              next;
 	poly_vertex         v[3];
-	UINT16              z;
-	UINT16              texheader[4];
-	UINT8               luma;
-	INT16               viewport[4];
-	INT16               center[2];
+	uint16_t              z;
+	uint16_t              texheader[4];
+	uint8_t               luma;
+	int16_t               viewport[4];
+	int16_t               center[2];
 };
 
 struct quad_m2
 {
 	poly_vertex         v[4];
-	UINT16              z;
-	UINT16              texheader[4];
-	UINT8               luma;
+	uint16_t              z;
+	uint16_t              texheader[4];
+	uint8_t               luma;
 };
 
 
 
 /*----------- defined in video/model2.c -----------*/
-void model2_3d_set_zclip( running_machine &machine, UINT8 clip );
+void model2_3d_set_zclip( running_machine &machine, uint8_t clip );

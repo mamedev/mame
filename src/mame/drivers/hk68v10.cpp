@@ -214,8 +214,8 @@ required_device<cpu_device> m_maincpu;
 required_device<scc8530_device> m_sccterm;
 
 // Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	UINT16  *m_sysrom;
-	UINT16  m_sysram[4];
+	uint16_t  *m_sysrom;
+	uint16_t  m_sysram[4];
 };
 
 static ADDRESS_MAP_START (hk68v10_mem, AS_PROGRAM, 16, hk68v10_state)
@@ -244,7 +244,7 @@ void hk68v10_state::machine_start ()
 	LOG(("%s\n", FUNCNAME));
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
+	m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0x0fc0000);
 }
 
 /* Support CPU resets
@@ -259,7 +259,7 @@ void hk68v10_state::machine_reset ()
 
 	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
-		m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
+		m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0x0fc0000);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xfc0000 to 0x0 at reset*/
@@ -285,7 +285,7 @@ WRITE16_MEMBER (hk68v10_state::bootvect_w){
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (hk68v10_state::vme_a24_r){
 	LOG(("%s\n", FUNCNAME));
-	return (UINT16) 0;
+	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (hk68v10_state::vme_a24_w){
@@ -294,7 +294,7 @@ WRITE16_MEMBER (hk68v10_state::vme_a24_w){
 
 READ16_MEMBER (hk68v10_state::vme_a16_r){
 	LOG(("%s\n", FUNCNAME));
-	return (UINT16) 0;
+	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (hk68v10_state::vme_a16_w){

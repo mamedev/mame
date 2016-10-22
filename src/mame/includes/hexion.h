@@ -16,8 +16,8 @@ public:
 	required_device<k053252_device> m_k053252;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	UINT8 *m_vram[2];
-	UINT8 *m_unkram;
+	uint8_t *m_vram[2];
+	uint8_t *m_unkram;
 	int m_bankctrl;
 	int m_rambank;
 	int m_pmcbank;
@@ -40,6 +40,6 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline void get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *ram);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *ram);
 };

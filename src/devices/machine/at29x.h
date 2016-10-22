@@ -34,7 +34,7 @@ enum  s_pgm_t
 class at29x_device : public device_t, public device_nvram_interface
 {
 public:
-	at29x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	at29x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -63,7 +63,7 @@ protected:
 private:
 	void        sync_flags(void);
 
-	std::unique_ptr<UINT8[]>      m_eememory;
+	std::unique_ptr<uint8_t[]>      m_eememory;
 
 	bool        m_lower_bbl;              // set when lower boot block lockout is enabled
 	bool        m_higher_bbl;             // set when upper boot block lockout is enabled
@@ -78,7 +78,7 @@ private:
 	bool        m_disabling_sdb;          // set when a sdp disable command is in progress
 	bool        m_toggle_bit;             // indicates flashing in progress (toggles for each query)
 
-	std::unique_ptr<UINT8[]>      m_programming_buffer;
+	std::unique_ptr<uint8_t[]>      m_programming_buffer;
 	int         m_programming_last_offset;
 	emu_timer*  m_programming_timer;
 };
@@ -89,19 +89,19 @@ private:
 class at29c020_device : public at29x_device
 {
 public:
-	at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class at29c040_device : public at29x_device
 {
 public:
-	at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class at29c040a_device : public at29x_device
 {
 public:
-	at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 #define MCFG_AT29C020_ADD(_tag )    \

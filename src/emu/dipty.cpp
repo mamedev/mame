@@ -51,7 +51,7 @@ bool device_pty_interface::is_open() const
 	return m_opened;
 }
 
-ssize_t device_pty_interface::read(UINT8 *rx_chars , size_t count) const
+ssize_t device_pty_interface::read(uint8_t *rx_chars , size_t count) const
 {
 	std::uint32_t actual_bytes;
 	if (m_opened && m_pty_master->read(rx_chars, 0, count, actual_bytes) == osd_file::error::NONE)
@@ -60,7 +60,7 @@ ssize_t device_pty_interface::read(UINT8 *rx_chars , size_t count) const
 		return -1;
 }
 
-void device_pty_interface::write(UINT8 tx_char) const
+void device_pty_interface::write(uint8_t tx_char) const
 {
 	std::uint32_t actual_bytes;
 	if (m_opened)

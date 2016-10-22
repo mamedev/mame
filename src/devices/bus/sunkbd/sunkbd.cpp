@@ -19,7 +19,7 @@ sun_keyboard_port_device::sun_keyboard_port_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock)
+		uint32_t clock)
 	: sun_keyboard_port_device(mconfig, SUNKBD_PORT, "Sun Keyboard Port", tag, owner, clock, "sunkbd", __FILE__)
 {
 }
@@ -31,7 +31,7 @@ sun_keyboard_port_device::sun_keyboard_port_device(
 		char const *name,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock,
+		uint32_t clock,
 		char const *shortname,
 		char const *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)

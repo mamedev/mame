@@ -25,7 +25,7 @@ dooyong_tilemap_device_base::dooyong_tilemap_device_base(
 			char const *name,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock,
+			uint32_t clock,
 			char const *shortname,
 			char const *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
@@ -46,12 +46,12 @@ void dooyong_tilemap_device_base::static_set_gfxnum(device_t &device, int gfxnum
 	downcast<dooyong_tilemap_device_base &>(device).m_gfxnum = gfxnum;
 }
 
-void dooyong_tilemap_device_base::draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, UINT32 flags, UINT8 priority)
+void dooyong_tilemap_device_base::draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, uint32_t flags, uint8_t priority)
 {
 	m_tilemap->draw(screen, dest, cliprect, flags, priority);
 }
 
-void dooyong_tilemap_device_base::set_palette_bank(UINT16 bank)
+void dooyong_tilemap_device_base::set_palette_bank(uint16_t bank)
 {
 	if (bank != m_palette_bank)
 	{
@@ -61,7 +61,7 @@ void dooyong_tilemap_device_base::set_palette_bank(UINT16 bank)
 }
 
 
-dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
+dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: dooyong_rom_tilemap_device(mconfig, DOOYONG_ROM_TILEMAP, "Dooyong ROM Tilemap", tag, owner, clock, "dooyong_rom_tilemap", __FILE__)
 {
 }
@@ -72,7 +72,7 @@ dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(
 			char const *name,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock,
+			uint32_t clock,
 			char const *shortname,
 			char const *source)
 	: dooyong_tilemap_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
@@ -113,7 +113,7 @@ void dooyong_rom_tilemap_device::static_set_primella_code_bits(device_t &device,
 WRITE8_MEMBER(dooyong_rom_tilemap_device::ctrl_w)
 {
 	offset &= 0x07U;
-	UINT8 const old = m_registers[offset];
+	uint8_t const old = m_registers[offset];
 	if (old != data)
 	{
 		m_registers[offset] = data;
@@ -207,7 +207,7 @@ TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
 }
 
 
-rshark_rom_tilemap_device::rshark_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
+rshark_rom_tilemap_device::rshark_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: dooyong_rom_tilemap_device(mconfig, RSHARK_ROM_TILEMAP, "R-Shark ROM Tilemap", tag, owner, clock, "rshark_rom_tilemap", __FILE__)
 	, m_colorrom(*this, finder_base::DUMMY_TAG)
 	, m_colorrom_offset(0)
@@ -237,12 +237,12 @@ TILE_GET_INFO_MEMBER(rshark_rom_tilemap_device::tile_info)
 {
 	dooyong_rom_tilemap_device::tile_info(tilemap, tileinfo, tile_index);
 
-	UINT8 const color = m_colorrom[m_colorrom_offset + adjust_tile_index(tile_index)] & 0x0fU;
+	uint8_t const color = m_colorrom[m_colorrom_offset + adjust_tile_index(tile_index)] & 0x0fU;
 	tileinfo.palette_base = gfx().colorbase() + (gfx().granularity() * (color % gfx().colors()));
 }
 
 
-dooyong_ram_tilemap_device::dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
+dooyong_ram_tilemap_device::dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: dooyong_tilemap_device_base(mconfig, DOOYONG_RAM_TILEMAP, "Dooyong RAM Tilemap", tag, owner, clock, "dooyong_ram_tilemap", __FILE__)
 	, m_tileram()
 {
@@ -251,7 +251,7 @@ dooyong_ram_tilemap_device::dooyong_ram_tilemap_device(machine_config const &mco
 WRITE16_MEMBER(dooyong_ram_tilemap_device::tileram_w)
 {
 	offset &= (64U * 32U) - 1U;
-	UINT16 value(m_tileram[offset]);
+	uint16_t value(m_tileram[offset]);
 	COMBINE_DATA(&value);
 	if (value != m_tileram[offset])
 	{
@@ -275,7 +275,7 @@ void dooyong_ram_tilemap_device::device_start()
 			32);
 	m_tilemap->set_transparent_pen(15);
 
-	m_tileram.reset(new UINT16[64 * 32]);
+	m_tileram.reset(new uint16_t[64 * 32]);
 	std::fill(m_tileram.get(), m_tileram.get() + (64 * 32), 0U);
 	m_palette_bank = 0U;
 
@@ -304,7 +304,7 @@ READ8_MEMBER(dooyong_z80_state::lastday_tx_r)
 WRITE8_MEMBER(dooyong_z80_state::lastday_tx_w)
 {
 	bool const lane(BIT(offset, 11));
-	m_tx->tileram_w(space, offset & 0x07ffU, UINT16(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
+	m_tx->tileram_w(space, offset & 0x07ffU, uint16_t(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
 }
 
 READ8_MEMBER(dooyong_z80_state::bluehawk_tx_r)
@@ -316,7 +316,7 @@ READ8_MEMBER(dooyong_z80_state::bluehawk_tx_r)
 WRITE8_MEMBER(dooyong_z80_state::bluehawk_tx_w)
 {
 	bool const lane(BIT(offset, 0));
-	m_tx->tileram_w(space, offset >> 1, UINT16(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
+	m_tx->tileram_w(space, offset >> 1, uint16_t(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
 }
 
 
@@ -349,7 +349,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 
 	/* bit 1 is used but unknown - palette banking (both write and display based on pollux bombs) */
-	UINT8 const last_palbank = m_palette_bank;
+	uint8_t const last_palbank = m_palette_bank;
 	if (m_paletteram_flytiger) m_palette_bank = BIT(data, 1);
 	if (last_palbank != m_palette_bank)
 	{
@@ -394,7 +394,7 @@ WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
 	if (m_palette_bank) offset |= 0x800;
 
 	m_paletteram_flytiger[offset] = data;
-	UINT16 const value = m_paletteram_flytiger[offset & ~1] | (m_paletteram_flytiger[offset | 1] << 8);
+	uint16_t const value = m_paletteram_flytiger[offset & ~1] | (m_paletteram_flytiger[offset | 1] << 8);
 	m_palette->set_pen_color(offset/2, pal5bit(value >> 10), pal5bit(value >> 5), pal5bit(value >> 0));
 
 }
@@ -407,7 +407,7 @@ WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
 	/* bits 1, 2 used but unknown */
 
 	/* bit 3 palette banking  */
-	UINT8 const last_palbank = m_palette_bank;
+	uint8_t const last_palbank = m_palette_bank;
 	m_palette_bank = BIT(data, 3);
 	if (last_palbank != m_palette_bank)
 	{
@@ -446,7 +446,7 @@ void dooyong_z80_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	   height only used by pollux, bluehawk and flytiger
 	   x flip and y flip only used by pollux and flytiger */
 
-	UINT8 const *const buffered_spriteram = m_spriteram->buffer();
+	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
 	for (int offs = 0; offs < m_spriteram->bytes(); offs += 32)
 	{
 		int sx = buffered_spriteram[offs+3] | ((buffered_spriteram[offs+1] & 0x10) << 4);
@@ -462,7 +462,7 @@ void dooyong_z80_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 		int height = 0;
 		if (extensions)
 		{
-			UINT8 const ext = buffered_spriteram[offs+0x1c];
+			uint8_t const ext = buffered_spriteram[offs+0x1c];
 
 			if (extensions & SPRITE_12BIT)
 				code |= ((ext & 0x01) << 11);
@@ -507,7 +507,7 @@ void dooyong_z80_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-UINT32 dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -525,7 +525,7 @@ UINT32 dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, bi
 	return 0;
 }
 
-UINT32 dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -542,7 +542,7 @@ UINT32 dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen, b
 	return 0;
 }
 
-UINT32 dooyong_z80_ym2203_state::screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dooyong_z80_ym2203_state::screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -556,7 +556,7 @@ UINT32 dooyong_z80_ym2203_state::screen_update_pollux(screen_device &screen, bit
 	return 0;
 }
 
-UINT32 dooyong_z80_state::screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dooyong_z80_state::screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -579,7 +579,7 @@ UINT32 dooyong_z80_state::screen_update_flytiger(screen_device &screen, bitmap_i
 }
 
 
-UINT32 dooyong_z80_state::screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dooyong_z80_state::screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -594,7 +594,7 @@ UINT32 dooyong_z80_state::screen_update_bluehawk(screen_device &screen, bitmap_i
 	return 0;
 }
 
-UINT32 dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -628,7 +628,7 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, gulfstrm)
 
 VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
 {
-	m_paletteram_flytiger = make_unique_clear<UINT8[]>(0x1000);
+	m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
 	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
 
 	m_palette_bank = 0;
@@ -645,7 +645,7 @@ VIDEO_START_MEMBER(dooyong_z80_state, bluehawk)
 
 VIDEO_START_MEMBER(dooyong_z80_state, flytiger)
 {
-	m_paletteram_flytiger = make_unique_clear<UINT8[]>(0x1000);
+	m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
 	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
 
 	m_palette_bank = 0;
@@ -698,7 +698,7 @@ void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	   w = width
 	   h = height */
 
-	UINT16 const *const buffered_spriteram = m_spriteram->buffer();
+	uint16_t const *const buffered_spriteram = m_spriteram->buffer();
 	for (int offs = (m_spriteram->bytes() / 2) - 8; offs >= 0; offs -= 8)
 	{
 		if (buffered_spriteram[offs] & 0x0001)    /* enable */
@@ -713,7 +713,7 @@ void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 			bool const flip = flip_screen();
 			int sx = buffered_spriteram[offs+4] & 0x01ff;
-			int sy = (INT16)buffered_spriteram[offs+6] & 0x01ff;
+			int sy = (int16_t)buffered_spriteram[offs+6] & 0x01ff;
 			if (sy & 0x0100) sy |= ~(int)0x01ff;    // Correctly sign-extend 9-bit number
 			if (flip)
 			{
@@ -742,7 +742,7 @@ void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-UINT32 rshark_state::screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rshark_state::screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -764,7 +764,7 @@ VIDEO_START_MEMBER(rshark_state, rshark)
 }
 
 
-UINT32 popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -777,9 +777,9 @@ UINT32 popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_ind1
 
 	for (int y = cliprect.min_y; cliprect.max_y >= y; y++)
 	{
-		UINT16 const *const bg_src(&m_bg_bitmap.pix16(y, 0));
-		UINT16 const *const bg2_src(&m_bg2_bitmap.pix16(y, 0));
-		UINT16 *const dst(&bitmap.pix16(y, 0));
+		uint16_t const *const bg_src(&m_bg_bitmap.pix16(y, 0));
+		uint16_t const *const bg2_src(&m_bg2_bitmap.pix16(y, 0));
+		uint16_t *const dst(&bitmap.pix16(y, 0));
 		for (int x = cliprect.min_x; cliprect.max_x >= x; x++)
 			dst[x] = 0x100U | (bg_src[x] << 4) | bg2_src[x];
 	}

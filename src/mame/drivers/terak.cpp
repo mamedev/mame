@@ -22,12 +22,12 @@ public:
 	DECLARE_WRITE16_MEMBER(terak_fdc_command_w);
 	DECLARE_READ16_MEMBER(terak_fdc_data_r);
 	DECLARE_WRITE16_MEMBER(terak_fdc_data_w);
-	UINT8 m_unit;
-	UINT8 m_cmd;
-	UINT16 m_data;
+	uint8_t m_unit;
+	uint8_t m_cmd;
+	uint16_t m_data;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -82,7 +82,7 @@ void terak_state::video_start()
 {
 }
 
-UINT32 terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

@@ -20,19 +20,19 @@ class dmv_ram_device :
 {
 public:
 	// construction/destruction
-	dmv_ram_device(const machine_config &mconfig, device_type type, UINT32 size, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	dmv_ram_device(const machine_config &mconfig, device_type type, uint32_t size, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// dmvcart_interface overrides
-	virtual void ram_read(UINT8 cas, offs_t offset, UINT8 &data) override;
-	virtual void ram_write(UINT8 cas, offs_t offset, UINT8 data) override;
+	virtual void ram_read(uint8_t cas, offs_t offset, uint8_t &data) override;
+	virtual void ram_write(uint8_t cas, offs_t offset, uint8_t data) override;
 
 private:
-	UINT8 *     m_ram;
-	UINT8       m_size;
+	uint8_t *     m_ram;
+	uint8_t       m_size;
 };
 
 
@@ -41,7 +41,7 @@ class dmv_k200_device :
 {
 public:
 	// construction/destruction
-	dmv_k200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -50,7 +50,7 @@ class dmv_k202_device :
 {
 public:
 	// construction/destruction
-	dmv_k202_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -59,7 +59,7 @@ class dmv_k208_device :
 {
 public:
 	// construction/destruction
-	dmv_k208_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

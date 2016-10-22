@@ -282,7 +282,7 @@ const device_type ALPHA_8201 = &device_creator<alpha_8201_device>;
 //  alpha_8201_device - constructor
 //-------------------------------------------------
 
-alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ALPHA_8201, "ALPHA-8201", tag, owner, clock, "alpha8201", __FILE__),
 	m_mcu(*this, "mcu")
 {
@@ -295,7 +295,7 @@ alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *
 
 void alpha_8201_device::device_start()
 {
-	m_shared_ram = make_unique_clear<UINT8[]>(0x400);
+	m_shared_ram = make_unique_clear<uint8_t[]>(0x400);
 
 	// zerofill
 	m_bus = 0;
@@ -364,7 +364,7 @@ void alpha_8201_device::mcu_update_address()
 
 READ8_MEMBER(alpha_8201_device::mcu_data_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (m_bus && ~m_mcu_d & 4)
 		ret = m_shared_ram[m_mcu_address];

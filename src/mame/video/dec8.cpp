@@ -76,7 +76,7 @@ sprites.
 
 PALETTE_INIT_MEMBER(dec8_state,ghostb)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -210,7 +210,7 @@ WRITE8_MEMBER(dec8_state::gondo_scroll_w)
 
 void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
 	/* Sprites */
@@ -258,7 +258,7 @@ void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	flip_screen_set(m_tilegen1->get_flip_state());
 
@@ -298,7 +298,7 @@ VIDEO_START_MEMBER(dec8_state,cobracom)
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_ghostb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_ghostb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	m_spritegen_krn->draw_sprites(bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
@@ -329,7 +329,7 @@ VIDEO_START_MEMBER(dec8_state,ghostb)
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	flip_screen_set(m_tilegen1->get_flip_state());
 
@@ -365,7 +365,7 @@ VIDEO_START_MEMBER(dec8_state,oscar)
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_lastmisn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_lastmisn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_scroll2[0] << 8)+ m_scroll2[1]));
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8)+ m_scroll2[3]));
@@ -376,7 +376,7 @@ UINT32 dec8_state::screen_update_lastmisn(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 dec8_state::screen_update_shackled(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_shackled(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_scroll2[0] << 8) + m_scroll2[1]));
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8) + m_scroll2[3]));
@@ -446,7 +446,7 @@ VIDEO_START_MEMBER(dec8_state,shackled)
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, (m_scroll2[0] << 8) + m_scroll2[1]);
 
@@ -501,7 +501,7 @@ VIDEO_START_MEMBER(dec8_state,srdarwin)
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_gondo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_gondo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_scroll2[0] << 8) + m_scroll2[1]));
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8) + m_scroll2[3]));
@@ -514,7 +514,7 @@ UINT32 dec8_state::screen_update_gondo(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-UINT32 dec8_state::screen_update_garyoret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_garyoret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_scroll2[0] << 8) + m_scroll2[1]));
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8) + m_scroll2[3]));

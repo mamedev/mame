@@ -48,7 +48,7 @@ const device_type IQ151_DISC2 = &device_creator<iq151_disc2_device>;
 //  iq151_disc2_device - constructor
 //-------------------------------------------------
 
-iq151_disc2_device::iq151_disc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_disc2_device::iq151_disc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, IQ151_DISC2, "IQ151 Disc2", tag, owner, clock, "iq151_disc2", __FILE__),
 		device_iq151cart_interface( mconfig, *this ),
 		m_fdc(*this, "fdc"), m_rom(nullptr), m_rom_enabled(false)
@@ -61,7 +61,7 @@ iq151_disc2_device::iq151_disc2_device(const machine_config &mconfig, const char
 
 void iq151_disc2_device::device_start()
 {
-	m_rom = (UINT8*)memregion("disc2")->base();
+	m_rom = (uint8_t*)memregion("disc2")->base();
 }
 
 //-------------------------------------------------
@@ -96,7 +96,7 @@ const tiny_rom_entry *iq151_disc2_device::device_rom_region() const
 //  read
 //-------------------------------------------------
 
-void iq151_disc2_device::read(offs_t offset, UINT8 &data)
+void iq151_disc2_device::read(offs_t offset, uint8_t &data)
 {
 	// interal ROM is mapped at 0xe000-0xe7ff
 	if (offset >= 0xe000 && offset < 0xe800 && m_rom_enabled)
@@ -108,7 +108,7 @@ void iq151_disc2_device::read(offs_t offset, UINT8 &data)
 //  IO read
 //-------------------------------------------------
 
-void iq151_disc2_device::io_read(offs_t offset, UINT8 &data)
+void iq151_disc2_device::io_read(offs_t offset, uint8_t &data)
 {
 	/* This is gross */
 	address_space *space = nullptr;
@@ -122,7 +122,7 @@ void iq151_disc2_device::io_read(offs_t offset, UINT8 &data)
 //  IO write
 //-------------------------------------------------
 
-void iq151_disc2_device::io_write(offs_t offset, UINT8 data)
+void iq151_disc2_device::io_write(offs_t offset, uint8_t data)
 {
 	address_space *space = nullptr;
 	if (offset == 0xab)

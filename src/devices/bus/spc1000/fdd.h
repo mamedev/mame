@@ -19,7 +19,7 @@ class spc1000_fdd_exp_device : public device_t,
 {
 public:
 	// construction/destruction
-	spc1000_fdd_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	spc1000_fdd_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -50,9 +50,9 @@ private:
 
 	emu_timer *m_timer_tc;
 
-	UINT8 m_i8255_0_pc;
-	UINT8 m_i8255_1_pc;
-	UINT8 m_i8255_portb;
+	uint8_t m_i8255_0_pc;
+	uint8_t m_i8255_1_pc;
+	uint8_t m_i8255_portb;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_TC = 0;

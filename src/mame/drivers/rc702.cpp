@@ -73,12 +73,12 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
 private:
-	UINT8 *m_p_chargen;
+	uint8_t *m_p_chargen;
 	bool m_q_state;
 	bool m_qbar_state;
 	bool m_drq_state;
-	UINT16 m_beepcnt;
-	UINT8 m_dack;
+	uint16_t m_beepcnt;
+	uint8_t m_dack;
 	bool m_tc;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
@@ -239,7 +239,7 @@ static const rgb_t our_palette[3] = {
 
 DRIVER_INIT_MEMBER( rc702_state, rc702 )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
@@ -251,7 +251,7 @@ DRIVER_INIT_MEMBER( rc702_state, rc702 )
 I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 gfx = 0;
+	uint8_t gfx = 0;
 
 	if (!vsp)
 		gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];

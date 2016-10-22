@@ -78,8 +78,8 @@ WRITE8_MEMBER( mc80_state::mc8030_vis_w )
 	//           1 0 x - operation code in B reg
 	// reg B
 	//
-	UINT16 addr = ((offset & 0xff00) >> 2) | ((offset & 0x08) << 2) | (data >> 3);
-	static const UINT8 val[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+	uint16_t addr = ((offset & 0xff00) >> 2) | ((offset & 0x08) << 2) | (data >> 3);
+	static const uint8_t val[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 	int c = offset & 1;
 	m_p_videoram[addr] = m_p_videoram[addr] | (val[data & 7]*c);
 }

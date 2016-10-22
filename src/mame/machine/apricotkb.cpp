@@ -245,7 +245,7 @@ ioport_constructor apricot_keyboard_device::device_input_ports() const
 //  apricot_keyboard_device - constructor
 //-------------------------------------------------
 
-apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APRICOT_KEYBOARD, "Apricot Keyboard", tag, owner, clock, "aprikb", __FILE__),
 	m_write_txd(*this),
 	m_y(*this, "Y%u", 0),
@@ -278,9 +278,9 @@ void apricot_keyboard_device::device_reset()
 //  read_keyboard -
 //-------------------------------------------------
 
-UINT8 apricot_keyboard_device::read_keyboard()
+uint8_t apricot_keyboard_device::read_keyboard()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 13; i++)
 	{
@@ -327,7 +327,7 @@ READ8_MEMBER( apricot_keyboard_device::kb_p6_r )
 
 	*/
 
-	UINT8 modifiers = m_modifiers->read();
+	uint8_t modifiers = m_modifiers->read();
 
 	return modifiers << 1;
 }

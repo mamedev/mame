@@ -110,16 +110,16 @@ inline std::string number_and_format::format() const
 	{
 	default:
 	case XML_INT_FORMAT_DECIMAL:
-		return string_format("%d", UINT32(m_value));
+		return string_format("%d", uint32_t(m_value));
 
 	case XML_INT_FORMAT_DECIMAL_POUND:
-		return string_format("#%d", UINT32(m_value));
+		return string_format("#%d", uint32_t(m_value));
 
 	case XML_INT_FORMAT_HEX_DOLLAR:
-		return string_format("$%X", UINT32(m_value));
+		return string_format("$%X", uint32_t(m_value));
 
 	case XML_INT_FORMAT_HEX_C:
-		return string_format("0x%X", UINT32(m_value));
+		return string_format("0x%X", uint32_t(m_value));
 	}
 }
 
@@ -153,7 +153,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 			throw emu_fatalerror("%s.xml(%d): item is value\n", filename, itemnode->line);
 
 		// extract the parameters
-		UINT64 value = xml_get_attribute_int(itemnode, "value", 0);
+		uint64_t value = xml_get_attribute_int(itemnode, "value", 0);
 		int format = xml_get_attribute_int_format(itemnode, "value");
 
 		// allocate and append a new item
@@ -179,12 +179,12 @@ const char *cheat_parameter::text()
 	// are we a value cheat?
 	if (!has_itemlist())
 	{
-		m_curtext = string_format("%d (0x%X)", UINT32(m_value), UINT32(m_value));
+		m_curtext = string_format("%d (0x%X)", uint32_t(m_value), uint32_t(m_value));
 	}
 	else
 	{
 		// if not, we're an item cheat
-		m_curtext = string_format("??? (%d)", UINT32(m_value));
+		m_curtext = string_format("??? (%d)", uint32_t(m_value));
 		for (auto &curitem : m_itemlist)
 			if (curitem->value() == m_value)
 			{
@@ -234,7 +234,7 @@ void cheat_parameter::save(emu_file &cheatfile) const
 
 bool cheat_parameter::set_minimum_state()
 {
-	UINT64 origvalue = m_value;
+	uint64_t origvalue = m_value;
 
 	// set based on whether we have an item list
 	m_value = (!has_itemlist()) ? m_minval : m_itemlist.front()->value();
@@ -249,7 +249,7 @@ bool cheat_parameter::set_minimum_state()
 
 bool cheat_parameter::set_prev_state()
 {
-	UINT64 origvalue = m_value;
+	uint64_t origvalue = m_value;
 
 	// are we a value cheat?
 	if (!has_itemlist())
@@ -283,7 +283,7 @@ bool cheat_parameter::set_prev_state()
 
 bool cheat_parameter::set_next_state()
 {
-	UINT64 origvalue = m_value;
+	uint64_t origvalue = m_value;
 
 	// are we a value cheat?
 	if (!has_itemlist())
@@ -357,7 +357,7 @@ cheat_script::cheat_script(cheat_manager &manager, symbol_table &symbols, const 
 //  execute - execute ourself
 //-------------------------------------------------
 
-void cheat_script::execute(cheat_manager &manager, UINT64 &argindex)
+void cheat_script::execute(cheat_manager &manager, uint64_t &argindex)
 {
 	// do nothing if disabled
 	if (!manager.enabled())
@@ -470,14 +470,14 @@ cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &s
 //  execute - execute a single script entry
 //-------------------------------------------------
 
-void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &argindex)
+void cheat_script::script_entry::execute(cheat_manager &manager, uint64_t &argindex)
 {
 	// evaluate the condition
 	if (!m_condition.is_empty())
 	{
 		try
 		{
-			UINT64 result = m_condition.execute();
+			uint64_t result = m_condition.execute();
 			if (result == 0)
 				return;
 		}
@@ -505,21 +505,21 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 	if (!m_format.empty())
 	{
 		// iterate over arguments and evaluate them
-		UINT64 params[MAX_ARGUMENTS];
+		uint64_t params[MAX_ARGUMENTS];
 		int curarg = 0;
 		for (auto &arg : m_arglist)
 			curarg += arg->values(argindex, &params[curarg]);
 
 		// generate the astring
 		manager.get_output_string(m_line, m_justify) = string_format(m_format,
-			(UINT32)params[0],  (UINT32)params[1],  (UINT32)params[2],  (UINT32)params[3],
-			(UINT32)params[4],  (UINT32)params[5],  (UINT32)params[6],  (UINT32)params[7],
-			(UINT32)params[8],  (UINT32)params[9],  (UINT32)params[10], (UINT32)params[11],
-			(UINT32)params[12], (UINT32)params[13], (UINT32)params[14], (UINT32)params[15],
-			(UINT32)params[16], (UINT32)params[17], (UINT32)params[18], (UINT32)params[19],
-			(UINT32)params[20], (UINT32)params[21], (UINT32)params[22], (UINT32)params[23],
-			(UINT32)params[24], (UINT32)params[25], (UINT32)params[26], (UINT32)params[27],
-			(UINT32)params[28], (UINT32)params[29], (UINT32)params[30], (UINT32)params[31]);
+			(uint32_t)params[0],  (uint32_t)params[1],  (uint32_t)params[2],  (uint32_t)params[3],
+			(uint32_t)params[4],  (uint32_t)params[5],  (uint32_t)params[6],  (uint32_t)params[7],
+			(uint32_t)params[8],  (uint32_t)params[9],  (uint32_t)params[10], (uint32_t)params[11],
+			(uint32_t)params[12], (uint32_t)params[13], (uint32_t)params[14], (uint32_t)params[15],
+			(uint32_t)params[16], (uint32_t)params[17], (uint32_t)params[18], (uint32_t)params[19],
+			(uint32_t)params[20], (uint32_t)params[21], (uint32_t)params[22], (uint32_t)params[23],
+			(uint32_t)params[24], (uint32_t)params[25], (uint32_t)params[26], (uint32_t)params[27],
+			(uint32_t)params[28], (uint32_t)params[29], (uint32_t)params[30], (uint32_t)params[31]);
 	}
 }
 
@@ -638,7 +638,7 @@ cheat_script::script_entry::output_argument::output_argument(cheat_manager &mana
 //  given output argument
 //-------------------------------------------------
 
-int cheat_script::script_entry::output_argument::values(UINT64 &argindex, UINT64 *result)
+int cheat_script::script_entry::output_argument::values(uint64_t &argindex, uint64_t *result)
 {
 	for (argindex = 0; argindex < m_count; argindex++)
 	{
@@ -945,7 +945,7 @@ bool cheat_entry::select_next_state()
 //  this cheat in a menu item
 //-------------------------------------------------
 
-void cheat_entry::menu_text(std::string &description, std::string &state, UINT32 &flags)
+void cheat_entry::menu_text(std::string &description, std::string &state, uint32_t &flags)
 {
 	// description is standard
 	description.assign(m_description);
@@ -1166,7 +1166,7 @@ void cheat_manager::reload()
 			// else we are loading outside the software list, try to load machine_basename/crc32.xml
 			else
 			{
-				UINT32 crc = image.crc();
+				uint32_t crc = image.crc();
 				if (crc != 0)
 				{
 					load_cheats(string_format("%s%s%08X", machine().basename(), PATH_SEPARATOR, crc).c_str());
@@ -1318,11 +1318,11 @@ std::string cheat_manager::quote_expression(const parsed_expression &expression)
 //  execute_frombcd - convert a value from BCD
 //-------------------------------------------------
 
-UINT64 cheat_manager::execute_frombcd(symbol_table &table, void *ref, int params, const UINT64 *param)
+uint64_t cheat_manager::execute_frombcd(symbol_table &table, void *ref, int params, const uint64_t *param)
 {
-	UINT64 value = param[0];
-	UINT64 multiplier = 1;
-	UINT64 result = 0;
+	uint64_t value = param[0];
+	uint64_t multiplier = 1;
+	uint64_t result = 0;
 
 	while (value != 0)
 	{
@@ -1338,11 +1338,11 @@ UINT64 cheat_manager::execute_frombcd(symbol_table &table, void *ref, int params
 //  execute_tobcd - convert a value to BCD
 //-------------------------------------------------
 
-UINT64 cheat_manager::execute_tobcd(symbol_table &table, void *ref, int params, const UINT64 *param)
+uint64_t cheat_manager::execute_tobcd(symbol_table &table, void *ref, int params, const uint64_t *param)
 {
-	UINT64 value = param[0];
-	UINT64 result = 0;
-	UINT8 shift = 0;
+	uint64_t value = param[0];
+	uint64_t result = 0;
+	uint8_t shift = 0;
 
 	while (value != 0)
 	{
@@ -1363,7 +1363,7 @@ void cheat_manager::frame_update()
 	// set up for accumulating output
 	m_lastline = 0;
 	m_numlines = floor(1.0f / mame_machine_manager::instance()->ui().get_line_height());
-	m_numlines = std::min<UINT8>(m_numlines, m_output.size());
+	m_numlines = std::min<uint8_t>(m_numlines, m_output.size());
 	for (auto & elem : m_output)
 		elem.clear();
 

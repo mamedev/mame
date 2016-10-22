@@ -7,7 +7,7 @@
 const device_type MSX_AUDIO_KBDC_PORT = &device_creator<msx_audio_kbdc_port_device>;
 
 
-msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_AUDIO_KBDC_PORT, "MSX Audio keyboard connector port", tag, owner, clock, "msx_audio_kbdc_port", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_keyboard(nullptr)
@@ -48,7 +48,7 @@ class msx_hxmu901 : public device_t
 					, public msx_audio_kb_port_interface
 {
 public:
-	msx_hxmu901(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	msx_hxmu901(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, MSX_AUDIO_KB_HXMU901, "Toshiba HXMU901", tag, owner, clock, "hxmu901", __FILE__)
 		, msx_audio_kb_port_interface(mconfig, *this)
 		, m_row(0)
@@ -60,7 +60,7 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(read) override
 	{
-		UINT8 result = 0xff;
+		uint8_t result = 0xff;
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -81,7 +81,7 @@ protected:
 	virtual void device_start() override { }
 
 private:
-	UINT8 m_row;
+	uint8_t m_row;
 	required_ioport_array<8> m_keyboard;
 };
 
@@ -179,7 +179,7 @@ class msx_nms1160 : public device_t
 					, public msx_audio_kb_port_interface
 {
 public:
-	msx_nms1160(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	msx_nms1160(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, MSX_AUDIO_KB_NMS1160, "Philips NMS-1160", tag, owner, clock, "nms1160", __FILE__)
 		, msx_audio_kb_port_interface(mconfig, *this)
 		, m_row(0)
@@ -190,7 +190,7 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(read) override
 	{
-		UINT8 result = 0xff;
+		uint8_t result = 0xff;
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -212,7 +212,7 @@ protected:
 	virtual void device_start() override { }
 
 private:
-	UINT8 m_row;
+	uint8_t m_row;
 	required_ioport_array<8> m_keyboard;
 };
 

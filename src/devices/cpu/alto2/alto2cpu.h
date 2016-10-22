@@ -85,7 +85,7 @@ enum {
 
 //! put a value %val into %reg, a word of %width bits, starting at bit %from until bit %to
 #define X_WRBITS(reg,width,from,to,val) do { \
-	UINT32 mask = X_BITMASK(from,to) << X_BITSHIFT(width,to); \
+	uint32_t mask = X_BITMASK(from,to) << X_BITSHIFT(width,to); \
 	reg = ((reg) & ~mask) | (((val) << X_BITSHIFT(width,to)) & mask); \
 } while (0)
 
@@ -180,7 +180,7 @@ class alto2_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	alto2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	alto2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~alto2_cpu_device();
 
 	//! driver interface to set diablo_hd_device
@@ -193,7 +193,7 @@ public:
 	void next_sector(int unit);
 
 	//! update the screen bitmap
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	//! set the vblank bit for the display to synch upon
 	void screen_vblank();
@@ -221,9 +221,9 @@ protected:
 	void interface_post_reset() override;
 
 	//! device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 1; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 1; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -236,9 +236,9 @@ protected:
 	void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	//! device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 
@@ -250,16 +250,16 @@ private:
 
 	address_space* m_iomem;
 
-	UINT32 m_cram_config;                   //!< CROM/CRAM configuration (1 .. 3)
-	UINT32 m_ucode_rom_pages;               //!< Number of CROM pages; derived from m_cram_config
-	UINT32 m_ucode_ram_pages;               //!< Number of CRAM pages; derived from m_cram_config
-	UINT32 m_ucode_ram_base;                //!< Base offset of the CRAM addresses
-	UINT32 m_ucode_size;                    //!< Size of both, CROM and CRAM together
-	UINT32 m_sreg_banks;                    //!< Number of S register banks; derived from m_cram_config
+	uint32_t m_cram_config;                   //!< CROM/CRAM configuration (1 .. 3)
+	uint32_t m_ucode_rom_pages;               //!< Number of CROM pages; derived from m_cram_config
+	uint32_t m_ucode_ram_pages;               //!< Number of CRAM pages; derived from m_cram_config
+	uint32_t m_ucode_ram_base;                //!< Base offset of the CRAM addresses
+	uint32_t m_ucode_size;                    //!< Size of both, CROM and CRAM together
+	uint32_t m_sreg_banks;                    //!< Number of S register banks; derived from m_cram_config
 
-	UINT8* m_ucode_crom;
-	std::unique_ptr<UINT8[]> m_ucode_cram;
-	UINT8* m_const_data;
+	uint8_t* m_ucode_crom;
+	std::unique_ptr<uint8_t[]> m_ucode_cram;
+	uint8_t* m_const_data;
 
 	//! read microcode CROM or CRAM, depending on m_ucode_ram_base
 	DECLARE_READ32_MEMBER ( crom_cram_r );
@@ -520,42 +520,42 @@ private:
 	};
 
 	//! get the normally accessed bank number from a bank register
-	static inline UINT16 GET_BANK_NORMAL(UINT16 breg) { return X_RDBITS(breg,16,12,13); }
+	static inline uint16_t GET_BANK_NORMAL(uint16_t breg) { return X_RDBITS(breg,16,12,13); }
 
 	//! get the extended bank number (accessed via XMAR) from a bank register
-	static inline UINT16 GET_BANK_EXTENDED(UINT16 breg) { return X_RDBITS(breg,16,14,15); }
+	static inline uint16_t GET_BANK_EXTENDED(uint16_t breg) { return X_RDBITS(breg,16,14,15); }
 
 	//! get an ignored bit field from a control RAM address
-	static inline UINT16 GET_CRAM_IGNORE(UINT16 addr) { return X_RDBITS(addr,16,0,1); }
+	static inline uint16_t GET_CRAM_IGNORE(uint16_t addr) { return X_RDBITS(addr,16,0,1); }
 
 	//! get the bank select bit field from a control RAM address
-	static inline UINT16 GET_CRAM_BANKSEL(UINT16 addr) { return X_RDBITS(addr,16,2,3); }
+	static inline uint16_t GET_CRAM_BANKSEL(uint16_t addr) { return X_RDBITS(addr,16,2,3); }
 
 	//! get the ROM/RAM flag from a control RAM address
-	static inline UINT16 GET_CRAM_RAMROM(UINT16 addr) { return X_RDBITS(addr,16,4,4); }
+	static inline uint16_t GET_CRAM_RAMROM(uint16_t addr) { return X_RDBITS(addr,16,4,4); }
 
 	//! get the half select flag from a control RAM address
-	static inline UINT16 GET_CRAM_HALFSEL(UINT16 addr) { return X_RDBITS(addr,16,5,5); }
+	static inline uint16_t GET_CRAM_HALFSEL(uint16_t addr) { return X_RDBITS(addr,16,5,5); }
 
 	//! get the word address bit field from a control RAM address
-	static inline UINT16 GET_CRAM_WORDADDR(UINT16 addr) { return X_RDBITS(addr,16,6,15); }
+	static inline uint16_t GET_CRAM_WORDADDR(uint16_t addr) { return X_RDBITS(addr,16,6,15); }
 
-	UINT16 m_task_mpc[ALTO2_TASKS];                 //!< per task micro program counter
-	UINT16 m_task_next2[ALTO2_TASKS];               //!< per task address modifier
-	UINT8 m_task;                                   //!< active task
-	UINT8 m_next_task;                              //!< next micro instruction's task
-	UINT8 m_next2_task;                             //!< next but one micro instruction's task
-	UINT16 m_mpc;                                   //!< micro program counter
-	UINT32 m_mir;                                   //!< micro instruction register
+	uint16_t m_task_mpc[ALTO2_TASKS];                 //!< per task micro program counter
+	uint16_t m_task_next2[ALTO2_TASKS];               //!< per task address modifier
+	uint8_t m_task;                                   //!< active task
+	uint8_t m_next_task;                              //!< next micro instruction's task
+	uint8_t m_next2_task;                             //!< next but one micro instruction's task
+	uint16_t m_mpc;                                   //!< micro program counter
+	uint32_t m_mir;                                   //!< micro instruction register
 
-	inline UINT32 rsel() const { return X_RDBITS(m_mir, 32, DRSEL0, DRSEL4); }
-	inline UINT32 aluf() const { return X_RDBITS(m_mir, 32, DALUF0, DALUF3); }
-	inline UINT32 bs() const { return X_RDBITS(m_mir, 32, DBS0, DBS2); }
-	inline UINT32 f1() const { return X_RDBITS(m_mir, 32, DF1_0, DF1_3); }
-	inline UINT32 f2() const { return X_RDBITS(m_mir, 32, DF2_0, DF2_3); }
-	inline UINT32 loadt() const { return X_BIT(m_mir, 32, DLOADT); }
-	inline UINT32 loadl() const { return X_BIT(m_mir, 32, DLOADL); }
-	inline UINT32 next() const { return X_RDBITS(m_mir, 32, NEXT0, NEXT9); }
+	inline uint32_t rsel() const { return X_RDBITS(m_mir, 32, DRSEL0, DRSEL4); }
+	inline uint32_t aluf() const { return X_RDBITS(m_mir, 32, DALUF0, DALUF3); }
+	inline uint32_t bs() const { return X_RDBITS(m_mir, 32, DBS0, DBS2); }
+	inline uint32_t f1() const { return X_RDBITS(m_mir, 32, DF1_0, DF1_3); }
+	inline uint32_t f2() const { return X_RDBITS(m_mir, 32, DF2_0, DF2_3); }
+	inline uint32_t loadt() const { return X_BIT(m_mir, 32, DLOADT); }
+	inline uint32_t loadl() const { return X_BIT(m_mir, 32, DLOADL); }
+	inline uint32_t next() const { return X_RDBITS(m_mir, 32, NEXT0, NEXT9); }
 
 	/**
 	 * \brief current micro instruction's register selection
@@ -563,28 +563,28 @@ private:
 	 * Note: The S registers are addressed by the original RSEL[0-4],
 	 * even when the emulator modifies this.
 	 */
-	UINT8 m_rsel;
-	UINT16 m_next;                                  //!< current micro instruction's next
-	UINT16 m_next2;                                 //!< next micro instruction's next
-	UINT16 m_r[ALTO2_REGS];                         //!< R register file
-	UINT16 m_s[8][ALTO2_REGS];                      //!< S register file(s) (1 or 8 are used)
-	UINT16 m_bus;                                   //!< wired-AND bus
-	UINT16 m_t;                                     //!< T register
-	UINT16 m_alu;                                   //!< the current ALU
-	UINT16 m_aluc0;                                 //!< the current ALU carry output
-	UINT16 m_l;                                     //!< L register
-	UINT16 m_shifter;                               //!< shifter output
-	UINT16 m_laluc0;                                //!< the latched ALU carry output
-	UINT16 m_myl;                                     //!< M register of RAM related tasks (MYL latch in the schematics)
-	UINT16 m_cram_addr;                             //!< constant RAM address
-	UINT16 m_task_wakeup;                           //!< task wakeup: bit 1<<n set if task n requesting service
+	uint8_t m_rsel;
+	uint16_t m_next;                                  //!< current micro instruction's next
+	uint16_t m_next2;                                 //!< next micro instruction's next
+	uint16_t m_r[ALTO2_REGS];                         //!< R register file
+	uint16_t m_s[8][ALTO2_REGS];                      //!< S register file(s) (1 or 8 are used)
+	uint16_t m_bus;                                   //!< wired-AND bus
+	uint16_t m_t;                                     //!< T register
+	uint16_t m_alu;                                   //!< the current ALU
+	uint16_t m_aluc0;                                 //!< the current ALU carry output
+	uint16_t m_l;                                     //!< L register
+	uint16_t m_shifter;                               //!< shifter output
+	uint16_t m_laluc0;                                //!< the latched ALU carry output
+	uint16_t m_myl;                                     //!< M register of RAM related tasks (MYL latch in the schematics)
+	uint16_t m_cram_addr;                             //!< constant RAM address
+	uint16_t m_task_wakeup;                           //!< task wakeup: bit 1<<n set if task n requesting service
 
-	UINT16 m_reset_mode;                            //!< reset mode register: bit 1<<n set if task n starts in ROM
+	uint16_t m_reset_mode;                            //!< reset mode register: bit 1<<n set if task n starts in ROM
 	bool m_rdram_flag;                              //!< set by rdram, action happens on next cycle
 	bool m_wrtram_flag;                             //!< set by wrtram, action happens on next cycle
 
-	UINT8 m_s_reg_bank[ALTO2_TASKS];                //!< active S register bank per task
-	UINT8 m_bank_reg[ALTO2_TASKS];                  //!< normal and extended RAM banks per task
+	uint8_t m_s_reg_bank[ALTO2_TASKS];                //!< active S register bank per task
+	uint8_t m_bank_reg[ALTO2_TASKS];                  //!< normal and extended RAM banks per task
 	bool m_ether_enable;                            //!< set to true, if the ethernet should be simulated
 	bool m_ewfct;                                   //!< set by Ether task when it want's a wakeup at switch to task_mrt
 	attoseconds_t m_display_time;                   //!< display time accu (display state machine)
@@ -594,11 +594,11 @@ private:
 	int m_bitclk_index;                             //!< bitclk index (bit number in sector)
 
 	static const char *task_name(int task);         //!< human readable task names
-	static const char *r_name(UINT8 reg);           //!< human readable register names
-	static const char *aluf_name(UINT8 aluf);       //!< human readable ALU function names
-	static const char *bs_name(UINT8 bs);           //!< human readable bus source names
-	static const char *f1_name(UINT8 f1);           //!< human readable F1 function names
-	static const char *f2_name(UINT8 f2);           //!< human readable F2 function names
+	static const char *r_name(uint8_t reg);           //!< human readable register names
+	static const char *aluf_name(uint8_t aluf);       //!< human readable ALU function names
+	static const char *bs_name(uint8_t bs);           //!< human readable bus source names
+	static const char *f1_name(uint8_t f1);           //!< human readable F1 function names
+	static const char *f2_name(uint8_t f2);           //!< human readable F2 function names
 
 	/**
 	 * @brief 2KCTL PROM u3 - 256x4
@@ -659,7 +659,7 @@ private:
 	 * access it. Also both, address and data lines, are inverted.
 	 * </PRE>
 	 */
-	UINT8* m_ctl2k_u3;
+	uint8_t* m_ctl2k_u3;
 
 	/**
 	 * @brief 2KCTL PROM u38; 82S23; 32x8 bit
@@ -708,7 +708,7 @@ private:
 	 *  B7     9      NEXT[06]'
 	 * </PRE>
 	 */
-	UINT8* m_ctl2k_u38;
+	uint8_t* m_ctl2k_u38;
 
 	//! output lines of the 2KCTL U38 PROM
 	enum {
@@ -780,22 +780,22 @@ private:
 	 * depending on the current NEXT[01]' level.
 	 * </PRE>
 	 */
-	UINT8* m_ctl2k_u76;
+	uint8_t* m_ctl2k_u76;
 
 	/**
 	 * @brief 3k CRAM PROM a37
 	 */
-	UINT8* m_cram3k_a37;
+	uint8_t* m_cram3k_a37;
 
 	/**
 	 * @brief memory addressing PROM a64
 	 */
-	UINT8* m_madr_a64;
+	uint8_t* m_madr_a64;
 
 	/**
 	 * @brief memory addressing PROM a65
 	 */
-	UINT8* m_madr_a65;
+	uint8_t* m_madr_a65;
 
 	/**
 	 * @brief unused PROM a90
@@ -810,7 +810,7 @@ private:
 	 *
 	 * I haven't found yet where KP3-KP5 are used
 	 */
-	UINT8* m_madr_a90;
+	uint8_t* m_madr_a90;
 
 	/**
 	 * @brief unused PROM a91
@@ -837,12 +837,12 @@ private:
 	 * KE(6)    KB(^L)  KB(RTN) KB(")   KB(/)   KB(S3)  KB(<-)    KB(])  KB(\)
 	 * KE(7)    KB(S1)  KB(DEL) KB(S2)  KB(LF)  KB(S4)  KB(S5)   KB(BW) KB(BS)
 	 */
-	UINT8* m_madr_a91;
+	uint8_t* m_madr_a91;
 
 	/**
 	 * @brief ALU function to 74181 operation lookup PROM
 	 */
-	UINT8* m_alu_a10;
+	uint8_t* m_alu_a10;
 
 	//! output lines of the ALU a10 PROM
 	enum {
@@ -862,10 +862,10 @@ private:
 
 	bool m_ram_related[ALTO2_TASKS];                //!< set when task is RAM related
 
-	UINT64 m_cycle;                                 //!< number of cycles executed in the current slice
+	uint64_t m_cycle;                                 //!< number of cycles executed in the current slice
 
-	UINT64 cycle() { return m_cycle; }              //!< return the current CPU cycle
-	UINT64 ntime() { return m_cycle*ALTO2_UCYCLE/1000; }    //!< return the current nano seconds
+	uint64_t cycle() { return m_cycle; }              //!< return the current CPU cycle
+	uint64_t ntime() { return m_cycle*ALTO2_UCYCLE/1000; }    //!< return the current nano seconds
 
 	void hard_reset();                              //!< reset the various registers
 	void soft_reset();                              //!< soft reset
@@ -906,12 +906,12 @@ private:
 	void f2_late_alucy();                           //!< F2 func: branch on latched ALU carry
 	void f2_late_load_md();                         //!< F2 func: load memory data
 
-	UINT32 alu_74181(UINT32 a, UINT32 b, UINT8 smc);
+	uint32_t alu_74181(uint32_t a, uint32_t b, uint8_t smc);
 
 	void rdram();                                   //!< read the microcode ROM/RAM halfword
 	void wrtram();                                  //!< write the microcode RAM from M register and ALU
 
-	UINT8 m_ether_id;                               //!< configured Ethernet ID for this machine
+	uint8_t m_ether_id;                               //!< configured Ethernet ID for this machine
 
 //*******************************************
 // inline the sub-devices

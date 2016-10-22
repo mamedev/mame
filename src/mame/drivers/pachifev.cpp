@@ -102,10 +102,10 @@ public:
 	int m_previous_power;
 	int m_cnt;
 
-	UINT32 m_adpcm_pos;
-	UINT8 m_adpcm_idle;
-	UINT8 m_trigger;
-	UINT8 m_adpcm_data;
+	uint32_t m_adpcm_pos;
+	uint8_t m_adpcm_idle;
+	uint8_t m_trigger;
+	uint8_t m_adpcm_data;
 	DECLARE_WRITE8_MEMBER(controls_w);
 	DECLARE_READ8_MEMBER(controls_r);
 	virtual void machine_start() override;
@@ -264,7 +264,7 @@ WRITE_LINE_MEMBER(pachifev_state::pf_adpcm_int)
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base();
+		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0)>>4) );
 		m_msm->data_w(m_adpcm_data & 0xf);
@@ -307,7 +307,7 @@ INTERRUPT_GEN_MEMBER(pachifev_state::pachifev_vblank_irq)
 		/* (bit 5 of 0xf0aa : 0 = player 1 and 1 = player 2 - bit 6 of 0xf0aa : 0 = upright and 1 = cocktail). */
 		/* All I found is that in main RAM, 0xe00f.b determines the player : 0x00 = player 1 and 0x01 = player 2. */
 		address_space &ramspace = device.memory().space(AS_PROGRAM);
-		UINT8 player = 0;
+		uint8_t player = 0;
 
 		if ((ramspace.read_byte(0xe00f) == 0x01) && ((ioport("DSW1")->read() & 0x08) == 0x00))
 			player = 1;

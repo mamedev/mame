@@ -65,7 +65,7 @@ enum
 const device_type LH5801 = &device_creator<lh5801_cpu_device>;
 
 
-lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, LH5801, "LH5801", tag, owner, clock, "lh5801", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -248,7 +248,7 @@ void lh5801_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-offs_t lh5801_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t lh5801_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( lh5801 );
 	return CPU_DISASSEMBLE_NAME(lh5801)(this, buffer, pc, oprom, opram, options);

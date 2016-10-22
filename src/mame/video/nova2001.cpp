@@ -12,7 +12,7 @@
 
 PALETTE_INIT_MEMBER(nova2001_state,nova2001)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* Color #1 is used for palette animation.          */
@@ -52,10 +52,10 @@ PALETTE_INIT_MEMBER(nova2001_state,nova2001)
 
 PALETTE_DECODER_MEMBER( nova2001_state, BBGGRRII )
 {
-	UINT8 i = raw & 3;
-	UINT8 r = (raw >> 0) & 0x0c;
-	UINT8 g = (raw >> 2) & 0x0c;
-	UINT8 b = (raw >> 4) & 0x0c;
+	uint8_t i = raw & 3;
+	uint8_t r = (raw >> 0) & 0x0c;
+	uint8_t g = (raw >> 2) & 0x0c;
+	uint8_t b = (raw >> 4) & 0x0c;
 
 	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
 }
@@ -268,7 +268,7 @@ WRITE8_MEMBER(nova2001_state::pkunwar_flipscreen_w)
 
 void nova2001_state::nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int offs;
 
@@ -305,7 +305,7 @@ void nova2001_state::nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 
 void nova2001_state::pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int offs;
 
@@ -349,7 +349,7 @@ void nova2001_state::pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 
 
 
-UINT32 nova2001_state::screen_update_nova2001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nova2001_state::screen_update_nova2001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -363,7 +363,7 @@ UINT32 nova2001_state::screen_update_nova2001(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 nova2001_state::screen_update_pkunwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nova2001_state::screen_update_pkunwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
@@ -374,7 +374,7 @@ UINT32 nova2001_state::screen_update_pkunwar(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-UINT32 nova2001_state::screen_update_ninjakun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nova2001_state::screen_update_ninjakun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -387,7 +387,7 @@ UINT32 nova2001_state::screen_update_ninjakun(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 nova2001_state::screen_update_raiders5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nova2001_state::screen_update_raiders5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 

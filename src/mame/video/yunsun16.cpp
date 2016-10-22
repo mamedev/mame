@@ -51,8 +51,8 @@ TILEMAP_MAPPER_MEMBER(yunsun16_state::tilemap_scan_pages)
 
 TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_0)
 {
-	UINT16 code = m_vram_0[2 * tile_index + 0];
-	UINT16 attr = m_vram_0[2 * tile_index + 1];
+	uint16_t code = m_vram_0[2 * tile_index + 0];
+	uint16_t attr = m_vram_0[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(TMAP_GFX,
 			code,
 			attr & 0xf,
@@ -61,8 +61,8 @@ TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_0)
 
 TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_1)
 {
-	UINT16 code = m_vram_1[2 * tile_index + 0];
-	UINT16 attr = m_vram_1[2 * tile_index + 1];
+	uint16_t code = m_vram_1[2 * tile_index + 0];
+	uint16_t attr = m_vram_1[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(TMAP_GFX,
 			code,
 			attr & 0xf,
@@ -193,7 +193,7 @@ void yunsun16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 ***************************************************************************/
 
 
-UINT32 yunsun16_state::screen_update_yunsun16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t yunsun16_state::screen_update_yunsun16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap_0->set_scrollx(0, m_scrollram_0[0]);
 	m_tilemap_0->set_scrolly(0, m_scrollram_0[1]);

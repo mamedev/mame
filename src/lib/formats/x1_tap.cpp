@@ -32,7 +32,7 @@ static int cas_size;
 static int samplerate;
 static int new_format;
 
-static int x1_fill_wave(INT16* buffer, UINT8 data, int sample_pos)
+static int x1_fill_wave(int16_t* buffer, uint8_t data, int sample_pos)
 {
 	int x;
 	int sample_count = 0;
@@ -48,7 +48,7 @@ static int x1_fill_wave(INT16* buffer, UINT8 data, int sample_pos)
 	return sample_count;
 }
 
-static int x1_handle_tap(INT16* buffer, const UINT8* casdata)
+static int x1_handle_tap(int16_t* buffer, const uint8_t* casdata)
 {
 	int sample_count = 0;
 	int data_pos = new_format ? 0x28 : 0x04;
@@ -71,9 +71,9 @@ static int x1_handle_tap(INT16* buffer, const UINT8* casdata)
 /*******************************************************************
    Calculate the number of samples needed for this tape image
 ********************************************************************/
-static int x1_cas_to_wav_size (const UINT8 *casdata, int caslen)
+static int x1_cas_to_wav_size (const uint8_t *casdata, int caslen)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	if (!memcmp(casdata, "TAPE", 4))  // new TAP format
 	{
@@ -98,7 +98,7 @@ static int x1_cas_to_wav_size (const UINT8 *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int x1_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int x1_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	return x1_handle_tap(buffer,bytes);
 }

@@ -87,7 +87,7 @@ void device_rtc_interface::set_current_time(const system_time &systime)
 //  convert_to_bcd -
 //-------------------------------------------------
 
-UINT8 device_rtc_interface::convert_to_bcd(int val)
+uint8_t device_rtc_interface::convert_to_bcd(int val)
 {
 	return ((val / 10) << 4) | (val % 10);
 }
@@ -97,7 +97,7 @@ UINT8 device_rtc_interface::convert_to_bcd(int val)
 //  bcd_to_integer -
 //-------------------------------------------------
 
-int device_rtc_interface::bcd_to_integer(UINT8 val)
+int device_rtc_interface::bcd_to_integer(uint8_t val)
 {
 	return (((val & 0xf0) >> 4) * 10) + (val & 0x0f);
 }

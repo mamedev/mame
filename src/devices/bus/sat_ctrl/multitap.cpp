@@ -25,7 +25,7 @@ const device_type SATURN_MULTITAP = &device_creator<saturn_multitap_device>;
 //  saturn_multitap_device - constructor
 //-------------------------------------------------
 
-saturn_multitap_device::saturn_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+saturn_multitap_device::saturn_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SATURN_MULTITAP, "Sega Saturn Multitap", tag, owner, clock, "saturn_multitap", __FILE__),
 	device_saturn_control_port_interface(mconfig, *this),
 	m_subctrl1_port(*this, "ctrl1"),
@@ -64,9 +64,9 @@ void saturn_multitap_device::device_reset()
 //  read_ctrl
 //-------------------------------------------------
 
-UINT8 saturn_multitap_device::read_ctrl(UINT8 offset)
+uint8_t saturn_multitap_device::read_ctrl(uint8_t offset)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 	switch (offset)
 	{
 		default:
@@ -102,7 +102,7 @@ UINT8 saturn_multitap_device::read_ctrl(UINT8 offset)
 //  read_id
 //-------------------------------------------------
 
-UINT8 saturn_multitap_device::read_id(int idx)
+uint8_t saturn_multitap_device::read_id(int idx)
 {
 	switch (idx)
 	{

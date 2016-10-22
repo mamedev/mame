@@ -32,7 +32,7 @@
 ***************************************************************************/
 PALETTE_INIT_MEMBER(suprloco_state, suprloco)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 
@@ -79,7 +79,7 @@ PALETTE_INIT_MEMBER(suprloco_state, suprloco)
 
 TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 {
-	UINT8 attr = m_videoram[2*tile_index+1];
+	uint8_t attr = m_videoram[2*tile_index+1];
 	SET_TILE_INFO_MEMBER(0,
 			m_videoram[2*tile_index] | ((attr & 0x03) << 8),
 			(attr & 0x1c) >> 2,
@@ -176,8 +176,8 @@ void suprloco_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect,
 {
 	int flip = flip_screen();
 	int sx,sy,col,row,height,src,adjy,dy;
-	UINT8 *spr_reg;
-	UINT8 *gfx2;
+	uint8_t *spr_reg;
+	uint8_t *gfx2;
 	pen_t pen_base;
 	short skip; /* bytes to skip before drawing each row (can be negative) */
 
@@ -207,8 +207,8 @@ void suprloco_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect,
 	for (row = 0;row < height;row++,adjy+=dy)
 	{
 		int color1,color2,flipx;
-		UINT8 data;
-		UINT8 *gfx;
+		uint8_t data;
+		uint8_t *gfx;
 
 		src += skip;
 
@@ -249,7 +249,7 @@ void suprloco_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect,
 void suprloco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int spr_number;
-	UINT8 *spr_reg;
+	uint8_t *spr_reg;
 
 
 	for (spr_number = 0;spr_number < (m_spriteram.bytes() >> 4);spr_number++)
@@ -260,7 +260,7 @@ void suprloco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 suprloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t suprloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);

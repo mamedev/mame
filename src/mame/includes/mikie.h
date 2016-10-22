@@ -20,9 +20,9 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -37,7 +37,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT8      m_irq_mask;
+	uint8_t      m_irq_mask;
 	DECLARE_READ8_MEMBER(mikie_sh_timer_r);
 	DECLARE_WRITE8_MEMBER(mikie_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(mikie_coin_counter_w);
@@ -51,7 +51,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mikie);
-	UINT32 screen_update_mikie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mikie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

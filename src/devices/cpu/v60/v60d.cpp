@@ -26,7 +26,7 @@ static const char *const v60_reg_names[69] = {
 	"ADTMR1","Reserved","Reserved","Reserved"
 };
 
-static const UINT8 *rombase;
+static const uint8_t *rombase;
 static offs_t pcbase;
 
 #define readop(a)   rombase[(a) - pcbase]

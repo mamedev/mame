@@ -21,7 +21,7 @@
 
 TILE_GET_INFO_MEMBER(gauntlet_state::get_alpha_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(gauntlet_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(gauntlet_state::get_playfield_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = ((m_playfield_tile_bank * 0x1000) + (data & 0xfff)) ^ 0x800;
 	int color = 0x10 + (m_playfield_color_bank * 8) + ((data >> 12) & 7);
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
@@ -82,7 +82,7 @@ const atari_motion_objects_config gauntlet_state::s_mob_config =
 VIDEO_START_MEMBER(gauntlet_state,gauntlet)
 {
 	/* modify the motion object code lookup table to account for the code XOR */
-	std::vector<UINT16> &codelookup = m_mob->code_lookup();
+	std::vector<uint16_t> &codelookup = m_mob->code_lookup();
 	for (auto & elem : codelookup)
 		elem ^= 0x800;
 
@@ -104,7 +104,7 @@ VIDEO_START_MEMBER(gauntlet_state,gauntlet)
 
 WRITE16_MEMBER( gauntlet_state::gauntlet_xscroll_w )
 {
-	UINT16 oldxscroll = *m_xscroll;
+	uint16_t oldxscroll = *m_xscroll;
 	COMBINE_DATA(m_xscroll);
 
 	/* if something changed, force a partial update */
@@ -128,7 +128,7 @@ WRITE16_MEMBER( gauntlet_state::gauntlet_xscroll_w )
 
 WRITE16_MEMBER( gauntlet_state::gauntlet_yscroll_w )
 {
-	UINT16 oldyscroll = *m_yscroll;
+	uint16_t oldyscroll = *m_yscroll;
 	COMBINE_DATA(m_yscroll);
 
 	/* if something changed, force a partial update */
@@ -157,7 +157,7 @@ WRITE16_MEMBER( gauntlet_state::gauntlet_yscroll_w )
  *
  *************************************/
 
-UINT32 gauntlet_state::screen_update_gauntlet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gauntlet_state::screen_update_gauntlet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_mob->draw_async(cliprect);
@@ -170,8 +170,8 @@ UINT32 gauntlet_state::screen_update_gauntlet(screen_device &screen, bitmap_ind1
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap.pix16(y);
-			UINT16 *pf = &bitmap.pix16(y);
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{

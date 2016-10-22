@@ -68,7 +68,7 @@ static const char *const CONDITION_CODE[16] =
 #define arg_IR(_value)              if ((_value & 0xf0) == 0xe0) ARG(Ir, _value & 0x0f) else ARG(IR, _value)
 #define arg_IRR(_value)             if ((_value & 0xf0) == 0xe0) ARG(Irr, _value & 0x0f) else ARG(IRR, _value)
 #define arg_IM(_value)              ARG(IM, _value)
-#define arg_RA                      ARG(RA, pc + (INT8)B0 + 2)
+#define arg_RA                      ARG(RA, pc + (int8_t)B0 + 2)
 #define arg_DA                      ARG(DA, B0 << 8 | B1)
 #define arg_X(_value1, _value2)     { if (argc) dst += sprintf(dst, ", "); dst += sprintf(dst, X, _value1, _value2); argc++; }
 
@@ -84,9 +84,9 @@ static const char *const CONDITION_CODE[16] =
 
 CPU_DISASSEMBLE( z8 )
 {
-	const UINT8 *startrom = oprom;
-	UINT32 flags = 0;
-	UINT8 opcode = *oprom++;
+	const uint8_t *startrom = oprom;
+	uint32_t flags = 0;
+	uint8_t opcode = *oprom++;
 	char *dst = buffer;
 	int argc = 0;
 

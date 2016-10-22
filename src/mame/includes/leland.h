@@ -9,6 +9,7 @@
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/dac.h"
+#include "sound/ay8910.h"
 #include "machine/pit8253.h"
 #include "cpu/i86/i186.h"
 
@@ -18,8 +19,8 @@
 
 struct vram_state_data
 {
-	UINT16  m_addr;
-	UINT8   m_latch[2];
+	uint16_t  m_addr;
+	uint8_t   m_latch[2];
 };
 
 class leland_80186_sound_device;
@@ -36,57 +37,61 @@ public:
 		m_sound(*this, "custom"),
 		m_dac0(*this, "dac0"),
 		m_dac1(*this, "dac1"),
+		m_ay8910(*this, "ay8910"),
+		m_ay8912(*this, "ay8912"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
-	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<uint8_t> m_mainram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<leland_80186_sound_device> m_sound;
-	optional_device<dac_device> m_dac0;
-	optional_device<dac_device> m_dac1;
+	optional_device<dac_byte_interface> m_dac0;
+	optional_device<dac_byte_interface> m_dac1;
+	optional_device<ay8910_device> m_ay8910;
+	optional_device<ay8912_device> m_ay8912;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	UINT8 m_dac_control;
-	UINT8 *m_alleymas_kludge_mem;
-	std::unique_ptr<UINT8[]> m_ataxx_qram;
-	UINT8 m_gfx_control;
-	UINT8 m_wcol_enable;
+	uint8_t m_dac_control;
+	uint8_t *m_alleymas_kludge_mem;
+	std::unique_ptr<uint8_t[]> m_ataxx_qram;
+	uint8_t m_gfx_control;
+	uint8_t m_wcol_enable;
 	emu_timer *m_master_int_timer;
-	UINT8 *m_master_base;
-	UINT8 *m_slave_base;
-	UINT8 *m_xrom_base;
-	UINT32 m_master_length;
-	UINT32 m_slave_length;
-	UINT32 m_xrom_length;
+	uint8_t *m_master_base;
+	uint8_t *m_slave_base;
+	uint8_t *m_xrom_base;
+	uint32_t m_master_length;
+	uint32_t m_slave_length;
+	uint32_t m_xrom_length;
 	int m_dangerz_x;
 	int m_dangerz_y;
-	UINT8 m_analog_result;
-	UINT8 m_dial_last_input[4];
-	UINT8 m_dial_last_result[4];
-	UINT8 m_keycard_shift;
-	UINT8 m_keycard_bit;
-	UINT8 m_keycard_state;
-	UINT8 m_keycard_clock;
-	UINT8 m_keycard_command[3];
-	UINT8 m_top_board_bank;
-	UINT8 m_sound_port_bank;
-	UINT8 m_alternate_bank;
-	UINT8 m_master_bank;
+	uint8_t m_analog_result;
+	uint8_t m_dial_last_input[4];
+	uint8_t m_dial_last_result[4];
+	uint8_t m_keycard_shift;
+	uint8_t m_keycard_bit;
+	uint8_t m_keycard_state;
+	uint8_t m_keycard_clock;
+	uint8_t m_keycard_command[3];
+	uint8_t m_top_board_bank;
+	uint8_t m_sound_port_bank;
+	uint8_t m_alternate_bank;
+	uint8_t m_master_bank;
 	void (leland_state::*m_update_master_bank)();
-	UINT32 m_xrom1_addr;
-	UINT32 m_xrom2_addr;
-	UINT8 m_battery_ram_enable;
-	UINT8 *m_battery_ram;
-	std::unique_ptr<UINT8[]> m_extra_tram;
-	std::unique_ptr<UINT8[]> m_video_ram;
+	uint32_t m_xrom1_addr;
+	uint32_t m_xrom2_addr;
+	uint8_t m_battery_ram_enable;
+	uint8_t *m_battery_ram;
+	std::unique_ptr<uint8_t[]> m_extra_tram;
+	std::unique_ptr<uint8_t[]> m_video_ram;
 	struct vram_state_data m_vram_state[2];
-	UINT16 m_xscroll;
-	UINT16 m_yscroll;
-	UINT8 m_gfxbank;
-	UINT16 m_last_scanline;
+	uint16_t m_xscroll;
+	uint16_t m_yscroll;
+	uint8_t m_gfxbank;
+	uint16_t m_last_scanline;
 	emu_timer *m_scanline_timer;
 	DECLARE_READ8_MEMBER(cerberus_dial_1_r);
 	DECLARE_READ8_MEMBER(cerberus_dial_2_r);
@@ -166,8 +171,8 @@ public:
 	DECLARE_VIDEO_START(leland);
 	DECLARE_VIDEO_START(leland2);
 	DECLARE_VIDEO_START(ataxx);
-	UINT32 screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(leland_master_interrupt);
 	TIMER_CALLBACK_MEMBER(leland_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(ataxx_interrupt_callback);
@@ -191,12 +196,12 @@ public:
 	void viper_bankswitch();
 	void offroad_bankswitch();
 	void ataxx_bankswitch();
-	void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
-	void ataxx_init_eeprom(const UINT16 *data);
+	void leland_init_eeprom(uint8_t default_val, const uint16_t *data, uint8_t serial_offset, uint8_t serial_type);
+	void ataxx_init_eeprom(const uint16_t *data);
 	int keycard_r();
 	void keycard_w(int data);
 	void leland_rotate_memory(const char *cpuname);
-	void init_master_ports(UINT8 mvram_base, UINT8 io_base);
+	void init_master_ports(uint8_t mvram_base, uint8_t io_base);
 };
 
 
@@ -212,8 +217,8 @@ public:
 class leland_80186_sound_device : public device_t
 {
 public:
-	leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE16_MEMBER(peripheral_ctrl);
@@ -223,16 +228,13 @@ public:
 	DECLARE_WRITE16_MEMBER(peripheral_w);
 	DECLARE_WRITE8_MEMBER(leland_80186_command_lo_w);
 	DECLARE_WRITE8_MEMBER(leland_80186_command_hi_w);
-	DECLARE_READ16_MEMBER(main_to_sound_comm_r);
 	DECLARE_READ8_MEMBER(leland_80186_response_r);
-	DECLARE_WRITE16_MEMBER(sound_to_main_comm_w);
 	DECLARE_WRITE16_MEMBER(dac_w);
 	DECLARE_WRITE16_MEMBER(ataxx_dac_control);
 	DECLARE_WRITE_LINE_MEMBER(pit0_2_w);
 	DECLARE_WRITE_LINE_MEMBER(pit1_0_w);
 	DECLARE_WRITE_LINE_MEMBER(pit1_1_w);
 	DECLARE_WRITE_LINE_MEMBER(pit1_2_w);
-	DECLARE_WRITE_LINE_MEMBER(pit2_0_w);
 	DECLARE_WRITE_LINE_MEMBER(i80186_tmr0_w);
 	DECLARE_WRITE_LINE_MEMBER(i80186_tmr1_w);
 protected:
@@ -248,14 +250,23 @@ protected:
 		TYPE_WSF
 	};
 
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
-	required_device<dac_device> m_dac3;
-	required_device<dac_device> m_dac4;
-	optional_device<dac_device> m_dac5;
-	optional_device<dac_device> m_dac6;
-	optional_device<dac_device> m_dac7;
-	optional_device<dac_device> m_dac8;
+	required_device<dac_byte_interface> m_dac1;
+	required_device<dac_byte_interface> m_dac2;
+	required_device<dac_byte_interface> m_dac3;
+	required_device<dac_byte_interface> m_dac4;
+	optional_device<dac_byte_interface> m_dac5;
+	optional_device<dac_byte_interface> m_dac6;
+	optional_device<dac_byte_interface> m_dac7;
+	optional_device<dac_byte_interface> m_dac8;
+	optional_device<dac_word_interface> m_dac9;
+	required_device<dac_byte_interface> m_dac1vol;
+	required_device<dac_byte_interface> m_dac2vol;
+	required_device<dac_byte_interface> m_dac3vol;
+	required_device<dac_byte_interface> m_dac4vol;
+	optional_device<dac_byte_interface> m_dac5vol;
+	optional_device<dac_byte_interface> m_dac6vol;
+	optional_device<dac_byte_interface> m_dac7vol;
+	optional_device<dac_byte_interface> m_dac8vol;
 
 private:
 	void command_lo_sync(void *ptr, int param);
@@ -264,16 +275,16 @@ private:
 
 	// internal state
 	i80186_cpu_device *m_audiocpu;
-	UINT16 m_peripheral;
-	UINT8 m_last_control;
-	UINT8 m_clock_active;
-	UINT8 m_clock_tick;
-	UINT16 m_sound_command;
-	UINT16 m_sound_response;
-	UINT32 m_ext_start;
-	UINT32 m_ext_stop;
-	UINT8 m_ext_active;
-	UINT8* m_ext_base;
+	uint16_t m_peripheral;
+	uint8_t m_last_control;
+	uint8_t m_clock_active;
+	uint8_t m_clock_tick;
+	uint16_t m_sound_command;
+	uint16_t m_sound_response;
+	uint32_t m_ext_start;
+	uint32_t m_ext_stop;
+	uint8_t m_ext_active;
+	uint8_t* m_ext_base;
 
 	required_device<pit8254_device> m_pit0;
 	optional_device<pit8254_device> m_pit1;
@@ -286,7 +297,7 @@ extern const device_type LELAND_80186;
 class redline_80186_sound_device : public leland_80186_sound_device
 {
 public:
-	redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_WRITE16_MEMBER(redline_dac_w);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
@@ -296,7 +307,7 @@ extern const device_type REDLINE_80186;
 class ataxx_80186_sound_device : public leland_80186_sound_device
 {
 public:
-	ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
@@ -305,7 +316,7 @@ extern const device_type ATAXX_80186;
 class wsf_80186_sound_device : public leland_80186_sound_device
 {
 public:
-	wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 

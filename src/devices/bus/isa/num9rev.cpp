@@ -22,12 +22,12 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 	if(!m_1024)
 	{
 		rgb_t color(0);
-		UINT16 overlay;
+		uint16_t overlay;
 		if(((address << 3) + 0xc0016) > (1024*1024))
 			return;
 		for(int i = 0; i < 16; i++)
 		{
-			UINT32 addr = (address << 3) + i;
+			uint32_t addr = (address << 3) + i;
 			overlay = m_ram[addr + 0xc0000] << 1;
 			overlay = m_overlay[overlay + ((m_mode & 8) ? 512 : 0)] | (m_overlay[overlay + 1 + ((m_mode & 8) ? 512 : 0)] << 8);
 			color.set_r(pal->entry_color(m_ram[addr] | ((overlay & 0xf) << 8)).r());
@@ -77,7 +77,7 @@ machine_config_constructor isa8_number_9_rev_device::device_mconfig_additions() 
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa8_number_9_rev_device::isa8_number_9_rev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_number_9_rev_device::isa8_number_9_rev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA8_NUM_9_REV, "Number Nine Revolution 512x32/1024x8", tag, owner, clock, "number_9_rev", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_upd7220(*this, "upd7220"),
@@ -121,7 +121,7 @@ READ8_MEMBER(isa8_number_9_rev_device::read8)
 		return m_ram[offset + ((m_mode & 0xc) << 14)];
 	else if((m_mode & 4) && !m_1024)
 	{
-		UINT32 newoff = ((offset & 3) << 18) | (m_bank << 14) | ((offset >> 2) & 0x3fff);
+		uint32_t newoff = ((offset & 3) << 18) | (m_bank << 14) | ((offset >> 2) & 0x3fff);
 		return m_ram[newoff];
 	}
 	else
@@ -134,7 +134,7 @@ WRITE8_MEMBER(isa8_number_9_rev_device::write8)
 		m_ram[offset + (m_bank << 16)] = data;
 	else if((m_mode & 1) || ((m_mode & 6) == 2))
 	{
-		UINT8 bank = m_bank;
+		uint8_t bank = m_bank;
 		if(m_mode & 1)
 			bank = (m_mode & 0xc) >> 2;
 		else
@@ -153,7 +153,7 @@ WRITE8_MEMBER(isa8_number_9_rev_device::write8)
 	}
 	else if(m_mode & 4)
 	{
-		UINT32 newoff = ((offset & 3) << 18) | (m_bank << 14) | ((offset >> 2) & 0x3fff);
+		uint32_t newoff = ((offset & 3) << 18) | (m_bank << 14) | ((offset >> 2) & 0x3fff);
 		if((newoff >= 0xc0000) && ((m_mode & 6) == 6))
 			return;
 		m_ram[newoff] = data;
@@ -198,7 +198,7 @@ WRITE8_MEMBER(isa8_number_9_rev_device::pal8_w)
 
 READ8_MEMBER(isa8_number_9_rev_device::pal12_r)
 {
-	UINT16 color = offset & 0xfff;
+	uint16_t color = offset & 0xfff;
 	palette_t *pal = m_palette->palette();
 	switch(offset & 0xf000)
 	{
@@ -214,7 +214,7 @@ READ8_MEMBER(isa8_number_9_rev_device::pal12_r)
 
 WRITE8_MEMBER(isa8_number_9_rev_device::pal12_w)
 {
-	UINT16 color = offset & 0xfff;
+	uint16_t color = offset & 0xfff;
 	palette_t *pal = m_palette->palette();
 	rgb_t pen = pal->entry_color(color);
 	switch(offset & 0xf000)
@@ -310,7 +310,7 @@ WRITE8_MEMBER(isa8_number_9_rev_device::ctrl_w)
 	}
 }
 
-UINT32 isa8_number_9_rev_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t isa8_number_9_rev_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rectangle visarea = screen.visible_area();
 	// try to support the 1024x8 or at least don't crash as there's no way to detect it

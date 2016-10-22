@@ -21,7 +21,7 @@
 // ======================> cococart_base_update_delegate
 
 // direct region update handler
-typedef delegate<void (UINT8 *)> cococart_base_update_delegate;
+typedef delegate<void (uint8_t *)> cococart_base_update_delegate;
 
 #define MCFG_COCO_CARTRIDGE_CART_CB(_devcb) \
 	devcb = &cococart_slot_device::static_set_cart_callback(*device, DEVCB_##_devcb);
@@ -59,7 +59,7 @@ public:
 	};
 
 	// construction/destruction
-	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &static_set_cart_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_cart_callback.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_nmi_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_nmi_callback.set_callback(object); }
@@ -98,7 +98,7 @@ public:
 	void twiddle_q_lines();
 
 	// cart base
-	UINT8* get_cart_base();
+	uint8_t* get_cart_base();
 	void set_cart_base_update(cococart_base_update_delegate update);
 
 private:
@@ -157,7 +157,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
 
-	virtual UINT8* get_cart_base();
+	virtual uint8_t* get_cart_base();
 	void set_cart_base_update(cococart_base_update_delegate update);
 
 protected:

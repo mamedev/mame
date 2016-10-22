@@ -667,7 +667,7 @@ CPU_DISASSEMBLE( lh5801 )
 {
 	int pos = 0;
 	int oper;
-	UINT16 absolut;
+	uint16_t absolut;
 	const Entry *entry;
 	int temp;
 

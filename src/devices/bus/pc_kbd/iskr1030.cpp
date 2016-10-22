@@ -259,7 +259,7 @@ ioport_constructor iskr_1030_keyboard_device::device_input_ports() const
 //  iskr_1030_keyboard_device - constructor
 //-------------------------------------------------
 
-iskr_1030_keyboard_device::iskr_1030_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iskr_1030_keyboard_device::iskr_1030_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC_KBD_ISKR_1030, "Iskra-1030 Keyboard", tag, owner, clock, "kb_iskr1030", __FILE__),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
@@ -348,8 +348,8 @@ WRITE_LINE_MEMBER( iskr_1030_keyboard_device::data_write )
 
 READ8_MEMBER( iskr_1030_keyboard_device::t1_r )
 {
-	UINT8 data = data_signal();
-	UINT8 bias = m_p1 & 15;
+	uint8_t data = data_signal();
+	uint8_t bias = m_p1 & 15;
 
 	if (!BIT(m_p1, 7)) {
 		DBG_LOG(2,0,( "%s: t1_r (l) %d\n", tag(), data));
@@ -440,7 +440,7 @@ READ8_MEMBER( iskr_1030_keyboard_device::p1_r )
 	    7
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	DBG_LOG(1,0,( "%s: p1_r %02x\n", tag(), data));
 

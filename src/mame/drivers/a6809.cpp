@@ -79,14 +79,14 @@ public:
 	DECLARE_MACHINE_RESET(a6809);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_p);
-	required_shared_ptr<UINT8> m_p_videoram;
-	UINT16 m_start_address;
-	UINT16 m_cursor_address;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	uint16_t m_start_address;
+	uint16_t m_cursor_address;
 private:
-	UINT8 m_cass_data[4];
+	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
-	UINT8 m_video_index;
+	uint8_t m_video_index;
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;
@@ -145,8 +145,8 @@ WRITE8_MEMBER( a6809_state::a6809_address_w )
 
 WRITE8_MEMBER( a6809_state::a6809_register_w )
 {
-	UINT16 temp = m_start_address;
-	UINT16 temq = m_cursor_address;
+	uint16_t temp = m_start_address;
+	uint16_t temq = m_cursor_address;
 
 	m_crtc->register_w( space, 0, data );
 
@@ -191,7 +191,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -203,7 +203,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_p)
 
 WRITE8_MEMBER( a6809_state::kbd_put )
 {
-	UINT8 d = data & 0x7f;
+	uint8_t d = data & 0x7f;
 	if (d == 8) d = 0x7f; // allow backspace to work
 
 	m_via->write_pb0((d>>0)&1);

@@ -29,8 +29,8 @@ protected:
 
 public:
 	rgbaint_t() { set(0, 0, 0, 0); }
-	explicit rgbaint_t(UINT32 rgba) { set(rgba); }
-	rgbaint_t(INT32 a, INT32 r, INT32 g, INT32 b) { set(a, r, g, b); }
+	explicit rgbaint_t(uint32_t rgba) { set(rgba); }
+	rgbaint_t(int32_t a, int32_t r, int32_t g, int32_t b) { set(a, r, g, b); }
 	explicit rgbaint_t(const rgb_t& rgb) { set(rgb); }
 	explicit rgbaint_t(VECS32 rgba) : m_value(rgba) { }
 
@@ -39,7 +39,7 @@ public:
 
 	void set(const rgbaint_t& other) { m_value = other.m_value; }
 
-	void set(UINT32 rgba)
+	void set(uint32_t rgba)
 	{
 		const VECU32 zero = { 0, 0, 0, 0 };
 #ifdef __LITTLE_ENDIAN__
@@ -51,7 +51,7 @@ public:
 #endif
 	}
 
-	void set(INT32 a, INT32 r, INT32 g, INT32 b)
+	void set(int32_t a, int32_t r, int32_t g, int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 result = { b, g, r, a };
@@ -77,7 +77,7 @@ public:
 	{
 		VECU32 temp = VECU32(vec_packs(m_value, m_value));
 		temp = VECU32(vec_packsu(VECS16(temp), VECS16(temp)));
-		UINT32 result;
+		uint32_t result;
 		vec_ste(temp, 0, &result);
 		return result;
 	}
@@ -86,38 +86,38 @@ public:
 	{
 		VECU32 temp = VECU32(vec_packs(m_value, m_value));
 		temp = VECU32(vec_packsu(VECS16(temp), VECS16(temp)));
-		UINT32 result;
+		uint32_t result;
 		vec_ste(temp, 0, &result);
 		return result;
 	}
 
-	void set_a(const INT32 value)
+	void set_a(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, alpha_perm);
 	}
 
-	void set_r(const INT32 value)
+	void set_r(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, red_perm);
 	}
 
-	void set_g(const INT32 value)
+	void set_g(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, green_perm);
 	}
 
-	void set_b(const INT32 value)
+	void set_b(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, blue_perm);
 	}
 
-	UINT8 get_a() const
+	uint8_t get_a() const
 	{
-		UINT8 result;
+		uint8_t result;
 #ifdef __LITTLE_ENDIAN__
 		vec_ste(vec_splat(VECU8(m_value), 12), 0, &result);
 #else
@@ -126,9 +126,9 @@ public:
 		return result;
 	}
 
-	UINT8 get_r() const
+	uint8_t get_r() const
 	{
-		UINT8 result;
+		uint8_t result;
 #ifdef __LITTLE_ENDIAN__
 		vec_ste(vec_splat(VECU8(m_value), 8), 0, &result);
 #else
@@ -137,9 +137,9 @@ public:
 		return result;
 	}
 
-	UINT8 get_g() const
+	uint8_t get_g() const
 	{
-		UINT8 result;
+		uint8_t result;
 #ifdef __LITTLE_ENDIAN__
 		vec_ste(vec_splat(VECU8(m_value), 4), 0, &result);
 #else
@@ -148,9 +148,9 @@ public:
 		return result;
 	}
 
-	UINT8 get_b() const
+	uint8_t get_b() const
 	{
-		UINT8 result;
+		uint8_t result;
 #ifdef __LITTLE_ENDIAN__
 		vec_ste(vec_splat(VECU8(m_value), 0), 0, &result);
 #else
@@ -159,9 +159,9 @@ public:
 		return result;
 	}
 
-	INT32 get_a32() const
+	int32_t get_a32() const
 	{
-		INT32 result;
+		int32_t result;
 #ifdef __LITTLE_ENDIAN__
 		vec_ste(vec_splat(m_value, 3), 0, &result);
 #else
@@ -170,9 +170,9 @@ public:
 		return result;
 	}
 
-	INT32 get_r32() const
+	int32_t get_r32() const
 	{
-		INT32 result;
+		int32_t result;
 #ifdef __LITTLE_ENDIAN__
 		vec_ste(vec_splat(m_value, 2), 0, &result);
 #else
@@ -181,9 +181,9 @@ public:
 		return result;
 	}
 
-	INT32 get_g32() const
+	int32_t get_g32() const
 	{
-		INT32 result;
+		int32_t result;
 #ifdef __LITTLE_ENDIAN__
 		vec_ste(vec_splat(m_value, 1), 0, &result);
 #else
@@ -192,9 +192,9 @@ public:
 		return result;
 	}
 
-	INT32 get_b32() const
+	int32_t get_b32() const
 	{
-		INT32 result;
+		int32_t result;
 #ifdef __LITTLE_ENDIAN__
 		vec_ste(vec_splat(m_value, 0), 0, &result);
 #else
@@ -208,13 +208,13 @@ public:
 		m_value = vec_add(m_value, color2.m_value);
 	}
 
-	inline void add_imm(const INT32 imm)
+	inline void add_imm(const int32_t imm)
 	{
 		const VECS32 temp = { imm, imm, imm, imm };
 		m_value = vec_add(m_value, temp);
 	}
 
-	inline void add_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
+	inline void add_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -229,13 +229,13 @@ public:
 		m_value = vec_sub(m_value, color2.m_value);
 	}
 
-	inline void sub_imm(const INT32 imm)
+	inline void sub_imm(const int32_t imm)
 	{
 		const VECS32 temp = { imm, imm, imm, imm };
 		m_value = vec_sub(m_value, temp);
 	}
 
-	inline void sub_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
+	inline void sub_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -250,13 +250,13 @@ public:
 		m_value = vec_sub(color2.m_value, m_value);
 	}
 
-	inline void subr_imm(const INT32 imm)
+	inline void subr_imm(const int32_t imm)
 	{
 		const VECS32 temp = { imm, imm, imm, imm };
 		m_value = vec_sub(temp, m_value);
 	}
 
-	inline void subr_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
+	inline void subr_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -277,9 +277,9 @@ public:
 #endif
 	}
 
-	inline void mul_imm(const INT32 imm)
+	inline void mul_imm(const int32_t imm)
 	{
-		const VECU32 value = { UINT32(imm), UINT32(imm), UINT32(imm), UINT32(imm) };
+		const VECU32 value = { uint32_t(imm), uint32_t(imm), uint32_t(imm), uint32_t(imm) };
 		const VECU32 shift = vec_splat_u32(-16);
 		const VECU32 temp = vec_msum(VECU16(m_value), VECU16(vec_rl(value, shift)), vec_splat_u32(0));
 #ifdef __LITTLE_ENDIAN__
@@ -289,12 +289,12 @@ public:
 #endif
 	}
 
-	inline void mul_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
+	inline void mul_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
-		const VECU32 value = { UINT32(b), UINT32(g), UINT32(r), UINT32(a) };
+		const VECU32 value = { uint32_t(b), uint32_t(g), uint32_t(r), uint32_t(a) };
 #else
-		const VECU32 value = { UINT32(a), UINT32(r), UINT32(g), UINT32(b) };
+		const VECU32 value = { uint32_t(a), uint32_t(r), uint32_t(g), uint32_t(b) };
 #endif
 		const VECU32 shift = vec_splat_u32(-16);
 		const VECU32 temp = vec_msum(VECU16(m_value), VECU16(vec_rl(value, shift)), vec_splat_u32(0));
@@ -311,7 +311,7 @@ public:
 		m_value = vec_and(vec_sl(m_value, VECU32(shift.m_value)), vec_cmpgt(limit, VECU32(shift.m_value)));
 	}
 
-	inline void shl_imm(const UINT8 shift)
+	inline void shl_imm(const uint8_t shift)
 	{
 		const VECU32 temp = { shift, shift, shift, shift };
 		m_value = vec_sl(m_value, temp);
@@ -323,7 +323,7 @@ public:
 		m_value = vec_and(vec_sr(m_value, VECU32(shift.m_value)), vec_cmpgt(limit, VECU32(shift.m_value)));
 	}
 
-	inline void shr_imm(const UINT8 shift)
+	inline void shr_imm(const uint8_t shift)
 	{
 		const VECU32 temp = { shift, shift, shift, shift };
 		m_value = vec_sr(m_value, temp);
@@ -335,7 +335,7 @@ public:
 		m_value = vec_sra(m_value, vec_min(VECU32(shift.m_value), limit));
 	}
 
-	inline void sra_imm(const UINT8 shift)
+	inline void sra_imm(const uint8_t shift)
 	{
 		const VECU32 temp = { shift, shift, shift, shift };
 		m_value = vec_sra(m_value, temp);
@@ -346,13 +346,13 @@ public:
 		m_value = vec_or(m_value, color2.m_value);
 	}
 
-	inline void or_imm(const INT32 value)
+	inline void or_imm(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_or(m_value, temp);
 	}
 
-	inline void or_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
+	inline void or_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -372,13 +372,13 @@ public:
 		m_value = vec_andc(m_value, color.m_value);
 	}
 
-	inline void and_imm(const INT32 value)
+	inline void and_imm(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_and(m_value, temp);
 	}
 
-	inline void and_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
+	inline void and_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -393,13 +393,13 @@ public:
 		m_value = vec_xor(m_value, color2.m_value);
 	}
 
-	inline void xor_imm(const INT32 value)
+	inline void xor_imm(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_xor(m_value, temp);
 	}
 
-	inline void xor_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
+	inline void xor_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -409,10 +409,10 @@ public:
 		m_value = vec_xor(m_value, temp);
 	}
 
-	inline void clamp_and_clear(const UINT32 sign)
+	inline void clamp_and_clear(const uint32_t sign)
 	{
 		const VECS32 vzero = { 0, 0, 0, 0 };
-		VECS32 vsign = { INT32(sign), INT32(sign), INT32(sign), INT32(sign) };
+		VECS32 vsign = { int32_t(sign), int32_t(sign), int32_t(sign), int32_t(sign) };
 		m_value = vec_and(m_value, vec_cmpeq(vec_and(m_value, vsign), vzero));
 		vsign = vec_nor(vec_sra(vsign, vec_splat_u32(1)), vzero);
 		const VECS32 mask = VECS32(vec_cmpgt(m_value, vsign));
@@ -433,32 +433,32 @@ public:
 #endif
 	}
 
-	inline void sign_extend(const UINT32 compare, const UINT32 sign)
+	inline void sign_extend(const uint32_t compare, const uint32_t sign)
 	{
-		const VECS32 compare_vec = { INT32(compare), INT32(compare), INT32(compare), INT32(compare) };
+		const VECS32 compare_vec = { int32_t(compare), int32_t(compare), int32_t(compare), int32_t(compare) };
 		const VECS32 compare_mask = VECS32(vec_cmpeq(vec_and(m_value, compare_vec), compare_vec));
-		const VECS32 sign_vec = { INT32(sign), INT32(sign), INT32(sign), INT32(sign) };
+		const VECS32 sign_vec = { int32_t(sign), int32_t(sign), int32_t(sign), int32_t(sign) };
 		m_value = vec_or(m_value, vec_and(sign_vec, compare_mask));
 	}
 
-	inline void min(const INT32 value)
+	inline void min(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_min(m_value, temp);
 	}
 
-	inline void max(const INT32 value)
+	inline void max(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_max(m_value, temp);
 	}
 
-	void blend(const rgbaint_t& other, UINT8 factor);
+	void blend(const rgbaint_t& other, uint8_t factor);
 
 	void scale_and_clamp(const rgbaint_t& scale);
-	void scale_imm_and_clamp(const INT32 scale);
+	void scale_imm_and_clamp(const int32_t scale);
 
-	void scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other)
+	void scale_imm_add_and_clamp(const int32_t scale, const rgbaint_t& other)
 	{
 		mul_imm(scale);
 		sra_imm(8);
@@ -490,13 +490,13 @@ public:
 		m_value = VECS32(vec_cmpeq(m_value, value.m_value));
 	}
 
-	inline void cmpeq_imm(const INT32 value)
+	inline void cmpeq_imm(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = VECS32(vec_cmpeq(m_value, temp));
 	}
 
-	inline void cmpeq_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
+	inline void cmpeq_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -511,13 +511,13 @@ public:
 		m_value = VECS32(vec_cmpgt(m_value, value.m_value));
 	}
 
-	inline void cmpgt_imm(const INT32 value)
+	inline void cmpgt_imm(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = VECS32(vec_cmpgt(m_value, temp));
 	}
 
-	inline void cmpgt_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
+	inline void cmpgt_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -532,13 +532,13 @@ public:
 		m_value = VECS32(vec_cmplt(m_value, value.m_value));
 	}
 
-	inline void cmplt_imm(const INT32 value)
+	inline void cmplt_imm(const int32_t value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = VECS32(vec_cmplt(m_value, temp));
 	}
 
-	inline void cmplt_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
+	inline void cmplt_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -554,7 +554,7 @@ public:
 		return *this;
 	}
 
-	inline rgbaint_t& operator+=(const INT32 other)
+	inline rgbaint_t& operator+=(const int32_t other)
 	{
 		const VECS32 temp = { other, other, other, other };
 		m_value = vec_add(m_value, temp);
@@ -579,7 +579,7 @@ public:
 		return *this;
 	}
 
-	inline rgbaint_t& operator*=(const INT32 other)
+	inline rgbaint_t& operator*=(const int32_t other)
 	{
 		const VECS32 value = { other, other, other, other };
 		const VECU32 shift = vec_splat_u32(-16);
@@ -592,9 +592,9 @@ public:
 		return *this;
 	}
 
-	inline rgbaint_t& operator>>=(const INT32 shift)
+	inline rgbaint_t& operator>>=(const int32_t shift)
 	{
-		const VECU32 temp = { UINT32(shift), UINT32(shift), UINT32(shift), UINT32(shift) };
+		const VECU32 temp = { uint32_t(shift), uint32_t(shift), uint32_t(shift), uint32_t(shift) };
 		m_value = vec_sra(m_value, temp);
 		return *this;
 	}
@@ -604,7 +604,7 @@ public:
 		m_value = vec_perm(m_value, alpha.m_value, alpha_perm);
 	}
 
-	static UINT32 bilinear_filter(const UINT32 &rgb00, const UINT32 &rgb01, const UINT32 &rgb10, const UINT32 &rgb11, UINT8 u, UINT8 v)
+	static uint32_t bilinear_filter(const uint32_t &rgb00, const uint32_t &rgb01, const uint32_t &rgb10, const uint32_t &rgb11, uint8_t u, uint8_t v)
 	{
 		const VECS32 zero = vec_splat_s32(0);
 
@@ -642,12 +642,12 @@ public:
 		color01 = VECS32(vec_packs(color01, color01));
 		color01 = VECS32(vec_packsu(VECS16(color01), VECS16(color01)));
 
-		UINT32 result;
+		uint32_t result;
 		vec_ste(VECU32(color01), 0, &result);
 		return result;
 	}
 
-	void bilinear_filter_rgbaint(const UINT32 &rgb00, const UINT32 &rgb01, const UINT32 &rgb10, const UINT32 &rgb11, UINT8 u, UINT8 v)
+	void bilinear_filter_rgbaint(const uint32_t &rgb00, const uint32_t &rgb01, const uint32_t &rgb10, const uint32_t &rgb11, uint8_t u, uint8_t v)
 	{
 		const VECS32 zero = vec_splat_s32(0);
 

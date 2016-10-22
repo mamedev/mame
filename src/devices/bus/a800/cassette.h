@@ -27,8 +27,8 @@ class a8sio_cassette_device
 {
 public:
 	// construction/destruction
-	a8sio_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a8sio_cassette_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a8sio_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a8sio_cassette_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -43,8 +43,8 @@ protected:
 	required_device<cassette_image_device> m_cassette;
 	emu_timer *m_read_timer;
 
-	UINT8 m_old_cass_signal;
-	UINT8 m_signal_count;
+	uint8_t m_old_cass_signal;
+	uint8_t m_signal_count;
 };
 
 // device type definition

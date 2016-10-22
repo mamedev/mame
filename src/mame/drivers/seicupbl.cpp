@@ -45,12 +45,12 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<UINT16> m_back_data;
-	required_shared_ptr<UINT16> m_fore_data;
-	required_shared_ptr<UINT16> m_mid_data;
-	required_shared_ptr<UINT16> m_textram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<uint16_t> m_back_data;
+	required_shared_ptr<uint16_t> m_fore_data;
+	required_shared_ptr<uint16_t> m_mid_data;
+	required_shared_ptr<uint16_t> m_textram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_vregs;
 	required_device<okim6295_device> m_oki;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -59,7 +59,7 @@ public:
 	tilemap_t *m_sc_layer[4];
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(okim_rombank_w);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(vram_sc0_w);
@@ -128,14 +128,14 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc3_tileinfo)
 
 void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *spriteram16 = m_spriteram;
 	int offs,fx,fy,x,y,color,sprite,cur_pri;
 	int dx,dy,ax,ay;
 	int pri_mask;
 
 	for (offs = 0;offs < 0x400;offs += 4)
 	{
-		UINT16 data = spriteram16[offs];
+		uint16_t data = spriteram16[offs];
 		if (!(data &0x8000)) continue;
 
 		pri_mask = 0;
@@ -269,7 +269,7 @@ void seicupbl_state::video_start()
 		m_sc_layer[i]->set_transparent_pen(15);
 }
 
-UINT32 seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/* Setup the tilemaps */
 	screen.priority().fill(0, cliprect);

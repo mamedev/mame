@@ -22,7 +22,7 @@ class scsihle_device : public device_t,
 {
 public:
 	// construction/destruction
-	scsihle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	scsihle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual int GetDeviceID(); // hack for legacy_scsi_host_adapter::get_device
 
@@ -47,32 +47,32 @@ protected:
 
 private:
 	required_ioport m_scsi_id;
-	void data_out(UINT8 data);
-	void scsi_out_req_delay(UINT8 state);
-	void scsi_change_phase(UINT8 newphase);
+	void data_out(uint8_t data);
+	void scsi_out_req_delay(uint8_t state);
+	void scsi_change_phase(uint8_t newphase);
 	int get_scsi_cmd_len(int cbyte);
-	UINT8 scsibus_driveno(UINT8  drivesel);
+	uint8_t scsibus_driveno(uint8_t  drivesel);
 	void scsibus_read_data();
 	void scsibus_write_data();
 	void scsibus_exec_command();
 	void dump_command_bytes();
 	void dump_data_bytes(int count);
-	void dump_bytes(UINT8 *buff, int count);
+	void dump_bytes(uint8_t *buff, int count);
 
 	emu_timer *req_timer;
 	emu_timer *sel_timer;
 	emu_timer *dataout_timer;
 
-	UINT8 cmd_idx;
-	UINT8 is_linked;
+	uint8_t cmd_idx;
+	uint8_t is_linked;
 
-	UINT8 buffer[ 1024 ];
-	UINT16 data_idx;
+	uint8_t buffer[ 1024 ];
+	uint16_t data_idx;
 	int bytes_left;
 	int data_last;
 
 	int scsiID;
-	UINT8 m_input_data;
+	uint8_t m_input_data;
 };
 
 extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0)[];

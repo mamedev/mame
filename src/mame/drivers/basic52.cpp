@@ -50,7 +50,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(unk_r);
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(from_term);
 };

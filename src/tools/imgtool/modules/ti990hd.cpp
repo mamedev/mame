@@ -39,31 +39,31 @@ that is longer than 39 characters. */
 
 struct UINT16BE
 {
-	UINT8 bytes[2];
+	uint8_t bytes[2];
 };
 
 struct UINT32BE
 {
-	UINT8 bytes[4];
+	uint8_t bytes[4];
 };
 
-static inline UINT16 get_UINT16BE(UINT16BE word)
+static inline uint16_t get_UINT16BE(UINT16BE word)
 {
 	return (word.bytes[0] << 8) | word.bytes[1];
 }
 
-static inline void set_UINT16BE(UINT16BE *word, UINT16 data)
+static inline void set_UINT16BE(UINT16BE *word, uint16_t data)
 {
 	word->bytes[0] = (data >> 8) & 0xff;
 	word->bytes[1] = data & 0xff;
 }
 
-static inline UINT32 get_UINT32BE(UINT32BE word)
+static inline uint32_t get_UINT32BE(UINT32BE word)
 {
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
-static inline void set_UINT32BE(UINT32BE *word, UINT32 data)
+static inline void set_UINT32BE(UINT32BE *word, uint32_t data)
 {
 	word->bytes[0] = (data >> 24) & 0xff;
 	word->bytes[1] = (data >> 16) & 0xff;
@@ -107,24 +107,24 @@ struct ti990_sc0
 {
 	char        vnm[8];         /* volume name */
 	UINT16BE    tna;            /* total number of ADUs */
-	UINT8       sbm;            /* starting sector of bit maps */
-	UINT8       tbm;            /* total bit maps */
+	uint8_t       sbm;            /* starting sector of bit maps */
+	uint8_t       tbm;            /* total bit maps */
 	UINT16BE    rl;             /* track 01 record length */
 	UINT16BE    slt;            /* system loader track address */
-	UINT8       fill00[6];      /* * * RESERVED * * */
+	uint8_t       fill00[6];      /* * * RESERVED * * */
 	UINT16BE    nba;            /* total number of bad ADUs on disk */
 	UINT16BE    sle;            /* system loader entry point */
 	UINT16BE    sll;            /* system loader length */
-	UINT8       fill01[8];      /* * * RESERVED * * */
+	uint8_t       fill01[8];      /* * * RESERVED * * */
 	UINT16BE    lt1;            /* system loader track (copy 2) */
-	UINT8       fill02[8];      /* * * RESERVED * * */
+	uint8_t       fill02[8];      /* * * RESERVED * * */
 	char        pi1[8];         /* primary system file name */
 	char        pi2[8];         /* secondary system file name */
 	UINT16BE    pif;            /* system selector */
 	UINT16BE    vda;            /* volume directory ADU */
 	UINT16BE    vpl;            /* vcatalog physical record length */
 	UINT16BE    spa;            /* sectors per ADU */
-	UINT8       dcd[4];         /* disk creation date */
+	uint8_t       dcd[4];         /* disk creation date */
 	char        pf1[8];         /* primary program file */
 	char        pf2[8];         /* secondary program file */
 	UINT16BE    pff;            /* program file switch */
@@ -214,7 +214,7 @@ struct ti990_fdr
 	UINT16BE    hkc;            /* hask key count: the number of file descriptor records that are present in the directory that hashed to this record number */
 	UINT16BE    hkv;            /* hask key value: the result of the hash algorithm for the file name actually covered in this record */
 	char        fnm[8];         /* file name */
-	UINT8       rsv[2];         /* reserved */
+	uint8_t       rsv[2];         /* reserved */
 	UINT16BE    fl1;            /* flags word 1 */
 	UINT16BE    flg;            /* flags word 2 */
 	UINT16BE    prs;            /* physical record size */
@@ -232,19 +232,19 @@ struct ti990_fdr
 	UINT16BE    btr;            /* B-tree roots block # */
 	UINT32BE    ebq;            /* empty block queue head */
 	UINT16BE    kdr;            /* key descriptions record # */
-	UINT8       ud[6];          /* last update date */
-	UINT8       cd[6];          /* creation date */
-	UINT8       apb;            /* ADU's per block */
-	UINT8       bpa;            /* blocks per ADU */
+	uint8_t       ud[6];          /* last update date */
+	uint8_t       cd[6];          /* creation date */
+	uint8_t       apb;            /* ADU's per block */
+	uint8_t       bpa;            /* blocks per ADU */
 	UINT16BE    mrs;            /* minimumu KIF record size */
-	UINT8       sat[64];        /* secondary allocation table: 16 2-word entries.  The first word of an entry contains the size, in ADUs, of the secondary allocation.  The second word contains the starting ADU of the allocation. */
+	uint8_t       sat[64];        /* secondary allocation table: 16 2-word entries.  The first word of an entry contains the size, in ADUs, of the secondary allocation.  The second word contains the starting ADU of the allocation. */
 
 /* bytes >86 to >100 are optional */
-	UINT8       res[10];        /* reserved: seem to be actually meaningful (at least under DX10 3.6.x) */
+	uint8_t       res[10];        /* reserved: seem to be actually meaningful (at least under DX10 3.6.x) */
 	char        uid[8];         /* user id of file creator */
 	UINT16BE    psa;            /* public security attribute */
 	ti990_ace   ace[9];         /* 9 access control entries */
-	UINT8       fil[2];         /* not used */
+	uint8_t       fil[2];         /* not used */
 };
 
 /*
@@ -284,19 +284,19 @@ struct ti990_cdr
 	UINT16BE    fill00;         /* reserved */
 	UINT16BE    fill01;         /* reserved */
 	UINT16BE    fdf;            /* flags (same as fdr.flg) */
-	UINT8       flg;            /* channel flzgs */
-	UINT8       iid;            /* owner task installed ID */
-	UINT8       typ;            /* default resource type */
-	UINT8       tf;             /* resource type flags */
+	uint8_t       flg;            /* channel flzgs */
+	uint8_t       iid;            /* owner task installed ID */
+	uint8_t       typ;            /* default resource type */
+	uint8_t       tf;             /* resource type flags */
 	UINT16BE    mxl;            /* maximum message length */
-	UINT8       fill04[6];      /* reserved (and, no, I don't know where fill02 and fill03 have gone) */
+	uint8_t       fill04[6];      /* reserved (and, no, I don't know where fill02 and fill03 have gone) */
 	UINT16BE    rna;            /* record number of next CDR or ADR */
 	UINT16BE    raf;            /* record # of actual FDR */
-	UINT8       fill05[110];    /* reserved */
+	uint8_t       fill05[110];    /* reserved */
 	char        uid[8];         /* user ID of channel creator */
 	UINT16BE    psa;            /* public security attribute */
-	UINT8       scg[94];        /* "SDT with 9 control groups" (whatever it means - and, no, 94 is not dividable by 9) */
-	UINT8       fill06[8];      /* reserved */
+	uint8_t       scg[94];        /* "SDT with 9 control groups" (whatever it means - and, no, 94 is not dividable by 9) */
+	uint8_t       fill06[8];      /* reserved */
 };
 
 /*
@@ -322,15 +322,15 @@ union directory_entry
 struct tifile_header
 {
 	char tifiles[8];        /* always '\7TIFILES' */
-	UINT8 secsused_MSB;     /* file length in sectors (big-endian) */
-	UINT8 secsused_LSB;
-	UINT8 flags;            /* see enum above */
-	UINT8 recspersec;       /* records per sector */
-	UINT8 eof;              /* current position of eof in last sector (0->255)*/
-	UINT8 reclen;           /* bytes per record ([1,255] 0->256) */
-	UINT8 fixrecs_MSB;      /* file length in records (big-endian) */
-	UINT8 fixrecs_LSB;
-	UINT8 res[128-16];      /* reserved */
+	uint8_t secsused_MSB;     /* file length in sectors (big-endian) */
+	uint8_t secsused_LSB;
+	uint8_t flags;            /* see enum above */
+	uint8_t recspersec;       /* records per sector */
+	uint8_t eof;              /* current position of eof in last sector (0->255)*/
+	uint8_t reclen;           /* bytes per record ([1,255] 0->256) */
+	uint8_t fixrecs_MSB;      /* file length in records (big-endian) */
+	uint8_t fixrecs_LSB;
+	uint8_t res[128-16];      /* reserved */
 };
 
 
@@ -339,7 +339,7 @@ struct tifile_header
 */
 struct catalog_entry
 {
-	UINT16 fdr_secnum;
+	uint16_t fdr_secnum;
 	char filename[10];
 };
 
@@ -385,20 +385,25 @@ struct ti990_iterator
 	directory_entry xdr[MAX_DIR_LEVEL]; /* fdr records */
 };
 
+static ti990_image *get_ti990_image(imgtool::image &image)
+{
+	return (ti990_image *)image.extra_bytes();
+}
 
-static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream &f);
-static void ti990_image_exit(imgtool::image *img);
-static void ti990_image_info(imgtool::image *img, char *string, size_t len);
-static imgtoolerr_t ti990_image_beginenum(imgtool::directory *enumeration, const char *path);
-static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent);
-static void ti990_image_closeenum(imgtool::directory *enumeration);
-static imgtoolerr_t ti990_image_freespace(imgtool::partition *partition, UINT64 *size);
+
+static imgtoolerr_t ti990_image_init(imgtool::image &img, imgtool::stream::ptr &&stream);
+static void ti990_image_exit(imgtool::image &img);
+static void ti990_image_info(imgtool::image &img, std::ostream &stream);
+static imgtoolerr_t ti990_image_beginenum(imgtool::directory &enumeration, const char *path);
+static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
+static void ti990_image_closeenum(imgtool::directory &enumeration);
+static imgtoolerr_t ti990_image_freespace(imgtool::partition &partition, uint64_t *size);
 #ifdef UNUSED_FUNCTION
-static imgtoolerr_t ti990_image_readfile(imgtool::partition *partition, const char *fpath, imgtool::stream *destf);
-static imgtoolerr_t ti990_image_writefile(imgtool::partition *partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions);
-static imgtoolerr_t ti990_image_deletefile(imgtool::partition *partition, const char *fpath);
+static imgtoolerr_t ti990_image_readfile(imgtool::partition &partition, const char *fpath, imgtool::stream *destf);
+static imgtoolerr_t ti990_image_writefile(imgtool::partition &partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions);
+static imgtoolerr_t ti990_image_deletefile(imgtool::partition &partition, const char *fpath);
 #endif
-static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions);
+static imgtoolerr_t ti990_image_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions);
 
 enum
 {
@@ -421,7 +426,7 @@ OPTION_GUIDE_END
 #define symb2str(a) symb2str2(a)
 #define ti990_create_optionspecs "B1-[145]-" symb2str(MAX_CYLINDERS)";C1-[4]-" symb2str(MAX_HEADS)";D1-[32]-" symb2str(MAX_SECTORS_PER_TRACK)";E" symb2str(MIN_SECTOR_SIZE)"-[256]-" symb2str(MAX_SECTOR_SIZE)";"
 
-void ti990_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void ti990_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{
@@ -1106,15 +1111,15 @@ static int qsort_catalog_compare(const void *p1, const void *p2)
 /*
     Open a file as a ti990_image.
 */
-static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream &f)
+static imgtoolerr_t ti990_image_init(imgtool::image &img, imgtool::stream::ptr &&stream)
 {
-	ti990_image *image = (ti990_image *) img->extra_bytes();
+	ti990_image *image = get_ti990_image(img);
 	disk_image_header header;
 	int reply;
 	unsigned totsecs;
 
-	image->file_handle = &f;
-	reply = f.read(&header, sizeof(header));
+	image->file_handle = stream.get();
+	reply = image->file_handle->read(&header, sizeof(header));
 	if (reply != sizeof(header))
 		return IMGTOOLERR_READERROR;
 
@@ -1131,14 +1136,14 @@ static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream &f)
 		|| (image->geometry.heads > MAX_HEADS)
 		|| (image->geometry.cylinders > MAX_CYLINDERS)
 		|| (totsecs < 1)
-		|| (f.size() != header_len + totsecs*image->geometry.bytes_per_sector))
+		|| (image->file_handle->size() != header_len + totsecs*image->geometry.bytes_per_sector))
 	{
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
 	{
 		ti990_phys_sec_address address = { 0, 0, 0 };
-		reply = read_sector_physical_len(f, &address, &image->geometry, & image->sec0, sizeof(image->sec0));
+		reply = read_sector_physical_len(*image->file_handle, &address, &image->geometry, & image->sec0, sizeof(image->sec0));
 	}
 	if (reply)
 	{
@@ -1156,15 +1161,16 @@ static imgtoolerr_t ti990_image_init(imgtool::image *img, imgtool::stream &f)
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
+	image->file_handle = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 
 /*
     close a ti990_image
 */
-static void ti990_image_exit(imgtool::image *img)
+static void ti990_image_exit(imgtool::image &img)
 {
-	ti990_image *image = (ti990_image *) img->extra_bytes();
+	ti990_image *image = get_ti990_image(img);
 	delete image->file_handle;
 }
 
@@ -1173,23 +1179,23 @@ static void ti990_image_exit(imgtool::image *img)
 
     Currently returns the volume name
 */
-static void ti990_image_info(imgtool::image *img, char *string, size_t len)
+static void ti990_image_info(imgtool::image &img, std::ostream &stream)
 {
-	ti990_image *image = (ti990_image *) img->extra_bytes();
+	ti990_image *image = get_ti990_image(img);
 	char vol_name[9];
 
 	fname_to_str(vol_name, image->sec0.vnm, 9);
 
-	snprintf(string, len, "%s", vol_name);
+	stream << vol_name;
 }
 
 /*
     Open the disk catalog for enumeration
 */
-static imgtoolerr_t ti990_image_beginenum(imgtool::directory *enumeration, const char *path)
+static imgtoolerr_t ti990_image_beginenum(imgtool::directory &enumeration, const char *path)
 {
-	ti990_image *image = (ti990_image *) enumeration->image().extra_bytes();
-	ti990_iterator *iter = (ti990_iterator *) enumeration->extra_bytes();
+	ti990_image *image = (ti990_image *) enumeration.image().extra_bytes();
+	ti990_iterator *iter = (ti990_iterator *) enumeration.extra_bytes();
 	ti990_dor dor;
 	int reply;
 
@@ -1212,15 +1218,15 @@ static imgtoolerr_t ti990_image_beginenum(imgtool::directory *enumeration, const
 /*
     Enumerate disk catalog next entry
 */
-static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
-	ti990_iterator *iter = (ti990_iterator *) enumeration->extra_bytes();
+	ti990_iterator *iter = (ti990_iterator *) enumeration.extra_bytes();
 	int flag;
 	int reply = 0;
 
 
-	ent->corrupt = 0;
-	ent->eof = 0;
+	ent.corrupt = 0;
+	ent.eof = 0;
 
 	while ((iter->level >= 0)
 			&& (! (reply = read_sector_logical_len(*iter->image->file_handle,
@@ -1238,28 +1244,28 @@ static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtoo
 
 	if (iter->level < 0)
 	{
-		ent->eof = 1;
+		ent.eof = 1;
 	}
 	else if (reply)
 		return IMGTOOLERR_READERROR;
 	else
 	{
 #if 0
-		fname_to_str(ent->filename, iter->xdr[iter->level].fdr.fnm, ARRAY_LENGTH(ent->filename));
+		fname_to_str(ent.filename, iter->xdr[iter->level].fdr.fnm, ARRAY_LENGTH(ent.filename));
 #else
 		{
 			int i;
 			char buf[9];
 
-			ent->filename[0] = '\0';
+			ent.filename[0] = '\0';
 			for (i=0; i<iter->level; i++)
 			{
 				fname_to_str(buf, iter->xdr[i].fdr.fnm, 9);
-				strncat(ent->filename, buf, ARRAY_LENGTH(ent->filename) - 1);
-				strncat(ent->filename, ".", ARRAY_LENGTH(ent->filename) - 1);
+				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
+				strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
 			}
 			fname_to_str(buf, iter->xdr[iter->level].fdr.fnm, 9);
-			strncat(ent->filename, buf, ARRAY_LENGTH(ent->filename) - 1);
+			strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
 		}
 #endif
 
@@ -1267,9 +1273,9 @@ static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtoo
 		flag = get_UINT16BE(iter->xdr[iter->level].fdr.flg);
 		if (flag & fdr_flg_cdr)
 		{
-			snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "CHANNEL");
+			snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "CHANNEL");
 
-			ent->filesize = 0;
+			ent.filesize = 0;
 		}
 		else if (flag & fdr_flg_ali)
 		{
@@ -1285,9 +1291,9 @@ static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtoo
 
 			fname_to_str(buf, target_fdr.fnm, 9);
 
-			snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "ALIAS OF %s", buf);
+			snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "ALIAS OF %s", buf);
 
-			ent->filesize = 0;
+			ent.filesize = 0;
 		}
 		else
 		{
@@ -1335,7 +1341,7 @@ static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtoo
 				}
 				break;
 			}
-			snprintf(ent->attr, ARRAY_LENGTH(ent->attr),
+			snprintf(ent.attr, ARRAY_LENGTH(ent.attr),
 						"%s %c %s%s%s%s%s", fmt, (flag & fdr_flg_all) ? 'N' : 'C', type,
 							(flag & fdr_flg_blb) ? "" : " BLK",
 							(flag & fdr_flg_tmp) ? " TMP" : "",
@@ -1343,17 +1349,17 @@ static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtoo
 							(flag & fdr_flg_dpb) ? " DPT" : "");
 
 			/* len in blocks */
-			ent->filesize = get_UINT32BE(iter->xdr[iter->level].fdr.bkm);
+			ent.filesize = get_UINT32BE(iter->xdr[iter->level].fdr.bkm);
 			if ((((flag >> fdr_flg_ft_shift) & 3) == 3) || get_UINT16BE(iter->xdr[iter->level].fdr.ofm))
-				ent->filesize++;
+				ent.filesize++;
 
 			/* convert to ADUs */
 			if (iter->xdr[iter->level].fdr.apb > 1)
 				/* more than one ADU per block */
-				ent->filesize *= iter->xdr[iter->level].fdr.apb;
+				ent.filesize *= iter->xdr[iter->level].fdr.apb;
 			else if (iter->xdr[iter->level].fdr.bpa > 1)
 				/* more than one block per ADU */
-				ent->filesize = (ent->filesize + iter->xdr[iter->level].fdr.bpa - 1) / iter->xdr[iter->level].fdr.bpa;
+				ent.filesize = (ent.filesize + iter->xdr[iter->level].fdr.bpa - 1) / iter->xdr[iter->level].fdr.bpa;
 		}
 		iter->index[iter->level]++;
 
@@ -1406,17 +1412,17 @@ static imgtoolerr_t ti990_image_nextenum(imgtool::directory *enumeration, imgtoo
 /*
     Free enumerator
 */
-static void ti990_image_closeenum(imgtool::directory *enumeration)
+static void ti990_image_closeenum(imgtool::directory &enumeration)
 {
 }
 
 /*
     Compute free space on disk image (in ADUs)
 */
-static imgtoolerr_t ti990_image_freespace(imgtool::partition *partition, UINT64 *size)
+static imgtoolerr_t ti990_image_freespace(imgtool::partition &partition, uint64_t *size)
 {
-	imgtool::image *img = &partition->image();
-	ti990_image *image = (ti990_image *) img->extra_bytes();
+	imgtool::image &img(partition.image());
+	ti990_image *image = get_ti990_image(img);
 	int totadus = get_UINT16BE(image->sec0.tna);
 	int adu, record, sub_adu;
 	char buf[256];
@@ -1453,10 +1459,10 @@ static imgtoolerr_t ti990_image_freespace(imgtool::partition *partition, UINT64 
 /*
     Extract a file from a ti990_image.
 */
-static imgtoolerr_t ti990_image_readfile(imgtool::partition *partition, const char *fpath, imgtool::stream *destf)
+static imgtoolerr_t ti990_image_readfile(imgtool::partition &partition, const char *fpath, imgtool::stream *destf)
 {
 	imgtool::image *img = &partition->image();
-	ti990_image *image = (ti990_image *) img->extra_bytes();
+	ti990_image *image = get_ti990_image(img);
 	int catalog_index, fdr_secnum, parent_fdr_secnum;
 	imgtoolerr_t reply;
 
@@ -1478,7 +1484,7 @@ static imgtoolerr_t ti990_image_readfile(imgtool::partition *partition, const ch
 	int i, lnks_index;
 	int cur_sec, last_sec;
 	int secsused;
-	UINT8 buf[256];
+	uint8_t buf[256];
 	int reply;
 
 	str_to_fname(ti_fname, filename);
@@ -1550,10 +1556,10 @@ static imgtoolerr_t ti990_image_readfile(imgtool::partition *partition, const ch
 /*
     Add a file to a ti990_image.
 */
-static imgtoolerr_t ti990_image_writefile(imgtool::partition *partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions)
+static imgtoolerr_t ti990_image_writefile(imgtool::partition &partition, const char *fpath, imgtool::stream *sourcef, util::option_resolution *writeoptions)
 {
 	imgtool::image *img = &partition->image();
-	ti990_image *image = (ti990_image *) img->extra_bytes();
+	ti990_image *image = get_ti990_image(img);
 	int catalog_index, fdr_secnum, parent_fdr_secnum;
 	imgtoolerr_t reply;
 
@@ -1576,7 +1582,7 @@ static imgtoolerr_t ti990_image_writefile(imgtool::partition *partition, const c
 	int i, lnks_index;
 	int cur_sec, last_sec;
 	int secsused;
-	UINT8 buf[256];
+	uint8_t buf[256];
 	int reply;
 	int fdr_secnum;
 
@@ -1674,10 +1680,10 @@ static imgtoolerr_t ti990_image_writefile(imgtool::partition *partition, const c
 /*
     Delete a file from a ti990_image.
 */
-static imgtoolerr_t ti990_image_deletefile(imgtool::partition *partition, const char *fpath)
+static imgtoolerr_t ti990_image_deletefile(imgtool::partition &partition, const char *fpath)
 {
 	imgtool::image *img = &partition->image();
-	ti990_image *image = (ti990_image *) img->extra_bytes();
+	ti990_image *image = get_ti990_image(img);
 	int catalog_index, fdr_secnum, parent_fdr_secnum;
 	imgtoolerr_t reply;
 
@@ -1700,7 +1706,7 @@ static imgtoolerr_t ti990_image_deletefile(imgtool::partition *partition, const 
 	int secsused;
 	int catalog_index;
 	int reply;
-	UINT8 buf[256];
+	uint8_t buf[256];
 
 	str_to_fname(ti_fname, filename);
 
@@ -1764,14 +1770,14 @@ static imgtoolerr_t ti990_image_deletefile(imgtool::partition *partition, const 
 /*
     Create a blank ti990_image.
 */
-static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream &f, util::option_resolution *createoptions)
+static imgtoolerr_t ti990_image_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions)
 {
 	//const char *volname;
 	ti990_geometry geometry;
 	unsigned totsecs;
 	disk_image_header header;
 	ti990_sc0 sec0;
-	UINT8 empty_sec[MAX_SECTOR_SIZE];
+	uint8_t empty_sec[MAX_SECTOR_SIZE];
 	int reply;
 	int i;
 
@@ -1790,7 +1796,7 @@ static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream &f
 	set_UINT32BE(& header.sectors_per_track, geometry.sectors_per_track);
 	set_UINT32BE(& header.bytes_per_sector, geometry.bytes_per_sector);
 
-	reply = f.write(&header, sizeof(header));
+	reply = stream->write(&header, sizeof(header));
 	if (reply != sizeof(header))
 	{
 		return IMGTOOLERR_WRITEERROR;
@@ -1803,7 +1809,7 @@ static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream &f
 
 
 	/* write sector 0 */
-	if (write_sector_logical(f, 0, & geometry, &sec0))
+	if (write_sector_logical(*stream, 0, & geometry, &sec0))
 		return IMGTOOLERR_WRITEERROR;
 
 
@@ -1811,7 +1817,7 @@ static imgtoolerr_t ti990_image_create(imgtool::image *image, imgtool::stream &f
 	memset(empty_sec, 0, geometry.bytes_per_sector);
 
 	for (i=1; i<totsecs; i++)
-		if (write_sector_logical(f, i, & geometry, empty_sec))
+		if (write_sector_logical(*stream, i, & geometry, empty_sec))
 			return IMGTOOLERR_WRITEERROR;
 
 	return (imgtoolerr_t)0;

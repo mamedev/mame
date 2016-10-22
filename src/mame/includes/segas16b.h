@@ -64,9 +64,9 @@ public:
 	{ }
 
 	// memory mapping
-	void memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index);
-	UINT8 mapper_sound_r();
-	void mapper_sound_w(UINT8 data);
+	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
+	uint8_t mapper_sound_r();
+	void mapper_sound_w(uint8_t data);
 
 	// main CPU read/write handlers
 	DECLARE_WRITE16_MEMBER( rom_5704_bank_w );
@@ -128,13 +128,13 @@ public:
 	DECLARE_DRIVER_INIT(aliensyn7_5358_small);
 
 	// video updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space,offset,data,mem_mask); };
 	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space,offset,data,mem_mask); };
 
 	// bootleg stuff
-	void tilemap_16b_fpointbl_fill_latch(int i, UINT16* latched_pageselect, UINT16* latched_yscroll, UINT16* latched_xscroll, UINT16* textram);
+	void tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
 
 protected:
 	// internal types
@@ -205,7 +205,7 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch; // not for atomicp
 
 	// memory pointers
-	required_shared_ptr<UINT16> m_workram;
+	required_shared_ptr<uint16_t> m_workram;
 
 	// configuration
 	segas16b_rom_board  m_romboard;
@@ -213,26 +213,26 @@ protected:
 	read16_delegate     m_custom_io_r;
 	write16_delegate    m_custom_io_w;
 	bool                m_disable_screen_blanking;
-	const UINT8 *       m_i8751_initial_config;
+	const uint8_t *       m_i8751_initial_config;
 	i8751_sim_delegate  m_i8751_vblank_hook;
-	UINT8               m_atomicp_sound_divisor;
+	uint8_t               m_atomicp_sound_divisor;
 
 	// game-specific state
-	UINT8               m_atomicp_sound_count;
-	UINT8               m_hwc_input_value;
+	uint8_t               m_atomicp_sound_count;
+	uint8_t               m_hwc_input_value;
 	optional_ioport     m_hwc_monitor;
 	optional_ioport     m_hwc_left;
 	optional_ioport     m_hwc_right;
-	UINT8               m_mj_input_num;
-	UINT8               m_mj_last_val;
+	uint8_t               m_mj_input_num;
+	uint8_t               m_mj_last_val;
 	optional_ioport_array<6> m_mj_inputs;
 	int                 m_spritepalbase;
 
 	required_device<gfxdecode_device> m_gfxdecode;
-	optional_shared_ptr<UINT8> m_sound_decrypted_opcodes;
-	optional_shared_ptr<UINT16> m_decrypted_opcodes;
-	optional_shared_ptr<UINT16> m_bootleg_scroll;
-	optional_shared_ptr<UINT16> m_bootleg_page;
+	optional_shared_ptr<uint8_t> m_sound_decrypted_opcodes;
+	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
+	optional_shared_ptr<uint16_t> m_bootleg_scroll;
+	optional_shared_ptr<uint16_t> m_bootleg_page;
 
 
 };
@@ -282,29 +282,29 @@ public:
 	DECLARE_WRITE16_MEMBER( main_bank_change_w );
 
 	// security callbacks
-	UINT32 shinfz_security(UINT32 input);
-	UINT32 tetrbx_security(UINT32 input);
+	uint32_t shinfz_security(uint32_t input);
+	uint32_t tetrbx_security(uint32_t input);
 
 //protected:
 	// driver overrides
 	virtual void machine_reset() override;
 
 	// configuration
-	UINT8           m_read_xor;
-	typedef delegate<UINT32 (UINT32)> security_callback_delegate;
+	uint8_t           m_read_xor;
+	typedef delegate<uint32_t (uint32_t)> security_callback_delegate;
 	security_callback_delegate m_security_callback;
 
 	// internal state
-	UINT16          m_cart_addrlatch;
-	UINT32          m_cart_addr;
-	UINT8           m_data_type;
-	UINT32          m_data_addr;
-	UINT8           m_data_mode;
-	UINT16          m_addr_latch;
-	UINT32          m_security_value;
-	UINT16          m_security_latch;
-	UINT8           m_rle_control_position;
-	UINT8           m_rle_control_byte;
+	uint16_t          m_cart_addrlatch;
+	uint32_t          m_cart_addr;
+	uint8_t           m_data_type;
+	uint32_t          m_data_addr;
+	uint8_t           m_data_mode;
+	uint16_t          m_addr_latch;
+	uint32_t          m_security_value;
+	uint16_t          m_security_latch;
+	uint8_t           m_rle_control_position;
+	uint8_t           m_rle_control_byte;
 	bool            m_rle_latched;
-	UINT8           m_rle_byte;
+	uint8_t           m_rle_byte;
 };

@@ -41,10 +41,10 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	required_shared_ptr<UINT8> m_m62_tileram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scroll_lo;
-	required_shared_ptr<UINT8> m_scroll_hi;
+	required_shared_ptr<uint8_t> m_m62_tileram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scroll_lo;
+	required_shared_ptr<uint8_t> m_scroll_hi;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
@@ -55,7 +55,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(spartanxtec);
 
 	tilemap_t*             m_bg_tilemap;
@@ -129,7 +129,7 @@ void spartanxtec_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 }
 
 
-UINT32 spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// there are 4 sets of scroll registers
 	// how to split them isn't clear, 4 groups of 8 rows would be logical
@@ -337,7 +337,7 @@ void spartanxtec_state::machine_reset()
 PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 {
 	// todo, proper weights for this bootleg PCB
-	const UINT8 *color_prom = memregion("cprom")->base();
+	const uint8_t *color_prom = memregion("cprom")->base();
 	for (int i = 0; i < 0x200; i++)
 	{
 		int r, g, b;

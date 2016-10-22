@@ -10,11 +10,11 @@ public:
 	}
 
 	// ASIC 3 (oriental legends protection)
-	UINT8         m_asic3_reg;
-	UINT8         m_asic3_latch[3];
-	UINT8         m_asic3_x;
-	UINT16        m_asic3_hilo;
-	UINT16        m_asic3_hold;
+	uint8_t         m_asic3_reg;
+	uint8_t         m_asic3_latch[3];
+	uint8_t         m_asic3_x;
+	uint16_t        m_asic3_hilo;
+	uint16_t        m_asic3_hold;
 
 	DECLARE_DRIVER_INIT(orlegend);
 	void asic3_compute_hold(int,int);

@@ -157,7 +157,7 @@ public:
 
 	void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// video
 	DECLARE_READ8_MEMBER( shifter_base_r );
@@ -206,8 +206,8 @@ public:
 	void glue_tick();
 	void set_screen_parameters();
 	void blitter_source();
-	UINT16 blitter_hop();
-	void blitter_op(UINT16 s, UINT32 dstaddr, UINT16 mask);
+	uint16_t blitter_hop();
+	void blitter_op(uint16_t s, uint32_t dstaddr, uint16_t mask);
 	void blitter_tick();
 
 	// driver
@@ -250,28 +250,28 @@ public:
 	void state_save();
 
 	/* memory state */
-	UINT8 m_mmu;
+	uint8_t m_mmu;
 
 	/* keyboard state */
 	int m_acia_ikbd_irq;
 	int m_acia_midi_irq;
-	UINT16 m_ikbd_keylatch;
-	UINT8 m_ikbd_mouse;
-	UINT8 m_ikbd_mouse_x;
-	UINT8 m_ikbd_mouse_y;
-	UINT8 m_ikbd_mouse_px;
-	UINT8 m_ikbd_mouse_py;
-	UINT8 m_ikbd_mouse_pc;
+	uint16_t m_ikbd_keylatch;
+	uint8_t m_ikbd_mouse;
+	uint8_t m_ikbd_mouse_x;
+	uint8_t m_ikbd_mouse_y;
+	uint8_t m_ikbd_mouse_px;
+	uint8_t m_ikbd_mouse_py;
+	uint8_t m_ikbd_mouse_pc;
 	int m_ikbd_tx;
 	int m_ikbd_joy;
 	int m_midi_tx;
 
 	/* floppy state */
-	UINT32 m_dma_base;
-	UINT16 m_dma_error;
-	UINT16 m_fdc_mode;
-	UINT8 m_fdc_sectors;
-	UINT16 m_fdc_fifo[2][8];
+	uint32_t m_dma_base;
+	uint16_t m_dma_error;
+	uint16_t m_fdc_mode;
+	uint8_t m_fdc_sectors;
+	uint16_t m_fdc_fifo[2][8];
 	int m_fdc_fifo_sel;
 	int m_fdc_fifo_index;
 	int m_fdc_fifo_msb;
@@ -279,13 +279,13 @@ public:
 	int m_fdc_dmabytes;
 
 	/* shifter state */
-	UINT32 m_shifter_base;
-	UINT32 m_shifter_ofs;
-	UINT8 m_shifter_sync;
-	UINT8 m_shifter_mode;
-	UINT16 m_shifter_palette[16];
-	UINT16 m_shifter_rr[4];
-	UINT16 m_shifter_ir[4];
+	uint32_t m_shifter_base;
+	uint32_t m_shifter_ofs;
+	uint8_t m_shifter_sync;
+	uint8_t m_shifter_mode;
+	uint16_t m_shifter_palette[16];
+	uint16_t m_shifter_rr[4];
+	uint16_t m_shifter_ir[4];
 	int m_shifter_bitplane;
 	int m_shifter_shift;
 	int m_shifter_h;
@@ -299,24 +299,24 @@ public:
 	int m_shifter_vblank_start;
 
 	/* blitter state */
-	UINT16 m_blitter_halftone[16];
-	INT16 m_blitter_src_inc_x;
-	INT16 m_blitter_src_inc_y;
-	INT16 m_blitter_dst_inc_x;
-	INT16 m_blitter_dst_inc_y;
-	UINT32 m_blitter_src;
-	UINT32 m_blitter_dst;
-	UINT16 m_blitter_endmask1;
-	UINT16 m_blitter_endmask2;
-	UINT16 m_blitter_endmask3;
-	UINT16 m_blitter_xcount;
-	UINT16 m_blitter_ycount;
-	UINT16 m_blitter_xcountl;
-	UINT8 m_blitter_hop;
-	UINT8 m_blitter_op;
-	UINT8 m_blitter_ctrl;
-	UINT8 m_blitter_skew;
-	UINT32 m_blitter_srcbuf;
+	uint16_t m_blitter_halftone[16];
+	int16_t m_blitter_src_inc_x;
+	int16_t m_blitter_src_inc_y;
+	int16_t m_blitter_dst_inc_x;
+	int16_t m_blitter_dst_inc_y;
+	uint32_t m_blitter_src;
+	uint32_t m_blitter_dst;
+	uint16_t m_blitter_endmask1;
+	uint16_t m_blitter_endmask2;
+	uint16_t m_blitter_endmask3;
+	uint16_t m_blitter_xcount;
+	uint16_t m_blitter_ycount;
+	uint16_t m_blitter_xcountl;
+	uint8_t m_blitter_hop;
+	uint8_t m_blitter_op;
+	uint8_t m_blitter_ctrl;
+	uint8_t m_blitter_skew;
+	uint32_t m_blitter_srcbuf;
 
 	/* timers */
 	emu_timer *m_mouse_timer;
@@ -402,24 +402,24 @@ public:
 	void state_save();
 
 	// shifter state
-	UINT8 m_shifter_lineofs;
-	UINT8 m_shifter_pixelofs;
+	uint8_t m_shifter_lineofs;
+	uint8_t m_shifter_pixelofs;
 
 	/* microwire state */
-	UINT16 m_mw_data;
-	UINT16 m_mw_mask;
+	uint16_t m_mw_data;
+	uint16_t m_mw_mask;
 	int m_mw_shift;
 
 	/* DMA sound state */
-	UINT32 m_dmasnd_base;
-	UINT32 m_dmasnd_end;
-	UINT32 m_dmasnd_cntr;
-	UINT32 m_dmasnd_baselatch;
-	UINT32 m_dmasnd_endlatch;
-	UINT8 m_dmasnd_ctrl;
-	UINT8 m_dmasnd_mode;
-	UINT8 m_dmasnd_fifo[8];
-	UINT8 m_dmasnd_samples;
+	uint32_t m_dmasnd_base;
+	uint32_t m_dmasnd_end;
+	uint32_t m_dmasnd_cntr;
+	uint32_t m_dmasnd_baselatch;
+	uint32_t m_dmasnd_endlatch;
+	uint8_t m_dmasnd_ctrl;
+	uint8_t m_dmasnd_mode;
+	uint8_t m_dmasnd_fifo[8];
+	uint8_t m_dmasnd_samples;
 	int m_dmasnd_active;
 
 	// timers
@@ -442,7 +442,7 @@ public:
 	DECLARE_READ16_MEMBER( cache_r );
 	DECLARE_WRITE16_MEMBER( cache_w );
 
-	UINT16 m_cache;
+	uint16_t m_cache;
 };
 
 class stbook_state : public ste_state

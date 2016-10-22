@@ -34,7 +34,7 @@ class sony_ldp1000_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	sony_ldp1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sony_ldp1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations TODO: both actually protected
 	DECLARE_WRITE8_MEMBER( command_w );
@@ -48,7 +48,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
-	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
+	virtual int32_t player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 
 	enum ldp1000_status {
@@ -68,17 +68,17 @@ protected:
 	};
 
 private:
-	UINT8 m_command;
+	uint8_t m_command;
 	ldp1000_status m_status;
 	ldp1000_player_state m_player_state;
 	bool m_audio_enable[2];
 	// TODO: sub-class into a specific internal player state
 	void set_new_player_state(ldp1000_player_state which);
-	void set_new_player_bcd(UINT8 data);
-	UINT32 bcd_to_raw();
+	void set_new_player_bcd(uint8_t data);
+	uint32_t bcd_to_raw();
 	void exec_enter_cmd();
-	UINT8 m_internal_bcd[0x10];
-	UINT8 m_index_state;
+	uint8_t m_internal_bcd[0x10];
+	uint8_t m_index_state;
 
 };
 

@@ -46,7 +46,7 @@
 
 PALETTE_INIT_MEMBER(mrdo_state, mrdo)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	const int R1 = 150;
@@ -114,7 +114,7 @@ PALETTE_INIT_MEMBER(mrdo_state, mrdo)
 	/* sprites */
 	for (i = 0x100; i < 0x140; i++)
 	{
-		UINT8 ctabentry = color_prom[(i - 0x100) & 0x1f];
+		uint8_t ctabentry = color_prom[(i - 0x100) & 0x1f];
 
 		if ((i - 0x100) & 0x20)
 			ctabentry >>= 4;        /* high 4 bits are for sprite color n + 8 */
@@ -135,7 +135,7 @@ PALETTE_INIT_MEMBER(mrdo_state, mrdo)
 
 TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 {
-	UINT8 attr = m_bgvideoram[tile_index];
+	uint8_t attr = m_bgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			m_bgvideoram[tile_index + 0x400] + ((attr & 0x80) << 1),
 			attr & 0x3f,
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(mrdo_state::get_fg_tile_info)
 {
-	UINT8 attr = m_fgvideoram[tile_index];
+	uint8_t attr = m_fgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			m_fgvideoram[tile_index+0x400] + ((attr & 0x80) << 1),
 			attr & 0x3f,
@@ -232,7 +232,7 @@ WRITE8_MEMBER(mrdo_state::mrdo_flipscreen_w)
 
 void mrdo_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
@@ -247,7 +247,7 @@ void mrdo_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 	}
 }
 
-UINT32 mrdo_state::screen_update_mrdo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mrdo_state::screen_update_mrdo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

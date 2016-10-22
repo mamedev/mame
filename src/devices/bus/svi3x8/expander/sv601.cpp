@@ -48,7 +48,7 @@ machine_config_constructor sv601_device::device_mconfig_additions() const
 //  sv601_device - constructor
 //-------------------------------------------------
 
-sv601_device::sv601_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sv601_device::sv601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SV601, "SV-601 Super Expander", tag, owner, clock, "sv601", __FILE__),
 	device_svi_expander_interface(mconfig, *this),
 	m_slotbus(*this, "slotbus")

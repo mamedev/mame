@@ -332,7 +332,7 @@ inline void abc800_keyboard_device::key_down(int state)
 //  abc800_keyboard_device - constructor
 //-------------------------------------------------
 
-abc800_keyboard_device::abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : device_t(mconfig, ABC800_KEYBOARD, "ABC-800 Keyboard", tag, owner, clock, "abc800kb", __FILE__),
+abc800_keyboard_device::abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : device_t(mconfig, ABC800_KEYBOARD, "ABC-800 Keyboard", tag, owner, clock, "abc800kb", __FILE__),
 	abc_keyboard_interface(mconfig, *this),
 	m_maincpu(*this, I8048_TAG),
 	m_x(*this, "X%u", 0),
@@ -400,7 +400,7 @@ void abc800_keyboard_device::txd_w(int state)
 
 READ8_MEMBER( abc800_keyboard_device::kb_p1_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_stb)
 	{

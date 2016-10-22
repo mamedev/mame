@@ -23,12 +23,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_spritebank;
-	required_shared_ptr<UINT8> m_scroll;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_workram;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	required_shared_ptr<uint8_t> m_spritebank;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_workram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	int m_hw;
 	tilemap_t *m_bgtilemap;
@@ -46,8 +46,8 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(darkmist);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void decrypt_fgbgtiles(UINT8* rgn, int size);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void decrypt_fgbgtiles(uint8_t* rgn, int size);
 	void decrypt_gfx();
 	void decrypt_snd();
 

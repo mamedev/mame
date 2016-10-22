@@ -29,7 +29,7 @@ class hd6309_device : public m6809_base_device
 {
 public:
 	// construction/destruction
-	hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -42,9 +42,9 @@ protected:
 	virtual void execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual bool is_6809() override { return false; };
 
@@ -76,23 +76,23 @@ private:
 
 	// CPU registers
 	PAIR16  m_v;
-	UINT8   m_md;
+	uint8_t   m_md;
 
 	// other state
-	UINT8   m_temp_im;
+	uint8_t   m_temp_im;
 
 	// operand reading/writing
-	UINT8 read_operand();
-	UINT8 read_operand(int ordinal);
-	void write_operand(UINT8 data);
-	void write_operand(int ordinal, UINT8 data);
+	uint8_t read_operand();
+	uint8_t read_operand(int ordinal);
+	void write_operand(uint8_t data);
+	void write_operand(int ordinal, uint8_t data);
 
 	// interrupt registers
 	bool firq_saves_entire_state()      { return m_md & 0x02; }
-	UINT16 entire_state_registers()     { return hd6309_native_mode() ? 0x3FF : 0xFF; }
+	uint16_t entire_state_registers()     { return hd6309_native_mode() ? 0x3FF : 0xFF; }
 
 	// bit tests
-	UINT8 &bittest_register();
+	uint8_t &bittest_register();
 	bool bittest_source();
 	bool bittest_dest();
 	void bittest_set(bool result);
@@ -106,10 +106,10 @@ private:
 	void set_e()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_E; }
 	void set_f()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_F; }
 	void set_w()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_W; }
-	exgtfr_register read_exgtfr_register(UINT8 reg);
-	void write_exgtfr_register(UINT8 reg, exgtfr_register value);
-	bool tfr_read(UINT8 opcode, UINT8 arg, UINT8 &data);
-	bool tfr_write(UINT8 opcode, UINT8 arg, UINT8 data);
+	exgtfr_register read_exgtfr_register(uint8_t reg);
+	void write_exgtfr_register(uint8_t reg, exgtfr_register value);
+	bool tfr_read(uint8_t opcode, uint8_t arg, uint8_t &data);
+	bool tfr_write(uint8_t opcode, uint8_t arg, uint8_t data);
 	bool add8_sets_h()                              { return (m_opcode & 0xFE) != 0x30; }
 	void register_register_op();
 	bool hd6309_native_mode()           { return m_md & 0x01; }

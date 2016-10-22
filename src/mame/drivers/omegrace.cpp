@@ -297,7 +297,7 @@ READ8_MEMBER(omegrace_state::omegrace_vg_go_r)
  * 5 4 3 2 1 0 for encoder 2 (not shifted..)
  */
 
-static const UINT8 spinnerTable[64] =
+static const uint8_t spinnerTable[64] =
 {
 	0x00, 0x04, 0x14, 0x10, 0x18, 0x1c, 0x5c, 0x58,
 	0x50, 0x54, 0x44, 0x40, 0x48, 0x4c, 0x6c, 0x68,
@@ -610,7 +610,7 @@ ROM_END
 DRIVER_INIT_MEMBER(omegrace_state,omegrace)
 {
 	int i, len = memregion("user1")->bytes();
-	UINT8 *prom = memregion("user1")->base();
+	uint8_t *prom = memregion("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
 	 * lines swapped before going into the decoder.

@@ -49,7 +49,7 @@
 const device_type SC61860 = &device_creator<sc61860_device>;
 
 
-sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SC61860, "SC61860", tag, owner, clock, "sc61860", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_reset(*this)
@@ -64,14 +64,14 @@ sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-offs_t sc61860_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t sc61860_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sc61860 );
 	return CPU_DISASSEMBLE_NAME(sc61860)(this, buffer, pc, oprom, opram, options);
 }
 
 
-UINT8 *sc61860_device::internal_ram()
+uint8_t *sc61860_device::internal_ram()
 {
 	return m_ram;
 }

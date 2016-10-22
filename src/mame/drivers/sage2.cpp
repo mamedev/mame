@@ -37,7 +37,7 @@
 
 READ8_MEMBER( sage2_state::read )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_reset || (offset >= 0xfe0000 && offset < 0xff4000))
 	{
@@ -296,7 +296,7 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// floppy interrupt
 	data = m_fdc->get_irq();

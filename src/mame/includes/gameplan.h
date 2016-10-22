@@ -48,16 +48,16 @@ public:
 			m_soundlatch(*this, "soundlatch") { }
 
 	/* machine state */
-	UINT8   m_current_port;
-	optional_shared_ptr<UINT8> m_trvquest_question;
+	uint8_t   m_current_port;
+	optional_shared_ptr<uint8_t> m_trvquest_question;
 
 	/* video state */
-	std::unique_ptr<UINT8[]>   m_videoram;
+	std::unique_ptr<uint8_t[]>   m_videoram;
 	size_t   m_videoram_size;
-	UINT8    m_video_x;
-	UINT8    m_video_y;
-	UINT8    m_video_command;
-	UINT8    m_video_data;
+	uint8_t    m_video_x;
+	uint8_t    m_video_y;
+	uint8_t    m_video_command;
+	uint8_t    m_video_data;
 	emu_timer *m_via_0_ca1_timer;
 
 	/* devices */
@@ -88,8 +88,8 @@ public:
 	DECLARE_VIDEO_START(leprechn);
 	DECLARE_VIDEO_START(trvquest);
 	DECLARE_VIDEO_START(common);
-	UINT32 screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(trvquest_interrupt);
 	TIMER_CALLBACK_MEMBER(clear_screen_done_callback);
 	TIMER_CALLBACK_MEMBER(via_irq_delayed);

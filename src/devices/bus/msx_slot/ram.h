@@ -16,9 +16,9 @@ class msx_slot_ram_device : public device_t,
 							public msx_internal_slot_interface
 {
 public:
-	msx_slot_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void force_start_address(device_t &device, UINT16 start) { downcast<msx_slot_ram_device &>(device).m_start_address = start; }
+	static void force_start_address(device_t &device, uint16_t start) { downcast<msx_slot_ram_device &>(device).m_start_address = start; }
 
 	virtual void device_start() override;
 
@@ -26,7 +26,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
-	std::vector<UINT8> m_ram;
+	std::vector<uint8_t> m_ram;
 };
 
 

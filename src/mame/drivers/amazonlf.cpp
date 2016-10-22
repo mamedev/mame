@@ -26,7 +26,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_amazonlf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amazonlf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_amazonlf(screen_device &screen, bool state);
 };
 
@@ -42,7 +42,7 @@ void amazonlf_state::machine_reset()
 {
 }
 
-UINT32 amazonlf_state::screen_update_amazonlf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amazonlf_state::screen_update_amazonlf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

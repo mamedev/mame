@@ -17,8 +17,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef device_delegate<double (UINT8 input)> adc1213x_ipt_convert_delegate;
-#define ADC12138_IPT_CONVERT_CB(name)  double name(UINT8 input)
+typedef device_delegate<double (uint8_t input)> adc1213x_ipt_convert_delegate;
+#define ADC12138_IPT_CONVERT_CB(name)  double name(uint8_t input)
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -27,8 +27,8 @@ typedef device_delegate<double (UINT8 input)> adc1213x_ipt_convert_delegate;
 class adc12138_device : public device_t
 {
 public:
-	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	adc12138_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc12138_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~adc12138_device() {}
 
 	static void set_ipt_convert_callback(device_t &device, adc1213x_ipt_convert_delegate callback) { downcast<adc12138_device &>(device).m_ipt_read_cb = callback; }
@@ -69,7 +69,7 @@ extern const device_type ADC12138;
 class adc12130_device : public adc12138_device
 {
 public:
-	adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type ADC12130;
@@ -77,7 +77,7 @@ extern const device_type ADC12130;
 class adc12132_device : public adc12138_device
 {
 public:
-	adc12132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adc12132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type ADC12132;

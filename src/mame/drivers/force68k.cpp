@@ -171,14 +171,14 @@ private:
 	required_device<acia6850_device> m_aciaremt;
 	optional_device<centronics_device> m_centronics;
 
-	INT32 m_centronics_ack;
-	INT32 m_centronics_busy;
-	INT32 m_centronics_perror;
-	INT32 m_centronics_select;
+	int32_t m_centronics_ack;
+	int32_t m_centronics_busy;
+	int32_t m_centronics_perror;
+	int32_t m_centronics_select;
 
 	// Pointer to System ROMs needed by bootvect_r
-	UINT16  *m_sysrom;
-	UINT16  *m_usrrom;
+	uint16_t  *m_sysrom;
+	uint16_t  *m_usrrom;
 
 	required_device<generic_slot_device> m_cart;
 };
@@ -291,12 +291,12 @@ void force68k_state::machine_start ()
 		save_item (NAME (m_centronics_perror));
 
 		/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-		m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x080000);
+		m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0x080000);
 
 		/* Map user ROM/RAM socket(s) */
 		if (m_cart->exists())
 		{
-				m_usrrom = (UINT16*)m_cart->get_rom_base();
+				m_usrrom = (uint16_t*)m_cart->get_rom_base();
 #if 0 // This should be the correct way but produces odd and even bytes swapped
 				m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(generic_slot_device::read16_rom), (generic_slot_device*)m_cart));
 #else // So we installs a custom very ineffecient handler for now until we understand hwp to solve the problem better
@@ -337,7 +337,7 @@ READ16_MEMBER (force68k_state::bootvect_r){
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (force68k_state::vme_a24_r){
 		LOG (logerror ("vme_a24_r\n"));
-		return (UINT16) 0;
+		return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (force68k_state::vme_a24_w){
@@ -346,7 +346,7 @@ WRITE16_MEMBER (force68k_state::vme_a24_w){
 
 READ16_MEMBER (force68k_state::vme_a16_r){
 		LOG (logerror ("vme_16_r\n"));
-		return (UINT16) 0;
+		return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (force68k_state::vme_a16_w){
@@ -402,7 +402,7 @@ MACHINE_CONFIG_END
 ****************************/
 image_init_result force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-		UINT32 size = slot->common_get_size("rom");
+		uint32_t size = slot->common_get_size("rom");
 
 		if (size > 0x20000) // Max 128Kb
 		{

@@ -13,7 +13,7 @@ class m68307_mbus
 {
 	public:
 
-	UINT16 m_MFCR;
+	uint16_t m_MFCR;
 
 	bool m_busy;
 	bool m_intpend;

@@ -46,10 +46,10 @@
 
 
 
-static const UINT8 reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
-static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
+static const uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
+static const uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 
-static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
+static const uint8_t bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
 //reel info
 #define STANDARD_REEL  0    // As originally designed 3/4 reels
@@ -85,13 +85,13 @@ static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14
 
 struct mpu4_chr_table
 {
-	UINT8 call;
-	UINT8 response;
+	uint8_t call;
+	uint8_t response;
 };
 
 struct bwb_chr_table//dynamically populated table for BwB protection
 {
-	UINT8 response;
+	uint8_t response;
 };
 
 
@@ -126,7 +126,7 @@ public:
 			m_meters(*this, "meters")
 	{}
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
@@ -333,12 +333,12 @@ protected:
 	int m_expansion_latch;
 	int m_global_volume;
 	int m_input_strobe;
-	UINT8 m_lamp_strobe;
-	UINT8 m_lamp_strobe2;
-	UINT8 m_lamp_strobe_ext;
-	UINT8 m_lamp_strobe_ext_persistence;
-	UINT8 m_led_strobe;
-	UINT8 m_ay_data;
+	uint8_t m_lamp_strobe;
+	uint8_t m_lamp_strobe2;
+	uint8_t m_lamp_strobe_ext;
+	uint8_t m_lamp_strobe_ext_persistence;
+	uint8_t m_led_strobe;
+	uint8_t m_ay_data;
 	int m_optic_pattern;
 
 	int m_active_reel;
@@ -363,7 +363,7 @@ protected:
 	int m_t1;
 	int m_t3l;
 	int m_t3h;
-	UINT8 m_numbanks;
+	uint8_t m_numbanks;
 	mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
 };

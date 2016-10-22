@@ -88,7 +88,7 @@ machine_config_constructor powermate_ide_device::device_mconfig_additions() cons
 //  powermate_ide_device - constructor
 //-------------------------------------------------
 
-powermate_ide_device::powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+powermate_ide_device::powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ADAM_IDE, "Powermate HP IDE", tag, owner, clock, "adam_ide", __FILE__),
 		device_adam_expansion_slot_card_interface(mconfig, *this),
 		m_ata(*this, ATA_TAG),
@@ -110,7 +110,7 @@ void powermate_ide_device::device_start()
 //  adam_bd_r - buffered data read
 //-------------------------------------------------
 
-UINT8 powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+uint8_t powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (!biorq)
 	{
@@ -171,7 +171,7 @@ UINT8 powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, UINT8
 //  adam_bd_w - buffered data write
 //-------------------------------------------------
 
-void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (!biorq)
 	{

@@ -23,17 +23,17 @@
 
 struct road_info
 {
-	UINT8           index;                          /* index of this structure */
-	UINT8           type;                           /* type of road system (see segaic16.h for details) */
-	UINT8           control;                        /* control register value */
-	UINT16          colorbase1;                     /* color base for road ROM data */
-	UINT16          colorbase2;                     /* color base for road background data */
-	UINT16          colorbase3;                     /* color base for sky data */
-	INT32           xoffs;                          /* X scroll offset */
+	uint8_t           index;                          /* index of this structure */
+	uint8_t           type;                           /* type of road system (see segaic16.h for details) */
+	uint8_t           control;                        /* control register value */
+	uint16_t          colorbase1;                     /* color base for road ROM data */
+	uint16_t          colorbase2;                     /* color base for road background data */
+	uint16_t          colorbase3;                     /* color base for sky data */
+	int32_t           xoffs;                          /* X scroll offset */
 	void            (*draw)(struct road_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	UINT16 *        roadram;                        /* pointer to roadram pointer */
-	std::unique_ptr<UINT16[]>        buffer;                         /* buffered roadram pointer */
-	std::unique_ptr<UINT8[]>          gfx;                            /* expanded road graphics */
+	uint16_t *        roadram;                        /* pointer to roadram pointer */
+	std::unique_ptr<uint16_t[]>        buffer;                         /* buffered roadram pointer */
+	std::unique_ptr<uint8_t[]>          gfx;                            /* expanded road graphics */
 };
 
 
@@ -41,10 +41,10 @@ struct road_info
 class segaic16_road_device : public device_t
 {
 public:
-	segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~segaic16_road_device() {}
 
-	UINT16 *segaic16_roadram_0;
+	uint16_t *segaic16_roadram_0;
 	void segaic16_road_hangon_decode(running_machine &machine, struct road_info *info);
 	void segaic16_road_outrun_decode(running_machine &machine, struct road_info *info);
 

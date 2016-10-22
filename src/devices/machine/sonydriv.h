@@ -24,21 +24,21 @@ enum
 };
 #endif
 
-void sony_set_lines(device_t *device,UINT8 lines);
+void sony_set_lines(device_t *device,uint8_t lines);
 void sony_set_enable_lines(device_t *device,int enable_mask);
 void sony_set_sel_line(device_t *device,int sel);
 
 void sony_set_speed(int speed);
 
-UINT8 sony_read_data(device_t *device);
-void sony_write_data(device_t *device,UINT8 data);
+uint8_t sony_read_data(device_t *device);
+void sony_write_data(device_t *device,uint8_t data);
 int sony_read_status(device_t *device);
 
 class sonydriv_floppy_image_device :    public legacy_floppy_image_device
 {
 public:
 	// construction/destruction
-	sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void call_unload() override;
 protected:

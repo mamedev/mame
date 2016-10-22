@@ -177,7 +177,7 @@ ioport_constructor adam_fdc_device::device_input_ports() const
 //  adam_fdc_device - constructor
 //-------------------------------------------------
 
-adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ADAM_FDC, "Adam FDC", tag, owner, clock, "adam_fdc", __FILE__),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
@@ -217,7 +217,7 @@ void adam_fdc_device::adamnet_reset_w(int state)
 
 READ8_MEMBER( adam_fdc_device::data_r )
 {
-	UINT8 data = m_fdc->data_r();
+	uint8_t data = m_fdc->data_r();
 
 	m_ram[offset & 0x3ff] = data;
 
@@ -246,7 +246,7 @@ READ8_MEMBER( adam_fdc_device::p1_r )
 
 	*/
 
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	// disk in place
 	data |= m_floppy0->exists() ? 0x00 : 0x01;
@@ -321,7 +321,7 @@ READ8_MEMBER( adam_fdc_device::p2_r )
 
 	*/
 
-	UINT8 data = M6801_MODE_2;
+	uint8_t data = M6801_MODE_2;
 
 	// NET RXD
 	data |= m_bus->rxd_r(this) << 3;

@@ -18,7 +18,7 @@
 
 const device_type TAITO_EN = &device_creator<taito_en_device>;
 
-taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TAITO_EN, "Taito Ensoniq Sound System", tag, owner, clock, "taito_en", __FILE__),
 	m_audiocpu(*this, "audiocpu"),
 	m_ensoniq(*this, "ensoniq"),
@@ -56,8 +56,8 @@ void taito_en_device::device_start()
 void taito_en_device::device_reset()
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
-	UINT16 *ROM = (UINT16 *)memregion("audiocpu")->base();
-	UINT16 *sound_ram = (UINT16 *)memshare("share1")->ptr();
+	uint16_t *ROM = (uint16_t *)memregion("audiocpu")->base();
+	uint16_t *sound_ram = (uint16_t *)memshare("share1")->ptr();
 	membank("bank1")->set_base(&ROM[0x80000]);
 	membank("bank2")->set_base(&ROM[0x90000]);
 	membank("bank3")->set_base(&ROM[0xa0000]);
@@ -105,7 +105,7 @@ WRITE8_MEMBER( taito_en_device::en_68000_share_w )
 
 WRITE16_MEMBER( taito_en_device::en_es5505_bank_w )
 {
-	UINT32 max_banks_this_game = (memregion(":ensoniq.0")->bytes()/0x200000)-1;
+	uint32_t max_banks_this_game = (memregion(":ensoniq.0")->bytes()/0x200000)-1;
 
 	/* mask out unused bits */
 	data &= max_banks_this_game;
@@ -146,7 +146,7 @@ READ16_MEMBER( taito_en_device::es5510_dsp_r )
 
 WRITE16_MEMBER( taito_en_device::es5510_dsp_w )
 {
-	UINT8 *snd_mem = (UINT8 *)memregion(":ensoniq.0")->base();
+	uint8_t *snd_mem = (uint8_t *)memregion(":ensoniq.0")->base();
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
 //      logerror("%06x: DSP write offset %04x %04x\n",space.device().safe_pc(),offset,data);

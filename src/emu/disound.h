@@ -68,11 +68,11 @@ public:
 	class sound_route
 	{
 	public:
-		sound_route(int output, int input, float gain, const char *target, UINT32 mixoutput);
+		sound_route(int output, int input, float gain, const char *target, uint32_t mixoutput);
 
-		UINT32              m_output;           // output index, or ALL_OUTPUTS
-		UINT32              m_input;            // target input index
-		UINT32              m_mixoutput;        // target mixer output
+		uint32_t              m_output;           // output index, or ALL_OUTPUTS
+		uint32_t              m_input;            // target input index
+		uint32_t              m_mixoutput;        // target mixer output
 		float               m_gain;             // gain
 		std::string         m_target;           // target tag
 	};
@@ -81,11 +81,13 @@ public:
 	device_sound_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_sound_interface();
 
+	virtual bool issound() { return true; } /// HACK: allow devices to hide from the ui
+
 	// configuration access
 	const std::vector<std::unique_ptr<sound_route>> &routes() const { return m_route_list; }
 
 	// static inline configuration helpers
-	static void static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT, UINT32 mixoutput = 0);
+	static void static_add_route(device_t &device, uint32_t output, const char *target, double gain, uint32_t input = AUTO_ALLOC_INPUT, uint32_t mixoutput = 0);
 	static void static_reset_routes(device_t &device);
 
 	// sound stream update overrides
@@ -139,8 +141,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal state
-	UINT8               m_outputs;              // number of outputs
-	std::vector<UINT8>       m_outputmap;            // map of inputs to outputs
+	uint8_t               m_outputs;              // number of outputs
+	std::vector<uint8_t>       m_outputmap;            // map of inputs to outputs
 	sound_stream *      m_mixer_stream;         // mixing stream
 };
 

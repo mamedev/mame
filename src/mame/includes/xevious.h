@@ -16,16 +16,16 @@ public:
 		m_samples(*this, "samples"),
 		m_subcpu3(*this, "sub3") { }
 
-	required_shared_ptr<UINT8> m_xevious_sr1;
-	required_shared_ptr<UINT8> m_xevious_sr2;
-	required_shared_ptr<UINT8> m_xevious_sr3;
-	required_shared_ptr<UINT8> m_xevious_fg_colorram;
-	required_shared_ptr<UINT8> m_xevious_bg_colorram;
-	required_shared_ptr<UINT8> m_xevious_fg_videoram;
-	required_shared_ptr<UINT8> m_xevious_bg_videoram;
+	required_shared_ptr<uint8_t> m_xevious_sr1;
+	required_shared_ptr<uint8_t> m_xevious_sr2;
+	required_shared_ptr<uint8_t> m_xevious_sr3;
+	required_shared_ptr<uint8_t> m_xevious_fg_colorram;
+	required_shared_ptr<uint8_t> m_xevious_bg_colorram;
+	required_shared_ptr<uint8_t> m_xevious_fg_videoram;
+	required_shared_ptr<uint8_t> m_xevious_bg_videoram;
 	optional_device<samples_device> m_samples;
 
-	INT32 m_xevious_bs[2];
+	int32_t m_xevious_bs[2];
 	DECLARE_DRIVER_INIT(xevious);
 	DECLARE_DRIVER_INIT(xevios);
 	DECLARE_DRIVER_INIT(battles);
@@ -35,7 +35,7 @@ public:
 	DECLARE_PALETTE_INIT(xevious);
 	DECLARE_MACHINE_RESET(xevios);
 	DECLARE_MACHINE_RESET(battles);
-	UINT32 screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(battles_interrupt_4);
 	TIMER_DEVICE_CALLBACK_MEMBER(battles_nmi_generate);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER( battles_CPU4_coin_w );
 	DECLARE_WRITE8_MEMBER( battles_noise_sound_w );
 
-	UINT8 m_customio[16];
+	uint8_t m_customio[16];
 	char m_battles_customio_command;
 	char m_battles_customio_prev_command;
 	char m_battles_customio_command_count;

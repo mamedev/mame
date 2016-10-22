@@ -60,13 +60,13 @@ public:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	bool m_nmi_enabled;
-	UINT8 m_bgcolor;
+	uint8_t m_bgcolor;
 	tilemap_t *m_tilemap;
 
 	DECLARE_WRITE8_MEMBER(bgcolor_w);
@@ -76,7 +76,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	DECLARE_PALETTE_INIT(carjmbre);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -126,7 +126,7 @@ static const res_net_info carjmbre_net_info =
 
 PALETTE_INIT_MEMBER(carjmbre_state, carjmbre)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, carjmbre_decode_info, carjmbre_net_info);
@@ -163,7 +163,7 @@ void carjmbre_state::video_start()
 }
 
 
-UINT32 carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgcolor, cliprect);
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);

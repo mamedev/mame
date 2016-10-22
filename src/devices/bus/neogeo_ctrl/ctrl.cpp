@@ -84,7 +84,7 @@ device_neogeo_ctrl_edge_interface::~device_neogeo_ctrl_edge_interface()
 //  neogeo_control_port_device - constructor
 //-------------------------------------------------
 
-neogeo_control_port_device::neogeo_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_control_port_device::neogeo_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, NEOGEO_CONTROL_PORT, "SNK Neo Geo control port", tag, owner, clock, "neogeo_control_port", __FILE__),
 						device_slot_interface(mconfig, *this), m_device(nullptr)
 {
@@ -110,24 +110,24 @@ void neogeo_control_port_device::device_start()
 }
 
 
-UINT8 neogeo_control_port_device::read_ctrl()
+uint8_t neogeo_control_port_device::read_ctrl()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (m_device)
 		data &= m_device->read_ctrl();
 	return data;
 }
 
-UINT8 neogeo_control_port_device::read_start_sel()
+uint8_t neogeo_control_port_device::read_start_sel()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (m_device)
 		data &= m_device->read_start_sel();
 	return data;
 }
 
 
-void neogeo_control_port_device::write_ctrlsel(UINT8 data)
+void neogeo_control_port_device::write_ctrlsel(uint8_t data)
 {
 	if (m_device)
 		m_device->write_ctrlsel(data);
@@ -138,7 +138,7 @@ void neogeo_control_port_device::write_ctrlsel(UINT8 data)
 //  neogeo_ctrl_edge_port_device - constructor
 //-------------------------------------------------
 
-neogeo_ctrl_edge_port_device::neogeo_ctrl_edge_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_ctrl_edge_port_device::neogeo_ctrl_edge_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 							device_t(mconfig, NEOGEO_CTRL_EDGE_CONNECTOR, "SNK Neo Geo Edge Connector (Controller)", tag, owner, clock, "neogeo_ctrl_edge", __FILE__),
 							device_slot_interface(mconfig, *this), m_device(nullptr)
 {
@@ -166,7 +166,7 @@ void neogeo_ctrl_edge_port_device::device_start()
 
 READ8_MEMBER(neogeo_ctrl_edge_port_device::in0_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (m_device)
 		data &= m_device->in0_r(space, offset, mem_mask);
 	return data;
@@ -174,21 +174,21 @@ READ8_MEMBER(neogeo_ctrl_edge_port_device::in0_r)
 
 READ8_MEMBER(neogeo_ctrl_edge_port_device::in1_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (m_device)
 		data &= m_device->in1_r(space, offset, mem_mask);
 	return data;
 }
 
-UINT8 neogeo_ctrl_edge_port_device::read_start_sel()
+uint8_t neogeo_ctrl_edge_port_device::read_start_sel()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (m_device)
 		data &= m_device->read_start_sel();
 	return data;
 }
 
-void neogeo_ctrl_edge_port_device::write_ctrlsel(UINT8 data)
+void neogeo_ctrl_edge_port_device::write_ctrlsel(uint8_t data)
 {
 	if (m_device)
 		m_device->write_ctrlsel(data);

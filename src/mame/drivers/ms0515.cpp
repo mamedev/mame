@@ -33,11 +33,11 @@ public:
 
 	virtual void machine_reset() override;
 
-	UINT8 *m_video_ram;
-	UINT8 m_sysreg;
+	uint8_t *m_video_ram;
+	uint8_t m_sysreg;
 	int m_blink;
 	DECLARE_PALETTE_INIT(ms0515);
-	UINT32 screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(ms0515_portc_w);
 };
 
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(ms0515_state::ms0515_bank_w)
 {
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	membank("bank0")->set_base(ram + 0000000 + BIT(data,0) * 0160000);
 	membank("bank1")->set_base(ram + 0020000 + BIT(data,1) * 0160000);
 	membank("bank2")->set_base(ram + 0040000 + BIT(data,2) * 0160000);
@@ -122,7 +122,7 @@ WRITE8_MEMBER(ms0515_state::ms0515_sys_w)
 
 void ms0515_state::machine_reset()
 {
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	ms0515_bank_w(machine().driver_data()->generic_space(),0,0);
 
 	m_video_ram = ram + 0000000 + 0340000;
@@ -141,7 +141,7 @@ static SLOT_INTERFACE_START( ms0515_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // 720 KB
 SLOT_INTERFACE_END
 
-UINT32 ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, x, b;
 	int addr = 0;
@@ -151,7 +151,7 @@ UINT32 ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &b
 			int horpos = 0;
 			for (x = 0; x < 40; x++)
 			{
-				UINT16 code = (m_video_ram[addr++] << 8);
+				uint16_t code = (m_video_ram[addr++] << 8);
 				code += m_video_ram[addr++];
 				for (b = 0; b < 16; b++)
 				{
@@ -166,12 +166,12 @@ UINT32 ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &b
 			int horpos = 0;
 			for (x = 0; x < 40; x++)
 			{
-				UINT8 code = m_video_ram[addr++];
-				UINT8 attr = m_video_ram[addr++];
-				UINT8 fg = (attr & 7) + BIT(attr,6)*8;
-				UINT8 bg = ((attr >> 3) & 7) + BIT(attr,6)*8;
+				uint8_t code = m_video_ram[addr++];
+				uint8_t attr = m_video_ram[addr++];
+				uint8_t fg = (attr & 7) + BIT(attr,6)*8;
+				uint8_t bg = ((attr >> 3) & 7) + BIT(attr,6)*8;
 				if (BIT(attr,7) && (m_blink == 20)) {
-					UINT8 tmp = fg;
+					uint8_t tmp = fg;
 					fg = bg; bg = tmp;
 					m_blink = -1;
 				}

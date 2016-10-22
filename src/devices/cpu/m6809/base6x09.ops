@@ -50,7 +50,7 @@ INTERRUPT_VECTOR:
 
 NEG8:
 	@m_temp.b.l = read_operand();
-	m_temp.b.l = set_flags(CC_NZVC, (UINT8)0, m_temp.b.l, -m_temp.b.l);
+	m_temp.b.l = set_flags(CC_NZVC, (uint8_t)0, m_temp.b.l, -m_temp.b.l);
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(m_temp.b.l);
 	return;
@@ -59,7 +59,7 @@ COM8:
 	@m_temp.b.l = read_operand();
 	m_cc &= ~CC_V;
 	m_cc |= CC_C;
-	m_temp.b.l = set_flags(CC_NZ, (UINT8) ~m_temp.b.l);
+	m_temp.b.l = set_flags(CC_NZ, (uint8_t) ~m_temp.b.l);
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(m_temp.b.l);
 	return;
@@ -68,14 +68,14 @@ LSR8:
 	@m_temp.b.l = read_operand();
 	m_cc &= ~CC_C;
 	m_cc |= (m_temp.b.l & 1) ? CC_C : 0;
-	m_temp.b.l = set_flags<UINT8>(CC_NZ, m_temp.b.l >> 1);
+	m_temp.b.l = set_flags<uint8_t>(CC_NZ, m_temp.b.l >> 1);
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(m_temp.b.l);
 	return;
 
 ROR8:
 	@m_temp.b.l = read_operand();
-	m_temp.b.l = set_flags<UINT8>(CC_NZ, rotate_right(m_temp.b.l));
+	m_temp.b.l = set_flags<uint8_t>(CC_NZ, rotate_right(m_temp.b.l));
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(m_temp.b.l);
 	return;
@@ -84,35 +84,35 @@ ASR8:
 	@m_temp.b.l = read_operand();
 	m_cc &= ~CC_NZC;
 	m_cc |= (m_temp.b.l & 1) ? CC_C : 0;
-	m_temp.b.l = set_flags<UINT8>(CC_NZ, ((INT8) m_temp.b.l) >> 1);
+	m_temp.b.l = set_flags<uint8_t>(CC_NZ, ((int8_t) m_temp.b.l) >> 1);
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(m_temp.b.l);
 	return;
 
 ASL8:
 	@m_temp.b.l = read_operand();
-	m_temp.b.l = set_flags<UINT8>(CC_NZVC, m_temp.b.l, m_temp.b.l, m_temp.b.l << 1);
+	m_temp.b.l = set_flags<uint8_t>(CC_NZVC, m_temp.b.l, m_temp.b.l, m_temp.b.l << 1);
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(m_temp.b.l);
 	return;
 
 ROL8:
 	@m_temp.b.l = read_operand();
-	m_temp.b.l = set_flags<UINT8>(CC_NZV, m_temp.b.l, m_temp.b.l, rotate_left(m_temp.b.l));
+	m_temp.b.l = set_flags<uint8_t>(CC_NZV, m_temp.b.l, m_temp.b.l, rotate_left(m_temp.b.l));
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(m_temp.b.l);
 	return;
 
 DEC8:
 	@m_temp.b.l = read_operand();
-	m_temp.b.l = set_flags<UINT8>(CC_NZV, m_temp.b.l, 1, m_temp.b.l - 1);
+	m_temp.b.l = set_flags<uint8_t>(CC_NZV, m_temp.b.l, 1, m_temp.b.l - 1);
 	@eat(hd6309_native_mode() && is_register_addressing_mode() ? 0 : 1);
 	@write_operand(m_temp.b.l);
 	return;
 
 INC8:
 	@m_temp.b.l = read_operand();
-	m_temp.b.l = set_flags<UINT8>(CC_NZV, m_temp.b.l, 1, m_temp.b.l + 1);
+	m_temp.b.l = set_flags<uint8_t>(CC_NZV, m_temp.b.l, 1, m_temp.b.l + 1);
 	@eat(hd6309_native_mode() && is_register_addressing_mode() ? 0 : 1);
 	@write_operand(m_temp.b.l);
 	return;
@@ -139,7 +139,7 @@ CLR8:
 NEG16:
 	m_temp.b.h = read_operand(0);
 	m_temp.b.l = read_operand(1);
-	m_temp.w = set_flags(CC_NZVC, (UINT16)0, m_temp.w, -m_temp.w);
+	m_temp.w = set_flags(CC_NZVC, (uint16_t)0, m_temp.w, -m_temp.w);
 	eat(hd6309_native_mode() ? 0 : 1);
 	write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
@@ -150,7 +150,7 @@ LSR16:
 	@m_temp.b.l = read_operand(1);
 	m_cc &= ~CC_C;
 	m_cc |= (m_temp.w & 1) ? CC_C : 0;
-	m_temp.w = set_flags<UINT16>(CC_NZ, m_temp.w >> 1);
+	m_temp.w = set_flags<uint16_t>(CC_NZ, m_temp.w >> 1);
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
@@ -159,7 +159,7 @@ LSR16:
 ROR16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
-	m_temp.w = set_flags<UINT16>(CC_NZ, rotate_right(m_temp.w));
+	m_temp.w = set_flags<uint16_t>(CC_NZ, rotate_right(m_temp.w));
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
@@ -170,7 +170,7 @@ ASR16:
 	@m_temp.b.l = read_operand(1);
 	m_cc &= ~CC_NZC;
 	m_cc |= (m_temp.w & 1) ? CC_C : 0;
-	m_temp.w = set_flags<UINT16>(CC_NZ, ((INT16) m_temp.w) >> 1);
+	m_temp.w = set_flags<uint16_t>(CC_NZ, ((int16_t) m_temp.w) >> 1);
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
@@ -179,7 +179,7 @@ ASR16:
 ASL16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
-	m_temp.w = set_flags<UINT16>(CC_NZVC, m_temp.w, m_temp.w, m_temp.w << 1);
+	m_temp.w = set_flags<uint16_t>(CC_NZVC, m_temp.w, m_temp.w, m_temp.w << 1);
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
@@ -188,7 +188,7 @@ ASL16:
 ROL16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
-	m_temp.w = set_flags<UINT16>(CC_NZV, rotate_left(m_temp.w));
+	m_temp.w = set_flags<uint16_t>(CC_NZV, rotate_left(m_temp.w));
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
@@ -197,7 +197,7 @@ ROL16:
 DEC16:
 	m_temp.b.h = read_operand(0);
 	m_temp.b.l = read_operand(1);
-	m_temp.w = set_flags<UINT16>(CC_NZVC, m_temp.w, 1, m_temp.w - 1);
+	m_temp.w = set_flags<uint16_t>(CC_NZVC, m_temp.w, 1, m_temp.w - 1);
 	eat(hd6309_native_mode() ? 0 : 1);
 	write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
@@ -206,7 +206,7 @@ DEC16:
 INC16:
 	m_temp.b.h = read_operand(0);
 	m_temp.b.l = read_operand(1);
-	m_temp.w = set_flags<UINT16>(CC_NZVC, m_temp.w, 1, m_temp.w + 1);
+	m_temp.w = set_flags<uint16_t>(CC_NZVC, m_temp.w, 1, m_temp.w + 1);
 	eat(hd6309_native_mode() ? 0 : 1);
 	write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
@@ -239,33 +239,33 @@ CMP8:
 	return;
 
 SBC8:
-	m_temp.w = (UINT16)read_operand() + (m_cc & CC_C ? 1 : 0);
+	m_temp.w = (uint16_t)read_operand() + (m_cc & CC_C ? 1 : 0);
 	regop8() = set_flags(CC_NZVC, regop8(), m_temp.b.l, regop8() - m_temp.w);
 	return;
 
 AND8:
 	m_cc &= ~CC_V;
-	regop8() = set_flags(CC_NZ, (UINT8)0, regop8(), regop8() & read_operand());
+	regop8() = set_flags(CC_NZ, (uint8_t)0, regop8(), regop8() & read_operand());
 	return;
 
 BIT8:
 	m_cc &= ~CC_V;
-	set_flags(CC_NZ, (UINT8)0, regop8(), regop8() & read_operand());
+	set_flags(CC_NZ, (uint8_t)0, regop8(), regop8() & read_operand());
 	return;
 
 EOR8:
 	m_cc &= ~CC_V;
-	regop8() = set_flags(CC_NZ, (UINT8)0, regop8(), regop8() ^ read_operand());
+	regop8() = set_flags(CC_NZ, (uint8_t)0, regop8(), regop8() ^ read_operand());
 	return;
 
 ADC8:
-	m_temp.w = (UINT16)read_operand() + (m_cc & CC_C ? 1 : 0);
+	m_temp.w = (uint16_t)read_operand() + (m_cc & CC_C ? 1 : 0);
 	regop8() = set_flags(add8_sets_h() ? CC_HNZVC : CC_NZVC, regop8(), m_temp.b.l, regop8() + m_temp.w);
 	return;
 
 OR8:
 	m_cc &= ~CC_V;
-	regop8() = set_flags(CC_NZ, (UINT8)0, regop8(), regop8() | read_operand());
+	regop8() = set_flags(CC_NZ, (uint8_t)0, regop8(), regop8() | read_operand());
 	return;
 
 ADD8:
@@ -356,7 +356,7 @@ ANDCC:
 	return;
 
 SEX:
-	m_q.r.d = set_flags<UINT16>(CC_NZ, (INT8) m_q.r.b);
+	m_q.r.d = set_flags<uint16_t>(CC_NZ, (int8_t) m_q.r.b);
 	eat(hd6309_native_mode() ? 0 : 1);
 	return;
 
@@ -365,7 +365,7 @@ BRANCH:
 	eat(1);
 	if (branch_taken())
 	{
-		m_pc.w += (INT8) m_temp.b.l;
+		m_pc.w += (int8_t) m_temp.b.l;
 	}
 	return;
 
@@ -382,14 +382,14 @@ LBRANCH:
 
 BSR:
 	@m_temp.b.l = read_opcode_arg();
-	m_ea.w = m_pc.w + (INT8) m_temp.b.l;
+	m_ea.w = m_pc.w + (int8_t) m_temp.b.l;
 	@eat(hd6309_native_mode() ? 2 : 3);
 	goto GOTO_SUBROUTINE;
 
 LBSR:
 	@m_temp.b.h = read_opcode_arg();
 	@m_temp.b.l = read_opcode_arg();
-	m_ea.w = m_pc.w + (INT16) m_temp.w;
+	m_ea.w = m_pc.w + (int16_t) m_temp.w;
 	@eat(hd6309_native_mode() ? 2 : 4);
 	goto GOTO_SUBROUTINE;
 
@@ -528,7 +528,7 @@ SOFTWARE_INTERRUPT:
 	goto INTERRUPT_VECTOR;
 	
 DIRECT:
-	@set_ea(((UINT16)m_dp << 8) | read_opcode_arg());
+	@set_ea(((uint16_t)m_dp << 8) | read_opcode_arg());
 	@eat(hd6309_native_mode() ? 0 : 1);
 	return;
 

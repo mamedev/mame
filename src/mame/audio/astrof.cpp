@@ -34,7 +34,7 @@
 
 WRITE8_MEMBER(astrof_state::astrof_audio_1_w)
 {
-	UINT8 rising_bits = data & ~m_port_1_last;
+	uint8_t rising_bits = data & ~m_port_1_last;
 
 	if (m_astrof_death_playing)
 		m_astrof_death_playing = m_samples->playing(CHANNEL_EXPLOSION);
@@ -79,7 +79,7 @@ WRITE8_MEMBER(astrof_state::astrof_audio_1_w)
 
 WRITE8_MEMBER(astrof_state::astrof_audio_2_w)
 {
-	UINT8 rising_bits = data & ~m_port_2_last;
+	uint8_t rising_bits = data & ~m_port_2_last;
 
 	/* D0-D2 - explosion select (triggered by D2 of the other port */
 	if (m_astrof_start_explosion)

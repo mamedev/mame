@@ -20,7 +20,7 @@
 ***************************************************************************/
 
 static void reset_log(x86log_context *log) noexcept;
-extern int i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mode);
+extern int i386_dasm_one_ex(char *buffer, uint64_t eip, const uint8_t *oprom, int mode);
 
 
 
@@ -130,9 +130,9 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 			{
 				default:
 				case 1:     sprintf(buffer, "db      %02X", *cur);              break;
-				case 2:     sprintf(buffer, "dw      %04X", *(UINT16 *)cur);    break;
-				case 4:     sprintf(buffer, "dd      %08X", *(UINT32 *)cur);    break;
-				case 8:     sprintf(buffer, "dq      %08X%08X", ((UINT32 *)cur)[1], ((UINT32 *)cur)[0]);    break;
+				case 2:     sprintf(buffer, "dw      %04X", *(uint16_t *)cur);    break;
+				case 4:     sprintf(buffer, "dd      %08X", *(uint32_t *)cur);    break;
+				case 8:     sprintf(buffer, "dq      %08X%08X", ((uint32_t *)cur)[1], ((uint32_t *)cur)[0]);    break;
 			}
 		}
 
@@ -146,7 +146,7 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 		/* otherwise, do a disassembly of the current instruction */
 		else
 		{
-			bytes = i386_dasm_one_ex(buffer, (FPTR)cur, cur, sizeof(void *) * 8) & DASMFLAG_LENGTHMASK;
+			bytes = i386_dasm_one_ex(buffer, (uintptr_t)cur, cur, sizeof(void *) * 8) & DASMFLAG_LENGTHMASK;
 		}
 
 		/* if we have a matching comment, output it */

@@ -332,13 +332,13 @@ protected:
 	virtual void driver_start() override;
 
 private:
-	required_shared_ptr<UINT16> m_sharedram;
+	required_shared_ptr<uint16_t> m_sharedram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 
 	memory_bank *m_bank[8];
-	UINT32 m_n_bankoffset;
-	UINT8 m_su_83;
+	uint32_t m_n_bankoffset;
+	uint8_t m_su_83;
 
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 };
@@ -397,7 +397,7 @@ WRITE16_MEMBER(namcos11_state::lightgun_w)
 
 READ16_MEMBER(namcos11_state::lightgun_r)
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	switch( offset )
 	{
@@ -537,7 +537,7 @@ void namcos11_state::driver_start()
 	memory_region *bankedroms = memregion( "bankedroms" );
 	if( bankedroms != nullptr )
 	{
-		UINT8 *base = bankedroms->base();
+		uint8_t *base = bankedroms->base();
 		int entries = bankedroms->bytes() / ( 1024 * 1024 );
 
 		static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };

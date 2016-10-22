@@ -52,40 +52,40 @@ public:
 
 	rectangle m_visarea;
 
-	UINT8 m_grom_bank;
-	UINT8 m_blitter_int;
-	UINT8 m_tms34061_int;
-	UINT8 m_periodic_int;
-	UINT8 m_sound_data;
-	UINT8 m_pia_porta_data;
-	UINT8 m_pia_portb_data;
-	UINT8 m_z80_ctrl;
-	UINT8 m_z80_port_val;
-	UINT8 m_z80_clear_to_send;
-	UINT16 m_sensor0;
-	UINT16 m_sensor1;
-	UINT16 m_sensor2;
-	UINT16 m_sensor3;
-	UINT8 m_curvx;
-	UINT8 m_curvy;
-	UINT8 m_curx;
-	INT8 m_xbuffer[YBUFFER_COUNT];
-	INT8 m_ybuffer[YBUFFER_COUNT];
+	uint8_t m_grom_bank;
+	uint8_t m_blitter_int;
+	uint8_t m_tms34061_int;
+	uint8_t m_periodic_int;
+	uint8_t m_sound_data;
+	uint8_t m_pia_porta_data;
+	uint8_t m_pia_portb_data;
+	uint8_t m_z80_ctrl;
+	uint8_t m_z80_port_val;
+	uint8_t m_z80_clear_to_send;
+	uint16_t m_sensor0;
+	uint16_t m_sensor1;
+	uint16_t m_sensor2;
+	uint16_t m_sensor3;
+	uint8_t m_curvx;
+	uint8_t m_curvy;
+	uint8_t m_curx;
+	int8_t m_xbuffer[YBUFFER_COUNT];
+	int8_t m_ybuffer[YBUFFER_COUNT];
 	int m_ybuffer_next;
 	int m_curxpos;
 	int m_last_ytotal;
-	UINT8 m_crosshair_vis;
-	UINT8 m_blitter_data[16];
-	UINT8 m_blit_in_progress;
-	UINT8 m_page_select;
+	uint8_t m_crosshair_vis;
+	uint8_t m_blitter_data[16];
+	uint8_t m_blit_in_progress;
+	uint8_t m_page_select;
 	offs_t m_fetch_offset;
-	UINT8 m_fetch_rle_count;
-	UINT8 m_fetch_rle_value;
-	UINT8 m_fetch_rle_literal;
-	UINT8 *m_grom_base;
-	UINT32 m_grom_size;
-	UINT8 m_grmatch_palcontrol;
-	UINT8 m_grmatch_xscroll;
+	uint8_t m_fetch_rle_count;
+	uint8_t m_fetch_rle_value;
+	uint8_t m_fetch_rle_literal;
+	uint8_t *m_grom_base;
+	uint32_t m_grom_size;
+	uint8_t m_grmatch_palcontrol;
+	uint8_t m_grmatch_xscroll;
 	rgb_t m_grmatch_palette[2][16];
 	emu_timer *m_irq_off_timer;
 	emu_timer *m_behind_beam_update_timer;
@@ -134,11 +134,11 @@ public:
 	DECLARE_VIDEO_START(slikshot);
 	DECLARE_MACHINE_START(sstrike);
 
-	UINT32 screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_grmatch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_slikshot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_grmatch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_slikshot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(generate_nmi);
 	TIMER_CALLBACK_MEMBER(irq_off);
@@ -147,9 +147,9 @@ public:
 	TIMER_CALLBACK_MEMBER(blitter_done);
 	TIMER_DEVICE_CALLBACK_MEMBER(grmatch_palette_update);
 
-	inline UINT8 fetch_next_raw();
+	inline uint8_t fetch_next_raw();
 	inline void consume_raw(int count);
-	inline UINT8 fetch_next_rle();
+	inline uint8_t fetch_next_rle();
 	inline void consume_rle(int count);
 	void perform_blit(address_space &space);
 	void update_interrupts(int periodic, int tms34061, int blitter);
@@ -163,15 +163,15 @@ public:
 	DECLARE_READ8_MEMBER( slikshot_z80_control_r );
 	DECLARE_WRITE8_MEMBER( slikshot_z80_control_w );
 
-	void inters_to_vels(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 beams,
-							UINT8 *xres, UINT8 *vxres, UINT8 *vyres);
-	void vels_to_inters(UINT8 x, UINT8 vx, UINT8 vy,
-							UINT16 *inter1, UINT16 *inter2, UINT16 *inter3, UINT8 *beams);
-	void inters_to_words(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 *beams,
-							UINT16 *word1, UINT16 *word2, UINT16 *word3);
+	void inters_to_vels(uint16_t inter1, uint16_t inter2, uint16_t inter3, uint8_t beams,
+							uint8_t *xres, uint8_t *vxres, uint8_t *vyres);
+	void vels_to_inters(uint8_t x, uint8_t vx, uint8_t vy,
+							uint16_t *inter1, uint16_t *inter2, uint16_t *inter3, uint8_t *beams);
+	void inters_to_words(uint16_t inter1, uint16_t inter2, uint16_t inter3, uint8_t *beams,
+							uint16_t *word1, uint16_t *word2, uint16_t *word3);
 
-	void words_to_sensors(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 beams,
-							UINT16 *sens0, UINT16 *sens1, UINT16 *sens2, UINT16 *sens3);
+	void words_to_sensors(uint16_t word1, uint16_t word2, uint16_t word3, uint8_t beams,
+							uint16_t *sens0, uint16_t *sens1, uint16_t *sens2, uint16_t *sens3);
 	void compute_sensors();
 	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
 

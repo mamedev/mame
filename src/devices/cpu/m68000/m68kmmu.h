@@ -46,7 +46,7 @@
 #define M68K_MMU_TC_SRE        0x02000000
 
 /* decodes the effective address */
-static UINT32 DECODE_EA_32(m68000_base_device *m68k, int ea)
+static uint32_t DECODE_EA_32(m68000_base_device *m68k, int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -59,17 +59,17 @@ static UINT32 DECODE_EA_32(m68000_base_device *m68k, int ea)
 		}
 		case 3:     // (An)+
 		{
-			UINT32 ea = EA_AY_PI_32(m68k);
+			uint32_t ea = EA_AY_PI_32(m68k);
 			return ea;
 		}
 		case 5:     // (d16, An)
 		{
-			UINT32 ea = EA_AY_DI_32(m68k);
+			uint32_t ea = EA_AY_DI_32(m68k);
 			return ea;
 		}
 		case 6:     // (An) + (Xn) + d8
 		{
-			UINT32 ea = EA_AY_IX_32(m68k);
+			uint32_t ea = EA_AY_IX_32(m68k);
 			return ea;
 		}
 		case 7:
@@ -78,19 +78,19 @@ static UINT32 DECODE_EA_32(m68000_base_device *m68k, int ea)
 			{
 				case 0:     // (xxx).W
 				{
-					UINT32 ea = (UINT32)OPER_I_16(m68k);
+					uint32_t ea = (uint32_t)OPER_I_16(m68k);
 					return ea;
 				}
 				case 1:     // (xxx).L
 				{
-					UINT32 d1 = OPER_I_16(m68k);
-					UINT32 d2 = OPER_I_16(m68k);
-					UINT32 ea = (d1 << 16) | d2;
+					uint32_t d1 = OPER_I_16(m68k);
+					uint32_t d2 = OPER_I_16(m68k);
+					uint32_t ea = (d1 << 16) | d2;
 					return ea;
 				}
 				case 2:     // (d16, PC)
 				{
-					UINT32 ea = EA_PCDI_32(m68k);
+					uint32_t ea = EA_PCDI_32(m68k);
 					return ea;
 				}
 				default:    fatalerror("m68k: DECODE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC(m68k));
@@ -105,14 +105,14 @@ static UINT32 DECODE_EA_32(m68000_base_device *m68k, int ea)
 /*
     pmmu_atc_add: adds this address to the ATC
 */
-void pmmu_atc_add(m68000_base_device *m68k, UINT32 logical, UINT32 physical, int fc)
+void pmmu_atc_add(m68000_base_device *m68k, uint32_t logical, uint32_t physical, int fc)
 {
 	int i, found;
 
 	// get page size (i.e. # of bits to ignore); is 10 for Apollo
 	int ps = (m68k->mmu_tc >> 20) & 0xf;
 	// Note: exact emulation would use (logical >> ps) << (ps-8)
-	UINT32 atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24)| logical >> ps;
+	uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24)| logical >> ps;
 
 	// first see if this is already in the cache
 	for (i = 0; i < MMU_ATC_ENTRIES; i++)
@@ -176,10 +176,10 @@ void pmmu_atc_flush(m68000_base_device *m68k)
 }
 
 
-static inline UINT32 get_dt2_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 ptest)
+static inline uint32_t get_dt2_table_entry(m68000_base_device *m68k, uint32_t tptr, uint8_t ptest)
 {
-	UINT32 tbl_entry = m68k->program->read_dword(tptr);
-	UINT32 dt = tbl_entry & M68K_MMU_DF_DT;
+	uint32_t tbl_entry = m68k->program->read_dword(tptr);
+	uint32_t dt = tbl_entry & M68K_MMU_DF_DT;
 
 	m68k->mmu_tmp_sr |= tbl_entry & 0x0004 ? M68K_MMU_SR_WRITE_PROTECT : 0;
 
@@ -198,11 +198,11 @@ static inline UINT32 get_dt2_table_entry(m68000_base_device *m68k, UINT32 tptr, 
 	return tbl_entry;
 }
 
-static inline UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 fc, UINT8 ptest)
+static inline uint32_t get_dt3_table_entry(m68000_base_device *m68k, uint32_t tptr, uint8_t fc, uint8_t ptest)
 {
-	UINT32 tbl_entry2 = m68k->program->read_dword(tptr);
-	UINT32 tbl_entry = m68k->program->read_dword(tptr + 4);
-	UINT32 dt = tbl_entry2 & M68K_MMU_DF_DT;
+	uint32_t tbl_entry2 = m68k->program->read_dword(tptr);
+	uint32_t tbl_entry = m68k->program->read_dword(tptr + 4);
+	uint32_t dt = tbl_entry2 & M68K_MMU_DF_DT;
 
 	m68k->mmu_tmp_sr |= ((tbl_entry2 & 0x0100) && !(fc & 4)) ? M68K_MMU_SR_SUPERVISOR_ONLY : 0;
 	m68k->mmu_tmp_sr |= tbl_entry2 & 0x0004 ? M68K_MMU_SR_WRITE_PROTECT : 0;
@@ -226,17 +226,17 @@ static inline UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, 
 /*
     pmmu_translate_addr_with_fc: perform 68851/68030-style PMMU address translation
 */
-/*static inline*/ static UINT32 pmmu_translate_addr_with_fc(m68000_base_device *m68k, UINT32 addr_in, UINT8 fc, UINT8 ptest)
+/*static inline*/ static uint32_t pmmu_translate_addr_with_fc(m68000_base_device *m68k, uint32_t addr_in, uint8_t fc, uint8_t ptest)
 {
-	UINT32 addr_out, tbl_entry = 0, tamode = 0, tbmode = 0, tcmode = 0;
-	UINT32 root_aptr, root_limit, tofs, ps, is, abits, bbits, cbits;
-	UINT32 resolved, tptr, shift, last_entry_ptr;
+	uint32_t addr_out, tbl_entry = 0, tamode = 0, tbmode = 0, tcmode = 0;
+	uint32_t root_aptr, root_limit, tofs, ps, is, abits, bbits, cbits;
+	uint32_t resolved, tptr, shift, last_entry_ptr;
 	int i;
-	UINT32 atc_tag;
+	uint32_t atc_tag;
 //  int verbose = 0;
 
-//  static UINT32 pmmu_access_count = 0;
-//  static UINT32 pmmu_atc_count = 0;
+//  static uint32_t pmmu_access_count = 0;
+//  static uint32_t pmmu_atc_count = 0;
 
 	resolved = 0;
 	addr_out = addr_in;
@@ -250,8 +250,8 @@ static inline UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, 
 	if (m68k->mmu_tt0 & 0x8000)
 	{
 		// transparent translation register 0 enabled
-		UINT32 address_base = m68k->mmu_tt0 & 0xff000000;
-		UINT32 address_mask = ((m68k->mmu_tt0 << 8) & 0xff000000) ^ 0xff000000;
+		uint32_t address_base = m68k->mmu_tt0 & 0xff000000;
+		uint32_t address_mask = ((m68k->mmu_tt0 << 8) & 0xff000000) ^ 0xff000000;
 		if ((addr_in & address_mask) == address_base && (fc & ~m68k->mmu_tt0) == ((m68k->mmu_tt0 >> 4) & 7))
 		{
 //          printf("PMMU: pc=%x TT0 fc=%x addr_in=%08x address_mask=%08x address_base=%08x\n", m68k->ppc, fc, addr_in, address_mask, address_base);
@@ -262,8 +262,8 @@ static inline UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, 
 	if (m68k->mmu_tt1 & 0x8000)
 	{
 		// transparent translation register 1 enabled
-		UINT32 address_base = m68k->mmu_tt1 & 0xff000000;
-		UINT32 address_mask = ((m68k->mmu_tt1 << 8) & 0xff000000) ^ 0xff000000;
+		uint32_t address_base = m68k->mmu_tt1 & 0xff000000;
+		uint32_t address_mask = ((m68k->mmu_tt1 << 8) & 0xff000000) ^ 0xff000000;
 		if ((addr_in & address_mask) == address_base && (fc & ~m68k->mmu_tt1) == ((m68k->mmu_tt1 >> 4) & 7))
 		{
 //          printf("PMMU: pc=%x TT1 fc=%x addr_in=%08x address_mask=%08x address_base=%08x\n", m68k->ppc, fc, addr_in, address_mask, address_base);
@@ -525,9 +525,9 @@ static inline UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, 
 
 // FC bits: 2 = supervisor, 1 = program, 0 = data
 // the 68040 is a subset of the 68851 and 68030 PMMUs - the page table sizes are fixed, there is no early termination, etc, etc.
-/*static inline*/ static UINT32 pmmu_translate_addr_with_fc_040(m68000_base_device *m68k, UINT32 addr_in, UINT8 fc, UINT8 ptest)
+/*static inline*/ static uint32_t pmmu_translate_addr_with_fc_040(m68000_base_device *m68k, uint32_t addr_in, uint8_t fc, uint8_t ptest)
 {
-	UINT32 addr_out, tt0, tt1;
+	uint32_t addr_out, tt0, tt1;
 
 	addr_out = addr_in;
 	m68k->mmu_tmp_sr = 0;
@@ -554,7 +554,7 @@ static inline UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, 
 	{
 		static int fcmask[4] = { 4, 4, 0, 0 };
 		static int fcmatch[4] = { 0, 4, 0, 0 };
-		UINT32 mask = (tt0>>16) & 0xff;
+		uint32_t mask = (tt0>>16) & 0xff;
 		mask ^= 0xff;
 		mask <<= 24;
 
@@ -579,7 +579,7 @@ static inline UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, 
 	{
 		static int fcmask[4] = { 4, 4, 0, 0 };
 		static int fcmatch[4] = { 0, 4, 0, 0 };
-		UINT32 mask = (tt1>>16) & 0xff;
+		uint32_t mask = (tt1>>16) & 0xff;
 		mask ^= 0xff;
 		mask <<= 24;
 
@@ -602,11 +602,11 @@ static inline UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, 
 
 	if (m68k->pmmu_enabled)
 	{
-		UINT32 root_idx = (addr_in>>25) & 0x7f;
-		UINT32 ptr_idx = (addr_in>>18) & 0x7f;
-		UINT32 page_idx, page;
-		UINT32 root_ptr, pointer_ptr, page_ptr;
-		UINT32 root_entry, pointer_entry, page_entry;
+		uint32_t root_idx = (addr_in>>25) & 0x7f;
+		uint32_t ptr_idx = (addr_in>>18) & 0x7f;
+		uint32_t page_idx, page;
+		uint32_t root_ptr, pointer_ptr, page_ptr;
+		uint32_t root_entry, pointer_entry, page_entry;
 
 		// select supervisor or user root pointer
 		if (fc & 4)
@@ -809,9 +809,9 @@ static inline UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, 
 /*
     pmmu_translate_addr: perform 68851/68030-style PMMU address translation
 */
-/*static inline*/ static UINT32 pmmu_translate_addr(m68000_base_device *m68k, UINT32 addr_in)
+/*static inline*/ static uint32_t pmmu_translate_addr(m68000_base_device *m68k, uint32_t addr_in)
 {
-	UINT32 addr_out;
+	uint32_t addr_out;
 
 	if (CPU_TYPE_IS_040_PLUS(m68k->cpu_type))
 	{
@@ -837,9 +837,9 @@ static inline UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, 
 
 void m68881_mmu_ops(m68000_base_device *m68k)
 {
-	UINT16 modes;
-	UINT32 ea = m68k->ir & 0x3f;
-	UINT64 temp64;
+	uint16_t modes;
+	uint32_t ea = m68k->ir & 0x3f;
+	uint64_t temp64;
 
 
 	// catch the 2 "weird" encodings up front (PBcc)
@@ -867,8 +867,8 @@ void m68881_mmu_ops(m68000_base_device *m68k)
 
 				if ((modes & 0xfde0) == 0x2000) // PLOAD
 				{
-					UINT32 ltmp = DECODE_EA_32(m68k, ea);
-					UINT32 ptmp;
+					uint32_t ltmp = DECODE_EA_32(m68k, ea);
+					uint32_t ptmp;
 
 					ptmp = ltmp;
 					if (m68k->pmmu_enabled)
@@ -910,9 +910,9 @@ void m68881_mmu_ops(m68000_base_device *m68k)
 				}
 				else if ((modes & 0xe000) == 0x8000)    // PTEST
 				{
-					UINT32 v_addr = DECODE_EA_32(m68k,  ea);
-					UINT32 p_addr;
-					UINT32 fc = modes & 0x1f;
+					uint32_t v_addr = DECODE_EA_32(m68k,  ea);
+					uint32_t p_addr;
+					uint32_t fc = modes & 0x1f;
 					switch (fc >> 3) {
 					case 0:
 						fc = fc == 0 ? m68k->sfc :  m68k->dfc;
@@ -969,12 +969,12 @@ void m68881_mmu_ops(m68000_base_device *m68k)
 											break;
 
 										case 0x12: // supervisor root pointer
-											WRITE_EA_64(m68k, ea, (UINT64)m68k->mmu_srp_limit<<32 | (UINT64)m68k->mmu_srp_aptr);
+											WRITE_EA_64(m68k, ea, (uint64_t)m68k->mmu_srp_limit<<32 | (uint64_t)m68k->mmu_srp_aptr);
 //                                          printf("PMMU: pc=%x PMOVE from SRP limit = %08x, aptr = %08x\n", REG_PPC(m68k), m68k->mmu_srp_limit, m68k->mmu_srp_aptr);
 											break;
 
 										case 0x13: // CPU root pointer
-											WRITE_EA_64(m68k, ea, (UINT64)m68k->mmu_crp_limit<<32 | (UINT64)m68k->mmu_crp_aptr);
+											WRITE_EA_64(m68k, ea, (uint64_t)m68k->mmu_crp_limit<<32 | (uint64_t)m68k->mmu_crp_aptr);
 //                                          printf("PMMU: pc=%x PMOVE from CRP limit = %08x, aptr = %08x\n", REG_PPC(m68k), m68k->mmu_crp_limit, m68k->mmu_crp_aptr);
 											break;
 
@@ -990,7 +990,7 @@ void m68881_mmu_ops(m68000_base_device *m68k)
 								{
 									case 0:
 										{
-											UINT32 temp = READ_EA_32(m68k, ea);
+											uint32_t temp = READ_EA_32(m68k, ea);
 
 											if (((modes>>10) & 7) == 2)
 											{
@@ -1057,7 +1057,7 @@ void m68881_mmu_ops(m68000_base_device *m68k)
 													if (m68k->cpu_type == CPU_TYPE_020)
 													{
 														// DomainOS on Apollo DN3000 will only reset this to 0
-														UINT16 mmu_ac = READ_EA_16(m68k, ea);
+														uint16_t mmu_ac = READ_EA_16(m68k, ea);
 														if (mmu_ac != 0)
 														{
 															printf("680x0 PMMU: pc=%x PMOVE to mmu_ac=%08x\n",
@@ -1075,7 +1075,7 @@ void m68881_mmu_ops(m68000_base_device *m68k)
 
 									case 3: // MMU status
 										{
-											UINT32 temp = READ_EA_32(m68k, ea);
+											uint32_t temp = READ_EA_32(m68k, ea);
 											printf("680x0: unsupported PMOVE %x to MMU status, PC %x\n", temp, m68k->pc);
 										}
 										break;
@@ -1111,9 +1111,9 @@ void m68881_mmu_ops(m68000_base_device *m68k)
 
 
 /* Apple HMMU translation is much simpler */
-static inline UINT32 hmmu_translate_addr(m68000_base_device *m68k, UINT32 addr_in)
+static inline uint32_t hmmu_translate_addr(m68000_base_device *m68k, uint32_t addr_in)
 {
-	UINT32 addr_out;
+	uint32_t addr_out;
 
 	addr_out = addr_in;
 

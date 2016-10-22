@@ -49,7 +49,7 @@ const device_type CRT = &device_creator<crt_device>;
 //  crt_device - constructor
 //-------------------------------------------------
 
-crt_device::crt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+crt_device::crt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CRT, "CRT Video", tag, owner, clock, "crt", __FILE__),
 		m_list(nullptr),
 		m_list_head(nullptr),
@@ -142,7 +142,7 @@ void crt_device::update(bitmap_ind16 &bitmap)
 		/* some time has elapsed: let's update the screen */
 		for (y=0; y<m_window_height; y++)
 		{
-			UINT16 *line = &bitmap.pix16(y+m_window_offset_y);
+			uint16_t *line = &bitmap.pix16(y+m_window_offset_y);
 
 			p_i = -1;
 

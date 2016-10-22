@@ -168,7 +168,7 @@ ioport_constructor qubide_t::device_input_ports() const
 //  qubide_t - constructor
 //-------------------------------------------------
 
-qubide_t::qubide_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+qubide_t::qubide_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, QUBIDE, "QubIDE", tag, owner, clock, "ql_qubide", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_ata(*this, "ata"),
@@ -210,7 +210,7 @@ void qubide_t::device_reset()
 //  read -
 //-------------------------------------------------
 
-UINT8 qubide_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t qubide_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xfc000) == m_base)
 	{
@@ -255,7 +255,7 @@ UINT8 qubide_t::read(address_space &space, offs_t offset, UINT8 data)
 //  write -
 //-------------------------------------------------
 
-void qubide_t::write(address_space &space, offs_t offset, UINT8 data)
+void qubide_t::write(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xfc000) == m_base)
 	{

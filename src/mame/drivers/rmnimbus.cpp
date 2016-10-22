@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8, rmnimbus_state )
 	AM_RANGE(0x20000, 0x20004) AM_READWRITE(nimbus_pc8031_port_r, nimbus_pc8031_port_w)
 ADDRESS_MAP_END
 
-static const UINT16 def_config[16] =
+static const uint16_t def_config[16] =
 {
 	0x0280, 0x017F, 0xE824, 0x8129,
 	0x0329, 0x0000, 0x0000, 0x0000,

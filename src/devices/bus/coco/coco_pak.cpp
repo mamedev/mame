@@ -39,14 +39,14 @@ const device_type COCO_PAK = &device_creator<coco_pak_device>;
 //-------------------------------------------------
 //  coco_pak_device - constructor
 //-------------------------------------------------
-coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr),
 		m_autostart(*this, ":" CART_AUTOSTART_TAG)
 {
 }
 
-coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, COCO_PAK, "CoCo Program PAK", tag, owner, clock, "cocopak", __FILE__),
 		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr),
 		m_autostart(*this, ":" CART_AUTOSTART_TAG)
@@ -103,7 +103,7 @@ void coco_pak_device::device_reset()
     get_cart_base
 -------------------------------------------------*/
 
-UINT8* coco_pak_device::get_cart_base()
+uint8_t* coco_pak_device::get_cart_base()
 {
 	return memregion(CARTSLOT_TAG)->base();
 }
@@ -126,7 +126,7 @@ const device_type COCO_PAK_BANKED = &device_creator<coco_pak_banked_device>;
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
-coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: coco_pak_device(mconfig, COCO_PAK_BANKED, "CoCo Program PAK (Banked)", tag, owner, clock, "cocopak_banked", __FILE__)
 {
 }
@@ -146,12 +146,12 @@ void coco_pak_banked_device::device_reset()
     banked_pak_set_bank - function to set the bank
 -------------------------------------------------*/
 
-void coco_pak_banked_device::banked_pak_set_bank(UINT32 bank)
+void coco_pak_banked_device::banked_pak_set_bank(uint32_t bank)
 {
-	UINT64 pos;
-	UINT32 i;
-	UINT8 *rom = memregion(CARTSLOT_TAG)->base();
-	UINT32 rom_length = memregion(CARTSLOT_TAG)->bytes();
+	uint64_t pos;
+	uint32_t i;
+	uint8_t *rom = memregion(CARTSLOT_TAG)->base();
+	uint32_t rom_length = memregion(CARTSLOT_TAG)->bytes();
 
 	if (m_cart->exists()) {
 		pos = (bank * 0x4000) % m_cart->length();

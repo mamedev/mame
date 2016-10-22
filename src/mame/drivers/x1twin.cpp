@@ -28,7 +28,7 @@ class x1twin_state : public x1_state
 		x1twin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: x1_state(mconfig, type, tag)
 	{ }
-	UINT32 screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 };
@@ -39,7 +39,7 @@ class x1twin_state : public x1_state
 #define MCU_CLOCK  XTAL_6MHz
 #define PCE_MAIN_CLOCK      VDP_CLOCK / 2
 
-UINT32 x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

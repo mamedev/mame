@@ -80,7 +80,7 @@ public:
 
 	// running the video
 	virtual void video_start() override;
-	UINT32 screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	enum { TIMER_SCANLINE };
@@ -110,16 +110,16 @@ protected:
 	// stuff for rendering video
 	emu_timer       *m_scanline_timer;
 	bitmap_ind16    m_bitmap;
-	UINT8 const     *m_gfx1;
-	UINT8 const     *m_gfx2;
+	uint8_t const     *m_gfx1;
+	uint8_t const     *m_gfx2;
 
 	// control lines
 	unsigned        m_input_mux;
 	bool            m_mpx_p_1_2;
 
 	// RAM used by TTL video hardware, writable by CPU
-	UINT8           m_bg_ram[0x400];    // background tilemap
-	UINT8           m_eff_ram[0x400];   // per-scanline effects (A8 not wired meaning only half is usable)
+	uint8_t           m_bg_ram[0x400];    // background tilemap
+	uint8_t           m_eff_ram[0x400];   // per-scanline effects (A8 not wired meaning only half is usable)
 	bool            m_mpx_bkeff;        // select between writing background and effects memory
 
 	// signals affecting the TTL-generated 32x32 sprite

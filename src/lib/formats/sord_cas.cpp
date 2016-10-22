@@ -16,7 +16,7 @@
 #define SORDM5_WAVESAMPLES_TRAILER 1
 #define SORDM5_WAVESAMPLES_BLOCK   1
 
-static const UINT8 SORDM5_CAS_HEADER[6] = { 'S', 'O', 'R', 'D', 'M', '5'};
+static const uint8_t SORDM5_CAS_HEADER[6] = { 'S', 'O', 'R', 'D', 'M', '5'};
 
 static const struct CassetteModulation sordm5_cas_modulation =
 {
@@ -25,9 +25,9 @@ static const struct CassetteModulation sordm5_cas_modulation =
 	3150.0 - 600, 3150.0, 3150.0 + 600
 };
 
-static UINT8 cassette_image_read_uint8( cassette_image *cassette, UINT64 offset)
+static uint8_t cassette_image_read_uint8( cassette_image *cassette, uint64_t offset)
 {
-	UINT8 data;
+	uint8_t data;
 	cassette_image_read( cassette, &data, offset, 1);
 	return data;
 }
@@ -40,13 +40,13 @@ static cassette_image::error sordm5_tap_identify( cassette_image *cassette, stru
 static cassette_image::error sordm5_tap_load( cassette_image *cassette)
 {
 	cassette_image::error err;
-	UINT64 image_size;
+	uint64_t image_size;
 	double time_index = 0.0;
 	double time_displacement;
-	UINT8 header[16];
-	UINT64 image_pos;
-	UINT8 block_type, byte, bit;
-	UINT32 block_size, i, j;
+	uint8_t header[16];
+	uint64_t image_pos;
+	uint8_t block_type, byte, bit;
+	uint32_t block_size, i, j;
 	size_t filler_length;
 	// init
 	image_size = cassette_image_size(cassette);

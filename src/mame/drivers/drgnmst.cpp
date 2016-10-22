@@ -455,7 +455,7 @@ ROM_START( drgnmst )
 ROM_END
 
 
-UINT8 drgnmst_state::drgnmst_asciitohex( UINT8 data )
+uint8_t drgnmst_state::drgnmst_asciitohex( uint8_t data )
 {
 	/* Convert ASCII data to HEX */
 
@@ -469,13 +469,13 @@ UINT8 drgnmst_state::drgnmst_asciitohex( UINT8 data )
 
 DRIVER_INIT_MEMBER(drgnmst_state,drgnmst)
 {
-	UINT8 *drgnmst_PICROM_HEX = memregion("user1")->base();
-	UINT16 *drgnmst_PICROM = (UINT16 *)memregion("audiocpu")->base();
-	UINT8 *drgnmst_PCM = memregion("oki1")->base();
-	INT32   offs, data;
-	UINT16  src_pos = 0;
-	UINT16  dst_pos = 0;
-	UINT8   data_hi, data_lo;
+	uint8_t *drgnmst_PICROM_HEX = memregion("user1")->base();
+	uint16_t *drgnmst_PICROM = (uint16_t *)memregion("audiocpu")->base();
+	uint8_t *drgnmst_PCM = memregion("oki1")->base();
+	int32_t   offs, data;
+	uint16_t  src_pos = 0;
+	uint16_t  dst_pos = 0;
+	uint8_t   data_hi, data_lo;
 
 	/* Configure the OKI-0 PCM data into a MAME friendly bank format */
 	/* $00000-1ffff is the same through all banks */

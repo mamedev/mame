@@ -73,14 +73,14 @@ public:
 	DECLARE_WRITE8_MEMBER( a5105_upd765_w );
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
-	required_shared_ptr<UINT16> m_video_ram;
-	UINT8 *m_ram_base;
-	UINT8 *m_rom_base;
-	UINT8 *m_char_ram;
-	UINT16 m_pcg_addr;
-	UINT16 m_pcg_internal_addr;
-	UINT8 m_key_mux;
-	UINT8 m_memsel[4];
+	required_shared_ptr<uint16_t> m_video_ram;
+	uint8_t *m_ram_base;
+	uint8_t *m_rom_base;
+	uint8_t *m_char_ram;
+	uint16_t m_pcg_addr;
+	uint16_t m_pcg_internal_addr;
+	uint8_t m_key_mux;
+	uint8_t m_memsel[4];
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(a5105);
@@ -98,7 +98,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( a5105_state::hgdc_display_pixels )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	int xi,gfx;
-	UINT8 pen;
+	uint8_t pen;
 
 	gfx = m_video_ram[(address & 0x1ffff) >> 1];
 
@@ -116,7 +116,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 	int x;
 	int xi,yi;
 	int tile,color;
-	UINT8 tile_data;
+	uint8_t tile_data;
 
 	for( x = 0; x < pitch; x++ )
 	{
@@ -231,7 +231,7 @@ WRITE8_MEMBER( a5105_state::a5105_ab_w )
 
 READ8_MEMBER( a5105_state::a5105_memsel_r )
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = (m_memsel[0] & 3) << 0;
 	res|= (m_memsel[1] & 3) << 2;
@@ -485,8 +485,8 @@ void a5105_state::machine_reset()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	a5105_ab_w(space, 0, 9); // turn motor off
 
-	m_ram_base = (UINT8*)m_ram->pointer();
-	m_rom_base = (UINT8*)memregion("maincpu")->base();
+	m_ram_base = (uint8_t*)m_ram->pointer();
+	m_rom_base = (uint8_t*)memregion("maincpu")->base();
 
 	membank("bank1")->set_base(m_rom_base);
 	membank("bank2")->set_base(m_rom_base + 0x4000);

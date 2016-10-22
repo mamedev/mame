@@ -48,8 +48,8 @@ class x2212_device :    public device_t,
 {
 public:
 	// construction/destruction
-	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size_data);
+	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int size_data);
 
 	// inline configuration helpers
 	static void static_set_auto_save(device_t &device);
@@ -92,13 +92,13 @@ protected:
 	bool        m_array_recall;
 
 	int m_size_data;
-	optional_region_ptr<UINT8> m_default_data;
+	optional_region_ptr<uint8_t> m_default_data;
 };
 
 class x2210_device :    public x2212_device
 {
 public:
-	x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

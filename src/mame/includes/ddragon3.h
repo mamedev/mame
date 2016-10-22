@@ -33,28 +33,28 @@ public:
 	}
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_fg_videoram;
-//  required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+//  required_shared_ptr<uint16_t> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram;
 
 	/* video-related */
 	tilemap_t         *m_fg_tilemap;
 	tilemap_t         *m_bg_tilemap;
-	UINT16          m_vreg;
-	UINT16          m_bg_scrollx;
-	UINT16          m_bg_scrolly;
-	UINT16          m_fg_scrollx;
-	UINT16          m_fg_scrolly;
-	UINT16          m_bg_tilebase;
+	uint16_t          m_vreg;
+	uint16_t          m_bg_scrollx;
+	uint16_t          m_bg_scrolly;
+	uint16_t          m_fg_scrollx;
+	uint16_t          m_fg_scrolly;
+	uint16_t          m_bg_tilebase;
 
-	UINT16 m_sprite_xoff;
-	UINT16 m_bg0_dx;
-	UINT16 m_bg1_dx[2];
+	uint16_t m_sprite_xoff;
+	uint16_t m_bg0_dx;
+	uint16_t m_bg1_dx[2];
 
 	/* misc */
-	UINT16          m_io_reg[8];
-	UINT8 m_pri;
+	uint16_t          m_io_reg[8];
+	uint8_t m_pri;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -76,8 +76,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_ddragon3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ctribe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ddragon3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ctribe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ddragon3_scanline);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
 
@@ -99,8 +99,8 @@ public:
 	}
 
 	/* wwfwfest has an extra layer */
-	required_shared_ptr<UINT16> m_fg0_videoram;
-	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<uint16_t> m_fg0_videoram;
+	required_shared_ptr<uint16_t> m_paletteram;
 	tilemap_t *m_fg0_tilemap;
 	DECLARE_WRITE16_MEMBER(wwfwfest_fg0_videoram_w);
 
@@ -119,6 +119,6 @@ public:
 
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(wwfwfstb);
-	UINT32 screen_update_wwfwfest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wwfwfest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 };

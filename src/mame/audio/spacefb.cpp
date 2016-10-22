@@ -7,10 +7,11 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/spacefb.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
-#include "includes/spacefb.h"
+#include "sound/volt_reg.h"
 
 
 READ8_MEMBER(spacefb_state::audio_p2_r)
@@ -75,13 +76,13 @@ static const char *const spacefb_sample_names[] =
 
 
 MACHINE_CONFIG_FRAGMENT( spacefb_audio )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(3)
 	MCFG_SAMPLES_NAMES(spacefb_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

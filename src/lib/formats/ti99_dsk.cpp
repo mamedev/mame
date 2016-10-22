@@ -58,7 +58,7 @@
     As said above, let's not spend too much effort allowing format deviations.
     If the image does not exactly adhere to the format, give up.
 */
-bool ti99_floppy_format::check_for_address_marks(UINT8* trackdata, int encoding)
+bool ti99_floppy_format::check_for_address_marks(uint8_t* trackdata, int encoding)
 {
 	int i=0;
 
@@ -94,7 +94,7 @@ int ti99_floppy_format::get_encoding(int cell_size)
 /*
     Load the image from disk and convert it into a sequence of flux levels.
 */
-bool ti99_floppy_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool ti99_floppy_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	int cell_size = 0;
 	int sector_count = 0;
@@ -105,7 +105,7 @@ bool ti99_floppy_format::load(io_generic *io, UINT32 form_factor, floppy_image *
 	if (cell_size == 0) return false;
 
 	// Be ready to hold a track of up to 36 sectors (with gaps and marks)
-	UINT8 trackdata[13000];
+	uint8_t trackdata[13000];
 
 	int maxtrack, maxheads;
 	image->get_maximal_geometry(maxtrack, maxheads);
@@ -188,8 +188,8 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 {
 	int act_track_size = 0;
 
-	UINT8 bitstream[500000/8];
-	UINT8 trackdata[9216];   // max size
+	uint8_t bitstream[500000/8];
+	uint8_t trackdata[9216];   // max size
 
 	int cellsizes[] = { 2000, 4000, 1000, 2000 };
 
@@ -299,10 +299,10 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 	return true;
 }
 
-void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image)
+void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, uint8_t* trackdata, floppy_image *image)
 {
 	int track_size_cells = 200000000/cell_size;
-	std::vector<UINT32> buffer;
+	std::vector<uint32_t> buffer;
 
 	// The TDF has a long track lead-out that makes the track length sum up
 	// to 3253; this is too long for the number of cells in the real track.
@@ -399,10 +399,10 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 	generate_track_from_levels(track, head, buffer, 0, image);
 }
 
-void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image)
+void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, uint8_t* trackdata, floppy_image *image)
 {
 	int track_size_cells = 200000000/cell_size;
-	std::vector<UINT32> buffer;
+	std::vector<uint32_t> buffer;
 
 	// See above
 	// We limit the track size to cell_number / 16, which means 6250 for MFM
@@ -510,15 +510,15 @@ enum
     Decodes the bitstream into a TDF track image.
     Returns the number of detected marks.
 */
-int ti99_floppy_format::decode_bitstream(const UINT8 *bitstream, UINT8 *trackdata, int* sector, int cell_count, int encoding, UINT8 gapbytes, int track_size)
+int ti99_floppy_format::decode_bitstream(const uint8_t *bitstream, uint8_t *trackdata, int* sector, int cell_count, int encoding, uint8_t gapbytes, int track_size)
 {
 	int databytes = 0;
 	int a1count = 0;
 	int lastpos = 0;
 	int headerbytes = 0;
 	int curpos = 0;
-	UINT8 curbyte = 0;
-	UINT16 shift_reg = 0;
+	uint8_t curbyte = 0;
+	uint16_t shift_reg = 0;
 	int tpos = 0;
 	int pos = 0;
 	int state;
@@ -695,7 +695,7 @@ int ti99_floppy_format::decode_bitstream(const UINT8 *bitstream, UINT8 *trackdat
 	return marks;
 }
 
-UINT8 ti99_floppy_format::get_data_from_encoding(UINT16 raw)
+uint8_t ti99_floppy_format::get_data_from_encoding(uint16_t raw)
 {
 	return (raw & 0x4000 ? 0x80 : 0x00) |
 			(raw & 0x1000 ? 0x40 : 0x00) |
@@ -750,9 +750,9 @@ const char *ti99_sdf_format::extensions() const
 	return "dsk";
 }
 
-int ti99_sdf_format::identify(io_generic *io, UINT32 form_factor)
+int ti99_sdf_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT64 file_size = io_generic_size(io);
+	uint64_t file_size = io_generic_size(io);
 	int vote = 0;
 
 	// Adding support for another sector image format which adds 768 bytes
@@ -810,7 +810,7 @@ int ti99_sdf_format::identify(io_generic *io, UINT32 form_factor)
 
 void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks)
 {
-	UINT64 file_size = io_generic_size(io);
+	uint64_t file_size = io_generic_size(io);
 	ti99vib vib;
 
 	cell_size = 0;
@@ -910,7 +910,7 @@ int ti99_sdf_format::get_track_size(int cell_size, int sector_count)
     acttrack is the actual track when double stepping is used and changes
     every two physical tracks.
 */
-void ti99_sdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int track, int acttrack, int sectorcount, int trackcount, int cellsize)
+void ti99_sdf_format::load_track(io_generic *io, uint8_t *trackdata, int head, int track, int acttrack, int sectorcount, int trackcount, int cellsize)
 {
 	bool fm = (cellsize==4000);
 	int tracksize = sectorcount * SECTOR_SIZE;
@@ -999,7 +999,7 @@ void ti99_sdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int
 /*
     For debugging. Outputs the byte array in a xxd-like way.
 */
-void ti99_floppy_format::showtrack(UINT8* trackdata, int length)
+void ti99_floppy_format::showtrack(uint8_t* trackdata, int length)
 {
 	for (int i=0; i < length; i+=16)
 	{
@@ -1023,7 +1023,7 @@ void ti99_floppy_format::showtrack(UINT8* trackdata, int length)
     Write the data to the disk. We have a list of sector positions, so we
     just need to go through that list and save each sector in the track data.
 */
-void ti99_sdf_format::write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes)
+void ti99_sdf_format::write_track(io_generic *io, uint8_t *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes)
 {
 	int logicaltrack = head * maxtrack;
 	logicaltrack += ((head&1)==0)?  track : (maxtrack - 1 - track);
@@ -1091,11 +1091,11 @@ const char *ti99_tdf_format::extensions() const
 /*
     Determine whether the image file can be interpreted as a track dump
 */
-int ti99_tdf_format::identify(io_generic *io, UINT32 form_factor)
+int ti99_tdf_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT64 file_size = io_generic_size(io);
+	uint64_t file_size = io_generic_size(io);
 	int vote = 0;
-	UINT8 trackdata[2000];
+	uint8_t trackdata[2000];
 
 	// Do we have a plausible image size? From the size alone we only give a 50 percent vote.
 	if ((file_size == 260240) || (file_size == 549760) || (file_size == 1099520))
@@ -1124,7 +1124,7 @@ int ti99_tdf_format::identify(io_generic *io, UINT32 form_factor)
 */
 void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks)
 {
-	UINT64 file_size = io_generic_size(io);
+	uint64_t file_size = io_generic_size(io);
 	heads = 2;  // TDF only supports two-sided recordings
 
 	if (file_size % get_track_size(2000, 0)==0) cell_size = 2000;
@@ -1138,7 +1138,7 @@ void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
     For TDF this just amounts to loading the track from the image file.
     acttrack is not used here, since the file contains the track data.
 */
-void ti99_tdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int track, int acttrack, int sectorcount, int trackcount, int cellsize)
+void ti99_tdf_format::load_track(io_generic *io, uint8_t *trackdata, int head, int track, int acttrack, int sectorcount, int trackcount, int cellsize)
 {
 	int offset = ((trackcount * head) + track) * get_track_size(cellsize, 0);
 	io_generic_read(io, trackdata, offset, get_track_size(cellsize, 0));
@@ -1147,7 +1147,7 @@ void ti99_tdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int
 /*
     Also here, we just need to write the complete track on the image file.
 */
-void ti99_tdf_format::write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes)
+void ti99_tdf_format::write_track(io_generic *io, uint8_t *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes)
 {
 	int offset = ((maxtrack * head) + track) * numbytes;
 	io_generic_write(io, trackdata, offset, numbytes);

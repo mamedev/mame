@@ -38,7 +38,7 @@ cassette_image_device* z80ne_state::cassette_device_image()
 
 TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 {
-	UINT8 cass_ws = 0;
+	uint8_t cass_ws = 0;
 	m_cass_data.input.length++;
 
 	cass_ws = ((cassette_device_image())->input() > +0.02) ? 1 : 0;
@@ -75,7 +75,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 DRIVER_INIT_MEMBER(z80ne_state,z80ne)
 {
 	/* first two entries point to rom on reset */
-	UINT8 *RAM = m_region_z80ne->base();
+	uint8_t *RAM = m_region_z80ne->base();
 	m_bank1->configure_entry(0, &RAM[0x00000]); /* RAM   at 0x0000 */
 	m_bank1->configure_entry(1, &RAM[0x14000]); /* ep382 at 0x0000 */
 	m_bank2->configure_entry(0, &RAM[0x14000]); /* ep382 at 0x8000 */
@@ -93,7 +93,7 @@ DRIVER_INIT_MEMBER(z80ne_state,z80netb)
 DRIVER_INIT_MEMBER(z80ne_state,z80netf)
 {
 	/* first two entries point to rom on reset */
-	UINT8 *RAM = m_region_z80ne->base();
+	uint8_t *RAM = m_region_z80ne->base();
 	m_bank1->configure_entry(0, &RAM[0x00000]); /* RAM   at 0x0000-0x03FF */
 	m_bank1->configure_entries(1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0x0000-0x03FF */
 	m_bank1->configure_entry(4, &RAM[0x14000]); /* ep382 at 0x0000-0x03FF */
@@ -131,9 +131,9 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_kbd_scan)
 	 *
 	 */
 
-	UINT16 key_bits;
-	UINT8 ctrl; //, rst;
-	UINT8 i;
+	uint16_t key_bits;
+	uint8_t ctrl; //, rst;
+	uint8_t i;
 
 	/* 4-bit counter */
 	--m_lx383_scan_counter;
@@ -357,7 +357,7 @@ MACHINE_RESET_MEMBER(z80ne_state,z80netf)
 
 INPUT_CHANGED_MEMBER(z80ne_state::z80ne_reset)
 {
-	UINT8 rst;
+	uint8_t rst;
 	rst = m_io_rst->read();
 
 	if ( ! BIT(rst, 0))
@@ -368,7 +368,7 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_reset)
 
 INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
 {
-	UINT8 nmi;
+	uint8_t nmi;
 	nmi = m_io_lx388_brk->read();
 
 	if ( ! BIT(nmi, 0))
@@ -523,7 +523,7 @@ READ8_MEMBER(z80ne_state::lx385_data_r)
 READ8_MEMBER(z80ne_state::lx385_ctrl_r)
 {
 	/* set unused bits high */
-	UINT8 data = 0xc0;
+	uint8_t data = 0xc0;
 
 	m_ay31015->set_input_pin(AY31015_SWE, 0);
 	data |= (m_ay31015->get_output_pin(AY31015_OR  ) ? 0x01 : 0);
@@ -553,9 +553,9 @@ WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 	 *     3 *TAPEA Enable (active low) (at reset: low)
 	 *     4 *TAPEB Enable (active low) (at reset: low)
 	 */
-	UINT8 uart_reset, uart_rdav, uart_tx_clock;
-	UINT8 motor_a, motor_b;
-	UINT8 changed_bits = (m_lx385_ctrl ^ data) & 0x1C;
+	uint8_t uart_reset, uart_rdav, uart_tx_clock;
+	uint8_t motor_a, motor_b;
+	uint8_t changed_bits = (m_lx385_ctrl ^ data) & 0x1C;
 	m_lx385_ctrl = data;
 
 	uart_reset = ((data & 0x03) == 0x00);
@@ -603,7 +603,7 @@ READ8_MEMBER(z80ne_state::lx388_mc6847_videoram_r)
 {
 	if (offset == ~0) return 0xff;
 
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int d6 = BIT(videoram[offset], 6);
 	int d7 = BIT(videoram[offset], 7);
 
@@ -616,7 +616,7 @@ READ8_MEMBER(z80ne_state::lx388_mc6847_videoram_r)
 
 READ8_MEMBER(z80ne_state::lx388_data_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = m_lx388_kr2376->data_r(space, 0) & 0x7f;
 	data |= m_lx388_kr2376->get_output_pin(KR2376_SO) << 7;
@@ -697,7 +697,7 @@ READ8_MEMBER(z80ne_state::lx390_reset_bank)
 
 READ8_MEMBER(z80ne_state::lx390_fdc_r)
 {
-	UINT8 d;
+	uint8_t d;
 
 	switch(offset)
 	{
@@ -733,7 +733,7 @@ READ8_MEMBER(z80ne_state::lx390_fdc_r)
 
 WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
 {
-	UINT8 d;
+	uint8_t d;
 
 	d = data;
 	switch(offset)

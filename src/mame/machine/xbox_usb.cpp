@@ -45,7 +45,7 @@ static const char *const usbregnames[] = {
 
 const device_type OHCI_USB_CONTROLLER = &device_creator<ohci_usb_controller>;
 
-ohci_usb_controller::ohci_usb_controller(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ohci_usb_controller::ohci_usb_controller(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_USB_CONTROLLER, "OHCI USB CONTROLLER", tag, owner, clock, "ohciusb", __FILE__),
 	m_interrupt_handler(*this)
 {
@@ -79,7 +79,7 @@ void ohci_usb_controller::device_reset()
 
 READ32_MEMBER(ohci_usb_controller::read)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 #ifdef LOG_OHCI
 	if (offset >= 0x54 / 4)
@@ -93,7 +93,7 @@ READ32_MEMBER(ohci_usb_controller::read)
 
 WRITE32_MEMBER(ohci_usb_controller::write)
 {
-	UINT32 old = ohcist.hc_regs[offset];
+	uint32_t old = ohcist.hc_regs[offset];
 
 #ifdef LOG_OHCI
 	if (offset >= 0x54 / 4)
@@ -226,8 +226,8 @@ WRITE32_MEMBER(ohci_usb_controller::write)
 
 void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	UINT32 hcca;
-	UINT32 plh;
+	uint32_t hcca;
+	uint32_t plh;
 	int changed = 0;
 	int list = 1;
 	bool cont = false;
@@ -278,7 +278,7 @@ void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int
 						if (!(ohcist.endpoint_descriptor.h | ohcist.endpoint_descriptor.k)) {
 							// compare the Endpoint Descriptor TailPointer and NextTransferDescriptor fields.
 							if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
-								UINT32 a, b;
+								uint32_t a, b;
 								int R = 0;
 
 								// service transfer descriptor
@@ -455,7 +455,7 @@ void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int
 						if (!(ohcist.endpoint_descriptor.h | ohcist.endpoint_descriptor.k)) {
 							// compare the Endpoint Descriptor TailPointer and NextTransferDescriptor fields.
 							if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
-								UINT32 a, b;
+								uint32_t a, b;
 								// set CLF (ControlListFilled)
 								ohcist.hc_regs[HcCommandStatus] |= CLF;
 								// service transfer descriptor
@@ -591,7 +591,7 @@ void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int
 						if (!(ohcist.endpoint_descriptor.h | ohcist.endpoint_descriptor.k)) {
 							// compare the Endpoint Descriptor TailPointer and NextTransferDescriptor fields.
 							if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
-								UINT32 a, b;
+								uint32_t a, b;
 								// set BLF (BulkListFilled)
 								ohcist.hc_regs[HcCommandStatus] |= BLF;
 								// service transfer descriptor
@@ -697,7 +697,7 @@ void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int
 		if ((ohcist.writebackdonehadcounter != 0) && (ohcist.writebackdonehadcounter != 7))
 			ohcist.writebackdonehadcounter--;
 		if ((ohcist.writebackdonehadcounter == 0) && ((ohcist.hc_regs[HcInterruptStatus] & WritebackDoneHead) == 0)) {
-			UINT32 b = 0;
+			uint32_t b = 0;
 
 			if ((ohcist.hc_regs[HcInterruptStatus] & ohcist.hc_regs[HcInterruptEnable]) != WritebackDoneHead)
 				b = 1;
@@ -740,9 +740,9 @@ void ohci_usb_controller::usb_ohci_interrupts()
 	}
 }
 
-void ohci_usb_controller::usb_ohci_read_endpoint_descriptor(UINT32 address)
+void ohci_usb_controller::usb_ohci_read_endpoint_descriptor(uint32_t address)
 {
-	UINT32 w;
+	uint32_t w;
 
 	w = ohcist.space->read_dword(address);
 	ohcist.endpoint_descriptor.word0 = w;
@@ -761,9 +761,9 @@ void ohci_usb_controller::usb_ohci_read_endpoint_descriptor(UINT32 address)
 	ohcist.endpoint_descriptor.nexted = ohcist.space->read_dword(address + 12);
 }
 
-void ohci_usb_controller::usb_ohci_writeback_endpoint_descriptor(UINT32 address)
+void ohci_usb_controller::usb_ohci_writeback_endpoint_descriptor(uint32_t address)
 {
-	UINT32 w;
+	uint32_t w;
 
 	w = ohcist.endpoint_descriptor.word0 & 0xf8000000;
 	w = w | (ohcist.endpoint_descriptor.mps << 16) | (ohcist.endpoint_descriptor.f << 15) | (ohcist.endpoint_descriptor.k << 14) | (ohcist.endpoint_descriptor.s << 13) | (ohcist.endpoint_descriptor.d << 11) | (ohcist.endpoint_descriptor.en << 7) | ohcist.endpoint_descriptor.fa;
@@ -772,9 +772,9 @@ void ohci_usb_controller::usb_ohci_writeback_endpoint_descriptor(UINT32 address)
 	ohcist.space->write_dword(address + 8, w);
 }
 
-void ohci_usb_controller::usb_ohci_read_transfer_descriptor(UINT32 address)
+void ohci_usb_controller::usb_ohci_read_transfer_descriptor(uint32_t address)
 {
-	UINT32 w;
+	uint32_t w;
 
 	w = ohcist.space->read_dword(address);
 	ohcist.transfer_descriptor.word0 = w;
@@ -789,9 +789,9 @@ void ohci_usb_controller::usb_ohci_read_transfer_descriptor(UINT32 address)
 	ohcist.transfer_descriptor.be = ohcist.space->read_dword(address + 12);
 }
 
-void ohci_usb_controller::usb_ohci_writeback_transfer_descriptor(UINT32 address)
+void ohci_usb_controller::usb_ohci_writeback_transfer_descriptor(uint32_t address)
 {
-	UINT32 w;
+	uint32_t w;
 
 	w = ohcist.transfer_descriptor.word0 & 0x0003ffff;
 	w = w | (ohcist.transfer_descriptor.cc << 28) | (ohcist.transfer_descriptor.ec << 26) | (ohcist.transfer_descriptor.t << 24) | (ohcist.transfer_descriptor.di << 21) | (ohcist.transfer_descriptor.dp << 19) | (ohcist.transfer_descriptor.r << 18);
@@ -800,9 +800,9 @@ void ohci_usb_controller::usb_ohci_writeback_transfer_descriptor(UINT32 address)
 	ohcist.space->write_dword(address + 8, ohcist.transfer_descriptor.nexttd);
 }
 
-void ohci_usb_controller::usb_ohci_read_isochronous_transfer_descriptor(UINT32 address)
+void ohci_usb_controller::usb_ohci_read_isochronous_transfer_descriptor(uint32_t address)
 {
-	UINT32 w;
+	uint32_t w;
 
 	w = ohcist.space->read_dword(address);
 	ohcist.isochronous_transfer_descriptor.word0 = w;
@@ -829,9 +829,9 @@ void ohci_usb_controller::usb_ohci_read_isochronous_transfer_descriptor(UINT32 a
 	ohcist.isochronous_transfer_descriptor.offset[7] = (w >> 16) & 0xffff;
 }
 
-void ohci_usb_controller::usb_ohci_writeback_isochronous_transfer_descriptor(UINT32 address)
+void ohci_usb_controller::usb_ohci_writeback_isochronous_transfer_descriptor(uint32_t address)
 {
-	UINT32 w;
+	uint32_t w;
 
 	w = ohcist.isochronous_transfer_descriptor.word0 & 0x1f0000;
 	w = w | (ohcist.isochronous_transfer_descriptor.cc << 28) | (ohcist.isochronous_transfer_descriptor.fc << 24) | (ohcist.isochronous_transfer_descriptor.di << 21) | ohcist.isochronous_transfer_descriptor.sf;
@@ -870,7 +870,7 @@ void ohci_function_device::initialize(running_machine &machine, ohci_usb_control
 {
 	busmanager = usb_bus_manager;
 	state = DefaultState;
-	descriptors = auto_alloc_array(machine, UINT8, 1024);
+	descriptors = auto_alloc_array(machine, uint8_t, 1024);
 	descriptors_pos = 0;
 	address = 0;
 	newaddress = 0;
@@ -893,7 +893,7 @@ void ohci_function_device::initialize(running_machine &machine, ohci_usb_control
 
 void ohci_function_device::add_device_descriptor(const USBStandardDeviceDescriptor &descriptor)
 {
-	UINT8 *p = descriptors + descriptors_pos;
+	uint8_t *p = descriptors + descriptors_pos;
 
 	p[0] = descriptor.bLength;
 	p[1] = descriptor.bDescriptorType;
@@ -920,7 +920,7 @@ void ohci_function_device::add_device_descriptor(const USBStandardDeviceDescript
 void ohci_function_device::add_configuration_descriptor(const USBStandardConfigurationDescriptor &descriptor)
 {
 	usb_device_configuration *c = new usb_device_configuration;
-	UINT8 *p = descriptors + descriptors_pos;
+	uint8_t *p = descriptors + descriptors_pos;
 
 	p[0] = descriptor.bLength;
 	p[1] = descriptor.bDescriptorType;
@@ -944,7 +944,7 @@ void ohci_function_device::add_interface_descriptor(const USBStandardInterfaceDe
 {
 	usb_device_interface *ii;
 	usb_device_interface_alternate *aa;
-	UINT8 *p = descriptors + descriptors_pos;
+	uint8_t *p = descriptors + descriptors_pos;
 
 	if (latest_configuration == nullptr)
 		return;
@@ -989,7 +989,7 @@ void ohci_function_device::add_interface_descriptor(const USBStandardInterfaceDe
 
 void ohci_function_device::add_endpoint_descriptor(const USBStandardEndpointDescriptor &descriptor)
 {
-	UINT8 *p = descriptors + descriptors_pos;
+	uint8_t *p = descriptors + descriptors_pos;
 
 	if (latest_alternate == nullptr)
 		return;
@@ -1007,11 +1007,11 @@ void ohci_function_device::add_endpoint_descriptor(const USBStandardEndpointDesc
 	latest_configuration->size += descriptor.bLength;
 }
 
-void ohci_function_device::add_string_descriptor(const UINT8 *descriptor)
+void ohci_function_device::add_string_descriptor(const uint8_t *descriptor)
 {
 	usb_device_string *ss;
 	int len = descriptor[0];
-	UINT8 *p = descriptors + descriptors_pos;
+	uint8_t *p = descriptors + descriptors_pos;
 
 
 	ss = new usb_device_string;
@@ -1104,13 +1104,13 @@ int ohci_function_device::find_alternate(int interfacei)
 	return 0;
 }
 
-UINT8 *ohci_function_device::position_device_descriptor(int &size)
+uint8_t *ohci_function_device::position_device_descriptor(int &size)
 {
 	size = descriptors_pos; // descriptors[0];
 	return descriptors;
 }
 
-UINT8 *ohci_function_device::position_configuration_descriptor(int index, int &size)
+uint8_t *ohci_function_device::position_configuration_descriptor(int index, int &size)
 {
 	for (auto c = configurations.begin(); c != configurations.end(); ++c)
 	{
@@ -1124,7 +1124,7 @@ UINT8 *ohci_function_device::position_configuration_descriptor(int index, int &s
 	return nullptr;
 }
 
-UINT8 *ohci_function_device::position_string_descriptor(int index, int &size)
+uint8_t *ohci_function_device::position_string_descriptor(int index, int &size)
 {
 	int i = 0;
 
@@ -1147,7 +1147,7 @@ void ohci_function_device::execute_reset()
 	newaddress = 0;
 }
 
-int ohci_function_device::execute_transfer(int endpoint, int pid, UINT8 *buffer, int size)
+int ohci_function_device::execute_transfer(int endpoint, int pid, uint8_t *buffer, int size)
 {
 	int descriptortype, descriptorindex;
 
@@ -1222,14 +1222,14 @@ int ohci_function_device::execute_transfer(int endpoint, int pid, UINT8 *buffer,
 					return handle_set_descriptor_request(endpoint, p);
 					break;
 				case GET_CONFIGURATION:
-					endpoints[endpoint].buffer[0] = (UINT8)configurationvalue;
+					endpoints[endpoint].buffer[0] = (uint8_t)configurationvalue;
 					endpoints[endpoint].position = endpoints[endpoint].buffer;
 					endpoints[endpoint].remain = 1;
 					if (p->wLength == 0)
 						endpoints[endpoint].remain = 0;
 					break;
 				case GET_INTERFACE:
-					endpoints[endpoint].buffer[0] = (UINT8)find_alternate(p->wIndex);
+					endpoints[endpoint].buffer[0] = (uint8_t)find_alternate(p->wIndex);
 					endpoints[endpoint].position = endpoints[endpoint].buffer;
 					endpoints[endpoint].remain = 1;
 					if (p->wLength == 0)
@@ -1393,7 +1393,7 @@ const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc02 = { 7
 
 const device_type OHCI_GAME_CONTROLLER = &device_creator<ohci_game_controller_device>;
 
-ohci_game_controller_device::ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ohci_game_controller_device::ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_GAME_CONTROLLER, "OHCI Game Controller", tag, owner, clock, "ohci_gc", __FILE__),
 	ohci_function_device(),
 	m_ThumbstickLh(*this, "ThumbstickLh"),
@@ -1426,7 +1426,7 @@ void ohci_game_controller_device::initialize(running_machine &machine, ohci_usb_
 int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
 	//                                    >=8  ==42  !=0  !=0  1,3       2<20 <=20
-	static const UINT8 reportinfo[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x14,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
+	static const uint8_t reportinfo[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x14,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
 
 	if (endpoint != 0)
 		return -1;
@@ -1434,7 +1434,7 @@ int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSet
 	{
 		if ((setup->bRequest == GET_DESCRIPTOR) && (setup->wValue == 0x4200))
 		{
-			endpoints[endpoint].position = (UINT8 *)reportinfo;
+			endpoints[endpoint].position = (uint8_t *)reportinfo;
 			endpoints[endpoint].remain = 16;
 			return 0;
 		}
@@ -1476,7 +1476,7 @@ int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSet
 	return -1;
 }
 
-int ohci_game_controller_device::handle_interrupt_pid(int endpoint, int pid, UINT8 *buffer, int size)
+int ohci_game_controller_device::handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
 	if ((endpoint == 2) && (pid == InPid)) {
 		int v;
@@ -1485,7 +1485,7 @@ int ohci_game_controller_device::handle_interrupt_pid(int endpoint, int pid, UIN
 		buffer[1] = 20;
 		v = m_DPad->read();
 		v = v | (m_Buttons->read() << 4);
-		buffer[2] = (UINT8)v;
+		buffer[2] = (uint8_t)v;
 		buffer[3] = 0;
 		buffer[4] = m_AGreen->read();
 		buffer[5] = m_BRed->read();
@@ -1497,20 +1497,20 @@ int ohci_game_controller_device::handle_interrupt_pid(int endpoint, int pid, UIN
 		buffer[11] = m_TriggerR->read();
 		v = m_ThumbstickLh->read();
 		v = (v - 128) * 256;
-		buffer[12] = (UINT16)v & 255;
-		buffer[13] = (UINT16)v >> 8;
+		buffer[12] = (uint16_t)v & 255;
+		buffer[13] = (uint16_t)v >> 8;
 		v = m_ThumbstickLv->read();
 		v = (v - 128) * 256;
-		buffer[14] = (UINT16)v & 255;
-		buffer[15] = (UINT16)v >> 8;
+		buffer[14] = (uint16_t)v & 255;
+		buffer[15] = (uint16_t)v >> 8;
 		v = m_ThumbstickRh->read();
 		v = (v - 128) * 256;
-		buffer[16] = (UINT16)v & 255;
-		buffer[17] = (UINT16)v >> 8;
+		buffer[16] = (uint16_t)v & 255;
+		buffer[17] = (uint16_t)v >> 8;
 		v = m_ThumbstickRv->read();
 		v = (v - 128) * 256;
-		buffer[18] = (UINT16)v & 255;
-		buffer[19] = (UINT16)v >> 8;
+		buffer[18] = (uint16_t)v & 255;
+		buffer[19] = (uint16_t)v >> 8;
 		return size;
 	}
 	return -1;

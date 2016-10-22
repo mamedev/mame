@@ -12,7 +12,7 @@
 #include "macutil.h"
 
 
-time_t mac_crack_time(UINT32 t)
+time_t mac_crack_time(uint32_t t)
 {
 	/* not sure if this is correct... */
 	return t - (((1970 - 1904) * 365) + 17) * 24 * 60 * 60;
@@ -20,7 +20,7 @@ time_t mac_crack_time(UINT32 t)
 
 
 
-UINT32 mac_setup_time(time_t t)
+uint32_t mac_setup_time(time_t t)
 {
 	/* not sure if this is correct... */
 	return t + (((1970 - 1904) * 365) + 17) * 24 * 60 * 60;
@@ -28,7 +28,7 @@ UINT32 mac_setup_time(time_t t)
 
 
 
-UINT32 mac_time_now(void)
+uint32_t mac_time_now(void)
 {
 	time_t now;
 	time(&now);

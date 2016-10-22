@@ -95,7 +95,7 @@ VIDEO_START_MEMBER(sauro_state,sauro)
 
 void sauro_state::sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs,code,sx,sy,color,flipx;
 	int flipy = flip_screen();
 
@@ -140,7 +140,7 @@ void sauro_state::sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 	}
 }
 
-UINT32 sauro_state::screen_update_sauro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sauro_state::screen_update_sauro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -158,7 +158,7 @@ VIDEO_START_MEMBER(sauro_state,trckydoc)
 
 void sauro_state::trckydoc_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs,code,sy,color,flipx,sx;
 	int flipy = flip_screen();
 
@@ -211,7 +211,7 @@ void sauro_state::trckydoc_draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 	}
 }
 
-UINT32 sauro_state::screen_update_trckydoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sauro_state::screen_update_trckydoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	trckydoc_draw_sprites(bitmap, cliprect);

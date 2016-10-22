@@ -53,10 +53,10 @@ public:
 	optional_device<buffered_spriteram16_device> m_spriteram2;
 
 	/* memory pointers */
-	optional_shared_ptr<UINT16> m_pf1_rowscroll;
-	optional_shared_ptr<UINT16> m_pf2_rowscroll;
-	required_shared_ptr<UINT16> m_pf3_rowscroll;
-	required_shared_ptr<UINT16> m_pf4_rowscroll;
+	optional_shared_ptr<uint16_t> m_pf1_rowscroll;
+	optional_shared_ptr<uint16_t> m_pf2_rowscroll;
+	required_shared_ptr<uint16_t> m_pf3_rowscroll;
+	required_shared_ptr<uint16_t> m_pf4_rowscroll;
 
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
@@ -72,10 +72,10 @@ public:
 	DECLARE_DRIVER_INIT(schmeisr);
 	DECLARE_DRIVER_INIT(rohga);
 	DECLARE_VIDEO_START(wizdfire);
-	UINT32 screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, UINT16 pri, UINT16 primask);
+	uint32_t screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, uint16_t pri, uint16_t primask);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(rohga_pri_callback);
 	DECOSPR_COLOUR_CB_MEMBER(rohga_col_callback);

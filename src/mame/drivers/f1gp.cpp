@@ -139,8 +139,8 @@ WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
 	if(old_bank != new_bank && new_bank < 5)
 	{
 	    // oki banking
-	    UINT8 *src = memregion("oki")->base() + 0x40000 + 0x10000 * new_bank;
-	    UINT8 *dst = memregion("oki")->base() + 0x30000;
+	    uint8_t *src = memregion("oki")->base() + 0x40000 + 0x10000 * new_bank;
+	    uint8_t *dst = memregion("oki")->base() + 0x30000;
 	    memcpy(dst, src, 0x10000);
 
 	    old_bank = new_bank;

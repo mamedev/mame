@@ -99,7 +99,7 @@ READ8_MEMBER(cop01_state::cop01_sound_command_r)
 
 CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
@@ -647,7 +647,7 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
 	   "Starting Area" fake Dip Switch */
-	UINT8 *RAM = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *RAM = (uint8_t *)memregion("maincpu")->base();
 	RAM[0x00e4] = 0x07; // rlca
 	RAM[0x00e5] = 0x07; // rlca
 	RAM[0x00e6] = 0x07; // rlca

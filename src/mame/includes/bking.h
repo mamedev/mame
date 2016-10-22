@@ -19,7 +19,7 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_playfield_ram;
+	required_shared_ptr<uint8_t> m_playfield_ram;
 
 	/* video-related */
 	bitmap_ind16    m_colmap_bg;
@@ -27,12 +27,12 @@ public:
 	tilemap_t     *m_bg_tilemap;
 	int         m_pc3259_output[4];
 	int         m_pc3259_mask;
-	UINT8       m_xld1;
-	UINT8       m_xld2;
-	UINT8       m_xld3;
-	UINT8       m_yld1;
-	UINT8       m_yld2;
-	UINT8       m_yld3;
+	uint8_t       m_xld1;
+	uint8_t       m_xld2;
+	uint8_t       m_xld3;
+	uint8_t       m_yld1;
+	uint8_t       m_yld2;
+	uint8_t       m_yld3;
 	int         m_ball1_pic;
 	int         m_ball2_pic;
 	int         m_crow_pic;
@@ -60,12 +60,12 @@ public:
 
 #if 0
 	/* 68705 */
-	UINT8 m_port_a_in;
-	UINT8 m_port_a_out;
-	UINT8 m_ddr_a;
-	UINT8 m_port_b_in;
-	UINT8 m_port_b_out;
-	UINT8 m_ddr_b;
+	uint8_t m_port_a_in;
+	uint8_t m_port_a_out;
+	uint8_t m_ddr_a;
+	uint8_t m_port_b_in;
+	uint8_t m_port_b_out;
+	uint8_t m_ddr_b;
 #endif
 	DECLARE_READ8_MEMBER(bking_sndnmi_disable_r);
 	DECLARE_WRITE8_MEMBER(bking_sndnmi_enable_w);
@@ -99,6 +99,6 @@ public:
 	DECLARE_MACHINE_START(bking3);
 	DECLARE_MACHINE_RESET(bking3);
 	DECLARE_MACHINE_RESET(common);
-	UINT32 screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_bking(screen_device &screen, bool state);
 };

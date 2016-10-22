@@ -266,7 +266,7 @@ void taitol_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-UINT32 taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int dx, dy;
 
@@ -313,7 +313,7 @@ void taitol_state::screen_eof_taitol(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		UINT8 *spriteram = m_rambanks + 0xb000;
+		uint8_t *spriteram = m_rambanks + 0xb000;
 
 		memcpy(m_buff_spriteram, spriteram, TAITOL_SPRITERAM_SIZE);
 	}

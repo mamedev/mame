@@ -14,26 +14,58 @@
 
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/dac.h"
 #include "includes/galeb.h"
+#include "cpu/m6502/m6502.h"
+#include "sound/volt_reg.h"
 
 static GFXDECODE_START( galeb )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galeb_charlayout, 0, 1 )
 GFXDECODE_END
 
-READ8_MEMBER(galeb_state::galeb_keyboard_r)
+void galeb_state::machine_start()
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+	save_item(NAME(m_dac_state));
 
-	return ioport(keynames[offset])->read();
+	m_dac->write(m_dac_state);
+}
+
+WRITE8_MEMBER(galeb_state::dac_w)
+{
+	m_dac_state = !m_dac_state;
+	m_dac->write(m_dac_state);
+}
+
+READ8_MEMBER(galeb_state::keyboard_r)
+{
+	return m_keyboard[offset]->read();
+}
+
+READ8_MEMBER(galeb_state::tape_status_r)
+{
+	int status = 0;
+	status |= 2; /// send ready
+	status |= 1; /// receive ready
+	return status;
+}
+
+WRITE8_MEMBER(galeb_state::tape_data_w)
+{
+	logerror("tape_data_w %02x\n", data);
+}
+
+READ8_MEMBER(galeb_state::tape_data_r)
+{
+	logerror("tape_data_r (press escape to cancel load)\n");
+	return 0x00;
 }
 
 /* Address maps */
 static ADDRESS_MAP_START(galeb_mem, AS_PROGRAM, 8, galeb_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM  // RAM
-	AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ(galeb_keyboard_r )
-	AM_RANGE( 0xbfe0, 0xbfe0 ) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ(keyboard_r )
+	AM_RANGE( 0xbfe0, 0xbfe0 ) AM_WRITE(dac_w)
+	AM_RANGE( 0xbffe, 0xbffe ) AM_READ(tape_status_r)
+	AM_RANGE( 0xbfff, 0xbfff ) AM_READWRITE(tape_data_r, tape_data_w)
 	AM_RANGE( 0xb000, 0xb3ff ) AM_RAM  AM_SHARE("video_ram") // video ram
 	AM_RANGE( 0xc000, 0xc7ff ) AM_ROM  // BASIC 01 ROM
 	AM_RANGE( 0xc800, 0xcfff ) AM_ROM  // BASIC 02 ROM
@@ -147,9 +179,10 @@ static MACHINE_CONFIG_START( galeb, galeb_state )
 
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 8.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 /* ROM definition */

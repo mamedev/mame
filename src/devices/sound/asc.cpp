@@ -45,7 +45,7 @@ const device_type ASC = &device_creator<asc_device>;
 //  asc_device - constructor
 //-------------------------------------------------
 
-asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ASC, "ASC", tag, owner, clock, "asc", __FILE__),
 		device_sound_interface(mconfig, *this),
 		write_irq(*this),
@@ -131,7 +131,7 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 {
 	stream_sample_t *outL, *outR;
 	int i, ch;
-	static UINT32 wtoffs[2] = { 0, 0x200 };
+	static uint32_t wtoffs[2] = { 0, 0x200 };
 
 	outL = outputs[0];
 	outR = outputs[1];
@@ -148,10 +148,10 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 		case 1: // FIFO mode
 			for (i = 0; i < samples; i++)
 			{
-				INT8 smpll, smplr;
+				int8_t smpll, smplr;
 
-				smpll = (INT8)m_fifo_a[m_fifo_a_rdptr]^0x80;
-				smplr = (INT8)m_fifo_b[m_fifo_b_rdptr]^0x80;
+				smpll = (int8_t)m_fifo_a[m_fifo_a_rdptr]^0x80;
+				smplr = (int8_t)m_fifo_b[m_fifo_b_rdptr]^0x80;
 
 				// don't advance the sample pointer if there are no more samples
 				if (m_fifo_cap_a)
@@ -212,8 +212,8 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 		case 2: // wavetable mode
 			for (i = 0; i < samples; i++)
 			{
-				INT32 mixL, mixR;
-				INT8 smpl;
+				int32_t mixL, mixR;
+				int8_t smpl;
 
 				mixL = mixR = 0;
 
@@ -224,11 +224,11 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 
 					if (ch < 2)
 					{
-						smpl = (INT8)m_fifo_a[((m_phase[ch]>>15)&0x1ff) + wtoffs[ch&1]];
+						smpl = (int8_t)m_fifo_a[((m_phase[ch]>>15)&0x1ff) + wtoffs[ch&1]];
 					}
 					else
 					{
-						smpl = (INT8)m_fifo_b[((m_phase[ch]>>15)&0x1ff) + wtoffs[ch&1]];
+						smpl = (int8_t)m_fifo_b[((m_phase[ch]>>15)&0x1ff) + wtoffs[ch&1]];
 					}
 
 					smpl ^= 0x80;
@@ -251,7 +251,7 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 
 READ8_MEMBER( asc_device::read )
 {
-	UINT8 rv;
+	uint8_t rv;
 
 //  printf("ASC: read at %x\n", offset);
 

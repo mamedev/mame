@@ -404,15 +404,15 @@ public:
 	//friend class mie_device;
 
 	// construction/destruction
-	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	int get_sense_line();
-	void send_packet(int destination, int length, UINT8 *data);
-	int received_packet(UINT8 *buffer);
+	void send_packet(int destination, int length, uint8_t *data);
+	int received_packet(uint8_t *buffer);
 };
 
 const device_type JVS_MASTER = &device_creator<jvs_master>;
 
-jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: jvs_host(mconfig, JVS_MASTER, "JVS MASTER", tag, owner, clock, "jvs_master", __FILE__)
 {
 }
@@ -426,10 +426,10 @@ int jvs_master::get_sense_line()
 	return 25;
 }
 
-void jvs_master::send_packet(int destination, int length, UINT8 *data)
+void jvs_master::send_packet(int destination, int length, uint8_t *data)
 {
-	push((UINT8)destination);
-	push((UINT8)length);
+	push((uint8_t)destination);
+	push((uint8_t)length);
 	length--;
 	while (length > 0)
 	{
@@ -440,10 +440,10 @@ void jvs_master::send_packet(int destination, int length, UINT8 *data)
 	commit_raw();
 }
 
-int jvs_master::received_packet(UINT8 *buffer)
+int jvs_master::received_packet(uint8_t *buffer)
 {
-	UINT32 length;
-	const UINT8 *data;
+	uint32_t length;
+	const uint8_t *data;
 
 	get_raw_reply(data, length);
 	if (length > 0)
@@ -458,11 +458,11 @@ extern const device_type OHCI_HLEAN2131QC;
 class ohci_hlean2131qc_device : public device_t, public ohci_function_device
 {
 public:
-	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
-	int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
-	void set_region_base(UINT8 *data);
+	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
+	void set_region_base(uint8_t *data);
 
 protected:
 	virtual void device_start() override;
@@ -480,16 +480,16 @@ private:
 	static const USBStandardEndpointDescriptor enddesc83;
 	static const USBStandardEndpointDescriptor enddesc84;
 	static const USBStandardEndpointDescriptor enddesc85;
-	static const UINT8 strdesc0[];
-	static const UINT8 strdesc1[];
-	static const UINT8 strdesc2[];
+	static const uint8_t strdesc0[];
+	static const uint8_t strdesc1[];
+	static const uint8_t strdesc2[];
 	int maximum_send;
-	UINT8 *region;
+	uint8_t *region;
 	struct
 	{
-		UINT8 buffer_in[32768];
+		uint8_t buffer_in[32768];
 		int buffer_in_expected;
-		UINT8 buffer_out[32768];
+		uint8_t buffer_out[32768];
 		int buffer_out_used;
 		int buffer_out_packets;
 		jvs_master *master;
@@ -503,11 +503,11 @@ extern const device_type OHCI_HLEAN2131SC;
 class ohci_hlean2131sc_device : public device_t, public ohci_function_device
 {
 public:
-	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
-	int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
-	void set_region_base(UINT8 *data);
+	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
+	void set_region_base(uint8_t *data);
 
 protected:
 	virtual void device_start() override;
@@ -521,10 +521,10 @@ private:
 	static const USBStandardEndpointDescriptor enddesc81;
 	static const USBStandardEndpointDescriptor enddesc82;
 	static const USBStandardEndpointDescriptor enddesc83;
-	static const UINT8 strdesc0[];
-	static const UINT8 strdesc1[];
-	static const UINT8 strdesc2[];
-	UINT8 *region;
+	static const uint8_t strdesc0[];
+	static const uint8_t strdesc1[];
+	static const uint8_t strdesc2[];
+	uint8_t *region;
 };
 
 const device_type OHCI_HLEAN2131SC = &device_creator<ohci_hlean2131sc_device>;
@@ -543,10 +543,10 @@ public:
 	DECLARE_WRITE32_MEMBER(mediaboard_w);
 
 	virtual void machine_start() override;
-	void baseboard_ide_event(int type, UINT8 *read, UINT8 *write);
-	UINT8 *baseboard_ide_dimmboard(UINT32 lba);
-	void dword_write_le(UINT8 *addr, UINT32 d);
-	void word_write_le(UINT8 *addr, UINT16 d);
+	void baseboard_ide_event(int type, uint8_t *read, uint8_t *write);
+	uint8_t *baseboard_ide_dimmboard(uint32_t lba);
+	void dword_write_le(uint8_t *addr, uint32_t d);
+	void word_write_le(uint8_t *addr, uint16_t d);
 	virtual void hack_eeprom() override;
 	virtual void hack_usb() override;
 
@@ -556,11 +556,11 @@ public:
 	} chihiro_devs;
 	int usbhack_index;
 	int usbhack_counter;
-	UINT8 *dimm_board_memory;
-	UINT32 dimm_board_memory_size;
+	uint8_t *dimm_board_memory;
+	uint32_t dimm_board_memory_size;
 
 private:
-	void jamtable_disasm(address_space &space, UINT32 address, UINT32 size);
+	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
 	void jamtable_disasm_command(int ref, int params, const char **param);
 	void threadlist_command(int ref, int params, const char **param);
 	void chihiro_help_command(int ref, int params, const char **param);
@@ -583,7 +583,7 @@ St.     Instr.       Comment
 */
 
 /* jamtable disassembler */
-void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32 size) // 0xff000080 == fff00080
+void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint32_t size) // 0xff000080 == fff00080
 {
 	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
@@ -597,11 +597,11 @@ void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32
 	{
 		offs_t base = addr;
 
-		UINT32 opcode = cpu.read_byte(space, address, true);
+		uint32_t opcode = cpu.read_byte(space, address, true);
 		addr++;
-		UINT32 op1 = cpu.read_dword(space, address, true);
+		uint32_t op1 = cpu.read_dword(space, address, true);
 		addr += 4;
-		UINT32 op2 = cpu.read_dword(space, address, true);
+		uint32_t op2 = cpu.read_dword(space, address, true);
 		addr += 4;
 
 		char sop1[16];
@@ -683,7 +683,7 @@ void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32
 void chihiro_state::jamtable_disasm_command(int ref, int params, const char **param)
 {
 	address_space &space = m_maincpu->space();
-	UINT64  addr, size;
+	uint64_t  addr, size;
 
 	if (params < 2)
 		return;
@@ -691,12 +691,12 @@ void chihiro_state::jamtable_disasm_command(int ref, int params, const char **pa
 		return;
 	if (!machine().debugger().commands().validate_number_parameter(param[1], &size))
 		return;
-	jamtable_disasm(space, (UINT32)addr, (UINT32)size);
+	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
 void chihiro_state::threadlist_command(int ref, int params, const char **param)
 {
-	const UINT32 thlists = 0x8003aae0; // magic address
+	const uint32_t thlists = 0x8003aae0; // magic address
 	address_space &space = m_maincpu->space();
 	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
@@ -705,15 +705,15 @@ void chihiro_state::threadlist_command(int ref, int params, const char **param)
 	con.printf("-------------------------------\n");
 	for (int pri=0;pri < 16;pri++)
 	{
-		UINT32 curr = thlists + pri * 8;
-		UINT32 next = cpu.read_dword(space, curr, true);
+		uint32_t curr = thlists + pri * 8;
+		uint32_t next = cpu.read_dword(space, curr, true);
 
 		while (next != curr)
 		{
-			UINT32 kthrd = next - 0x5c;
-			UINT32 topstack = cpu.read_dword(space, kthrd + 0x1c, true);
-			UINT32 tlsdata = cpu.read_dword(space, kthrd + 0x28, true);
-			UINT32 function;
+			uint32_t kthrd = next - 0x5c;
+			uint32_t topstack = cpu.read_dword(space, kthrd + 0x1c, true);
+			uint32_t tlsdata = cpu.read_dword(space, kthrd + 0x28, true);
+			uint32_t function;
 			if (tlsdata == 0)
 				function = cpu.read_dword(space, topstack - 0x210 - 8, true);
 			else
@@ -760,8 +760,8 @@ static const struct {
 	const char *game_name;
 	const bool disable_usb;
 	struct {
-		UINT32 address;
-		UINT8 write_byte;
+		uint32_t address;
+		uint8_t write_byte;
 	} modify[16];
 } hacks[HACK_ITEMS] = { { "chihiro",  false, { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
 						{ "outr2",    true,  { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
@@ -808,11 +808,11 @@ const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc82 = { 0x07,
 const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
 const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc84 = { 0x07,0x05,0x84,0x02,0x0040,0x00 };
 const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc85 = { 0x07,0x05,0x85,0x02,0x0040,0x00 };
-const UINT8 ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
-const UINT8 ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
-const UINT8 ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
+const uint8_t ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
+const uint8_t ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+const uint8_t ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
 
-ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_HLEAN2131QC, "OHCI Hlean2131qc", tag, owner, clock, "ohci_hlean2131qc", __FILE__),
 	ohci_function_device()
 {
@@ -847,7 +847,7 @@ void ohci_hlean2131qc_device::initialize(running_machine &machine, ohci_usb_cont
 	jvs.master = machine.device<jvs_master>("jvs_master");
 }
 
-void ohci_hlean2131qc_device::set_region_base(UINT8 *data)
+void ohci_hlean2131qc_device::set_region_base(uint8_t *data)
 {
 	region = data;
 }
@@ -974,7 +974,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		{
 			jvs.buffer_out_packets = 0;
 			jvs.buffer_out[0] = 0;
-			jvs.buffer_out[1] = (UINT8)jvs.buffer_out_packets;
+			jvs.buffer_out[1] = (uint8_t)jvs.buffer_out_packets;
 			jvs.buffer_out_used = 2;
 		}
 		jvs.buffer_in_expected = setup->wIndex;
@@ -1009,7 +1009,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	return 0;
 }
 
-int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size)
+int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
 #ifdef VERBOSE_MSG
 	printf("Bulk request to an2131qc: %x %d %x\n\r", endpoint, pid, size);
@@ -1087,7 +1087,7 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 						jvs.buffer_out[jvs.buffer_out_used + 5 + recv] = chk & 255;
 						jvs.buffer_out_packets++;
 						// jvs node address
-						jvs.buffer_out[jvs.buffer_out_used] = (UINT8)dest;
+						jvs.buffer_out[jvs.buffer_out_used] = (uint8_t)dest;
 						// dummy
 						jvs.buffer_out[jvs.buffer_out_used + 1] = 0;
 						// length following
@@ -1097,7 +1097,7 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 						// body
 						jvs.buffer_out[jvs.buffer_out_used + 4] = 0xe0;
 						jvs.buffer_out_used = jvs.buffer_out_used + recv + 5 - 1;
-						jvs.buffer_out[1] = (UINT8)jvs.buffer_out_packets;
+						jvs.buffer_out[1] = (uint8_t)jvs.buffer_out_packets;
 					}
 					p = p + len;
 				}
@@ -1121,18 +1121,18 @@ const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc03 = { 0x07,
 const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
 const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
 const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
-const UINT8 ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
-const UINT8 ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
-const UINT8 ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
+const uint8_t ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
+const uint8_t ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+const uint8_t ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
 
-ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_HLEAN2131SC, "OHCI Hlean2131sc", tag, owner, clock, "ohci_hlean2131sc", __FILE__),
 	ohci_function_device()
 {
 	region = nullptr;
 }
 
-void ohci_hlean2131sc_device::set_region_base(UINT8 *data)
+void ohci_hlean2131sc_device::set_region_base(uint8_t *data)
 {
 	region = data;
 }
@@ -1274,7 +1274,7 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	return 0;
 }
 
-int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size)
+int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
 //#ifdef VERBOSE_MSG
 	printf("Bulk request to an2131sc: %x %d %x\n\r", endpoint, pid, size);
@@ -1300,16 +1300,16 @@ class ide_baseboard_device : public ata_mass_storage_device
 {
 public:
 	// construction/destruction
-	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual int  read_sector(UINT32 lba, void *buffer) override;
-	virtual int  write_sector(UINT32 lba, const void *buffer) override;
+	virtual int  read_sector(uint32_t lba, void *buffer) override;
+	virtual int  write_sector(uint32_t lba, const void *buffer) override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	UINT8 read_buffer[0x20];
-	UINT8 write_buffer[0x20];
+	uint8_t read_buffer[0x20];
+	uint8_t write_buffer[0x20];
 	chihiro_state *chihirosystem;
 	static const int size_factor = 2;
 };
@@ -1325,7 +1325,7 @@ const device_type IDE_BASEBOARD = &device_creator<ide_baseboard_device>;
 //  ide_baseboard_device - constructor
 //-------------------------------------------------
 
-ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ata_mass_storage_device(mconfig, IDE_BASEBOARD, "IDE Baseboard", tag, owner, clock, "ide_baseboard", __FILE__)
 {
 }
@@ -1361,10 +1361,10 @@ void ide_baseboard_device::device_reset()
 	ata_mass_storage_device::device_reset();
 }
 
-int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
+int ide_baseboard_device::read_sector(uint32_t lba, void *buffer)
 {
 	int off;
-	UINT8 *data;
+	uint8_t *data;
 
 	/*
 	It assumes there are 4 "partitions", the size of the first one depends on bits 3-0 of io port 40f4:
@@ -1411,7 +1411,7 @@ int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 	return 1;
 }
 
-int ide_baseboard_device::write_sector(UINT32 lba, const void *buffer)
+int ide_baseboard_device::write_sector(uint32_t lba, const void *buffer)
 {
 	logerror("baseboard: write sector lba %08x\n", lba);
 	if (lba >= ((0x40000 << size_factor) - 0x8000)) {
@@ -1431,7 +1431,7 @@ int ide_baseboard_device::write_sector(UINT32 lba, const void *buffer)
  * Chihiro Type 1 baseboard
  */
 
-void chihiro_state::dword_write_le(UINT8 *addr, UINT32 d)
+void chihiro_state::dword_write_le(uint8_t *addr, uint32_t d)
 {
 	addr[0] = d & 255;
 	addr[1] = (d >> 8) & 255;
@@ -1439,13 +1439,13 @@ void chihiro_state::dword_write_le(UINT8 *addr, UINT32 d)
 	addr[3] = (d >> 24) & 255;
 }
 
-void chihiro_state::word_write_le(UINT8 *addr, UINT16 d)
+void chihiro_state::word_write_le(uint8_t *addr, uint16_t d)
 {
 	addr[0] = d & 255;
 	addr[1] = (d >> 8) & 255;
 }
 
-void chihiro_state::baseboard_ide_event(int type, UINT8 *read_buffer, UINT8 *write_buffer)
+void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t *write_buffer)
 {
 	int c;
 
@@ -1495,7 +1495,7 @@ void chihiro_state::baseboard_ide_event(int type, UINT8 *read_buffer, UINT8 *wri
 	xbox_base_devs.pic8259_2->ir2_w(1);
 }
 
-UINT8 *chihiro_state::baseboard_ide_dimmboard(UINT32 lba)
+uint8_t *chihiro_state::baseboard_ide_dimmboard(uint32_t lba)
 {
 	// return pointer to memory containing decrypted gdrom data (contains an image of a fatx partition)
 	if (chihiro_devs.dimmboard != nullptr)
@@ -1505,7 +1505,7 @@ UINT8 *chihiro_state::baseboard_ide_dimmboard(UINT32 lba)
 
 READ32_MEMBER(chihiro_state::mediaboard_r)
 {
-	UINT32 r;
+	uint32_t r;
 
 	logerror("I/O port read %04x mask %08X\n", offset * 4 + 0x4000, mem_mask);
 	r = 0;

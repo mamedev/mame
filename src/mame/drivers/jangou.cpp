@@ -55,16 +55,16 @@ public:
 	/* sound-related */
 	// Jangou CVSD Sound
 	emu_timer    *m_cvsd_bit_timer;
-	UINT8        m_cvsd_shiftreg;
+	uint8_t        m_cvsd_shiftreg;
 	int          m_cvsd_shift_cnt;
 	// Jangou Lady ADPCM Sound
-	UINT8        m_adpcm_byte;
+	uint8_t        m_adpcm_byte;
 	int          m_msm5205_vclk_toggle;
 
 	/* misc */
-	UINT8        m_mux_data;
-	UINT8        m_nsc_latch;
-	UINT8        m_z80_latch;
+	uint8_t        m_mux_data;
+	uint8_t        m_nsc_latch;
+	uint8_t        m_z80_latch;
 
 	/* devices */
 	required_device<cpu_device> m_cpu_0;
@@ -100,7 +100,7 @@ public:
 	DECLARE_MACHINE_RESET(jngolady);
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_RESET(common);
-	UINT32 screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
 
@@ -117,7 +117,7 @@ public:
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 PALETTE_INIT_MEMBER(jangou_state, jangou)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -160,23 +160,23 @@ void jangou_state::video_start()
 	m_tmp_bitmap = std::make_unique<bitmap_ind16>(256, 256);
 }
 
-UINT32 jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
-		UINT16 *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
+		uint8_t *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
+		uint16_t *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			UINT32 srcpix = *src++;
+			uint32_t srcpix = *src++;
 			*dst++ = m_palette->pen(srcpix & 0xf);
 			*dst++ = m_palette->pen((srcpix >> 4) & 0xf);
 		}
 	}
-	//void copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect)
+	//void copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, int32_t destx, int32_t desty, const rectangle &cliprect)
 
 	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(),0,0, cliprect);
 
@@ -1219,7 +1219,7 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
 {
 	// this is WRONG
 	int A;
-	UINT8 *ROM = memregion("cpu0")->base();
+	uint8_t *ROM = memregion("cpu0")->base();
 
 	unsigned char patn1[32] = {
 		0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0,
@@ -1233,7 +1233,7 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
 
 	for (A = 0; A < 0x3000; A++)
 	{
-		UINT8 dat = ROM[A];
+		uint8_t dat = ROM[A];
 		if (A&0x100) dat = dat ^ patn2[A & 0x1f];
 		else dat = dat ^ patn1[A & 0x1f];
 

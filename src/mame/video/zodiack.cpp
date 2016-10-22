@@ -46,7 +46,7 @@ WRITE8_MEMBER( zodiack_state::flipscreen_w )
 
 PALETTE_INIT_MEMBER(zodiack_state,zodiack)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -162,7 +162,7 @@ void zodiack_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 zodiack_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t zodiack_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	for (int i = 0; i < 32; i++)
 		m_fg_tilemap->set_scrolly(i, m_attributeram[i * 2]);

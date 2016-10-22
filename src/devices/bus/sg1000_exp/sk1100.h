@@ -34,7 +34,7 @@ class sega_sk1100_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -51,7 +51,7 @@ protected:
 	// device_sg1000_expansion_slot_interface overrides
 	virtual DECLARE_READ8_MEMBER(peripheral_r) override;
 	virtual DECLARE_WRITE8_MEMBER(peripheral_w) override;
-	virtual bool is_readable(UINT8 offset) override;
+	virtual bool is_readable(uint8_t offset) override;
 
 private:
 	required_device<cassette_image_device> m_cassette;
@@ -60,7 +60,7 @@ private:
 	required_ioport_array<8> m_pb;
 
 	/* keyboard state */
-	UINT8 m_keylatch;
+	uint8_t m_keylatch;
 };
 
 

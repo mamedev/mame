@@ -289,7 +289,7 @@
  * @param val 32 bits
  * @return 1 for even parity, 0 for odd parity
  */
-static __inline UINT8 parity_even(UINT32 val)
+static __inline uint8_t parity_even(uint32_t val)
 {
 	val -= ((val >> 1) & 0x55555555);
 	val = (((val >> 2) & 0x33333333) + (val & 0x33333333));
@@ -330,47 +330,47 @@ static const int hamming_lut[64] = {
  * @param dw_data the double-word data
  * @return dw_data, possibly with 1 bit error corrected
  */
-UINT32 alto2_cpu_device::hamming_code(bool write, UINT32 dw_addr, UINT32 dw_data)
+uint32_t alto2_cpu_device::hamming_code(bool write, uint32_t dw_addr, uint32_t dw_data)
 {
-	const UINT8 hpb = write ? 0 : m_mem.hpb[dw_addr];
+	const uint8_t hpb = write ? 0 : m_mem.hpb[dw_addr];
 
 	/* a75: WD01   WD04   WD08   WD11   WD15   WD19   WD23   WD26   WD30 ---     HC(0)A */
-	const UINT8 hc_0_a = parity_odd (dw_data & A75);
+	const uint8_t hc_0_a = parity_odd (dw_data & A75);
 
 	/* a76: WD00   WD03   WD06   WD10   WD13   WD17   WD21   WD25   WD29 HC(0B1) ---    */
-	const UINT8 hc_0b1 = parity_even(dw_data & A76);
+	const uint8_t hc_0b1 = parity_even(dw_data & A76);
 
 	/* a86: WD02   WD05   WD09   WD12   WD16   WD20   WD24   WD27   WD31 HC(1)A  ---    */
-	const UINT8 hc_1_a = parity_even(dw_data & A86);
+	const uint8_t hc_1_a = parity_even(dw_data & A86);
 
 	/* a64: WD01   WD02   WD03   WD07   WD08   WD09   WD10   WD14   WD15 ---     HC(2)A */
-	const UINT8 hc_2_a = parity_odd (dw_data & A64);
+	const uint8_t hc_2_a = parity_odd (dw_data & A64);
 
 	/* a85: WD16   WD17   WD22   WD23   WD24   WD25   WD29   WD30   WD31 HC(2)B  ---    */
-	const UINT8 hc_2_b = parity_even(dw_data & A85);
+	const uint8_t hc_2_b = parity_even(dw_data & A85);
 
-	const UINT8 hc_0  = H0(hpb) ^ hc_0_a ^ hc_0b1;
-	const UINT8 hc_1  = H1(hpb) ^ hc_1_a ^ hc_0b1;
-	const UINT8 hc_2  = hc_2_a ^ hc_2_b ^ H2(hpb);
-	const UINT8 h_0_2 = H0(hpb) ^ H1(hpb) ^ H2(hpb);
+	const uint8_t hc_0  = H0(hpb) ^ hc_0_a ^ hc_0b1;
+	const uint8_t hc_1  = H1(hpb) ^ hc_1_a ^ hc_0b1;
+	const uint8_t hc_2  = hc_2_a ^ hc_2_b ^ H2(hpb);
+	const uint8_t h_0_2 = H0(hpb) ^ H1(hpb) ^ H2(hpb);
 
 	/* a66: WD04   WD05   WD06   WD07   WD08   WD09   WD10   H(3)   0    ---     HC(3)A */
-	const UINT8 hc_3_a = parity_odd ((dw_data & A66) ^ H3(hpb));
+	const uint8_t hc_3_a = parity_odd ((dw_data & A66) ^ H3(hpb));
 
 	/* a84: WD18   WD19   WD20   WD21   WD22   WD23   WD24   WD25   0    HC(3/4) HCPA   */
-	const UINT8 hcpa   = parity_odd (dw_data & A84);
-	const UINT8 hc_3_4 = hcpa ^ 1;
+	const uint8_t hcpa   = parity_odd (dw_data & A84);
+	const uint8_t hc_3_4 = hcpa ^ 1;
 
 	/* a63: WD11   WD12   WD13   WD14   WD15   WD16   WD17   H(4)   0    ---     HC(4)A */
-	const UINT8 hc_4_a = parity_odd ((dw_data & A63) ^ H4(hpb));
+	const uint8_t hc_4_a = parity_odd ((dw_data & A63) ^ H4(hpb));
 
 	/* a87: WD26   WD27   WD28   WD29   WD30   WD31   H(5)   0      0    HC(5)   HCPB   */
-	const UINT8 hcpb   = parity_odd ((dw_data & A87) ^ H5(hpb));
-	const UINT8 hc_3   = hc_3_a ^ hc_3_4;
-	const UINT8 hc_4   = hc_4_a ^ hc_3_4;
-	const UINT8 hc_5   = hcpb ^ 1;
+	const uint8_t hcpb   = parity_odd ((dw_data & A87) ^ H5(hpb));
+	const uint8_t hc_3   = hc_3_a ^ hc_3_4;
+	const uint8_t hc_4   = hc_4_a ^ hc_3_4;
+	const uint8_t hc_5   = hcpb ^ 1;
 
-	const UINT8 syndrome = 32*hc_0 + 16*hc_1 + 8*hc_2 + 4*hc_3 + 2*hc_4 + hc_5;
+	const uint8_t syndrome = 32*hc_0 + 16*hc_1 + 8*hc_2 + 4*hc_3 + 2*hc_4 + hc_5;
 
 
 	/* a54: HC(3)A HC(4)A HCPA   HCPB   H(0/2) XX01   WD02   WD03   P    PERR    ---
@@ -379,7 +379,7 @@ UINT32 alto2_cpu_device::hamming_code(bool write, UINT32 dw_addr, UINT32 dw_data
 	 * which has the same effect as spreading them over some bits
 	 * and then counting them... I hope ;-)
 	 */
-	const UINT8 perr = parity_even(
+	const uint8_t perr = parity_even(
 				hc_3_a ^
 				hc_4_a ^
 				hcpa ^
@@ -392,11 +392,11 @@ UINT32 alto2_cpu_device::hamming_code(bool write, UINT32 dw_addr, UINT32 dw_data
 				1);
 
 	/* a65: WD00   WD01   WD02   WD04   WD05   WD07   WD10   WD11   WD12 ---     PCA    */
-	const UINT8 pca = parity_odd (dw_data & A65);
+	const uint8_t pca = parity_odd (dw_data & A65);
 
 	/* a74: WD14   WD17   WD18   WD21   WD23   WD24   WD26   WD27   WD29 PCB     ---    */
-	const UINT8 pcb = parity_even(dw_data & A74);
-	const UINT8 pc = pca ^ pcb;
+	const uint8_t pcb = parity_even(dw_data & A74);
+	const uint8_t pc = pca ^ pcb;
 
 	if (write) {
 		/* Update the hamming code and parity bit store */
@@ -508,7 +508,7 @@ READ16_MEMBER( alto2_cpu_device::mear_r )
  */
 READ16_MEMBER( alto2_cpu_device::mesr_r )
 {
-	UINT16 data = m_mem.mesr ^ 0177777;
+	uint16_t data = m_mem.mesr ^ 0177777;
 	if (!space.debugger_access()) {
 		LOG((this,LOG_MEM,2,"    MESR read %07o\n", data));
 		LOG((this,LOG_MEM,6,"        Hamming code read    : %#o\n", GET_MESR_HAMMING(data)));
@@ -572,7 +572,7 @@ WRITE16_MEMBER( alto2_cpu_device::mecr_w )
  */
 READ16_MEMBER( alto2_cpu_device::mecr_r )
 {
-	UINT16 data = m_mem.mecr ^ 0177777;
+	uint16_t data = m_mem.mecr ^ 0177777;
 	// all spare bits are set
 	if (!space.debugger_access()) {
 		LOG((this,LOG_MEM,2,"    MECR read %07o\n", data));
@@ -593,7 +593,7 @@ READ16_MEMBER( alto2_cpu_device::mecr_r )
 READ16_MEMBER ( alto2_cpu_device::ioram_r )
 {
 	offs_t dw_addr = offset / 2;
-	return static_cast<UINT16>(offset & 1 ? GET_ODD(m_mem.ram[dw_addr]) : GET_EVEN(m_mem.ram[dw_addr]));
+	return static_cast<uint16_t>(offset & 1 ? GET_ODD(m_mem.ram[dw_addr]) : GET_EVEN(m_mem.ram[dw_addr]));
 }
 
 /**
@@ -616,7 +616,7 @@ WRITE16_MEMBER( alto2_cpu_device::ioram_w )
  * @param rsel selected register (to detect refresh cycles)
  * @param addr memory address
  */
-void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
+void alto2_cpu_device::load_mar(uint8_t rsel, uint32_t addr)
 {
 	if (rsel == 037) {
 		/*
@@ -657,7 +657,7 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
  *
  * @result returns value from memory (RAM or MMIO)
  */
-UINT16 alto2_cpu_device::read_mem()
+uint16_t alto2_cpu_device::read_mem()
 {
 	if (ALTO2_MEM_NONE == m_mem.access) {
 		LOG((this,LOG_MEM,0,"    fatal: mem read with no preceding address\n"));
@@ -668,7 +668,7 @@ UINT16 alto2_cpu_device::read_mem()
 		return m_mem.md;
 	}
 
-	const UINT32 base_addr = m_mem.mar & 0177777;
+	const uint32_t base_addr = m_mem.mar & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE && m_mem.mar < ALTO2_RAM_SIZE) {
 		m_mem.md = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
 		LOG((this,LOG_MEM,6,"    MD = MMIO[%#o] (%#o)\n", base_addr, m_mem.md));
@@ -709,7 +709,7 @@ UINT16 alto2_cpu_device::read_mem()
  *
  * @param data data to write to RAM or MMIO
  */
-void alto2_cpu_device::write_mem(UINT16 data)
+void alto2_cpu_device::write_mem(uint16_t data)
 {
 	int base_addr;
 
@@ -766,7 +766,7 @@ void alto2_cpu_device::write_mem(UINT16 data)
  * @param addr address to read
  * @return memory contents at address (16 bits)
  */
-UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
+uint16_t alto2_cpu_device::debug_read_mem(uint32_t addr)
 {
 	int base_addr = addr & 0177777;
 	int data;
@@ -786,7 +786,7 @@ UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
  * @param addr address to write
  * @param data data to write (16 bits used)
  */
-void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
+void alto2_cpu_device::debug_write_mem(uint32_t addr, uint16_t data)
 {
 	int base_addr = addr & 0177777;
 	if (addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
@@ -840,13 +840,13 @@ void alto2_cpu_device::reset_memory()
 	// config should be valid, unless the driver doesn't define it
 	if (config && 0 == config->read())
 		m_mem.size *= 2;
-	logerror("Main memory %u KiB\n", static_cast<UINT32>(sizeof(UINT16) * m_mem.size / 1024));
+	logerror("Main memory %u KiB\n", static_cast<uint32_t>(sizeof(uint16_t) * m_mem.size / 1024));
 
-	m_mem.ram = make_unique_clear<UINT32[]>(sizeof(UINT16) * m_mem.size);
-	m_mem.hpb = make_unique_clear<UINT8[]> (sizeof(UINT16) * m_mem.size);
+	m_mem.ram = make_unique_clear<uint32_t[]>(sizeof(uint16_t) * m_mem.size);
+	m_mem.hpb = make_unique_clear<uint8_t[]> (sizeof(uint16_t) * m_mem.size);
 
 	// Initialize the hamming codes and parity bits
-	for (UINT32 addr = 0; addr < m_mem.size; addr++)
+	for (uint32_t addr = 0; addr < m_mem.size; addr++)
 		hamming_code(true, addr, 0);
 
 	m_mem.mar = 0;

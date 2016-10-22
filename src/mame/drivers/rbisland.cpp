@@ -944,7 +944,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(rbisland_state,rbisland)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
@@ -953,7 +953,7 @@ DRIVER_INIT_MEMBER(rbisland_state,rbisland)
 
 DRIVER_INIT_MEMBER(rbisland_state,rbislande)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 

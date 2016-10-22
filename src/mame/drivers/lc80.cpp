@@ -237,7 +237,7 @@ READ8_MEMBER( lc80_state::pio2_pb_r )
 
 	*/
 
-	UINT8 data = 0xf0;
+	uint8_t data = 0xf0;
 	int i;
 
 	for (i = 0; i < 6; i++)
@@ -272,7 +272,7 @@ void lc80_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	UINT8 *ROM = memregion(Z80_TAG)->base();
+	uint8_t *ROM = memregion(Z80_TAG)->base();
 
 	/* setup memory banking */
 	membank("bank1")->configure_entry(0, &ROM[0]); // TODO

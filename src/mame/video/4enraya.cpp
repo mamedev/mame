@@ -29,7 +29,7 @@ void _4enraya_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_4enraya_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 _4enraya_state::screen_update_4enraya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t _4enraya_state::screen_update_4enraya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

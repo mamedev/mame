@@ -177,14 +177,14 @@
 		// if it doesn't exist, add a new one
 		if (bp == nullptr)
 		{
-			UINT32 const bpnum = device.debug()->breakpoint_set(address, nullptr, nullptr);
+			uint32_t const bpnum = device.debug()->breakpoint_set(address, nullptr, nullptr);
 			machine->debugger().console().printf("Breakpoint %X set\n", bpnum);
 		}
 		else
 		{
 			int const bpnum = bp->index();
 			device.debug()->breakpoint_clear(bpnum);
-			machine->debugger().console().printf("Breakpoint %X cleared\n", (UINT32)bpnum);
+			machine->debugger().console().printf("Breakpoint %X cleared\n", (uint32_t)bpnum);
 		}
 
 		// fail to do this and the display doesn't update
@@ -204,7 +204,7 @@
 		{
 			device.debug()->breakpoint_enable(bp->index(), !bp->enabled());
 			machine->debugger().console().printf("Breakpoint %X %s\n",
-								                 (UINT32)bp->index(),
+								                 (uint32_t)bp->index(),
 								                 bp->enabled() ? "enabled" : "disabled");
 			machine->debug_view().update_all();
 			machine->debugger().refresh_display();

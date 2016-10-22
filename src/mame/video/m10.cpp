@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "includes/m10.h"
 
-static const UINT32 extyoffs[] =
+static const uint32_t extyoffs[] =
 {
 	STEP256(0, 8)
 };
@@ -120,7 +120,7 @@ VIDEO_START_MEMBER(m10_state,m15)
 
 ***************************************************************************/
 
-UINT32 m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	static const int color[4]= { 3, 3, 5, 5 };
@@ -159,7 +159,7 @@ UINT32 m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap,
 
 ***************************************************************************/
 
-UINT32 m10_state::screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m10_state::screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 

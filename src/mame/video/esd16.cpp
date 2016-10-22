@@ -54,7 +54,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0)
 {
-	UINT16 code = m_vram_0[tile_index];
+	uint16_t code = m_vram_0[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			code,
 			m_tilemap0_color,
@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0)
 
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0_16x16)
 {
-	UINT16 code = m_vram_0[tile_index];
+	uint16_t code = m_vram_0[tile_index];
 	SET_TILE_INFO_MEMBER(2,
 			code,
 			m_tilemap0_color,
@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0_16x16)
 
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1)
 {
-	UINT16 code = m_vram_1[tile_index];
+	uint16_t code = m_vram_1[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			code,
 			m_tilemap1_color,
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1)
 
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1_16x16)
 {
-	UINT16 code = m_vram_1[tile_index];
+	uint16_t code = m_vram_1[tile_index];
 	SET_TILE_INFO_MEMBER(2,
 			code,
 			m_tilemap1_color,
@@ -160,7 +160,7 @@ void esd16_state::video_start()
 
 ***************************************************************************/
 
-UINT32 esd16_state::screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t esd16_state::screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 

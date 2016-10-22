@@ -95,21 +95,21 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm5205;
 	required_memory_bank m_sample_bank;
-	UINT8 m_sample_data;
+	uint8_t m_sample_data;
 	bool m_more_data;
 	bool m_nmi_enable;
 
 private:
-	UINT32 m_segment1;
-	UINT32 m_segment2;
-	UINT8 m_strobe;
-	UINT8 m_kbdrow;
-	UINT8 m_diag;
+	uint32_t m_segment1;
+	uint32_t m_segment2;
+	uint8_t m_strobe;
+	uint8_t m_kbdrow;
+	uint8_t m_diag;
 	bool m_ca1;
-	UINT8 m_sound_data;
+	uint8_t m_sound_data;
 
-	UINT8 m_sample_bank_num;
-	UINT8 m_msm_prescaler;
+	uint8_t m_sample_bank_num;
+	uint8_t m_msm_prescaler;
 };
 
 /*static ADDRESS_MAP_START( de_2_map, AS_PROGRAM, 8, de_2_state )
@@ -218,7 +218,7 @@ MACHINE_RESET_MEMBER(de_2_state, de_2)
 
 DRIVER_INIT_MEMBER(de_2_state, de_2)
 {
-	UINT8 *ROM = memregion("sound1")->base();
+	uint8_t *ROM = memregion("sound1")->base();
 	m_sample_bank->configure_entries(0, 16, &ROM[0x0000], 0x4000);
 	m_sample_bank->set_entry(0);
 }
@@ -269,7 +269,7 @@ WRITE8_MEMBER( de_2_state::lamp0_w )
 // 6821 PIA at 0x2800
 WRITE8_MEMBER( de_2_state::dig0_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
 	m_strobe = data & 15;
 	m_diag = (data & 0x70) >> 4;
@@ -313,7 +313,7 @@ WRITE8_MEMBER( de_2_state::alpha3_dig1_w )
 
 READ8_MEMBER( de_2_state::pia28_w7_r )
 {
-	UINT8 ret = 0x80;
+	uint8_t ret = 0x80;
 
 	ret |= m_strobe;
 	ret |= m_diag << 4;
@@ -410,7 +410,7 @@ READ8_MEMBER( de_2_state::sound_latch_r )
 
 WRITE8_MEMBER( de_2_state::sample_bank_w )
 {
-	static const UINT8 prescale[4] = { MSM5205_S96_4B, MSM5205_S48_4B, MSM5205_S64_4B, 0 };
+	static const uint8_t prescale[4] = { MSM5205_S96_4B, MSM5205_S48_4B, MSM5205_S64_4B, 0 };
 
 	m_sample_bank_num = (data & 0x07);
 	m_sample_bank->set_entry(m_sample_bank_num);
@@ -422,7 +422,7 @@ WRITE8_MEMBER( de_2_state::sample_bank_w )
 
 READ8_MEMBER(de_2_state::display_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	switch(offset)
 	{

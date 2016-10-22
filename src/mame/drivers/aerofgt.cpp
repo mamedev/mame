@@ -1320,7 +1320,7 @@ MACHINE_START_MEMBER(aerofgt_state,common)
 
 MACHINE_START_MEMBER(aerofgt_state,aerofgt)
 {
-	UINT8 *rom = memregion("audiocpu")->base();
+	uint8_t *rom = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &rom[0x10000], 0x8000);
 

@@ -21,11 +21,11 @@
 
 class m6510_device : public m6502_device {
 public:
-	m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	m6510_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6510_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	UINT8 get_port();
-	void set_pulls(UINT8 pullup, UINT8 pulldown);
+	uint8_t get_port();
+	void set_pulls(uint8_t pullup, uint8_t pulldown);
 
 	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
 		read_port.set_callback(rd);
@@ -34,7 +34,7 @@ public:
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
@@ -45,32 +45,32 @@ protected:
 
 		mi_6510_normal(m6510_device *base);
 		virtual ~mi_6510_normal() {}
-		virtual UINT8 read(UINT16 adr) override;
-		virtual UINT8 read_sync(UINT16 adr) override;
-		virtual UINT8 read_arg(UINT16 adr) override;
-		virtual void write(UINT16 adr, UINT8 val) override;
+		virtual uint8_t read(uint16_t adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
 	class mi_6510_nd : public mi_6510_normal {
 	public:
 		mi_6510_nd(m6510_device *base);
 		virtual ~mi_6510_nd() {}
-		virtual UINT8 read_sync(UINT16 adr) override;
-		virtual UINT8 read_arg(UINT16 adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
 	devcb_read8  read_port;
 	devcb_write8 write_port;
 
-	UINT8 pullup, floating, dir, port, drive;
+	uint8_t pullup, floating, dir, port, drive;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	UINT8 dir_r();
-	void dir_w(UINT8 data);
-	UINT8 port_r();
-	void port_w(UINT8 data);
+	uint8_t dir_r();
+	void dir_w(uint8_t data);
+	uint8_t port_r();
+	void port_w(uint8_t data);
 
 	void update_port();
 

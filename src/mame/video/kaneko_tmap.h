@@ -5,7 +5,7 @@
 class kaneko_view2_tilemap_device : public device_t
 {
 public:
-	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -18,14 +18,14 @@ public:
 	int m_dx, m_dy, m_xdim, m_ydim;
 	int m_invert_flip;
 
-	std::unique_ptr<UINT16[]> m_vram[2];
-	std::unique_ptr<UINT16[]> m_vscroll[2];
-	std::unique_ptr<UINT16[]> m_regs;
+	std::unique_ptr<uint16_t[]> m_vram[2];
+	std::unique_ptr<uint16_t[]> m_vscroll[2];
+	std::unique_ptr<uint16_t[]> m_regs;
 	tilemap_t* m_tmap[2];
-	UINT16 m_vram_tile_addition[2]; // galsnew
+	uint16_t m_vram_tile_addition[2]; // galsnew
 
 	void get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
-	void kaneko16_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_);
+	void kaneko16_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_);
 
 	// call to do the rendering etc.
 	template<class _BitmapClass>

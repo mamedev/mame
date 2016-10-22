@@ -25,9 +25,9 @@ INPUT_CHANGED_MEMBER(madalien_state::coin_inserted)
 }
 
 
-inline UINT8 madalien_state::shift_common(UINT8 hi, UINT8 lo)
+inline uint8_t madalien_state::shift_common(uint8_t hi, uint8_t lo)
 {
-	const UINT8 *table = memregion("user2")->base();
+	const uint8_t *table = memregion("user2")->base();
 
 	return table[((hi & 0x07) << 8) | lo];
 }
@@ -39,10 +39,10 @@ READ8_MEMBER(madalien_state::shift_r)
 
 READ8_MEMBER(madalien_state::shift_rev_r)
 {
-	UINT8 hi = *m_shift_hi ^ 0x07;
-	UINT8 lo = BITSWAP8(*m_shift_lo,0,1,2,3,4,5,6,7);
+	uint8_t hi = *m_shift_hi ^ 0x07;
+	uint8_t lo = BITSWAP8(*m_shift_lo,0,1,2,3,4,5,6,7);
 
-	UINT8 ret = shift_common(hi, lo);
+	uint8_t ret = shift_common(hi, lo);
 
 	return BITSWAP8(ret,7,0,1,2,3,4,5,6) & 0x7f;
 }

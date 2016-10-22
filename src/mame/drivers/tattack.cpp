@@ -34,14 +34,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_tmap;
 	DECLARE_DRIVER_INIT(tattack);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tattack);
-	UINT32 screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 		0);
 }
 
-UINT32 tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tmap->mark_all_dirty();
 	m_tmap->draw(screen, bitmap, cliprect, 0,0);
@@ -243,7 +243,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(tattack_state,tattack)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x1b4]=0;
 	rom[0x1b5]=0;

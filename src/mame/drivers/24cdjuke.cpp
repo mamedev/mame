@@ -75,7 +75,7 @@ public:
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;
 	required_ioport m_io_row3;
-	required_region_ptr<UINT16> m_charset;
+	required_region_ptr<uint16_t> m_charset;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -87,13 +87,13 @@ public:
 	DECLARE_READ8_MEMBER(unknown_r) { return machine().rand(); }
 
 private:
-	UINT8 m_kb_col;
+	uint8_t m_kb_col;
 };
 
 
 READ8_MEMBER(midcoin24cdjuke_state::kb_row_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!(m_kb_col & 0x10))
 		data &= m_io_row0->read();
@@ -114,7 +114,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::kb_col_w)
 
 WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 {
-	UINT16 char_data = m_charset[((data & 0x60) << 1) | (data & 0x1f)];
+	uint16_t char_data = m_charset[((data & 0x60) << 1) | (data & 0x1f)];
 
 	char_data = BITSWAP16(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
 

@@ -38,7 +38,7 @@ const device_type SONY_LDP1000 = &device_creator<sony_ldp1000_device>;
 //  ldp1000_device - constructor
 //-------------------------------------------------
 
-sony_ldp1000_device::sony_ldp1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sony_ldp1000_device::sony_ldp1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: laserdisc_device(mconfig, SONY_LDP1000, "Sony LDP-1000", tag, owner, clock, "ldp1000", __FILE__)
 {
 }
@@ -104,7 +104,7 @@ void sony_ldp1000_device::player_vsync(const vbi_metadata &vbi, int fieldnum, co
 //  the first visible line of the frame
 //-------------------------------------------------
 
-INT32 sony_ldp1000_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
+int32_t sony_ldp1000_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	//printf("%d update\n",fieldnum);
 
@@ -118,7 +118,7 @@ INT32 sony_ldp1000_device::player_update(const vbi_metadata &vbi, int fieldnum, 
 
 READ8_MEMBER( sony_ldp1000_device::status_r )
 {
-	UINT8 res = m_status;
+	uint8_t res = m_status;
 	m_status = stat_undef;
 	return res;
 }
@@ -131,7 +131,7 @@ void sony_ldp1000_device::set_new_player_state(ldp1000_player_state which)
 }
 
 // TODO: probably don't even need a size ...
-void sony_ldp1000_device::set_new_player_bcd(UINT8 data)
+void sony_ldp1000_device::set_new_player_bcd(uint8_t data)
 {
 	m_internal_bcd[m_index_state] = data;
 	m_index_state ++;
@@ -141,9 +141,9 @@ void sony_ldp1000_device::set_new_player_bcd(UINT8 data)
 	m_status = stat_ack;
 }
 
-UINT32 sony_ldp1000_device::bcd_to_raw()
+uint32_t sony_ldp1000_device::bcd_to_raw()
 {
-	UINT32 res = 0;
+	uint32_t res = 0;
 	for(int i=0;i<6;i++)
 		res |= (m_internal_bcd[i] & 0xf) << i*4;
 	return res;
@@ -151,7 +151,7 @@ UINT32 sony_ldp1000_device::bcd_to_raw()
 
 void sony_ldp1000_device::exec_enter_cmd()
 {
-	//const UINT32 saved_frame = bcd_to_raw();
+	//const uint32_t saved_frame = bcd_to_raw();
 
 	switch(m_player_state)
 	{

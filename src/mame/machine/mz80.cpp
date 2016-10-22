@@ -37,7 +37,7 @@ READ8_MEMBER( mz80_state::mz80k_8255_portb_r )
 
 READ8_MEMBER( mz80_state::mz80k_8255_portc_r )
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 	val |= m_mz80k_vertical ? 0x80 : 0x00;
 	val |= ((m_mz80k_cursor_cnt & 0x3f) > 31) ? 0x40 : 0x00;
 	val |= (m_cassette->get_state() & CASSETTE_MASK_UISTATE)== CASSETTE_PLAY ? 0x10 : 0x00;
@@ -75,7 +75,7 @@ WRITE_LINE_MEMBER( mz80_state::pit_out2_changed )
 
 READ8_MEMBER( mz80_state::mz80k_strobe_r )
 {
-	return 0x7e | (UINT8)m_mz80k_tempo_strobe;
+	return 0x7e | (uint8_t)m_mz80k_tempo_strobe;
 }
 
 WRITE8_MEMBER( mz80_state::mz80k_strobe_w )

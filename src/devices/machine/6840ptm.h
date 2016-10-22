@@ -49,7 +49,7 @@ class ptm6840_device :  public device_t
 {
 public:
 	// construction/destruction
-	ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_internal_clock(device_t &device, double clock) { downcast<ptm6840_device &>(device).m_internal_clock = clock; }
 	static void set_external_clocks(device_t &device, double clock0, double clock1, double clock2) { downcast<ptm6840_device &>(device).m_external_clock[0] = clock0; downcast<ptm6840_device &>(device).m_external_clock[1] = clock1; downcast<ptm6840_device &>(device).m_external_clock[2] = clock2; }
@@ -58,14 +58,14 @@ public:
 
 	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
 	int irq_state() const { return m_irq; }                 // get IRQ state
-	UINT16 count(int counter) const { return compute_counter(counter); }    // get counter value
+	uint16_t count(int counter) const { return compute_counter(counter); }    // get counter value
 	void set_ext_clock(int counter, double clock);  // set clock frequency
 	int ext_clock(int counter) const { return m_external_clock[counter]; }  // get clock frequency
 
 	DECLARE_WRITE8_MEMBER( write );
-	void write(offs_t offset, UINT8 data) { write(machine().driver_data()->generic_space(), offset, data); }
+	void write(offs_t offset, uint8_t data) { write(machine().driver_data()->generic_space(), offset, data); }
 	DECLARE_READ8_MEMBER( read );
-	UINT8 read(offs_t offset) { return read(machine().driver_data()->generic_space(), offset); }
+	uint8_t read(offs_t offset) { return read(machine().driver_data()->generic_space(), offset); }
 
 	void set_gate(int idx, int state);
 	DECLARE_WRITE_LINE_MEMBER( set_g1 );
@@ -90,7 +90,7 @@ private:
 	void tick(int counter, int count);
 	void timeout(int idx);
 
-	UINT16 compute_counter(int counter) const;
+	uint16_t compute_counter(int counter) const;
 	void reload_count(int idx);
 
 	enum
@@ -131,26 +131,26 @@ private:
 	devcb_write_line m_out_cb[3];
 	devcb_write_line m_irq_cb;
 
-	UINT8 m_control_reg[3];
-	UINT8 m_output[3]; // Output states
-	UINT8 m_gate[3];   // Input gate states
-	UINT8 m_clk[3];  // Clock states
-	UINT8 m_enabled[3];
-	UINT8 m_mode[3];
-	UINT8 m_fired[3];
-	UINT8 m_t3_divisor;
-	UINT8 m_t3_scaler;
-	UINT8 m_irq;
-	UINT8 m_status_reg;
-	UINT8 m_status_read_since_int;
-	UINT8 m_lsb_buffer;
-	UINT8 m_msb_buffer;
+	uint8_t m_control_reg[3];
+	uint8_t m_output[3]; // Output states
+	uint8_t m_gate[3];   // Input gate states
+	uint8_t m_clk[3];  // Clock states
+	uint8_t m_enabled[3];
+	uint8_t m_mode[3];
+	uint8_t m_fired[3];
+	uint8_t m_t3_divisor;
+	uint8_t m_t3_scaler;
+	uint8_t m_irq;
+	uint8_t m_status_reg;
+	uint8_t m_status_read_since_int;
+	uint8_t m_lsb_buffer;
+	uint8_t m_msb_buffer;
 
 	// Each PTM has 3 timers
 	emu_timer *m_timer[3];
 
-	UINT16 m_latch[3];
-	UINT16 m_counter[3];
+	uint16_t m_latch[3];
+	uint16_t m_counter[3];
 
 	static const char *const opmode[];
 };

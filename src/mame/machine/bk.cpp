@@ -17,7 +17,7 @@
 
 TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 {
-	UINT8 code, i, j;
+	uint8_t code, i, j;
 	static const char *const keynames[] = {
 		"LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6",
 		"LINE7", "LINE8", "LINE9", "LINE10", "LINE11"
@@ -102,7 +102,7 @@ READ16_MEMBER(bk_state::bk_vid_scrool_r)
 READ16_MEMBER(bk_state::bk_key_press_r)
 {
 	double level = m_cassette->input();
-	UINT16 cas;
+	uint16_t cas;
 	if (level < 0)
 	{
 		cas = 0x00;

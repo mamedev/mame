@@ -18,7 +18,7 @@ if len(sys.argv) < 4:
 srcfile = sys.argv[1]
 dstfile = sys.argv[2]
 varname = sys.argv[3]
-type = 'UINT8'
+type = 'uint8_t'
 
 try:
     myfile = open(srcfile, 'rb')

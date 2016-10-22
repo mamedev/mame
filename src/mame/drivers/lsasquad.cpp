@@ -545,7 +545,7 @@ WRITE8_MEMBER(lsasquad_state::unk)
 
 MACHINE_START_MEMBER(lsasquad_state,lsasquad)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 

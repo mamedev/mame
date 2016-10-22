@@ -108,7 +108,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 
 READ8_MEMBER( pc1512_state::system_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -274,7 +274,7 @@ WRITE8_MEMBER( pc1512_state::system_w )
 
 READ8_MEMBER( pc1512_state::mouse_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -379,7 +379,7 @@ WRITE8_MEMBER( pc1512_state::nmi_mask_w )
 
 READ8_MEMBER( pc1512_state::printer_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -442,7 +442,7 @@ READ8_MEMBER( pc1512_state::printer_r )
 
 READ8_MEMBER( pc1640_state::printer_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -552,7 +552,7 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 
 READ8_MEMBER( pc1640_state::io_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	offs_t addr = offset & 0x3ff;
 	bool decoded = false;
 
@@ -578,7 +578,7 @@ READ8_MEMBER( pc1640_state::io_r )
 	}
 	else if (!BIT(offset, 7))
 	{
-		UINT16 sw = m_sw->read();
+		uint16_t sw = m_sw->read();
 
 		if (!BIT(offset, 14))
 		{

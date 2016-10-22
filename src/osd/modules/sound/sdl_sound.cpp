@@ -62,14 +62,14 @@ public:
 
 	// sound_module
 
-	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame) override;
+	virtual void update_audio_stream(bool is_throttled, const int16_t *buffer, int samples_this_frame) override;
 	virtual void set_mastervolume(int attenuation) override;
 
 private:
 	int lock_buffer(bool is_throttled, long offset, long size, void **buffer1, long *length1, void **buffer2, long *length2);
 	void unlock_buffer(void);
-	void att_memcpy(void *dest, const INT16 *data, int bytes_to_copy);
-	void copy_sample_data(bool is_throttled, const INT16 *data, int bytes_to_copy);
+	void att_memcpy(void *dest, const int16_t *data, int bytes_to_copy);
+	void copy_sample_data(bool is_throttled, const int16_t *data, int bytes_to_copy);
 	int sdl_create_buffers(void);
 	void sdl_destroy_buffers(void);
 
@@ -80,11 +80,11 @@ private:
 
 	int              buf_locked;
 
-	INT8             *stream_buffer;
-	volatile INT32   stream_playpos;
+	int8_t             *stream_buffer;
+	volatile int32_t   stream_playpos;
 
-	UINT32           stream_buffer_size;
-	UINT32           stream_buffer_in;
+	uint32_t           stream_buffer_size;
+	uint32_t           stream_buffer_in;
 
 	// buffer over/underflow counts
 	int              buffer_underflows;
@@ -182,10 +182,10 @@ void sound_sdl::unlock_buffer(void)
 //  Apply attenuation
 //============================================================
 
-void sound_sdl::att_memcpy(void *dest, const INT16 *data, int bytes_to_copy)
+void sound_sdl::att_memcpy(void *dest, const int16_t *data, int bytes_to_copy)
 {
 	int level= (int) (pow(10.0, (double) attenuation / 20.0) * 128.0);
-	INT16 *d = (INT16 *) dest;
+	int16_t *d = (int16_t *) dest;
 	int count = bytes_to_copy/2;
 	while (count>0)
 	{
@@ -198,7 +198,7 @@ void sound_sdl::att_memcpy(void *dest, const INT16 *data, int bytes_to_copy)
 //  copy_sample_data
 //============================================================
 
-void sound_sdl::copy_sample_data(bool is_throttled, const INT16 *data, int bytes_to_copy)
+void sound_sdl::copy_sample_data(bool is_throttled, const int16_t *data, int bytes_to_copy)
 {
 	void *buffer1, *buffer2 = (void *)nullptr;
 	long length1, length2;
@@ -228,7 +228,7 @@ void sound_sdl::copy_sample_data(bool is_throttled, const INT16 *data, int bytes
 
 	// adjust for the number of bytes
 	bytes_to_copy -= cur_bytes;
-	data = (INT16 *)((UINT8 *)data + cur_bytes);
+	data = (int16_t *)((uint8_t *)data + cur_bytes);
 
 	// copy the second chunk
 	if (bytes_to_copy != 0)
@@ -246,18 +246,18 @@ void sound_sdl::copy_sample_data(bool is_throttled, const INT16 *data, int bytes
 //  update_audio_stream
 //============================================================
 
-void sound_sdl::update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame)
+void sound_sdl::update_audio_stream(bool is_throttled, const int16_t *buffer, int samples_this_frame)
 {
 	// if nothing to do, don't do it
 	if (sample_rate() != 0 && stream_buffer)
 	{
-		int bytes_this_frame = samples_this_frame * sizeof(INT16) * 2;
+		int bytes_this_frame = samples_this_frame * sizeof(int16_t) * 2;
 		int play_position, write_position, stream_in;
 		int orig_write; // used in LOG
 
 		play_position = stream_playpos;
 
-		write_position = stream_playpos + ((sample_rate() / 50) * sizeof(INT16) * 2);
+		write_position = stream_playpos + ((sample_rate() / 50) * sizeof(int16_t) * 2);
 		orig_write = write_position;
 
 		if (!stream_in_initialized)
@@ -448,7 +448,7 @@ int sound_sdl::init(const osd_options &options)
 		audio_latency = std::max(std::min(m_audio_latency, MAX_AUDIO_LATENCY), 1);
 
 		// compute the buffer sizes
-		stream_buffer_size = (sample_rate() * 2 * sizeof(INT16) * (2 + audio_latency)) / 30;
+		stream_buffer_size = (sample_rate() * 2 * sizeof(int16_t) * (2 + audio_latency)) / 30;
 		stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 		if (stream_buffer_size < 1024)
 			stream_buffer_size = 1024;
@@ -514,7 +514,7 @@ int sound_sdl::sdl_create_buffers(void)
 {
 	osd_printf_verbose("sdl_create_buffers: creating stream buffer of %u bytes\n", stream_buffer_size);
 
-	stream_buffer = global_alloc_array_clear<INT8>(stream_buffer_size);
+	stream_buffer = global_alloc_array_clear<int8_t>(stream_buffer_size);
 	stream_playpos = 0;
 	buf_locked = 0;
 	return 0;

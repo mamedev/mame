@@ -16,7 +16,7 @@ TODO:
 const device_type YM2148 = &device_creator<ym2148_device>;
 
 
-ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YM2148, "YM2148", tag, owner, clock, "ym2148", __FILE__)
 	, device_serial_interface(mconfig, *this)
 	, m_txd_handler(*this)
@@ -102,7 +102,7 @@ void ym2148_device::transmit_clock()
 		/* if diserial has bits to send, make them so */
 		if (!is_transmit_register_empty())
 		{
-			UINT8 data = transmit_register_get_data_bit();
+			uint8_t data = transmit_register_get_data_bit();
 			m_tx_busy = true;
 			m_txd_handler(data);
 		}
@@ -197,7 +197,7 @@ WRITE8_MEMBER(ym2148_device::write)
 }
 
 
-UINT8 ym2148_device::get_irq_vector()
+uint8_t ym2148_device::get_irq_vector()
 {
 	return (m_irq_state == ASSERT_LINE) ? m_irq_vector : m_external_irq_vector;
 }

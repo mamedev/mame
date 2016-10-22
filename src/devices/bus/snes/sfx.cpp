@@ -18,7 +18,7 @@
 const device_type SNS_LOROM_SUPERFX = &device_creator<sns_rom_superfx_device>;
 
 
-sns_rom_superfx_device::sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom_superfx_device::sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: sns_rom_device(mconfig, SNS_LOROM_SUPERFX, "SNES Cart (LoROM) + SuperFX", tag, owner, clock, "sns_rom_superfx", __FILE__),
 			m_superfx(*this, "superfx")
 {
@@ -124,7 +124,7 @@ READ8_MEMBER(sns_rom_superfx_device::read_h)
 		}
 		else
 		{
-			static const UINT8 sfx_data[16] = {
+			static const uint8_t sfx_data[16] = {
 				0x00, 0x01, 0x00, 0x01, 0x04, 0x01, 0x00, 0x01,
 				0x00, 0x01, 0x08, 0x01, 0x00, 0x01, 0x0c, 0x01,
 			};

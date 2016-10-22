@@ -75,7 +75,7 @@
 #include "emu.h"
 #include "sound/speaker.h"
 
-static const INT16 default_levels[2] = {0, 32767};
+static const int16_t default_levels[2] = {0, 32767};
 
 // Internal oversampling factor (interm. samples vs stream samples)
 static const int RATE_MULTIPLIER = 4;
@@ -83,7 +83,7 @@ static const int RATE_MULTIPLIER = 4;
 
 const device_type SPEAKER_SOUND = &device_creator<speaker_sound_device>;
 
-speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, SPEAKER_SOUND, "Filtered 1-bit DAC", tag, owner, clock, "speaker_sound", __FILE__),
 						device_sound_interface(mconfig, *this),
 						m_num_levels(2),

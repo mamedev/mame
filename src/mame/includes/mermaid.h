@@ -31,13 +31,13 @@ public:
 	}
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_bg_scrollram;
-	required_shared_ptr<UINT8> m_fg_scrollram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_ay8910_enable;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_bg_scrollram;
+	required_shared_ptr<uint8_t> m_fg_scrollram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_ay8910_enable;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -53,13 +53,13 @@ public:
 	int m_rougien_gfxbank2;
 
 	/* sound-related */
-	UINT32   m_adpcm_pos;
-	UINT32   m_adpcm_end;
-	UINT8    m_adpcm_idle;
+	uint32_t   m_adpcm_pos;
+	uint32_t   m_adpcm_end;
+	uint8_t    m_adpcm_idle;
 	int      m_adpcm_data;
-	UINT8    m_adpcm_trigger;
-	UINT8    m_adpcm_rom_sel;
-	UINT8    m_adpcm_play_reg;
+	uint8_t    m_adpcm_trigger;
+	uint8_t    m_adpcm_rom_sel;
+	uint8_t    m_adpcm_play_reg;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -70,7 +70,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	UINT8    m_nmi_mask;
+	uint8_t    m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(mermaid_ay8910_write_port_w);
 	DECLARE_WRITE8_MEMBER(mermaid_ay8910_control_port_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
@@ -94,10 +94,10 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mermaid);
 	DECLARE_PALETTE_INIT(rougien);
-	UINT32 screen_update_mermaid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mermaid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_mermaid(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	UINT8 collision_check( rectangle& rect );
+	uint8_t collision_check( rectangle& rect );
 	DECLARE_WRITE_LINE_MEMBER(rougien_adpcm_int);
 };

@@ -403,7 +403,7 @@ READ8_MEMBER(xor100_state::i8255_pc_r)
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* on line */
 	data |= m_centronics_select << 4;
@@ -475,8 +475,8 @@ SLOT_INTERFACE_END
 void xor100_state::machine_start()
 {
 	int banks = m_ram->size() / 0x10000;
-	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = m_rom->base();
+	uint8_t *ram = m_ram->pointer();
+	uint8_t *rom = m_rom->base();
 
 	/* setup memory banking */
 	membank("bank1")->configure_entries(1, banks, ram, 0x10000);

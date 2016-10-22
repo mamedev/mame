@@ -7,8 +7,8 @@
 
 CPU_DISASSEMBLE( ie15 )
 {
-	UINT32 flags = 0;
-	UINT8 op;
+	uint32_t flags = 0;
+	uint8_t op;
 	unsigned PC = pc;
 
 	op = OP(pc++);

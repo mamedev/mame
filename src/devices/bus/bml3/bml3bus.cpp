@@ -59,13 +59,13 @@ const device_type BML3BUS_SLOT = &device_creator<bml3bus_slot_device>;
 //-------------------------------------------------
 //  bml3bus_slot_device - constructor
 //-------------------------------------------------
-bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, BML3BUS_SLOT, "Hitachi MB-6890 Slot", tag, owner, clock, "bml3bus_slot", __FILE__),
 		device_slot_interface(mconfig, *this), m_bml3bus_tag(nullptr), m_bml3bus_slottag(nullptr)
 {
 }
 
-bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this), m_bml3bus_tag(nullptr), m_bml3bus_slottag(nullptr)
 {
@@ -109,7 +109,7 @@ void bml3bus_device::static_set_cputag(device_t &device, const char *tag)
 //  bml3bus_device - constructor
 //-------------------------------------------------
 
-bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, BML3BUS, "Hitachi MB-6890 Bus", tag, owner, clock, "bml3bus", __FILE__), m_maincpu(nullptr),
 		m_out_nmi_cb(*this),
 		m_out_irq_cb(*this),
@@ -117,7 +117,7 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
 		m_out_nmi_cb(*this),
 		m_out_irq_cb(*this),

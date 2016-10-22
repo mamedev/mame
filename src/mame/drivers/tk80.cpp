@@ -69,11 +69,11 @@ public:
 	DECLARE_WRITE8_MEMBER(mikrolab_serial_w);
 	DECLARE_READ8_MEMBER(display_r);
 	DECLARE_WRITE8_MEMBER(display_w);
-	UINT8 m_term_data;
-	UINT8 m_keyb_press;
-	UINT8 m_keyb_press_flag;
-	UINT8 m_shift_press_flag;
-	UINT8 m_ppi_portc;
+	uint8_t m_term_data;
+	uint8_t m_keyb_press;
+	uint8_t m_keyb_press_flag;
+	uint8_t m_shift_press_flag;
+	uint8_t m_ppi_portc;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -195,7 +195,7 @@ READ8_MEMBER( tk80_state::key_matrix_r )
 {
 // PA0-7 keyscan in
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (BIT(m_ppi_portc, 4))
 		data &= ioport("X0")->read();
@@ -211,7 +211,7 @@ READ8_MEMBER( tk80_state::nd80z_key_r )
 {
 // PA0-7 keyscan in
 
-	UINT8 data = 0xff, row = m_ppi_portc & 7;
+	uint8_t data = 0xff, row = m_ppi_portc & 7;
 	if (row == 6)
 		data &= ioport("X0")->read();
 	else

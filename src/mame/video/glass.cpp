@@ -84,7 +84,7 @@ WRITE16_MEMBER(glass_state::blitter_w)
 		/* fill the screen bitmap with the current picture */
 		{
 			int i, j;
-			UINT8 *gfx = (UINT8 *)memregion("gfx3")->base();
+			uint8_t *gfx = (uint8_t *)memregion("gfx3")->base();
 
 			gfx = gfx + (m_current_command & 0x07) * 0x10000 + (m_current_command & 0x08) * 0x10000 + 0x140;
 
@@ -191,7 +191,7 @@ void glass_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 ****************************************************************************/
 
-UINT32 glass_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t glass_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* set scroll registers */
 	m_pant[0]->set_scrolly(0, m_vregs[0]);

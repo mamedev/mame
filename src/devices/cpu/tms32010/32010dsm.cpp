@@ -208,7 +208,7 @@ static void InitDasm32010(void)
 			fatalerror("not enough bits in encoding '%s %s' %d\n",
 				ops[0],ops[1],bit);
 		}
-		while (isspace((UINT8)*p)) p++;
+		while (isspace((uint8_t)*p)) p++;
 		if (*p) Op[i].extcode = *p;
 		Op[i].bits = bits;
 		Op[i].mask = mask;
@@ -224,7 +224,7 @@ static void InitDasm32010(void)
 
 CPU_DISASSEMBLE( tms32010 )
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	int a, b, d, k, m, n, p, r, s, w;   /* these can all be filled in by parsing an instruction */
 	int i;
 	int op;

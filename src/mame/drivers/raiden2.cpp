@@ -201,12 +201,12 @@ void raiden2_state::machine_start()
 }
 
 /*
-UINT16 raiden2_state::rps()
+uint16_t raiden2_state::rps()
 {
     return m_maincpu->state_int(NEC_CS);
 }
 
-UINT16 raiden2_state::rpc()
+uint16_t raiden2_state::rpc()
 {
     return m_maincpu->state_int(NEC_IP);
 }
@@ -245,9 +245,9 @@ WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 
 
 
-void raiden2_state::combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
+void raiden2_state::combine32(uint32_t *val, int offset, uint16_t data, uint16_t mem_mask)
 {
-	UINT16 *dest = (UINT16 *)val + BYTE_XOR_LE(offset);
+	uint16_t *dest = (uint16_t *)val + BYTE_XOR_LE(offset);
 	COMBINE_DATA(dest);
 }
 
@@ -257,7 +257,7 @@ void raiden2_state::combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_m
 
 void raiden2_state::draw_sprites(const rectangle &cliprect)
 {
-	UINT16 *source = sprites + (0x1000/2)-4;
+	uint16_t *source = sprites + (0x1000/2)-4;
 	sprite_buffer.fill(0xf, cliprect);
 
 	gfx_element *gfx = m_gfxdecode->gfx(2);
@@ -515,10 +515,10 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(raiden2_state,raiden2)
 {
-	back_data = make_unique_clear<UINT16[]>(0x800/2);
-	fore_data =  make_unique_clear<UINT16[]>(0x800/2);
-	mid_data =  make_unique_clear<UINT16[]>(0x800/2);
-	text_data =  make_unique_clear<UINT16[]>(0x1000/2);
+	back_data = make_unique_clear<uint16_t[]>(0x800/2);
+	fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
+	mid_data =  make_unique_clear<uint16_t[]>(0x800/2);
+	text_data =  make_unique_clear<uint16_t[]>(0x1000/2);
 
 	save_pointer(NAME(back_data.get()), 0x800/2);
 	save_pointer(NAME(fore_data.get()), 0x800/2);
@@ -541,10 +541,10 @@ void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	const pen_t *pens = &m_palette->pen(0);
 	layer <<= 14;
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
-		const UINT16 *src = &source.pix16(y, cliprect.min_x);
-		UINT32 *dst = &bitmap.pix32(y, cliprect.min_x);
+		const uint16_t *src = &source.pix16(y, cliprect.min_x);
+		uint32_t *dst = &bitmap.pix32(y, cliprect.min_x);
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
-			UINT16 val = *src++;
+			uint16_t val = *src++;
 			if((val & 0xc000) == layer && (val & 0x000f) != 0x000f) {
 				val &= 0x07ff;
 
@@ -564,7 +564,7 @@ void raiden2_state::tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &
 	blend_layer(bitmap, cliprect, tile_buffer, 0);
 }
 
-UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	if (!(raiden2_tilemap_enable & 16)) {
@@ -622,11 +622,11 @@ INTERRUPT_GEN_MEMBER(raiden2_state::raiden2_interrupt)
 
 // Sprite encryption key upload
 
-static UINT32 sprcpt_adr, sprcpt_idx;
+static uint32_t sprcpt_adr, sprcpt_idx;
 
-static UINT16 sprcpt_flags2;
-static UINT32 sprcpt_val[2], sprcpt_flags1;
-static UINT32 sprcpt_data_1[0x100], sprcpt_data_2[0x40], sprcpt_data_3[6], sprcpt_data_4[4];
+static uint16_t sprcpt_flags2;
+static uint32_t sprcpt_val[2], sprcpt_flags1;
+static uint32_t sprcpt_data_1[0x100], sprcpt_data_2[0x40], sprcpt_data_3[6], sprcpt_data_4[4];
 
 void raiden2_state::sprcpt_init(void)
 {
@@ -830,18 +830,18 @@ READ16_MEMBER(raiden2_state::sprite_prot_src_seg_r)
 WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 {
 	sprite_prot_src_addr[1] = data;
-	UINT32 src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
+	uint32_t src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
 
-	int x = INT16((space.read_dword(src+0x08) >> 16) - (sprite_prot_x));
-	int y = INT16((space.read_dword(src+0x04) >> 16) - (sprite_prot_y));
+	int x = int16_t((space.read_dword(src+0x08) >> 16) - (sprite_prot_x));
+	int y = int16_t((space.read_dword(src+0x04) >> 16) - (sprite_prot_y));
 
-	UINT16 head1 = space.read_word(src+cop_spr_off);
-	UINT16 head2 = space.read_word(src+cop_spr_off+2);
+	uint16_t head1 = space.read_word(src+cop_spr_off);
+	uint16_t head2 = space.read_word(src+cop_spr_off+2);
 
 	int w = (((head1 >> 8 ) & 7) + 1) << 4;
 	int h = (((head1 >> 12) & 7) + 1) << 4;
 
-	UINT16 flag = x-w/2 > -w && x-w/2 < cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
+	uint16_t flag = x-w/2 > -w && x-w/2 < cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
 
 	flag = (space.read_word(src) & 0xfffe) | flag;
 	space.write_word(src, flag);
@@ -3007,7 +3007,7 @@ ROM_START( xsedae )
 	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )   /* ADPCM samples */
 ROM_END
 
-const UINT16 raiden2_state::raiden_blended_colors[] = {
+const uint16_t raiden2_state::raiden_blended_colors[] = {
 	// bridge tunnel entrance shadow
 	0x380,
 
@@ -3055,7 +3055,7 @@ const UINT16 raiden2_state::raiden_blended_colors[] = {
 	0xffff,
 };
 
-void raiden2_state::init_blending(const UINT16 *table)
+void raiden2_state::init_blending(const uint16_t *table)
 {
 	for(auto & elem : blend_active)
 		elem = false;
@@ -3083,7 +3083,7 @@ DRIVER_INIT_MEMBER(raiden2_state,raidendx)
 	raiden2_decrypt_sprites(machine());
 }
 
-const UINT16 raiden2_state::xsedae_blended_colors[] = {
+const uint16_t raiden2_state::xsedae_blended_colors[] = {
 	0xffff,
 };
 
@@ -3095,7 +3095,7 @@ DRIVER_INIT_MEMBER(raiden2_state,xsedae)
 	/* doesn't have banking */
 }
 
-const UINT16 raiden2_state::zeroteam_blended_colors[] = {
+const uint16_t raiden2_state::zeroteam_blended_colors[] = {
 	// Player selection
 	0x37e,
 	// Boss spear shadow

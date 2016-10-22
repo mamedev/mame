@@ -51,11 +51,11 @@ class h8_watchdog_device : public device_t {
 public:
 	enum { B, H, S };
 
-	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_info(const char *intc, int irq, int type);
 
-	UINT64 internal_update(UINT64 current_time);
+	uint64_t internal_update(uint64_t current_time);
 
 	DECLARE_READ16_MEMBER(wd_r);
 	DECLARE_WRITE16_MEMBER(wd_w);
@@ -88,10 +88,10 @@ private:
 	const char *intc_tag;
 	int irq;
 	int type;
-	UINT8 tcnt, tcsr, rst;
-	UINT64 tcnt_cycle_base;
+	uint8_t tcnt, tcsr, rst;
+	uint64_t tcnt_cycle_base;
 
-	void tcnt_update(UINT64 current_time = 0);
+	void tcnt_update(uint64_t current_time = 0);
 };
 
 extern const device_type H8_WATCHDOG;

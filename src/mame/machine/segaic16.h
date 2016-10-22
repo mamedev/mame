@@ -66,15 +66,15 @@ protected:
 
 public: // -- stupid system16.c
 	// memory pointers
-	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<uint16_t> m_paletteram;
 protected:
 
 	// internal state
 	bool        m_open_bus_recurse;         // flag to track recursion through open_bus_r
-	UINT32      m_palette_entries;          // number of palette entries
-	UINT8       m_palette_normal[32];       // RGB translations for normal pixels
-	UINT8       m_palette_shadow[32];       // RGB translations for shadowed pixels
-	UINT8       m_palette_hilight[32];      // RGB translations for hilighted pixels
+	uint32_t      m_palette_entries;          // number of palette entries
+	uint8_t       m_palette_normal[32];       // RGB translations for normal pixels
+	uint8_t       m_palette_shadow[32];       // RGB translations for shadowed pixels
+	uint8_t       m_palette_hilight[32];      // RGB translations for hilighted pixels
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 };
@@ -85,12 +85,12 @@ protected:
 class sega_315_5195_mapper_device : public device_t
 {
 public:
-	typedef device_delegate<void (sega_315_5195_mapper_device &, UINT8)> mapper_delegate;
-	typedef device_delegate<UINT8 ()> sound_read_delegate;
-	typedef device_delegate<void (UINT8)> sound_write_delegate;
+	typedef device_delegate<void (sega_315_5195_mapper_device &, uint8_t)> mapper_delegate;
+	typedef device_delegate<uint8_t ()> sound_read_delegate;
+	typedef device_delegate<void (uint8_t)> sound_write_delegate;
 
 	// construction/destruction
-	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	static void static_set_cputag(device_t &device, const char *cpu);
@@ -102,12 +102,12 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	// mapping helpers
-	void map_as_rom(UINT32 offset, UINT32 length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler);
-	void map_as_ram(UINT32 offset, UINT32 length, offs_t mirror, const char *bank_share_name, write16_delegate whandler);
-	void map_as_handler(UINT32 offset, UINT32 length, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
+	void map_as_rom(uint32_t offset, uint32_t length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler);
+	void map_as_ram(uint32_t offset, uint32_t length, offs_t mirror, const char *bank_share_name, write16_delegate whandler);
+	void map_as_handler(uint32_t offset, uint32_t length, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
 
 	// perform an explicit configuration (for bootlegs with hard-coded mappings)
-	void configure_explicit(const UINT8 *map_data);
+	void configure_explicit(const uint8_t *map_data);
 
 protected:
 	// device-level overrides
@@ -137,7 +137,7 @@ private:
 		void set_decrypt(fd1089_base_device *fd1089);
 		void set_decrypt(fd1094_device *fd1094);
 		void clear() { set(nullptr, nullptr, 0, 0, ~0, nullptr); }
-		void set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, UINT8 *src);
+		void set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, uint8_t *src);
 
 		// updating
 		void update();
@@ -150,16 +150,16 @@ private:
 		offs_t                  m_start;
 		offs_t                  m_end;
 		offs_t                  m_rgnoffs;
-		UINT8 *                 m_srcptr;
+		uint8_t *                 m_srcptr;
 		fd1089_base_device *    m_fd1089;
-		std::vector<UINT16>   m_fd1089_decrypted;
+		std::vector<uint16_t>   m_fd1089_decrypted;
 		std::unique_ptr<fd1094_decryption_cache> m_fd1094_cache;
 	};
 
 	// internal helpers
-	void compute_region(region_info &info, UINT8 index, UINT32 length, UINT32 mirror, UINT32 offset = 0);
+	void compute_region(region_info &info, uint8_t index, uint32_t length, uint32_t mirror, uint32_t offset = 0);
 	void update_mapping();
-	void fd1094_state_change(UINT8 state);
+	void fd1094_state_change(uint8_t state);
 
 	// configuration
 	required_device<m68000_device> m_cpu;
@@ -171,8 +171,8 @@ private:
 	// internal state
 	address_space *             m_space;
 	address_space *             m_decrypted_space;
-	UINT8                       m_regs[0x20];
-	UINT8                       m_curregion;
+	uint8_t                       m_regs[0x20];
+	uint8_t                       m_curregion;
 	decrypt_bank                m_banks[8];
 };
 
@@ -183,7 +183,7 @@ class sega_315_5248_multiplier_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// public interface
 	DECLARE_READ16_MEMBER( read );
@@ -196,7 +196,7 @@ protected:
 
 private:
 	// internal state
-	UINT16                      m_regs[4];
+	uint16_t                      m_regs[4];
 };
 
 
@@ -206,7 +206,7 @@ class sega_315_5249_divider_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// public interface
 	DECLARE_READ16_MEMBER( read );
@@ -222,7 +222,7 @@ private:
 	void execute(int mode);
 
 	// internal state
-	UINT16                      m_regs[8];
+	uint16_t                      m_regs[8];
 };
 
 
@@ -231,11 +231,11 @@ private:
 class sega_315_5250_compare_timer_device : public device_t
 {
 public:
-	typedef device_delegate<void (UINT8)> sound_write_delegate;
+	typedef device_delegate<void (uint8_t)> sound_write_delegate;
 	typedef device_delegate<void ()> timer_ack_delegate;
 
 	// construction/destruction
-	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	static void static_set_timer_ack(device_t &device, timer_ack_delegate callback);
@@ -261,9 +261,9 @@ private:
 	sound_write_delegate        m_sound_write;
 
 	// internal state
-	UINT16                      m_regs[16];
-	UINT16                      m_counter;
-	UINT8                       m_bit;
+	uint16_t                      m_regs[16];
+	uint16_t                      m_counter;
+	uint8_t                       m_bit;
 };
 
 

@@ -13,7 +13,7 @@ enum
 class asr733_device : public device_t, public device_gfx_interface
 {
 public:
-	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_PALETTE_INIT(asr733);
 
@@ -29,7 +29,7 @@ public:
 		return downcast<asr733_device &>(device).m_lineint_line.set_callback(object);
 	}
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -42,7 +42,7 @@ protected:
 private:
 	// internal state
 #if 0
-	UINT8 m_OutQueue[ASROutQueueSize];
+	uint8_t m_OutQueue[ASROutQueueSize];
 	int m_OutQueueHead;
 	int m_OutQueueLen;
 #endif
@@ -53,16 +53,16 @@ private:
 	void set_interrupt_line();
 	void draw_char(int character, int x, int y, int color);
 	void linefeed();
-	void transmit(UINT8 data);
+	void transmit(uint8_t data);
 
 	emu_timer *m_line_timer;                // screen line timer
 
-	UINT8   m_recv_buf;
-	UINT8   m_xmit_buf;
+	uint8_t   m_recv_buf;
+	uint8_t   m_xmit_buf;
 
-	UINT8   m_status;
-	UINT8   m_mode;
-	UINT8   m_last_key_pressed;
+	uint8_t   m_status;
+	uint8_t   m_mode;
+	uint8_t   m_last_key_pressed;
 	int     m_last_modifier_state;
 
 	unsigned char m_repeat_timer;

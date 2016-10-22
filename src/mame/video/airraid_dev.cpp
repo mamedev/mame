@@ -11,7 +11,7 @@
 
 extern const device_type AIRRAID_VIDEO = &device_creator<airraid_video_device>;
 
-airraid_video_device::airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+airraid_video_device::airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AIRRAID_VIDEO, "Seibu Air Raid Video", tag, owner, clock, "airraid_vid", __FILE__),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "^palette"),
@@ -160,10 +160,10 @@ void airraid_video_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 		if (m_sprite_ram[i+1]&0x80)
 			continue;
 
-		UINT16 tile = (m_sprite_ram[i]);
+		uint16_t tile = (m_sprite_ram[i]);
 		tile |= (m_sprite_ram[i + 1] & 0x70) << 4;
 
-		UINT16 col = (m_sprite_ram[i+1] & 0x0f);
+		uint16_t col = (m_sprite_ram[i+1] & 0x0f);
 		//col |= (m_sprite_ram[i+1] & 0x80)<<3;
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, tile,col, 0, 0, m_sprite_ram[i+3],m_sprite_ram[i+2],0);
@@ -177,16 +177,16 @@ void airraid_video_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 #define DISPLAY_TXT     8
 #define DM_GETSCROLL(n) (((m_vregs[(n)]<<1)&0xff) + ((m_vregs[(n)]&0x80)?1:0) +( ((m_vregs[(n)-1]<<4) | (m_vregs[(n)-1]<<12) )&0xff00))
 
-void airraid_video_device::mix_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* clut, int base)
+void airraid_video_device::mix_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* clut, int base)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dest = &bitmap.pix16(y);
-		UINT16 *src = &m_temp_bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix16(y);
+		uint16_t *src = &m_temp_bitmap.pix16(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT8 pix = src[x] & 0xff;
-			UINT8 real = clut[pix];
+			uint8_t pix = src[x] & 0xff;
+			uint8_t real = clut[pix];
 
 			if (!(real & 0x40))
 			{
@@ -197,9 +197,9 @@ void airraid_video_device::mix_layer(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-UINT32 airraid_video_device::screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t airraid_video_device::screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 bgscrolly = DM_GETSCROLL(0x6);
+	uint16_t bgscrolly = DM_GETSCROLL(0x6);
 	// this is more likely to be 'bank' than scroll, like NMK16
 	bgscrolly += ((m_hw & 0xc0) >> 6) * 256;
 
@@ -258,7 +258,7 @@ WRITE8_MEMBER(airraid_video_device::vregs_w)
 		printf("vregs_w %02x: %02x\n", offset, data);
 }
 
-void airraid_video_device::layer_enable_w(UINT8 enable)
+void airraid_video_device::layer_enable_w(uint8_t enable)
 {
 	m_hw = enable;
 }

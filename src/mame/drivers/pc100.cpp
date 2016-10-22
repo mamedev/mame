@@ -82,8 +82,8 @@ public:
 	required_device<beep_device> m_beeper;
 	required_device<msm58321_device> m_rtc;
 	required_device<palette_device> m_palette;
-	required_region_ptr<UINT16> m_kanji_rom;
-	required_region_ptr<UINT16> m_vram;
+	required_region_ptr<uint16_t> m_kanji_rom;
+	required_region_ptr<uint16_t> m_vram;
 
 	DECLARE_READ16_MEMBER(pc100_vram_r);
 	DECLARE_WRITE16_MEMBER(pc100_vram_w);
@@ -104,22 +104,22 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_porta_w);
 	DECLARE_READ8_MEMBER(rtc_portc_r);
 	DECLARE_WRITE8_MEMBER(rtc_portc_w);
-	UINT16 m_kanji_addr;
-	UINT8 m_timer_mode;
+	uint16_t m_kanji_addr;
+	uint8_t m_timer_mode;
 
-	UINT8 m_bank_r,m_bank_w;
+	uint8_t m_bank_r,m_bank_w;
 
 	struct{
-		UINT8 shift;
-		UINT16 mask;
-		UINT16 vstart;
-		UINT8 addr;
-		UINT8 reg[8];
+		uint8_t shift;
+		uint16_t mask;
+		uint16_t vstart;
+		uint8_t addr;
+		uint8_t reg[8];
 	}m_crtc;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc100_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_600hz_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_100hz_irq);
@@ -131,14 +131,14 @@ public:
 	WRITE_LINE_MEMBER(rtc_portc_1_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 1)) | ((state & 1) << 1); }
 	WRITE_LINE_MEMBER(rtc_portc_2_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
 	WRITE_LINE_MEMBER(rtc_portc_3_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
-	UINT8 m_rtc_portc;
+	uint8_t m_rtc_portc;
 };
 
 void pc100_state::video_start()
 {
 }
 
-UINT32 pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count;
@@ -181,7 +181,7 @@ READ16_MEMBER( pc100_state::pc100_vram_r )
 
 WRITE16_MEMBER( pc100_state::pc100_vram_w )
 {
-	UINT16 old_vram;
+	uint16_t old_vram;
 	int i;
 
 	for(i=0;i<4;i++)

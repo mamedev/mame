@@ -187,7 +187,7 @@ WRITE8_MEMBER(spectrum_state::spectrum_128_port_7ffd_w)
 
 void spectrum_state::spectrum_128_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	/* select ram at 0x0c000-0x0ffff */
 	int ram_page = m_port_7ffd_data & 0x07;
@@ -238,7 +238,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	memset(messram,0,128*1024);
 	/* 0x0000-0x3fff always holds ROM */

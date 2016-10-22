@@ -49,14 +49,14 @@ ADDRESS_MAP_END
 
 
 
-n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, N2A03, "N2A03", tag, owner, clock, "n2a03", __FILE__),
 	m_apu(*this, "nesapu"),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(n2a03_map))
 {
 }
 
-offs_t n2a03_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t n2a03_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
 }
@@ -76,42 +76,42 @@ void n2a03_device::device_start()
 	init();
 }
 
-UINT8 n2a03_device::mi_2a03_normal::read(UINT16 adr)
+uint8_t n2a03_device::mi_2a03_normal::read(uint16_t adr)
 {
 	return program->read_byte(adr);
 }
 
-UINT8 n2a03_device::mi_2a03_normal::read_sync(UINT16 adr)
+uint8_t n2a03_device::mi_2a03_normal::read_sync(uint16_t adr)
 {
 	return sdirect->read_byte(adr);
 }
 
-UINT8 n2a03_device::mi_2a03_normal::read_arg(UINT16 adr)
+uint8_t n2a03_device::mi_2a03_normal::read_arg(uint16_t adr)
 {
 	return direct->read_byte(adr);
 }
 
-void n2a03_device::mi_2a03_normal::write(UINT16 adr, UINT8 val)
+void n2a03_device::mi_2a03_normal::write(uint16_t adr, uint8_t val)
 {
 	program->write_byte(adr, val);
 }
 
-UINT8 n2a03_device::mi_2a03_nd::read(UINT16 adr)
+uint8_t n2a03_device::mi_2a03_nd::read(uint16_t adr)
 {
 	return program->read_byte(adr);
 }
 
-UINT8 n2a03_device::mi_2a03_nd::read_sync(UINT16 adr)
+uint8_t n2a03_device::mi_2a03_nd::read_sync(uint16_t adr)
 {
 	return sprogram->read_byte(adr);
 }
 
-UINT8 n2a03_device::mi_2a03_nd::read_arg(UINT16 adr)
+uint8_t n2a03_device::mi_2a03_nd::read_arg(uint16_t adr)
 {
 	return program->read_byte(adr);
 }
 
-void n2a03_device::mi_2a03_nd::write(UINT16 adr, UINT8 val)
+void n2a03_device::mi_2a03_nd::write(uint16_t adr, uint8_t val)
 {
 	program->write_byte(adr, val);
 }

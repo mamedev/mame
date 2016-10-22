@@ -50,7 +50,7 @@ public:
 	virtual void hack_usb() {};
 
 	void vblank_callback(screen_device &screen, bool state);
-	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(xbox_pic8259_1_set_int_line);
@@ -74,21 +74,21 @@ public:
 		int command;
 		int rw;
 		int(*devices[128])(xbox_base_state &chs, int command, int rw, int data);
-		UINT32 words[256 / 4];
+		uint32_t words[256 / 4];
 	} smbusst;
 	struct apu_state {
-		UINT32 memory[0x60000 / 4];
-		UINT32 gpdsp_sgaddress; // global processor scatter-gather
-		UINT32 gpdsp_sgblocks;
-		UINT32 gpdsp_address;
-		UINT32 epdsp_sgaddress; // encoder processor scatter-gather
-		UINT32 epdsp_sgblocks;
-		UINT32 unknown_sgaddress;
-		UINT32 unknown_sgblocks;
+		uint32_t memory[0x60000 / 4];
+		uint32_t gpdsp_sgaddress; // global processor scatter-gather
+		uint32_t gpdsp_sgblocks;
+		uint32_t gpdsp_address;
+		uint32_t epdsp_sgaddress; // encoder processor scatter-gather
+		uint32_t epdsp_sgblocks;
+		uint32_t unknown_sgaddress;
+		uint32_t unknown_sgblocks;
 		int voice_number;
-		UINT32 voices_heap_blockaddr[1024];
-		UINT64 voices_active[4]; //one bit for each voice: 1 playing 0 not
-		UINT32 voicedata_address;
+		uint32_t voices_heap_blockaddr[1024];
+		uint64_t voices_active[4]; //one bit for each voice: 1 playing 0 not
+		uint32_t voicedata_address;
 		int voices_frequency[256]; // sample rate
 		int voices_position[256]; // position in samples * 1000
 		int voices_position_start[256]; // position in samples * 1000
@@ -98,17 +98,17 @@ public:
 		address_space *space;
 	} apust;
 	struct ac97_state {
-		UINT32 mixer_regs[0x80 / 4];
-		UINT32 controller_regs[0x38 / 4];
+		uint32_t mixer_regs[0x80 / 4];
+		uint32_t controller_regs[0x38 / 4];
 	} ac97st;
 	struct superio_state
 	{
 		bool configuration_mode;
 		int index;
 		int selected;
-		UINT8 registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
+		uint8_t registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
 	} superiost;
-	UINT8 pic16lc_buffer[0xff];
+	uint8_t pic16lc_buffer[0xff];
 	std::unique_ptr<nv2a_renderer> nvidia_nv2a;
 	bool debug_irq_active;
 	int debug_irq_number;

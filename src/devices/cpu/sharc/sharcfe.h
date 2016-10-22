@@ -18,7 +18,7 @@
 class sharc_frontend : public drc_frontend
 {
 public:
-	sharc_frontend(adsp21062_device *sharc, UINT32 window_start, UINT32 window_end, UINT32 max_sequence);
+	sharc_frontend(adsp21062_device *sharc, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 	void flush();
 
 	enum UREG_ACCESS
@@ -42,17 +42,17 @@ public:
 
 	struct LOOP_ENTRY
 	{
-		UINT16 entrytype;
-		UINT8 looptype;
-		UINT8 condition;
-		UINT32 start_pc;
+		uint16_t entrytype;
+		uint8_t looptype;
+		uint8_t condition;
+		uint32_t start_pc;
 	};
 
 	struct LOOP_DESCRIPTOR
 	{
-		UINT32 start_pc;
-		UINT32 end_pc;
-		UINT32 astat_check_pc;
+		uint32_t start_pc;
+		uint32_t end_pc;
+		uint32_t astat_check_pc;
 		LOOP_TYPE type;
 		int condition;
 	};
@@ -62,16 +62,16 @@ protected:
 	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
 
 private:
-	bool describe_compute(opcode_desc &desc, UINT64 opcode);
+	bool describe_compute(opcode_desc &desc, uint64_t opcode);
 	bool describe_ureg_access(opcode_desc &desc, int reg, UREG_ACCESS access);
 	bool describe_shiftop_imm(opcode_desc &desc, int shiftop, int rn, int rx);
 	void describe_if_condition(opcode_desc &desc, int condition);
 
 	void insert_loop(const LOOP_DESCRIPTOR &loopdesc);
-	void add_loop_entry(UINT32 pc, UINT8 type, UINT32 start_pc, UINT8 looptype, UINT8 condition);
-	bool is_loop_evaluation(UINT32 pc);
-	bool is_loop_start(UINT32 pc);
-	bool is_astat_delay_check(UINT32 pc);
+	void add_loop_entry(uint32_t pc, uint8_t type, uint32_t start_pc, uint8_t looptype, uint8_t condition);
+	bool is_loop_evaluation(uint32_t pc);
+	bool is_loop_start(uint32_t pc);
+	bool is_astat_delay_check(uint32_t pc);
 
 	adsp21062_device *m_sharc;
 

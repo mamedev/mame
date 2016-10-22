@@ -22,44 +22,44 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scrlram;
-	optional_shared_ptr<UINT8> m_workram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scrlram;
+	optional_shared_ptr<uint8_t> m_workram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
-	std::vector<UINT8> m_paletteram;
-	std::vector<UINT8> m_paletteram_ext;
-	UINT8    m_gfxctrl;
-	UINT8    m_char_bank;
-	UINT8    m_palette_bank;
+	std::vector<uint8_t> m_paletteram;
+	std::vector<uint8_t> m_paletteram_ext;
+	uint8_t    m_gfxctrl;
+	uint8_t    m_char_bank;
+	uint8_t    m_palette_bank;
 
 	/* sound-related */
-	UINT8    m_snd_data;
-	UINT8    m_snd_flag;
+	uint8_t    m_snd_data;
+	uint8_t    m_snd_flag;
 	int      m_sound_nmi_enable;
 	int      m_pending_nmi;
 	int      m_vol_ctrl[16];
-	UINT8    m_snd_ctrl0;
-	UINT8    m_snd_ctrl1;
-	UINT8    m_snd_ctrl2;
-	UINT8    m_snd_ctrl3;
+	uint8_t    m_snd_ctrl0;
+	uint8_t    m_snd_ctrl1;
+	uint8_t    m_snd_ctrl2;
+	uint8_t    m_snd_ctrl3;
 
 	/* protection */
-	UINT8    m_from_main;
-	UINT8    m_from_mcu;
+	uint8_t    m_from_main;
+	uint8_t    m_from_mcu;
 	int      m_mcu_sent;
 	int      m_main_sent;
-	UINT8    m_port_a_in;
-	UINT8    m_port_a_out;
-	UINT8    m_ddr_a;
-	UINT8    m_port_b_in;
-	UINT8    m_port_b_out;
-	UINT8    m_ddr_b;
-	UINT8    m_port_c_in;
-	UINT8    m_port_c_out;
-	UINT8    m_ddr_c;
+	uint8_t    m_port_a_in;
+	uint8_t    m_port_a_out;
+	uint8_t    m_ddr_a;
+	uint8_t    m_port_b_in;
+	uint8_t    m_port_b_out;
+	uint8_t    m_ddr_b;
+	uint8_t    m_port_c_in;
+	uint8_t    m_port_c_out;
+	uint8_t    m_ddr_c;
 	int      m_mcu_select;
 
 	/* devices */
@@ -72,15 +72,15 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* mcu */
-	UINT8 m_mcu_cmd;
-	UINT8 m_mcu_counter;
-	UINT8 m_mcu_b4_cmd;
-	UINT8 m_mcu_param;
-	UINT8 m_mcu_b2_res;
-	UINT8 m_mcu_b1_res;
-	UINT8 m_mcu_bb_res;
-	UINT8 m_mcu_b5_res;
-	UINT8 m_mcu_b6_res;
+	uint8_t m_mcu_cmd;
+	uint8_t m_mcu_counter;
+	uint8_t m_mcu_b4_cmd;
+	uint8_t m_mcu_param;
+	uint8_t m_mcu_b2_res;
+	uint8_t m_mcu_b1_res;
+	uint8_t m_mcu_bb_res;
+	uint8_t m_mcu_b5_res;
+	uint8_t m_mcu_b6_res;
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_READ8_MEMBER(snd_flag_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);
@@ -129,9 +129,9 @@ public:
 	DECLARE_MACHINE_RESET(rumba);
 	DECLARE_VIDEO_START(rumba);
 	DECLARE_MACHINE_RESET(ta7630);
-	UINT32 screen_update_flstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_victnine(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_flstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_victnine(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

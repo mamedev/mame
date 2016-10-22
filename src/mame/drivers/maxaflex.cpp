@@ -39,19 +39,19 @@ public:
 		m_joy23(*this, "djoy_2_3")
 	{ }
 
-	UINT8 m_portA_in;
-	UINT8 m_portA_out;
-	UINT8 m_ddrA;
-	UINT8 m_portB_in;
-	UINT8 m_portB_out;
-	UINT8 m_ddrB;
-	UINT8 m_portC_in;
-	UINT8 m_portC_out;
-	UINT8 m_ddrC;
-	UINT8 m_tdr;
-	UINT8 m_tcr;
+	uint8_t m_portA_in;
+	uint8_t m_portA_out;
+	uint8_t m_ddrA;
+	uint8_t m_portB_in;
+	uint8_t m_portB_out;
+	uint8_t m_ddrB;
+	uint8_t m_portC_in;
+	uint8_t m_portC_out;
+	uint8_t m_ddrC;
+	uint8_t m_tdr;
+	uint8_t m_tcr;
 	timer_device *m_mcu_timer;
-	void mmu(UINT8 new_mmu);
+	void mmu(uint8_t new_mmu);
 	DECLARE_READ8_MEMBER(mcu_portA_r);
 	DECLARE_WRITE8_MEMBER(mcu_portA_w);
 	DECLARE_READ8_MEMBER(mcu_portB_r);
@@ -78,7 +78,7 @@ public:
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<cpu_device> m_mcu;
 	required_device<speaker_sound_device> m_speaker;
-	required_region_ptr<UINT8> m_region_maincpu;
+	required_region_ptr<uint8_t> m_region_maincpu;
 	required_ioport m_dsw;
 	required_ioport m_coin;
 	required_ioport m_console;
@@ -87,7 +87,7 @@ public:
 };
 
 
-void maxaflex_state::mmu(UINT8 new_mmu)
+void maxaflex_state::mmu(uint8_t new_mmu)
 {
 	/* check if self-test ROM changed */
 	if (new_mmu & 0x80)
@@ -148,7 +148,7 @@ READ8_MEMBER(maxaflex_state::mcu_portB_r)
 
 WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
 {
-	UINT8 diff = data ^ m_portB_out;
+	uint8_t diff = data ^ m_portB_out;
 	m_portB_out = data;
 
 	/* clear coin interrupt */
@@ -186,7 +186,7 @@ READ8_MEMBER(maxaflex_state::mcu_portC_r)
 WRITE8_MEMBER(maxaflex_state::mcu_portC_w)
 {
 	/* uses a 7447A, which is equivalent to an LS47/48 */
-	static const UINT8 ls48_map[16] =
+	static const uint8_t ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	m_portC_out = data & 0x0f;

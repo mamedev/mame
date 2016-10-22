@@ -36,24 +36,24 @@ enum
 class z80_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
-	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void z80_set_cycle_tables(const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex);
+	void z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex);
 	template<class _Object> static devcb_base &set_irqack_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_irqack_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_refresh_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_refresh_cb.set_callback(object); }
 
 protected:
-	z80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	z80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 2; }
-	virtual UINT32 execute_max_cycles() const override { return 16; }
-	virtual UINT32 execute_input_lines() const override { return 4; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_min_cycles() const override { return 2; }
+	virtual uint32_t execute_max_cycles() const override { return 16; }
+	virtual uint32_t execute_input_lines() const override { return 4; }
+	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -66,9 +66,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 #undef PROTOTYPES
 #define PROTOTYPES(prefix) \
@@ -149,15 +149,15 @@ protected:
 
 	void halt();
 	void leave_halt();
-	UINT8 in(UINT16 port);
-	void out(UINT16 port, UINT8 value);
-	UINT8 rm(UINT16 addr);
-	void rm16(UINT16 addr, PAIR &r);
-	void wm(UINT16 addr, UINT8 value);
-	void wm16(UINT16 addr, PAIR &r);
-	UINT8 rop();
-	UINT8 arg();
-	UINT16 arg16();
+	uint8_t in(uint16_t port);
+	void out(uint16_t port, uint8_t value);
+	uint8_t rm(uint16_t addr);
+	void rm16(uint16_t addr, PAIR &r);
+	void wm(uint16_t addr, uint8_t value);
+	void wm16(uint16_t addr, PAIR &r);
+	uint8_t rop();
+	uint8_t arg();
+	uint16_t arg16();
 	void eax();
 	void eay();
 	void pop(PAIR &r);
@@ -165,35 +165,35 @@ protected:
 	void jp(void);
 	void jp_cond(bool cond);
 	void jr();
-	void jr_cond(bool cond, UINT8 opcode);
+	void jr_cond(bool cond, uint8_t opcode);
 	void call();
-	void call_cond(bool cond, UINT8 opcode);
-	void ret_cond(bool cond, UINT8 opcode);
+	void call_cond(bool cond, uint8_t opcode);
+	void ret_cond(bool cond, uint8_t opcode);
 	void retn();
 	void reti();
 	void ld_r_a();
 	void ld_a_r();
 	void ld_i_a();
 	void ld_a_i();
-	void rst(UINT16 addr);
-	UINT8 inc(UINT8 value);
-	UINT8 dec(UINT8 value);
+	void rst(uint16_t addr);
+	uint8_t inc(uint8_t value);
+	uint8_t dec(uint8_t value);
 	void rlca();
 	void rrca();
 	void rla();
 	void rra();
 	void rrd();
 	void rld();
-	void add_a(UINT8 value);
-	void adc_a(UINT8 value);
-	void sub(UINT8 value);
-	void sbc_a(UINT8 value);
+	void add_a(uint8_t value);
+	void adc_a(uint8_t value);
+	void sub(uint8_t value);
+	void sbc_a(uint8_t value);
 	void neg();
 	void daa();
-	void and_a(UINT8 value);
-	void or_a(UINT8 value);
-	void xor_a(UINT8 value);
-	void cp(UINT8 value);
+	void and_a(uint8_t value);
+	void or_a(uint8_t value);
+	void xor_a(uint8_t value);
+	void cp(uint8_t value);
 	void ex_af();
 	void ex_de_hl();
 	void exx();
@@ -201,19 +201,19 @@ protected:
 	void add16(PAIR &dr, PAIR &sr);
 	void adc_hl(PAIR &r);
 	void sbc_hl(PAIR &r);
-	UINT8 rlc(UINT8 value);
-	UINT8 rrc(UINT8 value);
-	UINT8 rl(UINT8 value);
-	UINT8 rr(UINT8 value);
-	UINT8 sla(UINT8 value);
-	UINT8 sra(UINT8 value);
-	UINT8 sll(UINT8 value);
-	UINT8 srl(UINT8 value);
-	void bit(int bit, UINT8 value);
-	void bit_hl(int bit, UINT8 value);
-	void bit_xy(int bit, UINT8 value);
-	UINT8 res(int bit, UINT8 value);
-	UINT8 set(int bit, UINT8 value);
+	uint8_t rlc(uint8_t value);
+	uint8_t rrc(uint8_t value);
+	uint8_t rl(uint8_t value);
+	uint8_t rr(uint8_t value);
+	uint8_t sla(uint8_t value);
+	uint8_t sra(uint8_t value);
+	uint8_t sll(uint8_t value);
+	uint8_t srl(uint8_t value);
+	void bit(int bit, uint8_t value);
+	void bit_hl(int bit, uint8_t value);
+	void bit_xy(int bit, uint8_t value);
+	uint8_t res(int bit, uint8_t value);
+	uint8_t set(int bit, uint8_t value);
 	void ldi();
 	void cpi();
 	void ini();
@@ -261,31 +261,31 @@ protected:
 	PAIR            m_bc2;
 	PAIR            m_de2;
 	PAIR            m_hl2;
-	UINT8           m_r;
-	UINT8           m_r2;
-	UINT8           m_iff1;
-	UINT8           m_iff2;
-	UINT8           m_halt;
-	UINT8           m_im;
-	UINT8           m_i;
-	UINT8           m_nmi_state;          /* nmi line state */
-	UINT8           m_nmi_pending;        /* nmi pending */
-	UINT8           m_irq_state;          /* irq line state */
+	uint8_t           m_r;
+	uint8_t           m_r2;
+	uint8_t           m_iff1;
+	uint8_t           m_iff2;
+	uint8_t           m_halt;
+	uint8_t           m_im;
+	uint8_t           m_i;
+	uint8_t           m_nmi_state;          /* nmi line state */
+	uint8_t           m_nmi_pending;        /* nmi pending */
+	uint8_t           m_irq_state;          /* irq line state */
 	int             m_wait_state;         // wait line state
 	int             m_busrq_state;        // bus request line state
-	UINT8           m_after_ei;           /* are we in the EI shadow? */
-	UINT8           m_after_ldair;        /* same, but for LD A,I or LD A,R */
-	UINT32          m_ea;
+	uint8_t           m_after_ei;           /* are we in the EI shadow? */
+	uint8_t           m_after_ldair;        /* same, but for LD A,I or LD A,R */
+	uint32_t          m_ea;
 	device_irq_acknowledge_delegate m_irq_callback;
 
 	int             m_icount;
-	UINT8           m_rtemp;
-	const UINT8 *   m_cc_op;
-	const UINT8 *   m_cc_cb;
-	const UINT8 *   m_cc_ed;
-	const UINT8 *   m_cc_xy;
-	const UINT8 *   m_cc_xycb;
-	const UINT8 *   m_cc_ex;
+	uint8_t           m_rtemp;
+	const uint8_t *   m_cc_op;
+	const uint8_t *   m_cc_cb;
+	const uint8_t *   m_cc_ed;
+	const uint8_t *   m_cc_xy;
+	const uint8_t *   m_cc_xycb;
+	const uint8_t *   m_cc_ex;
 };
 
 extern const device_type Z80;
@@ -293,7 +293,7 @@ extern const device_type Z80;
 class nsc800_device : public z80_device
 {
 public:
-	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -301,12 +301,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_input_lines() const override { return 7; }
+	virtual uint32_t execute_input_lines() const override { return 7; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	void take_interrupt_nsc800();
-	UINT8 m_nsc800_irq_state[4]; /* state of NSC800 restart interrupts A, B, C */
+	uint8_t m_nsc800_irq_state[4]; /* state of NSC800 restart interrupts A, B, C */
 };
 
 extern const device_type NSC800;

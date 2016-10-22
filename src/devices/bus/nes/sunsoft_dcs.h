@@ -25,11 +25,11 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read) { return m_rom[offset]; }
 
-	UINT8 *get_cart_base() { return m_rom; }
+	uint8_t *get_cart_base() { return m_rom; }
 
 protected:
 	// internal state
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 };
 
 // ======================> nes_ntb_slot_device
@@ -40,7 +40,7 @@ class nes_ntb_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_ntb_slot_device();
 
 	// device-level overrides
@@ -90,11 +90,11 @@ class nes_ntb_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_ntb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_ntb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual UINT8* get_cart_base();
+	virtual uint8_t* get_cart_base();
 
 protected:
 	// device-level overrides
@@ -120,7 +120,7 @@ class nes_sunsoft_dcs_device : public nes_sunsoft_4_device
 {
 public:
 	// construction/destruction
-	nes_sunsoft_dcs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sunsoft_dcs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;

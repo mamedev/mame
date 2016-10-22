@@ -25,7 +25,7 @@ class i8008_device : public cpu_device
 {
 public:
 	// construction/destruction
-	i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -33,8 +33,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -48,22 +48,22 @@ protected:
 
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual void execute_one(int opcode);
 
 	void push_stack();
 	void pop_stack();
-	UINT8 rop();
-	UINT8 get_reg(UINT8 reg);
-	void set_reg(UINT8 reg, UINT8 val);
-	UINT8 arg();
-	void update_flags(UINT8 val);
-	UINT8 do_condition(UINT8 val);
-	UINT16 get_addr();
-	void illegal(UINT8 opcode);
+	uint8_t rop();
+	uint8_t get_reg(uint8_t reg);
+	void set_reg(uint8_t reg, uint8_t val);
+	uint8_t arg();
+	void update_flags(uint8_t val);
+	uint8_t do_condition(uint8_t val);
+	uint16_t get_addr();
+	void illegal(uint8_t opcode);
 	void take_interrupt();
 	void init_tables(void);
 
@@ -74,19 +74,19 @@ protected:
 	const address_space_config      m_program_config;
 	const address_space_config      m_io_config;
 
-	UINT8   m_A,m_B,m_C,m_D,m_E,m_H,m_L;
+	uint8_t   m_A,m_B,m_C,m_D,m_E,m_H,m_L;
 	PAIR    m_PC; // It is in fact one of ADDR regs
 	PAIR    m_ADDR[8]; // Address registers
-	UINT8   m_CF; // Carry flag
-	UINT8   m_ZF; // Zero flag
-	UINT8   m_SF; // Sign flag
-	UINT8   m_PF; // Parity flag
-	UINT8   m_HALT;
-	UINT8   m_flags; // temporary I/O only
+	uint8_t   m_CF; // Carry flag
+	uint8_t   m_ZF; // Zero flag
+	uint8_t   m_SF; // Sign flag
+	uint8_t   m_PF; // Parity flag
+	uint8_t   m_HALT;
+	uint8_t   m_flags; // temporary I/O only
 
-	UINT8   m_irq_state;
+	uint8_t   m_irq_state;
 
-	UINT8 m_PARITY[256];
+	uint8_t m_PARITY[256];
 
 	address_space *m_program;
 	address_space *m_io;

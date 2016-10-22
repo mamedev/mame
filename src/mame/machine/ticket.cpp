@@ -38,7 +38,7 @@ const device_type TICKET_DISPENSER = &device_creator<ticket_dispenser_device>;
 //  ticket_dispenser_device - constructor
 //-------------------------------------------------
 
-ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TICKET_DISPENSER, "Ticket Dispenser", tag, owner, clock, "ticket_dispenser", __FILE__),
 		m_motor_sense(TICKET_MOTOR_ACTIVE_LOW),
 		m_status_sense(TICKET_STATUS_ACTIVE_LOW),
@@ -83,7 +83,7 @@ void ticket_dispenser_device::static_set_period(device_t &device, const attotime
 //  the motor and status bits
 //-------------------------------------------------
 
-void ticket_dispenser_device::static_set_senses(device_t &device, UINT8 motor_sense, UINT8 status_sense)
+void ticket_dispenser_device::static_set_senses(device_t &device, uint8_t motor_sense, uint8_t status_sense)
 {
 	ticket_dispenser_device &ticket = downcast<ticket_dispenser_device &>(device);
 	ticket.m_motor_sense = motor_sense;

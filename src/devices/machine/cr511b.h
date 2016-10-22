@@ -75,7 +75,7 @@ class cr511b_device : public device_t
 {
 public:
 	// construction/destruction
-	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
 	template<class _Object> static devcb_base &set_stch_handler(device_t &device, _Object object)
@@ -141,7 +141,7 @@ private:
 	int m_cmd;
 
 	// data transfer
-	//UINT8 m_sector_buffer[CD_MAX_SECTOR_DATA];
+	//uint8_t m_sector_buffer[CD_MAX_SECTOR_DATA];
 };
 
 // device type definition

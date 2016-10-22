@@ -15,7 +15,7 @@
 
 const device_type ST0020_SPRITES = &device_creator<st0020_device>;
 
-st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ST0020_SPRITES, "Seta ST0020 Sprites", tag, owner, clock, "st0020", __FILE__)
 	, device_gfx_interface(mconfig, *this)
 {
@@ -65,11 +65,11 @@ void st0020_device::device_start()
 		m_rom_size = 0;
 	}
 
-	m_st0020_gfxram = make_unique_clear<UINT16[]>(4 * 0x100000 / 2);
-	m_st0020_spriteram = make_unique_clear<UINT16[]>(0x80000 / 2);
-	m_st0020_blitram = make_unique_clear<UINT16[]>(0x100 / 2);
+	m_st0020_gfxram = make_unique_clear<uint16_t[]>(4 * 0x100000 / 2);
+	m_st0020_spriteram = make_unique_clear<uint16_t[]>(0x80000 / 2);
+	m_st0020_blitram = make_unique_clear<uint16_t[]>(0x100 / 2);
 
-	set_gfx(0, std::make_unique<gfx_element>(palette(), layout_16x8x8_2, (UINT8 *)m_st0020_gfxram.get(), 0, palette().entries() / 64, 0));
+	set_gfx(0, std::make_unique<gfx_element>(palette(), layout_16x8x8_2, (uint8_t *)m_st0020_gfxram.get(), 0, palette().entries() / 64, 0));
 
 	gfx(0)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
@@ -87,7 +87,7 @@ void st0020_device::device_reset()
 
 READ16_MEMBER(st0020_device::st0020_gfxram_r)
 {
-	UINT16 data;
+	uint16_t data;
 	ST0020_ST0032_BYTESWAP_MEM_MASK
 
 	data = m_st0020_gfxram[offset + m_st0020_gfxram_bank * 0x100000/2];
@@ -108,7 +108,7 @@ WRITE16_MEMBER(st0020_device::st0020_gfxram_w)
 
 READ16_MEMBER(st0020_device::st0020_sprram_r)
 {
-	UINT16 data;
+	uint16_t data;
 
 	data = m_st0020_spriteram[offset];
 
@@ -135,14 +135,14 @@ READ16_MEMBER(st0020_device::st0020_blit_r)
 
 READ16_MEMBER(st0020_device::st0020_blitram_r)
 {
-	UINT16 data;
+	uint16_t data;
 	data = st0020_blit_r(space, offset, mem_mask);
 	return data;
 }
 
 WRITE16_MEMBER(st0020_device::st0020_blit_w)
 {
-	UINT16 *st0020_blitram = m_st0020_blitram.get();
+	uint16_t *st0020_blitram = m_st0020_blitram.get();
 
 	COMBINE_DATA(&st0020_blitram[offset]);
 
@@ -167,9 +167,9 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 
 		case 0xca/2:
 		{
-			UINT32 src  =   (st0020_blitram[0xc0/2] + (st0020_blitram[0xc2/2] << 16)) << 1;
-			UINT32 dst  =   (st0020_blitram[0xc4/2] + (st0020_blitram[0xc6/2] << 16)) << 4;
-			UINT32 len  =   (st0020_blitram[0xc8/2]) << 4;
+			uint32_t src  =   (st0020_blitram[0xc0/2] + (st0020_blitram[0xc2/2] << 16)) << 1;
+			uint32_t dst  =   (st0020_blitram[0xc4/2] + (st0020_blitram[0xc6/2] << 16)) << 4;
+			uint32_t len  =   (st0020_blitram[0xc8/2]) << 4;
 
 			if (!m_rom_ptr)
 			{
@@ -268,9 +268,9 @@ WRITE16_MEMBER(st0020_device::st0020_blitram_w)
 void st0020_device::st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	/* Sprites list */
-	UINT16 *spriteram16_2 = m_st0020_spriteram.get();
-	UINT16 *s1  =   spriteram16_2;
-	UINT16 *end1    =   spriteram16_2 + 0x02000/2;
+	uint16_t *spriteram16_2 = m_st0020_spriteram.get();
+	uint16_t *s1  =   spriteram16_2;
+	uint16_t *end1    =   spriteram16_2 + 0x02000/2;
 
 	priority <<= 4;
 

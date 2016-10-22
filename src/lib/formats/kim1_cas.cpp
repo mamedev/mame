@@ -11,7 +11,7 @@
 static int cas_size;
 
 
-static inline int kim1_output_signal( INT16 *buffer, int sample_pos, int high )
+static inline int kim1_output_signal( int16_t *buffer, int sample_pos, int high )
 {
 	int sample_count, i, j;
 
@@ -62,7 +62,7 @@ static inline int kim1_output_signal( INT16 *buffer, int sample_pos, int high )
 }
 
 
-static inline int kim1_output_byte( INT16 *buffer, int sample_pos, UINT8 byte )
+static inline int kim1_output_byte( int16_t *buffer, int sample_pos, uint8_t byte )
 {
 	int i;
 	int sample_count = 0;
@@ -78,11 +78,11 @@ static inline int kim1_output_byte( INT16 *buffer, int sample_pos, UINT8 byte )
 }
 
 
-static int kim1_handle_kim(INT16 *buffer, const UINT8 *casdata)
+static int kim1_handle_kim(int16_t *buffer, const uint8_t *casdata)
 {
-	static const UINT8 encoding[16] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46 };
+	static const uint8_t encoding[16] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46 };
 	int i, data_pos, sample_count;
-	UINT16 size, address, file_id, checksum;
+	uint16_t size, address, file_id, checksum;
 
 	if ( cas_size < 9 ) return -1;
 	if ( memcmp( casdata, "KIM1", 4 ) ) return -1;
@@ -115,7 +115,7 @@ static int kim1_handle_kim(INT16 *buffer, const UINT8 *casdata)
 	/* Output the data */
 	while( data_pos < cas_size && data_pos < ( size + 9 ) )
 	{
-		UINT8 data = casdata[data_pos];
+		uint8_t data = casdata[data_pos];
 
 		sample_count += kim1_output_byte( buffer, sample_count, encoding[ data >> 4 ] );
 		sample_count += kim1_output_byte( buffer, sample_count, encoding[ data & 0x0f ] );
@@ -143,7 +143,7 @@ static int kim1_handle_kim(INT16 *buffer, const UINT8 *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int kim1_kim_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int kim1_kim_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	return kim1_handle_kim( buffer, bytes );
 }
@@ -152,7 +152,7 @@ static int kim1_kim_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 /*******************************************************************
    Calculate the number of samples needed for this tape image
 ********************************************************************/
-static int kim1_kim_to_wav_size(const UINT8 *casdata, int caslen)
+static int kim1_kim_to_wav_size(const uint8_t *casdata, int caslen)
 {
 	cas_size = caslen;
 

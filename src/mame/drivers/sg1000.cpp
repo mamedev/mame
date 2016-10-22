@@ -384,7 +384,7 @@ READ8_MEMBER( sf7000_state::ppi_pa_r )
 	    PA7
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_fdc->get_irq() ? 0x01 : 0x00;
 	data |= m_centronics_busy << 1;

@@ -24,11 +24,11 @@ public:
 
 	struct jvc_header
 	{
-		UINT8 sectors_per_track;
-		UINT8 side_count;
-		UINT8 sector_size;
-		UINT8 first_sector_id;
-		UINT8 sector_attribute_flag;
+		uint8_t sectors_per_track;
+		uint8_t side_count;
+		uint8_t sector_size;
+		uint8_t first_sector_id;
+		uint8_t sector_attribute_flag;
 		int header_size;
 	};
 
@@ -36,8 +36,8 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 
-	virtual int identify(io_generic *io, UINT32 form_factor) override;
-	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
+	virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) override;
 	virtual bool save(io_generic *io, floppy_image *image) override;
 	virtual bool supports_save() const override;
 

@@ -40,7 +40,7 @@ ADDRESS_MAP_END
 DEVICE_ADDRESS_MAP_START(empty, 32, pci9050_device)
 ADDRESS_MAP_END
 
-pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, PCI9050, "PLX PCI9050 PCI to Local Bus Bridge", tag, owner, clock, "pci9050", __FILE__),
 	m_user_input_handler(*this), m_user_output_handler(*this)
 {
@@ -108,8 +108,8 @@ void pci9050_device::device_reset()
 
 void pci9050_device::remap_local(int id)
 {
-	UINT32 csbase = m_csbase[id];
-	UINT32 lasrr = m_lasrr[id];
+	uint32_t csbase = m_csbase[id];
+	uint32_t lasrr = m_lasrr[id];
 	logerror("local bus %d csbase=%08x lasrr=%08x\n", id, csbase, lasrr);
 
 	if(!(csbase & 1)) {
@@ -130,7 +130,7 @@ void pci9050_device::remap_local(int id)
 		return;
 	}
 
-	UINT32 mask = ~(size - 1);
+	uint32_t mask = ~(size - 1);
 	if(lasrr & 1)
 		mask &= 0x0ffffffc;
 	else
@@ -280,7 +280,7 @@ WRITE32_MEMBER(pci9050_device::cntrl_w)
 {
 	if (0)
 		logerror("%06X:PCI9050 CNTRL write %08x\n", machine().device("maincpu")->safe_pc(), data);
-	UINT32 oldData = m_cntrl;
+	uint32_t oldData = m_cntrl;
 	m_cntrl = data;
 	remap_rom();
 	if ((oldData ^ m_cntrl) & 0x3000)

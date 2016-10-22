@@ -27,7 +27,7 @@ public:
 	virtual ~ns10_decrypter_device();
 
 protected:
-	ns10_decrypter_device(device_type type, const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ns10_decrypter_device(device_type type, const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void init(int iv)=0;
 	virtual void device_start()override=0;
@@ -43,7 +43,7 @@ public:
 	uint16_t decrypt(uint16_t cipherword)override;
 
 protected:
-	ns10_type1_decrypter_device(device_type type, const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ns10_type1_decrypter_device(device_type type, const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	uint16_t _mask;
@@ -73,7 +73,7 @@ public:
 protected:
 	ns10_type2_decrypter_device(
 		device_type type, const ns10_type2_decrypter_device::ns10_crypto_logic &logic,
-		const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	uint16_t _mask;

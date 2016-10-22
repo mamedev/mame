@@ -48,12 +48,12 @@ class msm5832_device :  public device_t,
 {
 public:
 	// construction/destruction
-	msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 
-	void address_w(UINT8 data);
+	void address_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( adj_w );
 	DECLARE_WRITE_LINE_MEMBER( test_w );
@@ -77,7 +77,7 @@ private:
 	inline int read_counter(int counter);
 	inline void write_counter(int counter, int value);
 
-	UINT8 m_reg[13];            // registers
+	uint8_t m_reg[13];            // registers
 
 	int m_hold;                 // counter hold
 	int m_address;              // address

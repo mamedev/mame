@@ -12,7 +12,7 @@ class nes_hengg_srich_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_hengg_srich_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_hengg_srich_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -28,7 +28,7 @@ class nes_hengg_xhzs_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_hengg_xhzs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_hengg_xhzs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -45,7 +45,7 @@ class nes_hengg_shjy3_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_hengg_shjy3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_hengg_shjy3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -57,13 +57,13 @@ public:
 private:
 	void update_banks();
 
-	UINT16 m_irq_count, m_irq_count_latch;
+	uint16_t m_irq_count, m_irq_count_latch;
 	int m_irq_enable;
 
 	int m_chr_mode;
-	UINT8 m_mmc_prg_bank[2];
-	UINT8 m_mmc_vrom_bank[8];
-	UINT8 m_mmc_extra_bank[8];
+	uint8_t m_mmc_prg_bank[2];
+	uint8_t m_mmc_vrom_bank[8];
+	uint8_t m_mmc_extra_bank[8];
 };
 
 

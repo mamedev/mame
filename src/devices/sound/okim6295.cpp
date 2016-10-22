@@ -51,7 +51,7 @@ const device_type OKIM6295 = &device_creator<okim6295_device>;
 // volume lookup table. The manual lists only 9 steps, ~3dB per step. Given the dB values,
 // that seems to map to a 5-bit volume control. Any volume parameter beyond the 9th index
 // results in silent playback.
-const UINT8 okim6295_device::s_volume_table[16] =
+const uint8_t okim6295_device::s_volume_table[16] =
 {
 	0x20,   //   0 dB
 	0x16,   //  -3.2 dB
@@ -80,7 +80,7 @@ const UINT8 okim6295_device::s_volume_table[16] =
 //  okim6295_device - constructor
 //-------------------------------------------------
 
-okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OKIM6295, "OKI6295", tag, owner, clock, "okim6295", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 18),
@@ -206,9 +206,9 @@ void okim6295_device::set_pin7(int pin7)
 //  read_status - read the status register
 //-------------------------------------------------
 
-UINT8 okim6295_device::read_status()
+uint8_t okim6295_device::read_status()
 {
-	UINT8 result = 0xf0;    // naname expects bits 4-7 to be 1
+	uint8_t result = 0xf0;    // naname expects bits 4-7 to be 1
 
 	// set the bit to 1 if something is playing on a given channel
 	m_stream->update();
@@ -234,7 +234,7 @@ READ8_MEMBER( okim6295_device::read )
 //  write_command - write to the command register
 //-------------------------------------------------
 
-void okim6295_device::write_command(UINT8 command)
+void okim6295_device::write_command(uint8_t command)
 {
 	// if a command is pending, process the second half
 	if (m_command != -1)

@@ -26,11 +26,11 @@ public:
 		m_palette(*this, "palette"),
 		m_aysnd(*this, "aysnd") { }
 
-	optional_shared_ptr<UINT8> m_rambase;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_paletteram;
-	optional_shared_ptr<UINT8> m_bullsdrt_tiles_bankram;
+	optional_shared_ptr<uint8_t> m_rambase;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_paletteram;
+	optional_shared_ptr<uint8_t> m_bullsdrt_tiles_bankram;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -39,15 +39,15 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<ay8910_device> m_aysnd;
 
-	UINT8 m_oldpos[4];
-	UINT8 m_sign[4];
-	UINT8 m_dsw_select;
-	UINT8 m_control_select;
-	UINT8 m_flipscreen;
-	UINT8 m_prg_bank;
-	UINT8 m_gfx_bank;
-	UINT8 m_bullsdrt_sprites_bank;
-	UINT8 m_penmask[64];
+	uint8_t m_oldpos[4];
+	uint8_t m_sign[4];
+	uint8_t m_dsw_select;
+	uint8_t m_control_select;
+	uint8_t m_flipscreen;
+	uint8_t m_prg_bank;
+	uint8_t m_gfx_bank;
+	uint8_t m_bullsdrt_sprites_bank;
+	uint8_t m_penmask[64];
 	tilemap_t *m_bg_tilemap;
 
 	// drivers/centiped.c
@@ -94,13 +94,13 @@ public:
 	DECLARE_VIDEO_START(milliped);
 	DECLARE_VIDEO_START(warlords);
 	DECLARE_PALETTE_INIT(warlords);
-	UINT32 screen_update_centiped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bullsdrt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_milliped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_warlords(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_centiped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bullsdrt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_milliped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_warlords(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(generate_interrupt);
 	void init_penmask();
 	void init_common();
-	void milliped_set_color(offs_t offset, UINT8 data);
+	void milliped_set_color(offs_t offset, uint8_t data);
 	inline int read_trackball(int idx, int switch_port);
 };

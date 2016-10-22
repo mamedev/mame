@@ -24,7 +24,7 @@
 
 extern const device_type ATARI_XGA = &device_creator<atari_xga_device>;
 
-atari_xga_device::atari_xga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_xga_device::atari_xga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, ATARI_XGA, "Atari XGA", tag, owner, clock, "xga", __FILE__),
 	m_mode(FPGA_RESET),
 	m_address(0),
@@ -42,16 +42,16 @@ atari_xga_device::atari_xga_device(const machine_config &mconfig, const char *ta
 
 void atari_xga_device::device_start()
 {
-	m_ram = std::make_unique<UINT16[]>(RAM_WORDS);
+	m_ram = std::make_unique<uint16_t[]>(RAM_WORDS);
 
-	save_pointer(NAME(m_ram.get()), RAM_WORDS * sizeof(UINT16));
+	save_pointer(NAME(m_ram.get()), RAM_WORDS * sizeof(uint16_t));
 	save_item(NAME(m_address));
 	save_item(NAME(m_ciphertext));
 }
 
 void atari_xga_device::device_reset()
 {
-	memset(m_ram.get(), 0, RAM_WORDS * sizeof(UINT16));
+	memset(m_ram.get(), 0, RAM_WORDS * sizeof(uint16_t));
 	m_mode = FPGA_RESET;
 	m_address = 0;
 	m_ciphertext = 0;
@@ -69,7 +69,7 @@ void atari_xga_device::device_reset()
 // Moto Frenzy
 
 /* key 0x10 is special, it has 15 "identical twins". */
-static const UINT8 kmap[128] =
+static const uint8_t kmap[128] =
 {
 	0x6B,0x11,0x1B,0x19,0x4B,0x50,0x17,0x09,
 	0x5D,0x69,0x43,0x33,0x0F,0x0C,0x28,0x3F,
@@ -97,9 +97,9 @@ static const UINT8 kmap[128] =
  *
  *************************************/
 
-UINT16 atari_xga_device::ctz(UINT16 x)
+uint16_t atari_xga_device::ctz(uint16_t x)
 {
-	UINT16 n = 0;
+	uint16_t n = 0;
 	if (x == 0) return 16;
 	if (!(x & 0x00FF)) n += 8, x >>= 8;
 	if (!(x & 0x000F)) n += 4, x >>= 4;
@@ -108,7 +108,7 @@ UINT16 atari_xga_device::ctz(UINT16 x)
 	return n;
 }
 
-size_t atari_xga_device::popcount(UINT16 x)
+size_t atari_xga_device::popcount(uint16_t x)
 {
 	size_t count = 0;
 	while (x != 0)
@@ -119,33 +119,33 @@ size_t atari_xga_device::popcount(UINT16 x)
 	return count;
 }
 
-UINT16 atari_xga_device::parity(UINT16 x)
+uint16_t atari_xga_device::parity(uint16_t x)
 {
 	return popcount(x) & 1;
 }
 
-UINT16 atari_xga_device::lfsr1(UINT16 x)
+uint16_t atari_xga_device::lfsr1(uint16_t x)
 {
-	const UINT16 bit = parity(x & 0x8016);
+	const uint16_t bit = parity(x & 0x8016);
 	return (x << 1) | bit;
 }
 
-UINT16 atari_xga_device::lfsr2(UINT16 x)
+uint16_t atari_xga_device::lfsr2(uint16_t x)
 {
-	UINT16 bit = parity(x & 0x002D);
+	uint16_t bit = parity(x & 0x002D);
 	return (x >> 1) | (bit << 15);
 }
 
-UINT16 atari_xga_device::powers2(UINT8 k, UINT16 x)
+uint16_t atari_xga_device::powers2(uint8_t k, uint16_t x)
 {
-	static const UINT16 L[16] = {
+	static const uint16_t L[16] = {
 			0x5E85,0xBD0B,0x2493,0x17A3,
 			0x2F47,0x0005,0x000B,0x0017,
 			0x002F,0x005E,0x00BD,0x017A,
 			0x02F4,0x05E8,0x0BD0,0x17A1
 		};
 
-	UINT16 t = (x == 16) ? (L[4] ^ L[5]) : L[x];
+	uint16_t t = (x == 16) ? (L[4] ^ L[5]) : L[x];
 
 	for (size_t i = 0; i < k; ++i)
 		t = lfsr1(t);
@@ -153,9 +153,9 @@ UINT16 atari_xga_device::powers2(UINT8 k, UINT16 x)
 	return t;
 }
 
-UINT16 atari_xga_device::decipher(UINT8 k, UINT16 c)
+uint16_t atari_xga_device::decipher(uint8_t k, uint16_t c)
 {
-	UINT16 p = 0;
+	uint16_t p = 0;
 
 	/* Only 128 keys internally, if high bit set,
 	then find the 7-bit "twin" by xor 0xA8. */
@@ -167,7 +167,7 @@ UINT16 atari_xga_device::decipher(UINT8 k, UINT16 c)
 	if ((c & (c - 1)) == 0)
 		return powers2(k, ctz(c));
 
-	for (UINT16 bit = 0; bit < 5; ++bit)
+	for (uint16_t bit = 0; bit < 5; ++bit)
 	{
 		if ((c >> bit) & 1)
 		{
@@ -175,7 +175,7 @@ UINT16 atari_xga_device::decipher(UINT8 k, UINT16 c)
 		}
 	}
 
-	for (UINT16 bit = 5; bit < 16; ++bit)
+	for (uint16_t bit = 5; bit < 16; ++bit)
 	{
 		if ((c >> bit) & 1)
 		{
@@ -183,8 +183,8 @@ UINT16 atari_xga_device::decipher(UINT8 k, UINT16 c)
 		}
 	}
 
-	UINT16 x = 0x8010;
-	for (UINT16 i = 0; i < k + 3; ++i)
+	uint16_t x = 0x8010;
+	for (uint16_t i = 0; i < k + 3; ++i)
 	{
 		if (x == c)
 		{
@@ -214,9 +214,9 @@ WRITE32_MEMBER(atari_xga_device::write)
 	case FPGA_SETKEY:
 		/* Write table to FPGA SRAM. */
 		if (ACCESSING_BITS_16_31)
-			m_ram[offset << 1] = UINT16 (data >> 16);
+			m_ram[offset << 1] = uint16_t (data >> 16);
 		if (ACCESSING_BITS_0_15)
-			m_ram[(offset << 1) + 1] = UINT16(data & 0xFFFF);
+			m_ram[(offset << 1) + 1] = uint16_t(data & 0xFFFF);
 		break;
 
 	case FPGA_DECIPHER:
@@ -224,12 +224,12 @@ WRITE32_MEMBER(atari_xga_device::write)
 		if (ACCESSING_BITS_16_31)
 		{
 			m_address = offset << 2;
-			m_ciphertext = UINT16(data >> 16);
+			m_ciphertext = uint16_t(data >> 16);
 		}
 		if (ACCESSING_BITS_0_15)
 		{
 			m_address = (offset << 2) + 2;
-			m_ciphertext = UINT16(data & 0xFFFF);
+			m_ciphertext = uint16_t(data & 0xFFFF);
 		}
 		break;
 	}
@@ -253,10 +253,10 @@ READ32_MEMBER(atari_xga_device::read)
 	if (m_mode == FPGA_RESET)
 		return 0;
 
-	UINT32 plaintext = 0;
+	uint32_t plaintext = 0;
 	if (m_mode == FPGA_DECIPHER)
 	{
-		UINT16 address = (offset << 2) - 0x400;
+		uint16_t address = (offset << 2) - 0x400;
 
 		if (ACCESSING_BITS_0_15)
 			address += 2;
@@ -264,7 +264,7 @@ READ32_MEMBER(atari_xga_device::read)
 		/* Reply with decrypted plaintext */
 		if (address == m_address)
 		{
-			UINT16 key_offset, key_byte;
+			uint16_t key_offset, key_byte;
 
 			/* Algorithm to select key byte based on offset. */
 			key_offset = ((((address >>  4) & 1) ^ 1) << 0)

@@ -29,9 +29,9 @@ public:
 
 	// devices
 	required_device<m68340cpu_device> m_maincpu;
-	required_shared_ptr<UINT32> m_gfxram;
+	required_shared_ptr<uint32_t> m_gfxram;
 
-	UINT32 screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DRIVER_INIT(cupidon);
 	DECLARE_DRIVER_INIT(funnyfm);
@@ -46,7 +46,7 @@ protected:
 
 };
 
-UINT32 cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 
@@ -56,11 +56,11 @@ UINT32 cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind16 
 		{
 			for (int y=0;y<16;y++)
 			{
-				UINT16* destline = &bitmap.pix16(ytile*16 + y);
+				uint16_t* destline = &bitmap.pix16(ytile*16 + y);
 
 				for (int x=0;x<8;x++)
 				{
-					UINT32 gfx = m_gfxram[count];
+					uint32_t gfx = m_gfxram[count];
 
 					destline[(xtile*16)+(x*2)+0] = (gfx >> 16)&0xffff;
 					destline[(xtile*16)+(x*2)+1] = (gfx >> 0)&0xffff;

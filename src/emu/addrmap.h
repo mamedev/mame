@@ -59,8 +59,8 @@ public:
 			m_tag(nullptr) { }
 
 	map_handler_type        m_type;             // type of the handler
-	UINT8                   m_bits;             // width of the handler in bits, or 0 for default
-	UINT64                  m_mask;             // mask for which lanes apply
+	uint8_t                   m_bits;             // width of the handler in bits, or 0 for default
+	uint64_t                  m_mask;             // mask for which lanes apply
 	const char *            m_name;             // name of the handler
 	const char *            m_tag;              // tag for I/O ports and banks
 };
@@ -104,7 +104,7 @@ public:
 	void set_handler(setoffset_delegate func);
 
 	// submap referencing
-	void set_submap(const char *tag, address_map_delegate func, int bits, UINT64 mask);
+	void set_submap(const char *tag, address_map_delegate func, int bits, uint64_t mask);
 
 	// public state
 	address_map_entry *     m_next;                 // pointer to the next entry
@@ -147,28 +147,28 @@ public:
 
 protected:
 	// internal handler setters for 8-bit functions
-	void internal_set_handler(read8_delegate func, UINT64 mask);
-	void internal_set_handler(write8_delegate func, UINT64 mask);
-	void internal_set_handler(read8_delegate rfunc, write8_delegate wfunc, UINT64 mask);
+	void internal_set_handler(read8_delegate func, uint64_t mask);
+	void internal_set_handler(write8_delegate func, uint64_t mask);
+	void internal_set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t mask);
 
 	// internal handler setters for 16-bit functions
-	void internal_set_handler(read16_delegate func, UINT64 mask);
-	void internal_set_handler(write16_delegate func, UINT64 mask);
-	void internal_set_handler(read16_delegate rfunc, write16_delegate wfunc, UINT64 mask);
+	void internal_set_handler(read16_delegate func, uint64_t mask);
+	void internal_set_handler(write16_delegate func, uint64_t mask);
+	void internal_set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t mask);
 
 	// internal handler setters for 32-bit functions
-	void internal_set_handler(read32_delegate func, UINT64 mask);
-	void internal_set_handler(write32_delegate func, UINT64 mask);
-	void internal_set_handler(read32_delegate rfunc, write32_delegate wfunc, UINT64 mask);
+	void internal_set_handler(read32_delegate func, uint64_t mask);
+	void internal_set_handler(write32_delegate func, uint64_t mask);
+	void internal_set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t mask);
 
 	// internal handler setters for 64-bit functions
-	void internal_set_handler(read64_delegate func, UINT64 mask);
-	void internal_set_handler(write64_delegate func, UINT64 mask);
-	void internal_set_handler(read64_delegate rfunc, write64_delegate wfunc, UINT64 mask);
+	void internal_set_handler(read64_delegate func, uint64_t mask);
+	void internal_set_handler(write64_delegate func, uint64_t mask);
+	void internal_set_handler(read64_delegate rfunc, write64_delegate wfunc, uint64_t mask);
 
 private:
 	// helper functions
-	bool unitmask_is_appropriate(UINT8 width, UINT64 unitmask, const char *string);
+	bool unitmask_is_appropriate(uint8_t width, uint64_t unitmask, const char *string);
 };
 
 
@@ -201,9 +201,9 @@ public:
 	void set_handler(read16_delegate rfunc, write16_delegate wfunc) { internal_set_handler(rfunc, wfunc, 0); }
 
 	// 8-bit handlers
-	void set_handler(read8_delegate func, UINT16 mask) { internal_set_handler(func, mask); }
-	void set_handler(write8_delegate func, UINT16 mask) { internal_set_handler(func, mask); }
-	void set_handler(read8_delegate rfunc, write8_delegate wfunc, UINT16 mask) { internal_set_handler(rfunc, wfunc, mask); }
+	void set_handler(read8_delegate func, uint16_t mask) { internal_set_handler(func, mask); }
+	void set_handler(write8_delegate func, uint16_t mask) { internal_set_handler(func, mask); }
+	void set_handler(read8_delegate rfunc, write8_delegate wfunc, uint16_t mask) { internal_set_handler(rfunc, wfunc, mask); }
 };
 
 
@@ -221,14 +221,14 @@ public:
 	void set_handler(read32_delegate rfunc, write32_delegate wfunc) { internal_set_handler(rfunc, wfunc, 0); }
 
 	// 16-bit handlers
-	void set_handler(read16_delegate func, UINT32 mask) { internal_set_handler(func, mask); }
-	void set_handler(write16_delegate func, UINT32 mask) { internal_set_handler(func, mask); }
-	void set_handler(read16_delegate rfunc, write16_delegate wfunc, UINT32 mask) { internal_set_handler(rfunc, wfunc, mask); }
+	void set_handler(read16_delegate func, uint32_t mask) { internal_set_handler(func, mask); }
+	void set_handler(write16_delegate func, uint32_t mask) { internal_set_handler(func, mask); }
+	void set_handler(read16_delegate rfunc, write16_delegate wfunc, uint32_t mask) { internal_set_handler(rfunc, wfunc, mask); }
 
 	// 8-bit handlers
-	void set_handler(read8_delegate func, UINT32 mask) { internal_set_handler(func, mask); }
-	void set_handler(write8_delegate func, UINT32 mask) { internal_set_handler(func, mask); }
-	void set_handler(read8_delegate rfunc, write8_delegate wfunc, UINT32 mask) { internal_set_handler(rfunc, wfunc, mask); }
+	void set_handler(read8_delegate func, uint32_t mask) { internal_set_handler(func, mask); }
+	void set_handler(write8_delegate func, uint32_t mask) { internal_set_handler(func, mask); }
+	void set_handler(read8_delegate rfunc, write8_delegate wfunc, uint32_t mask) { internal_set_handler(rfunc, wfunc, mask); }
 };
 
 
@@ -246,19 +246,19 @@ public:
 	void set_handler(read64_delegate rfunc, write64_delegate wfunc) { internal_set_handler(rfunc, wfunc, 0); }
 
 	// 32-bit handlers
-	void set_handler(read32_delegate func, UINT64 mask) { internal_set_handler(func, mask); }
-	void set_handler(write32_delegate func, UINT64 mask) { internal_set_handler(func, mask); }
-	void set_handler(read32_delegate rfunc, write32_delegate wfunc, UINT64 mask) { internal_set_handler(rfunc, wfunc, mask); }
+	void set_handler(read32_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
+	void set_handler(write32_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
+	void set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t mask) { internal_set_handler(rfunc, wfunc, mask); }
 
 	// 16-bit handlers
-	void set_handler(read16_delegate func, UINT64 mask) { internal_set_handler(func, mask); }
-	void set_handler(write16_delegate func, UINT64 mask) { internal_set_handler(func, mask); }
-	void set_handler(read16_delegate rfunc, write16_delegate wfunc, UINT64 mask) { internal_set_handler(rfunc, wfunc, mask); }
+	void set_handler(read16_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
+	void set_handler(write16_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
+	void set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t mask) { internal_set_handler(rfunc, wfunc, mask); }
 
 	// 8-bit handlers
-	void set_handler(read8_delegate func, UINT64 mask) { internal_set_handler(func, mask); }
-	void set_handler(write8_delegate func, UINT64 mask) { internal_set_handler(func, mask); }
-	void set_handler(read8_delegate rfunc, write8_delegate wfunc, UINT64 mask) { internal_set_handler(rfunc, wfunc, mask); }
+	void set_handler(read8_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
+	void set_handler(write8_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
+	void set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t mask) { internal_set_handler(rfunc, wfunc, mask); }
 };
 
 
@@ -271,15 +271,15 @@ public:
 	// construction/destruction
 	address_map(device_t &device, address_spacenum spacenum);
 	address_map(device_t &device, address_map_entry *entry);
-	address_map(const address_space &space, offs_t start, offs_t end, int bits, UINT64 unitmask, device_t &device, address_map_delegate submap_delegate);
+	address_map(const address_space &space, offs_t start, offs_t end, int bits, uint64_t unitmask, device_t &device, address_map_delegate submap_delegate);
 	~address_map();
 
 	// configuration
-	void configure(address_spacenum _spacenum, UINT8 _databits);
+	void configure(address_spacenum _spacenum, uint8_t _databits);
 
 	// setters
 	void set_global_mask(offs_t mask);
-	void set_unmap_value(UINT8 value) { m_unmapval = value; }
+	void set_unmap_value(uint8_t value) { m_unmapval = value; }
 
 	// add a new entry of the given type
 	address_map_entry8 *add(device_t &device, offs_t start, offs_t end, address_map_entry8 *ptr);
@@ -289,8 +289,8 @@ public:
 
 	// public data
 	address_spacenum        m_spacenum;         // space number of the map
-	UINT8                   m_databits;         // data bits represented by the map
-	UINT8                   m_unmapval;         // unmapped memory value
+	uint8_t                   m_databits;         // data bits represented by the map
+	uint8_t                   m_unmapval;         // unmapped memory value
 	offs_t                  m_globalmask;       // global mask
 	simple_list<address_map_entry> m_entrylist; // list of entries
 

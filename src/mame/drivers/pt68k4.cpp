@@ -113,7 +113,7 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_shared_ptr<UINT16> m_p_base;
+	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart1;
 	required_device<mc68681_device> m_duart2;
@@ -123,12 +123,12 @@ private:
 
 	void irq5_update();
 
-	UINT8 m_hiram[0x800];
+	uint8_t m_hiram[0x800];
 
 	bool m_kclk;
-	UINT8 m_kdata;
-	UINT8 m_scancode;
-	UINT8 m_kbdflag;
+	uint8_t m_kdata;
+	uint8_t m_scancode;
+	uint8_t m_kbdflag;
 	int m_kbit;
 	int m_lastdrive;
 	bool m_irq5_duart1, m_irq5_isa;
@@ -270,7 +270,7 @@ READ8_MEMBER(pt68k4_state::keyboard_r)
 {
 	if (offset == 0)
 	{
-		UINT8 rv = m_kbdflag;
+		uint8_t rv = m_kbdflag;
 
 		m_kbdflag = 0;
 		m_duart1->ip2_w(ASSERT_LINE);
@@ -312,8 +312,8 @@ void pt68k4_state::machine_start()
 
 void pt68k4_state::machine_reset()
 {
-	UINT8* user1 = memregion("roms")->base();
-	memcpy((UINT8*)m_p_base.target(), user1, 8);
+	uint8_t* user1 = memregion("roms")->base();
+	memcpy((uint8_t*)m_p_base.target(), user1, 8);
 
 	m_maincpu->reset();
 

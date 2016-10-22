@@ -16,7 +16,7 @@ class a2_video_device :
 {
 public:
 	// construction/destruction
-	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_PALETTE_INIT(apple2);
 
@@ -29,10 +29,10 @@ public:
 	bool m_80col;
 	bool m_altcharset;
 	bool m_an2;
-	std::unique_ptr<UINT16[]> m_hires_artifact_map;
-	std::unique_ptr<UINT16[]> m_dhires_artifact_map;
+	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
+	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
 
-	UINT8 *m_ram_ptr, *m_aux_ptr, *m_char_ptr;
+	uint8_t *m_ram_ptr, *m_aux_ptr, *m_char_ptr;
 	int m_char_size;
 
 	int m_sysconfig;
@@ -52,10 +52,10 @@ protected:
 	virtual void device_start() override;
 
 private:
-	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code, const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg);
-	void plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code, const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg);
-	void plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code, const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg);
-	void plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code, const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg);
+	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);
+	void plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);
+	void plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);
+	void plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);
 };
 
 // device type definition

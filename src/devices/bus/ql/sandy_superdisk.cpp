@@ -111,7 +111,7 @@ machine_config_constructor sandy_super_disk_t::device_mconfig_additions() const
 //  sandy_super_disk_t - constructor
 //-------------------------------------------------
 
-sandy_super_disk_t::sandy_super_disk_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sandy_super_disk_t::sandy_super_disk_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SANDY_SUPER_DISK, "Sandy Super Disk", tag, owner, clock, "ql_sdisk", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
@@ -156,7 +156,7 @@ void sandy_super_disk_t::device_reset()
 //  read -
 //-------------------------------------------------
 
-UINT8 sandy_super_disk_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t sandy_super_disk_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf0000) == 0xc0000)
 	{
@@ -202,7 +202,7 @@ UINT8 sandy_super_disk_t::read(address_space &space, offs_t offset, UINT8 data)
 //  write -
 //-------------------------------------------------
 
-void sandy_super_disk_t::write(address_space &space, offs_t offset, UINT8 data)
+void sandy_super_disk_t::write(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf0000) == 0xc0000)
 	{

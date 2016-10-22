@@ -64,16 +64,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/rescap.h"
-#include "machine/6821pia.h"
-#include "machine/74123.h"
-#include "video/mc6845.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/ay8910.h"
-#include "sound/dac.h"
+#include "machine/6821pia.h"
+#include "machine/74123.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/mc6845.h"
 
 
 #define MAIN_CPU_MASTER_CLOCK       XTAL_11_2MHz
@@ -107,16 +108,16 @@ public:
 		m_soundlatch3(*this, "soundlatch3") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram1;
-	required_shared_ptr<UINT8> m_colorram1;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_colorram2;
+	required_shared_ptr<uint8_t> m_videoram1;
+	required_shared_ptr<uint8_t> m_colorram1;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_colorram2;
 
 	/* video-related */
 	int      m_flipscreen;
-	UINT8    m_star_enable;
-	UINT16   m_star_delay_counter;
-	UINT16   m_star_shift_reg;
+	uint8_t    m_star_enable;
+	uint16_t   m_star_delay_counter;
+	uint16_t   m_star_shift_reg;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -255,11 +256,11 @@ WRITE_LINE_MEMBER(nyny_state::flipscreen_w)
 
 MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 {
-	UINT8 x = 0;
+	uint8_t x = 0;
 
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		UINT8 data1, data2, color1, color2;
+		uint8_t data1, data2, color1, color2;
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 5) & 0x8000) |
@@ -277,7 +278,7 @@ MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 
 		for (int i = 0; i < 8; i++)
 		{
-			UINT8 bit1, bit2, color;
+			uint8_t bit1, bit2, color;
 
 			if (m_flipscreen)
 			{
@@ -321,7 +322,7 @@ void nyny_state::shift_star_generator(  )
 MC6845_END_UPDATE( nyny_state::crtc_end_update )
 {
 	/* draw the star field into the bitmap */
-	UINT16 delay_counter = m_star_delay_counter;
+	uint16_t delay_counter = m_star_delay_counter;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -332,7 +333,7 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 				((m_star_shift_reg & 0x80ff) == 0x00ff) &&
 				(((y & 0x01) ^ m_flipscreen) ^ (((x & 0x08) >> 3) ^ m_flipscreen)))
 			{
-				UINT8 color = ((m_star_shift_reg & 0x0100) >>  8) |  /* R */
+				uint8_t color = ((m_star_shift_reg & 0x0100) >>  8) |  /* R */
 								((m_star_shift_reg & 0x0400) >>  9) |    /* G */
 								((m_star_shift_reg & 0x1000) >> 10);     /* B */
 
@@ -403,7 +404,7 @@ WRITE8_MEMBER(nyny_state::audio_2_command_w)
 
 READ8_MEMBER(nyny_state::nyny_pia_1_2_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
 	if (BIT(offset, 2))  ret = m_pia1->read(space, offset & 0x03);
@@ -637,7 +638,7 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(nyny_state,main_cpu_irq))
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -645,19 +646,20 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CPU_1_CLOCK)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nyny_state, nyny_ay8910_37_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CPU_1_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay3", AY8910, AUDIO_CPU_2_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.03)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

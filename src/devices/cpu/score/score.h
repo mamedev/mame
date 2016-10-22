@@ -33,16 +33,16 @@ class score7_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	score7_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	score7_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 1; }
-	virtual UINT32 execute_input_lines() const override { return 64; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 1; }
+	virtual uint32_t execute_input_lines() const override { return 64; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -53,28 +53,28 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	// helpers
-	bool check_condition_branch(UINT8 bc);
-	bool check_condition(UINT8 bc);
-	INT32 sign_extend(UINT32 data, UINT8 len);
-	UINT32 fetch();
-	UINT8 read_byte(offs_t offset);
-	UINT16 read_word(offs_t offset);
-	UINT32 read_dword(offs_t offset);
-	void write_byte(offs_t offset, UINT8 data);
-	void write_word(offs_t offset, UINT16 data);
-	void write_dword(offs_t offset, UINT32 data);
+	bool check_condition_branch(uint8_t bc);
+	bool check_condition(uint8_t bc);
+	int32_t sign_extend(uint32_t data, uint8_t len);
+	uint32_t fetch();
+	uint8_t read_byte(offs_t offset);
+	uint16_t read_word(offs_t offset);
+	uint32_t read_dword(offs_t offset);
+	void write_byte(offs_t offset, uint8_t data);
+	void write_word(offs_t offset, uint16_t data);
+	void write_dword(offs_t offset, uint32_t data);
 	void check_irq();
-	void gen_exception(int cause, UINT32 param = 0);
+	void gen_exception(int cause, uint32_t param = 0);
 
-	offs_t disasm(char *buffer, offs_t pc, UINT32 opcode);
-	char *disasm32(char *buffer, offs_t pc, UINT32 opcode);
-	char *disasm16(char *buffer, offs_t pc, UINT16 opcode);
+	offs_t disasm(char *buffer, offs_t pc, uint32_t opcode);
+	char *disasm32(char *buffer, offs_t pc, uint32_t opcode);
+	char *disasm16(char *buffer, offs_t pc, uint16_t opcode);
 	void unemulated_op(const char * op);
 
 	// 32-bit opcodes
@@ -117,13 +117,13 @@ private:
 
 	// internal state
 	int                 m_icount;
-	UINT32              m_pc;
-	UINT32              m_ppc;
-	UINT32              m_op;
-	UINT32              m_gpr[0x20];
-	UINT32              m_cr[0x20];
-	UINT32              m_sr[3];
-	UINT32              m_ce[2];
+	uint32_t              m_pc;
+	uint32_t              m_ppc;
+	uint32_t              m_op;
+	uint32_t              m_gpr[0x20];
+	uint32_t              m_cr[0x20];
+	uint32_t              m_sr[3];
+	uint32_t              m_ce[2];
 	bool                m_pending_interrupt[64];
 
 	// opcodes tables

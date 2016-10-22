@@ -63,8 +63,8 @@ public:
 	DECLARE_MACHINE_RESET(mz700);
 	DECLARE_MACHINE_RESET(mz800);
 	virtual void machine_start() override;
-	UINT32 screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_cursor_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_other_callback);
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
@@ -91,8 +91,8 @@ private:
 	int m_mz700_ram_vram;       /* 1 if vram is banked in */
 
 	/* mz800 specific */
-	std::unique_ptr<UINT8[]> m_cgram;
-	UINT8 *m_p_chargen;
+	std::unique_ptr<uint8_t[]> m_cgram;
+	uint8_t *m_p_chargen;
 
 	int m_mz700_mode;           /* 1 if in mz700 mode */
 	int m_mz800_ram_lock;       /* 1 if lock is active */
@@ -104,13 +104,13 @@ private:
 	int m_centronics_busy;
 	int m_centronics_perror;
 
-	UINT8 *m_colorram;
-	std::unique_ptr<UINT8[]> m_videoram;
-	UINT8 m_speaker_level;
-	UINT8 m_prev_state;
-	UINT16 m_mz800_ramaddr;
-	UINT8 m_mz800_palette[4];
-	UINT8 m_mz800_palette_bank;
+	uint8_t *m_colorram;
+	std::unique_ptr<uint8_t[]> m_videoram;
+	uint8_t m_speaker_level;
+	uint8_t m_prev_state;
+	uint16_t m_mz800_ramaddr;
+	uint8_t m_mz800_palette[4];
+	uint8_t m_mz800_palette_bank;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;

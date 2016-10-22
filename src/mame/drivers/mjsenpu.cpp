@@ -67,13 +67,13 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<ticket_dispenser_device> m_hopper;
 
-	required_shared_ptr<UINT32> m_mainram;
-//	required_shared_ptr<UINT32> m_vram;
-	UINT8 m_pal[0x200];
-	UINT32 m_vram0[0x20000 / 4];
-	UINT32 m_vram1[0x20000 / 4];
-	UINT8 m_control;
-	UINT8 m_mux;
+	required_shared_ptr<uint32_t> m_mainram;
+//	required_shared_ptr<uint32_t> m_vram;
+	uint8_t m_pal[0x200];
+	uint32_t m_vram0[0x20000 / 4];
+	uint32_t m_vram1[0x20000 / 4];
+	uint8_t m_control;
+	uint8_t m_mux;
 
 	DECLARE_READ8_MEMBER(palette_low_r);
 	DECLARE_READ8_MEMBER(palette_high_r);
@@ -95,7 +95,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<palette_device> m_palette;
 };
@@ -114,7 +114,7 @@ READ8_MEMBER(mjsenpu_state::palette_high_r)
 
 void mjsenpu_state::set_palette(int offset)
 {
-	UINT16 paldata = (m_pal[(offset * 2) + 0] << 8) | (m_pal[(offset * 2) + 1]);
+	uint16_t paldata = (m_pal[(offset * 2) + 0] << 8) | (m_pal[(offset * 2) + 1]);
 	m_palette->set_pen_color(offset, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal6bit(paldata >> 10));
 }
 
@@ -394,12 +394,12 @@ void mjsenpu_state::video_start()
 
 
 
-UINT32 mjsenpu_state::screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mjsenpu_state::screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 	int color;
 
-	UINT32* vram;
+	uint32_t* vram;
 
 	if (m_control & 0x01) vram = m_vram0;
 	else  vram = m_vram1;

@@ -161,12 +161,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	UINT8 m_videoram[VMEM_SIZE];
-	UINT8 m_colorram[VMEM_SIZE];
-	UINT8 m_prot_data;
+	uint8_t m_videoram[VMEM_SIZE];
+	uint8_t m_colorram[VMEM_SIZE];
+	uint8_t m_prot_data;
 	pen_t m_pens[NUM_PENS];
 
-	UINT8 m_atamanot_prot_state;
+	uint8_t m_atamanot_prot_state;
 	DECLARE_WRITE8_MEMBER(ssingles_videoram_w);
 	DECLARE_WRITE8_MEMBER(ssingles_colorram_w);
 	DECLARE_READ8_MEMBER(c000_r);
@@ -184,7 +184,7 @@ public:
 };
 
 //fake palette
-static const UINT8 ssingles_colors[NUM_PENS*3]=
+static const uint8_t ssingles_colors[NUM_PENS*3]=
 {
 	0x00,0x00,0x00, 0xff,0xff,0xff, 0xff,0x00,0x00, 0x80,0x00,0x00,
 	0x00,0x00,0x00, 0xf0,0xf0,0xf0, 0xff,0xff,0x00, 0x40,0x40,0x40,
@@ -198,10 +198,10 @@ static const UINT8 ssingles_colors[NUM_PENS*3]=
 
 MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 {
-	UINT32 tile_address;
-	UINT16 cell, palette;
-	UINT8 b0, b1;
-	const UINT8 *gfx = memregion("gfx1")->base();
+	uint32_t tile_address;
+	uint16_t cell, palette;
+	uint8_t b0, b1;
+	const uint8_t *gfx = memregion("gfx1")->base();
 
 	for (int cx = 0; cx < x_count; ++cx)
 	{
@@ -234,10 +234,10 @@ MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 
 MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 {
-	UINT32 tile_address;
-	UINT16 cell, palette;
-	UINT8 b0, b1;
-	const UINT8 *gfx = memregion("gfx1")->base();
+	uint32_t tile_address;
+	uint16_t cell, palette;
+	uint8_t b0, b1;
+	const uint8_t *gfx = memregion("gfx1")->base();
 
 	for (int cx = 0; cx < x_count; ++cx)
 	{
@@ -271,14 +271,14 @@ MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 
 WRITE8_MEMBER(ssingles_state::ssingles_videoram_w)
 {
-	UINT8 *vram = memregion("vram")->base();
+	uint8_t *vram = memregion("vram")->base();
 	vram[offset] = data;
 	m_videoram[offset]=data;
 }
 
 WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
 {
-	UINT8 *cram = memregion("cram")->base();
+	uint8_t *cram = memregion("cram")->base();
 	cram[offset] = data;
 	m_colorram[offset]=data;
 }

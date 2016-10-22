@@ -113,8 +113,8 @@ const device_type MCCS1850 = &device_creator<mccs1850_device>;
 
 inline void mccs1850_device::check_interrupt()
 {
-	UINT8 status = m_ram[REGISTER_STATUS];
-	UINT8 control = m_ram[REGISTER_CONTROL];
+	uint8_t status = m_ram[REGISTER_STATUS];
+	uint8_t control = m_ram[REGISTER_CONTROL];
 
 	bool interrupt = (((status & STATUS_AI) && (control & CONTROL_AE))      // alarm interrupt
 					|| ((status & STATUS_LB) && (control & CONTROL_LBE))    // low battery
@@ -152,7 +152,7 @@ inline void mccs1850_device::set_pse_line(bool state)
 //  read_register -
 //-------------------------------------------------
 
-inline UINT8 mccs1850_device::read_register(offs_t offset)
+inline uint8_t mccs1850_device::read_register(offs_t offset)
 {
 	switch (offset)
 	{
@@ -182,7 +182,7 @@ inline UINT8 mccs1850_device::read_register(offs_t offset)
 //  write_register -
 //-------------------------------------------------
 
-inline void mccs1850_device::write_register(offs_t offset, UINT8 data)
+inline void mccs1850_device::write_register(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -248,7 +248,7 @@ inline void mccs1850_device::write_register(offs_t offset, UINT8 data)
 
 inline void mccs1850_device::advance_seconds()
 {
-	UINT32 alarm = (m_ram[REGISTER_ALARM_LATCH] << 24) | (m_ram[REGISTER_ALARM_LATCH + 1] << 16) | (m_ram[REGISTER_ALARM_LATCH + 2] << 8) | m_ram[REGISTER_ALARM_LATCH + 3];
+	uint32_t alarm = (m_ram[REGISTER_ALARM_LATCH] << 24) | (m_ram[REGISTER_ALARM_LATCH + 1] << 16) | (m_ram[REGISTER_ALARM_LATCH + 2] << 8) | m_ram[REGISTER_ALARM_LATCH + 3];
 
 	m_counter++;
 
@@ -279,7 +279,7 @@ inline void mccs1850_device::advance_seconds()
 //  mccs1850_device - constructor
 //-------------------------------------------------
 
-mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MCCS1850, "MCCS1850", tag, owner, clock, "mccs1850", __FILE__),
 	device_rtc_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
@@ -380,7 +380,7 @@ void mccs1850_device::nvram_default()
 
 	if (machine().root_device().memregion(tag()) != nullptr)
 	{
-		UINT8 *nvram = machine().root_device().memregion(tag())->base();
+		uint8_t *nvram = machine().root_device().memregion(tag())->base();
 
 		// initialize NVRAM
 		memcpy(m_ram, nvram, 0x20);

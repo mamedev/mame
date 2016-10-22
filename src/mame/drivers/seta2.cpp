@@ -128,7 +128,7 @@ WRITE16_MEMBER(seta2_state::sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *ROM = memregion( "x1snd" )->base();
+		uint8_t *ROM = memregion( "x1snd" )->base();
 		int banks = (memregion( "x1snd" )->bytes() - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
@@ -329,7 +329,7 @@ ADDRESS_MAP_END
     The offset to use is stored in RAM at address 0x20BA16 */
 READ16_MEMBER(seta2_state::pzlbowl_protection_r)
 {
-	UINT32 address = (space.read_word(0x20ba16) << 16) | space.read_word(0x20ba18);
+	uint32_t address = (space.read_word(0x20ba16) << 16) | space.read_word(0x20ba18);
 	return memregion("maincpu")->base()[address - 2];
 }
 
@@ -561,7 +561,7 @@ WRITE16_MEMBER(seta2_state::staraudi_camera_w)
 // Tile RAM
 
 #define TILE0 (0x7c000)
-#define TILERAM(offset) ((UINT16*)(memregion("sprites")->base() + TILE0 * 8*8 + (offset * 2 / 0x20000) * 2 + ((offset * 2) % 0x20000) / 2 * 8))
+#define TILERAM(offset) ((uint16_t*)(memregion("sprites")->base() + TILE0 * 8*8 + (offset * 2 / 0x20000) * 2 + ((offset * 2) % 0x20000) / 2 * 8))
 
 READ16_MEMBER(seta2_state::staraudi_tileram_r)
 {
@@ -627,7 +627,7 @@ class funcube_touchscreen_device : public device_t,
 									public device_serial_interface
 {
 public:
-	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<funcube_touchscreen_device &>(device).m_tx_cb.set_callback(object); }
@@ -646,9 +646,9 @@ private:
 	required_ioport m_y;
 	required_ioport m_btn;
 
-	UINT8 m_button_state;
+	uint8_t m_button_state;
 	int m_serial_pos;
-	UINT8 m_serial[4];
+	uint8_t m_serial[4];
 };
 
 const device_type FUNCUBE_TOUCHSCREEN = &device_creator<funcube_touchscreen_device>;
@@ -664,7 +664,7 @@ static INPUT_PORTS_START( funcube_touchscreen )
 	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y ) PORT_MINMAX(0,0x46+1) PORT_CROSSHAIR(Y, -(0xf0-8.0)/0xf0*0x047/0x46, -1.0/0x46, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(5) PORT_REVERSE
 INPUT_PORTS_END
 
-funcube_touchscreen_device::funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+funcube_touchscreen_device::funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, FUNCUBE_TOUCHSCREEN, "Funcube Touchscreen", tag, owner, clock, "funcube_touchscrene", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_tx_cb(*this),
@@ -708,7 +708,7 @@ void funcube_touchscreen_device::device_timer(emu_timer &timer, device_timer_id 
 		return;
 	}
 
-	UINT8 button_state = m_btn->read();
+	uint8_t button_state = m_btn->read();
 	if(m_button_state != button_state) {
 		m_button_state = button_state;
 		m_serial[0] = button_state ? 0xfe : 0xfd;
@@ -737,7 +737,7 @@ void funcube_touchscreen_device::tra_callback()
 // RAM shared with the sub CPU
 READ32_MEMBER(seta2_state::funcube_nvram_dword_r)
 {
-	UINT16 val = m_nvram[offset];
+	uint16_t val = m_nvram[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
@@ -768,7 +768,7 @@ READ16_MEMBER(seta2_state::spriteram16_word_r)
 
 READ32_MEMBER(seta2_state::funcube_debug_r)
 {
-	UINT32 ret = ioport("DEBUG")->read();
+	uint32_t ret = ioport("DEBUG")->read();
 
 	// This bits let you move the crosshair in the inputs / touch panel test with a joystick
 	if (!(m_screen->frame_number() % 3))
@@ -785,12 +785,12 @@ WRITE32_MEMBER(seta2_state::oki_write)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		const UINT8 tmp = (data & 0x000000ff);
+		const uint8_t tmp = (data & 0x000000ff);
 		m_oki->write_TMP_register(tmp);
 	}
 	else if (ACCESSING_BITS_16_23)
 	{
-		const UINT8 cmd = (data & 0x00ff0000) >> 16;
+		const uint8_t cmd = (data & 0x00ff0000) >> 16;
 		m_oki->write_command(cmd);
 	}
 }
@@ -849,17 +849,17 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta2_state::funcube_coins_r)
 {
-	UINT8 ret = ioport("SWITCH")->read();
-	UINT8 coin_bit0 = 1;    // active low
-	UINT8 coin_bit1 = 1;
+	uint8_t ret = ioport("SWITCH")->read();
+	uint8_t coin_bit0 = 1;    // active low
+	uint8_t coin_bit1 = 1;
 
-	UINT8 hopper_bit = (m_funcube_hopper_motor && !(m_screen->frame_number()%20)) ? 1 : 0;
+	uint8_t hopper_bit = (m_funcube_hopper_motor && !(m_screen->frame_number()%20)) ? 1 : 0;
 
-	const UINT64 coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK / (1000/20);
+	const uint64_t coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK / (1000/20);
 
 	if ( m_funcube_coin_start_cycles )
 	{
-		UINT64 elapsed = downcast<cpu_device *>(&space.device())->total_cycles() - m_funcube_coin_start_cycles;
+		uint64_t elapsed = downcast<cpu_device *>(&space.device())->total_cycles() - m_funcube_coin_start_cycles;
 
 		if ( elapsed < coin_total_cycles/2 )
 			coin_bit0 = 0;
@@ -2793,8 +2793,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(seta2_state,funcube)
 {
-	UINT32 *main_cpu = (UINT32 *) memregion("maincpu")->base();
-	UINT16 *sub_cpu  = (UINT16 *) memregion("sub")->base();
+	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
+	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0x064/4] = 0x0000042a; // PIC protection?
 
@@ -2804,8 +2804,8 @@ DRIVER_INIT_MEMBER(seta2_state,funcube)
 
 DRIVER_INIT_MEMBER(seta2_state,funcube2)
 {
-	UINT32 *main_cpu = (UINT32 *) memregion("maincpu")->base();
-	UINT16 *sub_cpu  = (UINT16 *) memregion("sub")->base();
+	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
+	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0xa5c/4] = 0x4e713e3c;       // PIC protection?
 	main_cpu[0xa74/4] = 0x4e713e3c;
@@ -2817,8 +2817,8 @@ DRIVER_INIT_MEMBER(seta2_state,funcube2)
 
 DRIVER_INIT_MEMBER(seta2_state,funcube3)
 {
-	UINT32 *main_cpu = (UINT32 *) memregion("maincpu")->base();
-	UINT16 *sub_cpu  = (UINT16 *) memregion("sub")->base();
+	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
+	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0x008bc/4] = 0x4a804e71;
 	main_cpu[0x19f0c/4] = 0x4e714e71;
@@ -3527,7 +3527,7 @@ ROM_END
 DRIVER_INIT_MEMBER(seta2_state,staraudi)
 {
 	// bad sound rom: replace the missing (zero) sample with the previous one
-	UINT8 *samples = memregion("x1snd")->base() + 0x100000;
+	uint8_t *samples = memregion("x1snd")->base() + 0x100000;
 	for (int i = 0; i < 0x400000; i += 2)
 		samples[i + 1] = samples[i];
 }

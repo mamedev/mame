@@ -126,13 +126,13 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
-	UINT8 crt8002(UINT8 ac_ra, UINT8 ac_chr, UINT8 ac_attr, UINT16 ac_cnt, bool ac_curs);
-	UINT8 *m_p_chargen;                 /* character ROM */
-	UINT8 *m_p_videoram;                    /* Video RAM */
-	UINT8 *m_p_attribram;                   /* Attribute RAM */
-	UINT8 m_term_data;
-	UINT8 m_term_status;
-	UINT16 m_cnt;
+	uint8_t crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs);
+	uint8_t *m_p_chargen;                 /* character ROM */
+	uint8_t *m_p_videoram;                    /* Video RAM */
+	uint8_t *m_p_attribram;                   /* Attribute RAM */
+	uint8_t m_term_data;
+	uint8_t m_term_status;
+	uint16_t m_cnt;
 	bool m_c8[8];
 	bool m_cc[8];
 	floppy_image_device *m_floppy;
@@ -173,7 +173,7 @@ WRITE8_MEMBER( bigbord2_state::portc0_w )
 
 READ8_MEMBER( bigbord2_state::portc4_r )
 {
-	UINT8 ret = m_term_status | 3 | (m_c8[6]<<2) | m_dsw->read();
+	uint8_t ret = m_term_status | 3 | (m_c8[6]<<2) | m_dsw->read();
 	m_term_status = 0;
 	return ret;
 }
@@ -182,7 +182,7 @@ READ8_MEMBER( bigbord2_state::portc4_r )
 
 READ8_MEMBER( bigbord2_state::portd0_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -458,7 +458,7 @@ void bigbord2_state::machine_start()
 
 void bigbord2_state::machine_reset()
 {
-	UINT8 i;
+	uint8_t i;
 	for (i = 0; i < 8; i++)
 	{
 		m_c8[i] = 0;
@@ -475,7 +475,7 @@ DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
 {
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	m_bankr->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 	m_bankv->configure_entries(0, 2, &RAM[0x6000], 0x10000);
 	m_banka->configure_entries(0, 2, &RAM[0x7000], 0x10000);
@@ -502,9 +502,9 @@ static GFXDECODE_START( crt8002 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, crt8002_charlayout, 0, 1 )
 GFXDECODE_END
 
-UINT8 bigbord2_state::crt8002(UINT8 ac_ra, UINT8 ac_chr, UINT8 ac_attr, UINT16 ac_cnt, bool ac_curs)
+uint8_t bigbord2_state::crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs)
 {
-	UINT8 gfx = 0;
+	uint8_t gfx = 0;
 	switch (ac_attr & 3)
 	{
 		case 0: // lores gfx
@@ -558,9 +558,9 @@ UINT8 bigbord2_state::crt8002(UINT8 ac_ra, UINT8 ac_chr, UINT8 ac_attr, UINT16 a
 MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx,attr;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx,attr;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 	ra &= 15;
 	m_cnt++;
 

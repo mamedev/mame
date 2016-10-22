@@ -31,11 +31,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen") { }
 
-	UINT16 m_out;
-	UINT8 m_interrupt_line_active;
-	required_shared_ptr<UINT16> m_pkscramble_fgtilemap_ram;
-	required_shared_ptr<UINT16> m_pkscramble_mdtilemap_ram;
-	required_shared_ptr<UINT16> m_pkscramble_bgtilemap_ram;
+	uint16_t m_out;
+	uint8_t m_interrupt_line_active;
+	required_shared_ptr<uint16_t> m_pkscramble_fgtilemap_ram;
+	required_shared_ptr<uint16_t> m_pkscramble_mdtilemap_ram;
+	required_shared_ptr<uint16_t> m_pkscramble_bgtilemap_ram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_md_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -49,7 +49,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
@@ -253,7 +253,7 @@ void pkscram_state::video_start()
 	m_fg_tilemap->set_transparent_pen(15);
 }
 
-UINT32 pkscram_state::screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pkscram_state::screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_md_tilemap->draw(screen, bitmap, cliprect, 0,0);

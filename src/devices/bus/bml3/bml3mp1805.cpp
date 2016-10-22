@@ -137,7 +137,7 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 //  LIVE DEVICE
 //**************************************************************************
 
-bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BML3BUS_MP1805, "Hitachi MP-1805 Floppy Controller Card", tag, owner, clock, "bml3mp1805", __FILE__),
 	device_bml3bus_card_interface(mconfig, *this),
 	m_mc6843(*this, "mc6843"), m_rom(nullptr)
@@ -161,7 +161,7 @@ void bml3bus_mp1805_device::device_start()
 	space_prg.install_readwrite_handler(0xff18, 0xff1f, read8_delegate( FUNC(mc6843_device::read), (mc6843_device*)m_mc6843), write8_delegate(FUNC(mc6843_device::write), (mc6843_device*)m_mc6843) );
 	space_prg.install_readwrite_handler(0xff20, 0xff20, read8_delegate( FUNC(bml3bus_mp1805_device::bml3_mp1805_r), this), write8_delegate(FUNC(bml3bus_mp1805_device::bml3_mp1805_w), this) );
 	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...
-	UINT8 *mainrom = device().machine().root_device().memregion("maincpu")->base();
+	uint8_t *mainrom = device().machine().root_device().memregion("maincpu")->base();
 	memcpy(mainrom + 0xf800, m_rom + 0xf800, 0x800);
 }
 

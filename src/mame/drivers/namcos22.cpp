@@ -1648,7 +1648,7 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 	}
 
 	// pick a random number, but don't pick the same twice in a row
-	UINT16 old_rng = m_keycus_rng;
+	uint16_t old_rng = m_keycus_rng;
 	do
 	{
 		m_keycus_rng = machine().rand() & 0xffff;
@@ -1679,7 +1679,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_keycus_w)
  */
 READ16_MEMBER(namcos22_state::namcos22_portbit_r)
 {
-	UINT16 ret = m_portbits[offset] & 1;
+	uint16_t ret = m_portbits[offset] & 1;
 	m_portbits[offset] = m_portbits[offset] >> 1 | 0x8000;
 	return ret;
 }
@@ -1955,8 +1955,8 @@ ADDRESS_MAP_END
 // Time Crisis gun
 READ32_MEMBER(namcos22_state::namcos22_gun_r)
 {
-	UINT16 xpos = ioport("LIGHTX")->read();
-	UINT16 ypos = ioport("LIGHTY")->read();
+	uint16_t xpos = ioport("LIGHTX")->read();
+	uint16_t ypos = ioport("LIGHTY")->read();
 	// ypos is not completely understood yet, there should be a difference between case 1 and 2
 
 	switch (offset)
@@ -2038,7 +2038,7 @@ void namcos22_state::slave_enable()
 
 READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 {
-	UINT32 value = m_polygonram[offset];
+	uint32_t value = m_polygonram[offset];
 
 	switch (m_dspram_bank)
 	{
@@ -2059,14 +2059,14 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 			break;
 	}
 
-	return (UINT16)value;
+	return (uint16_t)value;
 }
 
 WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 {
-	UINT32 value = m_polygonram[offset];
-	UINT16 lo = value & 0xffff;
-	UINT16 hi = value >> 16;
+	uint32_t value = m_polygonram[offset];
+	uint16_t lo = value & 0xffff;
+	uint16_t hi = value >> 16;
 
 	switch (m_dspram_bank)
 	{
@@ -2096,7 +2096,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_dspram16_bank_w)
 }
 
 
-void namcos22_state::point_write(offs_t offs, UINT32 data)
+void namcos22_state::point_write(offs_t offs, uint32_t data)
 {
 	offs &= 0x00ffffff; /* 24 bit addressing */
 	if (m_is_ss22)
@@ -2111,7 +2111,7 @@ void namcos22_state::point_write(offs_t offs, UINT32 data)
 	}
 }
 
-INT32 namcos22_state::point_read(INT32 addr)
+int32_t namcos22_state::point_read(int32_t addr)
 {
 	if (addr < 0)
 		return -1;
@@ -2121,7 +2121,7 @@ INT32 namcos22_state::point_read(INT32 addr)
 		return m_pointrom[addr];
 
 	// point ram, only used in ram test?
-	INT32 result = 0;
+	int32_t result = 0;
 	if (m_is_ss22)
 	{
 		if (addr >= 0xf80000 && addr < 0xfa0000)
@@ -2173,12 +2173,12 @@ READ16_MEMBER(namcos22_state::pdp_status_r)
 	return m_dsp_master_bioz;
 }
 
-UINT32 namcos22_state::pdp_polygonram_read(offs_t offs)
+uint32_t namcos22_state::pdp_polygonram_read(offs_t offs)
 {
 	return m_polygonram[offs & 0x7fff];
 }
 
-void namcos22_state::pdp_polygonram_write(offs_t offs, UINT32 data)
+void namcos22_state::pdp_polygonram_write(offs_t offs, uint32_t data)
 {
 	m_polygonram[offs & 0x7fff] = data;
 }
@@ -2188,16 +2188,16 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 	/* this feature appears to be only used on Super System22 hardware */
 	if (m_is_ss22)
 	{
-		UINT16 offs = pdp_polygonram_read(0x7fff);
+		uint16_t offs = pdp_polygonram_read(0x7fff);
 		m_dsp_master_bioz = 1;
 		for (;;)
 		{
-			UINT16 start = offs;
-			UINT16 cmd = pdp_polygonram_read(offs++);
-			UINT32 srcAddr;
-			UINT32 dstAddr;
-			UINT32 numWords;
-			UINT32 data;
+			uint16_t start = offs;
+			uint16_t cmd = pdp_polygonram_read(offs++);
+			uint32_t srcAddr;
+			uint32_t dstAddr;
+			uint32_t numWords;
+			uint32_t data;
 			switch (cmd)
 			{
 				case 0xfff0:
@@ -2680,13 +2680,13 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcos22_state::s22mcu_shared_r)
 {
-	UINT16 *share16 = (UINT16 *)m_shareram.target();
+	uint16_t *share16 = (uint16_t *)m_shareram.target();
 	return share16[BYTE_XOR_BE(offset)];
 }
 
 WRITE16_MEMBER(namcos22_state::s22mcu_shared_w)
 {
-	UINT16 *share16 = (UINT16 *)m_shareram.target();
+	uint16_t *share16 = (uint16_t *)m_shareram.target();
 	COMBINE_DATA(&share16[BYTE_XOR_BE(offset)]);
 }
 
@@ -2787,7 +2787,7 @@ READ8_MEMBER(namcos22_state::mcu_port7_r)
 
 READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
 {
-	UINT16 adc = m_adc_ports[offset >> 1 & 7].read_safe(0) << 2;
+	uint16_t adc = m_adc_ports[offset >> 1 & 7].read_safe(0) << 2;
 	return (offset & 1) ? adc >> 8 : adc;
 }
 
@@ -2817,9 +2817,9 @@ ADDRESS_MAP_END
 /* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
 void namcos22_state::handle_coinage(int slots, int address_is_odd)
 {
-	UINT16 *share16 = (UINT16 *)m_shareram.target();
+	uint16_t *share16 = (uint16_t *)m_shareram.target();
 
-	UINT32 coin_state = ioport("INPUTS")->read() & 0x1200;
+	uint32_t coin_state = ioport("INPUTS")->read() & 0x1200;
 
 	if (!(coin_state & 0x1000) && (m_old_coin_state & 0x1000))
 	{
@@ -2846,12 +2846,12 @@ void namcos22_state::handle_driving_io()
 {
 	if (m_syscontrol[0x18] != 0)
 	{
-		UINT16 flags = ioport("INPUTS")->read();
-		UINT16 coinram_address_is_odd = 0;
+		uint16_t flags = ioport("INPUTS")->read();
+		uint16_t coinram_address_is_odd = 0;
 
-		UINT16 gas   = ioport("GAS")->read();
-		UINT16 brake = ioport("BRAKE")->read();
-		UINT16 steer = ioport("STEER")->read();
+		uint16_t gas   = ioport("GAS")->read();
+		uint16_t brake = ioport("BRAKE")->read();
+		uint16_t steer = ioport("STEER")->read();
 
 		switch (m_gametype)
 		{
@@ -2905,12 +2905,12 @@ void namcos22_state::handle_cybrcomm_io()
 {
 	if (m_syscontrol[0x18] != 0)
 	{
-		UINT16 flags = ioport("INPUTS")->read();
+		uint16_t flags = ioport("INPUTS")->read();
 
-		UINT16 volume0 = ioport("STICKY1")->read() * 0x10;
-		UINT16 volume1 = ioport("STICKY2")->read() * 0x10;
-		UINT16 volume2 = ioport("STICKX1")->read() * 0x10;
-		UINT16 volume3 = ioport("STICKX2")->read() * 0x10;
+		uint16_t volume0 = ioport("STICKY1")->read() * 0x10;
+		uint16_t volume1 = ioport("STICKY2")->read() * 0x10;
+		uint16_t volume2 = ioport("STICKX1")->read() * 0x10;
+		uint16_t volume3 = ioport("STICKX2")->read() * 0x10;
 
 		m_shareram[0x030/4] = (flags << 16) | volume0;
 		m_shareram[0x034/4] = (volume1 << 16) | volume2;
@@ -2981,7 +2981,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 {
 	// arbitrary timer for reading optical pedal
-	UINT8 i = ioport("PEDAL")->read();
+	uint8_t i = ioport("PEDAL")->read();
 
 	if (i != 0)
 	{
@@ -3016,8 +3016,8 @@ TIMER_CALLBACK_MEMBER(namcos22_state::adillor_trackball_interrupt)
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 {
 	// arbitrary timer for reading optical trackball
-	UINT8 ix = ioport("TRACKX")->read();
-	UINT8 iy = ioport("TRACKY")->read();
+	uint8_t ix = ioport("TRACKX")->read();
+	uint8_t iy = ioport("TRACKY")->read();
 
 	if (ix != 0x80 || iy < 0x80)
 	{
@@ -3310,7 +3310,7 @@ INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER(namcos22_state::alpine_motor_read)
 {
-	return m_motor_status >> (FPTR)param & 1;
+	return m_motor_status >> (uintptr_t)param & 1;
 }
 
 static INPUT_PORTS_START( alpiner )
@@ -5541,7 +5541,7 @@ DRIVER_INIT_MEMBER(namcos22_state,airco22)
 
 DRIVER_INIT_MEMBER(namcos22_state,propcycl)
 {
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
 	// patch out strange routine (uninitialized-eeprom related?)
 	// maybe needs more accurate 28C64 eeprom device emulation

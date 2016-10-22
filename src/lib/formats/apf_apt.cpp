@@ -47,7 +47,7 @@ e. A checksum byte (8-bit addition)
 /* 500 microsecond of bit 0 and 1000 microsecond of bit 1 */
 static int apf_image_size;
 
-static int apf_put_samples(INT16 *buffer, int sample_pos, int count, int level)
+static int apf_put_samples(int16_t *buffer, int sample_pos, int count, int level)
 {
 	if (buffer)
 	{
@@ -58,7 +58,7 @@ static int apf_put_samples(INT16 *buffer, int sample_pos, int count, int level)
 	return count;
 }
 
-static int apf_output_bit(INT16 *buffer, int sample_pos, bool bit)
+static int apf_output_bit(int16_t *buffer, int sample_pos, bool bit)
 {
 	int samples = 0;
 
@@ -76,10 +76,10 @@ static int apf_output_bit(INT16 *buffer, int sample_pos, bool bit)
 	return samples;
 }
 
-static int apf_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
+static int apf_output_byte(int16_t *buffer, int sample_pos, uint8_t byte)
 {
 	int samples = 0;
-	UINT8 i;
+	uint8_t i;
 
 	/* data */
 	for (i = 0; i<8; i++)
@@ -88,12 +88,12 @@ static int apf_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
 	return samples;
 }
 
-static int apf_apt_handle_cassette(INT16 *buffer, const UINT8 *bytes)
+static int apf_apt_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 {
-	UINT32 sample_count = 0;
-	UINT32 i;
-	UINT8 cksm = 0;
-	UINT32 temp = 0;
+	uint32_t sample_count = 0;
+	uint32_t i;
+	uint8_t cksm = 0;
+	uint32_t temp = 0;
 
 	// silence
 	sample_count += apf_put_samples(buffer, 0, 12000, 0);
@@ -121,11 +121,11 @@ static int apf_apt_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 	return sample_count;
 }
 
-static int apf_cpf_handle_cassette(INT16 *buffer, const UINT8 *bytes)
+static int apf_cpf_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 {
-	UINT32 sample_count = 0;
-	UINT32 i;
-	UINT8 cksm = 0;
+	uint32_t sample_count = 0;
+	uint32_t i;
+	uint8_t cksm = 0;
 
 	// silence
 	sample_count += apf_put_samples(buffer, 0, 12000, 0);
@@ -154,12 +154,12 @@ static int apf_cpf_handle_cassette(INT16 *buffer, const UINT8 *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int apf_apt_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int apf_apt_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	return apf_apt_handle_cassette(buffer, bytes);
 }
 
-static int apf_cpf_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int apf_cpf_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	return apf_cpf_handle_cassette(buffer, bytes);
 }
@@ -168,14 +168,14 @@ static int apf_cpf_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
    Calculate the number of samples needed for this tape image
 ********************************************************************/
 
-static int apf_apt_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int apf_apt_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	apf_image_size = length;
 
 	return apf_apt_handle_cassette(nullptr, bytes);
 }
 
-static int apf_cpf_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int apf_cpf_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	apf_image_size = length;
 

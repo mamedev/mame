@@ -22,7 +22,7 @@ const device_type MIDIOUT = &device_creator<midiout_device>;
     ctor
 -------------------------------------------------*/
 
-midiout_device::midiout_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+midiout_device::midiout_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDIOUT, "MIDI Out image device", tag, owner, clock, "midiout", __FILE__),
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
@@ -96,7 +96,7 @@ void midiout_device::call_unload(void)
 void midiout_device::rcv_complete()    // Rx completed receiving byte
 {
 	receive_register_extract();
-	UINT8 data = get_received_char();
+	uint8_t data = get_received_char();
 
 	if (m_midi)
 	{

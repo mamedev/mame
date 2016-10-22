@@ -31,8 +31,8 @@ public:
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_ram16;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_ram16;
 	int m_bgcharbank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
@@ -49,7 +49,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
 	virtual void video_start() override;
-	UINT32 screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void f1dream_protection_w(address_space &space);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -60,12 +60,12 @@ public:
 	required_device<tigeroad_spr_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	UINT16     m_control[2];
+	uint16_t     m_control[2];
 
 	/* misc */
-	UINT8      m_shared_ram[8];
-	UINT16     m_latch;
-	UINT16     m_new_latch;
+	uint8_t      m_shared_ram[8];
+	uint16_t     m_latch;
+	uint16_t     m_new_latch;
 	int m_has_coinlock;
 
 	/* protection handling */

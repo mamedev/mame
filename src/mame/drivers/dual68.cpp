@@ -30,8 +30,8 @@ public:
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	DECLARE_WRITE16_MEMBER( dual68_terminal_w );
-	//UINT8 m_term_data;
-	required_shared_ptr<UINT16> m_p_ram;
+	//uint8_t m_term_data;
+	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
 };
 
@@ -67,9 +67,9 @@ INPUT_PORTS_END
 
 void dual68_state::machine_reset()
 {
-	UINT8* user1 = memregion("user1")->base();
+	uint8_t* user1 = memregion("user1")->base();
 
-	memcpy((UINT8*)m_p_ram.target(),user1,0x2000);
+	memcpy((uint8_t*)m_p_ram.target(),user1,0x2000);
 
 	m_maincpu->reset();
 }

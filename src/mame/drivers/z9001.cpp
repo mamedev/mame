@@ -56,20 +56,20 @@ public:
 	}
 
 	required_device<cpu_device> m_maincpu;
-	UINT8 m_framecnt;
+	uint8_t m_framecnt;
 	required_device<beep_device> m_beeper;
 	required_device<cassette_image_device> m_cass;
-	required_shared_ptr<UINT8> m_p_colorram;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_colorram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE8_MEMBER(port88_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	const UINT8 *m_p_chargen;
+	const uint8_t *m_p_chargen;
 	bool m_cassbit;
 	virtual void machine_reset() override;
 	//virtual void machine_start();
 	virtual void video_start() override;
-	UINT32 screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 };
 
@@ -133,17 +133,17 @@ void z9001_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 z9001_state::screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t z9001_state::screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,col,fg,bg;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx,col,fg,bg;
+	uint16_t sy=0,ma=0,x;
 	m_framecnt++;
 
 	for(y = 0; y < 24; y++ )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 40; x++)
 			{

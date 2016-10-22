@@ -74,7 +74,7 @@ void alto2_cpu_device::f1_early_dht_block()
  */
 void alto2_cpu_device::f2_late_dht_setmode()
 {
-	UINT16 r = X_RDBITS(m_bus,16,0,0);
+	uint16_t r = X_RDBITS(m_bus,16,0,0);
 	m_dsp.setmode = m_bus;
 	LOG((this,LOG_DHT,2,"    SETMODE<- BUS (%#o), branch on BUS[0] (%#o | %#o)\n", m_bus, m_next2, r));
 	m_next2 |= r;

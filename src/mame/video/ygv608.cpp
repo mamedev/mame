@@ -51,13 +51,13 @@
 
 /* text-layer characters */
 
-static const UINT32 pts_4bits_layout_xoffset[64] =
+static const uint32_t pts_4bits_layout_xoffset[64] =
 {
 	STEP8( 0*256, 4 ), STEP8( 1*256, 4 ), STEP8( 4*256, 4 ), STEP8( 5*256, 4 ),
 	STEP8( 16*256, 4 ), STEP8( 17*256, 4 ), STEP8( 20*256, 4 ), STEP8( 21*256, 4 )
 };
 
-static const UINT32 pts_4bits_layout_yoffset[64] =
+static const uint32_t pts_4bits_layout_yoffset[64] =
 {
 	STEP8( 0*256, 8*4 ), STEP8( 2*256, 8*4 ), STEP8( 8*256, 8*4 ), STEP8( 10*256, 8*4 ),
 	STEP8( 32*256, 8*4 ), STEP8( 34*256, 8*4 ), STEP8( 40*256, 8*4 ), STEP8( 42*256, 8*4 )
@@ -150,13 +150,13 @@ GFXDECODE_END
 
 const device_type YGV608 = &device_creator<ygv608_device>;
 
-ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, YGV608, "YGV608 VDP", tag, owner, clock, "ygv608", __FILE__),
 	device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608))
 {
 }
 
-void ygv608_device::set_gfxbank(UINT8 gfxbank)
+void ygv608_device::set_gfxbank(uint8_t gfxbank)
 {
 	m_namcond1_gfxbank = gfxbank;
 }
@@ -197,7 +197,7 @@ TILEMAP_MAPPER_MEMBER( ygv608_device::get_tile_offset )
 {
 	// this optimisation is not much good to us,
 	// since we really need row,col in the get_tile_info() routines
-	// - so just pack them into a UINT32
+	// - so just pack them into a uint32_t
 
 	return( ( col << 6 ) | row );
 }
@@ -211,7 +211,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
 
-	UINT8   attr = 0;
+	uint8_t   attr = 0;
 	int             pattern_name_base = 0;
 	int             set = ((m_regs.s.r7 & r7_md) == MD_1PLANE_256COLOUR
 						? GFX_8X8_8BIT : GFX_8X8_4BIT );
@@ -304,7 +304,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
 
-	UINT8   attr = 0;
+	uint8_t   attr = 0;
 	int             pattern_name_base = ( ( m_page_y << m_pny_shift )
 						<< m_bits16 );
 	int             set = GFX_8X8_4BIT;
@@ -375,7 +375,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 		}
 		if ((m_regs.s.r12 & r12_bpf) != 0)
 		{
-			UINT8 color = (m_regs.s.r12 & r12_bpf) >> 3;
+			uint8_t color = (m_regs.s.r12 & r12_bpf) >> 3;
 
 			/* assume 16 colour mode for now... */
 			attr = ( j >> ( (color - 1 ) * 2 ) ) & 0x0f;
@@ -401,7 +401,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
 
-	UINT8   attr = 0;
+	uint8_t   attr = 0;
 	int             pattern_name_base = 0;
 	int             set = ((m_regs.s.r7 & r7_md) == MD_1PLANE_256COLOUR
 						? GFX_16X16_8BIT : GFX_16X16_4BIT );
@@ -490,7 +490,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
 
-	UINT8   attr = 0;
+	uint8_t   attr = 0;
 	int             pattern_name_base = ( ( m_page_y << m_pny_shift )
 					<< m_bits16 );
 	int             set = GFX_16X16_4BIT;
@@ -554,7 +554,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 
 	if ((m_regs.s.r12 & r12_bpf) != 0)
 	{
-		UINT8 color = (m_regs.s.r12 & r12_bpf) >> 3;
+		uint8_t color = (m_regs.s.r12 & r12_bpf) >> 3;
 
 		/* assume 16 colour mode for now... */
 		attr = ( j >> (color * 2)) & 0x0f;
@@ -831,7 +831,7 @@ static const char *const mode[] = {
 static const char *const psize[] = { "8x8", "16x16", "32x32", "64x64" };
 #endif
 
-UINT32 ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef _SHOW_VIDEO_DEBUG
 	char buffer[64];
@@ -1045,14 +1045,14 @@ READ16_MEMBER( ygv608_device::read )
 	static int p3_state = 0;
 	static int pattern_name_base = 0;  /* pattern name table base address */
 	int pn=0;
-	UINT16  data = 0;
+	uint16_t  data = 0;
 
 	switch (offset)
 	{
 		case 0x00: /* P#0 - pattern name table data port */
 		{
-			UINT8 xTile = m_regs.s.r1 & r1_pnx;
-			UINT8 yTile = m_regs.s.r0 & r0_pny;
+			uint8_t xTile = m_regs.s.r1 & r1_pnx;
+			uint8_t yTile = m_regs.s.r0 & r0_pny;
 
 			switch (p0_state)
 			{
@@ -1162,7 +1162,7 @@ READ16_MEMBER( ygv608_device::read )
 
 		case 0x04: /* P#4 - register data port */
 		{
-			UINT8 regNum = (m_ports.s.p5) & p5_rn;
+			uint8_t regNum = (m_ports.s.p5) & p5_rn;
 			data = m_regs.b[regNum];
 			if (m_ports.s.p5 & p5_rrai)
 			{
@@ -1183,7 +1183,7 @@ READ16_MEMBER( ygv608_device::read )
 
 		case 0x06:
 		case 0x07:
-			return( (UINT16)(m_ports.b[offset]) << 8 );
+			return( (uint16_t)(m_ports.b[offset]) << 8 );
 
 		default :
 			logerror( "unknown ygv608 register (%d)\n", offset );
@@ -1206,8 +1206,8 @@ WRITE16_MEMBER( ygv608_device::write )
 	{
 		case 0x00: /* P#0 - pattern name table data port */
 		{
-			UINT8 xTile = m_regs.s.r1 & r1_pnx;
-			UINT8 yTile = m_regs.s.r0 & r0_pny;
+			uint8_t xTile = m_regs.s.r1 & r1_pnx;
+			uint8_t yTile = m_regs.s.r0 & r0_pny;
 
 			switch (p0_state)
 			{
@@ -1319,7 +1319,7 @@ WRITE16_MEMBER( ygv608_device::write )
 
 		case 0x04: /* P#4 - register data port */
 		{
-			UINT8 regNum = (m_ports.s.p5) & p5_rn;
+			uint8_t regNum = (m_ports.s.p5) & p5_rn;
 #if 0
 			logerror( "R#%d = $%02X\n", regNum, data );
 #endif
@@ -1398,11 +1398,11 @@ void ygv608_device::HandleYGV608Reset()
 void ygv608_device::HandleRomTransfers()
 {
 #if 0
-	static UINT8 *sdt = (UINT8 *)m_scroll_data_table;
-	static UINT8 *sat = (UINT8 *)m_sprite_attribute_table.b;
+	static uint8_t *sdt = (uint8_t *)m_scroll_data_table;
+	static uint8_t *sat = (uint8_t *)m_sprite_attribute_table.b;
 
 	/* fudge copy from sprite data for now... */
-	UINT8 *RAM = machine.memory_region[0];
+	uint8_t *RAM = machine.memory_region[0];
 	int i;
 
 	int src = ( ( (int)m_regs.s.tb13 << 8 ) +
@@ -1448,7 +1448,7 @@ void ygv608_device::HandleRomTransfers()
 }
 
 #if 0
-void nvsram( offs_t offset, UINT16 data )
+void nvsram( offs_t offset, uint16_t data )
 {
 	static int i = 0;
 
@@ -1512,7 +1512,7 @@ void ygv608_device::SetPostShortcuts(int reg )
 	{
 	case 0:
 	{
-		UINT8 yTile = m_regs.s.r0 & r0_pny;
+		uint8_t yTile = m_regs.s.r0 & r0_pny;
 
 		if (yTile >= m_page_y)
 		logerror ("%s:setting pny(%d) >= page_y(%d)\n", machine().describe_context(),
@@ -1525,7 +1525,7 @@ void ygv608_device::SetPostShortcuts(int reg )
 
 	case 1:
 	{
-		UINT8 xTile = m_regs.s.r1 & r1_pnx;
+		uint8_t xTile = m_regs.s.r1 & r1_pnx;
 
 		if (xTile >= m_page_x)
 		logerror ("%s:setting pnx(%d) >= page_x(%d)\n", machine().describe_context(),
@@ -1663,11 +1663,11 @@ void ygv608_device::SetPostShortcuts(int reg )
 //#define SHOW_SOURCE_MODE
 
 #if 0
-void dump_block( char *name, UINT8 *block, int len )
+void dump_block( char *name, uint8_t *block, int len )
 {
 	int i;
 
-	logerror( "UINT8 %s[] = {\n", name );
+	logerror( "uint8_t %s[] = {\n", name );
 	for( i=0; i<len; i++ ) {
 	if( i%8 == 0 )
 		logerror( " " );
@@ -1696,19 +1696,19 @@ READ16_MEMBER( ygv608_device::debug_trigger_r )
 #ifdef SHOW_SOURCE_MODE
 #if 0
 	dump_block( "ygv608_regs",
-			(UINT8 *)m_regs.b,
+			(uint8_t *)m_regs.b,
 			64 );
 	dump_block( "ygv608_pnt",
-			(UINT8 *)m_pattern_name_table,
+			(uint8_t *)m_pattern_name_table,
 			4096 );
 	dump_block( "ygv608_sat",
-			(UINT8 *)m_sprite_attribute_table.b,
+			(uint8_t *)m_sprite_attribute_table.b,
 			256 );
 	dump_block( "ygv608_sdt",
-			(UINT8 *)m_scroll_data_table,
+			(uint8_t *)m_scroll_data_table,
 			512 );
 	dump_block( "ygv608_cp",
-			(UINT8 *)m_colour_palette,
+			(uint8_t *)m_colour_palette,
 			768 );
 #endif
 

@@ -36,18 +36,18 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_charram;
-	required_shared_ptr<UINT16> m_xscroll1;
-	required_shared_ptr<UINT16> m_xscroll2;
-	required_shared_ptr<UINT16> m_yscroll2;
-	required_shared_ptr<UINT16> m_yscroll1;
-	required_shared_ptr<UINT16> m_videoram1;
-	required_shared_ptr<UINT16> m_videoram2;
-	required_shared_ptr<UINT16> m_colorram1;
-	required_shared_ptr<UINT16> m_colorram2;
-	required_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_paletteram;
-	optional_shared_ptr<UINT8> m_gx400_shared_ram;
+	required_shared_ptr<uint16_t> m_charram;
+	required_shared_ptr<uint16_t> m_xscroll1;
+	required_shared_ptr<uint16_t> m_xscroll2;
+	required_shared_ptr<uint16_t> m_yscroll2;
+	required_shared_ptr<uint16_t> m_yscroll1;
+	required_shared_ptr<uint16_t> m_videoram1;
+	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint16_t> m_colorram1;
+	required_shared_ptr<uint16_t> m_colorram2;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_paletteram;
+	optional_shared_ptr<uint8_t> m_gx400_shared_ram;
 
 	/* video-related */
 	tilemap_t *m_background;
@@ -55,18 +55,18 @@ public:
 	int       m_spriteram_words;
 	int       m_tilemap_flip;
 	int       m_flipscreen;
-	UINT8     m_irq_port_last;
-	UINT8     m_blank_tile[8*8];
-	UINT8     m_palette_lookup[32];
+	uint8_t     m_irq_port_last;
+	uint8_t     m_blank_tile[8*8];
+	uint8_t     m_palette_lookup[32];
 
 	/* misc */
 	int       m_irq_on;
 	int       m_irq1_on;
 	int       m_irq2_on;
 	int       m_irq4_on;
-	UINT16    m_selected_ip; /* Copied from WEC Le Mans 24 driver, explicity needed for Hyper Crash */
+	uint16_t    m_selected_ip; /* Copied from WEC Le Mans 24 driver, explicity needed for Hyper Crash */
 	int       m_gx400_irq1_cnt;
-	UINT8     m_frame_counter;
+	uint8_t     m_frame_counter;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -113,7 +113,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nemesis_interrupt);
 	INTERRUPT_GEN_MEMBER(blkpnthr_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);

@@ -18,8 +18,8 @@ public:
 	int        m_gfxbank;   // redclash only
 
 	/* misc */
-	UINT8      m_sraider_0x30;
-	UINT8      m_sraider_0x38;
+	uint8_t      m_sraider_0x30;
+	uint8_t      m_sraider_0x38;
 
 	DECLARE_READ8_MEMBER(sraider_sound_low_r);
 	DECLARE_READ8_MEMBER(sraider_sound_high_r);
@@ -39,8 +39,8 @@ public:
 	DECLARE_MACHINE_RESET(redclash);
 	DECLARE_VIDEO_START(redclash);
 	DECLARE_PALETTE_INIT(redclash);
-	UINT32 screen_update_sraider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sraider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sraider(screen_device &screen, bool state);
 	void screen_eof_redclash(screen_device &screen, bool state);
 	DECLARE_WRITE8_MEMBER( redclash_videoram_w );
@@ -55,10 +55,10 @@ public:
 	DECLARE_WRITE8_MEMBER( irqack_w );
 
 	/* sraider uses the zerohour star generator board */
-	void redclash_set_stars_enable(UINT8 on);
+	void redclash_set_stars_enable(uint8_t on);
 	void redclash_update_stars_state();
-	void redclash_set_stars_speed(UINT8 speed);
-	void redclash_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
+	void redclash_set_stars_speed(uint8_t speed);
+	void redclash_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t palette_offset, uint8_t sraider, uint8_t firstx, uint8_t lastx);
 	void redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void redclash_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

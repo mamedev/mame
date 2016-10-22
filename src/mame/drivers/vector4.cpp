@@ -30,7 +30,7 @@ public:
 	DECLARE_READ8_MEMBER(vector4_03_r);
 	DECLARE_WRITE8_MEMBER(vector4_02_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
@@ -49,7 +49,7 @@ READ8_MEMBER( vector4_state::vector4_03_r )
 
 READ8_MEMBER( vector4_state::vector4_02_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

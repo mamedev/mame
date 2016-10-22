@@ -604,7 +604,7 @@ ROM_END
 
 void crospang_state::tumblepb_gfx1_rearrange()
 {
-	UINT8 *rom = memregion("gfx1")->base();
+	uint8_t *rom = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();
 	int i;
 

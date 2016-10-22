@@ -91,7 +91,7 @@ void speedatk_state::machine_start()
 	save_item(NAME(m_coin_impulse));
 }
 
-UINT8 speedatk_state::iox_key_matrix_calc(UINT8 p_side)
+uint8_t speedatk_state::iox_key_matrix_calc(uint8_t p_side)
 {
 	static const char *const keynames[] = { "P1_ROW0", "P1_ROW1", "P2_ROW0", "P2_ROW1" };
 
@@ -134,8 +134,8 @@ READ8_MEMBER(speedatk_state::key_matrix_r)
 	/* both side checks */
 	if(m_mux_data == 1)
 	{
-		UINT8 p1_side = iox_key_matrix_calc(0);
-		UINT8 p2_side = iox_key_matrix_calc(2);
+		uint8_t p1_side = iox_key_matrix_calc(0);
+		uint8_t p2_side = iox_key_matrix_calc(2);
 
 		if(p1_side != 0)
 			return p1_side;

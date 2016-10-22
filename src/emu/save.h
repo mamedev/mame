@@ -62,7 +62,7 @@ class state_entry
 {
 public:
 	// construction/destruction
-	state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, UINT8 size, UINT32 count);
+	state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, uint8_t size, uint32_t count);
 
 	// helpers
 	void flip_data();
@@ -74,9 +74,9 @@ public:
 	std::string         m_module;               // module name
 	std::string         m_tag;                  // tag name
 	int                 m_index;                // index
-	UINT8               m_typesize;             // size of the raw data type
-	UINT32              m_typecount;            // number of items
-	UINT32              m_offset;               // offset within the final structure
+	uint8_t               m_typesize;             // size of the raw data type
+	uint32_t              m_typecount;            // number of items
+	uint32_t              m_offset;               // offset within the final structure
 };
 
 class save_manager
@@ -96,7 +96,7 @@ public:
 
 	// registration control
 	void allow_registration(bool allowed = true);
-	const char *indexed_item(int index, void *&base, UINT32 &valsize, UINT32 &valcount) const;
+	const char *indexed_item(int index, void *&base, uint32_t &valsize, uint32_t &valcount) const;
 
 	// function registration
 	void register_presave(save_prepost_delegate func);
@@ -107,7 +107,7 @@ public:
 	void dispatch_postload();
 
 	// generic memory registration
-	void save_memory(device_t *device, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount = 1);
+	void save_memory(device_t *device, const char *module, const char *tag, uint32_t index, const char *name, void *val, uint32_t valsize, uint32_t valcount = 1);
 
 	// templatized wrapper for general objects
 	template<typename _ItemType>
@@ -136,7 +136,7 @@ public:
 
 	// templatized wrapper for pointers
 	template<typename _ItemType>
-	void save_pointer(device_t *device, const char *module, const char *tag, int index, _ItemType *value, const char *valname, UINT32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, _ItemType *value, const char *valname, uint32_t count)
 	{
 		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
 		save_memory(device, module, tag, index, valname, value, sizeof(*value), count);
@@ -146,7 +146,7 @@ public:
 	template<typename _ItemType>
 	void save_item(_ItemType &value, const char *valname, int index = 0) { save_item(nullptr, "global", nullptr, index, value, valname); }
 	template<typename _ItemType>
-	void save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { save_pointer(nullptr, "global", nullptr, index, value, valname, count); }
+	void save_pointer(_ItemType *value, const char *valname, uint32_t count, int index = 0) { save_pointer(nullptr, "global", nullptr, index, value, valname, count); }
 
 	// file processing
 	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
@@ -155,9 +155,9 @@ public:
 
 private:
 	// internal helpers
-	UINT32 signature() const;
+	uint32_t signature() const;
 	void dump_registry() const;
-	static save_error validate_header(const UINT8 *header, const char *gamename, UINT32 signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
+	static save_error validate_header(const uint8_t *header, const char *gamename, uint32_t signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
 
 	// state callback item
 	class state_callback
@@ -183,14 +183,14 @@ private:
 // template specializations to enumerate the fundamental atomic types you are allowed to save
 ALLOW_SAVE_TYPE_AND_ARRAY(char)
 ALLOW_SAVE_TYPE          (bool); // std::vector<bool> may be packed internally
-ALLOW_SAVE_TYPE_AND_ARRAY(INT8)
-ALLOW_SAVE_TYPE_AND_ARRAY(UINT8)
-ALLOW_SAVE_TYPE_AND_ARRAY(INT16)
-ALLOW_SAVE_TYPE_AND_ARRAY(UINT16)
-ALLOW_SAVE_TYPE_AND_ARRAY(INT32)
-ALLOW_SAVE_TYPE_AND_ARRAY(UINT32)
-ALLOW_SAVE_TYPE_AND_ARRAY(INT64)
-ALLOW_SAVE_TYPE_AND_ARRAY(UINT64)
+ALLOW_SAVE_TYPE_AND_ARRAY(int8_t)
+ALLOW_SAVE_TYPE_AND_ARRAY(uint8_t)
+ALLOW_SAVE_TYPE_AND_ARRAY(int16_t)
+ALLOW_SAVE_TYPE_AND_ARRAY(uint16_t)
+ALLOW_SAVE_TYPE_AND_ARRAY(int32_t)
+ALLOW_SAVE_TYPE_AND_ARRAY(uint32_t)
+ALLOW_SAVE_TYPE_AND_ARRAY(int64_t)
+ALLOW_SAVE_TYPE_AND_ARRAY(uint64_t)
 ALLOW_SAVE_TYPE_AND_ARRAY(PAIR)
 ALLOW_SAVE_TYPE_AND_ARRAY(PAIR64)
 ALLOW_SAVE_TYPE_AND_ARRAY(float)

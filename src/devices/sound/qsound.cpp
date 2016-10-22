@@ -67,7 +67,7 @@ ROM_END
 //  qsound_device - constructor
 //-------------------------------------------------
 
-qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock, "qsound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_cpu(*this, "qsound"),
@@ -182,7 +182,7 @@ void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					}
 				}
 
-				INT8 sample = read_sample(elem.bank | elem.address);
+				int8_t sample = read_sample(elem.bank | elem.address);
 				*lmix++ += ((sample * elem.lvol * elem.vol) >> 14);
 				*rmix++ += ((sample * elem.rvol * elem.vol) >> 14);
 			}
@@ -222,7 +222,7 @@ READ8_MEMBER(qsound_device::qsound_r)
 }
 
 
-void qsound_device::write_data(UINT8 address, UINT16 data)
+void qsound_device::write_data(uint8_t address, uint16_t data)
 {
 	int ch = 0, reg;
 

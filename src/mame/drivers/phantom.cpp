@@ -75,7 +75,7 @@ protected:
 
 DRIVER_INIT_MEMBER(phantom_state, fphantom)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
 }
 

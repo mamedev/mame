@@ -35,8 +35,8 @@
 void midway_serial_pic_device::generate_serial_data(int upper)
 {
 	int year = atoi(machine().system().year), month = 12, day = 11;
-	UINT32 serial_number, temp;
-	UINT8 serial_digit[9];
+	uint32_t serial_number, temp;
+	uint8_t serial_digit[9];
 
 	serial_number = 123456;
 	serial_number += upper * 1000000;
@@ -112,7 +112,7 @@ const device_type MIDWAY_SERIAL_PIC = &device_creator<midway_serial_pic_device>;
 //  midway_serial_pic2_device - constructor
 //-------------------------------------------------
 
-midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MIDWAY_SERIAL_PIC2, "Midway Serial Pic", tag, owner, clock, "midway_serial_pic", __FILE__),
 	m_upper(0),
 	m_buff(0),
@@ -124,7 +124,7 @@ midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig
 	memset(m_data,0,sizeof(m_data));
 }
 
-midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_upper(0),
 	m_buff(0),
@@ -202,7 +202,7 @@ WRITE8_MEMBER(midway_serial_pic_device::write)
  *
  *************************************/
 
-static inline UINT8 make_bcd(UINT8 data)
+static inline uint8_t make_bcd(uint8_t data)
 {
 	return ((data / 10) << 4) | (data % 10);
 }
@@ -214,7 +214,7 @@ const device_type MIDWAY_SERIAL_PIC2 = &device_creator<midway_serial_pic2_device
 //  midway_serial_pic2_device - constructor
 //-------------------------------------------------
 
-midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	midway_serial_pic_device(mconfig, MIDWAY_SERIAL_PIC2, "Midway Serial Pic 2", tag, owner, clock, "midway_serial_pic2", __FILE__),
 	device_nvram_interface(mconfig, *this),
 	m_latch(0),
@@ -234,7 +234,7 @@ midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconf
 
 }
 
-midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	midway_serial_pic_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_nvram_interface(mconfig, *this),
 	m_latch(0),
@@ -296,7 +296,7 @@ void midway_serial_pic2_device::pic_register_state()
 
 
 
-void midway_serial_pic2_device::set_default_nvram(const UINT8 *nvram)
+void midway_serial_pic2_device::set_default_nvram(const uint8_t *nvram)
 {
 	memcpy(m_default_nvram, nvram, sizeof(m_default_nvram));
 }
@@ -304,7 +304,7 @@ void midway_serial_pic2_device::set_default_nvram(const UINT8 *nvram)
 
 READ8_MEMBER(midway_serial_pic2_device::status_r)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	/* if we're still holding the data ready bit high, do it */
 	if (m_latch & 0xf00)
@@ -323,7 +323,7 @@ READ8_MEMBER(midway_serial_pic2_device::status_r)
 
 READ8_MEMBER(midway_serial_pic2_device::read)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	/* PIC data register */
 	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", machine().describe_context(), m_index, m_total, m_latch);
@@ -558,7 +558,7 @@ enum
 	IOASIC_UARTCONTROL, /* 4: controls some UART behavior */
 	IOASIC_UARTOUT,     /* 5: UART output */
 	IOASIC_UARTIN,      /* 6: UART input */
-	IOASIC_UNKNOWN7,    /* 7: ??? */
+	IOASIC_COIN,        /* 7: triggered on coin insertion */
 	IOASIC_SOUNDCTL,    /* 8: sound communications control */
 	IOASIC_SOUNDOUT,    /* 9: sound output port */
 	IOASIC_SOUNDSTAT,   /* a: sound status port */
@@ -591,7 +591,7 @@ const device_type MIDWAY_IOASIC = &device_creator<midway_ioasic_device>;
 //  midway_serial_pic2_device - constructor
 //-------------------------------------------------
 
-midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, "Midway IOASIC", tag, owner, clock, "midway_ioasic", __FILE__),
 	m_has_dcs(0),
 	m_has_cage(0),
@@ -624,7 +624,7 @@ midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const 
 void midway_ioasic_device::device_start()
 //void midway_ioasic_init(running_machine &machine, int shuffle, int upper, int yearoffs, void (*irq_callback)(running_machine &, int))
 {
-	static const UINT8 shuffle_maps[][16] =
+	static const uint8_t shuffle_maps[][16] =
 	{
 		{ 0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf },    /* WarGods, WG3DH, SFRush, MK4 */
 		{ 0x4,0x5,0x6,0x7,0xb,0xa,0x9,0x8,0x3,0x2,0x1,0x0,0xf,0xe,0xd,0xc },    /* Blitz, Blitz99 */
@@ -700,9 +700,9 @@ void midway_ioasic_device::ioasic_reset()
 
 void midway_ioasic_device::update_ioasic_irq()
 {
-	UINT16 fifo_state = fifo_status_r(machine().driver_data()->generic_space(),0);
-	UINT16 irqbits = 0x2000;
-	UINT8 new_state;
+	uint16_t fifo_state = fifo_status_r(machine().driver_data()->generic_space(),0);
+	uint16_t irqbits = 0x2000;
+	uint8_t new_state;
 
 	irqbits |= m_sound_irq_state;
 	if (m_reg[IOASIC_UARTIN] & 0x1000)
@@ -767,7 +767,7 @@ WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_output_full)
 
 READ16_MEMBER(midway_ioasic_device::fifo_r)
 {
-	UINT16 result = 0;
+	uint16_t result = 0;
 
 	/* we can only read data if there's some to read! */
 	if (m_fifo_bytes != 0)
@@ -802,7 +802,7 @@ READ16_MEMBER(midway_ioasic_device::fifo_r)
 
 READ16_MEMBER(midway_ioasic_device::fifo_status_r)
 {
-	UINT16 result = 0;
+	uint16_t result = 0;
 
 	if (m_fifo_bytes == 0 && !m_force_fifo_full)
 		result |= 0x08;
@@ -846,7 +846,7 @@ WRITE_LINE_MEMBER(midway_ioasic_device::fifo_reset_w)
 }
 
 
-void midway_ioasic_device::fifo_w(UINT16 data)
+void midway_ioasic_device::fifo_w(uint16_t data)
 {
 	/* if we have room, add it to the FIFO buffer */
 	if (m_fifo_bytes < FIFO_SIZE)
@@ -866,13 +866,53 @@ void midway_ioasic_device::fifo_w(UINT16 data)
 }
 
 
-void midway_ioasic_device::fifo_full_w(UINT16 data)
+void midway_ioasic_device::fifo_full_w(uint16_t data)
 {
 	if (LOG_FIFO)
 		logerror("fifo_full_w(%04X)\n", data);
 	m_force_fifo_full = 1;
 	update_ioasic_irq();
 	m_dcs->fifo_notify(m_fifo_bytes, FIFO_SIZE);
+}
+
+
+/* need to check if device callback is required instead of hardcode here */
+void midway_ioasic_device::output_w(uint32_t data)
+{
+	/* two writes in pairs. flag off first, on second. arg remains the same. */
+	uint8_t flag = (data >> 8) & 0x8;
+	uint8_t op = (data >> 8) & 0x7;
+	uint8_t arg = data & 0xFF;
+	
+	switch (op)
+	{
+		default:
+			logerror("Unknown output (%02X) = %02X\n", flag | op, arg);
+			break;
+
+		case 0x0:
+			if (flag)
+			{
+				machine().output().set_value("wheel", arg); // wheel motor delta. signed byte.
+			}
+			break;
+			
+		case 0x4:
+			if (flag)
+			{
+				for (uint8_t bit = 0; bit < 8; bit++)
+					machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
+			}
+			break;
+			
+		case 0x5:
+			if (flag)
+			{
+				for (uint8_t bit = 0; bit < 8; bit++)
+					machine().output().set_lamp_value(8 + bit, (arg >> bit) & 0x1);
+			}
+			break;
+	}
 }
 
 
@@ -885,7 +925,7 @@ void midway_ioasic_device::fifo_full_w(UINT16 data)
 
 READ32_MEMBER( midway_ioasic_device::packed_r )
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (ACCESSING_BITS_0_15)
 		result |= read(space, offset*2, 0x0000ffff) & 0xffff;
 	if (ACCESSING_BITS_16_31)
@@ -896,7 +936,7 @@ READ32_MEMBER( midway_ioasic_device::packed_r )
 
 READ32_MEMBER( midway_ioasic_device::read )
 {
-	UINT32 result;
+	uint32_t result;
 
 	offset = m_shuffle_active ? m_shuffle_map[offset & 15] : offset;
 	result = m_reg[offset];
@@ -960,7 +1000,7 @@ READ32_MEMBER( midway_ioasic_device::read )
 				result = m_cage->main_r();
 			else
 			{
-				static UINT16 val = 0;
+				static uint16_t val = 0;
 				result = val = ~val;
 			}
 			break;
@@ -991,7 +1031,7 @@ WRITE32_MEMBER( midway_ioasic_device::packed_w )
 
 WRITE32_MEMBER( midway_ioasic_device::write )
 {
-	UINT32 oldreg, newreg;
+	uint32_t oldreg, newreg;
 
 	offset = m_shuffle_active ? m_shuffle_map[offset & 15] : offset;
 	oldreg = m_reg[offset];
@@ -1071,6 +1111,10 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 				midway_serial_pic2_device::write(space, 0, newreg ^ 0x05);
 			else
 				midway_serial_pic2_device::write(space, 0, newreg);
+			break;
+			
+		case IOASIC_PICIN:
+			output_w(data);
 			break;
 
 		case IOASIC_INTCTL:

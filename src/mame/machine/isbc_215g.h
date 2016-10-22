@@ -12,7 +12,7 @@
 class isbc_215g_device : public device_t
 {
 public:
-	isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	const tiny_rom_entry *device_rom_region() const override;
@@ -28,7 +28,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(isbx_irq_10_w);
 	DECLARE_WRITE_LINE_MEMBER(isbx_irq_11_w);
 
-	static void static_set_wakeup_addr(device_t &device, UINT32 wakeup) { downcast<isbc_215g_device &>(device).m_wakeup = wakeup; }
+	static void static_set_wakeup_addr(device_t &device, uint32_t wakeup) { downcast<isbc_215g_device &>(device).m_wakeup = wakeup; }
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_215g_device &>(device).m_maincpu_tag = maincpu_tag; }
 	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<isbc_215g_device &>(device).m_out_irq_func.set_callback(object); }
 
@@ -38,8 +38,8 @@ protected:
 
 private:
 	void find_sector();
-	UINT16 read_sector();
-	bool write_sector(UINT16 data);
+	uint16_t read_sector();
+	bool write_sector(uint16_t data);
 
 	required_device<i8089_device> m_dmac;
 	required_device<harddisk_image_device> m_hdd0;
@@ -50,13 +50,13 @@ private:
 	devcb_write_line m_out_irq_func;
 
 	int m_reset;
-	UINT16 m_wakeup, m_secoffset, m_sector[512];
+	uint16_t m_wakeup, m_secoffset, m_sector[512];
 	const char *m_maincpu_tag;
 	address_space *m_maincpu_mem;
-	UINT32 m_lba[2];
-	UINT16 m_cyl[2];
-	UINT8 m_idcompare[4], m_drive, m_head, m_index;
-	INT8 m_format_bytes;
+	uint32_t m_lba[2];
+	uint16_t m_cyl[2];
+	uint8_t m_idcompare[4], m_drive, m_head, m_index;
+	int8_t m_format_bytes;
 	bool m_idfound, m_stepdir, m_wrgate, m_rdgate, m_amsrch;
 
 	bool m_isbx_irq[4], m_fdctc, m_step, m_format;

@@ -48,15 +48,15 @@ public:
 	virtual bool open_output(const char *devname) override;
 	virtual void close() override;
 	virtual bool poll() override;
-	virtual int read(UINT8 *pOut) override;
-	virtual void write(UINT8 data) override;
+	virtual int read(uint8_t *pOut) override;
+	virtual void write(uint8_t data) override;
 
 private:
 	PortMidiStream *pmStream;
 	PmEvent rx_evBuf[RX_EVENT_BUF_SIZE];
-	UINT8 xmit_in[4]; // Pm_Messages mean we can at most have 3 residue bytes
+	uint8_t xmit_in[4]; // Pm_Messages mean we can at most have 3 residue bytes
 	int xmit_cnt;
-	UINT8 last_status;
+	uint8_t last_status;
 	bool rx_sysex;
 };
 
@@ -219,7 +219,7 @@ bool osd_midi_device_pm::poll()
 	return (chk == pmGotData) ? true : false;
 }
 
-int osd_midi_device_pm::read(UINT8 *pOut)
+int osd_midi_device_pm::read(uint8_t *pOut)
 {
 	int msgsRead = Pm_Read(pmStream, rx_evBuf, RX_EVENT_BUF_SIZE);
 	int bytesOut = 0;
@@ -231,7 +231,7 @@ int osd_midi_device_pm::read(UINT8 *pOut)
 
 	for (int msg = 0; msg < msgsRead; msg++)
 	{
-		UINT8 status = Pm_MessageStatus(rx_evBuf[msg].message);
+		uint8_t status = Pm_MessageStatus(rx_evBuf[msg].message);
 
 		if (rx_sysex)
 		{
@@ -258,7 +258,7 @@ int osd_midi_device_pm::read(UINT8 *pOut)
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					UINT8 byte = rx_evBuf[msg].message & 0xff;
+					uint8_t byte = rx_evBuf[msg].message & 0xff;
 					*pOut++ = byte;
 					bytesOut++;
 					if (byte == MIDI_EOX)
@@ -289,7 +289,7 @@ int osd_midi_device_pm::read(UINT8 *pOut)
 							*pOut++ = status;   // this should be OK: the shortest legal sysex is F0 tt dd F7, I believe
 							*pOut++ = (rx_evBuf[msg].message>>8) & 0xff;
 							*pOut++ = (rx_evBuf[msg].message>>16) & 0xff;
-							UINT8 last = *pOut++ = (rx_evBuf[msg].message>>24) & 0xff;
+							uint8_t last = *pOut++ = (rx_evBuf[msg].message>>24) & 0xff;
 							bytesOut += 4;
 							rx_sysex = (last != MIDI_EOX);
 							break;
@@ -327,7 +327,7 @@ int osd_midi_device_pm::read(UINT8 *pOut)
 	return bytesOut;
 }
 
-void osd_midi_device_pm::write(UINT8 data)
+void osd_midi_device_pm::write(uint8_t data)
 {
 	int bytes_needed = 0;
 	PmEvent ev;

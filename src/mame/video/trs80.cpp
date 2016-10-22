@@ -53,12 +53,12 @@ void trs80_state::video_start()
 
 
 /* 7 or 8-bit video, 32/64 characters per line = trs80, trs80l2, sys80 */
-UINT32 trs80_state::screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t trs80_state::screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,gfxbit;
-	UINT16 sy=0,ma=0,x;
-	UINT8 cols = BIT(m_mode, 0) ? 32 : 64;
-	UINT8 skip = BIT(m_mode, 0) ? 2 : 1;
+	uint8_t y,ra,chr,gfx,gfxbit;
+	uint16_t sy=0,ma=0,x;
+	uint8_t cols = BIT(m_mode, 0) ? 32 : 64;
+	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
 
 	if (m_mode != m_size_store)
 	{
@@ -70,7 +70,7 @@ UINT32 trs80_state::screen_update_trs80(screen_device &screen, bitmap_ind16 &bit
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
@@ -124,16 +124,16 @@ UINT32 trs80_state::screen_update_trs80(screen_device &screen, bitmap_ind16 &bit
 }
 
 /* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4. */
-UINT32 trs80_state::screen_update_trs80m4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t trs80_state::screen_update_trs80m4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,gfxbit;
-	UINT16 sy=0,ma=0,x;
-	UINT8 skip=1;
-	UINT8 cols = BIT(m_mode, 2) ? 80 : 64;
-	UINT8 rows = BIT(m_mode, 2) ? 24 : 16;
-	UINT8 lines = BIT(m_mode, 2) ? 10 : 12;
-	UINT8 s_cols = cols;
-	UINT8 mask = BIT(m_mode, 5) ? 0xff : 0xbf;  /* Select Japanese or extended chars */
+	uint8_t y,ra,chr,gfx,gfxbit;
+	uint16_t sy=0,ma=0,x;
+	uint8_t skip=1;
+	uint8_t cols = BIT(m_mode, 2) ? 80 : 64;
+	uint8_t rows = BIT(m_mode, 2) ? 24 : 16;
+	uint8_t lines = BIT(m_mode, 2) ? 10 : 12;
+	uint8_t s_cols = cols;
+	uint8_t mask = BIT(m_mode, 5) ? 0xff : 0xbf;  /* Select Japanese or extended chars */
 
 	if (m_mode & 1)
 	{
@@ -151,7 +151,7 @@ UINT32 trs80_state::screen_update_trs80m4(screen_device &screen, bitmap_ind16 &b
 	{
 		for (ra = 0; ra < lines; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + cols; x+=skip)
 			{
@@ -218,12 +218,12 @@ UINT32 trs80_state::screen_update_trs80m4(screen_device &screen, bitmap_ind16 &b
 }
 
 /* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */
-UINT32 trs80_state::screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t trs80_state::screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,gfxbit;
-	UINT16 sy=0,ma=0,x;
-	UINT8 cols = BIT(m_mode, 0) ? 32 : 64;
-	UINT8 skip = BIT(m_mode, 0) ? 2 : 1;
+	uint8_t y,ra,chr,gfx,gfxbit;
+	uint16_t sy=0,ma=0,x;
+	uint8_t cols = BIT(m_mode, 0) ? 32 : 64;
+	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
 
 	if (m_mode != m_size_store)
 	{
@@ -235,7 +235,7 @@ UINT32 trs80_state::screen_update_ht1080z(screen_device &screen, bitmap_ind16 &b
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
@@ -276,12 +276,12 @@ UINT32 trs80_state::screen_update_ht1080z(screen_device &screen, bitmap_ind16 &b
 }
 
 /* 8-bit video, 64/80 characters per line = lnw80 */
-UINT32 trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
-	UINT8 chr,gfx,gfxbit,bg=7,fg=0;
-	UINT16 sy=0,ma=0,x,y,ra;
-	UINT8 cols = BIT(m_mode, 4) ? 80 : 64;
+	static const uint16_t rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
+	uint8_t chr,gfx,gfxbit,bg=7,fg=0;
+	uint16_t sy=0,ma=0,x,y,ra;
+	uint8_t cols = BIT(m_mode, 4) ? 80 : 64;
 
 	/* Although the OS can select 32-character mode, it is not supported by hardware */
 	if (m_mode != m_size_store)
@@ -303,7 +303,7 @@ UINT32 trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bit
 			{
 				for (ra = 0; ra < 12; ra++)
 				{
-					UINT16 *p = &bitmap.pix16(sy++);
+					uint16_t *p = &bitmap.pix16(sy++);
 
 					for (x = ma; x < ma + 64; x++)
 					{
@@ -348,7 +348,7 @@ UINT32 trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bit
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					UINT16 *p = &bitmap.pix16(sy++);
+					uint16_t *p = &bitmap.pix16(sy++);
 
 					for (x = 0; x < 0x40; x++)
 					{
@@ -384,7 +384,7 @@ UINT32 trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bit
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					UINT16 *p = &bitmap.pix16(sy++);
+					uint16_t *p = &bitmap.pix16(sy++);
 
 					for (x = 0; x < 0x40; x++)
 					{
@@ -411,7 +411,7 @@ UINT32 trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bit
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					UINT16 *p = &bitmap.pix16(sy++);
+					uint16_t *p = &bitmap.pix16(sy++);
 
 					for (x = 0; x < 0x40; x++)
 					{
@@ -448,12 +448,12 @@ UINT32 trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bit
 }
 
 /* lores characters are in the character generator. Each character is 8x16. */
-UINT32 trs80_state::screen_update_radionic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t trs80_state::screen_update_radionic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
-	UINT8 cols = BIT(m_mode, 0) ? 32 : 64;
-	UINT8 skip = BIT(m_mode, 0) ? 2 : 1;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
+	uint8_t cols = BIT(m_mode, 0) ? 32 : 64;
+	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
 
 	if (m_mode != m_size_store)
 	{
@@ -465,7 +465,7 @@ UINT32 trs80_state::screen_update_radionic(screen_device &screen, bitmap_ind16 &
 	{
 		for (ra = 0; ra < 16; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
@@ -490,13 +490,13 @@ UINT32 trs80_state::screen_update_radionic(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-UINT32 trs80_state::screen_update_meritum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t trs80_state::screen_update_meritum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 /* lores characters are in the character generator. Each character is 6x11. */
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
-	UINT8 cols = BIT(m_mode, 0) ? 32 : 64;
-	UINT8 skip = BIT(m_mode, 0) ? 2 : 1;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
+	uint8_t cols = BIT(m_mode, 0) ? 32 : 64;
+	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
 
 	if (m_mode != m_size_store)
 	{
@@ -508,7 +508,7 @@ UINT32 trs80_state::screen_update_meritum(screen_device &screen, bitmap_ind16 &b
 	{
 		for (ra = 0; ra < 11; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{

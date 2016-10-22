@@ -42,34 +42,34 @@ public:
 	int m_system_status;
 	int m_fdc_interrupt_code;
 	int m_interrupt_counter;
-	UINT8 m_banks[4];
+	uint8_t m_banks[4];
 	unsigned char m_bank_force;
-	UINT8 m_timer_irq_flag;
-	UINT8 m_nmi_flag;
-	UINT8 m_printer_command;
-	UINT8 m_printer_data;
-	UINT8 m_printer_status;
-	INT16 m_printer_headpos;
-	UINT16 m_kb_scan_row;
-	UINT8 m_mcu_keyboard_data[16];
-	UINT8 m_mcu_transmit_reset_seq;
-	UINT8 m_mcu_transmit_count;
-	UINT8 m_mcu_selected;
-	UINT8 m_mcu_buffer;
-	UINT8 m_mcu_prev;
+	uint8_t m_timer_irq_flag;
+	uint8_t m_nmi_flag;
+	uint8_t m_printer_command;
+	uint8_t m_printer_data;
+	uint8_t m_printer_status;
+	int16_t m_printer_headpos;
+	uint16_t m_kb_scan_row;
+	uint8_t m_mcu_keyboard_data[16];
+	uint8_t m_mcu_transmit_reset_seq;
+	uint8_t m_mcu_transmit_count;
+	uint8_t m_mcu_selected;
+	uint8_t m_mcu_buffer;
+	uint8_t m_mcu_prev;
 	unsigned int m_roller_ram_addr;
 	unsigned short m_roller_ram_offset;
 	unsigned char m_vdu_video_control_register;
-	UINT8 m_printer_serial;  // value if shift/store data pin
-	UINT8 m_printer_shift;  // state of shift register
-	UINT8 m_printer_shift_output;  // output presented to the paper feed motor and print head motor
-	UINT8 m_head_motor_state;
-	UINT8 m_linefeed_motor_state;
-	UINT16 m_printer_pins;
-	UINT8 m_printer_p2;  // MCU port P2 state
-	UINT32 m_paper_feed;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
+	uint8_t m_printer_serial;  // value if shift/store data pin
+	uint8_t m_printer_shift;  // state of shift register
+	uint8_t m_printer_shift_output;  // output presented to the paper feed motor and print head motor
+	uint8_t m_head_motor_state;
+	uint8_t m_linefeed_motor_state;
+	uint16_t m_printer_pins;
+	uint8_t m_printer_p2;  // MCU port P2 state
+	uint32_t m_paper_feed;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
 	std::unique_ptr<bitmap_ind16> m_prn_output;
-	UINT8 m_printer_p2_prev;
+	uint8_t m_printer_p2_prev;
 	emu_timer* m_prn_stepper;
 	emu_timer* m_prn_pins;
 	DECLARE_READ8_MEMBER(pcw_keyboard_r);
@@ -103,14 +103,14 @@ public:
 	DECLARE_READ8_MEMBER(mcu_kb_t0_r);
 	DECLARE_READ8_MEMBER(pcw9512_parallel_r);
 	DECLARE_WRITE8_MEMBER(pcw9512_parallel_w);
-	void mcu_transmit_serial(UINT8 bit);
+	void mcu_transmit_serial(uint8_t bit);
 	DECLARE_DRIVER_INIT(pcw);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pcw);
-	UINT32 screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pcw_timer_pulse);
 	TIMER_CALLBACK_MEMBER(pcw_stepper_callback);
 	TIMER_CALLBACK_MEMBER(pcw_pins_callback);
@@ -127,14 +127,14 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	inline void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	inline void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void pcw_update_interrupt_counter();
 	void pcw_update_irqs();
 	void pcw_update_read_memory_block(int block, int bank);
 	void pcw_update_write_memory_block(int block, int bank);
 	void pcw_update_mem(int block, int data);
 	int pcw_get_sys_status();
-	void pcw_printer_fire_pins(UINT16 pins);
+	void pcw_printer_fire_pins(uint16_t pins);
 };
 
 #endif /* PCW_H_ */

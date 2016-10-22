@@ -35,8 +35,8 @@ public:
 	std::string get_category() { return ini_index[c_file].second[c_cat].first; }
 	size_t total() { return ini_index.size(); }
 	size_t cat_total() { return ini_index[c_file].second.size(); }
-	UINT16 &cur_file() { return c_file; }
-	UINT16 &cur_cat() { return c_cat; }
+	uint16_t &cur_file() { return c_file; }
+	uint16_t &cur_cat() { return c_cat; }
 
 	// load games from category
 	void load_ini_category(std::vector<int> &temp_filter);
@@ -53,7 +53,7 @@ private:
 	using categoryindex = std::vector<std::pair<std::string, long>>;
 
 	// files indices
-	static UINT16 c_file, c_cat;
+	static uint16_t c_file, c_cat;
 	std::vector<std::pair<std::string, categoryindex>> ini_index;
 
 	// init category index

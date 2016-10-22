@@ -102,7 +102,7 @@ void dragon_alpha_state::device_reset(void)
 //  modem_r
 //-------------------------------------------------
 
-UINT8 dragon_alpha_state::modem_r(offs_t offset)
+uint8_t dragon_alpha_state::modem_r(offs_t offset)
 {
 	return 0xFF;
 }
@@ -113,7 +113,7 @@ UINT8 dragon_alpha_state::modem_r(offs_t offset)
 //  modem_w
 //-------------------------------------------------
 
-void dragon_alpha_state::modem_w(offs_t offset, UINT8 data)
+void dragon_alpha_state::modem_w(offs_t offset, uint8_t data)
 {
 }
 
@@ -129,7 +129,7 @@ void dragon_alpha_state::modem_w(offs_t offset, UINT8 data)
 
 READ8_MEMBER( dragon_alpha_state::ff20_read )
 {
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 
 	switch(offset & 0x0f)
 	{
@@ -220,7 +220,7 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 
 WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
 {
-	UINT8 ddr = ~m_pia_2->port_b_z_mask();
+	uint8_t ddr = ~m_pia_2->port_b_z_mask();
 
 	/* If bit 2 of the pia2 ddra is 1 then this pin is an output so use it */
 	/* to control the paging of the boot and basic roms */

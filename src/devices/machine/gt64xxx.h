@@ -173,14 +173,14 @@
 struct galileo_timer
 {
 	emu_timer *     timer;
-	UINT32          count;
-	UINT8           active;
+	uint32_t          count;
+	uint8_t           active;
 };
 
 struct galileo_addr_map
 {
-	UINT32 low_addr;
-	UINT32 high_addr;
+	uint32_t low_addr;
+	uint32_t high_addr;
 	address_space* space;
 	galileo_addr_map() : low_addr(0xffffffff), high_addr(0x0) {}
 };
@@ -196,14 +196,14 @@ struct galileo_device_map
 
 class gt64xxx_device : public pci_host_device {
 public:
-	gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void reset_all_mappings() override;
-	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	void set_cpu_tag(const char *tag) { cpu_tag = tag;}
-	void set_clock(const UINT32 clock) {m_clock = clock;}
+	void set_clock(const uint32_t clock) {m_clock = clock;}
 	void set_be(const int be) {m_be = be;}
 	void set_autoconfig(const int autoconfig) {m_autoconfig = autoconfig;}
 	void set_irq_num(const int irq_num) {m_irq_num = irq_num;}
@@ -255,16 +255,16 @@ protected:
 private:
 	mips3_device *m_cpu;
 	const char *cpu_tag;
-	UINT32 m_clock;
+	uint32_t m_clock;
 	int m_be, m_autoconfig;
 	int m_irq_num;
 
 	int m_pci_stall_state;
 	int m_retry_count;
 	int m_pci_cpu_stalled;
-	UINT32 m_cpu_stalled_offset;
-	UINT32 m_cpu_stalled_data;
-	UINT32 m_cpu_stalled_mem_mask;
+	uint32_t m_cpu_stalled_offset;
+	uint32_t m_cpu_stalled_data;
+	uint32_t m_cpu_stalled_mem_mask;
 
 	address_space_config m_mem_config, m_io_config;
 
@@ -275,19 +275,19 @@ private:
 
 	void map_cpu_space();
 
-	UINT32 m_prev_addr;
+	uint32_t m_prev_addr;
 	/* raw register data */
-	UINT32          m_reg[0xd00/4];
+	uint32_t          m_reg[0xd00/4];
 
 	/* timer info */
 	galileo_timer   m_timer[4];
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
 	/* DMA info */
-	INT8            m_dma_active;
+	int8_t            m_dma_active;
 
 	// Ram
-	std::vector<UINT32> m_ram[4];
+	std::vector<uint32_t> m_ram[4];
 
 	// Chip Select
 	galileo_device_map m_cs_map[4];
@@ -308,7 +308,7 @@ private:
 	galileo_addr_map dma_addr_map[proc_addr_bank::ADDR_NUM];
 	int dma_fetch_next(address_space &space, int which);
 	TIMER_CALLBACK_MEMBER(perform_dma);
-	address_space* dma_decode_address(UINT32 &addr);
+	address_space* dma_decode_address(uint32_t &addr);
 
 };
 

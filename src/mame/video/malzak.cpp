@@ -18,7 +18,7 @@
 #include "video/saa5050.h"
 #include "includes/malzak.h"
 
-UINT32 malzak_state::screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t malzak_state::screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int sx, sy;

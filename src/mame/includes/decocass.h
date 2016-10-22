@@ -56,14 +56,14 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch2;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_rambase;
-	required_shared_ptr<UINT8> m_charram;
-	required_shared_ptr<UINT8> m_fgvideoram;
-	required_shared_ptr<UINT8> m_colorram;
-	UINT8 *   m_bgvideoram; /* shares bits D0-3 with tileram! */
-	required_shared_ptr<UINT8> m_tileram;
-	required_shared_ptr<UINT8> m_objectram;
-	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<uint8_t> m_rambase;
+	required_shared_ptr<uint8_t> m_charram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	uint8_t *   m_bgvideoram; /* shares bits D0-3 with tileram! */
+	required_shared_ptr<uint8_t> m_tileram;
+	required_shared_ptr<uint8_t> m_objectram;
+	required_shared_ptr<uint8_t> m_paletteram;
 
 	size_t    m_bgvideoram_size;
 
@@ -71,38 +71,38 @@ public:
 	tilemap_t   *m_fg_tilemap;
 	tilemap_t   *m_bg_tilemap_l;
 	tilemap_t   *m_bg_tilemap_r;
-	UINT8     m_empty_tile[16*16];
-	INT32     m_watchdog_count;
-	INT32     m_watchdog_flip;
-	INT32     m_color_missiles;
-	INT32     m_color_center_bot;
-	INT32     m_mode_set;
-	INT32     m_back_h_shift;
-	INT32     m_back_vl_shift;
-	INT32     m_back_vr_shift;
-	INT32     m_part_h_shift;
-	INT32     m_part_v_shift;
-	INT32     m_center_h_shift_space;
-	INT32     m_center_v_shift;
+	uint8_t     m_empty_tile[16*16];
+	int32_t     m_watchdog_count;
+	int32_t     m_watchdog_flip;
+	int32_t     m_color_missiles;
+	int32_t     m_color_center_bot;
+	int32_t     m_mode_set;
+	int32_t     m_back_h_shift;
+	int32_t     m_back_vl_shift;
+	int32_t     m_back_vr_shift;
+	int32_t     m_part_h_shift;
+	int32_t     m_part_v_shift;
+	int32_t     m_center_h_shift_space;
+	int32_t     m_center_v_shift;
 	rectangle m_bg_tilemap_l_clip;
 	rectangle m_bg_tilemap_r_clip;
 
 	/* sound-related */
-	UINT8     m_sound_ack;  /* sound latches, ACK status bits and NMI timer */
-	UINT8     m_audio_nmi_enabled;
-	UINT8     m_audio_nmi_state;
+	uint8_t     m_sound_ack;  /* sound latches, ACK status bits and NMI timer */
+	uint8_t     m_audio_nmi_enabled;
+	uint8_t     m_audio_nmi_state;
 
 	/* misc */
-	INT32     m_firsttime;
-	UINT8     m_latch1;
-	UINT8     m_decocass_reset;
-	INT32     m_de0091_enable;  /* DE-0091xx daughter board enable */
-	UINT8     m_quadrature_decoder[4];  /* four inputs from the quadrature decoder (H1, V1, H2, V2) */
+	int32_t     m_firsttime;
+	uint8_t     m_latch1;
+	uint8_t     m_decocass_reset;
+	int32_t     m_de0091_enable;  /* DE-0091xx daughter board enable */
+	uint8_t     m_quadrature_decoder[4];  /* four inputs from the quadrature decoder (H1, V1, H2, V2) */
 	int       m_showmsg;        // for debugging purposes
 
 	/* i8041 */
-	UINT8     m_i8041_p1;
-	UINT8     m_i8041_p2;
+	uint8_t     m_i8041_p1;
+	uint8_t     m_i8041_p2;
 	int       m_i8041_p1_write_latch;
 	int       m_i8041_p1_read_latch;
 	int       m_i8041_p2_write_latch;
@@ -113,29 +113,29 @@ public:
 	write8_delegate   m_dongle_w;
 
 	/* dongle type #1 */
-	UINT32    m_type1_inmap;
-	UINT32    m_type1_outmap;
+	uint32_t    m_type1_inmap;
+	uint32_t    m_type1_outmap;
 
 	/* dongle type #2: status of the latches */
-	INT32     m_type2_d2_latch; /* latched 8041-STATUS D2 value */
-	INT32     m_type2_xx_latch; /* latched value (D7-4 == 0xc0) ? 1 : 0 */
-	INT32     m_type2_promaddr; /* latched PROM address A0-A7 */
+	int32_t     m_type2_d2_latch; /* latched 8041-STATUS D2 value */
+	int32_t     m_type2_xx_latch; /* latched value (D7-4 == 0xc0) ? 1 : 0 */
+	int32_t     m_type2_promaddr; /* latched PROM address A0-A7 */
 
 	/* dongle type #3: status and patches */
-	INT32     m_type3_ctrs;     /* 12 bit counter stage */
-	INT32     m_type3_d0_latch; /* latched 8041-D0 value */
-	INT32     m_type3_pal_19;       /* latched 1 for PAL input pin-19 */
-	INT32     m_type3_swap;
+	int32_t     m_type3_ctrs;     /* 12 bit counter stage */
+	int32_t     m_type3_d0_latch; /* latched 8041-D0 value */
+	int32_t     m_type3_pal_19;       /* latched 1 for PAL input pin-19 */
+	int32_t     m_type3_swap;
 
 	/* dongle type #4: status */
-	INT32     m_type4_ctrs;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
-	INT32     m_type4_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
+	int32_t     m_type4_ctrs;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
+	int32_t     m_type4_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
 
 	/* dongle type #5: status */
-	INT32     m_type5_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
+	int32_t     m_type5_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
 
 	/* DS Telejan */
-	UINT8     m_mux_data;
+	uint8_t     m_mux_data;
 
 	DECLARE_DRIVER_INIT(decocass);
 	DECLARE_DRIVER_INIT(decocrom);
@@ -184,7 +184,7 @@ public:
 	DECLARE_MACHINE_RESET(cflyball);
 	DECLARE_MACHINE_RESET(cmanhat);
 	DECLARE_MACHINE_RESET(cocean1a); /* 10 */
-	UINT32 screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(decocass_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(decocass_sound_command_w);
 	DECLARE_READ8_MEMBER( decocass_sound_command_main_r );
@@ -258,17 +258,17 @@ private:
 	DECLARE_WRITE8_MEMBER(decocass_type5_w);
 	DECLARE_READ8_MEMBER(decocass_nodong_r);
 
-	UINT8* m_type1_map;
+	uint8_t* m_type1_map;
 	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mark_bg_tile_dirty(offs_t offset);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int color,
 					int sprite_y_adjust, int sprite_y_adjust_flip_screen,
-					UINT8 *sprite_ram, int interleave);
+					uint8_t *sprite_ram, int interleave);
 
 	void draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect,
 					int missile_y_adjust, int missile_y_adjust_flip_screen,
-					UINT8 *missile_ram, int interleave);
-	void decocass_fno( offs_t offset, UINT8 data );
+					uint8_t *missile_ram, int interleave);
+	void decocass_fno( offs_t offset, uint8_t data );
 };

@@ -73,8 +73,8 @@ public:
 	};
 
 
-	h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	void set_info(int tgr_count, int tbr_count, const char *intc, int irq_base);
 
@@ -95,11 +95,11 @@ public:
 	DECLARE_READ16_MEMBER(tbr_r);
 	DECLARE_WRITE16_MEMBER(tbr_w);
 
-	UINT64 internal_update(UINT64 current_time);
-	void set_ier(UINT8 value);
+	uint64_t internal_update(uint64_t current_time);
+	void set_ier(uint8_t value);
 	void set_enable(bool enable);
-	void tisr_w(int offset, UINT8 data);
-	UINT8 tisr_r(int offset) const;
+	void tisr_w(int offset, uint8_t data);
+	uint8_t tisr_r(int offset) const;
 
 protected:
 	required_device<h8_device> cpu;
@@ -107,32 +107,32 @@ protected:
 	h8_intc_device *intc;
 	const char *chain_tag, *intc_tag;
 	int interrupt[6];
-	UINT8 tier_mask;
+	uint8_t tier_mask;
 
 	int tgr_count, tbr_count;
 	int tgr_clearing;
-	UINT8 tcr, tier, ier, isr;
+	uint8_t tcr, tier, ier, isr;
 	int clock_type, clock_divider;
-	UINT16 tcnt, tgr[6];
-	UINT64 last_clock_update, event_time;
-	UINT32 phase, counter_cycle;
+	uint16_t tcnt, tgr[6];
+	uint64_t last_clock_update, event_time;
+	uint32_t phase, counter_cycle;
 	bool counter_incrementing;
 	bool channel_active;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void update_counter(UINT64 cur_time = 0);
-	void recalc_event(UINT64 cur_time = 0);
+	void update_counter(uint64_t cur_time = 0);
+	void recalc_event(uint64_t cur_time = 0);
 	virtual void tcr_update();
 	virtual void tier_update();
-	virtual void isr_update(UINT8 value);
-	virtual UINT8 isr_to_sr() const;
+	virtual void isr_update(uint8_t value);
+	virtual uint8_t isr_to_sr() const;
 };
 
 class h8h_timer16_channel_device : public h8_timer16_channel_device {
 public:
-	h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~h8h_timer16_channel_device();
 
 	void set_info(int tgr_count, int tbr_count, const char *intc, int irq_base);
@@ -140,16 +140,16 @@ public:
 protected:
 	virtual void tcr_update() override;
 	virtual void tier_update() override;
-	virtual void isr_update(UINT8 value) override;
-	virtual UINT8 isr_to_sr() const override;
+	virtual void isr_update(uint8_t value) override;
+	virtual uint8_t isr_to_sr() const override;
 };
 
 class h8s_timer16_channel_device : public h8_timer16_channel_device {
 public:
-	h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~h8s_timer16_channel_device();
 
-	void set_info(int tgr_count, UINT8 _tier_mask, const char *intc, int irq_base,
+	void set_info(int tgr_count, uint8_t _tier_mask, const char *intc, int irq_base,
 					int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7);
 	void set_chain(const char *chain_tag);
 
@@ -158,15 +158,15 @@ protected:
 
 	virtual void tcr_update() override;
 	virtual void tier_update() override;
-	virtual void isr_update(UINT8 value) override;
-	virtual UINT8 isr_to_sr() const override;
+	virtual void isr_update(uint8_t value) override;
+	virtual uint8_t isr_to_sr() const override;
 };
 
 class h8_timer16_device : public device_t {
 public:
-	h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_info(int timer_count, UINT8 default_tstr);
+	void set_info(int timer_count, uint8_t default_tstr);
 
 	DECLARE_READ8_MEMBER(tstr_r);
 	DECLARE_WRITE8_MEMBER(tstr_w);
@@ -190,8 +190,8 @@ protected:
 	required_device<h8_device> cpu;
 	h8_timer16_channel_device *timer_channel[6];
 	int timer_count;
-	UINT8 default_tstr;
-	UINT8 tstr;
+	uint8_t default_tstr;
+	uint8_t tstr;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

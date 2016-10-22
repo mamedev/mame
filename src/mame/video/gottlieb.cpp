@@ -87,7 +87,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_laserdisc_video_control_w)
 
 WRITE8_MEMBER(gottlieb_state::gottlieb_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -112,7 +112,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_charram_w)
 
 TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];
 	if ((code & 0x80) == 0)
 		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];
 	if ((code & 0xc0) == 0)
 		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
@@ -191,7 +191,7 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 
 void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	rectangle clip = cliprect;
 	int offs;
 
@@ -226,7 +226,7 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-UINT32 gottlieb_state::screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gottlieb_state::screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* if the background has lower priority, render it first, else clear the screen */
 	if (!m_background_priority)

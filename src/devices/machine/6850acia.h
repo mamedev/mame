@@ -28,7 +28,7 @@ class acia6850_device :  public device_t
 {
 public:
 	// construction/destruction
-	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_txd_handler.set_callback(object); }
@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_txc );
 
 protected:
-	acia6850_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	acia6850_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -99,9 +99,9 @@ private:
 	devcb_write_line m_rts_handler;
 	devcb_write_line m_irq_handler;
 
-	UINT8 m_status;
-	UINT8 m_tdr;
-	UINT8 m_rdr;
+	uint8_t m_status;
+	uint8_t m_tdr;
+	uint8_t m_rdr;
 
 	bool m_first_master_reset;
 	int m_dcd_irq_pending;

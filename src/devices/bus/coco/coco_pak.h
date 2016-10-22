@@ -20,14 +20,14 @@ class coco_pak_device :
 {
 public:
 		// construction/destruction
-		coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
 		virtual const tiny_rom_entry *device_rom_region() const override;
 
-		virtual UINT8* get_cart_base() override;
+		virtual uint8_t* get_cart_base() override;
 protected:
 		// device-level overrides
 		virtual void device_start() override;
@@ -51,14 +51,14 @@ class coco_pak_banked_device :
 {
 public:
 		// construction/destruction
-		coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 		// device-level overrides
 		virtual void device_reset() override;
 		virtual DECLARE_WRITE8_MEMBER(write) override;
 private:
-		void banked_pak_set_bank(UINT32 bank);
+		void banked_pak_set_bank(uint32_t bank);
 };
 
 

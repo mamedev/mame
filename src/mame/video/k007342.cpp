@@ -37,7 +37,7 @@ control registers
 
 const device_type K007342 = &device_creator<k007342_device>;
 
-k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K007342, "K007342 Video Controller", tag, owner, clock, "k007342", __FILE__),
 	m_ram(nullptr),
 	m_scroll_ram(nullptr),
@@ -81,8 +81,8 @@ void k007342_device::device_start()
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info0),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info1),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
 
-	m_ram = make_unique_clear<UINT8[]>(0x2000);
-	m_scroll_ram = make_unique_clear<UINT8[]>(0x0200);
+	m_ram = make_unique_clear<uint8_t[]>(0x2000);
+	m_scroll_ram = make_unique_clear<uint8_t[]>(0x0200);
 
 	m_colorram_0 = &m_ram[0x0000];
 	m_colorram_1 = &m_ram[0x1000];
@@ -241,7 +241,7 @@ void k007342_device::tilemap_update( )
 #endif
 }
 
-void k007342_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, UINT32 priority )
+void k007342_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, uint32_t priority )
 {
 	m_tilemap[num]->draw(screen, bitmap, cliprect, flags, priority);
 }
@@ -274,7 +274,7 @@ TILEMAP_MAPPER_MEMBER(k007342_device::scan)
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
 }
 
-void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram )
+void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram )
 {
 	int color, code, flags;
 

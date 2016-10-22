@@ -76,7 +76,7 @@
 
 const device_type SEIBU_SOUND = &device_creator<seibu_sound_device>;
 
-seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_SOUND, "Seibu Sound System", tag, owner, clock, "seibu_sound", __FILE__),
 		m_sound_rom(*this, ":audiocpu"),
 		m_main2sub_pending(0),
@@ -145,7 +145,7 @@ void seibu_sound_device::device_reset()
 	update_irq_lines(VECTOR_INIT);
 }
 
-static UINT8 decrypt_data(int a,int src)
+static uint8_t decrypt_data(int a,int src)
 {
 	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
 	if ( BIT(a,11) &  BIT(a,4) &  BIT(a,1)) src ^= 0x40;
@@ -159,7 +159,7 @@ static UINT8 decrypt_data(int a,int src)
 	return src;
 }
 
-static UINT8 decrypt_opcode(int a,int src)
+static uint8_t decrypt_opcode(int a,int src)
 {
 	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
 	if ( BIT(a,11) &  BIT(a,4) &  BIT(a,1)) src ^= 0x40;
@@ -178,13 +178,13 @@ static UINT8 decrypt_opcode(int a,int src)
 	return src;
 }
 
-UINT8 *seibu_sound_device::get_custom_decrypt()
+uint8_t *seibu_sound_device::get_custom_decrypt()
 {
 	if (m_decrypted_opcodes)
 		return m_decrypted_opcodes.get();
 
 	int size = memregion(":audiocpu")->bytes();
-	m_decrypted_opcodes = make_unique_clear<UINT8[]>(size);
+	m_decrypted_opcodes = make_unique_clear<uint8_t[]>(size);
 	membank(":seibu_bank0d")->set_base(m_decrypted_opcodes.get());
 	if (size > 0x10000) {
 		membank(":seibu_bank1d")->configure_entries(0, (size - 0x10000) / 0x8000, m_decrypted_opcodes.get() + 0x10000, 0x8000);
@@ -195,11 +195,11 @@ UINT8 *seibu_sound_device::get_custom_decrypt()
 	return m_decrypted_opcodes.get();
 }
 
-void seibu_sound_device::apply_decrypt(UINT8 *rom, UINT8 *opcodes, int length)
+void seibu_sound_device::apply_decrypt(uint8_t *rom, uint8_t *opcodes, int length)
 {
 	for (int i = 0;i < length;i++)
 	{
-		UINT8 src = rom[i];
+		uint8_t src = rom[i];
 
 		rom[i]      = decrypt_data(i,src);
 		opcodes[i]  = decrypt_opcode(i,src);
@@ -505,7 +505,7 @@ ADDRESS_MAP_END
 
 const device_type SEIBU_ADPCM = &device_creator<seibu_adpcm_device>;
 
-seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM (MSM5205)", tag, owner, clock, "seibu_adpcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

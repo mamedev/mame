@@ -67,7 +67,7 @@ public:
 	int m_break;
 	int m_m1;
 
-	UINT8 m_lednum;
+	uint8_t m_lednum;
 
 	emu_timer *m_led_refresh_timer;
 	DECLARE_DRIVER_INIT(mpf1);

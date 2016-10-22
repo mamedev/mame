@@ -31,8 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(rs232_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	virtual void machine_reset() override;
-	UINT8 m_term_data;
-	UINT8 m_term_out;
+	uint8_t m_term_data;
+	uint8_t m_term_out;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -54,7 +54,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( evmbug_state::rs232_r )
 {
-	static UINT8 temp = 0;
+	static uint8_t temp = 0;
 	temp^=0xff;
 	if (offset == 1)
 		return temp;
@@ -64,7 +64,7 @@ READ8_MEMBER( evmbug_state::rs232_r )
 		return 0xff;//(m_term_data) ? 0 : 0xff;
 	}
 
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

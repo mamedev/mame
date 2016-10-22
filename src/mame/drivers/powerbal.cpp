@@ -40,7 +40,7 @@ public:
 	DECLARE_MACHINE_START(powerbal);
 	DECLARE_MACHINE_RESET(powerbal);
 	DECLARE_VIDEO_START(powerbal);
-	UINT32 screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE16_MEMBER(magicstk_coin_eeprom_w);
 	DECLARE_WRITE16_MEMBER(magicstk_bgvideoram_w);
@@ -401,7 +401,7 @@ TILE_GET_INFO_MEMBER(powerbal_state::powerbal_get_bg_tile_info)
 
 void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs;
 	int height = m_gfxdecode->gfx(0)->height();
 
@@ -436,7 +436,7 @@ VIDEO_START_MEMBER(powerbal_state,powerbal)
 	m_bg_tilemap->set_scrolly(0, m_bg_yoffset);
 }
 
-UINT32 powerbal_state::screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t powerbal_state::screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites_powerbal(bitmap, cliprect);

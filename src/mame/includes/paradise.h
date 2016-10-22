@@ -27,12 +27,12 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_vram_0;
-	required_shared_ptr<UINT8> m_vram_1;
-	required_shared_ptr<UINT8> m_vram_2;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_paletteram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_vram_0;
+	required_shared_ptr<uint8_t> m_vram_1;
+	required_shared_ptr<uint8_t> m_vram_2;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t *m_tilemap_0;
@@ -40,9 +40,9 @@ public:
 	tilemap_t *m_tilemap_2;
 
 	bitmap_ind16 m_tmpbitmap;
-	UINT8 m_palbank;
-	UINT8 m_priority;
-	UINT8 m_pixbank;
+	uint8_t m_palbank;
+	uint8_t m_priority;
+	uint8_t m_pixbank;
 	int m_sprite_inc;
 	int m_irq_count;
 
@@ -78,9 +78,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update_paradise(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_paradise(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(irq);
 

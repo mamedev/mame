@@ -30,7 +30,7 @@
 
 PALETTE_INIT_MEMBER(champbas_state,champbas)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -71,7 +71,7 @@ PALETTE_INIT_MEMBER(champbas_state,champbas)
 
 	for (int i = 0; i < 0x200; i++)
 	{
-		UINT8 ctabentry = (color_prom[i & 0xff] & 0x0f) | ((i & 0x100) >> 4);
+		uint8_t ctabentry = (color_prom[i & 0xff] & 0x0f) | ((i & 0x100) >> 4);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -79,7 +79,7 @@ PALETTE_INIT_MEMBER(champbas_state,champbas)
 
 PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	/* create a lookup table for the palette */
 	for (int i = 0; i < 0x20; i++)
@@ -115,14 +115,14 @@ PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 	for (int i = 0; i < 0x100; i++)
 	{
 		int swapped_i = BITSWAP8(i, 2, 7, 6, 5, 4, 3, 1, 0);
-		UINT8 ctabentry = (color_prom[swapped_i] & 0x0f) | ((i & 0x80) >> 3);
+		uint8_t ctabentry = (color_prom[swapped_i] & 0x0f) | ((i & 0x80) >> 3);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites (4bpp) */
 	for (int i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[0x100 + i] & 0x0f) | 0x10;
+		uint8_t ctabentry = (color_prom[0x100 + i] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i + 0x100, ctabentry);
 	}
 }
@@ -225,7 +225,7 @@ void champbas_state::champbas_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		int sy = 255 - m_spriteram[offs];
 
 		// attribute data is from last section of mainram
-		UINT8 *attr = &(m_mainram[0x7f0]);
+		uint8_t *attr = &(m_mainram[0x7f0]);
 		int code = (attr[offs] >> 2 & 0x3f) | (m_gfx_bank << 6);
 		int color = (attr[offs + 1] & 0x1f) | (m_palette_bank << 6);
 		int flipx = ~attr[offs] & 1;
@@ -291,14 +291,14 @@ void champbas_state::exctsccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 }
 
 
-UINT32 champbas_state::screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t champbas_state::screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	champbas_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
-UINT32 champbas_state::screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t champbas_state::screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	exctsccr_draw_sprites(bitmap, cliprect);
