@@ -80,10 +80,11 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 
 #define VERBOSE 0
 #define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x) {}
-#define LOGR(x) {}
+#define LOG(x) LOGPRINT(x)
+#define LOGR(x)  LOGPRINT(x)
 #define LOGSETUP(x) LOGPRINT(x)
 #define LOGINT(x) {} LOGPRINT(x)
+#define LOGTX(x) {} LOGPRINT(x)
 #define LOGRCV(x){}
 #if VERBOSE == 2
 #define logerror printf
@@ -780,7 +781,6 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 		m_rxd(0),
 		m_cts(0),
 		m_dcd(0),
-		m_tx_data(0),
 		m_tx_clock(0),
 		m_dtr(0),
 		m_rts(0),
@@ -797,11 +797,14 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 	m_wr0 = m_wr1 = m_wr2 = m_wr3  = m_wr4  = m_wr5  = m_wr6  = m_wr7 = m_wr7p = m_wr8
 		= m_wr10 = m_wr11 = m_wr12 = m_wr13 = m_wr14 = m_wr15 = 0;
 
-	for (int i = 0; i < 3; i++) // TODO adapt to SCC fifos
-	{
-		m_rx_data_fifo[i] = 0;
-		m_rx_error_fifo[i] = 0;
-	}
+	for (auto & elem : m_rx_data_fifo)
+		elem = 0;
+	for (auto & elem : m_rx_error_fifo)  // TODO: Status FIFO needs to be fixed
+		elem = 0;
+	for (auto & elem : m_tx_data_fifo)
+		elem = 0;
+	for (auto & elem : m_tx_error_fifo) //  TODO: Status FIFO needs to be fixed
+		elem = 0;
 }
 
 
@@ -819,6 +822,9 @@ void z80scc_channel::device_start()
 
 	m_rx_fifo_sz = (m_uart->m_variant & SET_ESCC) ? 8 : 3;
 	m_rx_fifo_wp = m_rx_fifo_rp = 0;
+
+	m_tx_fifo_sz = (m_uart->m_variant & SET_ESCC) ? 4 : 1;
+	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
 #if LOCAL_BRG
 	// baudrate clocks and timers
@@ -859,8 +865,13 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_wr13));
 	save_item(NAME(m_wr14));
 	save_item(NAME(m_wr15));
+	save_item(NAME(m_tx_data_fifo));
+	save_item(NAME(m_tx_error_fifo)); //  TODO: Status FIFO needs to be fixed
+	save_item(NAME(m_tx_fifo_rp));
+	save_item(NAME(m_tx_fifo_wp));
+	save_item(NAME(m_tx_fifo_sz));
 	save_item(NAME(m_rx_data_fifo));
-	save_item(NAME(m_rx_error_fifo));
+	save_item(NAME(m_rx_error_fifo)); //  TODO: Status FIFO needs to be fixed
 	save_item(NAME(m_rx_fifo_rp));
 	save_item(NAME(m_rx_fifo_wp));
 	save_item(NAME(m_rx_fifo_sz));
@@ -871,7 +882,6 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_ri));
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dcd));
-	save_item(NAME(m_tx_data));
 	save_item(NAME(m_tx_clock));
 	save_item(NAME(m_dtr));
 	save_item(NAME(m_rts));
@@ -1013,23 +1023,48 @@ void z80scc_channel::tra_callback()
 
 void z80scc_channel::tra_complete()
 {
+	// Delayed baudrate change according to SCC specs
 	if ( m_delayed_tx_brg_change == 1)
 	{
 		m_delayed_tx_brg_change = 0;
 		set_tra_rate(m_brg_rate);
 		LOG(("Delayed setup - Baud Rate Generator: %d mode: %dx\n", m_brg_rate, get_clock_mode() ));
 	}
-	if ((m_wr5 & WR5_TX_ENABLE) && !(m_wr5 & WR5_SEND_BREAK) && !(m_rr0 & RR0_TX_BUFFER_EMPTY))
+
+	if ((m_wr5 & WR5_TX_ENABLE) && !(m_wr5 & WR5_SEND_BREAK))
 	{
-		LOG((LLFORMAT " %s() \"%s \"Channel %c Transmit Data Byte '%02x' m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_tx_data, m_wr5));
+		if ( (m_rr0 & RR0_TX_BUFFER_EMPTY) == 0 || // Takes care of the NMOS/CMOS 1 slot TX FIFO
+			 m_tx_fifo_rp != m_tx_fifo_wp) // or there are more characters to send in a longer FIFO.
+		{
+			LOGTX((" %s() %s %c done sending, loading data from fifo:%02x '%c'\n", FUNCNAME, m_owner->tag(), 'A' + m_index, 
+				   m_tx_data_fifo[m_tx_fifo_rp], isascii(m_tx_data_fifo[m_tx_fifo_rp]) ? m_tx_data_fifo[m_tx_fifo_rp] : ' '));
+			transmit_register_setup(m_tx_data_fifo[m_tx_fifo_rp]); // Reload the shift register
+			m_tx_fifo_rp_step();
+			m_rr0 |= RR0_TX_BUFFER_EMPTY; // Now here is room in the tx fifo again
+		}
+		else
+		{
+			LOGTX((" %s() %s %c done sending, setting all sent bit\n", FUNCNAME, m_owner->tag(), 'A' + m_index));
+			m_rr1 |= RR1_ALL_SENT;
 
-		transmit_register_setup(m_tx_data);
-
-		// empty transmit buffer
-		m_rr0 |= RR0_TX_BUFFER_EMPTY;
+			// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
+			if (!m_rts) // TODO: Clean up RTS handling
+				set_rts(1);
+		}
 
 		if (m_wr1 & WR1_TX_INT_ENABLE)
-			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+		{
+			if ((m_uart->m_variant & SET_ESCC) && 
+				(m_wr7p & WR7P_TX_FIFO_EMPTY)  &&
+				m_tx_fifo_wp == m_tx_fifo_rp)  // ESCC and fifo empty bit set and fifo is completelly empty?
+			{
+				m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
+			}
+			else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots availble
+			{
+				m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
+			}
+		}
 	}
 	else if (m_wr5 & WR5_SEND_BREAK)
 	{
@@ -1048,18 +1083,6 @@ void z80scc_channel::tra_complete()
 			m_uart->m_out_txda_cb(1);
 		else
 			m_uart->m_out_txdb_cb(1);
-	}
-
-	// if transmit buffer is empty
-	if (m_rr0 & RR0_TX_BUFFER_EMPTY)
-	{
-		LOG((LLFORMAT " %s() \"%s \"Channel %c Transmit buffer empty m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5));
-		// then all characters have been sent
-		m_rr1 |= RR1_ALL_SENT;
-
-		// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
-		if (!m_rts)
-			set_rts(1);
 	}
 }
 
@@ -1322,12 +1345,12 @@ UINT8 z80scc_channel::do_sccreg_rr5()
 UINT8 z80scc_channel::do_sccreg_rr6()
 {
 	LOGR(("%s\n", FUNCNAME));
-	if (!(m_uart->m_variant & (SET_NMOS)))
+	if (m_wr15 & WR15_STATUS_FIFO)
 	{
-		logerror(" %s() not implemented feature\n", FUNCNAME);
+		logerror(" - Status FIFO for synchronous mode - not implemented\n");
 		return 0;
 	}
-	return m_rr2;
+	return m_rr2; /* Note that NMOS calls are redirected to do_sccreg_rr2() before getting here */
 }
 
 /* (not on NMOS)
@@ -1731,6 +1754,7 @@ void z80scc_channel::do_sccreg_wr5(UINT8 data)
 	}
 	else
 	{
+		//		UINT8 old_wr5 = m_wr5;
 		m_wr5 = data;
 		LOG(("- Transmitter Enable %u\n", (data & WR5_TX_ENABLE) ? 1 : 0));
 		LOG(("- Transmitter Bits/Character %u\n", get_tx_word_length()));
@@ -1740,6 +1764,10 @@ void z80scc_channel::do_sccreg_wr5(UINT8 data)
 		update_serial();
 		safe_transmit_register_reset();
 		update_rts();
+#if 0
+		if ( !(old_wr5 & WR5_TX_ENABLE) && m_wr5 & WR5_TX_ENABLE )
+			write_data(m_tx_data);
+#endif
 		m_rr0 |= RR0_TX_BUFFER_EMPTY;
 	}
 }
@@ -1759,7 +1787,7 @@ void z80scc_channel::do_sccreg_wr7(UINT8 data)
 /* WR8 is the transmit buffer register */
 void z80scc_channel::do_sccreg_wr8(UINT8 data)
 {
-	LOG(("%s(%02x) \"%s\": %c : Transmit Buffer read %02x\n", FUNCNAME, data, m_owner->tag(), 'A' + m_index, data));
+	LOG(("%s(%02x) \"%s\": %c : Transmit Buffer write %02x\n", FUNCNAME, data, m_owner->tag(), 'A' + m_index, data));
 	data_write(data);
 }
 
@@ -2133,7 +2161,7 @@ UINT8 z80scc_channel::data_read()
 		data = m_rx_fifo_rp_data();
 
 		// load error status from the FIFO
-		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp];
+		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp]; //  TODO: Status FIFO needs to be fixed
 
 		// trigger interrup and lock the fifo if an error is present
 		if (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR))
@@ -2191,11 +2219,21 @@ void z80scc_channel::m_rx_fifo_rp_step()
 				m_rx_fifo_rp = 0;
 		}
 
-		// check if FIFO is empty
+		// check if RX FIFO is empty
 		if (m_rx_fifo_rp == m_rx_fifo_wp)
 		{
 				// no more characters available in the FIFO
 				m_rr0 &= ~ RR0_RX_CHAR_AVAILABLE;
+		}
+}
+
+/* Step TX read pointer */
+void z80scc_channel::m_tx_fifo_rp_step()
+{
+		m_tx_fifo_rp++;
+		if (m_tx_fifo_rp >= m_tx_fifo_sz)
+		{
+				m_tx_fifo_rp = 0;
 		}
 }
 
@@ -2209,28 +2247,65 @@ WRITE8_MEMBER (z80scc_device::db_w) { m_chanB->data_write(data); }
 //-------------------------------------------------
 void z80scc_channel::data_write(UINT8 data)
 {
-	m_tx_data = data;
-
-	if ((m_wr5 & WR5_TX_ENABLE) && is_transmit_register_empty())
+	/* Tx FIFO is full or...? */
+	if ( !(m_rr0 & RR0_TX_BUFFER_EMPTY) && // NMOS/CMOS 1 slot "FIFO" is controlled by the TBE bit instead of fifo logic
+		( (m_tx_fifo_wp + 1 == m_tx_fifo_rp) || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) )))
 	{
-		LOG(("%s(%02x) \"%s\": %c : Transmit Data Byte '%02x' %c\n", FUNCNAME, data, m_owner->tag(), 'A' + m_index, m_tx_data, m_tx_data));
-		transmit_register_setup(m_tx_data);
-
-		// empty transmit buffer
-		m_rr0 |= RR0_TX_BUFFER_EMPTY;
-
-		if (m_wr1 & WR1_TX_INT_ENABLE)
+		logerror("- TX FIFO is full, discarding data\n");
+		LOG(("- TX FIFO is full, discarding data\n"));
+	}
+	else // ..there is still room
+	{
+		m_tx_data_fifo[m_tx_fifo_wp++] = data;
+		if (m_tx_fifo_wp >= m_tx_fifo_sz)
 		{
-			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+			m_tx_fifo_wp = 0;
+		}
+
+		// Check FIFO fullness and set TBE bit accordingly
+		if (m_tx_fifo_sz == 1)
+		{
+			m_rr0 &= ~RR0_TX_BUFFER_EMPTY; // If only one FIFO position it is full now! 
+		}
+		else if (m_tx_fifo_wp + 1 == m_tx_fifo_rp || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) ))
+		{
+			m_rr0 &= ~RR0_TX_BUFFER_EMPTY; // Indicate that the TX fifo is full
+		}else
+			m_rr0 |= RR0_TX_BUFFER_EMPTY; // or there is a slot in the FIFO available
+
+		m_rr1 &= ~RR1_ALL_SENT; // All is definitelly not sent anymore
+	}
+
+	/* Transmitter enabled?  */
+	if (m_wr5 & WR5_TX_ENABLE)
+	{
+		if (is_transmit_register_empty()) // Is the shift register loaded?
+		{
+			LOG(("- Setting up transmitter\n"));
+			transmit_register_setup(m_tx_data_fifo[m_tx_fifo_rp]); // Load the shift register, reload is done in tra_complete()
+			m_tx_fifo_rp_step();
+			m_rr1 |= RR1_ALL_SENT; // Now stuff is on its way again
+			m_rr0 |= RR0_TX_BUFFER_EMPTY; // And there is a slot in the FIFO available
 		}
 	}
-	else
+	/* "While transmit interrupts are enabled, the nmos/cmos version sets the transmit interrupt pending
+	   (TxIP) bit whenever the transmit buffer becomes empty. this means that the transmit buffer
+	   must be full before the TxIP can be set. thus, when transmit interrupts are first enabled, the TxIP
+	   will not be set until after the first character is written to the nmos/cmos." */
+	// check if to fire interrupt
+	if (m_wr1 & WR1_TX_INT_ENABLE)
 	{
-		m_rr0 &= ~RR0_TX_BUFFER_EMPTY;
-		//LOG(("%s(%02x) \"%s\": %c : failed to send %c,(%02x)\n", FUNCNAME, data, m_owner->tag(), 'A' + m_index, isascii(data) ? data : ' ', data));
+		if ((m_uart->m_variant & SET_ESCC) && 
+			(m_wr7p & WR7P_TX_FIFO_EMPTY)  &&
+			m_tx_fifo_wp == m_tx_fifo_rp)  // ESCC and fifo empty bit set and fifo is completelly empty?
+		{
+			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
+		}
+		else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots availble
+		{
+			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
+		}
 	}
-
-	m_rr1 &= ~RR1_ALL_SENT;
 }
 
 
@@ -2245,12 +2320,12 @@ void z80scc_channel::receive_data(UINT8 data)
 	if (m_rx_fifo_wp + 1 == m_rx_fifo_rp || ( (m_rx_fifo_wp + 1 == m_rx_fifo_sz) && (m_rx_fifo_rp == 0) ))
 	{
 		// receive overrun error detected
-		m_rx_error_fifo[m_rx_fifo_wp] |= RR1_RX_OVERRUN_ERROR; // = m_rx_error;
+		m_rx_error_fifo[m_rx_fifo_wp] |= RR1_RX_OVERRUN_ERROR; // = m_rx_error;  TODO: Status FIFO needs to be fixed
 		logerror("Receive_data() Error %02x\n", m_rx_error_fifo[m_rx_fifo_wp] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
 	}
 	else
 	{
-		m_rx_error_fifo[m_rx_fifo_wp] &= ~RR1_RX_OVERRUN_ERROR; // = m_rx_error;
+		m_rx_error_fifo[m_rx_fifo_wp] &= ~RR1_RX_OVERRUN_ERROR; // = m_rx_error;  TODO: Status FIFO needs to be fixed
 		m_rx_fifo_wp++;
 		if (m_rx_fifo_wp >= m_rx_fifo_sz)
 		{
