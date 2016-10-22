@@ -2832,4 +2832,26 @@ namespace luabridge {
 			return static_cast <unsigned long long> (luaL_checkunsigned (L, index));
 		}
 	};
+
+	template <>
+	struct Stack <char16_t> {
+		static inline void push(lua_State* L, char16_t value) {
+			lua_pushunsigned(L, static_cast <lua_Unsigned> (value));
+		}
+
+		static inline char16_t get(lua_State* L, int index) {
+			return static_cast <char16_t> (luaL_checkunsigned(L, index));
+		}
+	};
+
+	template <>
+	struct Stack <char32_t> {
+		static inline void push(lua_State* L, char32_t value) {
+			lua_pushunsigned(L, static_cast <lua_Unsigned> (value));
+		}
+
+		static inline char32_t get(lua_State* L, int index) {
+			return static_cast <char32_t> (luaL_checkunsigned(L, index));
+		}
+	};
 }
