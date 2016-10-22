@@ -841,10 +841,10 @@ void shaders::begin_draw()
 	downsample_effect->set_technique("DefaultTechnique");
 	vector_effect->set_technique("DefaultTechnique");
 
-	HRESULT result = d3d->get_device()->GetRenderTarget(0, &backbuffer);
+	HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
 	if (FAILED(result))
 	{
-		osd_printf_verbose("Direct3D: Error %08lX during device GetRenderTarget call\n", result);
+		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 	}
 }
 
@@ -940,7 +940,7 @@ int shaders::ntsc_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	curr_effect->set_float("SignalOffset", signal_offset);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->source_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->source_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	color_effect->set_texture("Diffuse", rt->source_texture[next_index]);
 
@@ -997,7 +997,7 @@ int shaders::color_convolution_pass(d3d_render_target *rt, int source_index, pol
 	// initial "Diffuse" texture is set in shaders::set_texture() or the result of shaders::ntsc_pass()
 
 	next_index = rt->next_index(next_index);
-	blit(rt->source_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->source_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1011,7 +1011,7 @@ int shaders::prescale_pass(d3d_render_target *rt, int source_index, poly_info *p
 	curr_effect->set_texture("Diffuse", rt->source_texture[next_index]);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1034,7 +1034,7 @@ int shaders::deconverge_pass(d3d_render_target *rt, int source_index, poly_info 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1054,7 +1054,7 @@ int shaders::defocus_pass(d3d_render_target *rt, int source_index, poly_info *po
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1076,7 +1076,7 @@ int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *p
 	curr_effect->set_bool("Passthrough", false);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	// Pass along our phosphor'd screen
 	curr_effect->update_uniforms();
@@ -1084,8 +1084,7 @@ int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *p
 	curr_effect->set_texture("LastPass", rt->target_texture[next_index]);
 	curr_effect->set_bool("Passthrough", true);
 
-	// Avoid changing targets due to page flipping
-	blit(rt->cache_surface, true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->cache_surface, false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1130,7 +1129,7 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 
 	next_index = rt->next_index(next_index);
-	blit(prepare_bloom ? rt->source_surface[next_index] : rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(prepare_bloom ? rt->source_surface[next_index] : rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1156,7 +1155,7 @@ int shaders::downsample_pass(d3d_render_target *rt, int source_index, poly_info 
 				? rt->source_texture[next_index]
 				: rt->bloom_texture[bloom_index - 1]);
 
-		blit(rt->bloom_surface[bloom_index], true, D3DPT_TRIANGLELIST, 0, 2);
+		blit(rt->bloom_surface[bloom_index], false, D3DPT_TRIANGLELIST, 0, 2);
 	}
 
 	return next_index;
@@ -1204,7 +1203,7 @@ int shaders::bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly
 	}
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1230,7 +1229,7 @@ int shaders::distortion_pass(d3d_render_target *rt, int source_index, poly_info 
 	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index]);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1245,6 +1244,7 @@ int shaders::vector_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	curr_effect->set_float("LengthScale", options->vector_length_scale);
 	curr_effect->set_float("BeamSmooth", options->vector_beam_smooth);
 
+	// we need to clear the vector render target here
 	blit(rt->target_surface[next_index], true, poly->type(), vertnum, poly->count());
 
 	return next_index;
@@ -1260,6 +1260,7 @@ int shaders::vector_buffer_pass(d3d_render_target *rt, int source_index, poly_in
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 
+	// we need to clear the vector render target here
 	next_index = rt->next_index(next_index);
 	blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
 
@@ -1276,27 +1277,19 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 
-	// we do not clear the backbuffer here because multiple screens might be rendered into
 	blit(backbuffer, false, poly->type(), vertnum, poly->count());
 
 	if (recording_movie)
 	{
 		blit(recorder->target_surface(), false, poly->type(), vertnum, poly->count());
 
-		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
-
 		recorder->save_frame();
 	}
 
 	if (render_snap)
 	{
-		blit(snap_target, false, poly->type(), vertnum, poly->count());
-
-		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
+		// we need to clear the snap render target here
+		blit(snap_target, true, poly->type(), vertnum, poly->count());
 
 		render_snapshot(snap_target);
 
@@ -1457,12 +1450,6 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		d3d->set_wrap(D3DTADDRESS_MIRROR);
 		next_index = screen_pass(rt, next_index, poly, vertnum);
 		d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(curr_texture->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
-
-		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
-		if (FAILED(result))
-		{
-			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
-		}
 
 		curr_screen++;
 	}
