@@ -620,7 +620,7 @@ class general_flag_reader
 public:
 	general_flag_reader(std::uint16_t val) : m_value(val) { }
 
-	bool        encrypted() const               { return (m_value & 0x0001) !=0; }
+	bool        encrypted() const               { return (m_value & 0x0001) != 0; }
 	bool        implode_8k_dict() const         { return (m_value & 0x0002) != 0; }
 	bool        implode_3_trees() const         { return (m_value & 0x0004) != 0; }
 	unsigned    deflate_option() const          { return unsigned((m_value >> 1) & 0x0003); }

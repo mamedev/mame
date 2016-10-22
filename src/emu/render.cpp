@@ -967,7 +967,7 @@ render_target::render_target(render_manager &manager, const internal_layout *lay
 	m_layerconfig = m_base_layerconfig;
 
 	// load the layout files
-	load_layout_files(layoutfile, (flags & RENDER_CREATE_SINGLE_FILE)!=0);
+	load_layout_files(layoutfile, (flags & RENDER_CREATE_SINGLE_FILE) != 0);
 
 	// set the current view to the first one
 	set_view(0);
@@ -1219,7 +1219,7 @@ void render_target::compute_visible_area(int32_t target_width, int32_t target_he
 			int scale_mode = m_scale_mode;
 			if (m_scale_mode == SCALE_FRACTIONAL_AUTO)
 			{
-				bool is_rotated = ((m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY))!=0;
+				bool is_rotated = ((m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY)) != 0;
 				scale_mode = is_rotated ^ target_is_portrait ? SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
 			}
 
