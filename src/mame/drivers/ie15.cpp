@@ -29,9 +29,9 @@
 #define IE15_DISP_HORZ  800
 #define IE15_HORZ_START 200
 
-#define IE15_TOTAL_VERT 28*11
-#define IE15_DISP_VERT  25*11
-#define IE15_VERT_START 2*11
+#define IE15_TOTAL_VERT (28*11)
+#define IE15_DISP_VERT  (25*11)
+#define IE15_VERT_START (2*11)
 #define IE15_STATUSLINE 11
 
 
@@ -65,11 +65,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE16_MEMBER( kbd_put );
-	DECLARE_PALETTE_INIT( ie15 );
+	//DECLARE_PALETTE_INIT( ie15 );
 
 	DECLARE_WRITE_LINE_MEMBER( serial_rx_callback );
 	virtual void rcv_complete() override;
@@ -102,14 +101,15 @@ public:
 
 	static const device_timer_id TIMER_HBLANK = 0;
 
+	//TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
+	void scanline_callback();
 private:
-
 	TIMER_CALLBACK_MEMBER(ie15_beepoff);
 	void update_leds();
-	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
+	uint32_t draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
-	bitmap_ind16 m_tmpbmp;
-	bitmap_ind16 m_offbmp;
+	bitmap_rgb32 m_tmpbmp;
+	bitmap_rgb32 m_offbmp;
 
 	emu_timer *m_hblank_timer;
 
@@ -134,6 +134,7 @@ private:
 	uint8_t m_serial_rx_ready;
 	uint8_t m_serial_tx_ready;
 	int m_hblank;
+	int m_vpos;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -296,14 +297,13 @@ void ie15_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 			if (m_hblank) // Transitioning from in blanking to out of blanking
 			{
 				m_hblank = 0;
-				int v = m_screen->vpos();
-				int next_v = (v == (IE15_TOTAL_VERT-1)) ? 0 : (v + 1);
-				m_hblank_timer->adjust(m_screen->time_until_pos(next_v, 0));
+				m_hblank_timer->adjust(m_screen->time_until_pos((m_vpos+1) % IE15_TOTAL_VERT, 0));
+				scanline_callback();
 			}
 			else
 			{
 				m_hblank = 1;
-				m_hblank_timer->adjust(m_screen->time_until_pos(m_screen->vpos(), IE15_HORZ_START));
+				m_hblank_timer->adjust(m_screen->time_until_pos(m_vpos, IE15_HORZ_START));
 			}
 			break;
 	}
@@ -371,7 +371,7 @@ READ8_MEMBER( ie15_state::flag_r ) {
 			ret = m_hblank;
 			break;
 		case 1: // marker scanline
-			ret = (m_screen->vpos() % 11) > 7;
+			ret = (m_vpos % 11) > 7;
 			break;
 		case 2: // vblank
 			ret = !m_screen->vblank();
@@ -483,6 +483,7 @@ void ie15_state::machine_reset()
 
 	m_hblank = 1;
 	m_hblank_timer->adjust(m_screen->time_until_pos(0, IE15_HORZ_START));
+	m_vpos = m_screen->vpos();
 
 	m_beeper->set_state(0);
 
@@ -536,39 +537,52 @@ void ie15_state::video_start()
     XXX 'dotted look' is caused by strobe at 2x pixel clock -- use HLSL for this.
 */
 
-uint32_t ie15_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline)
+uint32_t ie15_state::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline)
 {
-	uint8_t gfx, fg, bg, ra, blink, red;
-	uint16_t x, chr;
+	static const uint32_t palette[2] = { 0xff000000, 0xff00c000 };
 
-	bg = 0; fg = 1; ra = scanline % 8;
-	blink = (m_screen->frame_number() % 10) > 4;
-	red = m_io_keyboard->read() & IE_KB_RED;
+	//uint8_t fg = 1;
+	//uint8_t bg = 0;
+	uint8_t ra = scanline % 8;
+	uint32_t ra_high = 0x200 | ra;
+	bool blink((m_screen->frame_number() % 10) > 4);
+	bool red(m_io_keyboard->read() & IE_KB_RED);
+	bool blink_red_line25 = blink && red && m_video.line25;
+	bool cursor_blank = scanline > 7 && (!m_video.cursor || blink);
 
-	for (x = offset; x < offset + 80; x++)
+	if (cursor_blank)
 	{
-		chr = m_p_videoram[x] << 3;
-		gfx = m_p_chargen[chr | ra];
-
-		if (scanline > 7 && (!m_video.cursor || blink))
-			gfx = 0;
-		else if (chr < (0x20<<3)) {
-			if (red && blink && m_video.line25)
-				gfx = m_p_chargen[chr | 0x200 | ra];
-			else
-				gfx = 0;
+		for (uint16_t x = 0; x < 80*10; x++)
+		{
+			*p++ = palette[0];
 		}
+	}
+	else
+	{
+		for (uint16_t x = offset; x < offset + 80; x++)
+		{
+			uint16_t chr = m_p_videoram[x] << 3;
+			uint8_t gfx = m_p_chargen[chr | ra];
 
-		*p++ = BIT(gfx, 7) ? fg : bg;
-		*p++ = BIT(gfx, 6) ? fg : bg;
-		*p++ = BIT(gfx, 5) ? fg : bg;
-		*p++ = BIT(gfx, 4) ? fg : bg;
-		*p++ = BIT(gfx, 3) ? fg : bg;
-		*p++ = BIT(gfx, 2) ? fg : bg;
-		*p++ = BIT(gfx, 1) ? fg : bg;
-		*p++ = bg;
-		*p++ = bg;
-		*p++ = bg;
+			if (chr < (0x20<<3))
+			{
+				if (blink_red_line25)
+					gfx = m_p_chargen[chr | ra_high];
+				else
+					gfx = 0;
+			}
+
+			*p++ = palette[BIT(gfx, 7)];
+			*p++ = palette[BIT(gfx, 6)];
+			*p++ = palette[BIT(gfx, 5)];
+			*p++ = palette[BIT(gfx, 4)];
+			*p++ = palette[BIT(gfx, 3)];
+			*p++ = palette[BIT(gfx, 2)];
+			*p++ = palette[BIT(gfx, 1)];
+			*p++ = palette[0];
+			*p++ = palette[0];
+			*p++ = palette[0];
+		}
 	}
 	return 0;
 }
@@ -590,9 +604,13 @@ void ie15_state::update_leds()
     VBlank is active for 3 topmost on-screen rows and 1 at the bottom; however, control flag 3 overrides VBlank,
     allowing status line to be switched on and off.
 */
-TIMER_DEVICE_CALLBACK_MEMBER(ie15_state::scanline_callback)
+void ie15_state::scanline_callback()
+//TIMER_DEVICE_CALLBACK_MEMBER( ie15_state::scanline_callback )
 {
-	uint16_t y = m_screen->vpos();
+	int y = m_vpos;
+
+	m_vpos++;
+	m_vpos %= IE15_TOTAL_VERT;
 
 	DBG_LOG(3,"scanline_cb",
 		("addr %03x frame %d x %.4d y %.3d row %.2d e:c:s %d:%d:%d\n",
@@ -606,11 +624,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(ie15_state::scanline_callback)
 	if (!m_video.enable || (y < IE15_STATUSLINE && m_video.line25)) {
 		copybitmap(m_tmpbmp, m_offbmp, 0, 0, 0, y, m_tmpclip);
 	} else {
-		draw_scanline(&m_tmpbmp.pix16(y), m_video.ptr2, y%11);
+		draw_scanline(&m_tmpbmp.pix32(y), m_video.ptr2, y % 11);
 	}
 }
 
-uint32_t ie15_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ie15_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_leds();
 	copybitmap(bitmap, m_tmpbmp, 0, 0, IE15_HORZ_START, IE15_VERT_START, cliprect);
@@ -636,20 +654,20 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER( ie15_state, ie15 )
-{
-	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
-}
+//PALETTE_INIT_MEMBER( ie15_state, ie15 )
+//{
+//	palette.set_pen_color(0, rgb_t::black); // black
+//	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
+//}
 
 static MACHINE_CONFIG_START( ie15, ie15_state )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", IE15, XTAL_30_8MHz/10)
 	MCFG_CPU_PROGRAM_MAP(ie15_mem)
 	MCFG_CPU_IO_MAP(ie15_io)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", ie15_state, scanline_callback, attotime::from_hz(50*28*11))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_30_8MHz/(2*IE15_HORZ_START)))
 
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", ie15_state, scanline_callback, attotime::from_hz(50*28*11))
+	//MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_30_8MHz/(2*IE15_HORZ_START)))
 
 	/* Video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
@@ -658,10 +676,10 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 		IE15_HORZ_START+IE15_DISP_HORZ, IE15_TOTAL_VERT, IE15_VERT_START,
 		IE15_VERT_START+IE15_DISP_VERT);
 
-	MCFG_SCREEN_PALETTE("palette")
+	//MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ie15)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", ie15)
+	//MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_ie15)
 
