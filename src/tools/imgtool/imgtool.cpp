@@ -914,7 +914,7 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 	}
 
 	// open the stream
-	stream = imgtool::stream::ptr(imgtool::stream::open(fname, read_or_write));
+	stream = imgtool::stream::open(fname, read_or_write);
 	if (!stream)
 	{
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_IMAGEFILE);
@@ -1871,7 +1871,7 @@ imgtoolerr_t imgtool::partition::get_file(const char *filename, const char *fork
 	const char *dest, filter_getinfoproc filter)
 {
 	imgtoolerr_t err;
-	imgtool::stream *f;
+	imgtool::stream::ptr f;
 	char *new_fname = nullptr;
 	char *alloc_dest = nullptr;
 	const char *filter_extension = nullptr;
@@ -1919,8 +1919,6 @@ imgtoolerr_t imgtool::partition::get_file(const char *filename, const char *fork
 		goto done;
 
 done:
-	if (f != nullptr)
-		delete f;
 	if (alloc_dest != nullptr)
 		free(alloc_dest);
 	if (new_fname != nullptr)
@@ -1938,7 +1936,7 @@ imgtoolerr_t imgtool::partition::put_file(const char *newfname, const char *fork
 	const char *source, util::option_resolution *opts, filter_getinfoproc filter)
 {
 	imgtoolerr_t err;
-	imgtool::stream *f = nullptr;
+	imgtool::stream::ptr f;
 	imgtool_charset charset;
 	char *alloc_newfname = nullptr;
 	std::string basename;
@@ -1971,8 +1969,6 @@ imgtoolerr_t imgtool::partition::put_file(const char *newfname, const char *fork
 
 done:
 	/* clean up */
-	if (f != nullptr)
-		delete f;
 	if (alloc_newfname != nullptr)
 		osd_free(alloc_newfname);
 	return err;

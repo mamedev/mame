@@ -56,28 +56,18 @@ static imgtoolerr_t convert_stream_eolns(imgtool::stream &source, imgtool::strea
 static imgtoolerr_t ascii_readfile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
-	imgtool::stream *mem_stream;
+	imgtool::stream::ptr mem_stream;
 
 	mem_stream = imgtool::stream::open_mem(nullptr, 0);
 	if (!mem_stream)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
+		return IMGTOOLERR_OUTOFMEMORY;
 
 	err = partition.read_file(filename, fork, *mem_stream, nullptr);
 	if (err)
-		goto done;
+		return err;
 
 	mem_stream->seek(SEEK_SET, 0);
-	err = convert_stream_eolns(*mem_stream, destf, EOLN);
-	if (err)
-		goto done;
-
-done:
-	if (mem_stream)
-		delete mem_stream;
-	return err;
+	return convert_stream_eolns(*mem_stream, destf, EOLN);
 }
 
 
@@ -85,32 +75,22 @@ done:
 static imgtoolerr_t ascii_writefile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
-	imgtool::stream *mem_stream = nullptr;
+	imgtool::stream::ptr mem_stream;
 	const char *eoln;
 
 	/* create a stream */
 	mem_stream = imgtool::stream::open_mem(nullptr, 0);
 	if (!mem_stream)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
+		return IMGTOOLERR_OUTOFMEMORY;
 
 	eoln = partition.get_info_string(IMGTOOLINFO_STR_EOLN);
 
 	err = convert_stream_eolns(sourcef, *mem_stream, eoln);
 	if (err)
-		goto done;
+		return err;
 	mem_stream->seek(SEEK_SET, 0);
 
-	err = partition.write_file(filename, fork, *mem_stream, opts, nullptr);
-	if (err)
-		goto done;
-
-done:
-	if (mem_stream)
-		delete mem_stream;
-	return err;
+	return partition.write_file(filename, fork, *mem_stream, opts, nullptr);
 }
 
 

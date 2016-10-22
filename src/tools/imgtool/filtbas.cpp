@@ -73,7 +73,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
-	imgtool::stream *mem_stream;
+	imgtool::stream::ptr mem_stream;
 	uint8_t line_header[4];
 	uint16_t line_number; //, address;
 	uint8_t b, shift;
@@ -84,16 +84,13 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 
 	/* open a memory stream */
 	mem_stream = imgtool::stream::open_mem(nullptr, 0);
-	if (mem_stream == nullptr)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
+	if (!mem_stream)
+		return IMGTOOLERR_OUTOFMEMORY;
 
 	/* read actual file */
 	err = partition.read_file(filename, fork, *mem_stream, nullptr);
 	if (err)
-		goto done;
+		return err;
 
 	/* skip first few bytes */
 	mem_stream->seek(tokens->skip_bytes, SEEK_SET);
@@ -160,9 +157,6 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		destf.puts(EOLN);
 	}
 
-done:
-	if (mem_stream != nullptr)
-		delete mem_stream;
 	return err;
 }
 
@@ -177,8 +171,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	imgtool::partition &partition, const char *filename,
 	const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
-	imgtoolerr_t err;
-	imgtool::stream *mem_stream;
+	imgtool::stream::ptr mem_stream;
 	char buf[1024];
 	int eof = FALSE;
 	uint32_t len;
@@ -194,11 +187,8 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 
 	/* open a memory stream */
 	mem_stream = imgtool::stream::open_mem(nullptr, 0);
-	if (mem_stream == nullptr)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
+	if (!mem_stream)
+		return IMGTOOLERR_OUTOFMEMORY;
 
 	/* skip first few bytes */
 	mem_stream->fill(0x00, tokens->skip_bytes);
@@ -343,14 +333,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	}
 
 	/* write actual file */
-	err = partition.write_file(filename, fork, *mem_stream, opts, nullptr);
-	if (err)
-		goto done;
-
-done:
-	if (mem_stream != nullptr)
-		delete mem_stream;
-	return err;
+	return partition.write_file(filename, fork, *mem_stream, opts, nullptr);
 }
 
 

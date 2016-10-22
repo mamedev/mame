@@ -1318,16 +1318,14 @@ static imgtoolerr_t thomcrypt_read_file(imgtool::partition &part,
 					const char *fork, imgtool::stream &dst)
 {
 	uint8_t buf[3];
-	imgtool::stream *org = imgtool::stream::open_mem( NULL, 0 );
+	imgtool::stream::ptr org = imgtool::stream::open_mem(nullptr, 0);
 	imgtoolerr_t err;
 	if ( !org ) return IMGTOOLERR_OUTOFMEMORY;
 
 	/* read file */
 	err = thom_read_file( part, name, fork, *org );
-	if ( err ) {
-	delete org;
-	return err;
-	}
+	if (err)
+		return err;
 
 	org->seek(0, SEEK_SET);
 	if ( org->read(buf, 3 ) < 3 || buf[0] != 0xfe )
@@ -1344,7 +1342,6 @@ static imgtoolerr_t thomcrypt_read_file(imgtool::partition &part,
 		thom_decrypt( dst, *org );
 	}
 
-	delete org;
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -1364,16 +1361,13 @@ static imgtoolerr_t thomcrypt_write_file(imgtool::partition &part,
 	else
 	{
 		/* regular file */
-		imgtool::stream *dst = imgtool::stream::open_mem( NULL, 0 );
-		imgtoolerr_t err;
+		imgtool::stream::ptr dst = imgtool::stream::open_mem(nullptr, 0);
 		if ( !dst ) return IMGTOOLERR_OUTOFMEMORY;
 		dst->putc( '\xfe' );
 		dst->write(buf+1, 2);
 		thom_encrypt( *dst, src );
 		dst->seek(0, SEEK_SET);
-		err = thom_write_file( part, name, fork, *dst, opts );
-		delete dst;
-		return err;
+		return thom_write_file( part, name, fork, *dst, opts );
 	}
 }
 
@@ -1402,7 +1396,7 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 						imgtool::stream &dst,
 						const char *const table[2][128])
 {
-	imgtool::stream *org = imgtool::stream::open_mem( NULL, 0 );
+	imgtool::stream::ptr org = imgtool::stream::open_mem(nullptr, 0);
 	imgtoolerr_t err;
 	uint8_t buf[4];
 	int i;
@@ -1411,10 +1405,8 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 
 	err = thomcrypt_read_file( part, name, fork, *org );
 	if (err)
-	{
-		delete org;
 		return err;
-	}
+
 	org->seek(3, SEEK_SET); /* skip header */
 
 	while ( 1 )
@@ -1469,7 +1461,6 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 	}
 	end:
 
-	delete org;
 	return IMGTOOLERR_SUCCESS;
 }
 
