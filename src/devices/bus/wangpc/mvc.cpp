@@ -48,7 +48,7 @@
 
 static const rgb_t PALETTE_MVC[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0x00, 0x80, 0x00),
 	rgb_t(0x00, 0xff, 0x00)
 };
@@ -114,7 +114,7 @@ MC6845_UPDATE_ROW( wangpc_mvc_device::crtc_update_row )
 			int color = ((BIT(data, 9) & ~ATTR_BLANK) ^ ATTR_REVERSE);
 
 			if ((color | bitmap.pix32(vbp + y, hbp + x)) & ATTR_BOLD) color = 2;
-			if (color) bitmap.pix32(vbp + y, hbp + x) = de ? PALETTE_MVC[color] : rgb_t::black;
+			if (color) bitmap.pix32(vbp + y, hbp + x) = de ? PALETTE_MVC[color] : rgb_t::black();
 
 			data <<= 1;
 		}

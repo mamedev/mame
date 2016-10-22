@@ -180,7 +180,7 @@ uint32_t alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 		for (i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x01) ? rgb_t::white : rgb_t::black;
+			pen_t pen = (data & 0x01) ? rgb_t::white() : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			data = data >> 1;

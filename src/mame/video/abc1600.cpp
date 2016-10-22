@@ -193,7 +193,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
 static MACHINE_CONFIG_FRAGMENT( abc1600_mover )
 	MCFG_DEFAULT_LAYOUT(layout_abc1600)
 
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(abc1600_mover_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_64MHz, 0x3e0, 0, 0x300, 0x433, 0, 0x400)
 
@@ -1255,7 +1255,7 @@ uint32_t abc1600_mover_device::screen_update(screen_device &screen, bitmap_rgb32
 	}
 	else
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.erase(cliprect);
 	}
 
 	return 0;

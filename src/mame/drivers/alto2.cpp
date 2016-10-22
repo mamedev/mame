@@ -281,7 +281,7 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	MCFG_CPU_IO_MAP(alto2_iomem_map)
 
 	// Video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz,
 			 A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH,
 			 A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT)

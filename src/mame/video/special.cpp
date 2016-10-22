@@ -14,8 +14,8 @@
 
 VIDEO_START_MEMBER(special_state,special)
 {
-	m_palette->set_pen_color(0,rgb_t::black); /* black */
-	m_palette->set_pen_color(1,rgb_t::white); /* white */
+	m_palette->set_pen_color(0, rgb_t::black());
+	m_palette->set_pen_color(1, rgb_t::white());
 }
 
 uint32_t special_state::screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

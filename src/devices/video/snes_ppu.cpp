@@ -1830,7 +1830,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 
 	if (m_screen_disabled) /* screen is forced blank */
 		for (x = 0; x < SNES_SCR_WIDTH * 2; x++)
-			bitmap.pix32(curline, x) = rgb_t::black;
+			bitmap.pix32(curline, x) = rgb_t::black();
 	else
 	{
 		/* Update clip window masks if necessary */

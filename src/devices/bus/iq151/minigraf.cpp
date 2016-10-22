@@ -82,7 +82,7 @@ void iq151_minigraf_device::device_stop()
 
 	if (filerr == osd_file::error::NONE)
 	{
-		static const rgb_t png_palette[] = { rgb_t::white, rgb_t::black };
+		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
 
 		// save the paper into a png
 		png_write_bitmap(file, nullptr, *m_paper, 2, png_palette);

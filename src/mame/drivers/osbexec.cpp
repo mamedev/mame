@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_CPU_IO_MAP( osbexec_io)
 	MCFG_Z80_DAISY_CHAIN( osbexec_daisy_config )
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )    /* May not be correct */
 	MCFG_SCREEN_PALETTE("palette")

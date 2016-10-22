@@ -162,7 +162,7 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 	MCFG_CPU_IO_MAP(mx2178_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not correct
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)

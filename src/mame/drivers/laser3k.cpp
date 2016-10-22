@@ -934,7 +934,7 @@ INPUT_PORTS_END
 // actual laser3000 has a digital RGB palette...
 static const rgb_t laser3k_palette[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0xE3, 0x1E, 0x60), /* Dark Red */
 	rgb_t(0x60, 0x4E, 0xBD), /* Dark Blue */
 	rgb_t(0xFF, 0x44, 0xFD), /* Purple */

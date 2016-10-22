@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( olypeopl, peoplepc_state)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(XTAL_22MHz,640,0,640,475,0,475)
 	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
 

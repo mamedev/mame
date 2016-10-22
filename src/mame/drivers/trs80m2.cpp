@@ -437,7 +437,7 @@ uint32_t trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 {
 	if (m_blnkvid)
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.erase(cliprect);
 	}
 	else
 	{
@@ -706,7 +706,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_CPU_IO_MAP(z80_io)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)
@@ -796,7 +796,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_DEVICE_DISABLE()
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)

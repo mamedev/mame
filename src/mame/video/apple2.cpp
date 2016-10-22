@@ -1608,7 +1608,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
  */
 static const rgb_t apple2_palette[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0xE3, 0x1E, 0x60), /* Dark Red */
 	rgb_t(0x60, 0x4E, 0xBD), /* Dark Blue */
 	rgb_t(0xFF, 0x44, 0xFD), /* Purple */

@@ -57,7 +57,7 @@ PALETTE_INIT_MEMBER(quasar_state,quasar)
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
 		/* intensity 0 */
-		palette.set_indirect_color(0x100 + i, rgb_t::black);
+		palette.set_indirect_color(0x100 + i, rgb_t::black());
 
 		/* intensity 1 */
 		color = rgb_t(r >> 2, g >> 2, b >> 2);

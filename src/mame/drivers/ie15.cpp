@@ -656,7 +656,7 @@ GFXDECODE_END
 
 //PALETTE_INIT_MEMBER( ie15_state, ie15 )
 //{
-//	palette.set_pen_color(0, rgb_t::black); // black
+//	palette.set_pen_color(0, rgb_t::black()); // black
 //	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
 //}
 
@@ -670,7 +670,7 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 	//MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_30_8MHz/(2*IE15_HORZ_START)))
 
 	/* Video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(ie15_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_30_8MHz/2, IE15_TOTAL_HORZ, IE15_HORZ_START,
 		IE15_HORZ_START+IE15_DISP_HORZ, IE15_TOTAL_VERT, IE15_VERT_START,

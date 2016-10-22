@@ -90,7 +90,7 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 				if (color)
 				{
-					bool black = bitmap.pix32(y, x) == rgb_t::black;
+					bool black = bitmap.pix32(y, x) == rgb_t::black();
 					bool opaque = !BIT(fgctl, 3);
 
 					if (black || opaque)
@@ -126,7 +126,7 @@ void abc800_state::video_start()
 uint32_t abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.erase(cliprect);
 
 	// draw text
 	if (!BIT(m_fgctl, 7))
@@ -274,7 +274,7 @@ MC6845_UPDATE_ROW( abc800m_state::abc800m_update_row )
 uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.erase(cliprect);
 
 	// draw HR graphics
 	hr_update(bitmap, cliprect);

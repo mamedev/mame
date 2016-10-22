@@ -212,7 +212,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	{
 		float width;
 		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = (std::max)(width, maxwidth);
 	}
@@ -366,7 +366,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	{
 		float width;
 		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = (std::max)(maxwidth, width);
 	}
@@ -567,7 +567,7 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 			if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
 			{
 				hover = HOVER_B_FAV + z;
-				color = rgb_t::white;
+				color = rgb_t::white();
 				float ypos = y2 + ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 				ui().draw_text_box(container(), _(hover_msg[z]), ui::text_layout::CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
 			}
@@ -588,7 +588,7 @@ void menu_select_launch::draw_star(float x0, float y0)
 {
 	float y1 = y0 + ui().get_line_height();
 	float x1 = x0 + ui().get_line_height() * container().manager().ui_aspect();
-	container().add_quad(x0, y0, x1, y1, rgb_t::white, m_cache->star_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
+	container().add_quad(x0, y0, x1, y1, rgb_t::white(), m_cache->star_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
 }
 
 
@@ -713,7 +713,7 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 	}
 
 	if (m_icons_bitmap[linenum] != nullptr && m_icons_bitmap[linenum]->valid())
-		container().add_quad(x0, y0, x1, y1, rgb_t::white, m_icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_quad(x0, y0, x1, y1, rgb_t::white(), m_icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	return ud_arrow_width * 1.5f;
 }
@@ -1725,7 +1725,7 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 		float text_length;
 		ui().draw_text_full(container(),
 				_(arts_info[x].first), origx1, origy1, origx2 - origx1,
-				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black,
+				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
 				&text_length, nullptr);
 		title_size = (std::max)(text_length + 0.01f, title_size);
 	}
@@ -1867,7 +1867,7 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 		float const y2 = origy2 - UI_BOX_TB_BORDER - line_height;
 
 		// apply texture
-		container().add_quad(x1, y1, x2, y2, rgb_t::white, m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_quad(x1, y1, x2, y2, rgb_t::white(), m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 }
 

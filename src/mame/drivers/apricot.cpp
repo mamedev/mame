@@ -284,7 +284,7 @@ uint32_t apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb3
 	if (!m_display_on)
 		m_crtc->screen_update(screen, bitmap, cliprect);
 	else
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.erase(cliprect);
 
 	return 0;
 }
@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_RAM_DEFAULT_SIZE("256k")
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(72)

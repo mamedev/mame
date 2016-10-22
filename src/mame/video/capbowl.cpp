@@ -133,7 +133,7 @@ uint32_t capbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	/* if we're blanked, just fill with black */
 	if (m_tms34061->m_display.blanked)
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.erase(cliprect);
 		return 0;
 	}
 
