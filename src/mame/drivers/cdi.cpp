@@ -140,7 +140,7 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 {
 	bool send = false;
 
-	switch((FPTR)param)
+	switch((uintptr_t)param)
 	{
 		case 0x39:
 			if (m_input1.read_safe(0) & 0x01) send = true;
@@ -177,7 +177,7 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 
 	if(send)
 	{
-		UINT8 data = (UINT8)((FPTR)param & 0x000000ff);
+		UINT8 data = (UINT8)((uintptr_t)param & 0x000000ff);
 		m_scc->quizard_rx(data);
 	}
 }

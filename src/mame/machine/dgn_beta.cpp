@@ -202,7 +202,7 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 		m_PageRegs[m_TaskReg][Page].memory=readbank;
 		membank(page_num)->set_base(readbank);
 
-		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)(FPTR)readbank));
+		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)(uintptr_t)readbank));
 		LOG_BANK_UPDATE(("PageRegsSet Task=%X Page=%x\n",m_TaskReg,Page));
 		//LOG_BANK_UPDATE(("%X)\n",membank(Page+1)));
 		LOG_BANK_UPDATE(("memory_install_write8_handler CPU=0\n"));

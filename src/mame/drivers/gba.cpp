@@ -154,7 +154,7 @@ TIMER_CALLBACK_MEMBER(gba_state::dma_complete)
 {
 	static const UINT32 ch_int[4] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
 
-	FPTR ch = param;
+	uintptr_t ch = param;
 
 //  printf("dma complete: ch %d\n", ch);
 
@@ -394,7 +394,7 @@ void gba_state::audio_tick(int ref)
 TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 {
 	static const UINT32 tmr_ints[4] = { INT_TM0_OVERFLOW, INT_TM1_OVERFLOW, INT_TM2_OVERFLOW, INT_TM3_OVERFLOW };
-	FPTR tmr = (FPTR) param;
+	uintptr_t tmr = (uintptr_t) param;
 
 	// "The reload value is copied into the counter only upon following two situations: Automatically upon timer overflows,"
 	// "or when the timer start bit becomes changed from 0 to 1."

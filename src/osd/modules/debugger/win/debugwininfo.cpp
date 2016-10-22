@@ -563,7 +563,7 @@ LRESULT CALLBACK debugwin_info::static_window_proc(HWND wnd, UINT message, WPARA
 		return 0;
 	}
 
-	debugwin_info *const info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	debugwin_info *const info = (debugwin_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	if (info == nullptr)
 		return DefWindowProc(wnd, message, wparam, lparam);
 

@@ -51,7 +51,7 @@ public:
 	 * the pixel values rgb_t(0xff,0xff,0xff,0xff) or
 	 * rgb_t(0x00,0xff,0xff,0xff) for each pixel of a black & white font
 	 */
-	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) = 0;
+	virtual bool get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) = 0;
 };
 
 // ======================> osd_interface

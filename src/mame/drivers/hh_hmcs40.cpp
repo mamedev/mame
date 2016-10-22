@@ -341,7 +341,7 @@ void hh_hmcs40_state::set_interrupt(int line, int state)
 
 INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 {
-	set_interrupt((int)(FPTR)param, newval);
+	set_interrupt((int)(uintptr_t)param, newval);
 }
 
 

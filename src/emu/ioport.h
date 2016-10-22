@@ -37,12 +37,12 @@ const ioport_value IP_ACTIVE_LOW = 0xffffffff;
 const int MAX_PLAYERS = 10;
 
 // unicode constants
-const unicode_char UCHAR_PRIVATE = 0x100000;
-const unicode_char UCHAR_SHIFT_1 = UCHAR_PRIVATE + 0;
-const unicode_char UCHAR_SHIFT_2 = UCHAR_PRIVATE + 1;
-const unicode_char UCHAR_SHIFT_BEGIN = UCHAR_SHIFT_1;
-const unicode_char UCHAR_SHIFT_END = UCHAR_SHIFT_2;
-const unicode_char UCHAR_MAMEKEY_BEGIN = UCHAR_PRIVATE + 2;
+const char32_t UCHAR_PRIVATE = 0x100000;
+const char32_t UCHAR_SHIFT_1 = UCHAR_PRIVATE + 0;
+const char32_t UCHAR_SHIFT_2 = UCHAR_PRIVATE + 1;
+const char32_t UCHAR_SHIFT_BEGIN = UCHAR_SHIFT_1;
+const char32_t UCHAR_SHIFT_END = UCHAR_SHIFT_2;
+const char32_t UCHAR_MAMEKEY_BEGIN = UCHAR_PRIVATE + 2;
 
 
 // sequence types for input_port_seq() call
@@ -1073,7 +1073,7 @@ public:
 	const ioport_value *remap_table() const { return m_remap_table; }
 
 	UINT8 way() const { return m_way; }
-	unicode_char keyboard_code(int which) const;
+	char32_t keyboard_code(int which) const;
 	std::string key_name(int which) const;
 	ioport_field_live &live() const { assert(m_live != nullptr); return *m_live; }
 
@@ -1159,7 +1159,7 @@ private:
 
 	// data relevant to other specific types
 	UINT8                       m_way;              // digital joystick 2/4/8-way descriptions
-	unicode_char                m_chars[4];         // unicode key data
+	char32_t                m_chars[4];         // unicode key data
 };
 
 
@@ -1513,7 +1513,7 @@ public:
 
 	// field helpers
 	void field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
-	void field_add_char(unicode_char ch);
+	void field_add_char(char32_t ch);
 	void field_add_code(input_seq_type which, input_code code);
 	void field_set_way(int way) const { m_curfield->m_way = way; }
 	void field_set_rotated() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_ROTATED; }

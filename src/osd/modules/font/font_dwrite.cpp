@@ -400,7 +400,7 @@ public:
 	//  pixel of a black & white font
 	//-------------------------------------------------
 
-	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override
+	virtual bool get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override
 	{
 		const int MEM_ALIGN_CONST = 31;
 		const int BITMAP_PAD = 50;

@@ -156,7 +156,7 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// coincounter on coin insert
-	if (((int)(FPTR)param) == 0)
+	if (((int)(uintptr_t)param) == 0)
 		machine().bookkeeping().coin_counter_w(0, newval);
 }
 

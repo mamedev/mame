@@ -154,7 +154,7 @@ WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_portb_w)
 
 CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 {
-	int coin = (FPTR)param;
+	int coin = (uintptr_t)param;
 
 	/* return coin counter values */
 	return m_coin_counter[coin] & 3;
@@ -163,7 +163,7 @@ CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 
 INPUT_CHANGED_MEMBER(arcadia_amiga_state::coin_changed_callback)
 {
-	int coin = (FPTR)param;
+	int coin = (uintptr_t)param;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval && m_coin_counter[coin] < 3)

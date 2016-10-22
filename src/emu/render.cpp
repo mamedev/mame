@@ -205,7 +205,7 @@ inline item_layer get_layer_and_blendmode(const layout_view &view, int index, in
 void render_primitive::reset()
 {
 	// do not clear m_next!
-	memset(&type, 0, FPTR(&texcoords + 1) - FPTR(&type));
+	memset(&type, 0, uintptr_t(&texcoords + 1) - uintptr_t(&type));
 }
 
 

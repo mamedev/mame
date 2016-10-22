@@ -304,7 +304,7 @@ INPUT_CHANGED_MEMBER(guab_state::coin_inserted)
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		/* Get the current credit value and add the new coin value */
-		credit = space.read_dword(0x8002c) + (UINT32)(FPTR)param;
+		credit = space.read_dword(0x8002c) + (UINT32)(uintptr_t)param;
 		space.write_dword(0x8002c, credit);
 	}
 }

@@ -247,7 +247,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 	drccodeptr *top = m_cache.begin_codegen(sizeof(UINT64) + sizeof(UINT32) + 2 * sizeof(UINT32) * m_entry_list.count());
 	if (top == nullptr)
 		block.abort();
-	UINT32 *dest = (UINT32 *)(((FPTR)*top + 7) & ~7);
+	UINT32 *dest = (UINT32 *)(((uintptr_t)*top + 7) & ~7);
 
 	// store the cookie first
 	*(UINT64 *)dest = m_uniquevalue;
@@ -355,7 +355,7 @@ UINT32 drc_map_variables::get_value(drccodeptr codebase, UINT32 mapvar) const
 	mapvar -= MAPVAR_M0;
 
 	// get an aligned pointer to start scanning
-	UINT64 *curscan = (UINT64 *)(((FPTR)codebase | 7) + 1);
+	UINT64 *curscan = (UINT64 *)(((uintptr_t)codebase | 7) + 1);
 	UINT64 *endscan = (UINT64 *)m_cache.top();
 
 	// look for the signature

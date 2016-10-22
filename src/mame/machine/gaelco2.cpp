@@ -221,7 +221,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bang_state::bang_irq)
 
 CUSTOM_INPUT_MEMBER(wrally2_state::wrally2_analog_bit_r)
 {
-	int which = (FPTR)param;
+	int which = (uintptr_t)param;
 	return (m_analog_ports[which] >> 7) & 0x01;
 }
 

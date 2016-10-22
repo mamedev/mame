@@ -117,7 +117,7 @@ INPUT_CHANGED_MEMBER(chessmst_state::view_monitor_button)
 
 INPUT_CHANGED_MEMBER(chessmst_state::chessmst_sensor)
 {
-	UINT8 pos = (UINT8)(FPTR)param;
+	UINT8 pos = (UINT8)(uintptr_t)param;
 
 	if (newval)
 	{

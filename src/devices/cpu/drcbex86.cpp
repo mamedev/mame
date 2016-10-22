@@ -452,7 +452,7 @@ inline void drcbe_x86::set_last_lower_reg(x86code *&dst, const be_parameter &par
 	if (param.is_memory())
 	{
 		m_last_lower_reg = reglo;
-		m_last_lower_addr = (UINT32 *)((FPTR)param.memory());
+		m_last_lower_addr = (UINT32 *)((uintptr_t)param.memory());
 		m_last_lower_pc = dst;
 	}
 }
@@ -466,7 +466,7 @@ inline void drcbe_x86::set_last_lower_reg(x86code *&dst, const be_parameter &par
 inline void drcbe_x86::set_last_upper_reg(x86code *&dst, const be_parameter &param, UINT8 reghi)
 {
 	m_last_upper_reg = reghi;
-	m_last_upper_addr = (param.is_int_register()) ? m_reghi[param.ireg()] : (UINT32 *)((FPTR)param.memory(4));
+	m_last_upper_addr = (param.is_int_register()) ? m_reghi[param.ireg()] : (UINT32 *)((uintptr_t)param.memory(4));
 	m_last_upper_pc = dst;
 }
 
@@ -677,8 +677,8 @@ void drcbe_x86::reset()
 	emit_mov_m32_r32(dst, MBD(REG_ECX, offsetof(drcuml_machine_state, exp)), REG_EAX);  // mov    state->exp,eax
 	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.r); regnum++)
 	{
-		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)nullptr)->r[regnum].w.l;
-		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)nullptr)->r[regnum].w.h;
+		uintptr_t regoffsl = (uintptr_t)&((drcuml_machine_state *)nullptr)->r[regnum].w.l;
+		uintptr_t regoffsh = (uintptr_t)&((drcuml_machine_state *)nullptr)->r[regnum].w.h;
 		if (int_register_map[regnum] != 0)
 			emit_mov_m32_r32(dst, MBD(REG_ECX, regoffsl), int_register_map[regnum]);
 		else
@@ -691,8 +691,8 @@ void drcbe_x86::reset()
 	}
 	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.f); regnum++)
 	{
-		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)nullptr)->f[regnum].s.l;
-		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)nullptr)->f[regnum].s.h;
+		uintptr_t regoffsl = (uintptr_t)&((drcuml_machine_state *)nullptr)->f[regnum].s.l;
+		uintptr_t regoffsh = (uintptr_t)&((drcuml_machine_state *)nullptr)->f[regnum].s.h;
 		emit_mov_r32_m32(dst, REG_EAX, MABS(&m_state.f[regnum].s.l));
 		emit_mov_m32_r32(dst, MBD(REG_ECX, regoffsl), REG_EAX);
 		emit_mov_r32_m32(dst, REG_EAX, MABS(&m_state.f[regnum].s.h));
@@ -706,8 +706,8 @@ void drcbe_x86::reset()
 	m_restore = dst;
 	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.r); regnum++)
 	{
-		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)nullptr)->r[regnum].w.l;
-		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)nullptr)->r[regnum].w.h;
+		uintptr_t regoffsl = (uintptr_t)&((drcuml_machine_state *)nullptr)->r[regnum].w.l;
+		uintptr_t regoffsh = (uintptr_t)&((drcuml_machine_state *)nullptr)->r[regnum].w.h;
 		if (int_register_map[regnum] != 0)
 			emit_mov_r32_m32(dst, int_register_map[regnum], MBD(REG_ECX, regoffsl));
 		else
@@ -720,8 +720,8 @@ void drcbe_x86::reset()
 	}
 	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.f); regnum++)
 	{
-		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)nullptr)->f[regnum].s.l;
-		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)nullptr)->f[regnum].s.h;
+		uintptr_t regoffsl = (uintptr_t)&((drcuml_machine_state *)nullptr)->f[regnum].s.l;
+		uintptr_t regoffsh = (uintptr_t)&((drcuml_machine_state *)nullptr)->f[regnum].s.h;
 		emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, regoffsl));
 		emit_mov_m32_r32(dst, MABS(&m_state.f[regnum].s.l), REG_EAX);
 		emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, regoffsh));
@@ -780,7 +780,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 		block.abort();
 
 	// compute the base by aligning the cache top to a cache line (assumed to be 64 bytes)
-	x86code *base = (x86code *)(((FPTR)*cachetop + 63) & ~63);
+	x86code *base = (x86code *)(((uintptr_t)*cachetop + 63) & ~63);
 	x86code *dst = base;
 
 	// generate code
@@ -891,7 +891,7 @@ void drcbe_x86::emit_mov_r32_p32_keepflags(x86code *&dst, UINT8 reg, const be_pa
 		emit_mov_r32_imm(dst, reg, param.immediate());                                      // mov   reg,param
 	else if (param.is_memory())
 	{
-		if (!can_skip_lower_load(dst, (UINT32 *)((FPTR)param.memory()), reg))
+		if (!can_skip_lower_load(dst, (UINT32 *)((uintptr_t)param.memory()), reg))
 			emit_mov_r32_m32(dst, reg, MABS(param.memory()));                               // mov   reg,[param]
 	}
 	else if (param.is_int_register())
@@ -913,7 +913,7 @@ void drcbe_x86::emit_mov_m32_p32(x86code *&dst, x86_memref memref, const be_para
 		emit_mov_m32_imm(dst, memref, param.immediate());                                   // mov   [mem],param
 	else if (param.is_memory())
 	{
-		if (!can_skip_lower_load(dst, (UINT32 *)((FPTR)param.memory()), REG_EAX))
+		if (!can_skip_lower_load(dst, (UINT32 *)((uintptr_t)param.memory()), REG_EAX))
 			emit_mov_r32_m32(dst, REG_EAX, MABS(param.memory()));                           // mov   eax,[param]
 		emit_mov_m32_r32(dst, memref, REG_EAX);                                     // mov   [mem],eax
 	}
@@ -1641,8 +1641,8 @@ void drcbe_x86::emit_mov_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const 
 	}
 	else if (param.is_memory())
 	{
-		int skip_lower = can_skip_lower_load(dst, (UINT32 *)((FPTR)param.memory()), reglo);
-		int skip_upper = can_skip_upper_load(dst, (UINT32 *)((FPTR)param.memory(4)), reghi);
+		int skip_lower = can_skip_lower_load(dst, (UINT32 *)((uintptr_t)param.memory()), reglo);
+		int skip_upper = can_skip_upper_load(dst, (UINT32 *)((uintptr_t)param.memory(4)), reghi);
 		if (reglo != REG_NONE && !skip_lower)
 			emit_mov_r32_m32(dst, reglo, MABS(param.memory()));                         // mov   reglo,[param]
 		if (reghi != REG_NONE && !skip_upper)
@@ -1676,8 +1676,8 @@ void drcbe_x86::emit_mov_r64_p64_keepflags(x86code *&dst, UINT8 reglo, UINT8 reg
 	}
 	else if (param.is_memory())
 	{
-		int skip_lower = can_skip_lower_load(dst, (UINT32 *)((FPTR)param.memory()), reglo);
-		int skip_upper = can_skip_upper_load(dst, (UINT32 *)((FPTR)param.memory(4)), reghi);
+		int skip_lower = can_skip_lower_load(dst, (UINT32 *)((uintptr_t)param.memory()), reglo);
+		int skip_upper = can_skip_upper_load(dst, (UINT32 *)((uintptr_t)param.memory(4)), reghi);
 		if (reglo != REG_NONE && !skip_lower)
 			emit_mov_r32_m32(dst, reglo, MABS(param.memory()));                         // mov   reglo,[param]
 		if (reghi != REG_NONE && !skip_upper)
@@ -1708,7 +1708,7 @@ void drcbe_x86::emit_mov_m64_p64(x86code *&dst, x86_memref memref, const be_para
 	}
 	else if (param.is_memory())
 	{
-		int skip_lower = can_skip_lower_load(dst, (UINT32 *)((FPTR)param.memory()), REG_EAX);
+		int skip_lower = can_skip_lower_load(dst, (UINT32 *)((uintptr_t)param.memory()), REG_EAX);
 		if (!skip_lower)
 			emit_mov_r32_m32(dst, REG_EAX, MABS(param.memory()));                           // mov   eax,[param]
 		emit_mov_m32_r32(dst, memref + 0, REG_EAX);                                 // mov   [mem],eax
@@ -2850,7 +2850,7 @@ void drcbe_x86::fixup_exception(drccodeptr *codeptr, void *param1, void *param2)
 	emit_mov_m32_p32(dst, MABS(&m_state.exp), exp);                     // mov   [exp],exp
 
 	// push the original return address on the stack
-	emit_push_imm(dst, (FPTR)src);                                                      // push  <return>
+	emit_push_imm(dst, (uintptr_t)src);                                                      // push  <return>
 	if (*targetptr != nullptr)
 		emit_jmp(dst, *targetptr);                                                      // jmp   *targetptr
 	else
@@ -3012,7 +3012,7 @@ void drcbe_x86::op_debug(x86code *&dst, const instruction &inst)
 
 		// push the parameter
 		emit_mov_m32_p32(dst, MBD(REG_ESP, 4), pcp);                            // mov   [esp+4],pcp
-		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)&m_device);                    // mov   [esp],device
+		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)&m_device);                    // mov   [esp],device
 		emit_call(dst, (x86code *)debugger_instruction_hook);                           // call  debug_cpu_instruction_hook
 
 		track_resolve_link(dst, skip);                                              // skip:
@@ -3274,8 +3274,8 @@ void drcbe_x86::op_callc(x86code *&dst, const instruction &inst)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
 	// perform the call
-	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)paramp.memory());                          // mov   [esp],paramp
-	emit_call(dst, (x86code *)(FPTR)funcp.cfunc());                                     // call  funcp
+	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)paramp.memory());                          // mov   [esp],paramp
+	emit_call(dst, (x86code *)(uintptr_t)funcp.cfunc());                                     // call  funcp
 
 	// resolve the conditional link
 	if (inst.condition() != uml::COND_ALWAYS)
@@ -3303,7 +3303,7 @@ void drcbe_x86::op_recover(x86code *&dst, const instruction &inst)
 	emit_sub_r32_imm(dst, REG_EAX, 1);                                                  // sub   eax,1
 	emit_mov_m32_imm(dst, MBD(REG_ESP, 8), inst.param(1).mapvar());                     // mov   [esp+8],param1
 	emit_mov_m32_r32(dst, MBD(REG_ESP, 4), REG_EAX);                                    // mov   [esp+4],eax
-	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)&m_map);                           // mov   [esp],m_map
+	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)&m_map);                           // mov   [esp],m_map
 	emit_call(dst, (x86code *)&drc_map_variables::static_get_value);                    // call  drcmap_get_value
 	emit_mov_p32_r32(dst, dstp, REG_EAX);                                       // mov   dstp,eax
 }
@@ -3548,7 +3548,7 @@ void drcbe_x86::op_save(x86code *&dst, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_M);
 
 	// copy live state to the destination
-	emit_mov_r32_imm(dst, REG_ECX, (FPTR)dstp.memory());                                        // mov    ecx,dstp
+	emit_mov_r32_imm(dst, REG_ECX, (uintptr_t)dstp.memory());                                        // mov    ecx,dstp
 	emit_call(dst, m_save);                                                     // call   save
 }
 
@@ -3567,7 +3567,7 @@ void drcbe_x86::op_restore(x86code *&dst, const instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_M);
 
 	// copy live state from the destination
-	emit_mov_r32_imm(dst, REG_ECX, (FPTR)srcp.memory());                                        // mov    ecx,dstp
+	emit_mov_r32_imm(dst, REG_ECX, (uintptr_t)srcp.memory());                                        // mov    ecx,dstp
 	emit_call(dst, m_restore);                                                  // call   restore
 }
 
@@ -3870,7 +3870,7 @@ void drcbe_x86::op_read(x86code *&dst, const instruction &inst)
 
 	// set up a call to the read byte handler
 	emit_mov_m32_p32(dst, MBD(REG_ESP, 4), addrp);                              // mov    [esp+4],addrp
-	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)m_space[spacesizep.space()]);  // mov    [esp],space
+	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)m_space[spacesizep.space()]);  // mov    [esp],space
 	if (spacesizep.size() == SIZE_BYTE)
 	{
 		emit_call(dst, (x86code *)m_accessors[spacesizep.space()].read_byte);
@@ -3950,7 +3950,7 @@ void drcbe_x86::op_readm(x86code *&dst, const instruction &inst)
 	else
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 8), maskp);                          // mov    [esp+8],maskp
 	emit_mov_m32_p32(dst, MBD(REG_ESP, 4), addrp);                              // mov    [esp+4],addrp
-	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)m_space[spacesizep.space()]);  // mov    [esp],space
+	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)m_space[spacesizep.space()]);  // mov    [esp],space
 	if (spacesizep.size() == SIZE_WORD)
 	{
 		emit_call(dst, (x86code *)m_accessors[spacesizep.space()].read_word_masked);
@@ -4020,7 +4020,7 @@ void drcbe_x86::op_write(x86code *&dst, const instruction &inst)
 	else
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 8), srcp);                           // mov    [esp+8],srcp
 	emit_mov_m32_p32(dst, MBD(REG_ESP, 4), addrp);                              // mov    [esp+4],addrp
-	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)m_space[spacesizep.space()]);  // mov    [esp],space
+	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)m_space[spacesizep.space()]);  // mov    [esp],space
 	if (spacesizep.size() == SIZE_BYTE)
 		emit_call(dst, (x86code *)m_accessors[spacesizep.space()].write_byte);
 																						// call   write_byte
@@ -4066,7 +4066,7 @@ void drcbe_x86::op_writem(x86code *&dst, const instruction &inst)
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 8), srcp);                           // mov    [esp+8],srcp
 	}
 	emit_mov_m32_p32(dst, MBD(REG_ESP, 4), addrp);                              // mov    [esp+4],addrp
-	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)m_space[spacesizep.space()]);  // mov    [esp],space
+	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)m_space[spacesizep.space()]);  // mov    [esp],space
 	if (spacesizep.size() == SIZE_WORD)
 		emit_call(dst, (x86code *)m_accessors[spacesizep.space()].write_word_masked);
 																						// call   write_word_masked
@@ -4848,10 +4848,10 @@ void drcbe_x86::op_mulu(x86code *&dst, const instruction &inst)
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 16), src2p);                     // mov   [esp+16],src2p
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 8), src1p);                          // mov   [esp+8],src1p
 		if (!compute_hi)
-			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (FPTR)&m_reslo);             // mov   [esp+4],&reslo
+			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (uintptr_t)&m_reslo);             // mov   [esp+4],&reslo
 		else
-			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (FPTR)&m_reshi);             // mov   [esp+4],&reshi
-		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)&m_reslo);                 // mov   [esp],&reslo
+			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (uintptr_t)&m_reshi);             // mov   [esp+4],&reshi
+		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)&m_reslo);                 // mov   [esp],&reslo
 		emit_call(dst, (x86code *)dmulu);                                               // call  dmulu
 		if (inst.flags() != 0)
 			emit_push_m32(dst, MABSI(flags_unmap, REG_EAX, 4));                         // push   flags_unmap[eax*4]
@@ -4978,10 +4978,10 @@ void drcbe_x86::op_muls(x86code *&dst, const instruction &inst)
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 16), src2p);                     // mov   [esp+16],src2p
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 8), src1p);                          // mov   [esp+8],src1p
 		if (!compute_hi)
-			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (FPTR)&m_reslo);             // mov   [esp+4],&reslo
+			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (uintptr_t)&m_reslo);             // mov   [esp+4],&reslo
 		else
-			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (FPTR)&m_reshi);             // push  [esp+4],&reshi
-		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)&m_reslo);                 // mov   [esp],&reslo
+			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (uintptr_t)&m_reshi);             // push  [esp+4],&reshi
+		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)&m_reslo);                 // mov   [esp],&reslo
 		emit_call(dst, (x86code *)dmuls);                                               // call  dmuls
 		if (inst.flags() != 0)
 			emit_push_m32(dst, MABSI(flags_unmap, REG_EAX, 4));                         // push   flags_unmap[eax*4]
@@ -5048,10 +5048,10 @@ void drcbe_x86::op_divu(x86code *&dst, const instruction &inst)
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 16), src2p);                     // mov   [esp+16],src2p
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 8), src1p);                          // mov   [esp+8],src1p
 		if (!compute_rem)
-			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (FPTR)&m_reslo);             // mov   [esp+4],&reslo
+			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (uintptr_t)&m_reslo);             // mov   [esp+4],&reslo
 		else
-			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (FPTR)&m_reshi);             // push  [esp+4],&reshi
-		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)&m_reslo);                 // mov   [esp],&reslo
+			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (uintptr_t)&m_reshi);             // push  [esp+4],&reshi
+		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)&m_reslo);                 // mov   [esp],&reslo
 		emit_call(dst, (x86code *)ddivu);                                               // call  ddivu
 		if (inst.flags() != 0)
 			emit_push_m32(dst, MABSI(flags_unmap, REG_EAX, 4));                         // push   flags_unmap[eax*4]
@@ -5118,10 +5118,10 @@ void drcbe_x86::op_divs(x86code *&dst, const instruction &inst)
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 16), src2p);                     // mov   [esp+16],src2p
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 8), src1p);                          // mov   [esp+8],src1p
 		if (!compute_rem)
-			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (FPTR)&m_reslo);             // mov   [esp+4],&reslo
+			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (uintptr_t)&m_reslo);             // mov   [esp+4],&reslo
 		else
-			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (FPTR)&m_reshi);             // push  [esp+4],&reshi
-		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)&m_reslo);                 // mov   [esp],&reslo
+			emit_mov_m32_imm(dst, MBD(REG_ESP, 4), (uintptr_t)&m_reshi);             // push  [esp+4],&reshi
+		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)&m_reslo);                 // mov   [esp],&reslo
 		emit_call(dst, (x86code *)ddivs);                                               // call  ddivs
 		if (inst.flags() != 0)
 			emit_push_m32(dst, MABSI(flags_unmap, REG_EAX, 4));                         // push   flags_unmap[eax*4]
@@ -6011,7 +6011,7 @@ void drcbe_x86::op_fread(x86code *&dst, const instruction &inst)
 
 	// set up a call to the read dword/qword handler
 	emit_mov_m32_p32(dst, MBD(REG_ESP, 4), addrp);                              // mov    [esp+4],addrp
-	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)m_space[spacep.space()]);      // mov    [esp],space
+	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)m_space[spacep.space()]);      // mov    [esp],space
 	if (inst.size() == 4)
 		emit_call(dst, (x86code *)m_accessors[spacep.space()].read_dword);  // call   read_dword
 	else if (inst.size() == 8)
@@ -6049,7 +6049,7 @@ void drcbe_x86::op_fwrite(x86code *&dst, const instruction &inst)
 	else if (inst.size() == 8)
 		emit_mov_m64_p64(dst, MBD(REG_ESP, 8), srcp);                           // mov    [esp+8],srcp
 	emit_mov_m32_p32(dst, MBD(REG_ESP, 4), addrp);                              // mov    [esp+4],addrp
-	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (FPTR)m_space[spacep.space()]);      // mov    [esp],space
+	emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)m_space[spacep.space()]);      // mov    [esp],space
 	if (inst.size() == 4)
 		emit_call(dst, (x86code *)m_accessors[spacep.space()].write_dword); // call   write_dword
 	else if (inst.size() == 8)

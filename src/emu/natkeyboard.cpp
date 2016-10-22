@@ -26,7 +26,7 @@
 //**************************************************************************
 
 const int KEY_BUFFER_SIZE = 4096;
-const unicode_char INVALID_CHAR = '?';
+const char32_t INVALID_CHAR = '?';
 
 
 
@@ -37,10 +37,10 @@ const unicode_char INVALID_CHAR = '?';
 // character information
 struct char_info
 {
-	unicode_char ch;
+	char32_t ch;
 	const char *alternate;  // alternative string, in UTF-8
 
-	static const char_info *find(unicode_char target);
+	static const char_info *find(char32_t target);
 };
 
 
@@ -381,7 +381,7 @@ void natural_keyboard::set_in_use(bool usage)
 //  post - post a single character
 //-------------------------------------------------
 
-void natural_keyboard::post(unicode_char ch)
+void natural_keyboard::post(char32_t ch)
 {
 	// ignore any \n that are preceded by \r
 	if (m_last_cr && ch == '\n')
@@ -426,14 +426,14 @@ void natural_keyboard::post(unicode_char ch)
 //  post - post a unicode encoded string
 //-------------------------------------------------
 
-void natural_keyboard::post(const unicode_char *text, size_t length, const attotime &rate)
+void natural_keyboard::post(const char32_t *text, size_t length, const attotime &rate)
 {
 	// set the fixed rate
 	m_current_rate = rate;
 
 	// 0 length means strlen
 	if (length == 0)
-		for (const unicode_char *scan = text; *scan != 0; scan++)
+		for (const char32_t *scan = text; *scan != 0; scan++)
 			length++;
 
 	// iterate over characters or until the buffer is full up
@@ -463,7 +463,7 @@ void natural_keyboard::post_utf8(const char *text, size_t length, const attotime
 	while (length > 0)
 	{
 		// decode the next character
-		unicode_char uc;
+		char32_t uc;
 		int count = uchar_from_utf8(&uc, text, length);
 		if (count < 0)
 		{
@@ -488,7 +488,7 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 	static const struct
 	{
 		const char *key;
-		unicode_char code;
+		char32_t code;
 	} codes[] =
 	{
 		{ "BACKSPACE",  8 },
@@ -533,7 +533,7 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 	while (curpos < length)
 	{
 		// extract next character
-		unicode_char ch = text[curpos];
+		char32_t ch = text[curpos];
 		size_t increment = 1;
 
 		// look for escape characters
@@ -576,7 +576,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 					if (field.type() == IPT_KEYBOARD)
 					{
 						// fetch the code, ignoring 0
-						unicode_char code = field.keyboard_code(curshift);
+						char32_t code = field.keyboard_code(curshift);
 						if (code == 0)
 							continue;
 
@@ -615,7 +615,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 //  unicode character can be directly posted
 //-------------------------------------------------
 
-bool natural_keyboard::can_post_directly(unicode_char ch)
+bool natural_keyboard::can_post_directly(char32_t ch)
 {
 	// if we have a queueing callback, then it depends on whether we can accept the character
 	if (!m_queue_chars.isnull())
@@ -632,7 +632,7 @@ bool natural_keyboard::can_post_directly(unicode_char ch)
 //  unicode character can be posted via translation
 //-------------------------------------------------
 
-bool natural_keyboard::can_post_alternate(unicode_char ch)
+bool natural_keyboard::can_post_alternate(char32_t ch)
 {
 	const char_info *info = char_info::find(ch);
 	if (info == nullptr)
@@ -644,7 +644,7 @@ bool natural_keyboard::can_post_alternate(unicode_char ch)
 
 	while (*altstring != 0)
 	{
-		unicode_char uchar;
+		char32_t uchar;
 		int count = uchar_from_utf8(&uchar, altstring, strlen(altstring));
 		if (count <= 0)
 			return false;
@@ -661,7 +661,7 @@ bool natural_keyboard::can_post_alternate(unicode_char ch)
 //  posting keyboard events
 //-------------------------------------------------
 
-attotime natural_keyboard::choose_delay(unicode_char ch)
+attotime natural_keyboard::choose_delay(char32_t ch)
 {
 	// if we have a live rate, just use that
 	if (m_current_rate != attotime::zero)
@@ -680,7 +680,7 @@ attotime natural_keyboard::choose_delay(unicode_char ch)
 //  internal_post - post a keyboard event
 //-------------------------------------------------
 
-void natural_keyboard::internal_post(unicode_char ch)
+void natural_keyboard::internal_post(char32_t ch)
 {
 	// need to start up the timer?
 	if (empty())
@@ -743,7 +743,7 @@ void natural_keyboard::timer(void *ptr, int param)
 //  logging and debugging
 //-------------------------------------------------
 
-std::string natural_keyboard::unicode_to_string(unicode_char ch)
+std::string natural_keyboard::unicode_to_string(char32_t ch)
 {
 	std::string buffer;
 	switch (ch)
@@ -781,7 +781,7 @@ std::string natural_keyboard::unicode_to_string(unicode_char ch)
 //  find_code - find a code in our lookup table
 //-------------------------------------------------
 
-const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(unicode_char ch) const
+const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(char32_t ch) const
 {
 	for (auto & elem : m_keycode_map)
 	{
@@ -831,7 +831,7 @@ std::string natural_keyboard::dump()
 //  character
 //-------------------------------------------------
 
-const char_info *char_info::find(unicode_char target)
+const char_info *char_info::find(char32_t target)
 {
 	// perform a simple binary search to find the proper alternate
 	int low = 0;
@@ -839,7 +839,7 @@ const char_info *char_info::find(unicode_char target)
 	while (high > low)
 	{
 		int middle = (high + low) / 2;
-		unicode_char ch = charinfo[middle].ch;
+		char32_t ch = charinfo[middle].ch;
 		if (ch < target)
 			low = middle + 1;
 		else if (ch > target)
@@ -861,7 +861,7 @@ int validate_natural_keyboard_statics(void)
 {
     int i;
     int error = FALSE;
-    unicode_char last_char = 0;
+    char32_t last_char = 0;
     const char_info *ci;
 
     // check to make sure that charinfo is in order

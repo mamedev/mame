@@ -237,13 +237,13 @@ READ32_MEMBER(palmz22_state::s3c2410_adc_data_r )
 
 INPUT_CHANGED_MEMBER(palmz22_state::palmz22_input_changed)
 {
-	if (((int)(FPTR)param) == 0)
+	if (((int)(uintptr_t)param) == 0)
 	{
 		m_s3c2410->s3c2410_touch_screen( (newval & 0x01) ? 1 : 0);
 	}
 	else
 	{
-		m_s3c2410->s3c2410_request_eint( (FPTR)param - 1);
+		m_s3c2410->s3c2410_request_eint( (uintptr_t)param - 1);
 	}
 }
 

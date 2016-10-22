@@ -620,7 +620,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 	// reset sequences and chars
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		m_seq[seqtype].set_default();
-	m_chars[0] = m_chars[1] = m_chars[2] = m_chars[3] = unicode_char(0);
+	m_chars[0] = m_chars[1] = m_chars[2] = m_chars[3] = char32_t(0);
 
 	// for DIP switches and configs, look for a default value from the owner
 	if (type == IPT_DIPSWITCH || type == IPT_CONFIG)
@@ -743,9 +743,9 @@ ioport_type_class ioport_field::type_class() const
 //  code
 //-------------------------------------------------
 
-unicode_char ioport_field::keyboard_code(int which) const
+char32_t ioport_field::keyboard_code(int which) const
 {
-	unicode_char ch;
+	char32_t ch;
 
 	if (which >= ARRAY_LENGTH(m_chars))
 		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
@@ -765,7 +765,7 @@ unicode_char ioport_field::keyboard_code(int which) const
 
 std::string ioport_field::key_name(int which) const
 {
-	unicode_char ch = keyboard_code(which);
+	char32_t ch = keyboard_code(which);
 
 	// attempt to get the string from the character info table
 	switch (ch)
@@ -1369,7 +1369,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		// loop through each character on the field
 		for (int which = 0; ; which++)
 		{
-			unicode_char ch = field.keyboard_code(which);
+			char32_t ch = field.keyboard_code(which);
 			if (ch == 0)
 				break;
 			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.key_name(which)));
@@ -2971,7 +2971,7 @@ const char *ioport_configurer::string_from_token(const char *string)
 		return nullptr;
 
 	// if the index is greater than the count, assume it to be a pointer
-	if (FPTR(string) >= INPUT_STRING_COUNT)
+	if (uintptr_t(string) >= INPUT_STRING_COUNT)
 		return string;
 
 #if FALSE // Set TRUE, If you want to take care missing-token or wrong-sorting
@@ -2980,14 +2980,14 @@ const char *ioport_configurer::string_from_token(const char *string)
 	{
 	int index;
 	for (index = 0; index < ARRAY_LENGTH(input_port_default_strings); index++)
-		if (input_port_default_strings[index].id == FPTR(string))
+		if (input_port_default_strings[index].id == uintptr_t(string))
 			return input_port_default_strings[index].string;
 	}
 	return "(Unknown Default)";
 
 #else
 
-	return input_port_default_strings[FPTR(string)-1].string;
+	return input_port_default_strings[uintptr_t(string)-1].string;
 
 #endif
 }
@@ -3056,7 +3056,7 @@ void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, iopor
 //  field_add_char - add a character to a field
 //-------------------------------------------------
 
-void ioport_configurer::field_add_char(unicode_char ch)
+void ioport_configurer::field_add_char(char32_t ch)
 {
 	for (int index = 0; index < ARRAY_LENGTH(m_curfield->m_chars); index++)
 		if (m_curfield->m_chars[index] == 0)

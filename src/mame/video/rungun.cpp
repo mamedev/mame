@@ -18,7 +18,7 @@
 /* TTL text plane stuff */
 TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 {
-	UINT32 base_addr = (FPTR)tilemap.user_data();
+	UINT32 base_addr = (uintptr_t)tilemap.user_data();
 	UINT8 *lvram = (UINT8 *)m_ttl_vram.get() + base_addr;
 	int attr, code;
 
@@ -58,7 +58,7 @@ WRITE16_MEMBER(rungun_state::rng_psac2_videoram_w)
 
 TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
 {
-	UINT32 base_addr = (FPTR)tilemap.user_data();
+	UINT32 base_addr = (uintptr_t)tilemap.user_data();
 	int tileno, colour, flipx;
 
 	tileno = m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0x3fff;
@@ -102,11 +102,11 @@ void rungun_state::video_start()
 	for(UINT32 screen_num = 0;screen_num < 2;screen_num++)
 	{
 		m_ttl_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-		m_ttl_tilemap[screen_num]->set_user_data((void *)(FPTR)(screen_num * 0x2000));
+		m_ttl_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x2000));
 		m_ttl_tilemap[screen_num]->set_transparent_pen(0);
 
 		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::get_rng_936_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
-		m_936_tilemap[screen_num]->set_user_data((void *)(FPTR)(screen_num * 0x80000));
+		m_936_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x80000));
 		m_936_tilemap[screen_num]->set_transparent_pen(0);
 
 	}

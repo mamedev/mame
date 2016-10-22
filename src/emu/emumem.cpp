@@ -4054,7 +4054,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 		{
 			m_allocated.resize(length + 0xfff);
 			memset(&m_allocated[0], 0, length + 0xfff);
-			m_data = reinterpret_cast<UINT8 *>((reinterpret_cast<FPTR>(&m_allocated[0]) + 0xfff) & ~0xfff);
+			m_data = reinterpret_cast<UINT8 *>((reinterpret_cast<uintptr_t>(&m_allocated[0]) + 0xfff) & ~0xfff);
 		}
 	}
 

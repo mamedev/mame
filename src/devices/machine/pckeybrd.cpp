@@ -893,7 +893,7 @@ WRITE8_MEMBER(at_keyboard_device::write)
   unicode_char_to_at_keycode
 ***************************************************************************/
 
-UINT8 pc_keyboard_device::unicode_char_to_at_keycode(unicode_char ch)
+UINT8 pc_keyboard_device::unicode_char_to_at_keycode(char32_t ch)
 {
 	UINT8 b;
 	switch(ch)
@@ -1034,7 +1034,7 @@ UINT8 pc_keyboard_device::unicode_char_to_at_keycode(unicode_char ch)
   queue_chars
 ***************************************************************************/
 
-int pc_keyboard_device::queue_chars(const unicode_char *text, size_t text_len)
+int pc_keyboard_device::queue_chars(const char32_t *text, size_t text_len)
 {
 	int i;
 	UINT8 b;
@@ -1293,7 +1293,7 @@ INPUT_PORTS_END
   Inputx stuff
 ***************************************************************************/
 
-bool pc_keyboard_device::accept_char(unicode_char ch)
+bool pc_keyboard_device::accept_char(char32_t ch)
 {
 	return unicode_char_to_at_keycode(ch) != 0;
 }

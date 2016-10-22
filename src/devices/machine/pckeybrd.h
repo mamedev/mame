@@ -49,13 +49,13 @@ protected:
 private:
 	void polling(void);
 	UINT32 readport(int port);
-	UINT8 unicode_char_to_at_keycode(unicode_char ch);
+	UINT8 unicode_char_to_at_keycode(char32_t ch);
 
 	virtual void standard_scancode_insert(int our_code, int pressed);
 	virtual void extended_scancode_insert(int code, int pressed) { }
 	int queue_size(void);
-	int queue_chars(const unicode_char *text, size_t text_len);
-	bool accept_char(unicode_char ch);
+	int queue_chars(const char32_t *text, size_t text_len);
+	bool accept_char(char32_t ch);
 	bool charqueue_empty();
 
 	bool m_on;

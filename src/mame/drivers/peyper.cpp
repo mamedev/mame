@@ -174,7 +174,7 @@ WRITE8_MEMBER(peyper_state::sol_w)
 
 CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{

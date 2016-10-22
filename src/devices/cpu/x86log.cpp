@@ -146,7 +146,7 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 		/* otherwise, do a disassembly of the current instruction */
 		else
 		{
-			bytes = i386_dasm_one_ex(buffer, (FPTR)cur, cur, sizeof(void *) * 8) & DASMFLAG_LENGTHMASK;
+			bytes = i386_dasm_one_ex(buffer, (uintptr_t)cur, cur, sizeof(void *) * 8) & DASMFLAG_LENGTHMASK;
 		}
 
 		/* if we have a matching comment, output it */

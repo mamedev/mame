@@ -548,7 +548,7 @@ WRITE8_MEMBER(esq5505_state::fdc_write_byte)
 #if KEYBOARD_HACK
 INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 {
-	int val = (UINT8)(FPTR)param;
+	int val = (UINT8)(uintptr_t)param;
 	int cmp = 0x60;
 
 	if (m_system_type == SQ1)
@@ -591,7 +591,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 		}
 		else if (oldval == 1 && newval == 0)
 		{
-	//        printf("key off %x\n", (UINT8)(FPTR)param);
+	//        printf("key off %x\n", (UINT8)(uintptr_t)param);
 			m_panel->xmit_char(val&0x7f);
 			m_panel->xmit_char(0x00);
 		}

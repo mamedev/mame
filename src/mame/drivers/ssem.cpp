@@ -108,7 +108,7 @@ INPUT_CHANGED_MEMBER(ssem_state::panel_check)
 	UINT8 edit3_state = ioport("EDIT3")->read();
 	UINT8 misc_state = ioport("MISC")->read();
 
-	switch( (int)(FPTR)param )
+	switch( (int)(uintptr_t)param )
 	{
 		case PANEL_BIT0:
 			if(edit0_state & 0x01) m_store[(m_store_line << 2) | 0] ^= 0x80;

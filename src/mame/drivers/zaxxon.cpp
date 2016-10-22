@@ -350,7 +350,7 @@ READ8_MEMBER(zaxxon_state::razmataz_counter_r)
 
 CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
 {
-	int num = (FPTR)param;
+	int num = (uintptr_t)param;
 	int res;
 
 	int delta = m_dials[num]->read();
@@ -399,14 +399,14 @@ INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 {
 	if (newval)
 	{
-		m_coin_status[(int)(FPTR)param] = m_coin_enable[(int)(FPTR)param];
+		m_coin_status[(int)(uintptr_t)param] = m_coin_enable[(int)(uintptr_t)param];
 	}
 }
 
 
 CUSTOM_INPUT_MEMBER(zaxxon_state::zaxxon_coin_r)
 {
-	return m_coin_status[(int)(FPTR)param];
+	return m_coin_status[(int)(uintptr_t)param];
 }
 
 

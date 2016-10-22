@@ -123,7 +123,7 @@ void *osd_malloc(size_t size)
 	UINT8 *const block = reinterpret_cast<UINT8 *>(HeapAlloc(GetProcessHeap(), 0, size));
 	if (block == nullptr)
 		return nullptr;
-	UINT8 *const result = reinterpret_cast<UINT8 *>(reinterpret_cast<FPTR>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(FPTR(MAX_ALIGNMENT) - 1));
+	UINT8 *const result = reinterpret_cast<UINT8 *>(reinterpret_cast<uintptr_t>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(uintptr_t(MAX_ALIGNMENT) - 1));
 
 	// store the size and return and pointer to the data afterward
 	*reinterpret_cast<size_t *>(block) = size;
@@ -161,7 +161,7 @@ void *osd_malloc_array(size_t size)
 
 	// work backwards from the page base to get to the block base
 	UINT8 *const block = GUARD_ALIGN_START ? reinterpret_cast<UINT8 *>(page_base) : (reinterpret_cast<UINT8 *>(page_base) + rounded_size - size);
-	UINT8 *const result = reinterpret_cast<UINT8 *>(reinterpret_cast<FPTR>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(FPTR(MAX_ALIGNMENT) - 1));
+	UINT8 *const result = reinterpret_cast<UINT8 *>(reinterpret_cast<uintptr_t>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(uintptr_t(MAX_ALIGNMENT) - 1));
 
 	// store the size at the start with a flag indicating it has a guard page
 	*reinterpret_cast<size_t *>(block) = size | 1;

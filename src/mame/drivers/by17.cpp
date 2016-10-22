@@ -431,8 +431,8 @@ INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER( by17_state::outhole_x0 )
 {
-	int bit_shift = ((FPTR)param & 0x07);
-	int port = (((FPTR)param >> 4) & 0x07);
+	int bit_shift = ((uintptr_t)param & 0x07);
+	int port = (((uintptr_t)param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in the Outhole so the Outhole Solenoid can release it */
 
@@ -444,8 +444,8 @@ CUSTOM_INPUT_MEMBER( by17_state::outhole_x0 )
 
 CUSTOM_INPUT_MEMBER( by17_state::saucer_x3 )
 {
-	int bit_shift = ((FPTR)param & 0x07);
-	int port = (((FPTR)param >> 4) & 0x07);
+	int bit_shift = ((uintptr_t)param & 0x07);
+	int port = (((uintptr_t)param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in a Saucer so the Saucer Solenoid can release it */
 
@@ -460,8 +460,8 @@ CUSTOM_INPUT_MEMBER( by17_state::drop_target_x2 )
 {
 	/* Here we simulate fallen Drop Targets so the Drop Target Reset Solenoids can release the switches */
 
-	int bit_shift = ((FPTR)param & 0x07);
-	int port = (((FPTR)param >> 4) & 0x07);
+	int bit_shift = ((uintptr_t)param & 0x07);
+	int port = (((uintptr_t)param >> 4) & 0x07);
 
 	switch (bit_shift)
 	{

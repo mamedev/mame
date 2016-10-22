@@ -138,12 +138,12 @@ menu_select_game::~menu_select_game()
 	game_driver const *const driver(isfavorite() ? nullptr : reinterpret_cast<game_driver const *>(get_selection_ref()));
 	ui_software_info *const swinfo(isfavorite() ? reinterpret_cast<ui_software_info *>(get_selection_ref()) : nullptr);
 
-	if (reinterpret_cast<FPTR>(driver) > skip_main_items)
+	if (reinterpret_cast<uintptr_t>(driver) > skip_main_items)
 		last_driver = driver->name;
 	else if (driver && m_prev_selected)
 		last_driver = reinterpret_cast<game_driver const *>(m_prev_selected)->name;
 
-	if (reinterpret_cast<FPTR>(swinfo) > skip_main_items)
+	if (reinterpret_cast<uintptr_t>(swinfo) > skip_main_items)
 		last_driver = swinfo->shortname;
 	else if (swinfo && m_prev_selected)
 		last_driver = reinterpret_cast<ui_software_info *>(m_prev_selected)->shortname;
@@ -255,7 +255,7 @@ void menu_select_game::handle()
 				if (!isfavorite())
 				{
 					const game_driver *drv = (const game_driver *)menu_event->itemref;
-					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view > 0)
+					if ((uintptr_t)drv > skip_main_items && ui_globals::curdats_view > 0)
 					{
 						ui_globals::curdats_view--;
 						m_topline_datsview = 0;
@@ -269,7 +269,7 @@ void menu_select_game::handle()
 						ui_globals::curdats_view--;
 						m_topline_datsview = 0;
 					}
-					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view > 0)
+					else if ((uintptr_t)drv > skip_main_items && ui_globals::cur_sw_dats_view > 0)
 					{
 						ui_globals::cur_sw_dats_view--;
 						m_topline_datsview = 0;
@@ -293,7 +293,7 @@ void menu_select_game::handle()
 				if (!isfavorite())
 				{
 					const game_driver *drv = (const game_driver *)menu_event->itemref;
-					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
+					if ((uintptr_t)drv > skip_main_items && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
 					{
 						ui_globals::curdats_view++;
 						m_topline_datsview = 0;
@@ -307,7 +307,7 @@ void menu_select_game::handle()
 						ui_globals::curdats_view++;
 						m_topline_datsview = 0;
 					}
-					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
+					else if ((uintptr_t)drv > skip_main_items && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
 					{
 						ui_globals::cur_sw_dats_view++;
 						m_topline_datsview = 0;
@@ -347,14 +347,14 @@ void menu_select_game::handle()
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)menu_event->itemref;
-				if ((FPTR)driver > skip_main_items && mame_machine_manager::instance()->lua()->call_plugin(driver->name, "data_list"))
+				if ((uintptr_t)driver > skip_main_items && mame_machine_manager::instance()->lua()->call_plugin(driver->name, "data_list"))
 					menu::stack_push<menu_dats_view>(ui(), container(), driver);
 			}
 			else
 			{
 				ui_software_info *ui_swinfo  = (ui_software_info *)menu_event->itemref;
 
-				if ((FPTR)ui_swinfo > skip_main_items)
+				if ((uintptr_t)ui_swinfo > skip_main_items)
 				{
 					if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin(ui_swinfo->driver->name, "data_list"))
 						menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
@@ -369,7 +369,7 @@ void menu_select_game::handle()
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)menu_event->itemref;
-				if ((FPTR)driver > skip_main_items)
+				if ((uintptr_t)driver > skip_main_items)
 				{
 					favorite_manager &mfav = mame_machine_manager::instance()->favorite();
 					if (!mfav.isgame_favorite(driver))
@@ -388,7 +388,7 @@ void menu_select_game::handle()
 			else
 			{
 				ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
-				if ((FPTR)swinfo > skip_main_items)
+				if ((uintptr_t)swinfo > skip_main_items)
 				{
 					machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
 					mame_machine_manager::instance()->favorite().remove_favorite_game(*swinfo);
@@ -592,12 +592,12 @@ void menu_select_game::populate()
 	// add special items
 	if (stack_has_special_main_menu())
 	{
-		item_append(_("Configure Options"), "", flags_ui, (void *)(FPTR)CONF_OPTS);
-		item_append(_("Configure Machine"), "", flags_ui, (void *)(FPTR)CONF_MACHINE);
+		item_append(_("Configure Options"), "", flags_ui, (void *)(uintptr_t)CONF_OPTS);
+		item_append(_("Configure Machine"), "", flags_ui, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 2;
 		if (machine().options().plugins())
 		{
-			item_append(_("Plugins"), "", flags_ui, (void *)(FPTR)CONF_PLUGINS);
+			item_append(_("Plugins"), "", flags_ui, (void *)(uintptr_t)CONF_PLUGINS);
 			skip_main_items++;
 		}
 	}
@@ -773,11 +773,11 @@ void menu_select_game::inkey_select(const event *menu_event)
 	const game_driver *driver = (const game_driver *)menu_event->itemref;
 
 	// special case for configure options
-	if ((FPTR)driver == CONF_OPTS)
+	if ((uintptr_t)driver == CONF_OPTS)
 		menu::stack_push<menu_game_options>(ui(), container());
 
 	// special case for configure machine
-	else if (FPTR(driver) == CONF_MACHINE)
+	else if (uintptr_t(driver) == CONF_MACHINE)
 	{
 		if (m_prev_selected)
 			menu::stack_push<menu_machine_configure>(ui(), container(), reinterpret_cast<const game_driver *>(m_prev_selected));
@@ -785,7 +785,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 	}
 
 	// special case for configure plugins
-	else if ((FPTR)driver == CONF_PLUGINS)
+	else if ((uintptr_t)driver == CONF_PLUGINS)
 	{
 		menu::stack_push<menu_plugins_configure>(ui(), container());
 	}
@@ -842,12 +842,12 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 	ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
 	ui_options &mopt = ui().options();
 
-	if ((FPTR)ui_swinfo == CONF_OPTS)
+	if ((uintptr_t)ui_swinfo == CONF_OPTS)
 	{
 		// special case for configure options
 		menu::stack_push<menu_game_options>(ui(), container());
 	}
-	else if ((FPTR)ui_swinfo == CONF_MACHINE)
+	else if ((uintptr_t)ui_swinfo == CONF_MACHINE)
 	{
 		// special case for configure machine
 		if (m_prev_selected)
@@ -857,7 +857,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		}
 		return;
 	}
-	else if ((FPTR)ui_swinfo == CONF_PLUGINS)
+	else if ((uintptr_t)ui_swinfo == CONF_PLUGINS)
 	{
 		// special case for configure plugins
 		menu::stack_push<menu_plugins_configure>(ui(), container());

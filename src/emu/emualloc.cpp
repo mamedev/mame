@@ -67,7 +67,7 @@ void resource_pool::add(resource_pool_item &item, size_t size, const char *type)
 	std::lock_guard<std::mutex> lock(m_listlock);
 
 	// insert into hash table
-	int hashval = reinterpret_cast<FPTR>(item.m_ptr) % m_hash_size;
+	int hashval = reinterpret_cast<uintptr_t>(item.m_ptr) % m_hash_size;
 	item.m_next = m_hash[hashval];
 	m_hash[hashval] = &item;
 
@@ -121,7 +121,7 @@ void resource_pool::remove(void *ptr)
 	// search for the item
 	std::lock_guard<std::mutex> lock(m_listlock);
 
-	int hashval = reinterpret_cast<FPTR>(ptr) % m_hash_size;
+	int hashval = reinterpret_cast<uintptr_t>(ptr) % m_hash_size;
 	for (resource_pool_item **scanptr = &m_hash[hashval]; *scanptr != nullptr; scanptr = &(*scanptr)->m_next)
 
 		// must match the pointer
@@ -160,7 +160,7 @@ resource_pool_item *resource_pool::find(void *ptr)
 	// search for the item
 	std::lock_guard<std::mutex> lock(m_listlock);
 
-	int hashval = reinterpret_cast<FPTR>(ptr) % m_hash_size;
+	int hashval = reinterpret_cast<uintptr_t>(ptr) % m_hash_size;
 	resource_pool_item *item;
 	for (item = m_hash[hashval]; item != nullptr; item = item->m_next)
 		if (item->m_ptr == ptr)

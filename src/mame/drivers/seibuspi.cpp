@@ -1198,7 +1198,7 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 	Start - 111 port A
 	*/
 	static const UINT8 encoding[] = { 6, 5, 4, 3, 2, 7 };
-	ioport_value state = ~m_key[(FPTR)param]->read();
+	ioport_value state = ~m_key[(uintptr_t)param]->read();
 
 	for (int bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
 		if (state & (1 << bit))
@@ -1349,16 +1349,16 @@ static INPUT_PORTS_START( spi_ejanhs )
 	PORT_INCLUDE( spi_mahjong_keyboard )
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (FPTR)3)
-	PORT_BIT( 0x00000038, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (FPTR)4)
-	PORT_BIT( 0x00000700, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (FPTR)2)
-	PORT_BIT( 0x00003800, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (FPTR)0)
+	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (uintptr_t)3)
+	PORT_BIT( 0x00000038, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (uintptr_t)4)
+	PORT_BIT( 0x00000700, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (uintptr_t)2)
+	PORT_BIT( 0x00003800, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (uintptr_t)0)
 	PORT_SPECIAL_ONOFF_DIPLOC( 0x00008000, 0x00000000, Flip_Screen, "SW1:1" )
 	PORT_BIT( 0xffff4000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
 	// These need a noncontiguous encoding, but are nonfunctional in any case
-	//PORT_BIT( 0x00000013, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (FPTR)1)
+	//PORT_BIT( 0x00000013, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (uintptr_t)1)
 	PORT_SERVICE_NO_TOGGLE( 0x00000004, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x000000f3, IP_ACTIVE_LOW, IPT_UNKNOWN )

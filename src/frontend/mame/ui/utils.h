@@ -244,7 +244,7 @@ std::vector<std::string> tokenize(const std::string &text, char sep);
 //-------------------------------------------------
 
 template <typename F>
-bool input_character(std::string &buffer, std::string::size_type size, unicode_char unichar, F &&filter)
+bool input_character(std::string &buffer, std::string::size_type size, char32_t unichar, F &&filter)
 {
 	bool result = false;
 	auto buflen = buffer.size();
@@ -280,7 +280,7 @@ bool input_character(std::string &buffer, std::string::size_type size, unicode_c
 //-------------------------------------------------
 
 template <typename F>
-bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
+bool input_character(std::string &buffer, char32_t unichar, F &&filter)
 {
 	auto size = std::numeric_limits<std::string::size_type>::max();
 	return input_character(buffer, size, unichar, filter);

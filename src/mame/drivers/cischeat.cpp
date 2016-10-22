@@ -786,7 +786,7 @@ void cischeat_state::captflag_motor_move(int side, UINT16 data)
 CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_pos_r)
 {
 	const UINT8 pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
-	return ~pos[m_captflag_motor_pos[(FPTR)param]];
+	return ~pos[m_captflag_motor_pos[(uintptr_t)param]];
 }
 
 CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_busy_r)

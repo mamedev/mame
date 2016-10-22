@@ -947,7 +947,7 @@ WRITE8_MEMBER( iqunlim_state::colors_w )
 
 INPUT_CHANGED_MEMBER( iqunlim_state::send_input )
 {
-	UINT8 data = (UINT8)(FPTR)param;
+	UINT8 data = (UINT8)(uintptr_t)param;
 
 	if (newval)
 	{

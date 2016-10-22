@@ -254,7 +254,7 @@ UINT32 turrett_state::update_inputs(void)
 
 INPUT_CHANGED_MEMBER( turrett_state::ipt_change )
 {
-	int p = (FPTR)param;
+	int p = (uintptr_t)param;
 
 	if (newval != oldval)
 	{

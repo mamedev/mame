@@ -268,7 +268,7 @@ CUSTOM_INPUT_MEMBER(taitosj_state::kikstart_gear_r)
 {
 	const char *port_tag;
 
-	int player = (int)(FPTR)param;
+	int player = (int)(uintptr_t)param;
 
 	if (player == 0)
 		port_tag = "GEARP1";

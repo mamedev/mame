@@ -511,7 +511,7 @@ float mame_ui_manager::get_line_height()
 //  single character
 //-------------------------------------------------
 
-float mame_ui_manager::get_char_width(unicode_char ch)
+float mame_ui_manager::get_char_width(char32_t ch)
 {
 	return get_font()->char_width(get_line_height(), machine().render().ui_aspect(), ch);
 }
@@ -1482,7 +1482,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		INT32 defval = 1000;
 
 		std::string str = string_format(_("%1$s Volume"), info.stream->input_name(info.inputnum));
-		sliders.push_back(slider_alloc(machine, SLIDER_ID_MIXERVOL + item, str.c_str(), 0, defval, maxval, 20, (void *)(FPTR)item));
+		sliders.push_back(slider_alloc(machine, SLIDER_ID_MIXERVOL + item, str.c_str(), 0, defval, maxval, 20, (void *)(uintptr_t)item));
 	}
 
 	// add analog adjusters
@@ -1702,7 +1702,7 @@ INT32 mame_ui_manager::slider_volume(running_machine &machine, void *arg, int id
 INT32 mame_ui_manager::slider_mixervol(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
 {
 	mixer_input info;
-	if (!machine.sound().indexed_mixer_input((FPTR)arg, info))
+	if (!machine.sound().indexed_mixer_input((uintptr_t)arg, info))
 		return 0;
 	if (newval != SLIDER_NOCHANGE)
 	{

@@ -179,7 +179,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 //  osd_uchar_from_osdchar
 //============================================================
 
-int osd_uchar_from_osdchar(UINT32 /* unicode_char */ *uchar, const char *osdchar, size_t count)
+int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 {
 	// we assume a standard 1:1 mapping of characters to the first 256 unicode characters
 	*uchar = (UINT8)*osdchar;

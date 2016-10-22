@@ -962,7 +962,7 @@ void layout_element::reel_component::draw(running_machine &machine, bitmap_argb3
 				const char *origs = m_stopnames[fruit].c_str();
 				const char *ends = origs + strlen(origs);
 				const char *s = origs;
-				unicode_char schar;
+				char32_t schar;
 
 				// loop over characters
 				while (*s != 0)
@@ -1122,7 +1122,7 @@ void layout_element::reel_component::draw_beltreel(running_machine &machine, bit
 				const char *origs =m_stopnames[fruit].c_str();
 				const char *ends = origs + strlen(origs);
 				const char *s = origs;
-				unicode_char schar;
+				char32_t schar;
 
 				// loop over characters
 				while (*s != 0)
@@ -1969,7 +1969,7 @@ void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest
 	const char *origs = str;
 	const char *ends = origs + strlen(origs);
 	const char *s = origs;
-	unicode_char schar;
+	char32_t schar;
 
 	// loop over characters
 	while (*s != 0)

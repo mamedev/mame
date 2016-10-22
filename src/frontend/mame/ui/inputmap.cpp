@@ -54,9 +54,9 @@ void menu_input_groups::populate()
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
 		auto s = string_format("Player %d Controls", player + 1);
-		item_append(s, "", 0, (void *)(FPTR)(IPG_PLAYER1 + player + 1));
+		item_append(s, "", 0, (void *)(uintptr_t)(IPG_PLAYER1 + player + 1));
 	}
-	item_append(_("Other Controls"), "", 0, (void *)(FPTR)(IPG_OTHER + 1));
+	item_append(_("Other Controls"), "", 0, (void *)(uintptr_t)(IPG_OTHER + 1));
 }
 
 menu_input_groups::~menu_input_groups()
@@ -485,7 +485,7 @@ void menu_settings::handle()
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		// reset
-		if ((FPTR)menu_event->itemref == 1)
+		if ((uintptr_t)menu_event->itemref == 1)
 		{
 			if (menu_event->iptkey == IPT_UI_SELECT)
 				machine().schedule_hard_reset();
@@ -654,7 +654,7 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 		UINT32 selectedmask = 0;
 
 		// determine the mask of selected bits
-		if ((FPTR)selectedref != 1)
+		if ((uintptr_t)selectedref != 1)
 		{
 			ioport_field *field = (ioport_field *)selectedref;
 

@@ -38,7 +38,7 @@ public:
 
 	virtual bool open(std::string const &font_path, std::string const &name, int &height) override;
 	virtual void close() override;
-	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override;
+	virtual bool get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override;
 
 	osd_font_windows &operator=(osd_font_windows &&obj)
 	{
@@ -144,7 +144,7 @@ void osd_font_windows::close()
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool osd_font_windows::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool osd_font_windows::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	// create a dummy DC to work with
 	HDC dummyDC = CreateCompatibleDC(nullptr);
@@ -200,7 +200,7 @@ bool osd_font_windows::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT
 		memset(bits, 0, rowbytes * bmheight);
 
 		// now draw the character
-		utf16_char tempchar[UTF16_CHAR_MAX];
+		char16_t tempchar[UTF16_CHAR_MAX];
 		UINT const count = INT(utf16_from_uchar(tempchar, ARRAY_LENGTH(tempchar), chnum));
 		SetTextColor(dummyDC, RGB(0xff, 0xff, 0xff));
 		SetBkColor(dummyDC, RGB(0x00, 0x00, 0x00));

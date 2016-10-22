@@ -99,7 +99,7 @@ READ8_MEMBER(cop01_state::cop01_sound_command_r)
 
 CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 

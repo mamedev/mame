@@ -719,7 +719,7 @@ hand, always returning 0xf inbetween valid values confuses the game.
 CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 {
 	static const char *const ports[] = { "P1ROT", "P2ROT" };
-	int which = (int)(FPTR)param;
+	int which = (int)(uintptr_t)param;
 	int value = ioport(ports[which])->read();
 
 	if ((m_last_value[which] == 0x5 && value == 0x6) || (m_last_value[which] == 0x6 && value == 0x5))
@@ -795,7 +795,7 @@ CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 
 CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{

@@ -430,8 +430,8 @@ INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
 {
-	int bit_shift = ((FPTR)param & 0x07);
-	int port = (((FPTR)param >> 4) & 0x07);
+	int bit_shift = ((uintptr_t)param & 0x07);
+	int port = (((uintptr_t)param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in the Outhole so the Outhole Solenoid can release it */
 
@@ -443,8 +443,8 @@ CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
 
 CUSTOM_INPUT_MEMBER( by35_state::kickback_x3 )
 {
-	int bit_shift = ((FPTR)param & 0x07);
-	int port = (((FPTR)param >> 4) & 0x07);
+	int bit_shift = ((uintptr_t)param & 0x07);
+	int port = (((uintptr_t)param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in a Saucer so the Saucer Solenoid can release it */
 
@@ -458,8 +458,8 @@ CUSTOM_INPUT_MEMBER( by35_state::drop_target_x0 )
 {
 	/* Here we simulate the Drop Target switch states so the Drop Target Reset Solenoid can also release the switches */
 
-	int bit_shift = ((FPTR)param & 0x07);
-	int port = (((FPTR)param >> 4) & 0x07);
+	int bit_shift = ((uintptr_t)param & 0x07);
+	int port = (((uintptr_t)param >> 4) & 0x07);
 
 	switch (bit_shift)
 	{

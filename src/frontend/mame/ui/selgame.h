@@ -79,7 +79,7 @@ private:
 	void *get_selection_ptr() const
 	{
 		void *const selected_ref(get_selection_ref());
-		return (FPTR(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
+		return (uintptr_t(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
 	}
 
 	// General info

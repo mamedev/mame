@@ -422,7 +422,7 @@ INPUT_CHANGED_MEMBER(z100_state::key_stroke)
 	if(newval && !oldval)
 	{
 		/* TODO: table */
-		m_keyb_press = (UINT8)(FPTR)(param) & 0xff;
+		m_keyb_press = (UINT8)(uintptr_t)(param) & 0xff;
 		//pic8259_ir6_w(m_picm, 1);
 		m_keyb_status = 1;
 	}

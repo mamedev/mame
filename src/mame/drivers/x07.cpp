@@ -916,7 +916,7 @@ inline UINT8 x07_state::get_char(UINT16 pos)
 INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 {
 	UINT8 data = 0;
-	UINT8 idx = (UINT8)(FPTR)param;
+	UINT8 idx = (UINT8)(uintptr_t)param;
 
 	if (m_kb_on && newval)
 	{
@@ -943,7 +943,7 @@ INPUT_CHANGED_MEMBER( x07_state::kb_keys )
 	UINT8 modifier;
 	UINT8 a1 = ioport("A1")->read();
 	UINT8 bz = ioport("BZ")->read();
-	UINT8 keycode = (UINT8)(FPTR)param;
+	UINT8 keycode = (UINT8)(uintptr_t)param;
 
 	if (m_kb_on && !newval)
 	{

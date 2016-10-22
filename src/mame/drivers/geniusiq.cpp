@@ -498,7 +498,7 @@ INPUT_CHANGED_MEMBER( geniusiq_state::send_mouse_input )
 
 INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
 {
-	UINT16 data = (UINT16)(FPTR)param;
+	UINT16 data = (UINT16)(uintptr_t)param;
 
 	// set bit 7 if the key is released
 	if (!newval)

@@ -434,7 +434,7 @@ const char *osd_get_volume_name(int idx)
 //  osd_is_valid_filename_char
 //============================================================
 
-bool osd_is_valid_filename_char(unicode_char uchar)
+bool osd_is_valid_filename_char(char32_t uchar)
 {
 	return osd_is_valid_filepath_char(uchar)
 		&& uchar != '/'
@@ -448,7 +448,7 @@ bool osd_is_valid_filename_char(unicode_char uchar)
 //  osd_is_valid_filepath_char
 //============================================================
 
-bool osd_is_valid_filepath_char(unicode_char uchar)
+bool osd_is_valid_filepath_char(char32_t uchar)
 {
 	return uchar >= 0x20
 		&& uchar != '<'

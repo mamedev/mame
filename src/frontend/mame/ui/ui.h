@@ -177,7 +177,7 @@ public:
 	void update_and_render(render_container &container);
 	render_font *get_font();
 	float get_line_height();
-	float get_char_width(unicode_char ch);
+	float get_char_width(char32_t ch);
 	float get_string_width(const char *s, float text_size = 1.0f);
 	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);

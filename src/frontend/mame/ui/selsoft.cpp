@@ -273,7 +273,7 @@ void menu_select_software::handle()
 			// handle UI_FAVORITES
 			ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
 
-			if ((FPTR)swinfo > 2)
+			if ((uintptr_t)swinfo > 2)
 			{
 				favorite_manager &mfav = mame_machine_manager::instance()->favorite();
 				if (!mfav.isgame_favorite(*swinfo))

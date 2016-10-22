@@ -719,7 +719,7 @@ INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER(fantland_state::wheelrun_wheel_r)
 {
-	int player = (FPTR)param;
+	int player = (uintptr_t)param;
 	int delta = ioport(player ? "WHEEL1" : "WHEEL0")->read();
 	delta = (delta & 0x7f) - (delta & 0x80) + 4;
 

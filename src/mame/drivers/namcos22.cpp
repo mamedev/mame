@@ -3310,7 +3310,7 @@ INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER(namcos22_state::alpine_motor_read)
 {
-	return m_motor_status >> (FPTR)param & 1;
+	return m_motor_status >> (uintptr_t)param & 1;
 }
 
 static INPUT_PORTS_START( alpiner )

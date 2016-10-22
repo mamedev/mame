@@ -1174,9 +1174,9 @@ inline x86_memref MBD(UINT8 base, INT32 disp) { return x86_memref(base, REG_NONE
 inline x86_memref MBISD(UINT8 base, UINT8 ind, UINT8 scale, INT32 disp) { return x86_memref(base, ind, scale, disp); }
 
 #if (X86EMIT_SIZE == 32)
-inline x86_memref MABS(const void *mem) { return x86_memref(REG_NONE, REG_NONE, 1, reinterpret_cast<FPTR>(const_cast<void *>(mem))); }
-inline x86_memref MABSI(const void *mem, UINT8 index) { return x86_memref(index, REG_NONE, 1, reinterpret_cast<FPTR>(const_cast<void *>(mem))); }
-inline x86_memref MABSI(const void *mem, UINT8 index, UINT8 scale) { return x86_memref(REG_NONE, index, scale, reinterpret_cast<FPTR>(const_cast<void *>(mem))); }
+inline x86_memref MABS(const void *mem) { return x86_memref(REG_NONE, REG_NONE, 1, reinterpret_cast<uintptr_t>(const_cast<void *>(mem))); }
+inline x86_memref MABSI(const void *mem, UINT8 index) { return x86_memref(index, REG_NONE, 1, reinterpret_cast<uintptr_t>(const_cast<void *>(mem))); }
+inline x86_memref MABSI(const void *mem, UINT8 index, UINT8 scale) { return x86_memref(REG_NONE, index, scale, reinterpret_cast<uintptr_t>(const_cast<void *>(mem))); }
 #endif
 
 

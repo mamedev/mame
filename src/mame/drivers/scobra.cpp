@@ -324,7 +324,7 @@ ADDRESS_MAP_END
 /* stratgyx coinage DIPs are spread across two input ports */
 CUSTOM_INPUT_MEMBER(scobra_state::stratgyx_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("IN4")->read() & bit_mask) ? 0x01 : 0x00;
 }
 

@@ -243,7 +243,7 @@ WRITE16_MEMBER(tispellb_state::rev2_write_r)
 
 INPUT_CHANGED_MEMBER(tispellb_state::power_button)
 {
-	int on = (int)(FPTR)param;
+	int on = (int)(uintptr_t)param;
 
 	if (on && !m_power_on)
 	{

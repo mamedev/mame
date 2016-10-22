@@ -39,13 +39,13 @@ public:
 
 	// size queries
 	INT32 pixel_height() const { return m_height; }
-	float char_width(float height, float aspect, unicode_char ch);
+	float char_width(float height, float aspect, char32_t ch);
 	float string_width(float height, float aspect, const char *string);
 	float utf8string_width(float height, float aspect, const char *utf8string);
 
 	// texture/bitmap queries
-	render_texture *get_char_texture_and_bounds(float height, float aspect, unicode_char ch, render_bounds &bounds);
-	void get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height, float aspect, unicode_char chnum, rectangle &bounds);
+	render_texture *get_char_texture_and_bounds(float height, float aspect, char32_t ch, render_bounds &bounds);
+	void get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height, float aspect, char32_t chnum, rectangle &bounds);
 
 private:
 	// a glyph describes a single glyph
@@ -80,8 +80,8 @@ private:
 	};
 
 	// helpers
-	glyph &get_char(unicode_char chnum);
-	void char_expand(unicode_char chnum, glyph &ch);
+	glyph &get_char(char32_t chnum);
+	void char_expand(char32_t chnum, glyph &ch);
 	bool load_cached_bdf(const char *filename);
 	bool load_bdf();
 	bool load_cached(emu_file &file, UINT32 hash);

@@ -694,7 +694,7 @@ MACHINE_START_MEMBER(md_boot_state, md_6button)
 
 	// setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(FPTR)i);
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
 }
 
 static MACHINE_CONFIG_START( megadrvb_6b, md_boot_state )

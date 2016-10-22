@@ -35,13 +35,13 @@ inline UINT32 ycc_to_rgb(const UINT8 y, const UINT8 cb, const UINT8 cr)
 
 inline UINT32 pixel_ycc_to_rgb(const UINT16 *pixel)
 {
-	const UINT32 p = *(UINT32 *)((FPTR) pixel & ~3);
+	const UINT32 p = *(UINT32 *)((uintptr_t) pixel & ~3);
 	return ycc_to_rgb((*pixel >> 8) & 0xff, (p) & 0xff, (p>>16) & 0xff);
 }
 
 inline UINT32 pixel_ycc_to_rgb_pal(const UINT16 *pixel, const rgb_t *palette)
 {
-	const UINT32 p = *(UINT32 *)((FPTR) pixel & ~3);
+	const UINT32 p = *(UINT32 *)((uintptr_t) pixel & ~3);
 	return ycc_to_rgb(palette[(*pixel >> 8) & 0xff], (p) & 0xff, (p>>16) & 0xff);
 }
 

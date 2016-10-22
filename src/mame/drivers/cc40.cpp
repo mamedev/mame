@@ -389,7 +389,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
 {
-	init_sysram((int)(FPTR)param, newval << 11);
+	init_sysram((int)(uintptr_t)param, newval << 11);
 }
 
 static INPUT_PORTS_START( cc40 )

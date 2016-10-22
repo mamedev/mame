@@ -298,7 +298,7 @@ union imgtoolinfo
 	imgtoolerr_t    (*read_block)       (imgtool::image &image, void *buffer, UINT64 block);
 	imgtoolerr_t    (*write_block)      (imgtool::image &image, const void *buffer, UINT64 block);
 	imgtoolerr_t    (*list_partitions)  (imgtool::image &image, std::vector<imgtool::partition_info> &partitions);
-	int             (*approve_filename_char)(unicode_char ch);
+	int             (*approve_filename_char)(char32_t ch);
 	int             (*make_class)(int index, imgtool_class *imgclass);
 
 	const util::option_guide *createimage_optguide;

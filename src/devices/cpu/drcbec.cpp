@@ -331,7 +331,7 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, UINT32 
 		block.abort();
 
 	// compute the base by aligning the cache top to an even multiple of drcbec_instruction
-	drcbec_instruction *base = (drcbec_instruction *)(((FPTR)*cachetop + sizeof(drcbec_instruction) - 1) & ~(sizeof(drcbec_instruction) - 1));
+	drcbec_instruction *base = (drcbec_instruction *)(((uintptr_t)*cachetop + sizeof(drcbec_instruction) - 1) & ~(sizeof(drcbec_instruction) - 1));
 	drcbec_instruction *dst = base;
 
 	// generate code by copying the instructions and extracting immediates

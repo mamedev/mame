@@ -1710,7 +1710,7 @@ device_debug::device_debug(device_t &device)
 		for (auto &entry : m_state->state_entries())
 		{
 			strmakelower(tempstr.assign(entry->symbol()));
-			m_symtable.add(tempstr.c_str(), (void *)(FPTR)entry->index(), get_state, set_state);
+			m_symtable.add(tempstr.c_str(), (void *)(uintptr_t)entry->index(), get_state, set_state);
 		}
 	}
 
@@ -3137,7 +3137,7 @@ void device_debug::set_logunmap(symbol_table &table, void *ref, UINT64 value)
 UINT64 device_debug::get_state(symbol_table &table, void *ref)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->m_state->state_int(reinterpret_cast<FPTR>(ref));
+	return device->debug()->m_state->state_int(reinterpret_cast<uintptr_t>(ref));
 }
 
 
@@ -3149,7 +3149,7 @@ UINT64 device_debug::get_state(symbol_table &table, void *ref)
 void device_debug::set_state(symbol_table &table, void *ref, UINT64 value)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	device->debug()->m_state->set_state_int(reinterpret_cast<FPTR>(ref), value);
+	device->debug()->m_state->set_state_int(reinterpret_cast<uintptr_t>(ref), value);
 }
 
 

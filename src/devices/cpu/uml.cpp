@@ -985,7 +985,7 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 
 				// cache memory
 				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
-					util::stream_format(buffer, "[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
+					util::stream_format(buffer, "[+$%X]", (UINT32)(uintptr_t)((drccodeptr)param.memory() - drcuml->cache().near()));
 
 				// general memory
 				else
@@ -995,7 +995,7 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 
 			// string pointer
 			case parameter::PTYPE_STRING:
-				util::stream_format(buffer, "%s", (const char *)(FPTR)param.string());
+				util::stream_format(buffer, "%s", (const char *)(uintptr_t)param.string());
 				break;
 
 			// handle pointer

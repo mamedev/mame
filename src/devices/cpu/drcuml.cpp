@@ -976,11 +976,11 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
 
 			// memory parameters: set the memory value in the parameter space and set the parameter value to point to it
 			case parameter::PTYPE_MEMORY:
-				curparam->value = (FPTR)&parammem[pnum];
+				curparam->value = (uintptr_t)&parammem[pnum];
 				if (psize == 4)
-					*(UINT32 *)(FPTR)curparam->value = test->param[pnum];
+					*(UINT32 *)(uintptr_t)curparam->value = test->param[pnum];
 				else
-					*(UINT64 *)(FPTR)curparam->value = test->param[pnum];
+					*(UINT64 *)(uintptr_t)curparam->value = test->param[pnum];
 				break;
 
 			// map variables: issue a MAPVAR instruction to set the value and set the parameter value to the mapvar index
@@ -1060,9 +1060,9 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 				// memory registers fetch from the memory address
 				case parameter::PTYPE_MEMORY:
 					if (psize == 4)
-						result = *(UINT32 *)(FPTR)params[pnum].value;
+						result = *(UINT32 *)(uintptr_t)params[pnum].value;
 					else
-						result = *(UINT64 *)(FPTR)params[pnum].value;
+						result = *(UINT64 *)(uintptr_t)params[pnum].value;
 					break;
 
 				default:

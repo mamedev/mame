@@ -561,7 +561,7 @@ inline int drcbe_x64::get_base_register_and_offset(x86code *&dst, void *target, 
 	else
 	{
 		offset = 0;
-		emit_mov_r64_imm(dst, reg, (FPTR)target);                                       // mov   reg,target
+		emit_mov_r64_imm(dst, reg, (uintptr_t)target);                                       // mov   reg,target
 		return reg;
 	}
 }
@@ -579,7 +579,7 @@ inline void drcbe_x64::emit_smart_call_r64(x86code *&dst, x86code *target, UINT8
 		emit_call(dst, target);                                                         // call  target
 	else
 	{
-		emit_mov_r64_imm(dst, reg, (FPTR)target);                                       // mov   reg,target
+		emit_mov_r64_imm(dst, reg, (uintptr_t)target);                                       // mov   reg,target
 		emit_call_r64(dst, reg);                                                        // call  reg
 	}
 }
@@ -639,7 +639,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 	m_near.double1 = 1.0;
 
 	// create absolute value masks that are aligned to SSE boundaries
-	m_absmask32 = (UINT32 *)(((FPTR)m_absmask32 + 15) & ~15);
+	m_absmask32 = (UINT32 *)(((uintptr_t)m_absmask32 + 15) & ~15);
 	m_absmask32[0] = m_absmask32[1] = m_absmask32[2] = m_absmask32[3] = 0x7fffffff;
 	m_absmask64 = (UINT64 *)&m_absmask32[4];
 	m_absmask64[0] = m_absmask64[1] = U64(0x7fffffffffffffff);
@@ -811,7 +811,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, UINT3
 		block.abort();
 
 	// compute the base by aligning the cache top to a cache line (assumed to be 64 bytes)
-	x86code *base = (x86code *)(((FPTR)*cachetop + 63) & ~63);
+	x86code *base = (x86code *)(((uintptr_t)*cachetop + 63) & ~63);
 	x86code *dst = base;
 
 	// generate code
@@ -2791,13 +2791,13 @@ void drcbe_x64::op_debug(x86code *&dst, const instruction &inst)
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
 
 		// test and branch
-		emit_mov_r64_imm(dst, REG_RAX, (FPTR)&m_device.machine().debug_flags);          // mov   rax,&debug_flags
+		emit_mov_r64_imm(dst, REG_RAX, (uintptr_t)&m_device.machine().debug_flags);          // mov   rax,&debug_flags
 		emit_test_m32_imm(dst, MBD(REG_RAX, 0), DEBUG_FLAG_CALL_HOOK);                  // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
 		emit_link skip = { nullptr };
 		emit_jcc_short_link(dst, x64emit::COND_Z, skip);                                // jz    skip
 
 		// push the parameter
-		emit_mov_r64_imm(dst, REG_PARAM1, (FPTR)&m_device);                             // mov   param1,device
+		emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)&m_device);                             // mov   param1,device
 		emit_mov_r32_p32(dst, REG_PARAM2, pcp);                                         // mov   param2,pcp
 		emit_smart_call_m64(dst, &m_near.debug_cpu_instruction_hook);                   // call  debug_cpu_instruction_hook
 
@@ -3068,8 +3068,8 @@ void drcbe_x64::op_callc(x86code *&dst, const instruction &inst)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
 	// perform the call
-	emit_mov_r64_imm(dst, REG_PARAM1, (FPTR)paramp.memory());                           // mov   param1,paramp
-	emit_smart_call_r64(dst, (x86code *)(FPTR)funcp.cfunc(), REG_RAX);                  // call  funcp
+	emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)paramp.memory());                           // mov   param1,paramp
+	emit_smart_call_r64(dst, (x86code *)(uintptr_t)funcp.cfunc(), REG_RAX);                  // call  funcp
 
 	// resolve the conditional link
 	if (inst.condition() != uml::COND_ALWAYS)
@@ -3094,7 +3094,7 @@ void drcbe_x64::op_recover(x86code *&dst, const instruction &inst)
 	// call the recovery code
 	emit_mov_r64_m64(dst, REG_RAX, MABS(&m_near.stacksave));                            // mov   rax,stacksave
 	emit_mov_r64_m64(dst, REG_RAX, MBD(REG_RAX, -8));                                   // mov   rax,[rax-4]
-	emit_mov_r64_imm(dst, REG_PARAM1, (FPTR)&m_map);                                    // mov   param1,m_map
+	emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)&m_map);                                    // mov   param1,m_map
 	emit_lea_r64_m64(dst, REG_PARAM2, MBD(REG_RAX, -1));                                // lea   param2,[rax-1]
 	emit_mov_r64_imm(dst, REG_PARAM3, inst.param(1).mapvar());                          // mov   param3,param[1].value
 	emit_smart_call_m64(dst, &m_near.drcmap_get_value);                                 // call  drcmap_get_value
@@ -3339,7 +3339,7 @@ void drcbe_x64::op_save(x86code *&dst, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_M);
 
 	// copy live state to the destination
-	emit_mov_r64_imm(dst, REG_RCX, (FPTR)dstp.memory());                                // mov    rcx,dstp
+	emit_mov_r64_imm(dst, REG_RCX, (uintptr_t)dstp.memory());                                // mov    rcx,dstp
 
 	// copy flags
 	emit_pushf(dst);                                                                    // pushf
@@ -3397,7 +3397,7 @@ void drcbe_x64::op_restore(x86code *&dst, const instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_M);
 
 	// copy live state from the destination
-	emit_mov_r64_imm(dst, REG_ECX, (FPTR)srcp.memory());                                // mov    rcx,dstp
+	emit_mov_r64_imm(dst, REG_ECX, (uintptr_t)srcp.memory());                                // mov    rcx,dstp
 
 	// copy integer registers
 	int regoffs = offsetof(drcuml_machine_state, r);
@@ -3736,7 +3736,7 @@ void drcbe_x64::op_read(x86code *&dst, const instruction &inst)
 	int dstreg = dstp.select_register(REG_EAX);
 
 	// set up a call to the read byte handler
-	emit_mov_r64_imm(dst, REG_PARAM1, (FPTR)(m_space[spacesizep.space()]));             // mov    param1,space
+	emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)(m_space[spacesizep.space()]));             // mov    param1,space
 	emit_mov_r32_p32(dst, REG_PARAM2, addrp);                                           // mov    param2,addrp
 	if (spacesizep.size() == SIZE_BYTE)
 	{
@@ -3795,7 +3795,7 @@ void drcbe_x64::op_readm(x86code *&dst, const instruction &inst)
 	int dstreg = dstp.select_register(REG_EAX);
 
 	// set up a call to the read byte handler
-	emit_mov_r64_imm(dst, REG_PARAM1, (FPTR)(m_space[spacesizep.space()]));             // mov    param1,space
+	emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)(m_space[spacesizep.space()]));             // mov    param1,space
 	emit_mov_r32_p32(dst, REG_PARAM2, addrp);                                           // mov    param2,addrp
 	if (spacesizep.size() != SIZE_QWORD)
 		emit_mov_r32_p32(dst, REG_PARAM3, maskp);                                       // mov    param3,maskp
@@ -3848,7 +3848,7 @@ void drcbe_x64::op_write(x86code *&dst, const instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write byte handler
-	emit_mov_r64_imm(dst, REG_PARAM1, (FPTR)(m_space[spacesizep.space()]));             // mov    param1,space
+	emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)(m_space[spacesizep.space()]));             // mov    param1,space
 	emit_mov_r32_p32(dst, REG_PARAM2, addrp);                                           // mov    param2,addrp
 	if (spacesizep.size() != SIZE_QWORD)
 		emit_mov_r32_p32(dst, REG_PARAM3, srcp);                                        // mov    param3,srcp
@@ -3888,7 +3888,7 @@ void drcbe_x64::op_writem(x86code *&dst, const instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write byte handler
-	emit_mov_r64_imm(dst, REG_PARAM1, (FPTR)(m_space[spacesizep.space()]));             // mov    param1,space
+	emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)(m_space[spacesizep.space()]));             // mov    param1,space
 	emit_mov_r32_p32(dst, REG_PARAM2, addrp);                                           // mov    param2,addrp
 	if (spacesizep.size() != SIZE_QWORD)
 	{
@@ -5965,7 +5965,7 @@ void drcbe_x64::op_fread(x86code *&dst, const instruction &inst)
 	assert((1 << spacep.size()) == inst.size());
 
 	// set up a call to the read dword/qword handler
-	emit_mov_r64_imm(dst, REG_PARAM1, (FPTR)(m_space[spacep.space()]));                 // mov    param1,space
+	emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)(m_space[spacep.space()]));                 // mov    param1,space
 	emit_mov_r32_p32(dst, REG_PARAM2, addrp);                                           // mov    param2,addrp
 	if (inst.size() == 4)
 		emit_smart_call_m64(dst, (x86code **)&m_accessors[spacep.space()].read_dword);  // call   read_dword
@@ -6009,7 +6009,7 @@ void drcbe_x64::op_fwrite(x86code *&dst, const instruction &inst)
 	assert((1 << spacep.size()) == inst.size());
 
 	// general case
-	emit_mov_r64_imm(dst, REG_PARAM1, (FPTR)(m_space[spacep.space()]));                 // mov    param1,space
+	emit_mov_r64_imm(dst, REG_PARAM1, (uintptr_t)(m_space[spacep.space()]));                 // mov    param1,space
 	emit_mov_r32_p32(dst, REG_PARAM2, addrp);                                           // mov    param21,addrp
 
 	// 32-bit form

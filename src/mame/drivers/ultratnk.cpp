@@ -22,7 +22,7 @@ Atari Ultra Tank driver
 
 CUSTOM_INPUT_MEMBER(ultratnk_state::get_collision)
 {
-	return m_collision[(FPTR) param];
+	return m_collision[(uintptr_t) param];
 }
 
 

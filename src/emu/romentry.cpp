@@ -30,7 +30,7 @@ static std::string hashdata_from_tiny_rom_entry(const tiny_rom_entry &ent)
 	case ROMENTRYTYPE_FILL:
 	case ROMENTRYTYPE_COPY:
 		// for these types, tiny_rom_entry::hashdata is an integer typecasted to a pointer
-		result = string_format("0x%x", (unsigned)(FPTR)ent.hashdata);
+		result = string_format("0x%x", (unsigned)(uintptr_t)ent.hashdata);
 		break;
 
 	default:

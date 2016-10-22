@@ -169,8 +169,8 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(a310_state::key_stroke)
 {
-	UINT8 row_val = (UINT8)(FPTR)(param) >> 4;
-	UINT8 col_val = (UINT8)(FPTR)(param) & 0xf;
+	UINT8 row_val = (UINT8)(uintptr_t)(param) >> 4;
+	UINT8 col_val = (UINT8)(uintptr_t)(param) & 0xf;
 
 	if(newval && !oldval)
 		m_kart->send_keycode_down(row_val,col_val);

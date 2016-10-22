@@ -238,7 +238,7 @@ WRITE32_MEMBER(hp49gp_state::s3c2410_gpio_port_w)
 
 INPUT_CHANGED_MEMBER(hp49gp_state::port_changed)
 {
-	m_s3c2410->s3c2410_request_eint( (FPTR)param + 8);
+	m_s3c2410->s3c2410_request_eint( (uintptr_t)param + 8);
 }
 
 // ...

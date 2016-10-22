@@ -1300,7 +1300,7 @@ WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
 
 CUSTOM_INPUT_MEMBER(galaxian_state::azurian_port_r)
 {
-	return (ioport("FAKE")->read() >> (FPTR)param) & 1;
+	return (ioport("FAKE")->read() >> (uintptr_t)param) & 1;
 }
 
 

@@ -54,7 +54,7 @@ inline const char *next_line(const char *ptr)
 //  in a font, expanding if necessary
 //-------------------------------------------------
 
-inline render_font::glyph &render_font::get_char(unicode_char chnum)
+inline render_font::glyph &render_font::get_char(char32_t chnum)
 {
 	static glyph dummy_glyph;
 
@@ -214,7 +214,7 @@ render_font::~render_font()
 //  character into a bitmap
 //-------------------------------------------------
 
-void render_font::char_expand(unicode_char chnum, glyph &gl)
+void render_font::char_expand(char32_t chnum, glyph &gl)
 {
 	rgb_t color = rgb_t(0xff,0xff,0xff,0xff);
 	bool is_cmd = (chnum >= COMMAND_UNICODE && chnum < COMMAND_UNICODE + MAX_GLYPH_FONT);
@@ -350,7 +350,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 //  bounds of the final bitmap
 //-------------------------------------------------
 
-render_texture *render_font::get_char_texture_and_bounds(float height, float aspect, unicode_char chnum, render_bounds &bounds)
+render_texture *render_font::get_char_texture_and_bounds(float height, float aspect, char32_t chnum, render_bounds &bounds)
 {
 	glyph &gl = get_char(chnum);
 
@@ -373,7 +373,7 @@ render_texture *render_font::get_char_texture_and_bounds(float height, float asp
 //  scaled bitmap and bounding rect for a char
 //-------------------------------------------------
 
-void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height, float aspect, unicode_char chnum, rectangle &bounds)
+void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height, float aspect, char32_t chnum, rectangle &bounds)
 {
 	glyph &gl = get_char(chnum);
 
@@ -409,7 +409,7 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height
 //  at the given height
 //-------------------------------------------------
 
-float render_font::char_width(float height, float aspect, unicode_char ch)
+float render_font::char_width(float height, float aspect, char32_t ch)
 {
 	return float(get_char(ch).width) * m_scale * height * aspect;
 }
@@ -427,7 +427,7 @@ float render_font::string_width(float height, float aspect, const char *string)
 
 	const char *ends = string + strlen(string);
 	const char *s = string;
-	unicode_char schar;
+	char32_t schar;
 
 	// loop over characters
 	while (*s != 0)
@@ -457,7 +457,7 @@ float render_font::utf8string_width(float height, float aspect, const char *utf8
 	INT32 totwidth = 0;
 	for (std::size_t offset = 0U; offset < length; offset += unsigned(count))
 	{
-		unicode_char uchar;
+		char32_t uchar;
 		count = uchar_from_utf8(&uchar, utf8string + offset, length - offset);
 		if (count < 0)
 			break;

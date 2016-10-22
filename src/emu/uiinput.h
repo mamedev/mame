@@ -46,7 +46,7 @@ struct ui_event
 	INT32               mouse_x;
 	INT32               mouse_y;
 	input_item_id       key;
-	unicode_char        ch;
+	char32_t        ch;
 	short               zdelta;
 	int                 num_lines;
 };
@@ -92,7 +92,7 @@ public:
 	void push_mouse_rdown_event(render_target* target, INT32 x, INT32 y);
 	void push_mouse_rup_event(render_target* target, INT32 x, INT32 y);
 	void push_mouse_double_click_event(render_target* target, INT32 x, INT32 y);
-	void push_char_event(render_target* target, unicode_char ch);
+	void push_char_event(render_target* target, char32_t ch);
 	void push_mouse_wheel_event(render_target *target, INT32 x, INT32 y, short delta, int ucNumLines);
 
 	void mark_all_as_pressed();

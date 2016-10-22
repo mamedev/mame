@@ -410,8 +410,8 @@ int core_text_file::getc()
 		}
 
 		// fetch the next character
-		utf16_char utf16_buffer[UTF16_CHAR_MAX];
-		unicode_char uchar = unicode_char(~0);
+		char16_t utf16_buffer[UTF16_CHAR_MAX];
+		char32_t uchar = char32_t(~0);
 		switch (m_text_type)
 		{
 		default:

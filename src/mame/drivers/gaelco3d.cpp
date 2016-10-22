@@ -397,7 +397,7 @@ WRITE16_MEMBER(gaelco3d_state::sound_status_w)
 
 CUSTOM_INPUT_MEMBER(gaelco3d_state::analog_bit_r)
 {
-	int which = (FPTR)param;
+	int which = (uintptr_t)param;
 	return (m_analog_ports[which] >> 7) & 0x01;
 }
 

@@ -243,7 +243,7 @@ WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
 
 INPUT_CHANGED_MEMBER(juicebox_state::port_changed)
 {
-	m_s3c44b0->request_eint((FPTR)param);
+	m_s3c44b0->request_eint((uintptr_t)param);
 }
 
 // ...

@@ -290,7 +290,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 
         The number of characters required to form a Unicode character.
 -----------------------------------------------------------------------------*/
-int osd_uchar_from_osdchar(unicode_char *uchar, const char *osdchar, size_t count);
+int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count);
 
 
 /*-----------------------------------------------------------------------------
@@ -305,7 +305,7 @@ int osd_uchar_from_osdchar(unicode_char *uchar, const char *osdchar, size_t coun
         Whether this character is legal in a filename
 -----------------------------------------------------------------------------*/
 
-bool osd_is_valid_filename_char(unicode_char uchar);
+bool osd_is_valid_filename_char(char32_t uchar);
 
 
 /*-----------------------------------------------------------------------------
@@ -320,7 +320,7 @@ bool osd_is_valid_filename_char(unicode_char uchar);
         Whether this character is legal in a file path
 -----------------------------------------------------------------------------*/
 
-bool osd_is_valid_filepath_char(unicode_char uchar);
+bool osd_is_valid_filepath_char(char32_t uchar);
 
 
 /***************************************************************************

@@ -170,7 +170,7 @@ void menu_file_manager::handle()
 	const event *event = process(0);
 	if (event != nullptr && event->itemref != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
-		if ((FPTR)event->itemref == 1)
+		if ((uintptr_t)event->itemref == 1)
 		{
 			if (m_curr_selected)
 				machine().schedule_hard_reset();

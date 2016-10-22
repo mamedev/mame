@@ -93,7 +93,7 @@ WRITE8_MEMBER(md_base_state::megadriv_68k_YM2612_write)
 // this is used by 6 button pads and gets installed in machine_start for drivers requiring it
 TIMER_CALLBACK_MEMBER(md_base_state::io_timeout_timer_callback)
 {
-	m_io_stage[(int)(FPTR)ptr] = -1;
+	m_io_stage[(int)(uintptr_t)ptr] = -1;
 }
 
 

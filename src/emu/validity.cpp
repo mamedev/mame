@@ -32,7 +32,7 @@
 
 inline const char *validity_checker::ioport_string_from_index(UINT32 index)
 {
-	return ioport_configurer::string_from_token((const char *)(FPTR)index);
+	return ioport_configurer::string_from_token((const char *)(uintptr_t)index);
 }
 
 

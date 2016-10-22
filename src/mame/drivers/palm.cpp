@@ -77,7 +77,7 @@ INPUT_CHANGED_MEMBER(palm_state::pen_check)
 INPUT_CHANGED_MEMBER(palm_state::button_check)
 {
 	UINT8 button_state = m_io_portd->read();
-	m_lsi->set_port_d_lines(button_state, (int)(FPTR)param);
+	m_lsi->set_port_d_lines(button_state, (int)(uintptr_t)param);
 }
 
 WRITE8_MEMBER(palm_state::palm_port_f_out)

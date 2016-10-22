@@ -1540,7 +1540,7 @@ void saturn_state::cd_free_block(blockT *blktofree)
 {
 	INT32 i;
 
-	CDROM_LOG(("cd_free_block: %x\n", (UINT32)(FPTR)blktofree))
+	CDROM_LOG(("cd_free_block: %x\n", (UINT32)(uintptr_t)blktofree))
 
 	if(blktofree == nullptr)
 	{

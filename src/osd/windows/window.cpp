@@ -1218,7 +1218,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			break;
 
 		case WM_CHAR:
-			window->machine().ui_input().push_char_event(window->m_target, (unicode_char) wparam);
+			window->machine().ui_input().push_char_event(window->m_target, (char32_t) wparam);
 			break;
 
 		case WM_MOUSEWHEEL:

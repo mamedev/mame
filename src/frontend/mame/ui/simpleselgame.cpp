@@ -149,7 +149,7 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 	const game_driver *driver = (const game_driver *)menu_event->itemref;
 
 	// special case for configure inputs
-	if ((FPTR)driver == 1)
+	if ((uintptr_t)driver == 1)
 		menu::stack_push<menu_game_options>(ui(), container());
 	// anything else is a driver
 	else
@@ -311,7 +311,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 						mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// determine the text to render below
-	driver = ((FPTR)selectedref > skip_main_items) ? (const game_driver *)selectedref : nullptr;
+	driver = ((uintptr_t)selectedref > skip_main_items) ? (const game_driver *)selectedref : nullptr;
 	if (driver != nullptr)
 	{
 		const char *gfxstat, *soundstat;

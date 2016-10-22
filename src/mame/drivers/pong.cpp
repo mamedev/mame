@@ -255,7 +255,7 @@ NETLIST_END()
 
 INPUT_CHANGED_MEMBER(pong_state::input_changed)
 {
-	int numpad = (FPTR) (param);
+	int numpad = (uintptr_t) (param);
 
 	switch (numpad)
 	{

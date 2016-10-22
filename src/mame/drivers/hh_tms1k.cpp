@@ -381,7 +381,7 @@ WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
 
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
-	m_power_on = (bool)(FPTR)param;
+	m_power_on = (bool)(uintptr_t)param;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -6857,7 +6857,7 @@ INPUT_CHANGED_MEMBER(phpball_state::flipper_button)
 {
 	// rectangular LEDs under LEDs D,F and E,G are directly connected
 	// to the left and right flipper buttons - output them to lamp90 and 91
-	output().set_lamp_value(90 + (int)(FPTR)param, newval);
+	output().set_lamp_value(90 + (int)(uintptr_t)param, newval);
 }
 
 

@@ -518,7 +518,7 @@ ADDRESS_MAP_END
 {
     if(newval && !oldval)
     {
-        m_keyb.rx = (UINT8)(FPTR)(param) & 0x7f;
+        m_keyb.rx = (UINT8)(uintptr_t)(param) & 0x7f;
         m_pic_m->ir4_w(1);
     }
 

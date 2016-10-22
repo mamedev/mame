@@ -389,7 +389,7 @@ WRITE32_MEMBER(crystal_state::Banksw_w)
 
 TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
 {
-	int which = (int)(FPTR)ptr;
+	int which = (int)(uintptr_t)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
 
 	if (!(m_Timerctrl[which] & 2))
@@ -772,7 +772,7 @@ void crystal_state::machine_start()
 	int i;
 
 	for (i = 0; i < 4; i++)
-		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(FPTR)i);
+		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(uintptr_t)i);
 
 	PatchReset();
 

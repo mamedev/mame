@@ -1075,7 +1075,7 @@ INPUT_CHANGED_MEMBER( px4_state::key_callback )
 		if (delta & (1 << i))
 		{
 			down = (newvalue & (1 << i)) ? 0x10 : 0x00;
-			scancode = (FPTR)param * 32 + i;
+			scancode = (uintptr_t)param * 32 + i;
 
 			// control keys
 			if ((scancode & 0xa0) == 0xa0)

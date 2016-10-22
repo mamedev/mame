@@ -386,7 +386,7 @@ void ui_input_manager::push_mouse_double_click_event(render_target* target, INT3
     push_char_event - pushes a char event
     to the specified render_target
 -------------------------------------------------*/
-void ui_input_manager::push_char_event(render_target* target, unicode_char ch)
+void ui_input_manager::push_char_event(render_target* target, char32_t ch)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_CHAR;

@@ -45,7 +45,7 @@ INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
 {
 	if (newval)
 	{
-		m_gear = (FPTR)param;
+		m_gear = (uintptr_t)param;
 		output().set_value("P1gear", m_gear+1);
 	}
 }
@@ -179,20 +179,20 @@ READ8_MEMBER(firetrk_state::montecar_dip_r)
 
 CUSTOM_INPUT_MEMBER(firetrk_state::steer_dir_r)
 {
-	return m_steer_dir[(FPTR)param];
+	return m_steer_dir[(uintptr_t)param];
 }
 
 
 CUSTOM_INPUT_MEMBER(firetrk_state::steer_flag_r)
 {
-	return m_steer_flag[(FPTR)param];
+	return m_steer_flag[(uintptr_t)param];
 }
 
 
 CUSTOM_INPUT_MEMBER(firetrk_state::skid_r)
 {
 	UINT32 ret;
-	int which = (FPTR)param;
+	int which = (uintptr_t)param;
 
 	if (which != 2)
 		ret = m_skid[which];
@@ -206,7 +206,7 @@ CUSTOM_INPUT_MEMBER(firetrk_state::skid_r)
 CUSTOM_INPUT_MEMBER(firetrk_state::crash_r)
 {
 	UINT32 ret;
-	int which = (FPTR)param;
+	int which = (uintptr_t)param;
 
 	if (which != 2)
 		ret = m_crash[which];
@@ -219,7 +219,7 @@ CUSTOM_INPUT_MEMBER(firetrk_state::crash_r)
 
 CUSTOM_INPUT_MEMBER(firetrk_state::gear_r)
 {
-	return (m_gear == (FPTR)param) ? 1 : 0;
+	return (m_gear == (uintptr_t)param) ? 1 : 0;
 }
 
 

@@ -474,7 +474,7 @@ const char *osd_get_volume_name(int idx)
 //  osd_is_valid_filename_char
 //============================================================
 
-bool osd_is_valid_filename_char(unicode_char uchar)
+bool osd_is_valid_filename_char(char32_t uchar)
 {
 	// The only one that's actually invalid is the slash
 	// The other two are just problematic because they're the escape character and path separator
@@ -494,7 +494,7 @@ bool osd_is_valid_filename_char(unicode_char uchar)
 //  osd_is_valid_filepath_char
 //============================================================
 
-bool osd_is_valid_filepath_char(unicode_char uchar)
+bool osd_is_valid_filepath_char(char32_t uchar)
 {
 	// One could argue that colon should be in here too because it functions as path separator
 	return uchar >= 0x20

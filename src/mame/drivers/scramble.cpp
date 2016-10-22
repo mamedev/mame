@@ -539,7 +539,7 @@ INPUT_PORTS_END
 /* ckongs coinage DIPs are spread across two input ports */
 CUSTOM_INPUT_MEMBER(scramble_state::ckongs_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 

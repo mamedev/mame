@@ -350,7 +350,7 @@ INPUT_CHANGED_MEMBER( digel804_state::mode_change )
 {
 	if (!newval && !m_keyen_state)
 	{
-		switch ((int)(FPTR)param)
+		switch ((int)(uintptr_t)param)
 		{
 			case MODE_OFF:
 				m_key_mode = m_remote_mode = m_sim_mode = 1;

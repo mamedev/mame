@@ -189,7 +189,7 @@ void menu_slot_devices::handle()
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
+		if ((uintptr_t)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 		{
 			mame_options::add_slot_options(machine().options());
 			machine().schedule_hard_reset();

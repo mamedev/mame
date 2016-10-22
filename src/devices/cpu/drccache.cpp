@@ -18,8 +18,8 @@
 //**************************************************************************
 
 // ensure that all memory allocated is aligned to an 8-byte boundary
-#define ALIGN_PTR_UP(p)         ((void *)(((FPTR)(p) + (CACHE_ALIGNMENT - 1)) & ~(CACHE_ALIGNMENT - 1)))
-#define ALIGN_PTR_DOWN(p)       ((void *)((FPTR)(p) & ~(CACHE_ALIGNMENT - 1)))
+#define ALIGN_PTR_UP(p)         ((void *)(((uintptr_t)(p) + (CACHE_ALIGNMENT - 1)) & ~(CACHE_ALIGNMENT - 1)))
+#define ALIGN_PTR_DOWN(p)       ((void *)((uintptr_t)(p) & ~(CACHE_ALIGNMENT - 1)))
 
 
 

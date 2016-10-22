@@ -163,7 +163,7 @@ public:
 					auto len = std::strlen(sdlevent.text.text);
 					while (len)
 					{
-						unicode_char ch;
+						char32_t ch;
 						auto chlen = uchar_from_utf8(&ch, ptr, len);
 						if (0 > chlen)
 						{

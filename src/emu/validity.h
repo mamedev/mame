@@ -61,7 +61,7 @@ protected:
 private:
 	// internal map types
 	typedef std::unordered_map<std::string,const game_driver *> game_driver_map;
-	typedef std::unordered_map<std::string,FPTR> int_map;
+	typedef std::unordered_map<std::string,uintptr_t> int_map;
 
 	// internal helpers
 	const char *ioport_string_from_index(UINT32 index);

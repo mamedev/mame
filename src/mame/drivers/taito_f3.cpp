@@ -45,7 +45,7 @@
 
 CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
 {
-	int num = (FPTR)param;
+	int num = (uintptr_t)param;
 	int data = m_dial[num]->read();
 	return ((data & 0xf)<<12) | ((data & 0xff0)>>4);
 }
@@ -53,7 +53,7 @@ CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
 
 CUSTOM_INPUT_MEMBER(taito_f3_state::f3_coin_r)
 {
-	int num = (FPTR)param;
+	int num = (uintptr_t)param;
 	return m_coin_word[num];
 }
 

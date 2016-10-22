@@ -1299,10 +1299,10 @@ ADDRESS_MAP_END
 CUSTOM_INPUT_MEMBER(vicdual_state::fake_lives_r)
 {
 	/* use the low byte for the bitmask */
-	UINT8 bit_mask = ((FPTR)param) & 0xff;
+	UINT8 bit_mask = ((uintptr_t)param) & 0xff;
 
 	/* and use d8 for the port */
-	int port = ((FPTR)param) >> 8 & 1;
+	int port = ((uintptr_t)param) >> 8 & 1;
 	return (m_fake_lives[port].read_safe(0) & bit_mask) ? 0 : 1;
 }
 
@@ -2106,7 +2106,7 @@ WRITE8_MEMBER(vicdual_state::samurai_protection_w)
 
 CUSTOM_INPUT_MEMBER(vicdual_state::samurai_protection_r)
 {
-	int offset = (FPTR)param;
+	int offset = (uintptr_t)param;
 	UINT32 answer = 0;
 
 	if (m_samurai_protection_data == 0xab)
@@ -2282,7 +2282,7 @@ INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
 {
 	if (newval)
 	{
-		int which = (int)(FPTR)param;
+		int which = (int)(uintptr_t)param;
 		int coinage = m_coinage->read();
 
 		switch (which)

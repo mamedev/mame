@@ -725,7 +725,7 @@ READ8_MEMBER(tispeak_state::k28_read_k)
 
 INPUT_CHANGED_MEMBER(tispeak_state::power_button)
 {
-	int on = (int)(FPTR)param;
+	int on = (int)(uintptr_t)param;
 
 	if (on && !m_power_on)
 	{

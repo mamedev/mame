@@ -907,7 +907,7 @@ CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
 
 CUSTOM_INPUT_MEMBER( cd32_state::cd32_sel_mirror_input )
 {
-	UINT8 bits = m_player_ports[(int)(FPTR)param]->read();
+	UINT8 bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;
 }
 

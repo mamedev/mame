@@ -146,7 +146,7 @@ WRITE8_MEMBER(galaxold_state::_4in1_bank_w)
 CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
 {
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	return (ioport(portnames[m__4in1_bank])->read() & bit_mask) ? 0x01 : 0x00;
 }

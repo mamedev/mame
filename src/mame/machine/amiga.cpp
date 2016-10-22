@@ -396,7 +396,7 @@ UINT16 amiga_state::joy1dat_r()
 
 CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
 {
-	UINT8 bits = m_joy_ports[(int)(FPTR)param].read_safe(0xff);
+	UINT8 bits = m_joy_ports[(int)(uintptr_t)param].read_safe(0xff);
 
 	int up = (bits >> 0) & 1;
 	int down = (bits >> 1) & 1;

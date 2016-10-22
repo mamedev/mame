@@ -467,7 +467,7 @@ void d3d_texture_manager::delete_resources()
 
 UINT32 d3d_texture_manager::texture_compute_hash(const render_texinfo *texture, UINT32 flags)
 {
-	return (FPTR)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
+	return (uintptr_t)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 }
 
 texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, UINT32 flags)

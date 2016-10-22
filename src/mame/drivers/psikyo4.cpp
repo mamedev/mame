@@ -171,7 +171,7 @@ INTERRUPT_GEN_MEMBER(psikyo4_state::psikyosh_interrupt)
 
 CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
 {
-	int player = (FPTR)param;
+	int player = (uintptr_t)param;
 	int ret = 0xff;
 
 	if (m_io_select & 1) ret &= m_keys[player+0]->read();

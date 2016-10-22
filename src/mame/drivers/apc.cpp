@@ -500,7 +500,7 @@ INPUT_CHANGED_MEMBER(apc_state::key_stroke)
 {
 	if(newval && !oldval)
 	{
-		m_keyb.data = (UINT8)(FPTR)(param) & 0xff;
+		m_keyb.data = (UINT8)(uintptr_t)(param) & 0xff;
 		//m_keyb.status &= ~1;
 		machine().device<pic8259_device>("pic8259_master")->ir4_w(1);
 	}

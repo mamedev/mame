@@ -21,7 +21,7 @@ Atari Sprint 4 driver
 
 CUSTOM_INPUT_MEMBER(sprint4_state::get_lever)
 {
-	int n = (FPTR) param;
+	int n = (uintptr_t) param;
 
 	return 4 * m_gear[n] > m_da_latch;
 }
@@ -29,7 +29,7 @@ CUSTOM_INPUT_MEMBER(sprint4_state::get_lever)
 
 CUSTOM_INPUT_MEMBER(sprint4_state::get_wheel)
 {
-	int n = (FPTR) param;
+	int n = (uintptr_t) param;
 
 	return 8 * m_steer_FF1[n] + 8 * m_steer_FF2[n] > m_da_latch;
 }
@@ -37,7 +37,7 @@ CUSTOM_INPUT_MEMBER(sprint4_state::get_wheel)
 
 CUSTOM_INPUT_MEMBER(sprint4_state::get_collision)
 {
-	int n = (FPTR) param;
+	int n = (uintptr_t) param;
 
 	return m_collision[n];
 }

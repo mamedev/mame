@@ -202,7 +202,7 @@ UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind1
 
 CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -218,7 +218,7 @@ CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
 
 CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -238,7 +238,7 @@ CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
 
 CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_payout_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{

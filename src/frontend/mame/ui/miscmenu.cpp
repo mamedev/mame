@@ -112,7 +112,7 @@ void menu_bios_selection::handle()
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
+		if ((uintptr_t)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 			machine().schedule_hard_reset();
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
@@ -569,7 +569,7 @@ void menu_export::handle()
 	const event *menu_event = process(PROCESS_NOIMAGE);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((FPTR)menu_event->itemref)
+		switch ((uintptr_t)menu_event->itemref)
 		{
 			case 1:
 			case 3:
@@ -605,7 +605,7 @@ void menu_export::handle()
 							drvlist.include(driver_list::find(*elem));
 
 						info_xml_creator creator(drvlist);
-						creator.output(pfile, ((FPTR)menu_event->itemref == 1) ? false : true);
+						creator.output(pfile, ((uintptr_t)menu_event->itemref == 1) ? false : true);
 						fclose(pfile);
 						machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
 					}
@@ -665,9 +665,9 @@ void menu_export::handle()
 void menu_export::populate()
 {
 	// add options items
-	item_append(_("Export list in XML format (like -listxml)"), "", 0, (void *)(FPTR)1);
-	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), "", 0, (void *)(FPTR)3);
-	item_append(_("Export list in TXT format (like -listfull)"), "", 0, (void *)(FPTR)2);
+	item_append(_("Export list in XML format (like -listxml)"), "", 0, (void *)(uintptr_t)1);
+	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), "", 0, (void *)(uintptr_t)3);
+	item_append(_("Export list in TXT format (like -listfull)"), "", 0, (void *)(uintptr_t)2);
 	item_append(menu_item_type::SEPARATOR);
 }
 
@@ -709,7 +709,7 @@ void menu_machine_configure::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			switch ((FPTR)menu_event->itemref)
+			switch ((uintptr_t)menu_event->itemref)
 			{
 				case SAVE:
 				{
@@ -776,15 +776,15 @@ void menu_machine_configure::populate()
 	if (!m_bios.empty())
 	{
 		UINT32 arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
-		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(FPTR)BIOS);
+		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(uintptr_t)BIOS);
 	}
 	else
 		item_append(_("This machine has no bios."), "", FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(FPTR)ADVANCED);
-	item_append(_(submenu::video_options[0].description), "", 0, (void *)(FPTR)VIDEO);
-	item_append(_(submenu::control_options[0].description), "", 0, (void *)(FPTR)CONTROLLER);
+	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(uintptr_t)ADVANCED);
+	item_append(_(submenu::video_options[0].description), "", 0, (void *)(uintptr_t)VIDEO);
+	item_append(_(submenu::control_options[0].description), "", 0, (void *)(uintptr_t)CONTROLLER);
 	item_append(menu_item_type::SEPARATOR);
 
 	if (!mame_machine_manager::instance()->favorite().isgame_favorite(m_drv))
@@ -793,7 +793,7 @@ void menu_machine_configure::populate()
 		item_append(_("Remove From Favorites"), "", 0, (void *)DELFAV);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Save machine configuration"), "", 0, (void *)(FPTR)SAVE);
+	item_append(_("Save machine configuration"), "", 0, (void *)(uintptr_t)SAVE);
 	item_append(menu_item_type::SEPARATOR);
 	customtop = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -944,7 +944,7 @@ void menu_plugins_configure::populate()
 		{
 			auto enabled = std::string(curentry.value()) == "1";
 			item_append(curentry.description(), enabled ? _("On") : _("Off"),
-				enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(FPTR)curentry.name());
+				enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)curentry.name());
 		}
 	}
 	item_append(menu_item_type::SEPARATOR);

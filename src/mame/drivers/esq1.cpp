@@ -571,13 +571,13 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
 	if (oldval == 0 && newval == 1)
 	{
-		send_through_panel((UINT8)(FPTR)param);
-		send_through_panel((UINT8)(FPTR)0x00);
+		send_through_panel((UINT8)(uintptr_t)param);
+		send_through_panel((UINT8)(uintptr_t)0x00);
 	}
 	else if (oldval == 1 && newval == 0)
 	{
-		send_through_panel((UINT8)(FPTR)param&0x7f);
-		send_through_panel((UINT8)(FPTR)0x00);
+		send_through_panel((UINT8)(uintptr_t)param&0x7f);
+		send_through_panel((UINT8)(uintptr_t)0x00);
 	}
 }
 
