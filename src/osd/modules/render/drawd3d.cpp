@@ -145,17 +145,26 @@ void renderer_d3d9::toggle_fsfx()
 
 void renderer_d3d9::record()
 {
-	get_shaders()->record_movie();
+	if (m_shaders != nullptr)
+	{
+		m_shaders->record_movie();
+	}
 }
 
 void renderer_d3d9::add_audio_to_recording(const int16_t *buffer, int samples_this_frame)
 {
-	get_shaders()->record_audio(buffer, samples_this_frame);
+	if (m_shaders != nullptr)
+	{
+		m_shaders->record_audio(buffer, samples_this_frame);
+	}
 }
 
 void renderer_d3d9::save()
 {
-	get_shaders()->save_snapshot();
+	if (m_shaders != nullptr)
+	{
+		m_shaders->save_snapshot();
+	}
 }
 
 
