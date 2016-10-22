@@ -341,7 +341,7 @@ osd_file::error osd_file::remove(std::string const &filename)
 
 int osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
 {
-	return FALSE; // no, no way, huh-uh, forget it
+	return false; // no, no way, huh-uh, forget it
 }
 
 

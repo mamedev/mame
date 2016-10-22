@@ -122,7 +122,7 @@ public:
 	void reset()
 	{
 		m_mutex.lock();
-		m_signalled = FALSE;
+		m_signalled = false;
 		m_mutex.unlock();
 	}
 
@@ -144,9 +144,9 @@ public:
 	void set()
 	{
 		m_mutex.lock();
-		if (m_signalled == FALSE)
+		if (m_signalled == false)
 		{
-			m_signalled = TRUE;
+			m_signalled = true;
 			if (m_autoreset)
 				m_cond.notify_one();
 			else

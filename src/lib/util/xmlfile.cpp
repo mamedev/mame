@@ -197,7 +197,7 @@ xml_data_node *xml_string_read(const char *string, xml_parse_options *opts)
 		return nullptr;
 
 	/* parse the data */
-	if (XML_Parse(parse_info.parser, string, length, TRUE) == XML_STATUS_ERROR)
+	if (XML_Parse(parse_info.parser, string, length, 1) == XML_STATUS_ERROR)
 	{
 		if (opts != nullptr && opts->error != nullptr)
 		{
